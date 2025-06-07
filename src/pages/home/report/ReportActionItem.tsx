@@ -11,7 +11,6 @@ import {
     getIndicatedMissingPaymentMethod,
     getOriginalReportID,
     getReimbursementDeQueuedOrCanceledActionMessage,
-    getReportAutomaticallyForwardedMessage,
     getTransactionsWithReceipts,
     isArchivedNonExpenseReportWithID,
     isChatThread,
@@ -37,7 +36,7 @@ function ReportActionItem({action, report, ...props}: PureReportActionItemProps)
     const reportID = report?.reportID;
     // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
     const originalReportID = useMemo(() => getOriginalReportID(reportID, action), [reportID, action]);
-    const [originalReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${originalReportID}`, {canBeMissing: false});
+    const [originalReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${originalReportID}`, {canBeMissing: true});
     const isOriginalReportArchived = useReportIsArchived(originalReportID);
     const [draftMessage] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS_DRAFTS}${originalReportID}`, {
         canBeMissing: true,
@@ -102,7 +101,6 @@ function ReportActionItem({action, report, ...props}: PureReportActionItemProps)
             clearAllRelatedReportActionErrors={clearAllRelatedReportActionErrors}
             dismissTrackExpenseActionableWhisper={dismissTrackExpenseActionableWhisper}
             userBillingFundID={userBillingFundID}
-            reportAutomaticallyForwardedMessage={getReportAutomaticallyForwardedMessage(action as ReportAction<typeof CONST.REPORT.ACTIONS.TYPE.FORWARDED>, reportID)}
         />
     );
 }
