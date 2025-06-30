@@ -1,14 +1,17 @@
 import Onyx from 'react-native-onyx';
+import type {OnyxEntry} from 'react-native-onyx';
+import type {ValueOf} from 'type-fest';
 import type {IOUAction, IOUType} from '@src/CONST';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
-import type {OnyxInputOrEntry, PersonalDetails, Report} from '@src/types/onyx';
+import type {LastPaymentMethod, LastPaymentMethodType, OnyxInputOrEntry, PersonalDetails, Report} from '@src/types/onyx';
 import type {Attendee} from '@src/types/onyx/IOU';
 import type {IOURequestType} from './actions/IOU';
 import {getCurrencyUnit} from './CurrencyUtils';
 import DateUtils from './DateUtils';
 import Navigation from './Navigation/Navigation';
+import Performance from './Performance';
 import {getReportTransactions} from './ReportUtils';
 import {getCurrency, getTagArrayFromName} from './TransactionUtils';
 
@@ -16,6 +19,12 @@ let lastLocationPermissionPrompt: string;
 Onyx.connect({
     key: ONYXKEYS.NVP_LAST_LOCATION_PERMISSION_PROMPT,
     callback: (val) => (lastLocationPermissionPrompt = val ?? ''),
+});
+
+let lastUsedPaymentMethods: OnyxEntry<LastPaymentMethod>;
+Onyx.connect({
+    key: ONYXKEYS.NVP_LAST_PAYMENT_METHOD,
+    callback: (value) => (lastUsedPaymentMethods = value),
 });
 
 function navigateToStartMoneyRequestStep(requestType: IOURequestType, iouType: IOUType, transactionID: string, reportID: string, iouAction?: IOUAction): void {
@@ -34,6 +43,20 @@ function navigateToStartMoneyRequestStep(requestType: IOURequestType, iouType: I
         default:
             Navigation.goBack(ROUTES.MONEY_REQUEST_CREATE_TAB_MANUAL.getRoute(CONST.IOU.ACTION.CREATE, iouType, transactionID, reportID), {compareParams: false});
             break;
+    }
+}
+
+function navigateToParticipantPage(iouType: ValueOf<typeof CONST.IOU.TYPE>, transactionID: string, reportID: string) {
+    Performance.markStart(CONST.TIMING.OPEN_CREATE_EXPENSE_CONTACT);
+    switch (iouType) {
+        case CONST.IOU.TYPE.REQUEST:
+            Navigation.navigate(ROUTES.MONEY_REQUEST_STEP_PARTICIPANTS.getRoute(CONST.IOU.TYPE.SUBMIT, transactionID, reportID));
+            break;
+        case CONST.IOU.TYPE.SEND:
+            Navigation.navigate(ROUTES.MONEY_REQUEST_STEP_PARTICIPANTS.getRoute(CONST.IOU.TYPE.PAY, transactionID, reportID));
+            break;
+        default:
+            Navigation.navigate(ROUTES.MONEY_REQUEST_STEP_PARTICIPANTS.getRoute(iouType, transactionID, reportID));
     }
 }
 
@@ -77,7 +100,7 @@ function updateIOUOwnerAndTotal<TReport extends OnyxInputOrEntry<Report>>(
     currency: string,
     isDeleting = false,
     isUpdating = false,
-    isOnhold = false,
+    isOnHold = false,
 ): TReport {
     // For the update case, we have calculated the diff amount in the calculateDiffAmount function so there is no need to compare currencies here
     if ((currency !== iouReport?.currency && !isUpdating) || !iouReport) {
@@ -93,12 +116,12 @@ function updateIOUOwnerAndTotal<TReport extends OnyxInputOrEntry<Report>>(
 
     if (actorAccountID === iouReport.ownerAccountID) {
         iouReportUpdate.total += isDeleting ? -amount : amount;
-        if (!isOnhold) {
+        if (!isOnHold) {
             iouReportUpdate.unheldTotal += isDeleting ? -amount : amount;
         }
     } else {
         iouReportUpdate.total += isDeleting ? amount : -amount;
-        if (!isOnhold) {
+        if (!isOnHold) {
             iouReportUpdate.unheldTotal += isDeleting ? amount : -amount;
         }
     }
@@ -132,6 +155,7 @@ function isValidMoneyRequestType(iouType: string): boolean {
         CONST.IOU.TYPE.REQUEST,
         CONST.IOU.TYPE.SUBMIT,
         CONST.IOU.TYPE.SPLIT,
+        CONST.IOU.TYPE.SPLIT_EXPENSE,
         CONST.IOU.TYPE.SEND,
         CONST.IOU.TYPE.PAY,
         CONST.IOU.TYPE.TRACK,
@@ -169,8 +193,8 @@ function isMovingTransactionFromTrackExpense(action?: IOUAction) {
     return false;
 }
 
-function shouldUseTransactionDraft(action: IOUAction | undefined) {
-    return action === CONST.IOU.ACTION.CREATE || isMovingTransactionFromTrackExpense(action);
+function shouldUseTransactionDraft(action: IOUAction | undefined, type?: IOUType) {
+    return action === CONST.IOU.ACTION.CREATE || type === CONST.IOU.TYPE.SPLIT_EXPENSE || isMovingTransactionFromTrackExpense(action);
 }
 
 function formatCurrentUserToAttendee(currentUser?: PersonalDetails, reportID?: string) {
@@ -199,6 +223,14 @@ function shouldStartLocationPermissionFlow() {
     );
 }
 
+function getLastUsedPaymentMethod(policyID?: string): LastPaymentMethodType | undefined {
+    if (!policyID) {
+        return;
+    }
+
+    return lastUsedPaymentMethods?.[policyID] as LastPaymentMethodType;
+}
+
 export {
     calculateAmount,
     insertTagIntoTransactionTagsString,
@@ -210,4 +242,6 @@ export {
     updateIOUOwnerAndTotal,
     formatCurrentUserToAttendee,
     shouldStartLocationPermissionFlow,
+    navigateToParticipantPage,
+    getLastUsedPaymentMethod,
 };

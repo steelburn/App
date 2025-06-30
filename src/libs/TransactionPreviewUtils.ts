@@ -11,17 +11,16 @@ import DateUtils from './DateUtils';
 import type {PlatformStackRouteProp} from './Navigation/PlatformStackNavigation/types';
 import type {TransactionDuplicateNavigatorParamList} from './Navigation/types';
 import {getOriginalMessage, getReportAction, isMessageDeleted, isMoneyRequestAction} from './ReportActionsUtils';
-import {isPaidGroupPolicy, isPaidGroupPolicyExpenseReport, isReportApproved, isSettled} from './ReportUtils';
+import {hasActionsWithErrors, hasReportViolations, isPaidGroupPolicy, isPaidGroupPolicyExpenseReport, isReportApproved, isReportOwner, isSettled} from './ReportUtils';
 import type {TransactionDetails} from './ReportUtils';
 import StringUtils from './StringUtils';
 import {
     compareDuplicateTransactionFields,
     getFormattedCreated,
-    getTransaction,
+    getOriginalTransactionWithSplitInfo,
     hasMissingSmartscanFields,
     hasNoticeTypeViolation,
     hasPendingRTERViolation,
-    hasReceipt,
     hasViolation,
     hasWarningTypeViolation,
     isAmountMissing,
@@ -33,7 +32,7 @@ import {
     isOnHold,
     isPending,
     isPerDiemRequest,
-    isReceiptBeingScanned,
+    isScanning,
 } from './TransactionUtils';
 
 const emptyPersonalDetails: OnyxTypes.PersonalDetails = {
@@ -43,7 +42,11 @@ const emptyPersonalDetails: OnyxTypes.PersonalDetails = {
     login: undefined,
 };
 
-function getIOUData(managerID: number, ownerAccountID: number, isIOUReport: boolean, personalDetails: OnyxTypes.PersonalDetailsList | undefined, amount: number) {
+/**
+ * Returns the data for displaying payer and receiver (`from` and `to`) values for given ids and amount.
+ * In IOU transactions we can deduce who is the payer and receiver based on sign (positive/negative) of the amount.
+ */
+function getIOUPayerAndReceiver(managerID: number, ownerAccountID: number, personalDetails: OnyxTypes.PersonalDetailsList | undefined, amount: number) {
     let fromID = ownerAccountID;
     let toID = managerID;
 
@@ -52,12 +55,10 @@ function getIOUData(managerID: number, ownerAccountID: number, isIOUReport: bool
         toID = ownerAccountID;
     }
 
-    return fromID && toID && isIOUReport
-        ? {
-              from: personalDetails ? personalDetails[fromID] : emptyPersonalDetails,
-              to: personalDetails ? personalDetails[toID] : emptyPersonalDetails,
-          }
-        : undefined;
+    return {
+        from: personalDetails ? personalDetails[fromID] : emptyPersonalDetails,
+        to: personalDetails ? personalDetails[toID] : emptyPersonalDetails,
+    };
 }
 
 const getReviewNavigationRoute = (
@@ -109,28 +110,30 @@ type TranslationPathOrText = {
 
 const dotSeparator: TranslationPathOrText = {text: ` ${CONST.DOT_SEPARATOR} `};
 
-const getOriginalTransactionIfBillIsSplit = (transaction: OnyxEntry<OnyxTypes.Transaction>) => {
-    const {originalTransactionID, source, splits} = transaction?.comment ?? {};
-
-    if (splits && splits.length > 0) {
-        return {isBillSplit: true, originalTransaction: getTransaction(originalTransactionID) ?? transaction};
-    }
-
-    if (!originalTransactionID || source !== CONST.IOU.TYPE.SPLIT) {
-        return {isBillSplit: false, originalTransaction: transaction};
-    }
-
-    const originalTransaction = getTransaction(originalTransactionID);
-
-    return {isBillSplit: !!originalTransaction, originalTransaction: originalTransaction ?? transaction};
-};
-
-function getViolationTranslatePath(violations: OnyxTypes.TransactionViolations, hasFieldErrors: boolean, violationMessage: string): TranslationPathOrText {
+function getViolationTranslatePath(violations: OnyxTypes.TransactionViolations, hasFieldErrors: boolean, violationMessage: string, isTransactionOnHold: boolean): TranslationPathOrText {
     const violationsCount = violations?.filter((v) => v.type === CONST.VIOLATION_TYPES.VIOLATION).length ?? 0;
+
+    const hasViolationsAndHold = violationsCount > 0 && isTransactionOnHold;
     const isTooLong = violationsCount > 1 || violationMessage.length > CONST.REPORT_VIOLATIONS.RBR_MESSAGE_MAX_CHARACTERS_FOR_PREVIEW;
     const hasViolationsAndFieldErrors = violationsCount > 0 && hasFieldErrors;
 
-    return isTooLong || hasViolationsAndFieldErrors ? {translationPath: 'violations.reviewRequired'} : {text: violationMessage};
+    return isTooLong || hasViolationsAndHold || hasViolationsAndFieldErrors ? {translationPath: 'violations.reviewRequired'} : {text: violationMessage};
+}
+
+/**
+ * Extracts unique error messages from report actions. If no report or actions are found,
+ * it returns an empty array. It identifies the latest error in each action and filters out duplicates to
+ * ensure only unique error messages are returned.
+ */
+function getUniqueActionErrors(reportActions: OnyxTypes.ReportActions) {
+    const reportErrors = Object.values(reportActions).map((reportAction) => {
+        const errors = reportAction.errors ?? {};
+        const key = Object.keys(errors).sort().reverse().at(0) ?? '';
+        const error = errors[key];
+        return typeof error === 'string' ? error : '';
+    });
+
+    return [...new Set(reportErrors)].filter((err) => err.length);
 }
 
 function getTransactionPreviewTextAndTranslationPaths({
@@ -142,6 +145,7 @@ function getTransactionPreviewTextAndTranslationPaths({
     isBillSplit,
     shouldShowRBR,
     violationMessage,
+    reportActions,
 }: {
     iouReport: OnyxEntry<OnyxTypes.Report>;
     transaction: OnyxEntry<OnyxTypes.Transaction>;
@@ -151,6 +155,7 @@ function getTransactionPreviewTextAndTranslationPaths({
     isBillSplit: boolean;
     shouldShowRBR: boolean;
     violationMessage?: string;
+    reportActions?: OnyxTypes.ReportActions;
 }) {
     const isFetchingWaypoints = isFetchingWaypointsFromServer(transaction);
     const isTransactionOnHold = isOnHold(transaction);
@@ -162,9 +167,10 @@ function getTransactionPreviewTextAndTranslationPaths({
     // We don't use isOnHold because it's true for duplicated transaction too and we only want to show hold message if the transaction is truly on hold
     const shouldShowHoldMessage = !(isMoneyRequestSettled && !isSettlementOrApprovalPartial) && !!transaction?.comment?.hold;
     const showCashOrCard: TranslationPathOrText = {translationPath: isTransactionMadeWithCard ? 'iou.card' : 'iou.cash'};
-    const isScanning = hasReceipt(transaction) && isReceiptBeingScanned(transaction);
+    const isTransactionScanning = isScanning(transaction);
     const hasFieldErrors = hasMissingSmartscanFields(transaction);
     const hasViolationsOfTypeNotice = hasNoticeTypeViolation(transaction?.transactionID, violations, true) && isPaidGroupPolicy(iouReport);
+    const hasActionWithErrors = hasActionsWithErrors(iouReport?.reportID);
 
     const {amount: requestAmount, currency: requestCurrency} = transactionDetails;
 
@@ -178,8 +184,9 @@ function getTransactionPreviewTextAndTranslationPaths({
         RBRMessage = {translationPath: 'iou.expenseWasPutOnHold'};
     }
 
-    if (violationMessage && RBRMessage === undefined) {
-        RBRMessage = getViolationTranslatePath(violations, hasFieldErrors, violationMessage);
+    const path = getViolationTranslatePath(violations, hasFieldErrors, violationMessage ?? '', isTransactionOnHold);
+    if (path.translationPath === 'violations.reviewRequired' || (RBRMessage === undefined && violationMessage)) {
+        RBRMessage = path;
     }
 
     if (hasFieldErrors && RBRMessage === undefined) {
@@ -194,6 +201,11 @@ function getTransactionPreviewTextAndTranslationPaths({
         }
     }
 
+    if (RBRMessage === undefined && hasActionWithErrors && !!reportActions) {
+        const actionsWithErrors = getUniqueActionErrors(reportActions);
+        RBRMessage = actionsWithErrors.length > 1 ? {translationPath: 'violations.reviewRequired'} : {text: actionsWithErrors.at(0)};
+    }
+
     RBRMessage ??= {text: ''};
 
     let previewHeaderText: TranslationPathOrText[] = [showCashOrCard];
@@ -202,7 +214,7 @@ function getTransactionPreviewTextAndTranslationPaths({
         previewHeaderText = [{translationPath: 'common.distance'}];
     } else if (isPerDiemRequest(transaction)) {
         previewHeaderText = [{translationPath: 'common.perDiem'}];
-    } else if (isScanning) {
+    } else if (isTransactionScanning) {
         previewHeaderText = [{translationPath: 'common.receipt'}];
     } else if (isBillSplit) {
         previewHeaderText = [{translationPath: 'iou.split'}];
@@ -241,13 +253,13 @@ function getTransactionPreviewTextAndTranslationPaths({
         }
     }
 
-    const amount = isBillSplit ? getOriginalTransactionIfBillIsSplit(transaction).originalTransaction?.amount : requestAmount;
-    let displayAmountText: TranslationPathOrText = isScanning ? {translationPath: 'iou.receiptStatusTitle'} : {text: convertToDisplayString(amount, requestCurrency)};
+    const amount = isBillSplit ? getOriginalTransactionWithSplitInfo(transaction).originalTransaction?.amount : requestAmount;
+    let displayAmountText: TranslationPathOrText = isTransactionScanning ? {translationPath: 'iou.receiptStatusTitle'} : {text: convertToDisplayString(amount, requestCurrency)};
     if (isFetchingWaypoints && !requestAmount) {
         displayAmountText = {translationPath: 'iou.fieldPending'};
     }
 
-    const iouOriginalMessage: OnyxEntry<OnyxTypes.OriginalMessageIOU> = isMoneyRequestAction(action) ? getOriginalMessage(action) ?? undefined : undefined;
+    const iouOriginalMessage: OnyxEntry<OnyxTypes.OriginalMessageIOU> = isMoneyRequestAction(action) ? (getOriginalMessage(action) ?? undefined) : undefined;
     const displayDeleteAmountText: TranslationPathOrText = {text: convertToDisplayString(iouOriginalMessage?.amount, iouOriginalMessage?.currency)};
 
     return {
@@ -279,8 +291,6 @@ function createTransactionPreviewConditionals({
 }) {
     const {amount: requestAmount, comment: requestComment, merchant, tag, category} = transactionDetails;
 
-    const isScanning = hasReceipt(transaction) && isReceiptBeingScanned(transaction);
-
     const requestMerchant = truncate(merchant, {length: CONST.REQUEST_PREVIEW.MAX_LENGTH});
     const description = truncate(StringUtils.lineBreaksToSpaces(requestComment), {length: CONST.REQUEST_PREVIEW.MAX_LENGTH});
 
@@ -299,12 +309,17 @@ function createTransactionPreviewConditionals({
 
     const shouldShowSkeleton = isEmptyObject(transaction) && !isMessageDeleted(action) && action?.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE;
     const shouldShowTag = !!tag && isReportAPolicyExpenseChat;
-    const shouldShowCategory = !!category && isReportAPolicyExpenseChat;
+
+    const emptyCategories = CONST.SEARCH.CATEGORY_EMPTY_VALUE.split(',');
+    const categoryForDisplay = emptyCategories.includes(category ?? '') ? '' : category;
+
+    const shouldShowCategory = !!categoryForDisplay && isReportAPolicyExpenseChat;
 
     // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
     const hasAnyViolations = hasViolationsOfTypeNotice || hasWarningTypeViolation(transaction?.transactionID, violations, true) || hasViolation(transaction, violations, true);
     const hasErrorOrOnHold = hasFieldErrors || (!isFullySettled && !isFullyApproved && isTransactionOnHold);
-    const shouldShowRBR = hasAnyViolations || hasErrorOrOnHold;
+    const hasReportViolationsOrActionErrors = (isReportOwner(iouReport) && hasReportViolations(iouReport?.reportID)) || hasActionsWithErrors(iouReport?.reportID);
+    const shouldShowRBR = hasAnyViolations || hasErrorOrOnHold || hasReportViolationsOrActionErrors;
 
     // When there are no settled transactions in duplicates, show the "Keep this one" button
     const shouldShowKeepButton = areThereDuplicates;
@@ -321,7 +336,7 @@ function createTransactionPreviewConditionals({
         requestMerchant !== CONST.TRANSACTION.PARTIAL_TRANSACTION_MERCHANT &&
         requestMerchant !== CONST.TRANSACTION.DEFAULT_MERCHANT &&
         !(isFetchingWaypoints && !requestAmount);
-    const shouldShowDescription = !!description && !shouldShowMerchant && !isScanning;
+    const shouldShowDescription = !!description && !shouldShowMerchant && !isScanning(transaction);
 
     return {
         shouldShowSkeleton,
@@ -337,10 +352,10 @@ function createTransactionPreviewConditionals({
 
 export {
     getReviewNavigationRoute,
-    getIOUData,
+    getIOUPayerAndReceiver,
     getTransactionPreviewTextAndTranslationPaths,
     createTransactionPreviewConditionals,
-    getOriginalTransactionIfBillIsSplit,
     getViolationTranslatePath,
+    getUniqueActionErrors,
 };
 export type {TranslationPathOrText};

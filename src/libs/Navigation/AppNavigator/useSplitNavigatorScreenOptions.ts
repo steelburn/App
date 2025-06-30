@@ -36,10 +36,11 @@ const useSplitNavigatorScreenOptions = () => {
                 cardStyleInterpolator: (props: StackCardInterpolationProps) => modalCardStyleInterpolator({props}),
                 cardStyle: {
                     ...StyleUtils.getNavigationModalCardStyle(),
-                    width: shouldUseNarrowLayout ? '100%' : variables.sideBarWithLHBWidth,
+                    width: shouldUseNarrowLayout ? '100%' : variables.sideBarWithLHBWidth + variables.navigationTabBarSize,
 
                     // We need to shift the sidebar to not be covered by the StackNavigator so it can be clickable.
-                    marginLeft: shouldUseNarrowLayout ? 0 : -variables.sideBarWithLHBWidth,
+                    marginLeft: shouldUseNarrowLayout ? 0 : -(variables.sideBarWithLHBWidth + variables.navigationTabBarSize),
+                    paddingLeft: shouldUseNarrowLayout ? 0 : variables.navigationTabBarSize,
                     ...(shouldUseNarrowLayout ? {} : themeStyles.borderRight),
                 },
             },
@@ -50,7 +51,7 @@ const useSplitNavigatorScreenOptions = () => {
             ...hideKeyboardOnSwipe,
             headerShown: false,
             title: CONFIG.SITE_TITLE,
-            animation: shouldUseNarrowLayout ? undefined : Animations.NONE,
+            animation: shouldUseNarrowLayout ? Animations.SLIDE_FROM_RIGHT : Animations.NONE,
             animationTypeForReplace: 'pop',
             web: {
                 cardStyleInterpolator: (props: StackCardInterpolationProps) => modalCardStyleInterpolator({props, isFullScreenModal: true, shouldAnimateSidePanel: true}),

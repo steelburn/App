@@ -1,113 +1,111 @@
 ---
-title: billing-and-subscriptions.md
+title: Billing and Subscriptions
 description: Understand how Collect and Control plans are billed in Expensify, including pricing tiers, eligibility, and how to transfer billing ownership.
-keywords: [billing, subscription, pricing, collect plan, control plan, expensify card, billing owner, workspace billing, transfer billing]
+keywords: [New Expensify, subscription, pricing, collect plan, control plan, transfer billing]
 ---
 <div id="new-expensify" markdown="1">
 
-Here’s everything you need to know about how Expensify bills for Collect and Control plans. Learn how pricing works, who gets billed, and how to transfer billing ownership.
+Expensify offers two plans: **Collect** and **Control**:
+- **Collect** is ideal for small teams that need a simple way to track receipts and get reimbursed.  
+- **Control** is built for growing businesses that want more control over spending, smoother approvals, and automated workflows.  
 
-# Billing and subscriptions
+For a full breakdown, visit the [Expensify pricing page](https://www.expensify.com/pricing).
 
-Expensify has two plans: Collect and Control.
+---
 
-Collect is perfect for small teams that need an easy way to track receipts and get reimbursed, while Control is built for growing businesses that want more control over spending, smoother approvals, and smarter policy automation. For a full breakdown of features across plans, visit [the Expensify pricing page](https://www.expensify.com/pricing).
+# Collect Plan
 
-## Collect plan
+## 💵 Pricing
 
-### 💵 Pricing
+- $5 per **unique member** per month
+- Fully month-to-month — no annual contracts
 
-- $5 per **unique member** per month  
-- Fully month-to-month (no annual contracts)
-
-### 👤 Who gets billed
+## 👤 Who gets billed
 
 - Every **unique member** added to a workspace, regardless of activity
 
-### 💳 Expensify Card not required
+## 💳 Expensify Card not required
 
-- You do **not** need to use the Expensify Card to access this pricing  
-- However, 1% cash back still applies if you do use it
+- The Expensify Card is optional, but using it earns **1% cash back** on US purchases
 
-### 📅 Eligibility
+## 📅 Eligibility
 
 - Applies to new Collect customers whose **first workspace** was created on or after **April 1, 2025**
 
-### 🌍 Localized pricing
+## 🌍 Localized pricing
 
-- Equivalent pricing available in **GBP**, **AUD**, and **NZD**
+- Pricing available in **GBP**, **AUD**, and **NZD**
 
-### 🔄 Flexible scaling
+## 🔄 Flexible scaling
 
-- Add or remove members anytime — your bill automatically adjusts each month
+- Add or remove members anytime — your bill automatically adjusts monthly
 
-### 🧾 Receipts
+## 🧾 Receipts
 
-- Receipts show: `X Collect members @ $5.00`  
-- View receipts under `Settings > Account > Subscription > Billing History`
+- Your billing receipts show: `X Collect members @ $5.00`
+- View them in **Workspaces > Subscription**
 
 ---
 
-## Control plan
+# Control Plan
 
-### 💸 Best way to save
+## 💸 Best Way to Save
 
-- Combine an **annual subscription** with the **Expensify Visa® Commercial Card**  
-- Price: **$9 per active member/month**
+- Pair an **Annual Subscription** with the **Expensify Visa® Commercial Card**
+- Pricing: **$9 per active member/month**
 
-**To qualify:**  
-Use the Expensify Card for **50% or more** of your total settled **US spend** for the month
+**To qualify:** Use the Expensify Card for **50% or more** of your total settled **US spend** in the month
 
-**Bonus:**  
-Earn **1%–2% cash back**  
-- 1% for all US purchases  
-- 2% if monthly spend reaches **$250,000+**  
-- Cash back is applied to your bill first, then to your bank
+**Bonus:**
+- Earn up to **2% cash back**
+  - 1% for all US purchases
+  - 2% if monthly spend reaches **$250,000+**
+- Cash back is applied to your Expensify bill first, then to your bank account
 
 👉 Use the [savings calculator](https://use.expensify.com/resource-center/tools/savings-calculator) to estimate your monthly savings.
 
-### 📅 Annual subscription only
+## 📅 Annual Subscription
 
-- Without card usage, pricing is **$18 per active member/month**  
-- Add users anytime (extends your term)  
-- You can only reduce users after your current term ends  
-- Extra users above your committed quantity are billed at **$36/month**
+- Without card usage: **$18 per active member/month**
+- Add users anytime (this extends your commitment term)
+- Reduce users only after your current term ends
+- Extra users over your committed amount: **$36/month**
 
-### 🔁 Pay-per-use (no commitment)
+## 🔁 Pay-per-use (No Commitment)
 
-- Price: **$36 per active member/month**  
-- This option allows flexibility without a long-term commitment
+- Price: **$36 per active member/month**
+- Best for flexible teams with fluctuating membership
 
-### 👤 Who gets billed
+## 👤 Who Gets Billed
 
-- Every **active member** (anyone who creates, submits, approves, reimburses, or exports reports during the month)  
+- Every **active member** (anyone who creates, submits, approves, reimburses, or exports reports)
 - Includes Copilots and automated Concierge actions
 
-### 💳 Expensify Card access
+## 💳 Expensify Card Access
 
-- Required for discounted pricing  
-- Cashback still applies even if discounted rate isn’t reached
+- Required for discounted pricing
+- Cash back applies even if the discount threshold isn't met
 
-### 🌍 Localized pricing
+## 🌍 Localized Pricing
 
-- Equivalent pricing available in **GBP**, **AUD**, and **NZD**
+- Available in **EUR**, **GBP**, **AUD**, and **NZD**
 
-### 🧾 Receipts
+## 🧾 Receipts
 
-- View billing receipts at `Settings > Account > Subscription > Billing History`  
-- We recommend having **one billing owner** per workspace
+- View billing receipts under **Workspaces > Subscription**
+- Each workspace can only have **one billing owner**
 
 ---
 
-## Transfer billing ownership
+# Transfer Billing Ownership
 
-To change the billing owner of a workspace:
+To transfer billing ownership of a workspace:
 
-1. Ensure the new billing owner is a **Workspace Admin**  
-2. Go to: `Settings > Workspaces > [Workspace Name] > Members`  
-3. Click the name of the **current billing owner**  
-4. Select **Transfer Ownership**  
-5. The new owner adds a payment card and will be billed starting the 1st of the next month
+1. Make sure the new billing owner is a **Workspace Admin**
+2. Use the **left-hand navigation bar (LHB)** to go to: **Workspaces > [Workspace Name] > Members**
+3. Click the current billing owner’s name
+4. Select **Transfer Ownership**
+5. The new owner will need to add a payment card and will be billed starting on the 1st of the next month
 
 ---
 
@@ -115,6 +113,6 @@ To change the billing owner of a workspace:
 
 ## Why am I being charged more than $5 per user for a Collect plan?
 
-The Collect plan pricing changed in **April 2025**. If your first workspace was created **before April 1, 2025**, your billing is based on the **previous pricing structure**. Reach out to **Concierge or your Account Manager** in chat if you need help understanding your charges.
+If your first workspace was created **before April 1, 2025**, your billing follows our previous pricing structure. If you need help understanding your charges, reach out to **Concierge** or your **Account Manager** via chat.
 
 </div>

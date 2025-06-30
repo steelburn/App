@@ -21,6 +21,7 @@ import useStyleUtils from '@hooks/useStyleUtils';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import DateUtils from '@libs/DateUtils';
+import focusAfterModalClose from '@libs/focusAfterModalClose';
 import Navigation from '@libs/Navigation/Navigation';
 import {clearCustomStatus, clearDraftCustomStatus, updateCustomStatus, updateDraftCustomStatus} from '@userActions/User';
 import CONST from '@src/CONST';
@@ -36,10 +37,11 @@ function StatusPage() {
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
     const {translate} = useLocalize();
-    const [draftStatus] = useOnyx(ONYXKEYS.CUSTOM_STATUS_DRAFT);
+    const [draftStatus] = useOnyx(ONYXKEYS.CUSTOM_STATUS_DRAFT, {canBeMissing: true});
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const formRef = useRef<FormRef>(null);
     const [brickRoadIndicator, setBrickRoadIndicator] = useState<ValueOf<typeof CONST.BRICK_ROAD_INDICATOR_STATUS>>();
+
     const currentUserEmojiCode = currentUserPersonalDetails?.status?.emojiCode ?? '';
     const currentUserStatusText = currentUserPersonalDetails?.status?.text ?? '';
     const currentUserClearAfter = currentUserPersonalDetails?.status?.clearAfter ?? '';
@@ -197,9 +199,7 @@ function StatusPage() {
                             role={CONST.ROLE.PRESENTATION}
                             defaultValue={defaultEmoji}
                             style={styles.mb3}
-                            onModalHide={() => {
-                                inputRef.current?.focus();
-                            }}
+                            onModalHide={() => focusAfterModalClose(inputRef.current)}
                             // eslint-disable-next-line @typescript-eslint/no-unused-vars
                             onInputChange={(emoji: string): void => {}}
                         />

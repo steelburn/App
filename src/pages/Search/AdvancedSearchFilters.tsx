@@ -9,8 +9,10 @@ import type {LocaleContextProps} from '@components/LocaleContextProvider';
 import MenuItemWithTopDescription from '@components/MenuItemWithTopDescription';
 import {usePersonalDetails} from '@components/OnyxProvider';
 import ScrollView from '@components/ScrollView';
-import type {SearchDateFilterKeys, SearchFilterKey} from '@components/Search/types';
+import type {SearchDateFilterKeys, SearchFilterKey, SearchGroupBy} from '@components/Search/types';
 import SpacerView from '@components/SpacerView';
+import Text from '@components/Text';
+import useEnvironment from '@hooks/useEnvironment';
 import useLocalize from '@hooks/useLocalize';
 import useSingleExecution from '@hooks/useSingleExecution';
 import useThemeStyles from '@hooks/useThemeStyles';
@@ -26,18 +28,45 @@ import Navigation from '@libs/Navigation/Navigation';
 import {createDisplayName} from '@libs/PersonalDetailsUtils';
 import {getAllTaxRates, getCleanedTagName, getTagNamesFromTagsLists, isPolicyFeatureEnabled} from '@libs/PolicyUtils';
 import {getReportName} from '@libs/ReportUtils';
-import {buildCannedSearchQuery, buildQueryStringFromFilterFormValues, buildSearchQueryJSON, isCannedSearchQuery} from '@libs/SearchQueryUtils';
-import {getExpenseTypeTranslationKey} from '@libs/SearchUIUtils';
+import {buildCannedSearchQuery, buildQueryStringFromFilterFormValues, buildSearchQueryJSON, isCannedSearchQuery, isSearchDatePreset, sortOptionsWithEmptyValue} from '@libs/SearchQueryUtils';
+import {getExpenseTypeTranslationKey, getStatusOptions} from '@libs/SearchUIUtils';
 import CONST from '@src/CONST';
+import type {TranslationPaths} from '@src/languages/types';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type {SearchAdvancedFiltersForm} from '@src/types/form';
 import {DATE_FILTER_KEYS} from '@src/types/form/SearchAdvancedFiltersForm';
 import type {CardList, PersonalDetailsList, Policy, PolicyTagLists, Report, WorkspaceCardsList} from '@src/types/onyx';
 import type {PolicyFeatureName} from '@src/types/onyx/Policy';
+import type {SearchDataTypes} from '@src/types/onyx/SearchResults';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
 
+type SectionType = {
+    titleTranslationKey: TranslationPaths;
+    items: Array<{
+        key: SearchFilterKey;
+        title: string | undefined;
+        description: string;
+        onPress: () => void;
+    }>;
+};
+
 const baseFilterConfig = {
+    type: {
+        getTitle: getFilterDisplayTitle,
+        description: 'common.type' as const,
+        route: ROUTES.SEARCH_ADVANCED_FILTERS_TYPE,
+    },
+    groupBy: {
+        getTitle: getFilterDisplayTitle,
+        description: 'search.groupBy' as const,
+        route: ROUTES.SEARCH_ADVANCED_FILTERS_GROUP_BY,
+    },
+    status: {
+        getTitle: getStatusFilterDisplayTitle,
+        description: 'common.status' as const,
+        route: ROUTES.SEARCH_ADVANCED_FILTERS_STATUS,
+    },
     date: {
         getTitle: getFilterDisplayTitle,
         description: 'common.date' as const,
@@ -148,11 +177,6 @@ const baseFilterConfig = {
         description: 'common.assignee' as const,
         route: ROUTES.SEARCH_ADVANCED_FILTERS_ASSIGNEE,
     },
-    createdBy: {
-        getTitle: getFilterParticipantDisplayTitle,
-        description: 'common.createdBy' as const,
-        route: ROUTES.SEARCH_ADVANCED_FILTERS_CREATED_BY,
-    },
     reimbursable: {
         getTitle: getFilterDisplayTitle,
         description: 'common.reimbursable' as const,
@@ -168,99 +192,6 @@ const baseFilterConfig = {
         description: 'workspace.common.workspace' as const,
         route: ROUTES.SEARCH_ADVANCED_FILTERS_WORKSPACE,
     },
-};
-
-/**
- * typeFiltersKeys is stored as an object keyed by the different search types.
- * Each value is then an array of arrays where each inner array is a separate section in the UI.
- */
-const typeFiltersKeys: Record<string, Array<Array<ValueOf<typeof CONST.SEARCH.SYNTAX_FILTER_KEYS>>>> = {
-    [CONST.SEARCH.DATA_TYPES.EXPENSE]: [
-        [CONST.SEARCH.SYNTAX_FILTER_KEYS.KEYWORD, CONST.SEARCH.SYNTAX_FILTER_KEYS.FROM, CONST.SEARCH.SYNTAX_FILTER_KEYS.TO, CONST.SEARCH.SYNTAX_FILTER_KEYS.POLICY_ID],
-        [
-            CONST.SEARCH.SYNTAX_FILTER_KEYS.EXPENSE_TYPE,
-            CONST.SEARCH.SYNTAX_FILTER_KEYS.MERCHANT,
-            CONST.SEARCH.SYNTAX_FILTER_KEYS.DATE,
-            CONST.SEARCH.SYNTAX_FILTER_KEYS.AMOUNT,
-            CONST.SEARCH.SYNTAX_FILTER_KEYS.CURRENCY,
-            CONST.SEARCH.SYNTAX_FILTER_KEYS.CATEGORY,
-            CONST.SEARCH.SYNTAX_FILTER_KEYS.TAG,
-            CONST.SEARCH.SYNTAX_FILTER_KEYS.DESCRIPTION,
-            CONST.SEARCH.SYNTAX_FILTER_KEYS.TAX_RATE,
-            CONST.SEARCH.SYNTAX_FILTER_KEYS.REIMBURSABLE,
-            CONST.SEARCH.SYNTAX_FILTER_KEYS.BILLABLE,
-        ],
-        [CONST.SEARCH.SYNTAX_FILTER_KEYS.CARD_ID, CONST.SEARCH.SYNTAX_FILTER_KEYS.POSTED],
-        [
-            CONST.SEARCH.SYNTAX_FILTER_KEYS.REPORT_ID,
-            CONST.SEARCH.SYNTAX_FILTER_KEYS.SUBMITTED,
-            CONST.SEARCH.SYNTAX_FILTER_KEYS.APPROVED,
-            CONST.SEARCH.SYNTAX_FILTER_KEYS.PAID,
-            CONST.SEARCH.SYNTAX_FILTER_KEYS.EXPORTED,
-        ],
-    ],
-    [CONST.SEARCH.DATA_TYPES.INVOICE]: [
-        [CONST.SEARCH.SYNTAX_FILTER_KEYS.KEYWORD, CONST.SEARCH.SYNTAX_FILTER_KEYS.FROM, CONST.SEARCH.SYNTAX_FILTER_KEYS.TO, CONST.SEARCH.SYNTAX_FILTER_KEYS.POLICY_ID],
-        [
-            CONST.SEARCH.SYNTAX_FILTER_KEYS.MERCHANT,
-            CONST.SEARCH.SYNTAX_FILTER_KEYS.DATE,
-            CONST.SEARCH.SYNTAX_FILTER_KEYS.AMOUNT,
-            CONST.SEARCH.SYNTAX_FILTER_KEYS.CURRENCY,
-            CONST.SEARCH.SYNTAX_FILTER_KEYS.CATEGORY,
-            CONST.SEARCH.SYNTAX_FILTER_KEYS.TAG,
-            CONST.SEARCH.SYNTAX_FILTER_KEYS.DESCRIPTION,
-            CONST.SEARCH.SYNTAX_FILTER_KEYS.TAX_RATE,
-        ],
-        [CONST.SEARCH.SYNTAX_FILTER_KEYS.CARD_ID, CONST.SEARCH.SYNTAX_FILTER_KEYS.POSTED],
-        [
-            CONST.SEARCH.SYNTAX_FILTER_KEYS.REPORT_ID,
-            CONST.SEARCH.SYNTAX_FILTER_KEYS.SUBMITTED,
-            CONST.SEARCH.SYNTAX_FILTER_KEYS.APPROVED,
-            CONST.SEARCH.SYNTAX_FILTER_KEYS.PAID,
-            CONST.SEARCH.SYNTAX_FILTER_KEYS.EXPORTED,
-        ],
-    ],
-    [CONST.SEARCH.DATA_TYPES.TRIP]: [
-        [CONST.SEARCH.SYNTAX_FILTER_KEYS.KEYWORD, CONST.SEARCH.SYNTAX_FILTER_KEYS.FROM, CONST.SEARCH.SYNTAX_FILTER_KEYS.TO, CONST.SEARCH.SYNTAX_FILTER_KEYS.POLICY_ID],
-        [
-            CONST.SEARCH.SYNTAX_FILTER_KEYS.MERCHANT,
-            CONST.SEARCH.SYNTAX_FILTER_KEYS.DATE,
-            CONST.SEARCH.SYNTAX_FILTER_KEYS.AMOUNT,
-            CONST.SEARCH.SYNTAX_FILTER_KEYS.CURRENCY,
-            CONST.SEARCH.SYNTAX_FILTER_KEYS.CATEGORY,
-            CONST.SEARCH.SYNTAX_FILTER_KEYS.TAG,
-            CONST.SEARCH.SYNTAX_FILTER_KEYS.DESCRIPTION,
-            CONST.SEARCH.SYNTAX_FILTER_KEYS.TAX_RATE,
-        ],
-        [CONST.SEARCH.SYNTAX_FILTER_KEYS.CARD_ID, CONST.SEARCH.SYNTAX_FILTER_KEYS.POSTED],
-        [
-            CONST.SEARCH.SYNTAX_FILTER_KEYS.REPORT_ID,
-            CONST.SEARCH.SYNTAX_FILTER_KEYS.SUBMITTED,
-            CONST.SEARCH.SYNTAX_FILTER_KEYS.APPROVED,
-            CONST.SEARCH.SYNTAX_FILTER_KEYS.PAID,
-            CONST.SEARCH.SYNTAX_FILTER_KEYS.EXPORTED,
-        ],
-    ],
-    [CONST.SEARCH.DATA_TYPES.CHAT]: [
-        [
-            CONST.SEARCH.SYNTAX_FILTER_KEYS.KEYWORD,
-            CONST.SEARCH.SYNTAX_FILTER_KEYS.FROM,
-            CONST.SEARCH.SYNTAX_FILTER_KEYS.TO,
-            CONST.SEARCH.SYNTAX_FILTER_KEYS.IN,
-            CONST.SEARCH.SYNTAX_FILTER_KEYS.POLICY_ID,
-        ],
-        [CONST.SEARCH.SYNTAX_FILTER_KEYS.DATE],
-    ],
-    [CONST.SEARCH.DATA_TYPES.TASK]: [
-        [
-            CONST.SEARCH.SYNTAX_FILTER_KEYS.TITLE,
-            CONST.SEARCH.SYNTAX_FILTER_KEYS.DESCRIPTION,
-            CONST.SEARCH.SYNTAX_FILTER_KEYS.IN,
-            CONST.SEARCH.SYNTAX_FILTER_KEYS.ASSIGNEE,
-            CONST.SEARCH.SYNTAX_FILTER_KEYS.CREATED_BY,
-        ],
-        [CONST.SEARCH.SYNTAX_FILTER_KEYS.DATE],
-    ],
 };
 
 function getFilterWorkspaceDisplayTitle(filters: SearchAdvancedFiltersForm, policies: WorkspaceListItem[]) {
@@ -314,39 +245,33 @@ function getFilterParticipantDisplayTitle(accountIDs: string[], personalDetails:
         .join(', ');
 }
 
-const sortOptionsWithEmptyValue = (a: string, b: string) => {
-    // Always show `No category` and `No tag` as the first option
-    if (a === CONST.SEARCH.EMPTY_VALUE) {
-        return -1;
-    }
-    if (b === CONST.SEARCH.EMPTY_VALUE) {
-        return 1;
-    }
-    return localeCompare(a, b);
-};
-
 function getFilterDisplayTitle(filters: Partial<SearchAdvancedFiltersForm>, filterKey: SearchFilterKey, translate: LocaleContextProps['translate']) {
     if (DATE_FILTER_KEYS.includes(filterKey as SearchDateFilterKeys)) {
         // the value of date filter is a combination of dateBefore + dateAfter values
         const keyBefore = `${filterKey}${CONST.SEARCH.DATE_MODIFIERS.BEFORE}` as `${SearchDateFilterKeys}${typeof CONST.SEARCH.DATE_MODIFIERS.BEFORE}`;
         const keyAfter = `${filterKey}${CONST.SEARCH.DATE_MODIFIERS.AFTER}` as `${SearchDateFilterKeys}${typeof CONST.SEARCH.DATE_MODIFIERS.AFTER}`;
+        const keyOn = `${filterKey}${CONST.SEARCH.DATE_MODIFIERS.ON}` as `${SearchDateFilterKeys}${typeof CONST.SEARCH.DATE_MODIFIERS.ON}`;
         const dateBefore = filters[keyBefore];
         const dateAfter = filters[keyAfter];
-        let dateValue = '';
+        const dateOn = filters[keyOn];
+        const dateValue = [];
+
         if (dateBefore) {
-            dateValue = translate('search.filters.date.before', {date: dateBefore});
-        }
-        if (dateBefore && dateAfter) {
-            dateValue += ', ';
-        }
-        if (dateAfter) {
-            dateValue += translate('search.filters.date.after', {date: dateAfter});
+            dateValue.push(translate('search.filters.date.before', {date: dateBefore}));
         }
 
-        return dateValue;
+        if (dateOn) {
+            dateValue.push(isSearchDatePreset(dateOn) ? translate(`search.filters.date.presets.${dateOn}`) : translate('search.filters.date.on', {date: dateOn}));
+        }
+
+        if (dateAfter) {
+            dateValue.push(translate('search.filters.date.after', {date: dateAfter}));
+        }
+
+        return dateValue.join(', ');
     }
 
-    const nonDateFilterKey = filterKey as Exclude<SearchFilterKey, SearchDateFilterKeys | typeof CONST.SEARCH.SYNTAX_ROOT_KEYS.GROUP_BY>;
+    const nonDateFilterKey = filterKey as Exclude<SearchFilterKey, SearchDateFilterKeys>;
 
     if (nonDateFilterKey === CONST.SEARCH.SYNTAX_FILTER_KEYS.AMOUNT) {
         const {lessThan, greaterThan} = filters;
@@ -375,7 +300,7 @@ function getFilterDisplayTitle(filters: Partial<SearchAdvancedFiltersForm>, filt
         const filterArray = filters[nonDateFilterKey] ?? [];
         return filterArray
             .sort(sortOptionsWithEmptyValue)
-            .map((value) => (value === CONST.SEARCH.EMPTY_VALUE ? translate('search.noCategory') : value))
+            .map((value) => (value === CONST.SEARCH.CATEGORY_EMPTY_VALUE ? translate('search.noCategory') : value))
             .join(', ');
     }
 
@@ -383,7 +308,7 @@ function getFilterDisplayTitle(filters: Partial<SearchAdvancedFiltersForm>, filt
         const filterArray = filters[nonDateFilterKey] ?? [];
         return filterArray
             .sort(sortOptionsWithEmptyValue)
-            .map((value) => (value === CONST.SEARCH.EMPTY_VALUE ? translate('search.noTag') : getCleanedTagName(value)))
+            .map((value) => (value === CONST.SEARCH.TAG_EMPTY_VALUE ? translate('search.noTag') : getCleanedTagName(value)))
             .join(', ');
     }
 
@@ -396,8 +321,41 @@ function getFilterDisplayTitle(filters: Partial<SearchAdvancedFiltersForm>, filt
         return filterValue ? translate(`common.${filterValue as ValueOf<typeof CONST.SEARCH.BOOLEAN>}`) : undefined;
     }
 
+    if (nonDateFilterKey === CONST.SEARCH.SYNTAX_FILTER_KEYS.TYPE) {
+        const filterValue = filters[nonDateFilterKey];
+        return filterValue ? translate(`common.${filterValue as ValueOf<typeof CONST.SEARCH.DATA_TYPES>}`) : undefined;
+    }
+
+    if (nonDateFilterKey === CONST.SEARCH.SYNTAX_ROOT_KEYS.GROUP_BY) {
+        const filterValue = filters[nonDateFilterKey];
+        return filterValue ? translate(`search.filters.groupBy.${filterValue}`) : undefined;
+    }
+
     const filterValue = filters[nonDateFilterKey];
     return Array.isArray(filterValue) ? filterValue.join(', ') : filterValue;
+}
+
+function getStatusFilterDisplayTitle(filters: Partial<SearchAdvancedFiltersForm>, type: SearchDataTypes, groupBy: SearchGroupBy | undefined, translate: LocaleContextProps['translate']) {
+    const statusOptions = getStatusOptions(type, groupBy).concat({translation: 'common.all', value: CONST.SEARCH.STATUS.EXPENSE.ALL});
+    let filterValue = filters?.status;
+
+    if (!filterValue?.length) {
+        return undefined;
+    }
+
+    if (typeof filterValue === 'string') {
+        filterValue = filterValue.split(',');
+    }
+
+    return filterValue
+        .reduce((acc, value) => {
+            const status = statusOptions.find((statusOption) => statusOption.value === value);
+            if (status) {
+                return acc.concat(translate(status.translation));
+            }
+            return acc;
+        }, [] as string[])
+        .join(', ');
 }
 
 function getFilterTaxRateDisplayTitle(filters: Partial<SearchAdvancedFiltersForm>, taxRates: Record<string, string[]>) {
@@ -450,12 +408,14 @@ function isFeatureEnabledInPolicies(policies: OnyxCollection<Policy>, featureNam
 function AdvancedSearchFilters() {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
+    const {isDevelopment} = useEnvironment();
     const {singleExecution} = useSingleExecution();
     const waitForNavigate = useWaitForNavigation();
     const [reports] = useOnyx(ONYXKEYS.COLLECTION.REPORT, {canBeMissing: false});
     const [savedSearches] = useOnyx(ONYXKEYS.SAVED_SEARCHES, {canBeMissing: true});
     const [searchAdvancedFilters = {} as SearchAdvancedFiltersForm] = useOnyx(ONYXKEYS.FORMS.SEARCH_ADVANCED_FILTERS_FORM, {canBeMissing: true});
 
+    const groupBy = searchAdvancedFilters.groupBy;
     const policyID = searchAdvancedFilters.policyID;
     const [userCardList] = useOnyx(ONYXKEYS.CARD_LIST, {canBeMissing: false});
     const [workspaceCardFeeds] = useOnyx(ONYXKEYS.COLLECTION.WORKSPACE_CARDS_LIST, {canBeMissing: false});
@@ -511,8 +471,11 @@ function AdvancedSearchFilters() {
     const shouldDisplayTaxFilter = shouldDisplayFilter(Object.keys(taxRates).length, areTaxEnabled);
     const shouldDisplayWorkspaceFilter = workspaces.some((section) => section.data.length !== 0);
 
+    // s77rt remove DEV lock
+    const shouldDisplayGroupByFilter = isDevelopment;
+
     let currentType = searchAdvancedFilters?.type ?? CONST.SEARCH.DATA_TYPES.EXPENSE;
-    if (!Object.keys(typeFiltersKeys).includes(currentType)) {
+    if (!Object.keys(CONST.SEARCH_TYPE_FILTERS_KEYS).includes(currentType)) {
         currentType = CONST.SEARCH.DATA_TYPES.EXPENSE;
     }
 
@@ -544,14 +507,10 @@ function AdvancedSearchFilters() {
         applyFiltersAndNavigate();
     };
 
-    const filters = typeFiltersKeys[currentType]
+    const filters = CONST.SEARCH_TYPE_FILTERS_KEYS[currentType]
         .map((section) => {
             return section
                 .map((key) => {
-                    // 'feed' filter row does not appear in advanced filters, it is created using selected cards
-                    if (key === CONST.SEARCH.SYNTAX_FILTER_KEYS.FEED) {
-                        return;
-                    }
                     const onPress = singleExecution(waitForNavigate(() => Navigation.navigate(baseFilterConfig[key].route)));
                     let filterTitle;
                     if (
@@ -566,7 +525,10 @@ function AdvancedSearchFilters() {
                         key === CONST.SEARCH.SYNTAX_FILTER_KEYS.MERCHANT ||
                         key === CONST.SEARCH.SYNTAX_FILTER_KEYS.REPORT_ID ||
                         key === CONST.SEARCH.SYNTAX_FILTER_KEYS.KEYWORD ||
-                        key === CONST.SEARCH.SYNTAX_FILTER_KEYS.TITLE
+                        key === CONST.SEARCH.SYNTAX_FILTER_KEYS.TITLE ||
+                        key === CONST.SEARCH.SYNTAX_FILTER_KEYS.REIMBURSABLE ||
+                        key === CONST.SEARCH.SYNTAX_FILTER_KEYS.BILLABLE ||
+                        key === CONST.SEARCH.SYNTAX_FILTER_KEYS.TYPE
                     ) {
                         filterTitle = baseFilterConfig[key].getTitle(searchAdvancedFilters, key, translate);
                     } else if (key === CONST.SEARCH.SYNTAX_FILTER_KEYS.CATEGORY) {
@@ -596,23 +558,23 @@ function AdvancedSearchFilters() {
                         filterTitle = baseFilterConfig[key].getTitle(searchAdvancedFilters, taxRates);
                     } else if (key === CONST.SEARCH.SYNTAX_FILTER_KEYS.EXPENSE_TYPE) {
                         filterTitle = baseFilterConfig[key].getTitle(searchAdvancedFilters, translate);
-                    } else if (
-                        key === CONST.SEARCH.SYNTAX_FILTER_KEYS.FROM ||
-                        key === CONST.SEARCH.SYNTAX_FILTER_KEYS.TO ||
-                        key === CONST.SEARCH.SYNTAX_FILTER_KEYS.ASSIGNEE ||
-                        key === CONST.SEARCH.SYNTAX_FILTER_KEYS.CREATED_BY
-                    ) {
+                    } else if (key === CONST.SEARCH.SYNTAX_FILTER_KEYS.FROM || key === CONST.SEARCH.SYNTAX_FILTER_KEYS.TO || key === CONST.SEARCH.SYNTAX_FILTER_KEYS.ASSIGNEE) {
                         filterTitle = baseFilterConfig[key].getTitle(searchAdvancedFilters[key] ?? [], personalDetails);
                     } else if (key === CONST.SEARCH.SYNTAX_FILTER_KEYS.IN) {
                         filterTitle = baseFilterConfig[key].getTitle(searchAdvancedFilters, translate, reports);
-                    } else if (key === CONST.SEARCH.SYNTAX_FILTER_KEYS.REIMBURSABLE || key === CONST.SEARCH.SYNTAX_FILTER_KEYS.BILLABLE) {
-                        filterTitle = baseFilterConfig[key].getTitle(searchAdvancedFilters, key, translate);
                     } else if (key === CONST.SEARCH.SYNTAX_FILTER_KEYS.POLICY_ID) {
                         if (!shouldDisplayWorkspaceFilter) {
                             return;
                         }
                         const workspacesData = workspaces.flatMap((value) => value.data);
                         filterTitle = baseFilterConfig[key].getTitle(searchAdvancedFilters, workspacesData);
+                    } else if (key === CONST.SEARCH.SYNTAX_FILTER_KEYS.STATUS) {
+                        filterTitle = baseFilterConfig[key].getTitle(searchAdvancedFilters, currentType, groupBy, translate);
+                    } else if (key === CONST.SEARCH.SYNTAX_ROOT_KEYS.GROUP_BY) {
+                        if (!shouldDisplayGroupByFilter) {
+                            return;
+                        }
+                        filterTitle = baseFilterConfig[key].getTitle(searchAdvancedFilters, key, translate);
                     }
                     return {
                         key,
@@ -626,21 +588,53 @@ function AdvancedSearchFilters() {
         .filter((section) => !!section.length);
     const displaySearchButton = queryJSON && !isCannedSearchQuery(queryJSON);
 
+    const sections: SectionType[] = [
+        {
+            titleTranslationKey: 'common.general',
+            items: filters.at(0) ?? [],
+        },
+        {
+            titleTranslationKey: 'common.expenses',
+            items: filters.at(1) ?? [],
+        },
+        {
+            titleTranslationKey: 'common.reports',
+            items: filters.at(2) ?? [],
+        },
+    ];
+
+    sections.forEach((section) => {
+        section.items.sort((a, b) => {
+            if (a.key === CONST.SEARCH.SYNTAX_FILTER_KEYS.TYPE) {
+                return -1;
+            }
+            if (b.key === CONST.SEARCH.SYNTAX_FILTER_KEYS.TYPE) {
+                return 1;
+            }
+            return localeCompare(a.description, b.description);
+        });
+    });
+
     return (
         <>
             <ScrollView contentContainerStyle={[styles.flexGrow1, styles.justifyContentBetween]}>
                 <View>
-                    {filters.map((section, index) => {
+                    {sections.map((section, index) => {
+                        if (section.items.length === 0) {
+                            return;
+                        }
+
                         return (
                             // eslint-disable-next-line react/no-array-index-key
-                            <View key={`${section.at(0)?.key}-${index}`}>
+                            <View key={`${section.items.at(0)?.key}-${index}`}>
                                 {index !== 0 && (
                                     <SpacerView
                                         shouldShow
                                         style={[styles.reportHorizontalRule]}
                                     />
                                 )}
-                                {section.map((item) => {
+                                <Text style={[styles.headerText, styles.reportHorizontalRule, index === 0 ? null : styles.mt4, styles.mb2]}>{translate(section.titleTranslationKey)}</Text>
+                                {section.items.map((item) => {
                                     return (
                                         <MenuItemWithTopDescription
                                             key={item.description}

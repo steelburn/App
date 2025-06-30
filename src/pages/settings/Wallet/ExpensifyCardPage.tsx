@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useContext, useEffect, useMemo, useState} from 'react';
 import {View} from 'react-native';
 import {useOnyx} from 'react-native-onyx';
 import type {ValueOf} from 'type-fest';
@@ -8,6 +8,7 @@ import CardPreview from '@components/CardPreview';
 import DotIndicatorMessage from '@components/DotIndicatorMessage';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import * as Expensicons from '@components/Icon/Expensicons';
+import {LockedAccountContext} from '@components/LockedAccountModalProvider';
 import MenuItem from '@components/MenuItem';
 import MenuItemWithTopDescription from '@components/MenuItemWithTopDescription';
 import ScreenWrapper from '@components/ScreenWrapper';
@@ -17,7 +18,6 @@ import useBeforeRemove from '@hooks/useBeforeRemove';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useLocalize from '@hooks/useLocalize';
 import useNetwork from '@hooks/useNetwork';
-import usePermissions from '@hooks/usePermissions';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {requestValidateCodeAction} from '@libs/actions/User';
 import {formatCardExpiration, getDomainCards, maskCard} from '@libs/CardUtils';
@@ -73,14 +73,13 @@ function ExpensifyCardPage({
     const styles = useThemeStyles();
     const {isOffline} = useNetwork();
     const {translate} = useLocalize();
-    const {canUseInAppProvisioning} = usePermissions();
     const [isValidateCodeActionModalVisible, setIsValidateCodeActionModalVisible] = useState(false);
     const [currentCardID, setCurrentCardID] = useState<number>(-1);
     const isTravelCard = cardList?.[cardID]?.nameValuePairs?.isTravelCard;
     const shouldDisplayCardDomain = !isTravelCard && (!cardList?.[cardID]?.nameValuePairs?.issuedBy || !cardList?.[cardID]?.nameValuePairs?.isVirtual);
     const domain = cardList?.[cardID]?.domainName ?? '';
     const expensifyCardTitle = isTravelCard ? translate('cardPage.expensifyTravelCard') : translate('cardPage.expensifyCard');
-    const pageTitle = shouldDisplayCardDomain ? expensifyCardTitle : cardList?.[cardID]?.nameValuePairs?.cardTitle ?? expensifyCardTitle;
+    const pageTitle = shouldDisplayCardDomain ? expensifyCardTitle : (cardList?.[cardID]?.nameValuePairs?.cardTitle ?? expensifyCardTitle);
     const {displayName} = useCurrentUserPersonalDetails();
 
     const [isNotFound, setIsNotFound] = useState(false);
@@ -107,6 +106,7 @@ function ExpensifyCardPage({
     const [isCardDetailsLoading, setIsCardDetailsLoading] = useState<Record<number, boolean>>({});
     const [cardsDetailsErrors, setCardsDetailsErrors] = useState<Record<number, string>>({});
     const [validateError, setValidateError] = useState<Errors>({});
+    const {isAccountLocked, showLockedAccountModal} = useContext(LockedAccountContext);
 
     const openValidateCodeModal = (revealedCardID: number) => {
         setCurrentCardID(revealedCardID);
@@ -160,7 +160,7 @@ function ExpensifyCardPage({
     const {limitNameKey, limitTitleKey} = getLimitTypeTranslationKeys(cardsToShow?.at(0)?.nameValuePairs?.limitType);
 
     const primaryLogin = account?.primaryLogin ?? '';
-    const isSignedInAsdelegate = !!account?.delegatedAccess?.delegate || false;
+    const isSignedInAsDelegate = !!account?.delegatedAccess?.delegate || false;
 
     if (isNotFound) {
         return <NotFoundPage onBackButtonPress={() => Navigation.goBack(ROUTES.SETTINGS_WALLET)} />;
@@ -236,10 +236,16 @@ function ExpensifyCardPage({
                                             titleStyle={styles.walletCardNumber}
                                             shouldShowRightComponent
                                             rightComponent={
-                                                !isSignedInAsdelegate ? (
+                                                !isSignedInAsDelegate ? (
                                                     <Button
                                                         text={translate('cardPage.cardDetails.revealDetails')}
-                                                        onPress={() => openValidateCodeModal(card.cardID)}
+                                                        onPress={() => {
+                                                            if (isAccountLocked) {
+                                                                showLockedAccountModal();
+                                                                return;
+                                                            }
+                                                            openValidateCodeModal(card.cardID);
+                                                        }}
                                                         isDisabled={isCardDetailsLoading[card.cardID] || isOffline}
                                                         isLoading={isCardDetailsLoading[card.cardID]}
                                                     />
@@ -253,13 +259,19 @@ function ExpensifyCardPage({
                                         />
                                     </>
                                 )}
-                                {!isSignedInAsdelegate && (
+                                {!isSignedInAsDelegate && (
                                     <MenuItemWithTopDescription
                                         title={translate('cardPage.reportFraud')}
                                         titleStyle={styles.walletCardMenuItem}
                                         icon={Expensicons.Flag}
                                         shouldShowRightIcon
-                                        onPress={() => Navigation.navigate(ROUTES.SETTINGS_REPORT_FRAUD.getRoute(String(card.cardID), Navigation.getActiveRoute()))}
+                                        onPress={() => {
+                                            if (isAccountLocked) {
+                                                showLockedAccountModal();
+                                                return;
+                                            }
+                                            Navigation.navigate(ROUTES.SETTINGS_REPORT_FRAUD.getRoute(String(card.cardID), Navigation.getActiveRoute()));
+                                        }}
                                     />
                                 )}
                             </>
@@ -281,7 +293,7 @@ function ExpensifyCardPage({
                                                 titleStyle={styles.walletCardNumber}
                                                 shouldShowRightComponent
                                                 rightComponent={
-                                                    !isSignedInAsdelegate ? (
+                                                    !isSignedInAsDelegate ? (
                                                         <Button
                                                             text={translate('cardPage.cardDetails.revealCvv')}
                                                             onPress={() => openValidateCodeModal(card.cardID)}
@@ -298,7 +310,7 @@ function ExpensifyCardPage({
                                             />
                                         </>
                                     )}
-                                    {!isSignedInAsdelegate && (
+                                    {!isSignedInAsDelegate && (
                                         <MenuItemWithTopDescription
                                             title={translate('cardPage.reportTravelFraud')}
                                             titleStyle={styles.walletCardMenuItem}
@@ -318,10 +330,16 @@ function ExpensifyCardPage({
                                     titleStyle={styles.walletCardNumber}
                                 />
                                 <MenuItem
-                                    title={translate('reportCardLostOrDamaged.report')}
+                                    title={translate('reportCardLostOrDamaged.screenTitle')}
                                     icon={Expensicons.Flag}
                                     shouldShowRightIcon
-                                    onPress={() => Navigation.navigate(ROUTES.SETTINGS_WALLET_REPORT_CARD_LOST_OR_DAMAGED.getRoute(String(currentPhysicalCard?.cardID)))}
+                                    onPress={() => {
+                                        if (isAccountLocked) {
+                                            showLockedAccountModal();
+                                            return;
+                                        }
+                                        Navigation.navigate(ROUTES.SETTINGS_WALLET_REPORT_CARD_LOST_OR_DAMAGED.getRoute(String(currentPhysicalCard?.cardID)));
+                                    }}
                                 />
                             </>
                         )}
@@ -339,7 +357,7 @@ function ExpensifyCardPage({
                         />
                     </>
                 )}
-                {!!canUseInAppProvisioning && cardToAdd !== undefined && (
+                {cardToAdd !== undefined && (
                     <AddToWalletButton
                         card={cardToAdd}
                         buttonStyle={styles.alignSelfCenter}
