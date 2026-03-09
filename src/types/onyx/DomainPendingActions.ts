@@ -2,6 +2,11 @@ import type CONST from '@src/CONST';
 import type PrefixedRecord from '@src/types/utils/PrefixedRecord';
 import type * as OnyxCommon from './OnyxCommon';
 
+
+
+
+
+
 /**
  * General pending action structure for domain members and admins
  * Pending actions structure is dictated by how `domain_` updates are handled in the app to prevent them from resetting unintentionally.
@@ -44,6 +49,11 @@ type DomainSecurityGroupPendingActions = {
      * Pending action for the default security group ID
      */
     defaultSecurityGroupID?: OnyxCommon.PendingAction;
+
+    /**
+     *
+     */
+    enableRestrictedPrimaryPolicy?: OnyxCommon.PendingAction;
 };
 
 /**

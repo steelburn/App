@@ -4025,6 +4025,11 @@ const ROUTES = {
         route: 'domain/:domainAccountID/groups/:groupID/name',
         getRoute: (domainAccountID: number, groupID: string) => `domain/${domainAccountID}/groups/${groupID}/name` as const,
     },
+
+    DOMAIN_SECURITY_GROUPS_PREFERRED_WORKSPACE: {
+        route: 'domain/:domainAccountID/groups/:groupID/preferred-workspace',
+        getRoute: (domainAccountID: number, groupID: string) => `domain/${domainAccountID}/groups/${groupID}/preferred-workspace` as const,
+    },
 } as const;
 
 /**

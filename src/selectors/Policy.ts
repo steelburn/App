@@ -87,6 +87,8 @@ const groupPaidPoliciesWithExpenseChatEnabledSelector = (policies: OnyxCollectio
 
 const shouldRedirectToExpensifyClassicSelector = (policies: OnyxCollection<Policy>) => areAllGroupPoliciesExpenseChatDisabled(policies);
 
+const policyNameSelector = (policy: OnyxEntry<Policy>) => policy?.name;
+
 export {
     activePolicySelector,
     createAllPolicyReportFieldsSelector,
@@ -97,4 +99,5 @@ export {
     hasMultipleOutputCurrenciesSelector,
     groupPaidPoliciesWithExpenseChatEnabledSelector,
     shouldRedirectToExpensifyClassicSelector,
+    policyNameSelector,
 };

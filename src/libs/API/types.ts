@@ -566,6 +566,7 @@ const WRITE_COMMANDS = {
     EXPORT_DOMAIN_MEMBERS_CSV: 'ExportDomainMembersCSV',
     UPDATE_DOMAIN_SECURITY_GROUP: 'UpdateDomainSecurityGroup',
     SET_DEFAULT_DOMAIN_SECURITY_GROUP: 'SetDefaultDomainSecurityGroup',
+    SET_ENABLE_RESTRICTED_PRIMARY_POLICY: 'SetEnableRestrictedPrimaryPolicy',
 } as const;
 
 type WriteCommand = ValueOf<typeof WRITE_COMMANDS>;
@@ -1150,6 +1151,7 @@ type WriteCommandParameters = {
     [WRITE_COMMANDS.EXPORT_DOMAIN_MEMBERS_CSV]: Parameters.ExportDomainMembersCSVParams;
     [WRITE_COMMANDS.UPDATE_DOMAIN_SECURITY_GROUP]: Parameters.UpdateDomainSecurityGroupParams;
     [WRITE_COMMANDS.SET_DEFAULT_DOMAIN_SECURITY_GROUP]: Parameters.SetDefaultDomainSecurityGroupParams;
+    [WRITE_COMMANDS.SET_ENABLE_RESTRICTED_PRIMARY_POLICY]: Parameters.SetEnableRestrictedPrimaryPolicyParams;
 };
 
 const READ_COMMANDS = {

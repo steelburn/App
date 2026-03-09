@@ -1,6 +1,6 @@
 import Onyx from 'react-native-onyx';
-import type {NullishDeep, OnyxUpdate} from 'react-native-onyx';
-import type {LocalizedTranslate} from '@components/LocaleContextProvider';
+import type { NullishDeep, OnyxUpdate } from 'react-native-onyx';
+import type { LocalizedTranslate } from '@components/LocaleContextProvider';
 import * as API from '@libs/API';
 import type {
     AddAdminToDomainParams,
@@ -10,6 +10,7 @@ import type {
     RemoveDomainAdminParams,
     ResetDomainMemberTwoFactorAuthParams,
     SetDefaultDomainSecurityGroupParams,
+    SetEnableRestrictedPrimaryPolicyParams,
     SetTechnicalContactEmailParams,
     SetTwoFactorAuthExemptEmailForDomainParams,
     SetVacationDelegateParams,
@@ -18,19 +19,292 @@ import type {
     UpdateDomainSecurityGroupParams,
 } from '@libs/API/parameters';
 import {READ_COMMANDS, SIDE_EFFECT_REQUEST_COMMANDS, WRITE_COMMANDS} from '@libs/API/types';
-import {getCommandURL} from '@libs/ApiUtils';
-import {getMicroSecondOnyxErrorWithTranslationKey} from '@libs/ErrorUtils';
+import { getCommandURL } from '@libs/ApiUtils';
+import { getMicroSecondOnyxErrorWithTranslationKey } from '@libs/ErrorUtils';
 import fileDownload from '@libs/fileDownload';
 import enhanceParameters from '@libs/Network/enhanceParameters';
-import {generateAccountID} from '@libs/UserUtils';
+import { generateAccountID } from '@libs/UserUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
-import type {Domain, DomainSecurityGroup, UserSecurityGroupData} from '@src/types/onyx';
-import type {PendingAction} from '@src/types/onyx/OnyxCommon';
-import type {BaseVacationDelegate} from '@src/types/onyx/VacationDelegate';
+import type { Domain, DomainSecurityGroup, UserSecurityGroupData } from '@src/types/onyx';
+import type { PendingAction } from '@src/types/onyx/OnyxCommon';
+import type { BaseVacationDelegate } from '@src/types/onyx/VacationDelegate';
 import type PrefixedRecord from '@src/types/utils/PrefixedRecord';
-import type {ScimTokenWithState} from './ScimToken/ScimTokenUtils';
-import {ScimTokenState} from './ScimToken/ScimTokenUtils';
+import type { ScimTokenWithState } from './ScimToken/ScimTokenUtils';
+import { ScimTokenState } from './ScimToken/ScimTokenUtils';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /**
  * Fetches a validation code that the user is supposed to put in the domain's DNS records to verify it
@@ -1910,6 +2184,96 @@ function clearDefaultSecurityGroupError(domainAccountID: number, groupID: string
             defaultSecurityGroupIDErrors: null,
         },
     });
+}
+
+function setEnableRestrictedPrimaryPolicy(domainAccountID: number, groupID: string, enabled: boolean) {
+    const SECURITY_GROUP_KEY = `${CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX}${groupID}`;
+
+    const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.DOMAIN | typeof ONYXKEYS.COLLECTION.DOMAIN_ERRORS | typeof ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS>> = [
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`,
+            value: {
+                [SECURITY_GROUP_KEY]: {
+                    enableRestrictedPrimaryPolicy: enabled,
+                },
+            } as PrefixedRecord<typeof CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX, DomainSecurityGroup>,
+        },
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`,
+            value: {
+                [SECURITY_GROUP_KEY]: {
+                    enableRestrictedPrimaryPolicy: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE,
+                },
+            },
+        },
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`,
+            value: {
+                [SECURITY_GROUP_KEY]: {
+                    enableRestrictedPrimaryPolicyErrors: null,
+                },
+            },
+        },
+    ];
+
+    const failureData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.DOMAIN | typeof ONYXKEYS.COLLECTION.DOMAIN_ERRORS | typeof ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS>> = [
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`,
+            // eslint-disable-next-line @typescript-eslint/naming-convention
+            value: {
+                [SECURITY_GROUP_KEY]: {
+                    enableRestrictedPrimaryPolicy: !enabled,
+                },
+            } as PrefixedRecord<typeof CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX, DomainSecurityGroup>,
+        },
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`,
+            value: {
+                [SECURITY_GROUP_KEY]: {
+                    enableRestrictedPrimaryPolicy: null,
+                },
+            },
+        },
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`,
+            value: {
+                [SECURITY_GROUP_KEY]: {
+                    enableRestrictedPrimaryPolicyErrors: getMicroSecondOnyxErrorWithTranslationKey('domain.verifyDomain.codeFetchError'),
+                },
+            },
+        },
+    ];
+
+    const successData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.DOMAIN_ERRORS | typeof ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS>> = [
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`,
+            value: {
+                [SECURITY_GROUP_KEY]: {
+                    enableRestrictedPrimaryPolicy: null,
+                },
+            },
+        },
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`,
+            value: {
+                [SECURITY_GROUP_KEY]: {
+                    enableRestrictedPrimaryPolicyErrors: null,
+                },
+            },
+        },
+    ];
+
+    const params: SetEnableRestrictedPrimaryPolicyParams = {
+
+    }
 }
 
 export {

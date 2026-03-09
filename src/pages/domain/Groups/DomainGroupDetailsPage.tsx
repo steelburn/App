@@ -1,5 +1,6 @@
 import {selectGroupByID} from '@selectors/Domain';
 import React from 'react';
+import {View} from 'react-native';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import MenuItemWithTopDescription from '@components/MenuItemWithTopDescription';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
@@ -13,11 +14,13 @@ import type {PlatformStackScreenProps} from '@navigation/PlatformStackNavigation
 import type {SettingsNavigatorParamList} from '@navigation/types';
 import DomainNotFoundPageWrapper from '@pages/domain/DomainNotFoundPageWrapper';
 import {clearUpdateDomainSecurityGroupNameError} from '@userActions/Domain';
+import Text from '@components/Text';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
 import DefaultGroupToggle from './DefaultGroupToggle';
+import PreferredWorkspaceToggle from './PreferredWorkspaceToggle';
 
 type DomainGroupDetailsPageProps = PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.DOMAIN.GROUP_DETAILS>;
 
@@ -63,6 +66,12 @@ function DomainGroupDetailsPage({route}: DomainGroupDetailsPageProps) {
                         domainAccountID={domainAccountID}
                         groupID={groupID}
                         groupName={group?.name}
+                    />
+                    <View style={[styles.sectionDividerLine, styles.ph5, styles.mv6]} />
+                    <Text style={[styles.textNormal, styles.textStrong, styles.ph5]}>{translate('domain.groups.permissions')}</Text>
+                    <PreferredWorkspaceToggle
+                        domainAccountID={domainAccountID}
+                        groupID={groupID}
                     />
                 </ScrollView>
             </ScreenWrapper>

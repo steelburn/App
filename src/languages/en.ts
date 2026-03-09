@@ -8619,6 +8619,10 @@ const translations = {
                 `Are you sure you want to make ${newName} the default group? New members will be invited to this group instead of the previous default group (${currentName}). `,
             makeDefault: 'Make default',
             nevermind: 'Nevermind',
+            permissions: 'Group permissions',
+            preferredWorkspace: 'Preferred Workspace',
+            preferredWorkspaceDescription: (enabled: boolean) => `All new reports and expenses will be created on ${enabled ? 'selected preferred' : 'this'} workspace.`,
+            preferredWorkspaceSelectDescription: 'All new expenses and reports will be created on this workspace.',
         },
     },
 };

@@ -2,6 +2,11 @@ import type CONST from '@src/CONST';
 import type PrefixedRecord from '@src/types/utils/PrefixedRecord';
 import type * as OnyxCommon from './OnyxCommon';
 
+
+
+
+
+
 /**
  * Basic errors for domain members and admins
  */
@@ -45,6 +50,11 @@ type DomainSecurityGroupErrors = {
      * Errors related to the default security group ID setting
      */
     defaultSecurityGroupIDErrors?: OnyxCommon.Errors;
+
+    /**
+     *
+     */
+    enableRestrictedPrimaryPolicyErrors?: OnyxCommon.Errors;
 };
 
 /**
