@@ -1,4 +1,4 @@
-import {selectGroupByID} from '@selectors/Domain';
+import {defaultSecurityGroupIDErrorsSelector, defaultSecurityGroupIDPendingActionSelector, selectGroupByID} from '@selectors/Domain';
 import {policyNameSelector} from '@selectors/Policy';
 import React from 'react';
 import MenuItemWithTopDescription from '@components/MenuItemWithTopDescription';
@@ -7,6 +7,7 @@ import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
 import Navigation from '@navigation/Navigation';
 import ToggleSettingOptionRow from '@pages/workspace/workflows/ToggleSettingsOptionRow';
+import {updateDomainSecurityGroup} from '@userActions/Domain';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 
@@ -28,9 +29,10 @@ function PreferredWorkspaceToggle({domainAccountID, groupID}: PreferredWorkspace
 
     const [preferredPolicyName] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${preferredPolicyID}`, {selector: policyNameSelector});
 
-    const onToggle = () => {
-        // TODO: Implement action to toggle enableRestrictedPrimaryPolicy
-    };
+    const [defaultSecurityGroupIDPendingAction] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`, {
+        selector: defaultSecurityGroupIDPendingActionSelector(groupID),
+    });
+    const [defaultSecurityGroupIDErrors] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`, {selector: defaultSecurityGroupIDErrorsSelector(groupID)});
 
     return (
         <>
@@ -40,8 +42,14 @@ function PreferredWorkspaceToggle({domainAccountID, groupID}: PreferredWorkspace
                 switchAccessibilityLabel={translate('domain.groups.preferredWorkspace')}
                 shouldPlaceSubtitleBelowSwitch
                 isActive={isEnabled}
-                onToggle={onToggle}
+                onToggle={(enabled) => {
+                    if (!group?.name) {
+                        return;
+                    }
+                    updateDomainSecurityGroup(domainAccountID, groupID, group.name, group, {enableRestrictedPrimaryPolicy: enabled}, 'enableRestrictedPrimaryPolicy');
+                }}
                 wrapperStyle={[styles.mv3, styles.ph5]}
+                // pendingAction={}
             />
             {isEnabled && (
                 <MenuItemWithTopDescription

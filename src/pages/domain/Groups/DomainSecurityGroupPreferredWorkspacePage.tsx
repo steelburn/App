@@ -17,6 +17,7 @@ import Navigation from '@navigation/Navigation';
 import type {PlatformStackScreenProps} from '@navigation/PlatformStackNavigation/types';
 import type {SettingsNavigatorParamList} from '@navigation/types';
 import DomainNotFoundPageWrapper from '@pages/domain/DomainNotFoundPageWrapper';
+import {updateDomainSecurityGroup} from '@userActions/Domain';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
@@ -83,18 +84,17 @@ function DomainSecurityGroupPreferredWorkspacePage({route}: DomainSecurityGroupP
         });
     }
 
-    const handleSelectWorkspace = (item: WorkspaceListItem) => {
-        setSelectedPolicyID(item.policyID);
-        setShouldShowError(false);
-    };
-
     const handleSubmit = () => {
         if (!selectedPolicyID) {
             setShouldShowError(true);
             return;
         }
 
-        // TODO: Implement action to update restrictedPrimaryPolicyID
+        if (!group?.name) {
+            return;
+        }
+
+        updateDomainSecurityGroup(domainAccountID, groupID, group.name, group, {restrictedPrimaryPolicyID: selectedPolicyID}, 'restrictedPrimaryPolicyID');
         Navigation.goBack(ROUTES.DOMAIN_GROUP_DETAILS.getRoute(domainAccountID, groupID));
     };
 
@@ -113,7 +113,10 @@ function DomainSecurityGroupPreferredWorkspacePage({route}: DomainSecurityGroupP
                 <SelectionList<WorkspaceListItem>
                     data={workspaceOptions.sort((a, b) => localeCompare(a.text ?? '', b.text ?? ''))}
                     ListItem={UserListItem}
-                    onSelectRow={handleSelectWorkspace}
+                    onSelectRow={(item: WorkspaceListItem) => {
+                        setSelectedPolicyID(item.policyID);
+                        setShouldShowError(false);
+                    }}
                     initiallyFocusedItemKey={currentPolicyID}
                     shouldUpdateFocusedIndex
                     footerContent={
