@@ -90,10 +90,6 @@ function DomainSecurityGroupPreferredWorkspacePage({route}: DomainSecurityGroupP
             return;
         }
 
-        if (!group?.name) {
-            return;
-        }
-
         updateDomainSecurityGroup(domainAccountID, groupID, group, {restrictedPrimaryPolicyID: selectedPolicyID}, 'restrictedPrimaryPolicyID');
         Navigation.goBack(ROUTES.DOMAIN_GROUP_DETAILS.getRoute(domainAccountID, groupID));
     };
