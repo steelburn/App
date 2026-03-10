@@ -1,13 +1,14 @@
-import {defaultSecurityGroupIDErrorsSelector, defaultSecurityGroupIDPendingActionSelector, selectGroupByID} from '@selectors/Domain';
+import {domainSecurityGroupSettingErrorsSelector, domainSecurityGroupSettingPendingActionSelector, selectGroupByID} from '@selectors/Domain';
 import {policyNameSelector} from '@selectors/Policy';
 import React from 'react';
 import MenuItemWithTopDescription from '@components/MenuItemWithTopDescription';
+import OfflineWithFeedback from '@components/OfflineWithFeedback';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
 import Navigation from '@navigation/Navigation';
 import ToggleSettingOptionRow from '@pages/workspace/workflows/ToggleSettingsOptionRow';
-import {updateDomainSecurityGroup} from '@userActions/Domain';
+import {clearDomainSecurityGroupSettingError, updateDomainSecurityGroup} from '@userActions/Domain';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 
@@ -29,10 +30,19 @@ function PreferredWorkspaceToggle({domainAccountID, groupID}: PreferredWorkspace
 
     const [preferredPolicyName] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${preferredPolicyID}`, {selector: policyNameSelector});
 
-    const [defaultSecurityGroupIDPendingAction] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`, {
-        selector: defaultSecurityGroupIDPendingActionSelector(groupID),
+    const [enableRestrictedPrimaryPolicyPendingAction] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`, {
+        selector: domainSecurityGroupSettingPendingActionSelector('enableRestrictedPrimaryPolicy', groupID),
     });
-    const [defaultSecurityGroupIDErrors] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`, {selector: defaultSecurityGroupIDErrorsSelector(groupID)});
+    const [enableRestrictedPrimaryPolicyErrors] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`, {
+        selector: domainSecurityGroupSettingErrorsSelector('enableRestrictedPrimaryPolicyErrors', groupID),
+    });
+
+    const [restrictedPrimaryPolicyIDPendingAction] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`, {
+        selector: domainSecurityGroupSettingPendingActionSelector('restrictedPrimaryPolicyID', groupID),
+    });
+    const [restrictedPrimaryPolicyIDErrors] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`, {
+        selector: domainSecurityGroupSettingErrorsSelector('restrictedPrimaryPolicyIDErrors', groupID),
+    });
 
     return (
         <>
@@ -46,18 +56,27 @@ function PreferredWorkspaceToggle({domainAccountID, groupID}: PreferredWorkspace
                     if (!group?.name) {
                         return;
                     }
-                    updateDomainSecurityGroup(domainAccountID, groupID, group.name, group, {enableRestrictedPrimaryPolicy: enabled}, 'enableRestrictedPrimaryPolicy');
+                    updateDomainSecurityGroup(domainAccountID, groupID, group, {enableRestrictedPrimaryPolicy: enabled}, 'enableRestrictedPrimaryPolicy');
                 }}
                 wrapperStyle={[styles.mv3, styles.ph5]}
-                // pendingAction={}
+                pendingAction={enableRestrictedPrimaryPolicyPendingAction}
+                errors={enableRestrictedPrimaryPolicyErrors}
+                onCloseError={() => clearDomainSecurityGroupSettingError(domainAccountID, groupID, 'enableRestrictedPrimaryPolicyErrors')}
             />
             {isEnabled && (
-                <MenuItemWithTopDescription
-                    description={translate('domain.groups.preferredWorkspace')}
-                    title={preferredPolicyName ?? ''}
-                    shouldShowRightIcon
-                    onPress={() => Navigation.navigate(ROUTES.DOMAIN_SECURITY_GROUPS_PREFERRED_WORKSPACE.getRoute(domainAccountID, groupID))}
-                />
+                <OfflineWithFeedback
+                    pendingAction={restrictedPrimaryPolicyIDPendingAction}
+                    errors={restrictedPrimaryPolicyIDErrors}
+                    errorRowStyles={styles.mh5}
+                    onClose={() => clearDomainSecurityGroupSettingError(domainAccountID, groupID, 'restrictedPrimaryPolicyIDErrors')}
+                >
+                    <MenuItemWithTopDescription
+                        description={translate('domain.groups.preferredWorkspace')}
+                        title={preferredPolicyName ?? ''}
+                        shouldShowRightIcon
+                        onPress={() => Navigation.navigate(ROUTES.DOMAIN_SECURITY_GROUPS_PREFERRED_WORKSPACE.getRoute(domainAccountID, groupID))}
+                    />
+                </OfflineWithFeedback>
             )}
         </>
     );

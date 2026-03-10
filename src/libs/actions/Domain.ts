@@ -10,7 +10,6 @@ import type {
     RemoveDomainAdminParams,
     ResetDomainMemberTwoFactorAuthParams,
     SetDefaultDomainSecurityGroupParams,
-    SetEnableRestrictedPrimaryPolicyParams,
     SetTechnicalContactEmailParams,
     SetTwoFactorAuthExemptEmailForDomainParams,
     SetVacationDelegateParams,
