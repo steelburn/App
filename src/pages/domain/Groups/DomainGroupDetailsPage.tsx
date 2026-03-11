@@ -9,7 +9,6 @@ import ScrollView from '@components/ScrollView';
 import Text from '@components/Text';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
-import useThemeStyles from '@hooks/useThemeStyles';
 import Navigation from '@navigation/Navigation';
 import type {PlatformStackScreenProps} from '@navigation/PlatformStackNavigation/types';
 import type {SettingsNavigatorParamList} from '@navigation/types';
@@ -19,6 +18,7 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
 import DefaultGroupToggle from './DefaultGroupToggle';
+import HTMLMessagesRow from './HTMLMessagesRow';
 import PreferredWorkspaceToggle from './PreferredWorkspaceToggle';
 
 type DomainGroupDetailsPageProps = PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.DOMAIN.GROUP_DETAILS>;
@@ -26,7 +26,6 @@ type DomainGroupDetailsPageProps = PlatformStackScreenProps<SettingsNavigatorPar
 function DomainGroupDetailsPage({route}: DomainGroupDetailsPageProps) {
     const {domainAccountID, groupID} = route.params;
 
-    const styles = useThemeStyles();
     const {translate} = useLocalize();
 
     const [group] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {
@@ -48,17 +47,16 @@ function DomainGroupDetailsPage({route}: DomainGroupDetailsPageProps) {
                     onBackButtonPress={() => Navigation.goBack(ROUTES.DOMAIN_GROUPS.getRoute(domainAccountID))}
                 />
                 <ScrollView>
-                    <OfflineWithFeedback
-                        pendingAction={namePendingAction}
-                        errors={nameErrors}
-                        errorRowStyles={styles.mh5}
-                        onClose={() => clearDomainSecurityGroupSettingError(domainAccountID, groupID, 'nameErrors')}
-                    >
+                    <OfflineWithFeedback pendingAction={namePendingAction}>
                         <MenuItemWithTopDescription
                             description={translate('common.name')}
                             title={group?.name ?? ''}
                             shouldShowRightIcon
                             onPress={() => Navigation.navigate(ROUTES.DOMAIN_GROUP_EDIT_NAME.getRoute(domainAccountID, groupID))}
+                        />
+                        <HTMLMessagesRow
+                            errors={nameErrors}
+                            onDismiss={() => clearDomainSecurityGroupSettingError(domainAccountID, groupID, 'nameErrors')}
                         />
                     </OfflineWithFeedback>
                     <DefaultGroupToggle
