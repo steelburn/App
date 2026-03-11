@@ -1,12 +1,14 @@
 import {domainSecurityGroupSettingErrorsSelector, domainSecurityGroupSettingPendingActionSelector, selectGroupByID} from '@selectors/Domain';
 import {policyNameSelector} from '@selectors/Policy';
 import React from 'react';
+import {View} from 'react-native';
 import MenuItemWithTopDescription from '@components/MenuItemWithTopDescription';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
 import Navigation from '@navigation/Navigation';
+import HTMLMessagesRow from '@pages/domain/Groups/HTMLMessagesRow';
 import ToggleSettingOptionRow from '@pages/workspace/workflows/ToggleSettingsOptionRow';
 import {clearDomainSecurityGroupSettingError, updateDomainSecurityGroup} from '@userActions/Domain';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -46,35 +48,38 @@ function PreferredWorkspaceToggle({domainAccountID, groupID}: PreferredWorkspace
 
     return (
         <>
-            <ToggleSettingOptionRow
-                title={translate('domain.groups.preferredWorkspace')}
-                subtitle={translate('domain.groups.preferredWorkspaceDescription', isEnabled)}
-                switchAccessibilityLabel={translate('domain.groups.preferredWorkspace')}
-                shouldPlaceSubtitleBelowSwitch
-                isActive={isEnabled}
-                onToggle={(enabled) => {
-                    if (!group?.name) {
-                        return;
-                    }
-                    updateDomainSecurityGroup(domainAccountID, groupID, group, {enableRestrictedPrimaryPolicy: enabled}, 'enableRestrictedPrimaryPolicy');
-                }}
-                wrapperStyle={[styles.mv3, styles.ph5]}
-                pendingAction={enableRestrictedPrimaryPolicyPendingAction}
-                errors={enableRestrictedPrimaryPolicyErrors}
-                onCloseError={() => clearDomainSecurityGroupSettingError(domainAccountID, groupID, 'enableRestrictedPrimaryPolicyErrors')}
-            />
+            <View style={styles.mv3}>
+                <ToggleSettingOptionRow
+                    title={translate('domain.groups.preferredWorkspace')}
+                    subtitle={translate('domain.groups.preferredWorkspaceDescription', isEnabled)}
+                    switchAccessibilityLabel={translate('domain.groups.preferredWorkspace')}
+                    shouldPlaceSubtitleBelowSwitch
+                    isActive={isEnabled}
+                    onToggle={(enabled) => {
+                        if (!group?.name) {
+                            return;
+                        }
+                        updateDomainSecurityGroup(domainAccountID, groupID, group, {enableRestrictedPrimaryPolicy: enabled}, 'enableRestrictedPrimaryPolicy');
+                    }}
+                    wrapperStyle={[styles.ph5]}
+                    pendingAction={enableRestrictedPrimaryPolicyPendingAction}
+                />
+                <HTMLMessagesRow
+                    errors={enableRestrictedPrimaryPolicyErrors}
+                    onDismiss={() => clearDomainSecurityGroupSettingError(domainAccountID, groupID, 'enableRestrictedPrimaryPolicyErrors')}
+                />
+            </View>
             {isEnabled && (
-                <OfflineWithFeedback
-                    pendingAction={restrictedPrimaryPolicyIDPendingAction}
-                    errors={restrictedPrimaryPolicyIDErrors}
-                    errorRowStyles={styles.mh5}
-                    onClose={() => clearDomainSecurityGroupSettingError(domainAccountID, groupID, 'restrictedPrimaryPolicyIDErrors')}
-                >
+                <OfflineWithFeedback pendingAction={restrictedPrimaryPolicyIDPendingAction}>
                     <MenuItemWithTopDescription
                         description={translate('domain.groups.preferredWorkspace')}
                         title={preferredPolicyName ?? ''}
                         shouldShowRightIcon
                         onPress={() => Navigation.navigate(ROUTES.DOMAIN_SECURITY_GROUPS_PREFERRED_WORKSPACE.getRoute(domainAccountID, groupID))}
+                    />
+                    <HTMLMessagesRow
+                        errors={restrictedPrimaryPolicyIDErrors}
+                        onDismiss={() => clearDomainSecurityGroupSettingError(domainAccountID, groupID, 'restrictedPrimaryPolicyIDErrors')}
                     />
                 </OfflineWithFeedback>
             )}

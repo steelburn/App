@@ -42,9 +42,9 @@ const createAdminPolicySelector = (currentPolicyID: string | undefined) => (poli
     }, {});
 };
 
-type DomainSecurityGroupPreferredWorkspacePageProps = PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.DOMAIN.SECURITY_GROUPS_PREFERRED_WORKSPACE>;
+type DomainGroupPreferredWorkspacePageProps = PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.DOMAIN.SECURITY_GROUPS_PREFERRED_WORKSPACE>;
 
-function DomainSecurityGroupPreferredWorkspacePage({route}: DomainSecurityGroupPreferredWorkspacePageProps) {
+function DomainGroupPreferredWorkspacePage({route}: DomainGroupPreferredWorkspacePageProps) {
     const {domainAccountID, groupID} = route.params;
 
     const styles = useThemeStyles();
@@ -89,6 +89,9 @@ function DomainSecurityGroupPreferredWorkspacePage({route}: DomainSecurityGroupP
             setShouldShowError(true);
             return;
         }
+        if (!group) {
+            return;
+        }
 
         updateDomainSecurityGroup(domainAccountID, groupID, group, {restrictedPrimaryPolicyID: selectedPolicyID}, 'restrictedPrimaryPolicyID');
         Navigation.goBack(ROUTES.DOMAIN_GROUP_DETAILS.getRoute(domainAccountID, groupID));
@@ -98,7 +101,7 @@ function DomainSecurityGroupPreferredWorkspacePage({route}: DomainSecurityGroupP
         <DomainNotFoundPageWrapper domainAccountID={domainAccountID}>
             <ScreenWrapper
                 shouldEnableMaxHeight
-                testID="DomainSecurityGroupPreferredWorkspacePage"
+                testID="DomainGroupPreferredWorkspacePage"
                 includeSafeAreaPaddingBottom
             >
                 <HeaderWithBackButton
@@ -130,4 +133,4 @@ function DomainSecurityGroupPreferredWorkspacePage({route}: DomainSecurityGroupP
     );
 }
 
-export default DomainSecurityGroupPreferredWorkspacePage;
+export default DomainGroupPreferredWorkspacePage;

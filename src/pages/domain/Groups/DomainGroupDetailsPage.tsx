@@ -9,6 +9,7 @@ import ScrollView from '@components/ScrollView';
 import Text from '@components/Text';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
+import useThemeStyles from '@hooks/useThemeStyles';
 import Navigation from '@navigation/Navigation';
 import type {PlatformStackScreenProps} from '@navigation/PlatformStackNavigation/types';
 import type {SettingsNavigatorParamList} from '@navigation/types';
@@ -26,6 +27,7 @@ type DomainGroupDetailsPageProps = PlatformStackScreenProps<SettingsNavigatorPar
 function DomainGroupDetailsPage({route}: DomainGroupDetailsPageProps) {
     const {domainAccountID, groupID} = route.params;
 
+    const styles = useThemeStyles();
     const {translate} = useLocalize();
 
     const [group] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {
