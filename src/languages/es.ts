@@ -8905,6 +8905,10 @@ ${amount} para ${merchant} - ${date}`,
             error: {
                 settings: '<rbr>No se pudo guardar este cambio. Inténtalo de nuevo o <concierge-link>contacta con Concierge</concierge-link> para obtener más ayuda.</rbr>',
             },
+            permissions: 'Permisos de grupo',
+            deleteGroup: 'Eliminar grupo',
+            deleteGroupDangerConfirmationModal: 'Eliminar grupo',
+            deleteGroupDangerConfirmationModalDescription: (defaultGroupName: string) => `¿Estás seguro? Esto reasignará a todos los miembros al grupo predeterminado (${defaultGroupName}) y no se puede deshacer.`
         },
     },
     gps: {

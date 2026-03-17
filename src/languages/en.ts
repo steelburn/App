@@ -8650,6 +8650,10 @@ const translations = {
             error: {
                 settings: '<rbr>Couldn’t save this change. Please try again or <concierge-link>contact Concierge</concierge-link> for more support.</rbr>',
             },
+            permissions: 'Group permissions',
+            deleteGroup: 'Delete Group',
+            deleteGroupDangerConfirmationModal: 'Delete Group',
+            deleteGroupDangerConfirmationModalDescription: (defaultGroupName: string) => `Are you sure? This will reassign all members to the default group (${defaultGroupName}) and can't be undone.`
         },
     },
 };
