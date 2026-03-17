@@ -8650,6 +8650,9 @@ const translations = {
             error: {
                 settings: '<rbr>Couldn’t save this change. Please try again or <concierge-link>contact Concierge</concierge-link> for more support.</rbr>',
             },
+            permissions: 'Group permissions',
+            ExpensifyCardPreferredWorkspace: 'Expensify Card Preferred Workspace',
+            ExpensifyCardPreferredWorkspaceDescription: 'All Expensify Card transactions will be created on the Expensify Card Preferred Workspace instead of the Preferred Workspace. Enabling this feature will override the Preferred Workspace setting for Expensify Card transactions only.'
         },
     },
 };

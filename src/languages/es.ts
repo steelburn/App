@@ -8905,6 +8905,9 @@ ${amount} para ${merchant} - ${date}`,
             error: {
                 settings: '<rbr>No se pudo guardar este cambio. Inténtalo de nuevo o <concierge-link>contacta con Concierge</concierge-link> para obtener más ayuda.</rbr>',
             },
+            permissions: 'Permisos de grupo',
+            ExpensifyCardPreferredWorkspace: 'Espacio de trabajo preferido para Expensify Card',
+            ExpensifyCardPreferredWorkspaceDescription: 'Todas las transacciones de Expensify Card se crearán en el espacio de trabajo preferido de Expensify Card en lugar del espacio de trabajo preferido. Al habilitar esta función, la configuración de espacio de trabajo preferido se aplicará solo a las transacciones de Expensify Card.'
         },
     },
     gps: {
