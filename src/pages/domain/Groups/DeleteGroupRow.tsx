@@ -6,6 +6,7 @@ import useConfirmModal from '@hooks/useConfirmModal';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
+import Navigation from '@libs/Navigation/Navigation';
 import {updateDomainSecurityGroup} from '@userActions/Domain';
 import ONYXKEYS from '@src/ONYXKEYS';
 
@@ -49,6 +50,7 @@ function DeleteGroupRow({domainAccountID, groupID}: DeleteGroupRowProps) {
 
         // placeholder
         updateDomainSecurityGroup(domainAccountID, groupID, group, {}, 'name');
+        Navigation.goBack();
     };
 
     // should i move render logic to DomainGroupDetailsPage or can i leave it here?
