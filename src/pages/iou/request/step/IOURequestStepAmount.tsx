@@ -189,6 +189,7 @@ function IOURequestStepAmount({
 
     const [recentWaypoints] = useOnyx(ONYXKEYS.NVP_RECENT_WAYPOINTS);
     const [conciergeReportID] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID);
+    const [parentReportPolicyTags] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_TAGS}${parentReport?.policyID}`);
 
     const navigateToNextPage = ({amount, paymentMethod}: AmountParams) => {
         isSaveButtonPressed.current = true;
@@ -418,6 +419,7 @@ function IOURequestStepAmount({
             currentUserEmailParam,
             isASAPSubmitBetaEnabled,
             policyRecentlyUsedCurrencies: policyRecentlyUsedCurrencies ?? [],
+            policyTagList: parentReportPolicyTags,
         });
         navigateBack();
     };

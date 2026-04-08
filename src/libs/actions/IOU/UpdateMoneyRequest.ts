@@ -731,7 +731,7 @@ type UpdateMoneyRequestAmountAndCurrencyParams = {
     amount: number;
     taxAmount: number;
     policy?: OnyxEntry<OnyxTypes.Policy>;
-    policyTagList?: OnyxEntry<OnyxTypes.PolicyTagLists>;
+    policyTagList: OnyxEntry<OnyxTypes.PolicyTagLists>;
     policyCategories?: OnyxEntry<OnyxTypes.PolicyCategories>;
     taxCode: string;
     taxValue: string;
@@ -786,7 +786,7 @@ function updateMoneyRequestAmountAndCurrency({
             iouReport: parentReport,
             transactionChanges,
             policy,
-            policyTagList: policyTagList ?? null,
+            policyTagList,
             policyCategories: policyCategories ?? null,
             allowNegative,
             currentUserAccountIDParam,
