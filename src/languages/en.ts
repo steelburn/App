@@ -8871,7 +8871,9 @@ const translations = {
             permissions: 'Group permissions',
             deleteGroup: 'Delete Group',
             deleteGroupDangerConfirmationModal: 'Delete Group',
-            deleteGroupDangerConfirmationModalDescription: (defaultGroupName: string) => `Are you sure? This will reassign all members to the default group (${defaultGroupName}) and can't be undone.`
+            deleteGroupDangerConfirmationModalDescription: (defaultGroupName: string) =>
+                `Are you sure? This will reassign all members to the default group (${defaultGroupName}) and can't be undone.`,
+            nevermind: 'Nevermind',
         },
     },
 };
