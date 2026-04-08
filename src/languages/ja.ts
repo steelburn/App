@@ -8762,6 +8762,10 @@ ${reportName}
             title: 'グループ',
             memberCount: () => ({one: 'メンバー 1 人', other: (count: number) => `${count}名のメンバー`}),
             error: {settings: '<rbr>この変更を保存できませんでした。もう一度お試しいただくか、<concierge-link>Conciergeにお問い合わせ</concierge-link>ください。</rbr>'},
+            permissions: 'グループ権限',
+            preferredWorkspace: '優先ワークスペース',
+            preferredWorkspaceDescription: (enabled: boolean) => `すべての新しいレポートと経費は${enabled ? '選択された優先' : 'この'}ワークスペースに作成されます。`,
+            preferredWorkspaceSelectDescription: 'すべての新しい経費とレポートはこのワークスペースに作成されます。',
         },
     },
     proactiveAppReview: {

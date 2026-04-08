@@ -8907,6 +8907,11 @@ Voici un *reçu test* pour vous montrer comment ça fonctionne :`,
             title: 'Groupes',
             memberCount: () => ({one: '1 membre', other: (count: number) => `${count} membres`}),
             error: {settings: "<rbr>Impossible d'enregistrer cette modification. Veuillez réessayer ou <concierge-link>contacter Concierge</concierge-link> pour obtenir de l'aide.</rbr>"},
+            permissions: 'Permissions du groupe',
+            preferredWorkspace: 'Espace de travail préféré',
+            preferredWorkspaceDescription: (enabled: boolean) =>
+                `Tous les nouveaux rapports et dépenses seront créés dans ${enabled ? "l'espace de travail préféré sélectionné" : 'cet espace de travail'}.`,
+            preferredWorkspaceSelectDescription: 'Toutes les nouvelles dépenses et tous les nouveaux rapports seront créés dans cet espace de travail.',
         },
     },
     proactiveAppReview: {

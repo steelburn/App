@@ -8838,6 +8838,11 @@ Aqui está um *comprovante de teste* para mostrar como funciona:`,
             title: 'Grupos',
             memberCount: () => ({one: '1 membro', other: (count: number) => `${count} membros`}),
             error: {settings: '<rbr>Não foi possível salvar esta alteração. Tente novamente ou <concierge-link>entre em contato com o Concierge</concierge-link> para mais suporte.</rbr>'},
+            permissions: 'Permissões do grupo',
+            preferredWorkspace: 'Espaço de trabalho preferido',
+            preferredWorkspaceDescription: (enabled: boolean) =>
+                `Todos os novos relatórios e despesas serão criados ${enabled ? 'no espaço de trabalho preferido selecionado' : 'neste espaço de trabalho'}.`,
+            preferredWorkspaceSelectDescription: 'Todas as novas despesas e relatórios serão criados neste espaço de trabalho.',
         },
     },
     proactiveAppReview: {

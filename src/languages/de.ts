@@ -8886,6 +8886,10 @@ Hier ist ein *Testbeleg*, um dir zu zeigen, wie es funktioniert:`,
                 settings:
                     '<rbr>Diese Änderung konnte nicht gespeichert werden. Bitte versuche es erneut oder <concierge-link>kontaktiere Concierge</concierge-link> für weitere Unterstützung.</rbr>',
             },
+            permissions: 'Gruppenberechtigungen',
+            preferredWorkspace: 'Bevorzugter Arbeitsbereich',
+            preferredWorkspaceDescription: (enabled: boolean) => `Alle neuen Berichte und Ausgaben werden im ${enabled ? 'ausgewählten bevorzugten' : 'diesem'} Arbeitsbereich erstellt.`,
+            preferredWorkspaceSelectDescription: 'Alle neuen Ausgaben und Berichte werden in diesem Arbeitsbereich erstellt.',
         },
     },
     proactiveAppReview: {

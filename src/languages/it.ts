@@ -8873,6 +8873,11 @@ Ecco una *ricevuta di prova* per mostrarti come funziona:`,
             title: 'Gruppi',
             memberCount: () => ({one: '1 membro', other: (count: number) => `${count} membri`}),
             error: {settings: '<rbr>Non è stato possibile salvare questa modifica. Riprova o <concierge-link>contatta Concierge</concierge-link> per ulteriore assistenza.</rbr>'},
+            permissions: 'Permessi del gruppo',
+            preferredWorkspace: 'Spazio di lavoro preferito',
+            preferredWorkspaceDescription: (enabled: boolean) =>
+                `Tutti i nuovi report e le spese verranno creati ${enabled ? 'nello spazio di lavoro preferito selezionato' : 'in questo spazio di lavoro'}.`,
+            preferredWorkspaceSelectDescription: 'Tutte le nuove spese e i report verranno creati in questo spazio di lavoro.',
         },
     },
     proactiveAppReview: {
