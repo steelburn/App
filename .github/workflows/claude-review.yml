@@ -26,7 +26,7 @@ jobs:
       needs.validate.outputs.IS_AUTHORIZED == 'true'
       && github.event.pull_request.draft != true
       && !contains(github.event.pull_request.title, 'Revert')
-    runs-on: blacksmith-2vcpu-ubuntu-2404
+    runs-on: ubuntu-latest
     env:
       PR_NUMBER: ${{ github.event.pull_request.number }}
       ALLOWED_RULES_FILE: ${{ runner.temp }}/allowed-rules.txt
