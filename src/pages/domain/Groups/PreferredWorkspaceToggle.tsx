@@ -90,6 +90,10 @@ function PreferredWorkspaceToggle({domainAccountID, groupID}: PreferredWorkspace
                         message={translate('domain.groups.noWorkspacesMessage')}
                     />
                 )}
+                <HTMLMessagesRow
+                    errors={enableRestrictedPrimaryPolicyErrors}
+                    onDismiss={() => clearDomainSecurityGroupSettingError(domainAccountID, groupID, 'enableRestrictedPrimaryPolicyErrors')}
+                />
             </View>
             {hasAdminPolicies && (
                 <OfflineWithFeedback pendingAction={restrictedPrimaryPolicyIDPendingAction}>

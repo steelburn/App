@@ -112,6 +112,7 @@ function DomainGroupPreferredWorkspacePage({route}: DomainGroupPreferredWorkspac
                             isAlertVisible={shouldShowError}
                             containerStyles={[!shouldShowError && styles.mt5]}
                             message={translate('common.error.pleaseSelectOne')}
+                            enabledWhenOffline
                         />
                     }
                 />
