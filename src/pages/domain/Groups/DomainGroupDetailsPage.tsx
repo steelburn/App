@@ -1,7 +1,7 @@
 import {domainSecurityGroupSettingErrorsSelector, domainSecurityGroupSettingPendingActionSelector, selectGroupByID} from '@selectors/Domain';
 import React from 'react';
-import ErrorMessageRow from '@components/ErrorMessageRow';
 import {View} from 'react-native';
+import ErrorMessageRow from '@components/ErrorMessageRow';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import MenuItemWithTopDescription from '@components/MenuItemWithTopDescription';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
@@ -28,7 +28,6 @@ function DomainGroupDetailsPage({route}: DomainGroupDetailsPageProps) {
 
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const styles = useThemeStyles();
 
     const [group] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {
         selector: selectGroupByID(groupID),

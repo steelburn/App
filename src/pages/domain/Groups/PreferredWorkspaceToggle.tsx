@@ -2,6 +2,7 @@ import {domainSecurityGroupSettingErrorsSelector, domainSecurityGroupSettingPend
 import {createAdminPoliciesSelector, policyNameSelector} from '@selectors/Policy';
 import React from 'react';
 import {View} from 'react-native';
+import ErrorMessageRow from '@components/ErrorMessageRow';
 import FormHelpMessage from '@components/FormHelpMessage';
 import MenuItemWithTopDescription from '@components/MenuItemWithTopDescription';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
@@ -9,7 +10,6 @@ import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
 import Navigation from '@navigation/Navigation';
-import HTMLMessagesRow from '@pages/domain/Groups/HTMLMessagesRow';
 import ToggleSettingOptionRow from '@pages/workspace/workflows/ToggleSettingsOptionRow';
 import {clearDomainSecurityGroupSettingError, updateDomainSecurityGroup} from '@userActions/Domain';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -90,9 +90,10 @@ function PreferredWorkspaceToggle({domainAccountID, groupID}: PreferredWorkspace
                         message={translate('domain.groups.noWorkspacesMessage')}
                     />
                 )}
-                <HTMLMessagesRow
+                <ErrorMessageRow
                     errors={enableRestrictedPrimaryPolicyErrors}
                     onDismiss={() => clearDomainSecurityGroupSettingError(domainAccountID, groupID, 'enableRestrictedPrimaryPolicyErrors')}
+                    errorRowStyles={[styles.mh5, styles.mt3]}
                 />
             </View>
             {hasAdminPolicies && (
@@ -104,9 +105,10 @@ function PreferredWorkspaceToggle({domainAccountID, groupID}: PreferredWorkspace
                         onPress={() => Navigation.navigate(ROUTES.DOMAIN_SECURITY_GROUPS_PREFERRED_WORKSPACE.getRoute(domainAccountID, groupID))}
                         disabled={!isEnabled}
                     />
-                    <HTMLMessagesRow
+                    <ErrorMessageRow
                         errors={restrictedPrimaryPolicyIDErrors}
                         onDismiss={() => clearDomainSecurityGroupSettingError(domainAccountID, groupID, 'restrictedPrimaryPolicyIDErrors')}
+                        errorRowStyles={[styles.mh5, styles.mt3]}
                     />
                 </OfflineWithFeedback>
             )}
