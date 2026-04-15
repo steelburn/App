@@ -1,5 +1,6 @@
 import {domainSecurityGroupSettingErrorsSelector, domainSecurityGroupSettingPendingActionSelector, selectGroupByID} from '@selectors/Domain';
 import React from 'react';
+import ErrorMessageRow from '@components/ErrorMessageRow';
 import {View} from 'react-native';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import MenuItemWithTopDescription from '@components/MenuItemWithTopDescription';
@@ -18,7 +19,6 @@ import {clearDomainSecurityGroupSettingError} from '@userActions/Domain';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
-import HTMLMessagesRow from './HTMLMessagesRow';
 import PreferredWorkspaceToggle from './PreferredWorkspaceToggle';
 
 type DomainGroupDetailsPageProps = PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.DOMAIN.GROUP_DETAILS>;
@@ -28,6 +28,7 @@ function DomainGroupDetailsPage({route}: DomainGroupDetailsPageProps) {
 
     const styles = useThemeStyles();
     const {translate} = useLocalize();
+    const styles = useThemeStyles();
 
     const [group] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {
         selector: selectGroupByID(groupID),
@@ -55,9 +56,10 @@ function DomainGroupDetailsPage({route}: DomainGroupDetailsPageProps) {
                             shouldShowRightIcon
                             onPress={() => Navigation.navigate(ROUTES.DOMAIN_GROUP_EDIT_NAME.getRoute(domainAccountID, groupID))}
                         />
-                        <HTMLMessagesRow
+                        <ErrorMessageRow
                             errors={nameErrors}
                             onDismiss={() => clearDomainSecurityGroupSettingError(domainAccountID, groupID, 'nameErrors')}
+                            errorRowStyles={[styles.mh5, styles.mt3]}
                         />
                     </OfflineWithFeedback>
                     <View style={[styles.sectionDividerLine, styles.ph5, styles.mv6]} />
