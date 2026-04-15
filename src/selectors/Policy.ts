@@ -165,6 +165,20 @@ function lastWorkspaceNumberSelector(policies: OnyxCollection<Policy>, email: st
 
 const policyNameSelector = (policy: OnyxEntry<Policy>) => policy?.name;
 
+const createAdminPoliciesSelector = (currentPolicyID: string | undefined) => (policies: OnyxCollection<Policy>) => {
+    return Object.entries(policies ?? {}).reduce<Record<string, Pick<Policy, 'name' | 'id' | 'avatarURL' | 'created'>>>((acc, [key, policy]) => {
+        if (!policy?.id || !policy?.name) {
+            return acc;
+        }
+        const isCurrentPolicy = policy.id === currentPolicyID;
+        if (!isCurrentPolicy && (policy.type === CONST.POLICY.TYPE.PERSONAL || policy.role !== CONST.POLICY.ROLE.ADMIN)) {
+            return acc;
+        }
+        acc[key] = {id: policy.id, name: policy.name, avatarURL: policy.avatarURL, created: policy.created};
+        return acc;
+    }, {});
+};
+
 export {
     activePolicySelector,
     createAllPolicyReportFieldsSelector,
@@ -183,4 +197,5 @@ export {
     hasPoliciesConnectedToNetSuiteSelector,
     lastWorkspaceNumberSelector,
     policyNameSelector,
+    createAdminPoliciesSelector,
 };

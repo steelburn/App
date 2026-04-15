@@ -1,7 +1,8 @@
 import {domainSecurityGroupSettingErrorsSelector, domainSecurityGroupSettingPendingActionSelector, selectGroupByID} from '@selectors/Domain';
-import {policyNameSelector} from '@selectors/Policy';
+import {createAdminPoliciesSelector, policyNameSelector} from '@selectors/Policy';
 import React from 'react';
 import {View} from 'react-native';
+import FormHelpMessage from '@components/FormHelpMessage';
 import MenuItemWithTopDescription from '@components/MenuItemWithTopDescription';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
 import useLocalize from '@hooks/useLocalize';
@@ -21,11 +22,19 @@ type PreferredWorkspaceToggleProps = {
 
 function PreferredWorkspaceToggle({domainAccountID, groupID}: PreferredWorkspaceToggleProps) {
     const styles = useThemeStyles();
-    const {translate} = useLocalize();
+    const {translate, localeCompare} = useLocalize();
 
     const [group] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {
         selector: selectGroupByID(groupID),
     });
+
+    const [adminPolicies] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {selector: createAdminPoliciesSelector(undefined)});
+    const firstAdminPolicy = Object.values(adminPolicies ?? {})
+        .sort((a, b) => localeCompare(a?.created ?? '', b?.created ?? ''))
+        .at(0);
+    const firstAdminPolicyID = firstAdminPolicy?.id;
+    const firstAdminPolicyName = firstAdminPolicy?.name;
+    const hasAdminPolicies = !!firstAdminPolicyID;
 
     const isEnabled = !!group?.enableRestrictedPrimaryPolicy;
     const preferredPolicyID = group?.restrictedPrimaryPolicyID;
@@ -55,8 +64,19 @@ function PreferredWorkspaceToggle({domainAccountID, groupID}: PreferredWorkspace
                     switchAccessibilityLabel={translate('domain.groups.preferredWorkspace')}
                     shouldPlaceSubtitleBelowSwitch
                     isActive={isEnabled}
+                    disabled={!hasAdminPolicies}
                     onToggle={(enabled) => {
                         if (!group?.name) {
+                            return;
+                        }
+                        if (enabled && !preferredPolicyID && firstAdminPolicyID) {
+                            updateDomainSecurityGroup(
+                                domainAccountID,
+                                groupID,
+                                group,
+                                {enableRestrictedPrimaryPolicy: enabled, restrictedPrimaryPolicyID: firstAdminPolicyID},
+                                'enableRestrictedPrimaryPolicy',
+                            );
                             return;
                         }
                         updateDomainSecurityGroup(domainAccountID, groupID, group, {enableRestrictedPrimaryPolicy: enabled}, 'enableRestrictedPrimaryPolicy');
@@ -64,18 +84,21 @@ function PreferredWorkspaceToggle({domainAccountID, groupID}: PreferredWorkspace
                     wrapperStyle={[styles.ph5]}
                     pendingAction={enableRestrictedPrimaryPolicyPendingAction}
                 />
-                <HTMLMessagesRow
-                    errors={enableRestrictedPrimaryPolicyErrors}
-                    onDismiss={() => clearDomainSecurityGroupSettingError(domainAccountID, groupID, 'enableRestrictedPrimaryPolicyErrors')}
-                />
+                {!hasAdminPolicies && (
+                    <FormHelpMessage
+                        style={[styles.ph5]}
+                        message={translate('domain.groups.noWorkspacesMessage')}
+                    />
+                )}
             </View>
-            {isEnabled && (
+            {hasAdminPolicies && (
                 <OfflineWithFeedback pendingAction={restrictedPrimaryPolicyIDPendingAction}>
                     <MenuItemWithTopDescription
                         description={translate('domain.groups.preferredWorkspace')}
-                        title={preferredPolicyName ?? ''}
+                        title={preferredPolicyName ?? firstAdminPolicyName ?? ''}
                         shouldShowRightIcon
                         onPress={() => Navigation.navigate(ROUTES.DOMAIN_SECURITY_GROUPS_PREFERRED_WORKSPACE.getRoute(domainAccountID, groupID))}
+                        disabled={!isEnabled}
                     />
                     <HTMLMessagesRow
                         errors={restrictedPrimaryPolicyIDErrors}

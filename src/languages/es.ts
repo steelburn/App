@@ -9157,6 +9157,7 @@ ${amount} para ${merchant} - ${date}`,
             preferredWorkspaceDescription: (enabled) =>
                 `Todos los nuevos informes y gastos se crearán en ${enabled ? 'el espacio de trabajo preferido seleccionado' : 'este espacio de trabajo'}.`,
             preferredWorkspaceSelectDescription: 'Todos los nuevos gastos e informes se crearán en este espacio de trabajo.',
+            noWorkspacesMessage: 'No hay espacios de trabajo en este dominio. Se requiere un espacio de trabajo para habilitar esta restricción.',
         },
     },
     gps: {
