@@ -58,7 +58,7 @@ function DomainGroupDetailsPage({route}: DomainGroupDetailsPageProps) {
                         <ErrorMessageRow
                             errors={nameErrors}
                             onDismiss={() => clearDomainSecurityGroupSettingError(domainAccountID, groupID, 'nameErrors')}
-                            errorRowStyles={[styles.mh5, styles.mt3]}
+                            errorRowStyles={[styles.mh5]}
                         />
                     </OfflineWithFeedback>
                     <View style={[styles.sectionDividerLine, styles.ph5, styles.mv6]} />

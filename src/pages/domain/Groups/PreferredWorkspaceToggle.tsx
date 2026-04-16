@@ -99,7 +99,7 @@ function PreferredWorkspaceToggle({domainAccountID, groupID}: PreferredWorkspace
                     pendingAction={restrictedPrimaryPolicyIDPendingAction}
                     errors={restrictedPrimaryPolicyIDErrors}
                     onClose={() => clearDomainSecurityGroupSettingError(domainAccountID, groupID, 'restrictedPrimaryPolicyIDErrors')}
-                    errorRowStyles={[styles.mh5, styles.mt3]}
+                    errorRowStyles={[styles.mh5]}
                 >
                     <MenuItemWithTopDescription
                         description={translate('domain.groups.preferredWorkspace')}
