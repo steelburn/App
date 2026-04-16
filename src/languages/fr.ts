@@ -8902,11 +8902,11 @@ Voici un *reçu test* pour vous montrer comment ça fonctionne :`,
             forceTwoFactorAuthDescription: `<muted-text>Exiger l’authentification à deux facteurs pour tous les membres de ce domaine. Les membres du domaine seront invités à configurer l’authentification à deux facteurs sur leur compte lorsqu’ils se connectent.</muted-text>`,
             forceTwoFactorAuthError: 'L’activation forcée de l’authentification à deux facteurs n’a pas pu être modifiée. Veuillez réessayer plus tard.',
             resetTwoFactorAuth: 'Réinitialiser l’authentification à deux facteurs',
+            error: 'Impossible d\’enregistrer cette modification. Veuillez réessayer.',
         },
         groups: {
             title: 'Groupes',
             memberCount: () => ({one: '1 membre', other: (count: number) => `${count} membres`}),
-            error: {settings: "<rbr>Impossible d'enregistrer cette modification. Veuillez réessayer ou <concierge-link>contacter Concierge</concierge-link> pour obtenir de l'aide.</rbr>"},
             permissions: 'Permissions du groupe',
             preferredWorkspace: 'Espace de travail préféré',
             preferredWorkspaceDescription: (enabled: boolean) =>
