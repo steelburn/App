@@ -8766,6 +8766,7 @@ ${reportName}
             preferredWorkspace: '優先ワークスペース',
             preferredWorkspaceDescription: (enabled: boolean) => `すべての新しいレポートと経費は${enabled ? '選択された優先' : 'この'}ワークスペースに作成されます。`,
             preferredWorkspaceSelectDescription: 'すべての新しい経費とレポートはこのワークスペースに作成されます。',
+            noWorkspacesMessage: 'このドメインにワークスペースがありません。この制限を有効にするにはワークスペースが必要です。',
         },
     },
     proactiveAppReview: {

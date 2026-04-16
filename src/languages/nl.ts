@@ -8855,6 +8855,7 @@ Hier is een *proefbon* om je te laten zien hoe het werkt:`,
             preferredWorkspace: 'Voorkeurswerkruimte',
             preferredWorkspaceDescription: (enabled: boolean) => `Alle nieuwe rapporten en uitgaven worden aangemaakt in ${enabled ? 'de geselecteerde voorkeurs' : 'deze'} werkruimte.`,
             preferredWorkspaceSelectDescription: 'Alle nieuwe uitgaven en rapporten worden aangemaakt in deze werkruimte.',
+            noWorkspacesMessage: 'Er zijn geen werkruimtes op dit domein. Een werkruimte is vereist om deze beperking in te schakelen.',
         },
     },
     proactiveAppReview: {

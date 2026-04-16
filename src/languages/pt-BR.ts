@@ -8843,6 +8843,7 @@ Aqui está um *comprovante de teste* para mostrar como funciona:`,
             preferredWorkspaceDescription: (enabled: boolean) =>
                 `Todos os novos relatórios e despesas serão criados ${enabled ? 'no espaço de trabalho preferido selecionado' : 'neste espaço de trabalho'}.`,
             preferredWorkspaceSelectDescription: 'Todas as novas despesas e relatórios serão criados neste espaço de trabalho.',
+            noWorkspacesMessage: 'Não há espaços de trabalho neste domínio. Um espaço de trabalho é necessário para ativar esta restrição.',
         },
     },
     proactiveAppReview: {

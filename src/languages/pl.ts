@@ -8832,6 +8832,7 @@ Oto *paragon testowy*, żeby pokazać Ci, jak to działa:`,
             preferredWorkspace: 'Preferowany obszar roboczy',
             preferredWorkspaceDescription: (enabled: boolean) => `Wszystkie nowe raporty i wydatki będą tworzone w ${enabled ? 'wybranym preferowanym' : 'tym'} obszarze roboczym.`,
             preferredWorkspaceSelectDescription: 'Wszystkie nowe wydatki i raporty będą tworzone w tym obszarze roboczym.',
+            noWorkspacesMessage: 'W tej domenie nie ma żadnych obszarów roboczych. Obszar roboczy jest wymagany, aby włączyć to ograniczenie.',
         },
     },
     proactiveAppReview: {
