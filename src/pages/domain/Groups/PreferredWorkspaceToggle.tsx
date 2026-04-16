@@ -28,13 +28,11 @@ function PreferredWorkspaceToggle({domainAccountID, groupID}: PreferredWorkspace
         selector: selectGroupByID(groupID),
     });
 
-    const [adminPolicies] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {selector: createAdminPoliciesSelector(undefined)});
+    const [adminPolicies] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {selector: createAdminPoliciesSelector()});
     const firstAdminPolicy = Object.values(adminPolicies ?? {})
         .sort((a, b) => localeCompare(a?.created ?? '', b?.created ?? ''))
         .at(0);
-    const firstAdminPolicyID = firstAdminPolicy?.id;
-    const firstAdminPolicyName = firstAdminPolicy?.name;
-    const hasAdminPolicies = !!firstAdminPolicyID;
+    const hasAdminPolicies = !!firstAdminPolicy;
 
     const isEnabled = !!group?.enableRestrictedPrimaryPolicy;
     const preferredPolicyID = group?.restrictedPrimaryPolicyID;
@@ -69,20 +67,25 @@ function PreferredWorkspaceToggle({domainAccountID, groupID}: PreferredWorkspace
                         if (!group?.name) {
                             return;
                         }
-                        if (enabled && !preferredPolicyID && firstAdminPolicyID) {
-                            updateDomainSecurityGroup(
-                                domainAccountID,
-                                groupID,
-                                group,
-                                {enableRestrictedPrimaryPolicy: enabled, restrictedPrimaryPolicyID: firstAdminPolicyID},
-                                'enableRestrictedPrimaryPolicy',
-                            );
-                            return;
-                        }
-                        updateDomainSecurityGroup(domainAccountID, groupID, group, {enableRestrictedPrimaryPolicy: enabled}, 'enableRestrictedPrimaryPolicy');
+                        updateDomainSecurityGroup(
+                            domainAccountID,
+                            groupID,
+                            group,
+                            {
+                                enableRestrictedPrimaryPolicy: enabled,
+                                ...(enabled &&
+                                    !preferredPolicyID &&
+                                    firstAdminPolicy?.id && {
+                                        restrictedPrimaryPolicyID: firstAdminPolicy?.id,
+                                    }),
+                            },
+                            'enableRestrictedPrimaryPolicy',
+                        );
                     }}
                     wrapperStyle={[styles.ph5]}
                     pendingAction={enableRestrictedPrimaryPolicyPendingAction}
+                    errors={enableRestrictedPrimaryPolicyErrors}
+                    onCloseError={() => clearDomainSecurityGroupSettingError(domainAccountID, groupID, 'enableRestrictedPrimaryPolicyErrors')}
                 />
                 {!hasAdminPolicies && (
                     <FormHelpMessage
@@ -90,25 +93,20 @@ function PreferredWorkspaceToggle({domainAccountID, groupID}: PreferredWorkspace
                         message={translate('domain.groups.noWorkspacesMessage')}
                     />
                 )}
-                <ErrorMessageRow
-                    errors={enableRestrictedPrimaryPolicyErrors}
-                    onDismiss={() => clearDomainSecurityGroupSettingError(domainAccountID, groupID, 'enableRestrictedPrimaryPolicyErrors')}
-                    errorRowStyles={[styles.mh5, styles.mt3]}
-                />
             </View>
             {hasAdminPolicies && (
-                <OfflineWithFeedback pendingAction={restrictedPrimaryPolicyIDPendingAction}>
+                <OfflineWithFeedback
+                    pendingAction={restrictedPrimaryPolicyIDPendingAction}
+                    errors={restrictedPrimaryPolicyIDErrors}
+                    onClose={() => clearDomainSecurityGroupSettingError(domainAccountID, groupID, 'restrictedPrimaryPolicyIDErrors')}
+                    errorRowStyles={[styles.mh5, styles.mt3]}
+                >
                     <MenuItemWithTopDescription
                         description={translate('domain.groups.preferredWorkspace')}
-                        title={preferredPolicyName ?? firstAdminPolicyName ?? ''}
+                        title={preferredPolicyName ?? firstAdminPolicy?.name}
                         shouldShowRightIcon
                         onPress={() => Navigation.navigate(ROUTES.DOMAIN_SECURITY_GROUPS_PREFERRED_WORKSPACE.getRoute(domainAccountID, groupID))}
                         disabled={!isEnabled}
-                    />
-                    <ErrorMessageRow
-                        errors={restrictedPrimaryPolicyIDErrors}
-                        onDismiss={() => clearDomainSecurityGroupSettingError(domainAccountID, groupID, 'restrictedPrimaryPolicyIDErrors')}
-                        errorRowStyles={[styles.mh5, styles.mt3]}
                     />
                 </OfflineWithFeedback>
             )}

@@ -165,7 +165,7 @@ function lastWorkspaceNumberSelector(policies: OnyxCollection<Policy>, email: st
 
 const policyNameSelector = (policy: OnyxEntry<Policy>) => policy?.name;
 
-const createAdminPoliciesSelector = (currentPolicyID: string | undefined) => (policies: OnyxCollection<Policy>) => {
+const createAdminPoliciesSelector = (currentPolicyID: string | undefined = undefined) => (policies: OnyxCollection<Policy>) => {
     return Object.entries(policies ?? {}).reduce<Record<string, Pick<Policy, 'name' | 'id' | 'avatarURL' | 'created'>>>((acc, [key, policy]) => {
         if (!policy?.id || !policy?.name) {
             return acc;

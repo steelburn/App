@@ -42,12 +42,12 @@ type DomainSecurityGroupErrors = {
     nameErrors?: OnyxCommon.Errors;
 
     /**
-     *
+     * Errors related to toggling the preferred workspace setting
      */
     enableRestrictedPrimaryPolicyErrors?: OnyxCommon.Errors;
 
     /**
-     *
+     * Errors related to changing the preferred workspace ID
      */
     restrictedPrimaryPolicyIDErrors?: OnyxCommon.Errors;
 };
