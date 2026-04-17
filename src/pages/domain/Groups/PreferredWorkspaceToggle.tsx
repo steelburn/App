@@ -1,9 +1,8 @@
 import {domainSecurityGroupSettingErrorsSelector, domainSecurityGroupSettingPendingActionSelector, selectGroupByID} from '@selectors/Domain';
 import {createAdminPoliciesSelector, policyNameSelector} from '@selectors/Policy';
-import React from 'react';
+import React, {useState} from 'react';
 import {View} from 'react-native';
-import ErrorMessageRow from '@components/ErrorMessageRow';
-import FormHelpMessage from '@components/FormHelpMessage';
+import ConfirmModal from '@components/ConfirmModal';
 import MenuItemWithTopDescription from '@components/MenuItemWithTopDescription';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
 import useLocalize from '@hooks/useLocalize';
@@ -23,6 +22,7 @@ type PreferredWorkspaceToggleProps = {
 function PreferredWorkspaceToggle({domainAccountID, groupID}: PreferredWorkspaceToggleProps) {
     const styles = useThemeStyles();
     const {translate, localeCompare} = useLocalize();
+    const [isNoWorkspacesModalVisible, setIsNoWorkspacesModalVisible] = useState(false);
 
     const [group] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {
         selector: selectGroupByID(groupID),
@@ -63,6 +63,7 @@ function PreferredWorkspaceToggle({domainAccountID, groupID}: PreferredWorkspace
                     shouldPlaceSubtitleBelowSwitch
                     isActive={isEnabled}
                     disabled={!hasAdminPolicies}
+                    disabledAction={() => setIsNoWorkspacesModalVisible(true)}
                     onToggle={(enabled) => {
                         if (!group?.name) {
                             return;
@@ -87,13 +88,16 @@ function PreferredWorkspaceToggle({domainAccountID, groupID}: PreferredWorkspace
                     errors={enableRestrictedPrimaryPolicyErrors}
                     onCloseError={() => clearDomainSecurityGroupSettingError(domainAccountID, groupID, 'enableRestrictedPrimaryPolicyErrors')}
                 />
-                {!hasAdminPolicies && (
-                    <FormHelpMessage
-                        style={[styles.ph5]}
-                        message={translate('domain.groups.noWorkspacesMessage')}
-                    />
-                )}
             </View>
+            <ConfirmModal
+                onConfirm={() => setIsNoWorkspacesModalVisible(false)}
+                onCancel={() => setIsNoWorkspacesModalVisible(false)}
+                isVisible={isNoWorkspacesModalVisible}
+                title={translate('workspace.distanceRates.oopsNotSoFast')}
+                prompt={translate('domain.groups.noWorkspacesMessage')}
+                confirmText={translate('common.buttonConfirm')}
+                shouldShowCancelButton={false}
+            />
             {hasAdminPolicies && (
                 <OfflineWithFeedback
                     pendingAction={restrictedPrimaryPolicyIDPendingAction}
