@@ -5162,6 +5162,7 @@ _Para instruções mais detalhadas, [visite nossa central de ajuda](${CONST.NETS
             free: 'Grátis',
             control: 'Controle',
             collect: 'Cobrar',
+            submit: 'Enviar',
         },
         companyCards: {
             addCards: 'Adicionar cartões',

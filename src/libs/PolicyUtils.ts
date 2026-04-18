@@ -935,15 +935,16 @@ function isSubmitPolicy(policy: OnyxInputOrEntry<Policy>): boolean {
     return policy?.type === CONST.POLICY.TYPE.SUBMIT;
 }
 
-function isPolicyEditor(policy: OnyxEntry<Policy>): boolean {
+function isPolicyEditor(policy: OnyxInputOrEntry<Policy>): boolean {
     return policy?.role === CONST.POLICY.ROLE.EDITOR;
 }
 
 /**
- * Returns true if the user can edit workspace settings — admins on any workspace, or editors on Submit workspaces.
+ * Returns true if the current user can edit workspace settings — admins on any workspace,
+ * or editors on Submit workspaces (Submit has no admin role, so editors manage it).
  */
-function canEditWorkspaceSettings(policy: OnyxEntry<Policy>): boolean {
-    return isPolicyAdmin(policy) || isPolicyEditor(policy);
+function canEditWorkspaceSettings(policy: OnyxInputOrEntry<Policy>): boolean {
+    return isPolicyAdmin(policy) || (isSubmitPolicy(policy) && isPolicyEditor(policy));
 }
 
 /**
@@ -1942,6 +1943,8 @@ function getUserFriendlyWorkspaceType(workspaceType: ValueOf<typeof CONST.POLICY
             return translate('workspace.type.control');
         case CONST.POLICY.TYPE.TEAM:
             return translate('workspace.type.collect');
+        case CONST.POLICY.TYPE.SUBMIT:
+            return translate('workspace.type.submit');
         default:
             return translate('workspace.type.free');
     }
