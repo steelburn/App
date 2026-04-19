@@ -14,10 +14,11 @@ import type {
 import {READ_COMMANDS, WRITE_COMMANDS} from '@libs/API/types';
 import * as CollectionUtils from '@libs/CollectionUtils';
 import DateUtils from '@libs/DateUtils';
+import DistanceRequestUtils from '@libs/DistanceRequestUtils';
 import {buildNextStepNew, buildOptimisticNextStep} from '@libs/NextStepUtils';
 import * as NumberUtils from '@libs/NumberUtils';
 import {rand64} from '@libs/NumberUtils';
-import {hasDependentTags, isPaidGroupPolicy} from '@libs/PolicyUtils';
+import {getDistanceRateCustomUnitRate, hasDependentTags, isPaidGroupPolicy} from '@libs/PolicyUtils';
 import {
     getAllReportActions,
     getIOUActionForReportID,
@@ -44,6 +45,7 @@ import {
 import {
     hasPendingRTERViolation,
     isDeletedTransaction,
+    isDistanceRequest,
     isManagedCardTransaction,
     isOnHold,
     recalculateUnreportedTransactionDetails,
@@ -1126,11 +1128,54 @@ function changeTransactionsReport({
             });
         }
 
+        // Auto-select a valid default distance rate when moving to a workspace where the current rate is invalid
+        let transactionForViolations = transaction;
+        if (isPaidGroupPolicy(policy) && policy?.id && isDistanceRequest(transaction)) {
+            const currentRateID = transaction.comment?.customUnit?.customUnitRateID;
+            if (!currentRateID || !getDistanceRateCustomUnitRate(policy, currentRateID)) {
+                const defaultRate = DistanceRequestUtils.getDefaultMileageRate(policy);
+                if (defaultRate?.customUnitRateID) {
+                    optimisticData.push({
+                        onyxMethod: Onyx.METHOD.MERGE,
+                        key: `${ONYXKEYS.COLLECTION.TRANSACTION}${transaction.transactionID}`,
+                        value: {
+                            comment: {
+                                customUnit: {
+                                    customUnitRateID: defaultRate.customUnitRateID,
+                                },
+                            },
+                        },
+                    });
+                    failureData.push({
+                        onyxMethod: Onyx.METHOD.MERGE,
+                        key: `${ONYXKEYS.COLLECTION.TRANSACTION}${transaction.transactionID}`,
+                        value: {
+                            comment: {
+                                customUnit: {
+                                    customUnitRateID: currentRateID ?? null,
+                                },
+                            },
+                        },
+                    });
+                    transactionForViolations = {
+                        ...transaction,
+                        comment: {
+                            ...transaction.comment,
+                            customUnit: {
+                                ...transaction.comment?.customUnit,
+                                customUnitRateID: defaultRate.customUnitRateID,
+                            },
+                        },
+                    };
+                }
+            }
+        }
+
         let transactionReimbursable = transaction.reimbursable;
         // 2. Calculate transaction violations if moving transaction to a workspace
         if (isPaidGroupPolicy(policy) && policy?.id) {
             const violationData = ViolationsUtils.getViolationsOnyxData(
-                transaction,
+                transactionForViolations,
                 currentTransactionViolations[transaction.transactionID] ?? [],
                 policy,
                 policyTagList,
