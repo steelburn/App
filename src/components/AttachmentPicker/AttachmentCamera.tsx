@@ -260,9 +260,9 @@ function AttachmentCamera({isVisible, onCapture, onClose}: AttachmentCameraProps
                         </View>
                     )}
                     {cameraPermissionStatus === RESULTS.GRANTED && device != null && (
-                        <View style={[styles.cameraView, styles.alignItemsCenter]}>
+                        <View style={[styles.cameraView, styles.alignItemsCenter, isInLandscapeMode && styles.justifyContentCenter]}>
                             <GestureDetector gesture={tapGesture}>
-                                <View style={StyleUtils.getCameraViewfinderStyle(cameraAspectRatio)}>
+                                <View style={isInLandscapeMode ? {aspectRatio: cameraAspectRatio, height: '100%'} : StyleUtils.getCameraViewfinderStyle(cameraAspectRatio)}>
                                     <VisionCamera
                                         ref={camera}
                                         device={device}
