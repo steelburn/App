@@ -254,6 +254,8 @@ function addPushParamsRouterExtension<RouterOptions extends PlatformStackRouterO
                 pushParamsHistoryPosition = -1;
             }
 
+            // Sync cursor to the new focused entry — otherwise a prior mid-cursor position leaks into the rebuilt history and truncates valid entries on the next PUSH_PARAMS.
+            pushParamsHistoryPosition = rehydratedState.history && rehydratedState.history.length > 0 ? rehydratedState.history.length - 1 : -1;
             return rehydratedState;
         };
 

@@ -599,6 +599,34 @@ describe('addPushParamsRouterExtension', () => {
         expect((state.routes.at(0)?.params as {q: string}).q).toBe('A');
     });
 
+    it('fall-through action (NAVIGATE/PUSH stack) after a mid-cursor RESET must sync the cursor to the new focused entry so a subsequent PUSH_PARAMS does not truncate valid history', () => {
+        const factory = createMockRouterFactory();
+        const enhancedRouter = addPushParamsRouterExtension(factory)({} as PlatformStackRouterOptions);
+
+        const initial = makeRoute('Search', 'search-1', {q: 'A'});
+        let state: TestState = makeState([initial], {history: [{...initial}] as CustomHistoryEntry[]});
+        state = enhancedRouter.getStateForAction(state, {type: CONST.NAVIGATION.ACTION_TYPE.PUSH_PARAMS, payload: {params: {q: 'B'}}}, CONFIG_OPTIONS) as TestState;
+        state = enhancedRouter.getStateForAction(state, {type: CONST.NAVIGATION.ACTION_TYPE.PUSH_PARAMS, payload: {params: {q: 'C'}}}, CONFIG_OPTIONS) as TestState;
+
+        const jumpToA: PushParamsRouterAction = {
+            type: CONST.NAVIGATION.ACTION_TYPE.RESET,
+            payload: {routes: [{name: 'Search', key: 'search-1', params: {q: 'A'}}], index: 0},
+        };
+        state = enhancedRouter.getStateForAction(state, jumpToA, CONFIG_OPTIONS) as TestState;
+
+        // NAVIGATE rebuilds history 1:1 — cursor must sync to the new focused entry.
+        state = enhancedRouter.getStateForAction(state, {type: 'NAVIGATE', payload: {name: 'Other'}} as unknown as PushParamsRouterAction, CONFIG_OPTIONS) as TestState;
+        expect(state.routes).toHaveLength(2);
+        expect(state.history).toHaveLength(2);
+
+        state = enhancedRouter.getStateForAction(state, {type: CONST.NAVIGATION.ACTION_TYPE.PUSH_PARAMS, payload: {params: {extra: 'X'}}}, CONFIG_OPTIONS) as TestState;
+
+        expect(state.history).toHaveLength(3);
+        const lastTwo = state.history?.slice(-2) ?? [];
+        expect(asRouteEntry(lastTwo.at(0) as CustomHistoryEntry).name).toBe('Other');
+        expect((asRouteEntry(lastTwo.at(1) as CustomHistoryEntry).params as {extra?: string})?.extra).toBe('X');
+    });
+
     it('RESET that replaces every route resets the cursor so a subsequent PUSH_PARAMS starts fresh', () => {
         const factory = createMockRouterFactory();
         const enhancedRouter = addPushParamsRouterExtension(factory)({} as PlatformStackRouterOptions);
