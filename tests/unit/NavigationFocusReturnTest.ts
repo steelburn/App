@@ -907,6 +907,27 @@ describe('shouldSkipAutoFocusDueToExistingFocus', () => {
         btn.focus();
         expect(shouldSkipAutoFocusDueToExistingFocus()).toBe(true);
     });
+
+    it('returns false when active element is stale focus inside an [aria-hidden] ancestor (transitioning-out previous screen)', () => {
+        const hiddenScreen = document.createElement('div');
+        hiddenScreen.setAttribute('aria-hidden', 'true');
+        const staleInput = document.createElement('input');
+        hiddenScreen.appendChild(staleInput);
+        document.body.appendChild(hiddenScreen);
+        staleInput.focus();
+        expect(document.activeElement).toBe(staleInput);
+        expect(shouldSkipAutoFocusDueToExistingFocus()).toBe(false);
+    });
+
+    it('returns false when active element is inside an [inert] ancestor', () => {
+        const inertScreen = document.createElement('div');
+        inertScreen.setAttribute('inert', '');
+        const staleInput = document.createElement('input');
+        inertScreen.appendChild(staleInput);
+        document.body.appendChild(inertScreen);
+        staleInput.focus();
+        expect(shouldSkipAutoFocusDueToExistingFocus()).toBe(false);
+    });
 });
 
 describe('hasFocusableAttributes', () => {
