@@ -8,7 +8,7 @@ import type {ValueOf} from 'type-fest';
 import ReceiptGeneric from '@assets/images/receipt-generic.png';
 import type {SearchQueryJSON} from '@components/Search/types';
 import * as API from '@libs/API';
-import type {CreateDistanceRequestParams, UpdateMoneyRequestParams, MarkReportPaymentReceivedParams} from '@libs/API/parameters';
+import type {CreateDistanceRequestParams, MarkReportPaymentReceivedParams, UpdateMoneyRequestParams} from '@libs/API/parameters';
 import {WRITE_COMMANDS} from '@libs/API/types';
 import DateUtils from '@libs/DateUtils';
 import {registerDeferredWrite} from '@libs/deferredLayoutWrite';
@@ -3575,7 +3575,6 @@ function createDistanceRequest(distanceRequestInformation: CreateDistanceRequest
 
     return {iouReport: distanceIouReport};
 }
-
 
 function markReportPaymentReceived(
     chatReport: OnyxEntry<OnyxTypes.Report>,
