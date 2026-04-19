@@ -1017,6 +1017,9 @@ function changeTransactionsReport({
     // Determine the destination currency for convertedAmount clearing logic
     const destinationCurrency = newReport?.currency ?? policy?.outputCurrency;
 
+    // Track distance rate updates so we can send them to the backend
+    const transactionIDToUpdatedCustomUnitRateID: Record<string, string> = {};
+
     for (const transaction of transactions) {
         const isDeletedExpense = isDeletedTransaction(transaction);
         const isUnreportedExpense = !transaction.reportID || transaction.reportID === CONST.REPORT.UNREPORTED_REPORT_ID;
@@ -1145,6 +1148,7 @@ function changeTransactionsReport({
             if (!currentRateID || !getDistanceRateCustomUnitRate(policy, currentRateID)) {
                 const defaultRate = DistanceRequestUtils.getDefaultMileageRate(policy);
                 if (defaultRate?.customUnitRateID) {
+                    transactionIDToUpdatedCustomUnitRateID[transaction.transactionID] = defaultRate.customUnitRateID;
                     // Build an updated transaction with the new rate so we can derive fields from it
                     const updatedTransaction: typeof transaction = {
                         ...transaction,
@@ -1758,6 +1762,9 @@ function changeTransactionsReport({
         transactionList: transactionIDs.join(','),
         reportID,
         transactionIDToReportActionAndThreadData: JSON.stringify(transactionIDToReportActionAndThreadData),
+        ...(Object.keys(transactionIDToUpdatedCustomUnitRateID).length > 0 && {
+            transactionIDToUpdatedCustomUnitRateID: JSON.stringify(transactionIDToUpdatedCustomUnitRateID),
+        }),
     };
 
     API.write(WRITE_COMMANDS.CHANGE_TRANSACTIONS_REPORT, parameters, {
