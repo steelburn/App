@@ -195,9 +195,12 @@ function addPushParamsRouterExtension<RouterOptions extends PlatformStackRouterO
                 if (!newState) {
                     return null;
                 }
+                const preservedHistory = preserveHistoryForRoutes(state.history as CustomHistoryEntry[], newState.routes);
+                // Sync cursor to the focused entry of the filtered history — same invariant as the fall-through path.
+                pushParamsHistoryPosition = preservedHistory.length > 0 ? preservedHistory.length - 1 : -1;
                 return {
                     ...newState,
-                    history: preserveHistoryForRoutes(state.history as CustomHistoryEntry[], newState.routes),
+                    history: preservedHistory,
                 };
             }
 
@@ -250,12 +253,10 @@ function addPushParamsRouterExtension<RouterOptions extends PlatformStackRouterO
                         history: preservedHistory,
                     };
                 }
-                // All routes removed — reset cursor so next PUSH_PARAMS starts fresh.
-                pushParamsHistoryPosition = -1;
             }
 
             // Sync cursor to the new focused entry — otherwise a prior mid-cursor position leaks into the rebuilt history and truncates valid entries on the next PUSH_PARAMS.
-            pushParamsHistoryPosition = rehydratedState.history && rehydratedState.history.length > 0 ? rehydratedState.history.length - 1 : -1;
+            pushParamsHistoryPosition = rehydratedState.history?.length ? rehydratedState.history.length - 1 : -1;
             return rehydratedState;
         };
 
