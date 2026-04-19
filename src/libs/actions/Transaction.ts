@@ -13,11 +13,14 @@ import type {
 } from '@libs/API/parameters';
 import {READ_COMMANDS, WRITE_COMMANDS} from '@libs/API/types';
 import * as CollectionUtils from '@libs/CollectionUtils';
+import {getCurrencySymbol} from '@libs/CurrencyUtils';
 import DateUtils from '@libs/DateUtils';
 import DistanceRequestUtils from '@libs/DistanceRequestUtils';
+import {toLocaleDigit} from '@libs/LocaleDigitUtils';
+import {translateLocal} from '@libs/Localize';
 import {buildNextStepNew, buildOptimisticNextStep} from '@libs/NextStepUtils';
 import * as NumberUtils from '@libs/NumberUtils';
-import {rand64} from '@libs/NumberUtils';
+import {rand64, roundToTwoDecimalPlaces} from '@libs/NumberUtils';
 import {getDistanceRateCustomUnitRate, hasDependentTags, isPaidGroupPolicy} from '@libs/PolicyUtils';
 import {
     getAllReportActions,
@@ -40,13 +43,18 @@ import {
     getReportTransactions,
     getTransactionDetails,
     hasViolations as hasViolationsReportUtils,
+    isExpenseReport,
     shouldEnableNegative,
 } from '@libs/ReportUtils';
 import {
+    getDistanceInMeters,
     hasPendingRTERViolation,
     isDeletedTransaction,
     isDistanceRequest,
+    isFetchingWaypointsFromServer,
     isManagedCardTransaction,
+    isManualDistanceRequest,
+    isOdometerDistanceRequest,
     isOnHold,
     recalculateUnreportedTransactionDetails,
     shouldClearConvertedAmount,
@@ -54,6 +62,7 @@ import {
 } from '@libs/TransactionUtils';
 import ViolationsUtils from '@libs/Violations/ViolationsUtils';
 import CONST from '@src/CONST';
+import IntlStore from '@src/languages/IntlStore';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {
     PersonalDetails,
@@ -1128,23 +1137,77 @@ function changeTransactionsReport({
             });
         }
 
-        // Auto-select a valid default distance rate when moving to a workspace where the current rate is invalid
+        // Auto-select a valid default distance rate when moving to a workspace where the current rate is invalid,
+        // and recalculate derived fields (amount, merchant, currency) to match the new rate.
         let transactionForViolations = transaction;
         if (isPaidGroupPolicy(policy) && policy?.id && isDistanceRequest(transaction)) {
             const currentRateID = transaction.comment?.customUnit?.customUnitRateID;
             if (!currentRateID || !getDistanceRateCustomUnitRate(policy, currentRateID)) {
                 const defaultRate = DistanceRequestUtils.getDefaultMileageRate(policy);
                 if (defaultRate?.customUnitRateID) {
+                    // Build an updated transaction with the new rate so we can derive fields from it
+                    const updatedTransaction: typeof transaction = {
+                        ...transaction,
+                        comment: {
+                            ...transaction.comment,
+                            customUnit: {
+                                ...transaction.comment?.customUnit,
+                                customUnitRateID: defaultRate.customUnitRateID,
+                                defaultP2PRate: undefined,
+                            },
+                        },
+                    };
+
+                    // Update distanceUnit if the new rate has a different unit, and convert distance if needed
+                    const existingDistanceUnit = transaction.comment?.customUnit?.distanceUnit;
+                    const newDistanceUnit = DistanceRequestUtils.getUpdatedDistanceUnit({transaction: updatedTransaction, policy});
+                    if (updatedTransaction.comment?.customUnit) {
+                        updatedTransaction.comment.customUnit.distanceUnit = newDistanceUnit;
+                    }
+                    if (existingDistanceUnit && newDistanceUnit !== existingDistanceUnit && !isOdometerDistanceRequest(transaction)) {
+                        const conversionFactor =
+                            existingDistanceUnit === CONST.CUSTOM_UNITS.DISTANCE_UNIT_MILES ? CONST.CUSTOM_UNITS.MILES_TO_KILOMETERS : CONST.CUSTOM_UNITS.KILOMETERS_TO_MILES;
+                        const distance = roundToTwoDecimalPlaces((transaction.comment?.customUnit?.quantity ?? 0) * conversionFactor);
+                        if (updatedTransaction.comment?.customUnit) {
+                            updatedTransaction.comment.customUnit.quantity = distance;
+                        }
+                    }
+
+                    // Recalculate amount, merchant, and currency from the new rate
+                    const optimisticValue: Partial<typeof transaction> = {
+                        comment: updatedTransaction.comment,
+                    };
+
+                    if (!isFetchingWaypointsFromServer(transaction)) {
+                        const updatedMileageRate = DistanceRequestUtils.getRate({transaction: updatedTransaction, policy, useTransactionDistanceUnit: false});
+                        const {unit, rate} = updatedMileageRate;
+                        const distanceInMeters = getDistanceInMeters(updatedTransaction, unit);
+                        const calculatedAmount = DistanceRequestUtils.getDistanceRequestAmount(distanceInMeters, unit, rate ?? 0);
+                        const shouldNegateAmount = isExpenseReport(newReport);
+                        const updatedAmount = shouldNegateAmount ? -calculatedAmount : calculatedAmount;
+                        const updatedCurrency = updatedMileageRate.currency ?? CONST.CURRENCY.USD;
+                        const updatedMerchant = DistanceRequestUtils.getDistanceMerchant(
+                            true,
+                            distanceInMeters,
+                            unit,
+                            rate,
+                            updatedCurrency,
+                            translateLocal,
+                            (digit) => toLocaleDigit(IntlStore.getCurrentLocale(), digit),
+                            getCurrencySymbol,
+                            isManualDistanceRequest(transaction),
+                        );
+
+                        optimisticValue.amount = updatedAmount;
+                        optimisticValue.modifiedAmount = updatedAmount;
+                        optimisticValue.modifiedMerchant = updatedMerchant;
+                        optimisticValue.modifiedCurrency = updatedCurrency;
+                    }
+
                     optimisticData.push({
                         onyxMethod: Onyx.METHOD.MERGE,
                         key: `${ONYXKEYS.COLLECTION.TRANSACTION}${transaction.transactionID}`,
-                        value: {
-                            comment: {
-                                customUnit: {
-                                    customUnitRateID: defaultRate.customUnitRateID,
-                                },
-                            },
-                        },
+                        value: optimisticValue,
                     });
                     failureData.push({
                         onyxMethod: Onyx.METHOD.MERGE,
@@ -1153,19 +1216,20 @@ function changeTransactionsReport({
                             comment: {
                                 customUnit: {
                                     customUnitRateID: currentRateID ?? null,
+                                    defaultP2PRate: transaction.comment?.customUnit?.defaultP2PRate,
+                                    distanceUnit: existingDistanceUnit,
+                                    quantity: transaction.comment?.customUnit?.quantity,
                                 },
                             },
+                            amount: transaction.amount,
+                            modifiedAmount: transaction.modifiedAmount,
+                            modifiedMerchant: transaction.modifiedMerchant,
+                            modifiedCurrency: transaction.modifiedCurrency,
                         },
                     });
                     transactionForViolations = {
-                        ...transaction,
-                        comment: {
-                            ...transaction.comment,
-                            customUnit: {
-                                ...transaction.comment?.customUnit,
-                                customUnitRateID: defaultRate.customUnitRateID,
-                            },
-                        },
+                        ...updatedTransaction,
+                        ...optimisticValue,
                     };
                 }
             }
