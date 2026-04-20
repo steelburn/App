@@ -1,10 +1,11 @@
 import React from 'react';
 import CONST from '@src/CONST';
 import SelectionButton from './SelectionButton';
-import type {SelectionButtonProps} from './SelectionButton';
+import type {CheckboxProps} from './SelectionButton';
 
-type CheckboxProps = Omit<SelectionButtonProps, 'role'>;
-
+/**
+ * A square checkbox that supports checked, unchecked, and indeterminate states.
+ */
 function Checkbox({
     isChecked,
     isIndeterminate,
@@ -27,7 +28,7 @@ function Checkbox({
     sentryLabel,
     tabIndex,
     accessible,
-}: CheckboxProps) {
+}: Omit<CheckboxProps, 'role'>) {
     return (
         <SelectionButton
             role={CONST.ROLE.CHECKBOX}

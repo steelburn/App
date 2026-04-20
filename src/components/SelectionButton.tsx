@@ -14,14 +14,8 @@ import Icon from './Icon';
 import type {PressableRef} from './Pressable/GenericPressable/types';
 import PressableWithFeedback from './Pressable/PressableWithFeedback';
 
-type SelectionButtonProps = Partial<ChildrenProps> &
+type BaseSelectionButtonProps = Partial<ChildrenProps> &
     WithSentryLabel & {
-        /** Whether the button is checked/selected */
-        isChecked?: boolean;
-
-        /** Whether the button is in the indeterminate ("mixed") state — only applicable for checkbox role */
-        isIndeterminate?: boolean;
-
         /** A function that is called when the button is pressed */
         onPress: () => void;
 
@@ -70,12 +64,33 @@ type SelectionButtonProps = Partial<ChildrenProps> &
         /** Tab index */
         tabIndex?: 0 | -1;
 
-        /** Whether this renders as a checkbox (square) or radio button (circular) */
-        role?: typeof CONST.ROLE.CHECKBOX | typeof CONST.ROLE.RADIO;
-
         /** Whether the button is accessible to screen readers */
         accessible?: boolean;
     };
+
+type CheckboxProps = BaseSelectionButtonProps & {
+    /** Whether this renders as a checkbox (square) — defaults to checkbox when role is omitted */
+    role?: typeof CONST.ROLE.CHECKBOX;
+
+    /** Whether the button is in the indeterminate ("mixed") state */
+    isIndeterminate?: boolean;
+
+    /** Whether the button is checked/selected */
+    isChecked?: boolean;
+};
+
+type RadioButtonProps = BaseSelectionButtonProps & {
+    /** Whether this renders as a radio button (circular) */
+    role: typeof CONST.ROLE.RADIO;
+
+    /** Not applicable for radio buttons */
+    isIndeterminate?: never;
+
+    /** Whether the button is checked/selected */
+    isChecked: boolean;
+};
+
+type SelectionButtonProps = CheckboxProps | RadioButtonProps;
 
 /**
  * Selection button that renders as either a checkbox (square) or radio button (circular)
@@ -187,4 +202,4 @@ function SelectionButton({
 
 export default SelectionButton;
 
-export type {SelectionButtonProps};
+export type {BaseSelectionButtonProps, CheckboxProps, RadioButtonProps, SelectionButtonProps};

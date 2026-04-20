@@ -2,7 +2,7 @@ import React from 'react';
 import type {ListItem} from '@components/SelectionList/ListItem/types';
 import CONST from '@src/CONST';
 import ListSelectionButton from './ListSelectionButton';
-import type {ListSelectionButtonProps} from './ListSelectionButton';
+import type {BaseListSelectionButtonProps} from './ListSelectionButton';
 
 /**
  * A circular radio button indicator for use in selection list rows.
@@ -17,7 +17,7 @@ function ListRadioButton<TItem extends ListItem>({
     containerStyle,
     shouldStopMouseDownPropagation,
     testID,
-}: Omit<ListSelectionButtonProps<TItem>, 'role'>) {
+}: BaseListSelectionButtonProps<TItem>) {
     return (
         <ListSelectionButton
             role={CONST.ROLE.RADIO}

@@ -1,40 +1,58 @@
 import React from 'react';
 import CONST from '@src/CONST';
 import SelectionButton from './SelectionButton';
+import type {RadioButtonProps} from './SelectionButton';
 
-type RadioButtonProps = {
-    /** Whether radioButton is checked */
-    isChecked: boolean;
-
-    /** A function that is called when the box/label is pressed */
-    onPress: () => void;
-
-    /** Whether the radio button is accessible to screen readers */
-    accessible?: boolean;
-
-    /** Specifies the accessibility label for the radio button */
-    accessibilityLabel: string;
-
-    /** Should the input be styled for errors  */
-    hasError?: boolean;
-
-    /** Should the input be disabled  */
-    disabled?: boolean;
-};
-
-function RadioButton({isChecked, onPress, accessibilityLabel, hasError = false, disabled = false, accessible}: RadioButtonProps) {
+/**
+ * A circular radio button for single-selection contexts.
+ */
+function RadioButton({
+    isChecked,
+    onPress,
+    hasError,
+    disabled,
+    style,
+    containerStyle,
+    children,
+    onMouseDown,
+    containerSize,
+    containerBorderRadius,
+    caretSize,
+    accessibilityLabel,
+    shouldStopMouseDownPropagation,
+    shouldSelectOnPressEnter = true,
+    wrapperStyle,
+    testID,
+    ref,
+    sentryLabel = CONST.SENTRY_LABEL.RADIO_BUTTON.BUTTON,
+    tabIndex,
+    accessible,
+}: Omit<RadioButtonProps, 'role'>) {
     return (
         <SelectionButton
+            role={CONST.ROLE.RADIO}
             isChecked={isChecked}
             onPress={onPress}
-            accessibilityLabel={accessibilityLabel}
             hasError={hasError}
             disabled={disabled}
+            style={style}
+            containerStyle={containerStyle}
+            onMouseDown={onMouseDown}
+            containerSize={containerSize}
+            containerBorderRadius={containerBorderRadius}
+            caretSize={caretSize}
+            accessibilityLabel={accessibilityLabel}
+            shouldStopMouseDownPropagation={shouldStopMouseDownPropagation}
+            shouldSelectOnPressEnter={shouldSelectOnPressEnter}
+            wrapperStyle={wrapperStyle}
+            testID={testID}
+            ref={ref}
+            sentryLabel={sentryLabel}
+            tabIndex={tabIndex}
             accessible={accessible}
-            role={CONST.ROLE.RADIO}
-            sentryLabel={CONST.SENTRY_LABEL.RADIO_BUTTON.BUTTON}
-            shouldSelectOnPressEnter
-        />
+        >
+            {children}
+        </SelectionButton>
     );
 }
 

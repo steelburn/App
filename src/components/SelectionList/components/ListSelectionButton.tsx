@@ -5,9 +5,6 @@ import type {ListItem} from '@components/SelectionList/ListItem/types';
 import CONST from '@src/CONST';
 
 type ListSelectionButtonProps<TItem extends ListItem> = {
-    /** Whether the button renders as a radio button (circular) or checkbox (square) */
-    role: typeof CONST.ROLE.CHECKBOX | typeof CONST.ROLE.RADIO;
-
     /** The item to render the selection button for */
     item: TItem;
 
@@ -43,13 +40,13 @@ function ListSelectionButton<TItem extends ListItem>({
     containerStyle,
     shouldStopMouseDownPropagation = true,
     testID,
-}: ListSelectionButtonProps<TItem>) {
+}: ListSelectionButtonProps<TItem> & {role: typeof CONST.ROLE.CHECKBOX | typeof CONST.ROLE.RADIO}) {
     return (
         <SelectionButton
             shouldSelectOnPressEnter
             role={role}
             accessibilityLabel={accessibilityLabel ?? item.text ?? ''}
-            isChecked={item.isSelected}
+            isChecked={item.isSelected ?? false}
             onPress={() => onSelectRow(item)}
             disabled={disabled}
             style={style}
@@ -62,4 +59,4 @@ function ListSelectionButton<TItem extends ListItem>({
 }
 
 export default ListSelectionButton;
-export type {ListSelectionButtonProps};
+export type {ListSelectionButtonProps as BaseListSelectionButtonProps, ListSelectionButtonProps};
