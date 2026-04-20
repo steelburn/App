@@ -8588,6 +8588,7 @@ Dodaj więcej zasad wydatków, żeby chronić płynność finansową firmy.`,
         details: {
             title: 'Szczegóły subskrypcji',
             annual: 'Abonament roczny',
+            creditBalance: 'Saldo kredytowe',
             taxExempt: 'Poproś o status zwolnienia z podatku',
             taxExemptEnabled: 'Zwolnione z podatku',
             taxExemptStatus: 'Status zwolnienia z podatku',

@@ -8602,6 +8602,7 @@ Voeg meer bestedingsregels toe om de kasstroom van het bedrijf te beschermen.`,
         details: {
             title: 'Abonnementsgegevens',
             annual: 'Jaarabonnement',
+            creditBalance: 'Creditsaldo',
             taxExempt: 'Vrijstelling van belasting aanvragen',
             taxExemptEnabled: 'Vrijgesteld van belasting',
             taxExemptStatus: 'Belastingvrijstellingstatus',
