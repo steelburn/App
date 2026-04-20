@@ -17,7 +17,7 @@ If you want to edit an expense on a report, [learn how to edit expenses](/articl
 
 - **All members**: Can retract their own Outstanding and Done reports. 
 - **Current approver**: Can retract Outstanding reports pending their approval.
-- **Workspace Admin**: Can retract any Outstanding or Done report on the Workspace.
+- **Workspace Admin**: Can retract any Done report on the Workspace.
 
 **Note:** Approved reports can't be retracted, they must be unapproved first. [Learn how to unapprove a report](/articles/new-expensify/reports-and-expenses/Approve-Expenses).
 
@@ -26,17 +26,17 @@ If you want to edit an expense on a report, [learn how to edit expenses](/articl
 ## How to retract a report 
 
 1. In the navigation tabs (on the left on web, on the bottom on mobile) go to **Spend > Reports**.
-3. Open the Outstanding or Done report you want to retract.
-4. Choose **More**.
-5. Select **Retract**.
+2. Open the Outstanding or Done report you want to retract.
+3. Choose **More**.
+4. Select **Retract**.
 
 ---
 
 ## What happens after you retract a report
 
- - The report status will change to Draft.
+- The report status will change to Draft.
 - A Retracted message appears in the report activity.
- - You can update, add, remove, or move expenses.
+- You can update, add, remove, or move expenses.
 - You can resubmit the report when ready.
 
 ---
