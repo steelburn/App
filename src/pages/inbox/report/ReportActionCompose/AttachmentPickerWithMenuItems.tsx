@@ -50,7 +50,7 @@ import {validTransactionDraftIDsSelector} from '@src/selectors/TransactionDraft'
 import type {AnchorPosition} from '@src/styles';
 import type * as OnyxTypes from '@src/types/onyx';
 import type {FileObject} from '@src/types/utils/Attachment';
-import ExpandCollapseComposerButton from './ExpandCollapseComposerButton';
+import ExpandCollapseButton from './ExpandCollapseButton';
 
 type MoneyRequestOptions = Record<
     Exclude<IOUType, typeof CONST.IOU.TYPE.REQUEST | typeof CONST.IOU.TYPE.SEND | typeof CONST.IOU.TYPE.CREATE | typeof CONST.IOU.TYPE.SPLIT_EXPENSE>,
@@ -476,7 +476,7 @@ function AttachmentPickerWithMenuItems({
                                         </PressableWithFeedback>
                                     </Tooltip>
                                 </View>
-                                <ExpandCollapseComposerButton
+                                <ExpandCollapseButton
                                     isFullComposerAvailable={isFullComposerAvailable}
                                     isComposerFullSize={isComposerFullSize}
                                     reportID={reportID}
