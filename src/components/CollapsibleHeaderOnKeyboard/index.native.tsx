@@ -37,14 +37,10 @@ function CollapsibleHeaderOnKeyboard({children, collapsibleHeaderOffset = 0}: Co
     useEffect(() => {
         windowHeightSV.set(windowHeight);
         isLandscapeSV.set(isInLandscapeMode(windowWidth, windowHeight));
-        // we only want to re-run this effect when the window dimensions change
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [windowWidth, windowHeight]);
+    }, [windowWidth, windowHeight, isLandscapeSV, windowHeightSV]);
     useEffect(() => {
         collapsibleHeaderOffsetSV.set(collapsibleHeaderOffset);
-        // we only want to re-run this effect when the collapsible header offset changes
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [collapsibleHeaderOffset]);
+    }, [collapsibleHeaderOffset, collapsibleHeaderOffsetSV]);
 
     const onLayout = (e: LayoutChangeEvent) => {
         const height = e.nativeEvent.layout.height;
