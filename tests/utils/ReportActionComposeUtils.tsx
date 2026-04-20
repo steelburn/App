@@ -3,6 +3,7 @@ import type {PropsWithChildren} from 'react';
 import ComposeProviders from '@components/ComposeProviders';
 import {LocaleContextProvider} from '@components/LocaleContextProvider';
 import OnyxListItemProvider from '@components/OnyxListItemProvider';
+import {KeyboardStateProvider} from '@components/withKeyboardState';
 import type {ReportActionComposeProps} from '@pages/inbox/report/ReportActionCompose/ReportActionCompose';
 import ReportActionCompose from '@pages/inbox/report/ReportActionCompose/ReportActionCompose';
 import {ReportActionEditMessageContextProvider} from '@pages/inbox/report/ReportActionEditMessageContext';
@@ -17,7 +18,7 @@ function ReportActionEditMessageContextProviderForReport({children}: PropsWithCh
 }
 
 function ReportScreenProviders({children}: PropsWithChildren) {
-    return <ComposeProviders components={[OnyxListItemProvider, LocaleContextProvider, ReportActionEditMessageContextProviderForReport]}>{children}</ComposeProviders>;
+    return <ComposeProviders components={[OnyxListItemProvider, LocaleContextProvider, KeyboardStateProvider, ReportActionEditMessageContextProviderForReport]}>{children}</ComposeProviders>;
 }
 
 const defaultReportActionComposeProps: ReportActionComposeProps = {
