@@ -19,13 +19,6 @@ function useComposerFocus({composerRef, suggestionsRef, actionButtonRef, initial
     const isKeyboardVisibleWhenShowingModalRef = useRef(false);
     const isNextModalWillOpenRef = useRef(false);
 
-    const focus = () => {
-        if (composerRef.current === null) {
-            return;
-        }
-        composerRef.current?.focus(true);
-    };
-
     const onAddActionPressed = () => {
         if (!willBlurTextInputOnTapOutside) {
             isKeyboardVisibleWhenShowingModalRef.current = !!composerRef.current?.isFocused();
@@ -57,7 +50,7 @@ function useComposerFocus({composerRef, suggestionsRef, actionButtonRef, initial
         setIsFocused(true);
     };
 
-    return {isFocused, onBlur, onFocus, focus, onAddActionPressed, onItemSelected, onTriggerAttachmentPicker, isNextModalWillOpenRef};
+    return {isFocused, onBlur, onFocus, onAddActionPressed, onItemSelected, onTriggerAttachmentPicker, isNextModalWillOpenRef};
 }
 
 export default useComposerFocus;

@@ -24,23 +24,32 @@ type ComposerState = {
     isFocused: boolean;
     isMenuVisible: boolean;
     isFullComposerAvailable: boolean;
+    didResetComposerHeight: boolean;
+};
+
+type ComposerEditState = {
+    isEditingInComposer: boolean;
+    editingReportActionID: string | null;
+    editingMessage: string | null;
+    editingState: 'off' | 'editing' | 'submitted';
 };
 
 // Warm — changes based on content + policy
 type ComposerSendState = {
     isSendDisabled: boolean;
+    debouncedCommentMaxLengthValidation: (value: string) => void;
+    isExceedingMaxLength: boolean;
     exceededMaxLength: number | null;
-    hasExceededMaxTaskTitleLength: boolean;
     isBlockedFromConcierge: boolean;
+    isTaskTitle: boolean;
 };
 
 // Frozen — stable references, never changes after mount
 type ComposerActions = {
-    setValue: (v: string) => void;
+    setText: (v: string) => void;
     setMenuVisibility: (v: boolean) => void;
     setIsFullComposerAvailable: (v: boolean) => void;
     setComposerRef: (ref: ComposerWithSuggestionsRef | null) => void;
-    focus: () => void;
     onBlur: (event: BlurEvent) => void;
     onFocus: () => void;
     onAddActionPressed: () => void;
@@ -49,9 +58,15 @@ type ComposerActions = {
     clearComposer: () => void;
 };
 
+type ComposerEditActions = {
+    publishDraft: (draftMessage: string) => void;
+    deleteDraft: () => void;
+};
+
 // Infrequent — changes only when send logic changes
 type ComposerSendActions = {
-    handleSendMessage: () => void;
+    validateAndSubmitDraft: (draftMessage: string) => void;
+    submitDraftAndClearComposer: () => void;
     onValueChange: (value: string) => void;
 };
 
@@ -73,23 +88,34 @@ const defaultState: ComposerState = {
     isFocused: false,
     isMenuVisible: false,
     isFullComposerAvailable: false,
+    didResetComposerHeight: false,
 };
 const ComposerStateContext = createContext<ComposerState>(defaultState);
 
 const defaultSendState: ComposerSendState = {
     isSendDisabled: true,
+    debouncedCommentMaxLengthValidation: noop,
+    isExceedingMaxLength: false,
     exceededMaxLength: null,
-    hasExceededMaxTaskTitleLength: false,
     isBlockedFromConcierge: false,
+    isTaskTitle: false,
 };
+
+const defaultEditState: ComposerEditState = {
+    isEditingInComposer: false,
+    editingReportActionID: null,
+    editingMessage: null,
+    editingState: 'off',
+};
+const ComposerEditStateContext = createContext<ComposerEditState>(defaultEditState);
+
 const ComposerSendStateContext = createContext<ComposerSendState>(defaultSendState);
 
 const defaultActions: ComposerActions = {
-    setValue: noop,
+    setText: noop,
     setMenuVisibility: noop,
     setIsFullComposerAvailable: noop,
     setComposerRef: noop,
-    focus: noop,
     onBlur: noop,
     onFocus: noop,
     onAddActionPressed: noop,
@@ -99,8 +125,15 @@ const defaultActions: ComposerActions = {
 };
 const ComposerActionsContext = createContext<ComposerActions>(defaultActions);
 
+const defaultEditActions: ComposerEditActions = {
+    publishDraft: noop,
+    deleteDraft: noop,
+};
+const ComposerEditActionsContext = createContext<ComposerEditActions>(defaultEditActions);
+
 const defaultSendActions: ComposerSendActions = {
-    handleSendMessage: noop,
+    validateAndSubmitDraft: noop,
+    submitDraftAndClearComposer: noop,
     onValueChange: noop,
 };
 const ComposerSendActionsContext = createContext<ComposerSendActions>(defaultSendActions);
@@ -115,12 +148,20 @@ function useComposerState() {
     return useContext(ComposerStateContext);
 }
 
+function useComposerEditState() {
+    return useContext(ComposerEditStateContext);
+}
+
 function useComposerSendState() {
     return useContext(ComposerSendStateContext);
 }
 
 function useComposerActions() {
     return useContext(ComposerActionsContext);
+}
+
+function useComposerEditActions() {
+    return useContext(ComposerEditActionsContext);
 }
 
 function useComposerSendActions() {
@@ -138,14 +179,18 @@ function useComposerMeta() {
 export {
     ComposerTextContext,
     ComposerStateContext,
+    ComposerEditStateContext,
     ComposerSendStateContext,
     ComposerActionsContext,
+    ComposerEditActionsContext,
     ComposerSendActionsContext,
     ComposerMetaContext,
     useComposerText,
     useComposerState,
+    useComposerEditState,
     useComposerSendState,
     useComposerActions,
+    useComposerEditActions,
     useComposerSendActions,
     useComposerMeta,
 };

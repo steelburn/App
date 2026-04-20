@@ -8,7 +8,6 @@ import ReportActionCompose from '@pages/inbox/report/ReportActionCompose/ReportA
 import {ReportActionEditMessageContextProvider} from '@pages/inbox/report/ReportActionEditMessageContext';
 import type {ReportActionItemMessageEditProps} from '@pages/inbox/report/ReportActionItemMessageEdit';
 import ReportActionItemMessageEdit from '@pages/inbox/report/ReportActionItemMessageEdit';
-import {KeyboardStateProvider} from '@src/components/withKeyboardState';
 import * as LHNTestUtils from './LHNTestUtils';
 
 const reportActionComposeTestReport = LHNTestUtils.getFakeReport();
@@ -18,7 +17,7 @@ function ReportActionEditMessageContextProviderForReport({children}: PropsWithCh
 }
 
 function ReportScreenProviders({children}: PropsWithChildren) {
-    return <ComposeProviders components={[OnyxListItemProvider, LocaleContextProvider, KeyboardStateProvider, ReportActionEditMessageContextProviderForReport]}>{children}</ComposeProviders>;
+    return <ComposeProviders components={[OnyxListItemProvider, LocaleContextProvider, ReportActionEditMessageContextProviderForReport]}>{children}</ComposeProviders>;
 }
 
 const defaultReportActionComposeProps: ReportActionComposeProps = {

@@ -137,7 +137,7 @@ type ComposerWithSuggestionsProps = Partial<ChildrenProps> &
         disabled?: boolean;
 
         /** Function to set whether the comment is empty */
-        setIsCommentEmpty: (isCommentEmpty: boolean) => void;
+        setIsCommentEmpty?: (isCommentEmpty: boolean) => void;
 
         /** Function to handle sending a message */
         onEnterKeyPress: () => void;
@@ -316,7 +316,7 @@ function ComposerWithSuggestions({
     }, []);
 
     const updateIsCommentEmptyOnEditEnd = useCallback(() => {
-        setIsCommentEmpty(ReportActionComposeUtils.getIsCommentEmpty(draftComment ?? ''));
+        setIsCommentEmpty?.(ReportActionComposeUtils.getIsCommentEmpty(draftComment ?? ''));
     }, [draftComment, setIsCommentEmpty]);
 
     const handleEditFocus = useCallback(() => {
@@ -536,7 +536,7 @@ function ComposerWithSuggestions({
 
             /** Only update isCommentEmpty state if it's different from previous one */
             if (!isEditingInComposer && isNewCommentEmpty !== isPrevCommentEmpty) {
-                setIsCommentEmpty(isNewCommentEmpty);
+                setIsCommentEmpty?.(isNewCommentEmpty);
             }
             emojisPresentBefore.current = emojis;
 
