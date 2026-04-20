@@ -1,5 +1,4 @@
 import type {RefObject} from 'react';
-import {useCallback} from 'react';
 import {Alert} from 'react-native';
 import {RESULTS} from 'react-native-permissions';
 import type {Camera, PhotoFile} from 'react-native-vision-camera';
@@ -70,16 +69,16 @@ function useCapturePhoto({
 }: UseCapturePhotoParams) {
     const {translate} = useLocalize();
 
-    const maybeCancelShutterSpan = useCallback(() => {
+    const maybeCancelShutterSpan = () => {
         if (isMultiScanEnabled) {
             return;
         }
 
         cancelSpan(CONST.TELEMETRY.SPAN_RECEIPT_CAPTURE);
         cancelSpan(CONST.TELEMETRY.SPAN_SHUTTER_TO_CONFIRMATION);
-    }, [isMultiScanEnabled]);
+    };
 
-    const capturePhoto = useCallback(() => {
+    const capturePhoto = () => {
         if (!isMultiScanEnabled) {
             startSpan(CONST.TELEMETRY.SPAN_SHUTTER_TO_CONFIRMATION, {
                 name: CONST.TELEMETRY.SPAN_SHUTTER_TO_CONFIRMATION,
@@ -179,30 +178,7 @@ function useCapturePhoto({
                 showCameraAlert();
                 Log.warn('Error taking photo', error);
             });
-    }, [
-        isMultiScanEnabled,
-        cameraRef,
-        isCapturingPhotoRef,
-        cameraPermissionStatus,
-        maybeCancelShutterSpan,
-        askForPermissions,
-        translate,
-        showBlink,
-        flash,
-        hasFlash,
-        isPlatformMuted,
-        isInLandscapeMode,
-        setDidCapturePhoto,
-        initialTransaction,
-        currentUserPersonalDetails,
-        reportID,
-        initialTransactionID,
-        isEditing,
-        updateScanAndNavigate,
-        receiptFiles,
-        setReceiptFiles,
-        submitReceipts,
-    ]);
+    };
 
     return {capturePhoto};
 }
