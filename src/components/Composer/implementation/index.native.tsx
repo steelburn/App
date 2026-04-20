@@ -47,7 +47,7 @@ function Composer({
     const isInLandscapeMode = useIsInLandscapeMode();
 
     useEffect(() => {
-        if (!textInputRef.current || !textInputRef.current.setSelection || !selection || isComposerFullSize) {
+        if (!textInputRef.current?.setSelection || !selection || isComposerFullSize) {
             return;
         }
 
