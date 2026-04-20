@@ -314,14 +314,6 @@ function ComposerProvider({children, reportID}: ComposerProviderProps) {
         });
     };
 
-    const onValueChange = (v: string) => {
-        setText(v);
-        if (v.length === 0 && isComposerFullSize) {
-            setIsComposerFullSize(reportID, false);
-        }
-        debouncedCommentMaxLengthValidation(v);
-    };
-
     const composerState = {
         isFocused,
         isMenuVisible,
@@ -366,7 +358,6 @@ function ComposerProvider({children, reportID}: ComposerProviderProps) {
     const composerSendActions = {
         validateAndSubmitDraft,
         submitDraftAndClearComposer,
-        onValueChange,
     };
 
     const composerMeta = {

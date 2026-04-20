@@ -10,6 +10,7 @@ import usePaginatedReportActions from '@hooks/usePaginatedReportActions';
 import useParentReportAction from '@hooks/useParentReportAction';
 import useReportIsArchived from '@hooks/useReportIsArchived';
 import useReportTransactionsCollection from '@hooks/useReportTransactionsCollection';
+import {setIsComposerFullSize} from '@libs/actions/Report';
 import FS from '@libs/Fullstory';
 import {getAllNonDeletedTransactions} from '@libs/MoneyRequestReportUtils';
 import {getCombinedReportActions, getFilteredReportActionsForReportView, getOneTransactionThreadReportID, isMoneyRequestAction, isSentMoneyReportAction} from '@libs/ReportActionsUtils';
@@ -46,14 +47,22 @@ function ComposerInput({reportID, onPasteFile}: ComposerInputProps) {
     const {translate, preferredLocale} = useLocalize();
     const {isOffline} = useNetwork();
     const {isMenuVisible} = useComposerState();
-    const {isBlockedFromConcierge} = useComposerSendState();
-    const {setIsFullComposerAvailable, onBlur, onFocus, setComposerRef} = useComposerActions();
-    const {submitDraftAndClearComposer, onValueChange, validateAndSubmitDraft} = useComposerSendActions();
+    const {isBlockedFromConcierge, debouncedCommentMaxLengthValidation} = useComposerSendState();
+    const {setIsFullComposerAvailable, onBlur, onFocus, setComposerRef, setText} = useComposerActions();
+    const {submitDraftAndClearComposer, validateAndSubmitDraft} = useComposerSendActions();
     const {containerRef, suggestionsRef, isNextModalWillOpenRef} = useComposerMeta();
 
     const [isComposerFullSize = false] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_IS_COMPOSER_FULL_SIZE}${reportID}`);
     const [blockedFromConcierge] = useOnyx(ONYXKEYS.NVP_BLOCKED_FROM_CONCIERGE);
     const userBlockedFromConcierge = isBlockedFromConciergeUserAction(blockedFromConcierge);
+
+    const onValueChange = (v: string) => {
+        setText(v);
+        if (v.length === 0 && isComposerFullSize) {
+            setIsComposerFullSize(reportID, false);
+        }
+        debouncedCommentMaxLengthValidation(v);
+    };
 
     const measureContainer = (callback: MeasureInWindowOnSuccessCallback) => {
         containerRef.current?.measureInWindow(callback);

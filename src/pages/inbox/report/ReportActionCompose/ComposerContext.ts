@@ -67,7 +67,6 @@ type ComposerEditActions = {
 type ComposerSendActions = {
     validateAndSubmitDraft: (draftMessage: string) => void;
     submitDraftAndClearComposer: () => void;
-    onValueChange: (value: string) => void;
 };
 
 // Frozen — stable refs, set once
@@ -134,7 +133,6 @@ const ComposerEditActionsContext = createContext<ComposerEditActions>(defaultEdi
 const defaultSendActions: ComposerSendActions = {
     validateAndSubmitDraft: noop,
     submitDraftAndClearComposer: noop,
-    onValueChange: noop,
 };
 const ComposerSendActionsContext = createContext<ComposerSendActions>(defaultSendActions);
 
