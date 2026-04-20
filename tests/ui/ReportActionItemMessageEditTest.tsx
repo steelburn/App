@@ -1,13 +1,21 @@
 import type * as NativeNavigation from '@react-navigation/native';
-import {act, fireEvent, screen} from '@testing-library/react-native';
+import {act, fireEvent, render, screen} from '@testing-library/react-native';
+import type {PropsWithChildren} from 'react';
 import Onyx from 'react-native-onyx';
-import {renderReportActionItemMessageEdit, reportActionComposeTestReportAction} from 'tests/utils/ReportActionComposeUtils';
+import ComposeProviders from '@components/ComposeProviders';
+import {LocaleContextProvider} from '@components/LocaleContextProvider';
+import OnyxListItemProvider from '@components/OnyxListItemProvider';
+import {KeyboardStateProvider} from '@components/withKeyboardState';
 import {editReportComment} from '@libs/actions/Report';
 import * as ReportActionContextMenu from '@pages/inbox/report/ContextMenu/ReportActionContextMenu';
+import {ReportActionEditMessageContextProvider} from '@pages/inbox/report/ReportActionEditMessageContext';
+import type {ReportActionItemMessageEditProps} from '@pages/inbox/report/ReportActionItemMessageEdit';
+import ReportActionItemMessageEdit from '@pages/inbox/report/ReportActionItemMessageEdit';
 import {draftMessageVideoAttributeCache} from '@pages/inbox/report/useDraftMessageVideoAttributeCache';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {Message} from '@src/types/onyx/ReportAction';
+import * as LHNTestUtils from '../utils/LHNTestUtils';
 import * as TestHelper from '../utils/TestHelper';
 
 const mockEditReportComment = jest.mocked(editReportComment);
@@ -55,6 +63,52 @@ jest.mock('@react-navigation/native', () => ({
 }));
 
 TestHelper.setupGlobalFetchMock();
+
+const defaultReport = LHNTestUtils.getFakeReport();
+const defaultReportAction = LHNTestUtils.getFakeReportAction();
+const defaultProps: ReportActionItemMessageEditProps = {
+    action: defaultReportAction,
+    reportID: defaultReport.reportID,
+    originalReportID: defaultReport.reportID,
+    index: 0,
+    isGroupPolicyReport: false,
+};
+
+function ReportActionEditMessageContextProviderForReport({children}: PropsWithChildren) {
+    return <ReportActionEditMessageContextProvider reportID={defaultReport.reportID}>{children}</ReportActionEditMessageContextProvider>;
+}
+
+function ReportScreenProviders({children}: PropsWithChildren) {
+    return <ComposeProviders components={[OnyxListItemProvider, LocaleContextProvider, KeyboardStateProvider, ReportActionEditMessageContextProviderForReport]}>{children}</ComposeProviders>;
+}
+
+const renderReportActionItemMessageEdit = (props?: Partial<ReportActionItemMessageEditProps>) => {
+    return render(
+        <ReportScreenProviders>
+            <ReportActionItemMessageEdit
+                // eslint-disable-next-line react/jsx-props-no-spreading
+                {...defaultProps}
+                // eslint-disable-next-line react/jsx-props-no-spreading
+                {...props}
+            />
+        </ReportScreenProviders>,
+    );
+};
+
+// const renderReportActionItemMessageEdit = (props?: Partial<ReportActionItemMessageEditProps>) => {
+//     return render(
+//         <ReportScreenProviders>
+//             {/* <ComposeProviders components={[OnyxListItemProvider, LocaleContextProvider]}> */}
+//             <ReportActionItemMessageEdit
+//                 // eslint-disable-next-line react/jsx-props-no-spreading
+//                 {...defaultProps}
+//                 // eslint-disable-next-line react/jsx-props-no-spreading
+//                 {...props}
+//             />
+//             {/* </ComposeProviders>, */}
+//         </ReportScreenProviders>,
+//     );
+// };
 
 describe('ReportActionCompose Integration Tests', () => {
     beforeAll(() => {
@@ -130,11 +184,11 @@ describe('ReportActionCompose Integration Tests', () => {
             const videoSource = 'https://example.com/video.mp4';
             const videoHtml = `<video src="${videoSource}" data-expensify-source="${videoSource}" data-name="video.mp4" data-expensify-height="100" data-expensify-width="200">video.mp4</video>`;
 
-            const messages = reportActionComposeTestReportAction.message as Message[];
+            const messages = defaultReportAction.message as Message[];
 
             renderReportActionItemMessageEdit({
                 action: {
-                    ...reportActionComposeTestReportAction,
+                    ...defaultReportAction,
                     message: [
                         {
                             ...messages.at(0),

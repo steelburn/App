@@ -1,10 +1,18 @@
 import type * as NativeNavigation from '@react-navigation/native';
-import {act, fireEvent, screen, waitFor} from '@testing-library/react-native';
+import {act, fireEvent, render, screen, waitFor} from '@testing-library/react-native';
+import React from 'react';
+import type {PropsWithChildren} from 'react';
 import Onyx from 'react-native-onyx';
+import ComposeProviders from '@components/ComposeProviders';
+import {LocaleContextProvider} from '@components/LocaleContextProvider';
+import OnyxListItemProvider from '@components/OnyxListItemProvider';
+import {KeyboardStateProvider} from '@components/withKeyboardState';
+import type {ReportActionComposeProps} from '@pages/inbox/report/ReportActionCompose/ReportActionCompose';
+import ReportActionCompose from '@pages/inbox/report/ReportActionCompose/ReportActionCompose';
+import {ReportActionEditMessageContextProvider} from '@pages/inbox/report/ReportActionEditMessageContext';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import * as LHNTestUtils from '../utils/LHNTestUtils';
-import {renderReportActionCompose, reportActionComposeTestReport} from '../utils/ReportActionComposeUtils';
 import * as TestHelper from '../utils/TestHelper';
 import waitForBatchedUpdatesWithAct from '../utils/waitForBatchedUpdatesWithAct';
 
@@ -46,6 +54,33 @@ jest.mock('@react-navigation/native', () => ({
 
 TestHelper.setupGlobalFetchMock();
 
+const defaultReport = LHNTestUtils.getFakeReport();
+const defaultProps: ReportActionComposeProps = {
+    reportID: defaultReport.reportID,
+};
+
+function ReportActionEditMessageContextProviderForReport({children}: PropsWithChildren) {
+    return <ReportActionEditMessageContextProvider reportID={defaultReport.reportID}>{children}</ReportActionEditMessageContextProvider>;
+}
+
+function ReportScreenProviders({children}: PropsWithChildren) {
+    return <ComposeProviders components={[OnyxListItemProvider, LocaleContextProvider, KeyboardStateProvider, ReportActionEditMessageContextProviderForReport]}>{children}</ComposeProviders>;
+}
+
+const renderReportActionCompose = (props?: Partial<ReportActionComposeProps>) => {
+    // eslint-disable-next-line react/jsx-props-no-spreading
+    return render(
+        <ReportScreenProviders>
+            <ReportActionCompose
+                // eslint-disable-next-line react/jsx-props-no-spreading
+                {...defaultProps}
+                // eslint-disable-next-line react/jsx-props-no-spreading
+                {...props}
+            />
+        </ReportScreenProviders>,
+    );
+};
+
 // Helper function to simulate text selection
 const simulateSelection = (composer: ReturnType<typeof screen.getByTestId>, start: number, end: number) => {
     fireEvent(composer, 'selectionChange', {
@@ -63,7 +98,7 @@ describe('ReportActionCompose Integration Tests', () => {
 
     beforeEach(async () => {
         await act(async () => {
-            await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT}${reportActionComposeTestReport.reportID}`, reportActionComposeTestReport);
+            await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT}${defaultReport.reportID}`, defaultReport);
         });
     });
 
@@ -391,7 +426,7 @@ describe('ReportActionCompose Integration Tests', () => {
             await waitFor(
                 () => {
                     // And the task-title-specific error should be displayed
-                    expect(screen.getByText('composer.commentExceededMaxLength')).toBeOnTheScreen();
+                    expect(screen.getByText('composer.taskTitleExceededMaxLength')).toBeOnTheScreen();
                 },
                 {timeout: CONST.TIMING.COMMENT_LENGTH_DEBOUNCE_TIME + 500},
             );
