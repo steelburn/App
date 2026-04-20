@@ -1,19 +1,13 @@
 import type * as NativeNavigation from '@react-navigation/native';
-import {act, fireEvent, render, screen} from '@testing-library/react-native';
-import React from 'react';
+import {act, fireEvent, screen} from '@testing-library/react-native';
 import Onyx from 'react-native-onyx';
-import ComposeProviders from '@components/ComposeProviders';
-import {LocaleContextProvider} from '@components/LocaleContextProvider';
-import OnyxListItemProvider from '@components/OnyxListItemProvider';
+import {renderReportActionItemMessageEdit, reportActionComposeTestReportAction} from 'tests/utils/ReportActionComposeUtils';
 import {editReportComment} from '@libs/actions/Report';
 import * as ReportActionContextMenu from '@pages/inbox/report/ContextMenu/ReportActionContextMenu';
-import ReportActionItemMessageEdit from '@pages/inbox/report/ReportActionItemMessageEdit';
-import type {ReportActionItemMessageEditProps} from '@pages/inbox/report/ReportActionItemMessageEdit';
 import {draftMessageVideoAttributeCache} from '@pages/inbox/report/useDraftMessageVideoAttributeCache';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {Message} from '@src/types/onyx/ReportAction';
-import * as LHNTestUtils from '../utils/LHNTestUtils';
 import * as TestHelper from '../utils/TestHelper';
 
 const mockEditReportComment = jest.mocked(editReportComment);
@@ -61,28 +55,6 @@ jest.mock('@react-navigation/native', () => ({
 }));
 
 TestHelper.setupGlobalFetchMock();
-
-const defaultReport = LHNTestUtils.getFakeReport();
-const defaultProps: ReportActionItemMessageEditProps = {
-    action: LHNTestUtils.getFakeReportAction(),
-    reportID: defaultReport.reportID,
-    originalReportID: defaultReport.reportID,
-    index: 0,
-    isGroupPolicyReport: false,
-};
-
-const renderReportActionItemMessageEdit = (props?: Partial<ReportActionItemMessageEditProps>) => {
-    return render(
-        <ComposeProviders components={[OnyxListItemProvider, LocaleContextProvider]}>
-            <ReportActionItemMessageEdit
-                // eslint-disable-next-line react/jsx-props-no-spreading
-                {...defaultProps}
-                // eslint-disable-next-line react/jsx-props-no-spreading
-                {...props}
-            />
-        </ComposeProviders>,
-    );
-};
 
 describe('ReportActionCompose Integration Tests', () => {
     beforeAll(() => {
@@ -158,11 +130,11 @@ describe('ReportActionCompose Integration Tests', () => {
             const videoSource = 'https://example.com/video.mp4';
             const videoHtml = `<video src="${videoSource}" data-expensify-source="${videoSource}" data-name="video.mp4" data-expensify-height="100" data-expensify-width="200">video.mp4</video>`;
 
-            const messages = defaultProps.action.message as Message[];
+            const messages = reportActionComposeTestReportAction.message as Message[];
 
             renderReportActionItemMessageEdit({
                 action: {
-                    ...defaultProps.action,
+                    ...reportActionComposeTestReportAction,
                     message: [
                         {
                             ...messages.at(0),

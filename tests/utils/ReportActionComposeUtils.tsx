@@ -13,6 +13,7 @@ import ReportActionItemMessageEdit from '@pages/inbox/report/ReportActionItemMes
 import * as LHNTestUtils from './LHNTestUtils';
 
 const reportActionComposeTestReport = LHNTestUtils.getFakeReport();
+const reportActionComposeTestReportAction = LHNTestUtils.getFakeReportAction();
 
 function ReportActionEditMessageContextProviderForReport({children}: PropsWithChildren) {
     return <ReportActionEditMessageContextProvider reportID={reportActionComposeTestReport.reportID}>{children}</ReportActionEditMessageContextProvider>;
@@ -45,7 +46,7 @@ const renderReportActionCompose = (props?: Partial<ReportActionComposeProps>) =>
 };
 
 const defaultReportActionItemMessageEditProps: ReportActionItemMessageEditProps = {
-    action: LHNTestUtils.getFakeReportAction(),
+    action: reportActionComposeTestReportAction,
     reportID: reportActionComposeTestReport.reportID,
     originalReportID: reportActionComposeTestReport.reportID,
     index: 0,
@@ -65,26 +66,4 @@ const renderReportActionItemMessageEdit = (props?: Partial<ReportActionItemMessa
     );
 };
 
-const renderReportActionMessageEditComponents = (
-    reportActionComposeProps?: Partial<ReportActionComposeProps>,
-    reportActionItemMessageEditProps?: Partial<ReportActionItemMessageEditProps>,
-) => {
-    return render(
-        <ReportScreenProviders>
-            <ReportActionCompose
-                // eslint-disable-next-line react/jsx-props-no-spreading
-                {...defaultReportActionComposeProps}
-                // eslint-disable-next-line react/jsx-props-no-spreading
-                {...reportActionComposeProps}
-            />
-            <ReportActionItemMessageEdit
-                // eslint-disable-next-line react/jsx-props-no-spreading
-                {...defaultReportActionItemMessageEditProps}
-                // eslint-disable-next-line react/jsx-props-no-spreading
-                {...reportActionItemMessageEditProps}
-            />
-        </ReportScreenProviders>,
-    );
-};
-
-export {ReportActionComposeWrapper, renderReportActionCompose, renderReportActionItemMessageEdit, renderReportActionMessageEditComponents, reportActionComposeTestReport};
+export {ReportActionComposeWrapper, renderReportActionCompose, renderReportActionItemMessageEdit, reportActionComposeTestReport, reportActionComposeTestReportAction};
