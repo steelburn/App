@@ -197,7 +197,7 @@ function ShareBankAccount({route}: ShareBankAccountProps) {
                             />
                         }
                         ListItem={UserListItem}
-                        onCheckboxPress={toggleOption}
+                        onSelectionButtonPress={toggleOption}
                         onSelectRow={toggleOption}
                         footerContent={
                             <FormAlertWithSubmitButton

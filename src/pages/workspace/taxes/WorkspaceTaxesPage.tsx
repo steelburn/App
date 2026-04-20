@@ -467,7 +467,7 @@ function WorkspaceTaxesPage({
                     customListHeader={getCustomListHeader()}
                     customListHeaderContent={headerContent}
                     shouldShowListEmptyContent={false}
-                    onCheckboxPress={toggleTax}
+                    onSelectionButtonPress={toggleTax}
                     showScrollIndicator={false}
                     turnOnSelectionModeOnLongPress
                     shouldHeaderBeInsideList

@@ -18,7 +18,7 @@ function TravelDomainListItem<TItem extends ListItem>({
     isDisabled,
     canSelectMultiple,
     onSelectRow,
-    onCheckboxPress,
+    onSelectionButtonPress,
     onFocus,
     shouldSyncFocus,
     selectionButtonPosition = CONST.SELECTION_BUTTON_POSITION.LEFT,
@@ -36,7 +36,7 @@ function TravelDomainListItem<TItem extends ListItem>({
             showTooltip={showTooltip}
             canSelectMultiple={canSelectMultiple}
             onSelectRow={onSelectRow}
-            onCheckboxPress={onCheckboxPress}
+            onSelectionButtonPress={onSelectionButtonPress}
             keyForList={item.keyForList}
             onFocus={onFocus}
             shouldSyncFocus={shouldSyncFocus}

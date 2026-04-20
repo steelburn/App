@@ -34,7 +34,7 @@ function ListItemRenderer<TItem extends ListItem>({
     onLongPressRow,
     shouldSingleExecuteRowSelect,
     selectRow,
-    onCheckboxPress,
+    onSelectionButtonPress,
     onDismissError,
     rightHandSideComponent,
     isMultilineSupported,
@@ -56,11 +56,11 @@ function ListItemRenderer<TItem extends ListItem>({
     isLastItem,
     shouldPreventEnterKeySubmit = true,
 }: ListItemRendererProps<TItem>) {
-    const handleOnCheckboxPress = () => {
+    const handleOnSelectionButtonPress = () => {
         if (isTransactionGroupListItemType(item)) {
-            return onCheckboxPress;
+            return onSelectionButtonPress;
         }
-        return onCheckboxPress ? () => onCheckboxPress(item) : undefined;
+        return onSelectionButtonPress ? () => onSelectionButtonPress(item) : undefined;
     };
 
     return (
@@ -80,7 +80,7 @@ function ListItemRenderer<TItem extends ListItem>({
                         selectRow(item, index);
                     }
                 }}
-                onCheckboxPress={handleOnCheckboxPress()}
+                onSelectionButtonPress={handleOnSelectionButtonPress()}
                 onDismissError={() => onDismissError?.(item)}
                 shouldPreventEnterKeySubmit={shouldPreventEnterKeySubmit}
                 rightHandSideComponent={rightHandSideComponent}

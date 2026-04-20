@@ -859,7 +859,7 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
                         style={{listItemTitleContainerStyles: shouldUseNarrowLayout ? undefined : styles.pr3}}
                         onTurnOnSelectionMode={(item) => item && toggleUser(item.login)}
                         shouldPreventDefaultFocusOnSelectRow={!canUseTouchScreen()}
-                        onCheckboxPress={(item) => toggleUser(item.login)}
+                        onSelectionButtonPress={(item) => toggleUser(item.login)}
                         shouldSingleExecuteRowSelect={!isPolicyAdmin}
                         customListHeader={getCustomListHeader()}
                         customListHeaderContent={headerContent}

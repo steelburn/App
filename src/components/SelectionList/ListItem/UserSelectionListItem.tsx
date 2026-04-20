@@ -23,7 +23,7 @@ function UserSelectionListItem<TItem extends ListItem>({
     isDisabled,
     canSelectMultiple,
     onSelectRow,
-    onCheckboxPress,
+    onSelectionButtonPress,
     onDismissError,
     shouldPreventEnterKeySubmit,
     onFocus,
@@ -63,7 +63,7 @@ function UserSelectionListItem<TItem extends ListItem>({
             showTooltip={showTooltip}
             canSelectMultiple={canSelectMultiple}
             onSelectRow={onSelectRow}
-            onCheckboxPress={onCheckboxPress}
+            onSelectionButtonPress={onSelectionButtonPress}
             onDismissError={onDismissError}
             shouldPreventEnterKeySubmit={shouldPreventEnterKeySubmit}
             // eslint-disable-next-line react/jsx-no-useless-fragment

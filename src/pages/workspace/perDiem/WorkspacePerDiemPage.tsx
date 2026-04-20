@@ -485,7 +485,7 @@ function WorkspacePerDiemPage({route}: WorkspacePerDiemPageProps) {
                         ListItem={TableListItem}
                         onSelectRow={openSubRateDetails}
                         canSelectMultiple={canSelectMultiple}
-                        onCheckboxPress={toggleSubRate}
+                        onSelectionButtonPress={toggleSubRate}
                         customListHeader={getCustomListHeader()}
                         selectedItems={selectedPerDiem.map((item) => item.subRateID)}
                         onSelectAll={filteredSubRatesList.length > 0 ? toggleAllSubRates : undefined}

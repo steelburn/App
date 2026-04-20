@@ -24,7 +24,7 @@ function TableListItem<TItem extends ListItem>({
     isDisabled,
     canSelectMultiple,
     onSelectRow,
-    onCheckboxPress,
+    onSelectionButtonPress,
     onDismissError,
     rightHandSideComponent,
     onFocus,
@@ -108,7 +108,7 @@ function TableListItem<TItem extends ListItem>({
                 canSelectMultiple={canSelectMultiple}
                 onLongPressRow={onLongPressRow}
                 onSelectRow={onSelectRow}
-                onCheckboxPress={onCheckboxPress}
+                onSelectionButtonPress={onSelectionButtonPress}
                 onDismissError={onDismissError}
                 rightHandSideComponent={rightHandSideComponent}
                 errors={item.errors}

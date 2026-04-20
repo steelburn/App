@@ -408,7 +408,7 @@ function ReportFieldsListValuesPage({
                         customListHeader={getCustomListHeader()}
                         customListHeaderContent={headerContent}
                         canSelectMultiple={canSelectMultiple}
-                        onCheckboxPress={toggleValue}
+                        onSelectionButtonPress={toggleValue}
                         shouldShowListEmptyContent={false}
                         showScrollIndicator={false}
                         turnOnSelectionModeOnLongPress

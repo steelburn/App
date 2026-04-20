@@ -15,7 +15,7 @@ function SelectableListItem<TItem extends ListItem>({
     canSelectMultiple = false,
     selectionButtonPosition = CONST.SELECTION_BUTTON_POSITION.RIGHT,
     item,
-    onCheckboxPress,
+    onSelectionButtonPress,
     onSelectRow,
     isDisabled = false,
     children,
@@ -40,7 +40,7 @@ function SelectableListItem<TItem extends ListItem>({
                     <>
                         <ButtonComponent
                             item={item}
-                            onSelectRow={onCheckboxPress ?? onSelectRow}
+                            onSelectRow={onSelectionButtonPress ?? onSelectRow}
                             // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
                             disabled={isDisabled || item.isDisabledCheckbox}
                             style={styles.ml3}
@@ -57,7 +57,7 @@ function SelectableListItem<TItem extends ListItem>({
                       <>
                           <ButtonComponent
                               item={item}
-                              onSelectRow={onCheckboxPress ?? onSelectRow}
+                              onSelectRow={onSelectionButtonPress ?? onSelectRow}
                               // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
                               disabled={isDisabled || item.isDisabledCheckbox}
                               style={styles.mr3}

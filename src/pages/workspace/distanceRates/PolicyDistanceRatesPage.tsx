@@ -532,7 +532,7 @@ function PolicyDistanceRatesPage({
                         data={filteredDistanceRatesList}
                         ListItem={TableListItem}
                         onSelectRow={openRateDetails}
-                        onCheckboxPress={toggleRate}
+                        onSelectionButtonPress={toggleRate}
                         selectedItems={selectedDistanceRates}
                         customListHeader={getCustomListHeader()}
                         onTurnOnSelectionMode={(item) => item && toggleRate(item)}

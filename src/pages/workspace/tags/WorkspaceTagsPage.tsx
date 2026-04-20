@@ -915,7 +915,7 @@ function WorkspaceTagsPage({route}: WorkspaceTagsPageProps) {
                             customListHeaderContent={headerContent}
                             shouldShowListEmptyContent={false}
                             showScrollIndicator={false}
-                            onCheckboxPress={toggleTag}
+                            onSelectionButtonPress={toggleTag}
                             isSelected={isTagSelected}
                             shouldHeaderBeInsideList
                             shouldShowRightCaret

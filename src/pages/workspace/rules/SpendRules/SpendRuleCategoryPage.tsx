@@ -119,7 +119,7 @@ function SpendRuleCategoryPage({route}: SpendRuleCategoryPageProps) {
                     listHeaderSelectAllTextStyle: [styles.textLabelSupporting],
                 }}
                 onSelectAll={listData.length > 0 ? toggleSelectAll : undefined}
-                onCheckboxPress={toggleCategory}
+                onSelectionButtonPress={toggleCategory}
                 onSelectRow={toggleCategory}
                 selectedItems={selectedCategories}
                 ListItem={MultiSelectListItem}

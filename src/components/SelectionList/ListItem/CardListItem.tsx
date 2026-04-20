@@ -40,7 +40,7 @@ function CardListItem<TItem extends ListItem>({
     isDisabled,
     canSelectMultiple,
     onSelectRow,
-    onCheckboxPress,
+    onSelectionButtonPress,
     onDismissError,
     rightHandSideComponent,
     onFocus,
@@ -74,7 +74,7 @@ function CardListItem<TItem extends ListItem>({
             showTooltip={showTooltip}
             canSelectMultiple={canSelectMultiple}
             onSelectRow={onSelectRow}
-            onCheckboxPress={onCheckboxPress}
+            onSelectionButtonPress={onSelectionButtonPress}
             onDismissError={onDismissError}
             rightHandSideComponent={rightHandSideComponent}
             errors={item.errors}

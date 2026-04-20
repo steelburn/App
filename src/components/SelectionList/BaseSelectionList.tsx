@@ -47,7 +47,7 @@ function BaseSelectionList<TItem extends ListItem>({
     onSelectRow,
     onSelectAll,
     onLongPressRow,
-    onCheckboxPress,
+    onSelectionButtonPress,
     onScrollBeginDrag,
     onDismissError,
     onEndReached,
@@ -224,7 +224,7 @@ function BaseSelectionList<TItem extends ListItem>({
                     textInputOptions?.onChangeText?.('');
                 } else if (isSmallScreenWidth) {
                     if (!item.isDisabledCheckbox) {
-                        onCheckboxPress?.(item);
+                        onSelectionButtonPress?.(item);
                     }
                     return;
                 }
@@ -248,7 +248,7 @@ function BaseSelectionList<TItem extends ListItem>({
             shouldPreventDefaultFocusOnSelectRow,
             isSmallScreenWidth,
             textInputOptions,
-            onCheckboxPress,
+            onSelectionButtonPress,
             setFocusedIndex,
         ],
     );
@@ -353,7 +353,7 @@ function BaseSelectionList<TItem extends ListItem>({
                 canSelectMultiple={canSelectMultiple}
                 onDismissError={onDismissError}
                 onLongPressRow={onLongPressRow}
-                onCheckboxPress={onCheckboxPress}
+                onSelectionButtonPress={onSelectionButtonPress}
                 shouldSingleExecuteRowSelect={shouldSingleExecuteRowSelect}
                 rightHandSideComponent={rightHandSideComponent}
                 isMultilineSupported={isRowMultilineSupported}

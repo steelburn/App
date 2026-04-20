@@ -17,7 +17,7 @@ function UserListItem<TItem extends ListItem>({
     isDisabled,
     canSelectMultiple,
     onSelectRow,
-    onCheckboxPress,
+    onSelectionButtonPress,
     onDismissError,
     shouldPreventEnterKeySubmit,
     rightHandSideComponent,
@@ -46,7 +46,7 @@ function UserListItem<TItem extends ListItem>({
             showTooltip={showTooltip}
             canSelectMultiple={canSelectMultiple}
             onSelectRow={onSelectRow}
-            onCheckboxPress={onCheckboxPress}
+            onSelectionButtonPress={onSelectionButtonPress}
             onDismissError={onDismissError}
             shouldPreventEnterKeySubmit={shouldPreventEnterKeySubmit}
             rightHandSideComponent={rightHandSideComponent}

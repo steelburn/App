@@ -32,7 +32,7 @@ function InviteMemberListItem<TItem extends ListItem>({
     isDisabled,
     canSelectMultiple,
     onSelectRow,
-    onCheckboxPress,
+    onSelectionButtonPress,
     onDismissError,
     rightHandSideComponent,
     onFocus,
@@ -90,7 +90,7 @@ function InviteMemberListItem<TItem extends ListItem>({
             onFocus={onFocus}
             shouldSyncFocus={shouldSyncFocus}
             shouldDisplayRBR={!(canSelectMultiple && !item.isDisabled)}
-            onCheckboxPress={onCheckboxPress}
+            onSelectionButtonPress={onSelectionButtonPress}
             testID={item.text}
         >
             {(hovered?: boolean) => (

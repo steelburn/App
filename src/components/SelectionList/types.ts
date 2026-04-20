@@ -43,8 +43,8 @@ type BaseSelectionListProps<TItem extends ListItem> = {
     /** Custom content to display in the header of list component. */
     customListHeaderContent?: React.JSX.Element | null;
 
-    /** Called when a checkbox is pressed */
-    onCheckboxPress?: (item: TItem) => void;
+    /** Called when a selection button is pressed */
+    onSelectionButtonPress?: (item: TItem) => void;
 
     /** Callback to fire when an error is dismissed */
     onDismissError?: (item: TItem) => void;

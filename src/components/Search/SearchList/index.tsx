@@ -439,7 +439,7 @@ function SearchList({
                         isFocused={isItemFocused}
                         onSelectRow={onSelectRow}
                         onLongPressRow={handleLongPressRow}
-                        onCheckboxPress={onCheckboxPress}
+                        onSelectionButtonPress={onCheckboxPress}
                         canSelectMultiple={canSelectMultiple}
                         item={itemWithSelection}
                         queryJSONHash={hash}

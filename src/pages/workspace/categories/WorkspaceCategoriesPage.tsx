@@ -762,7 +762,7 @@ function WorkspaceCategoriesPage({route}: WorkspaceCategoriesPageProps) {
                     <SelectionListWithModal
                         data={filteredCategoryList}
                         ListItem={TableListItem}
-                        onCheckboxPress={toggleCategory}
+                        onSelectionButtonPress={toggleCategory}
                         selectedItems={selectedCategories}
                         onSelectRow={navigateToCategorySettings}
                         onTurnOnSelectionMode={(item) => item && toggleCategory(item)}

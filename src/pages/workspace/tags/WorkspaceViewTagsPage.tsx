@@ -440,7 +440,7 @@ function WorkspaceViewTagsPage({route}: WorkspaceViewTagsProps) {
                         canSelectMultiple={canSelectMultiple}
                         onSelectRow={navigateToTagSettings}
                         shouldShowListEmptyContent={false}
-                        onCheckboxPress={toggleTag}
+                        onSelectionButtonPress={toggleTag}
                         shouldHeaderBeInsideList
                         shouldShowRightCaret
                         showScrollIndicator

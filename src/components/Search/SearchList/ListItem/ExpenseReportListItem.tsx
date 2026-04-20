@@ -48,7 +48,7 @@ function ExpenseReportListItem<TItem extends ListItem>({
     onFocus,
     onLongPressRow,
     shouldSyncFocus,
-    onCheckboxPress,
+    onSelectionButtonPress,
     lastPaymentMethod,
     personalPolicyID,
     isLastItem,
@@ -166,9 +166,9 @@ function ExpenseReportListItem<TItem extends ListItem>({
         amountOwed,
     ]);
 
-    const handleCheckboxPress = useCallback(() => {
-        onCheckboxPress?.(reportItem as unknown as TItem);
-    }, [onCheckboxPress, reportItem]);
+    const handleSelectionButtonPress = useCallback(() => {
+        onSelectionButtonPress?.(reportItem as unknown as TItem);
+    }, [onSelectionButtonPress, reportItem]);
 
     const listItemPressableStyle = useMemo(
         () => [
@@ -292,7 +292,7 @@ function ExpenseReportListItem<TItem extends ListItem>({
                         isActionLoading={isActionLoading ?? isLoading}
                         showTooltip={showTooltip}
                         canSelectMultiple={canSelectMultiple}
-                        onCheckboxPress={handleCheckboxPress}
+                        onCheckboxPress={handleSelectionButtonPress}
                         onButtonPress={handleOnButtonPress}
                         isSelectAllChecked={!!reportItem.isSelected}
                         isIndeterminate={false}
