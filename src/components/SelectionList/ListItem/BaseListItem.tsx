@@ -210,8 +210,13 @@ function BaseListItem<TItem extends ListItem>({
                 style={[
                     pressableStyle,
                     isFocused &&
-                        shouldHighlightSelectedItem &&
-                        StyleUtils.getItemBackgroundColorStyle(!!item.isSelected, !!isFocused, !!item.isDisabled, theme.activeComponentBG, theme.hoverComponentBG),
+                        StyleUtils.getItemBackgroundColorStyle(
+                            shouldHighlightSelectedItem && !!item.isSelected,
+                            !!isFocused,
+                            !!item.isDisabled,
+                            theme.activeComponentBG,
+                            theme.hoverComponentBG,
+                        ),
                 ]}
                 onFocus={onFocus}
                 role={role}
