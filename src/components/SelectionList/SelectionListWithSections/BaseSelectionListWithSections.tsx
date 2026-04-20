@@ -336,6 +336,10 @@ function BaseSelectionListWithSections<TItem extends ListItem>({
             }
             case CONST.SECTION_LIST_ITEM_TYPE.ROW: {
                 const isItemFocused = index === focusedIndex;
+                // isItemFocused tracks keyboard focus (whether the item responds to Enter/arrows).
+                // The visual highlight is intentionally suppressed on initial focus until the user
+                // starts navigating, so isFocused (visual) is a subset of isItemFocused (keyboard).
+                const isItemVisuallyFocused = isItemFocused && (shouldHighlightInitiallyFocusedItem || hasKeyBeenPressed.current);
                 const isDisabled = !!item.isDisabled;
 
                 return (
@@ -346,7 +350,7 @@ function BaseSelectionListWithSections<TItem extends ListItem>({
                         item={item}
                         index={index}
                         normalizedIndex={index}
-                        isFocused={isItemFocused && (shouldHighlightInitiallyFocusedItem || hasKeyBeenPressed.current)}
+                        isFocused={isItemVisuallyFocused}
                         isDisabled={isDisabled}
                         canSelectMultiple={canSelectMultiple}
                         shouldSingleExecuteRowSelect={shouldSingleExecuteRowSelect}
