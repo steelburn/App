@@ -2,7 +2,7 @@
 title: Edit Expenses
 description: Learn how to edit individual expenses, and edit multiple expenses at once.
 keywords: [bulk edit expenses, edit multiple expenses Expensify, update expenses in bulk, modify multiple expenses]
-internalScope: Audience is all members. Covers editing expenses individually and in bulk bulk editing multiple expenses at once. Does not cover creating, submitting or reopening reports. 
+internalScope: Audience is all members. Covers editing expenses individually and in bulkediting multiple expenses at once. Does not cover creating, submitting or reopening reports. 
 ---
 
 # Edit Expenses 
@@ -15,7 +15,7 @@ You can edit a single expense from within a report, or update multiple expenses 
 - **Current approver**: Can edit expenses on Outstanding reports pending their approval.
 - **Workspace Admin**: Can edit expenses on any Draft or Outstanding report on the Workspace.
 
-Expenses on Approved reports must be unapproved before they can be edited. Expenses on Paid and Done report cannot be edited. 
+Expenses on Approved reports must be unapproved before they can be edited. Expenses on Paid and Done reports cannot be edited. 
 
 ---
 
@@ -54,7 +54,7 @@ On Draft and Outstanding reports, you can edit:
  - Date
  - Other fields like Category, Tag and Attendees
 
-**Note:** Expenses on Approved reports must be unapproved before they can be edited. Expenses on Paid or Done reports cannot be edited. [Learn how to unapprove a report](Approve expenses](/articles/new-expensify/reports-and-expenses/Approve-Expenses).
+**Note:** Expenses on Approved reports must be unapproved before they can be edited. Expenses on Paid or Done reports cannot be edited. [Learn how to unapprove a report](/articles/new-expensify/reports-and-expenses/Approve-Expenses).
 
 ---
 
@@ -74,8 +74,8 @@ No, Paid or Done reports are locked and cannot be reopened for editing.
 
 ## Why are some fields not editable in the Edit multiple panel?
 
-If a field is restricted for any selected expense (for example, amount on a card expense), iit will be disabled in the **Edit multiple** panel.
+If a field is restricted for any selected expense (for example, amount on a card expense), it will be disabled in the **Edit multiple** panel.
 
 ## Why can't I see the Edit multiple option?
 
-**Edit multiple** only appears when you select 2 or more Unreported, Draft, our Outstanding expenses that have at least one editable field.
+**Edit multiple** only appears when you select 2 or more Unreported, Draft, or Outstanding expenses that have at least one editable field.
