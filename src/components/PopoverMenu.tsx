@@ -15,6 +15,7 @@ import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {isSafari} from '@libs/Browser';
 import getPlatform from '@libs/getPlatform';
+import {addKeyDownPressListener, removeKeyDownPressListener} from '@libs/KeyboardShortcut/KeyDownPressListener';
 import variables from '@styles/variables';
 import {close} from '@userActions/Modal';
 import CONST from '@src/CONST';
@@ -318,21 +319,25 @@ function BasePopoverMenu({
     const platform = getPlatform();
     const isWeb = platform === CONST.PLATFORM.WEB;
     const [focusedIndex, setFocusedIndex] = useArrowKeyFocusManager({
-        initialFocusedIndex: shouldShowRadioButton ? -1 : currentMenuItemsFocusedIndex,
+        initialFocusedIndex: currentMenuItemsFocusedIndex,
         maxIndex: currentMenuItems.length - 1,
         isActive: isVisible,
     });
     const expensifyIcons = useMemoizedLazyExpensifyIcons(['BackArrow', 'ReceiptScan', 'MoneyCircle']);
     const prevMenuItems = usePrevious(menuItems);
+    const [hasKeyBeenPressed, setHasKeyBeenPressed] = useState(false);
 
-    // initialFocusedIndex does not reset when the popover is closed and reopened.
-    // In radio-button mode the selected item must not appear highlighted on open, so we reset focus explicitly each time the popover becomes visible.
+    // In radio-button mode, suppress the visual highlight until the user starts navigating,
+    // even though the selected item is already focused (for immediate Enter/arrow support).
     useEffect(() => {
         if (!isVisible || !shouldShowRadioButton) {
             return;
         }
-        setFocusedIndex(-1);
-    }, [isVisible, shouldShowRadioButton, setFocusedIndex]);
+        setHasKeyBeenPressed(false);
+        const handleKeyDown = () => setHasKeyBeenPressed(true);
+        addKeyDownPressListener(handleKeyDown);
+        return () => removeKeyDownPressListener(handleKeyDown);
+    }, [isVisible, shouldShowRadioButton]);
 
     const selectItem = (index: number, event?: GestureResponderEvent | KeyboardEvent) => {
         const selectedItem = currentMenuItems.at(index);
@@ -419,6 +424,8 @@ function BasePopoverMenu({
         const icon = typeof item.icon === 'string' ? expensifyIcons[item.icon as keyof typeof expensifyIcons] : item.icon;
         // eslint-disable-next-line react/no-array-index-key
         const reactKey = shouldIgnoreKeyForRendering ? `${item.text}_${menuIndex}` : (key ?? `${item.text}_${menuIndex}`);
+        // In radio-button mode, suppress visual focus highlight until the user starts keyboard navigation.
+        const isVisuallyFocused = focusedIndex === menuIndex && (!shouldShowRadioButton || hasKeyBeenPressed);
         return (
             <OfflineWithFeedback
                 key={reactKey}
@@ -429,7 +436,7 @@ function BasePopoverMenu({
                     pressableTestID={menuItemTestID ?? `PopoverMenuItem-${item.text}`}
                     title={text}
                     onPress={(event) => selectItem(menuIndex, event)}
-                    focused={focusedIndex === menuIndex}
+                    focused={isVisuallyFocused}
                     shouldShowRadioButton={shouldShowRadioButton}
                     shouldCheckActionAllowedOnPress={false}
                     iconRight={item.rightIcon}
@@ -446,7 +453,7 @@ function BasePopoverMenu({
                     wrapperStyle={[
                         StyleUtils.getItemBackgroundColorStyle(
                             shouldShowRadioButton ? false : !!item.isSelected,
-                            focusedIndex === menuIndex,
+                            isVisuallyFocused,
                             item.disabled ?? false,
                             theme.activeComponentBG,
                             theme.hoverComponentBG,
@@ -573,7 +580,7 @@ function BasePopoverMenu({
         }
 
         return stylesArray;
-    }, [isSmallScreenWidth, shouldEnableMaxHeight, styles.createMenuContainer, shouldUseScrollView]);
+    }, [isSmallScreenWidth, shouldEnableMaxHeight, styles.createMenuContainer, shouldUseScrollView, isInLandscapeMode]);
 
     const {paddingTop, paddingBottom, paddingVertical, ...restScrollContainerStyle} = (StyleSheet.flatten([styles.pv4, scrollContainerStyle]) as ViewStyle) ?? {};
     const {
