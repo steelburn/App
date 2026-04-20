@@ -1,4 +1,4 @@
-import type {MutableRefObject} from 'react';
+import type {RefObject} from 'react';
 import {useCallback} from 'react';
 import {Alert} from 'react-native';
 import {RESULTS} from 'react-native-permissions';
@@ -19,8 +19,8 @@ import type Transaction from '@src/types/onyx/Transaction';
 import type {FileObject} from '@src/types/utils/Attachment';
 
 type UseCapturePhotoParams = {
-    cameraRef: MutableRefObject<Camera | null>;
-    isCapturingPhotoRef: MutableRefObject<boolean>;
+    cameraRef: RefObject<Camera | null>;
+    isCapturingPhotoRef: RefObject<boolean>;
     cameraPermissionStatus: string | null;
     flash: boolean;
     hasFlash: boolean;

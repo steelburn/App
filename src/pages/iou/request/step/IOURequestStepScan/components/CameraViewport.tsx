@@ -1,5 +1,5 @@
 import React from 'react';
-import type {MutableRefObject} from 'react';
+import type {RefObject} from 'react';
 import type {ViewStyle} from 'react-native';
 import {StyleSheet, View} from 'react-native';
 import type {GestureType} from 'react-native-gesture-handler';
@@ -19,7 +19,7 @@ import type IconAsset from '@src/types/utils/IconAsset';
 import NavigationAwareCamera from './NavigationAwareCamera/Camera';
 
 type CameraViewportProps = {
-    camera: MutableRefObject<Camera | null>;
+    camera: RefObject<Camera | null>;
     device: CameraDevice;
     format: CameraDeviceFormat | undefined;
     fps: number;
