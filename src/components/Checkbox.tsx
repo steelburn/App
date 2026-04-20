@@ -5,13 +5,55 @@ import type {SelectionButtonProps} from './SelectionButton';
 
 type CheckboxProps = Omit<SelectionButtonProps, 'role'>;
 
-function Checkbox(props: CheckboxProps) {
+function Checkbox({
+    isChecked,
+    isIndeterminate,
+    onPress,
+    hasError,
+    disabled,
+    style,
+    containerStyle,
+    children,
+    onMouseDown,
+    containerSize,
+    containerBorderRadius,
+    caretSize,
+    accessibilityLabel,
+    shouldStopMouseDownPropagation,
+    shouldSelectOnPressEnter,
+    wrapperStyle,
+    testID,
+    ref,
+    sentryLabel,
+    tabIndex,
+    accessible,
+}: CheckboxProps) {
     return (
         <SelectionButton
-            // eslint-disable-next-line react/jsx-props-no-spreading
-            {...props}
             role={CONST.ROLE.CHECKBOX}
-        />
+            isChecked={isChecked}
+            isIndeterminate={isIndeterminate}
+            onPress={onPress}
+            hasError={hasError}
+            disabled={disabled}
+            style={style}
+            containerStyle={containerStyle}
+            onMouseDown={onMouseDown}
+            containerSize={containerSize}
+            containerBorderRadius={containerBorderRadius}
+            caretSize={caretSize}
+            accessibilityLabel={accessibilityLabel}
+            shouldStopMouseDownPropagation={shouldStopMouseDownPropagation}
+            shouldSelectOnPressEnter={shouldSelectOnPressEnter}
+            wrapperStyle={wrapperStyle}
+            testID={testID}
+            ref={ref}
+            sentryLabel={sentryLabel}
+            tabIndex={tabIndex}
+            accessible={accessible}
+        >
+            {children}
+        </SelectionButton>
     );
 }
 
