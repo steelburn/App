@@ -272,7 +272,6 @@ function IOURequestStepScan({
                         isMultiScanEnabled={isMultiScanEnabled}
                         canUseMultiScan={canUseMultiScan}
                         shouldAcceptMultipleFiles={shouldAcceptMultipleFiles}
-                        cameraPermissionStatus={cameraPermissionStatus}
                         flash={flash}
                         hasFlash={hasFlash}
                         setFlash={setFlash}

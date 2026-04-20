@@ -1,6 +1,5 @@
 import React from 'react';
 import {View} from 'react-native';
-import {RESULTS} from 'react-native-permissions';
 import AttachmentPicker from '@components/AttachmentPicker';
 import Icon from '@components/Icon';
 import ImageSVG from '@components/ImageSVG';
@@ -18,7 +17,6 @@ type ScannerControlsBarProps = {
     isMultiScanEnabled: boolean;
     canUseMultiScan: boolean;
     shouldAcceptMultipleFiles: boolean;
-    cameraPermissionStatus: string | null;
     flash: boolean;
     hasFlash: boolean;
     setFlash: (updater: (prev: boolean) => boolean) => void;
@@ -39,7 +37,6 @@ function ScannerControlsBar({
     isMultiScanEnabled,
     canUseMultiScan,
     shouldAcceptMultipleFiles,
-    cameraPermissionStatus,
     flash,
     hasFlash,
     setFlash,
@@ -131,7 +128,7 @@ function ScannerControlsBar({
                     accessibilityLabel={translate('receipt.flash')}
                     sentryLabel={CONST.SENTRY_LABEL.REQUEST_STEP.SCAN.FLASH}
                     style={[styles.alignItemsEnd, !hasFlash && styles.opacity0]}
-                    disabled={cameraPermissionStatus !== RESULTS.GRANTED || !hasFlash}
+                    disabled={!hasFlash}
                     onPress={() => setFlash((prevFlash) => !prevFlash)}
                 >
                     <Icon
