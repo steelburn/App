@@ -775,7 +775,7 @@ type UpdateMoneyRequestAmountAndCurrencyParams = {
     amount: number;
     taxAmount: number;
     policy?: OnyxEntry<OnyxTypes.Policy>;
-    policyTagList: OnyxEntry<OnyxTypes.PolicyTagLists>;
+    policyTagList?: OnyxEntry<OnyxTypes.PolicyTagLists>;
     policyCategories?: OnyxEntry<OnyxTypes.PolicyCategories>;
     taxCode: string;
     taxValue: string;
