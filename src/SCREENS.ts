@@ -21,6 +21,7 @@ const SCREENS = {
     WORKSPACE_AVATAR: 'WorkspaceAvatar',
     REPORT_AVATAR: 'ReportAvatar',
     NOT_FOUND: 'not-found',
+    REPORT_ACTION_NOT_FOUND: 'ReportActionNotFound',
     TRANSITION_BETWEEN_APPS: 'TransitionBetweenApps',
     VALIDATE_LOGIN: 'ValidateLogin',
     CONNECTION_COMPLETE: 'ConnectionComplete',

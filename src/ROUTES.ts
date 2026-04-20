@@ -916,6 +916,10 @@ const ROUTES = {
             return getUrlWithBackToParam(`${baseRoute}${queryString}` as const, backTo);
         },
     },
+    REPORT_ACTION_NOT_FOUND: {
+        route: 'r/:reportID/not-found',
+        getRoute: (reportID: string) => `r/${reportID}/not-found` as const,
+    },
     REPORT_CARD_ACTIVATE: {
         route: 'r/:reportID/:reportActionID?/card/:cardID/activate',
         getRoute: (cardID: number, reportID?: string, reportActionID?: string) => {
