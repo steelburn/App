@@ -133,6 +133,9 @@ type SearchListProps = Pick<FlashListProps<SearchListItem>, 'onScroll' | 'conten
 
     policyForMovingExpenses?: Policy;
 
+    /** Whether the action column should use its wider variant (e.g. when there is at least one deleted transaction) */
+    isActionColumnWide?: boolean;
+
     /** Reference to the outer element */
     ref?: ForwardedRef<SearchListHandle>;
 };
@@ -217,6 +220,7 @@ function SearchList({
     selectedTransactions,
     hasLoadedAllTransactions,
     policyForMovingExpenses,
+    isActionColumnWide,
     ref,
 }: SearchListProps) {
     const styles = useThemeStyles();
@@ -331,7 +335,7 @@ function SearchList({
     }, [data, groupBy, newTransactions]);
 
     const {windowWidth} = useWindowDimensions();
-    const minTableWidth = getTableMinWidth(columns, queryJSON.type);
+    const minTableWidth = getTableMinWidth(columns, queryJSON.type, isActionColumnWide);
     const shouldScrollHorizontally = !!SearchTableHeader && minTableWidth > windowWidth;
 
     const horizontalScrollViewRef = useRef<RNScrollView>(null);
