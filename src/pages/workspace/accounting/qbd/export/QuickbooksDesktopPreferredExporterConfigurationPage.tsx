@@ -17,7 +17,7 @@ import type {WithPolicyConnectionsProps} from '@pages/workspace/withPolicyConnec
 import withPolicyConnections from '@pages/workspace/withPolicyConnections';
 import {clearQBDErrorField} from '@userActions/Policy/Policy';
 import CONST from '@src/CONST';
-import ROUTES from '@src/ROUTES';
+import ROUTES, {DYNAMIC_ROUTES} from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
 
 type CardListItem = ListItem & {
@@ -37,7 +37,7 @@ function QuickbooksDesktopPreferredExporterConfigurationPage({policy}: WithPolic
     const policyID = policy?.id;
 
     const goBack = useCallback(() => {
-        Navigation.goBack(backTo ?? ROUTES.POLICY_ACCOUNTING_QUICKBOOKS_DESKTOP_EXPORT.getRoute(policyID));
+        Navigation.goBack(backTo ?? `${ROUTES.POLICY_ACCOUNTING.getRoute(policyID, CONST.POLICY.CONNECTIONS.NAME.QBD)}/${DYNAMIC_ROUTES.POLICY_ACCOUNTING_QUICKBOOKS_DESKTOP_EXPORT.path}`);
     }, [policyID, backTo]);
 
     const data: CardListItem[] = useMemo(

@@ -19,7 +19,7 @@ import CONST from '@src/CONST';
 import ROUTES, {DYNAMIC_ROUTES} from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
 
-function QuickbooksDesktopExportPage({policy}: WithPolicyConnectionsProps) {
+function DynamicQuickbooksDesktopExportPage({policy}: WithPolicyConnectionsProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
     const policyID = policy?.id;
@@ -90,7 +90,7 @@ function QuickbooksDesktopExportPage({policy}: WithPolicyConnectionsProps) {
 
     return (
         <ConnectionLayout
-            displayName="QuickbooksDesktopExportPage"
+            displayName="DynamicQuickbooksDesktopExportPage"
             headerTitle="workspace.accounting.export"
             title="workspace.qbd.exportDescription"
             accessVariants={[CONST.POLICY.ACCESS_VARIANTS.ADMIN, CONST.POLICY.ACCESS_VARIANTS.CONTROL]}
@@ -123,4 +123,4 @@ function QuickbooksDesktopExportPage({policy}: WithPolicyConnectionsProps) {
     );
 }
 
-export default withPolicyConnections(QuickbooksDesktopExportPage);
+export default withPolicyConnections(DynamicQuickbooksDesktopExportPage);

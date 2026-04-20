@@ -16,7 +16,7 @@ import type {WithPolicyConnectionsProps} from '@pages/workspace/withPolicyConnec
 import withPolicyConnections from '@pages/workspace/withPolicyConnections';
 import {clearQBDErrorField} from '@userActions/Policy/Policy';
 import CONST from '@src/CONST';
-import ROUTES from '@src/ROUTES';
+import ROUTES, {DYNAMIC_ROUTES} from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
 import type {Account, QBDNonReimbursableExportAccountType} from '@src/types/onyx/Policy';
 
@@ -69,7 +69,10 @@ function QuickbooksDesktopCompanyCardExpenseAccountSelectCardPage({policy}: With
     );
 
     const goBack = useCallback(() => {
-        Navigation.goBack(backTo ?? (policyID && ROUTES.POLICY_ACCOUNTING_QUICKBOOKS_DESKTOP_COMPANY_CARD_EXPENSE_ACCOUNT.getRoute(policyID)));
+        Navigation.goBack(
+            backTo ??
+                `${ROUTES.POLICY_ACCOUNTING.getRoute(policyID, CONST.POLICY.CONNECTIONS.NAME.QBD)}/${DYNAMIC_ROUTES.POLICY_ACCOUNTING_QUICKBOOKS_DESKTOP_EXPORT.path}/${DYNAMIC_ROUTES.POLICY_ACCOUNTING_QUICKBOOKS_DESKTOP_COMPANY_CARD_EXPENSE_ACCOUNT.path}`,
+        );
     }, [backTo, policyID]);
 
     const selectExportCompanyCard = useCallback(

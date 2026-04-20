@@ -19,14 +19,14 @@ import withPolicyConnections from '@pages/workspace/withPolicyConnections';
 import variables from '@styles/variables';
 import {clearQBDErrorField} from '@userActions/Policy/Policy';
 import CONST from '@src/CONST';
-import ROUTES, {DYNAMIC_ROUTES} from '@src/ROUTES';
+import {DYNAMIC_ROUTES} from '@src/ROUTES';
 import type {Account} from '@src/types/onyx/Policy';
 
 type CardListItem = ListItem & {
     value: Account;
 };
 
-function QuickbooksDesktopCompanyCardExpenseAccountSelectPage({policy}: WithPolicyConnectionsProps) {
+function DynamicQuickbooksDesktopCompanyCardExpenseAccountSelectPage({policy}: WithPolicyConnectionsProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
     const policyID = policy?.id;
@@ -48,8 +48,8 @@ function QuickbooksDesktopCompanyCardExpenseAccountSelectPage({policy}: WithPoli
     }, [policy?.connections?.quickbooksDesktop, nonReimbursable, nonReimbursableAccount]);
 
     const goBack = useCallback(() => {
-        Navigation.goBack(backPath || (policyID && `${ROUTES.POLICY_ACCOUNTING_QUICKBOOKS_DESKTOP_EXPORT.getRoute(policyID)}/${DYNAMIC_ROUTES.POLICY_ACCOUNTING_QUICKBOOKS_DESKTOP_COMPANY_CARD_EXPENSE_ACCOUNT.path}`));
-    }, [policyID, backPath]);
+        Navigation.goBack(backPath);
+    }, [backPath]);
 
     const selectExportAccount = useCallback(
         (row: CardListItem) => {
@@ -79,7 +79,7 @@ function QuickbooksDesktopCompanyCardExpenseAccountSelectPage({policy}: WithPoli
             policyID={policyID}
             accessVariants={[CONST.POLICY.ACCESS_VARIANTS.ADMIN, CONST.POLICY.ACCESS_VARIANTS.CONTROL]}
             featureName={CONST.POLICY.MORE_FEATURES.ARE_CONNECTIONS_ENABLED}
-            displayName="QuickbooksDesktopCompanyCardExpenseAccountSelectPage"
+            displayName="DynamicQuickbooksDesktopCompanyCardExpenseAccountSelectPage"
             headerTitleAlreadyTranslated={getQBDNonReimbursableExportAccountType(translate, nonReimbursable)}
             headerContent={nonReimbursable ? <Text style={[styles.ph5, styles.pb5]}>{translate(`workspace.qbd.accounts.${nonReimbursable}AccountDescription`)}</Text> : null}
             data={data}
@@ -98,4 +98,4 @@ function QuickbooksDesktopCompanyCardExpenseAccountSelectPage({policy}: WithPoli
     );
 }
 
-export default withPolicyConnections(QuickbooksDesktopCompanyCardExpenseAccountSelectPage);
+export default withPolicyConnections(DynamicQuickbooksDesktopCompanyCardExpenseAccountSelectPage);

@@ -18,7 +18,7 @@ import withPolicyConnections from '@pages/workspace/withPolicyConnections';
 import ToggleSettingOptionRow from '@pages/workspace/workflows/ToggleSettingsOptionRow';
 import {clearQBDErrorField} from '@userActions/Policy/Policy';
 import CONST from '@src/CONST';
-import ROUTES from '@src/ROUTES';
+import ROUTES, {DYNAMIC_ROUTES} from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
 import type {PendingAction} from '@src/types/onyx/OnyxCommon';
 
@@ -102,7 +102,9 @@ function QuickbooksDesktopOutOfPocketExpenseConfigurationPage({policy}: WithPoli
             contentContainerStyle={styles.pb2}
             titleStyle={styles.ph5}
             connectionName={CONST.POLICY.CONNECTIONS.NAME.QBD}
-            onBackButtonPress={() => Navigation.goBack(backTo ?? ROUTES.POLICY_ACCOUNTING_QUICKBOOKS_DESKTOP_EXPORT.getRoute(policyID))}
+            onBackButtonPress={() =>
+                Navigation.goBack(backTo ?? `${ROUTES.POLICY_ACCOUNTING.getRoute(policyID, CONST.POLICY.CONNECTIONS.NAME.QBD)}/${DYNAMIC_ROUTES.POLICY_ACCOUNTING_QUICKBOOKS_DESKTOP_EXPORT.path}`)
+            }
         >
             {sections.map((section, index) => (
                 <OfflineWithFeedback
