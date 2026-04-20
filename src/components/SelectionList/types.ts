@@ -121,9 +121,6 @@ type BaseSelectionListProps<TItem extends ListItem> = {
     /** Whether to set the hover style */
     setShouldDisableHoverStyle?: React.Dispatch<React.SetStateAction<boolean>>;
 
-    /** Whether to show the selection button (checkbox or radio) */
-    shouldShowSelectionButton?: boolean;
-
     /** Which side of the row to render the selection button on */
     selectionButtonPosition?: ValueOf<typeof CONST.SELECTION_BUTTON_POSITION>;
 

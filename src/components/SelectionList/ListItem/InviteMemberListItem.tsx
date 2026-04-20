@@ -42,7 +42,6 @@ function InviteMemberListItem<TItem extends ListItem>({
     canShowProductTrainingTooltip = true,
     index = 0,
     sectionIndex = 0,
-    shouldShowSelectionButton = true,
 }: InviteMemberListItemProps<TItem>) {
     const styles = useThemeStyles();
     const theme = useTheme();
@@ -91,7 +90,6 @@ function InviteMemberListItem<TItem extends ListItem>({
             onFocus={onFocus}
             shouldSyncFocus={shouldSyncFocus}
             shouldDisplayRBR={!(canSelectMultiple && !item.isDisabled)}
-            shouldShowSelectionButton={shouldShowSelectionButton}
             onCheckboxPress={onCheckboxPress}
             testID={item.text}
         >

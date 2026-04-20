@@ -51,7 +51,6 @@ function ListItemRenderer<TItem extends ListItem>({
     shouldHighlightSelectedItem,
     shouldDisableHoverStyle,
     shouldShowRightCaret,
-    shouldShowSelectionButton,
     selectionButtonPosition,
     errorRowStyles,
     isLastItem,
@@ -110,7 +109,6 @@ function ListItemRenderer<TItem extends ListItem>({
                 shouldHighlightSelectedItem={shouldHighlightSelectedItem}
                 shouldDisableHoverStyle={shouldDisableHoverStyle}
                 shouldShowRightCaret={shouldShowRightCaret}
-                shouldShowSelectionButton={shouldShowSelectionButton}
                 selectionButtonPosition={selectionButtonPosition}
                 isLastItem={isLastItem}
             />

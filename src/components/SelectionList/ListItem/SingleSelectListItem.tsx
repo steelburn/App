@@ -24,7 +24,6 @@ function SingleSelectListItem<TItem extends ListItem>({
     titleStyles,
     shouldHighlightSelectedItem,
     rightHandSideComponent = undefined,
-    shouldShowSelectionButton = true,
     selectionButtonPosition,
 }: SingleSelectListItemProps<TItem>) {
     const styles = useThemeStyles();
@@ -48,7 +47,6 @@ function SingleSelectListItem<TItem extends ListItem>({
             wrapperStyle={[styles.optionRow, wrapperStyle]}
             titleStyles={titleStyles}
             shouldHighlightSelectedItem={shouldHighlightSelectedItem}
-            shouldShowSelectionButton={shouldShowSelectionButton}
             selectionButtonPosition={selectionButtonPosition}
         />
     );

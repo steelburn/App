@@ -78,7 +78,6 @@ function BaseSelectionListWithSections<TItem extends ListItem>({
     titleNumberOfLines,
     shouldHighlightSelectedItem,
     shouldDisableHoverStyle,
-    shouldShowSelectionButton,
     selectionButtonPosition,
     setShouldDisableHoverStyle = () => {},
     canShowProductTrainingTooltip,
@@ -364,7 +363,6 @@ function BaseSelectionListWithSections<TItem extends ListItem>({
                         titleNumberOfLines={titleNumberOfLines}
                         shouldHighlightSelectedItem={shouldHighlightSelectedItem}
                         shouldDisableHoverStyle={shouldDisableHoverStyle}
-                        shouldShowSelectionButton={shouldShowSelectionButton}
                         selectionButtonPosition={selectionButtonPosition}
                         shouldPreventEnterKeySubmit={!disableKeyboardShortcuts}
                     />

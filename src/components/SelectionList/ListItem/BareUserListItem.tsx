@@ -2,22 +2,23 @@ import React from 'react';
 import Text from '@components/Text';
 import useLocalize from '@hooks/useLocalize';
 import useThemeStyles from '@hooks/useThemeStyles';
-import SelectableListItem from './SelectableListItem';
+import BaseListItem from './BaseListItem';
 import type {ListItem, UserListItemProps} from './types';
 import UserListItemContent from './UserListItemContent';
 
 /**
- * A row with user/workspace avatar(s), display name, and optional subtitle. Used broadly for
- * user and workspace selection (e.g. task assignee, workspace picker, card assignee, delegates).
+ * A variant of UserListItem for lists that never show a selection button.
+ * Uses BaseListItem directly, no checkbox or radio button is rendered.
+ *
+ * Prefer UserListItem in most cases. Only use where a fully custom
+ * right-side component handles selection (such as a standalone action button).
  */
-function UserListItem<TItem extends ListItem>({
+function BareUserListItem<TItem extends ListItem>({
     item,
     isFocused,
     showTooltip,
     isDisabled,
-    canSelectMultiple,
     onSelectRow,
-    onCheckboxPress,
     onDismissError,
     shouldPreventEnterKeySubmit,
     rightHandSideComponent,
@@ -28,25 +29,22 @@ function UserListItem<TItem extends ListItem>({
     forwardedFSClass,
     shouldDisableHoverStyle,
     shouldHighlightSelectedItem,
-    selectionButtonPosition,
 }: UserListItemProps<TItem>) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
 
     const renderedRightComponent = typeof rightHandSideComponent === 'function' ? rightHandSideComponent(item, isFocused) : rightHandSideComponent;
     // Disable accessible grouping when a right-side button is visible, so VoiceOver can focus it independently.
-    const shouldDisableAccessibleGrouping = !!renderedRightComponent && !canSelectMultiple;
+    const shouldDisableAccessibleGrouping = !!renderedRightComponent;
 
     return (
-        <SelectableListItem
+        <BaseListItem
             item={item}
             wrapperStyle={[styles.flex1, styles.justifyContentBetween, styles.sidebarLinkInner, styles.userSelectNone, styles.peopleRow, wrapperStyle]}
             isFocused={isFocused}
             isDisabled={isDisabled}
             showTooltip={showTooltip}
-            canSelectMultiple={canSelectMultiple}
             onSelectRow={onSelectRow}
-            onCheckboxPress={onCheckboxPress}
             onDismissError={onDismissError}
             shouldPreventEnterKeySubmit={shouldPreventEnterKeySubmit}
             rightHandSideComponent={rightHandSideComponent}
@@ -64,7 +62,6 @@ function UserListItem<TItem extends ListItem>({
             accessible={shouldDisableAccessibleGrouping ? false : undefined}
             shouldDisableHoverStyle={shouldDisableHoverStyle}
             shouldHighlightSelectedItem={shouldHighlightSelectedItem}
-            selectionButtonPosition={selectionButtonPosition}
         >
             {(hovered?: boolean) => (
                 <UserListItemContent
@@ -78,8 +75,8 @@ function UserListItem<TItem extends ListItem>({
                     hovered={!!hovered}
                 />
             )}
-        </SelectableListItem>
+        </BaseListItem>
     );
 }
 
-export default UserListItem;
+export default BareUserListItem;

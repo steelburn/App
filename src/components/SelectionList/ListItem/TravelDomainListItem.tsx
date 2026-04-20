@@ -21,7 +21,6 @@ function TravelDomainListItem<TItem extends ListItem>({
     onCheckboxPress,
     onFocus,
     shouldSyncFocus,
-    shouldShowSelectionButton = true,
     selectionButtonPosition = CONST.SELECTION_BUTTON_POSITION.LEFT,
 }: TravelDomainListItemProps<TItem>) {
     const styles = useThemeStyles();
@@ -42,7 +41,6 @@ function TravelDomainListItem<TItem extends ListItem>({
             onFocus={onFocus}
             shouldSyncFocus={shouldSyncFocus}
             rightHandSideComponent={showRecommendedTag ? <Badge text={translate('travel.domainSelector.recommended')} /> : undefined}
-            shouldShowSelectionButton={shouldShowSelectionButton}
             selectionButtonPosition={selectionButtonPosition}
         >
             <TextWithTooltip

@@ -31,7 +31,6 @@ function BaseSelectListItem<TItem extends ListItem>({
     titleStyles,
     shouldHighlightSelectedItem,
     accessibilityRole,
-    shouldShowSelectionButton,
     selectionButtonPosition,
 }: BaseSelectListItemProps<TItem>) {
     const styles = useThemeStyles();
@@ -58,7 +57,6 @@ function BaseSelectListItem<TItem extends ListItem>({
             errors={item.errors}
             shouldHighlightSelectedItem={shouldHighlightSelectedItem}
             accessibilityRole={accessibilityRole}
-            shouldShowSelectionButton={shouldShowSelectionButton}
             selectionButtonPosition={selectionButtonPosition}
         >
             <>

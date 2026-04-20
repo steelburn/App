@@ -5,7 +5,7 @@ import {usePersonalDetails} from '@components/OnyxListItemProvider';
 import OptionsListSkeletonView from '@components/OptionsListSkeletonView';
 import type {AnimatedTextInputRef} from '@components/RNTextInput';
 import type {ListItem as NewListItem, UserListItemProps} from '@components/SelectionList/ListItem/types';
-import UserListItem from '@components/SelectionList/ListItem/UserListItem';
+import BareUserListItem from '@components/SelectionList/ListItem/BareUserListItem';
 import SelectionListWithSections from '@components/SelectionList/SelectionListWithSections';
 import type {Section, SelectionListWithSectionsHandle} from '@components/SelectionList/SelectionListWithSections/types';
 import useAutocompleteSuggestions from '@hooks/useAutocompleteSuggestions';
@@ -117,7 +117,6 @@ function SearchRouterItem(props: UserListItemProps<AutocompleteListItem> | Searc
         isFocused,
         showTooltip,
         isDisabled,
-        canSelectMultiple,
         onSelectRow,
         onDismissError,
         shouldPreventEnterKeySubmit,
@@ -129,13 +128,12 @@ function SearchRouterItem(props: UserListItemProps<AutocompleteListItem> | Searc
     const fsClass = FS.getChatFSClass((item as SearchOption<Report> | undefined)?.item);
 
     return (
-        <UserListItem
+        <BareUserListItem
             item={item}
             keyForList={item.keyForList}
             isFocused={isFocused}
             showTooltip={showTooltip}
             isDisabled={isDisabled}
-            canSelectMultiple={canSelectMultiple}
             onSelectRow={onSelectRow}
             onDismissError={onDismissError}
             shouldPreventEnterKeySubmit={shouldPreventEnterKeySubmit}
@@ -145,7 +143,6 @@ function SearchRouterItem(props: UserListItemProps<AutocompleteListItem> | Searc
             wrapperStyle={wrapperStyle}
             pressableStyle={[styles.br2, styles.ph3]}
             forwardedFSClass={fsClass}
-            shouldShowSelectionButton={false}
             shouldHighlightSelectedItem
         />
     );

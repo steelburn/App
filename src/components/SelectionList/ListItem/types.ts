@@ -14,6 +14,7 @@ import type {SplitExpense} from '@src/types/onyx/IOU';
 import type {Errors, Icon, PendingAction} from '@src/types/onyx/OnyxCommon';
 import type {ReceiptErrors} from '@src/types/onyx/Transaction';
 import type WithSentryLabel from '@src/types/utils/SentryLabel';
+import type BareUserListItem from './BareUserListItem';
 import type BaseListItem from './BaseListItem';
 import type InviteMemberListItem from './InviteMemberListItem';
 import type MultiSelectListItem from './MultiSelectListItem';
@@ -234,9 +235,6 @@ type ListItemProps<TItem extends ListItem> = CommonListItemProps<TItem> & {
     /** Callback to fire when the selection button is pressed */
     onCheckboxPress?: (item: TItem, itemTransactions?: TransactionListItemType[]) => void;
 
-    /** Whether to show the selection button (checkbox or radio) */
-    shouldShowSelectionButton?: boolean;
-
     /** Which side of the row to render the selection button on */
     selectionButtonPosition?: ValueOf<typeof CONST.SELECTION_BUTTON_POSITION>;
 
@@ -305,6 +303,7 @@ type ValidListItem =
     | typeof SplitListItem
     | typeof TableListItem
     | typeof TravelDomainListItem
+    | typeof BareUserListItem
     | typeof UserListItem
     | typeof UserSelectionListItem;
 
@@ -347,9 +346,6 @@ type BaseListItemProps<TItem extends ListItem> = CommonListItemProps<TItem> &
 type SelectableListItemProps<TItem extends ListItem> = BaseListItemProps<TItem> & {
     /** Callback to fire when the selection button is pressed */
     onCheckboxPress?: (item: TItem, itemTransactions?: TransactionListItemType[]) => void;
-
-    /** Whether to show the selection button (checkbox or radio) */
-    shouldShowSelectionButton?: boolean;
 
     /** Which side of the row to render the selection button on */
     selectionButtonPosition?: ValueOf<typeof CONST.SELECTION_BUTTON_POSITION>;

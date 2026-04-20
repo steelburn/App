@@ -13,7 +13,6 @@ import type {ListItem, SelectableListItemProps} from './types';
  */
 function SelectableListItem<TItem extends ListItem>({
     canSelectMultiple = false,
-    shouldShowSelectionButton = true,
     selectionButtonPosition = CONST.SELECTION_BUTTON_POSITION.RIGHT,
     item,
     onCheckboxPress,
@@ -37,7 +36,7 @@ function SelectableListItem<TItem extends ListItem>({
             canSelectMultiple={canSelectMultiple}
             onSelectRow={onSelectRow}
             rightHandSideComponent={
-                shouldShowSelectionButton && selectionButtonPosition === CONST.SELECTION_BUTTON_POSITION.RIGHT ? (
+                selectionButtonPosition === CONST.SELECTION_BUTTON_POSITION.RIGHT ? (
                     <>
                         <ButtonComponent
                             item={item}
@@ -53,7 +52,7 @@ function SelectableListItem<TItem extends ListItem>({
                 )
             }
         >
-            {shouldShowSelectionButton && selectionButtonPosition === CONST.SELECTION_BUTTON_POSITION.LEFT
+            {selectionButtonPosition === CONST.SELECTION_BUTTON_POSITION.LEFT
                 ? (hovered: boolean) => (
                       <>
                           <ButtonComponent

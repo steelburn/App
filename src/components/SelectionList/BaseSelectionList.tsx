@@ -93,7 +93,6 @@ function BaseSelectionList<TItem extends ListItem>({
     shouldClearInputOnSelect = false,
     shouldHighlightSelectedItem,
     shouldDisableHoverStyle = false,
-    shouldShowSelectionButton,
     selectionButtonPosition,
     setShouldDisableHoverStyle = () => {},
 }: SelectionListProps<TItem>) {
@@ -372,7 +371,6 @@ function BaseSelectionList<TItem extends ListItem>({
                 shouldShowRightCaret={shouldShowRightCaret}
                 isLastItem={index === data.length - 1}
                 shouldPreventEnterKeySubmit={!disableKeyboardShortcuts}
-                shouldShowSelectionButton={shouldShowSelectionButton}
                 selectionButtonPosition={selectionButtonPosition}
             />
         );

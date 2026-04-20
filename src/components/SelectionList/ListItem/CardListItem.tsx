@@ -45,7 +45,6 @@ function CardListItem<TItem extends ListItem>({
     rightHandSideComponent,
     onFocus,
     shouldSyncFocus,
-    shouldShowSelectionButton = true,
 }: CardListItemProps<TItem>) {
     const icons = useMemoizedLazyExpensifyIcons(['FallbackAvatar']);
     const styles = useThemeStyles();
@@ -83,7 +82,6 @@ function CardListItem<TItem extends ListItem>({
             keyForList={item.keyForList}
             onFocus={onFocus}
             shouldSyncFocus={shouldSyncFocus}
-            shouldShowSelectionButton={shouldShowSelectionButton}
         >
             <>
                 {!!item.bankIcon && (
