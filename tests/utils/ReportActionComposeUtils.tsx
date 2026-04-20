@@ -1,5 +1,6 @@
 import {render} from '@testing-library/react-native';
 import type {PropsWithChildren} from 'react';
+import React from 'react';
 import ComposeProviders from '@components/ComposeProviders';
 import {LocaleContextProvider} from '@components/LocaleContextProvider';
 import OnyxListItemProvider from '@components/OnyxListItemProvider';
