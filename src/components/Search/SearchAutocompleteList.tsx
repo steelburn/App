@@ -4,8 +4,8 @@ import type {OnyxCollection} from 'react-native-onyx';
 import {usePersonalDetails} from '@components/OnyxListItemProvider';
 import OptionsListSkeletonView from '@components/OptionsListSkeletonView';
 import type {AnimatedTextInputRef} from '@components/RNTextInput';
-import type {ListItem as NewListItem, UserListItemProps} from '@components/SelectionList/ListItem/types';
 import BareUserListItem from '@components/SelectionList/ListItem/BareUserListItem';
+import type {ListItem as NewListItem, UserListItemProps} from '@components/SelectionList/ListItem/types';
 import SelectionListWithSections from '@components/SelectionList/SelectionListWithSections';
 import type {Section, SelectionListWithSectionsHandle} from '@components/SelectionList/SelectionListWithSections/types';
 import useAutocompleteSuggestions from '@hooks/useAutocompleteSuggestions';
@@ -112,19 +112,7 @@ function SearchRouterItem(props: UserListItemProps<AutocompleteListItem> | Searc
         );
     }
 
-    const {
-        item,
-        isFocused,
-        showTooltip,
-        isDisabled,
-        onSelectRow,
-        onDismissError,
-        shouldPreventEnterKeySubmit,
-        rightHandSideComponent,
-        onFocus,
-        shouldSyncFocus,
-        wrapperStyle,
-    } = props;
+    const {item, isFocused, showTooltip, isDisabled, onSelectRow, onDismissError, shouldPreventEnterKeySubmit, rightHandSideComponent, onFocus, shouldSyncFocus, wrapperStyle} = props;
     const fsClass = FS.getChatFSClass((item as SearchOption<Report> | undefined)?.item);
 
     return (
