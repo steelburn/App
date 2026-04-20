@@ -688,8 +688,11 @@ function updateSettlementFrequency(
 }
 
 function toggleCashbackToBill(workspaceAccountID: number, programKey: CardProgramKey, shouldApplyCashbackToBill: boolean, currentValue?: boolean) {
-    const optimisticValue = {[programKey]: {shouldApplyCashbackToBill}};
-    const failureValue = {[programKey]: {shouldApplyCashbackToBill: currentValue ?? true}};
+    const optimisticValue = {
+        [programKey]: {shouldApplyCashbackToBill, pendingFields: {shouldApplyCashbackToBill: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE}},
+    };
+    const successValue = {[programKey]: {shouldApplyCashbackToBill, pendingFields: {shouldApplyCashbackToBill: null}}};
+    const failureValue = {[programKey]: {shouldApplyCashbackToBill: currentValue ?? true, pendingFields: {shouldApplyCashbackToBill: null}}};
 
     const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.PRIVATE_EXPENSIFY_CARD_SETTINGS>> = [
         {
@@ -703,7 +706,7 @@ function toggleCashbackToBill(workspaceAccountID: number, programKey: CardProgra
         {
             onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.PRIVATE_EXPENSIFY_CARD_SETTINGS}${workspaceAccountID}`,
-            value: optimisticValue,
+            value: successValue,
         },
     ];
 
