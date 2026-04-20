@@ -2581,6 +2581,7 @@ describe('actions/Duplicate', () => {
                 draftTransactionIDs: [],
                 betas: [CONST.BETAS.ALL],
                 recentWaypoints: [],
+                conciergeReportID: undefined,
             });
 
             await waitForBatchedUpdates();
