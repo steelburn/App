@@ -18,7 +18,7 @@ import getButtonState from '@libs/getButtonState';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {Report} from '@src/types/onyx';
-import BaseListItem from './BaseListItem';
+import SelectableListItem from './SelectableListItem';
 import type {ListItem, UserListItemProps} from './types';
 
 const reportExistsSelector = (report: OnyxEntry<Report>) => !!report;
@@ -77,7 +77,7 @@ function UserListItem<TItem extends ListItem>({
 
     const contactAccessibilityLabel = getAccessibilityLabel(item);
     return (
-        <BaseListItem
+        <SelectableListItem
             item={item}
             wrapperStyle={[styles.flex1, styles.justifyContentBetween, styles.sidebarLinkInner, styles.userSelectNone, styles.peopleRow, wrapperStyle]}
             isFocused={isFocused}
@@ -166,7 +166,7 @@ function UserListItem<TItem extends ListItem>({
                     </View>
                 );
             }}
-        </BaseListItem>
+        </SelectableListItem>
     );
 }
 

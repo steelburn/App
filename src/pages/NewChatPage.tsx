@@ -9,7 +9,7 @@ import Button from '@components/Button';
 import {usePersonalDetails} from '@components/OnyxListItemProvider';
 import ReferralProgramCTA from '@components/ReferralProgramCTA';
 import ScreenWrapper from '@components/ScreenWrapper';
-import ListSelectionButton from '@components/SelectionList/components/ListSelectionButton';
+import ListCheckbox from '@components/SelectionList/components/ListCheckbox';
 import UserListItem from '@components/SelectionList/ListItem/UserListItem';
 import SelectionListWithSections from '@components/SelectionList/SelectionListWithSections';
 import type {Section} from '@components/SelectionList/SelectionListWithSections/types';
@@ -389,8 +389,7 @@ function NewChatPage({ref}: NewChatPageProps) {
 
         if (item.isSelected) {
             return (
-                <ListSelectionButton
-                    role={CONST.ROLE.CHECKBOX}
+                <ListCheckbox
                     item={item}
                     onSelectRow={toggleOption}
                     disabled={!!item.isDisabled}

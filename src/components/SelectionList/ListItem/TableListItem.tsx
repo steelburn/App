@@ -7,7 +7,7 @@ import useStyleUtils from '@hooks/useStyleUtils';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import CONST from '@src/CONST';
-import BaseListItem from './BaseListItem';
+import SelectableListItem from './SelectableListItem';
 import type {ListItem, TableListItemProps} from './types';
 
 /**
@@ -48,7 +48,7 @@ function TableListItem<TItem extends ListItem>({
     const hoveredBackgroundColor = styles.sidebarLinkHover?.backgroundColor ? styles.sidebarLinkHover.backgroundColor : theme.sidebar;
 
     return (
-        <BaseListItem
+        <SelectableListItem
             item={item}
             pressableStyle={[
                 styles.selectionListPressableItemWrapper,
@@ -119,7 +119,7 @@ function TableListItem<TItem extends ListItem>({
                     {!!item.rightElement && item.rightElement}
                 </>
             )}
-        </BaseListItem>
+        </SelectableListItem>
     );
 }
 

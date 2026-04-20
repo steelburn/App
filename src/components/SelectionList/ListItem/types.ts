@@ -162,9 +162,6 @@ type CommonListItemProps<TItem extends ListItem> = {
     /** Callback to fire when the item is pressed */
     onSelectRow: (item: TItem, transactionPreviewData?: TransactionPreviewData) => void;
 
-    /** Callback to fire when a checkbox is pressed */
-    onCheckboxPress?: (item: TItem, itemTransactions?: TransactionListItemType[]) => void;
-
     /** Callback to fire when an error is dismissed */
     onDismissError?: (item: TItem) => void;
 
@@ -233,6 +230,9 @@ type TRightHandSideComponent<TItem extends ListItem> = {
 type ListItemProps<TItem extends ListItem> = CommonListItemProps<TItem> & {
     /** The section list item */
     item: TItem;
+
+    /** Callback to fire when the selection button is pressed */
+    onCheckboxPress?: (item: TItem, itemTransactions?: TransactionListItemType[]) => void;
 
     /** Whether to show the selection button (checkbox or radio) */
     shouldShowSelectionButton?: boolean;
@@ -339,13 +339,21 @@ type BaseListItemProps<TItem extends ListItem> = CommonListItemProps<TItem> &
          * When false, allows child elements (like TextInput) to be independently focusable by screen readers.
          */
         accessible?: boolean;
-
-        /** Whether to show the selection button (checkbox or radio) */
-        shouldShowSelectionButton?: boolean;
-
-        /** Which side of the row to render the selection button on */
-        selectionButtonPosition?: ValueOf<typeof CONST.SELECTION_BUTTON_POSITION>;
     };
+
+/**
+ * Props for SelectableListItem, which extends BaseListItem with selection button support.
+ */
+type SelectableListItemProps<TItem extends ListItem> = BaseListItemProps<TItem> & {
+    /** Callback to fire when the selection button is pressed */
+    onCheckboxPress?: (item: TItem, itemTransactions?: TransactionListItemType[]) => void;
+
+    /** Whether to show the selection button (checkbox or radio) */
+    shouldShowSelectionButton?: boolean;
+
+    /** Which side of the row to render the selection button on */
+    selectionButtonPosition?: ValueOf<typeof CONST.SELECTION_BUTTON_POSITION>;
+};
 
 type SplitListItemType = ListItem &
     SplitExpense & {
@@ -412,7 +420,7 @@ type WorkspaceListItemType = {
     brickRoadIndicator?: BrickRoad;
 } & ListItem;
 
-type TravelDomainListItemProps<TItem extends ListItem> = BaseListItemProps<
+type TravelDomainListItemProps<TItem extends ListItem> = SelectableListItemProps<
     TItem & {
         /** Value of the domain */
         value?: string;
@@ -432,6 +440,7 @@ export type {
     ListItemFocusEventHandler,
     BaseSelectListItemProps,
     ValidListItem,
+    SelectableListItemProps,
     SingleSelectListItemProps,
     MultiSelectListItemProps,
     TravelDomainListItemProps,

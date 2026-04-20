@@ -5,7 +5,6 @@ import Icon from '@components/Icon';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
 import PressableWithFeedback from '@components/Pressable/PressableWithFeedback';
 import type {PressableWithFeedbackProps} from '@components/Pressable/PressableWithFeedback';
-import ListSelectionButton from '@components/SelectionList/components/ListSelectionButton';
 import getAccessibilityLabel from '@components/SelectionList/utils/getAccessibilityLabel';
 import {getItemRole} from '@components/SelectionList/utils/getItemRole';
 import {getSelectableState} from '@components/SelectionList/utils/getSelectableState';
@@ -68,7 +67,8 @@ function getAccessibilityProps<TItem extends ListItem>({
 
 /**
  * The foundational pressable row that all list items build on. Handles press/hover/focus states,
- * selection buttons (radio or checkbox), error indicators, and accessibility roles.
+ * error indicators, and accessibility roles. Use SelectableListItem when a selection button
+ * (checkbox or radio) is needed.
  */
 function BaseListItem<TItem extends ListItem>({
     item,
@@ -80,7 +80,6 @@ function BaseListItem<TItem extends ListItem>({
     shouldPreventEnterKeySubmit = false,
     canSelectMultiple = false,
     onSelectRow,
-    onCheckboxPress,
     onDismissError = () => {},
     rightHandSideComponent,
     keyForList,
@@ -102,8 +101,6 @@ function BaseListItem<TItem extends ListItem>({
     accessible,
     accessibilityRole = getButtonRole(true),
     forwardedFSClass,
-    shouldShowSelectionButton = true,
-    selectionButtonPosition = CONST.SELECTION_BUTTON_POSITION.RIGHT,
 }: BaseListItemProps<TItem>) {
     const theme = useTheme();
     const styles = useThemeStyles();
@@ -243,17 +240,6 @@ function BaseListItem<TItem extends ListItem>({
                     ]}
                     fsClass={forwardedFSClass}
                 >
-                    {shouldShowSelectionButton && selectionButtonPosition === CONST.SELECTION_BUTTON_POSITION.LEFT && (
-                        <ListSelectionButton
-                            role={canSelectMultiple ? CONST.ROLE.CHECKBOX : CONST.ROLE.RADIO}
-                            item={item}
-                            onSelectRow={onCheckboxPress ?? onSelectRow}
-                            // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-                            disabled={isDisabled || item.isDisabledCheckbox}
-                            style={styles.mr3}
-                        />
-                    )}
-
                     {typeof children === 'function' ? children(hovered) : children}
 
                     {shouldShowRBRIndicator && (
@@ -264,17 +250,6 @@ function BaseListItem<TItem extends ListItem>({
                                 fill={item.brickRoadIndicator === CONST.BRICK_ROAD_INDICATOR_STATUS.INFO ? theme.iconSuccessFill : theme.danger}
                             />
                         </View>
-                    )}
-
-                    {shouldShowSelectionButton && selectionButtonPosition === CONST.SELECTION_BUTTON_POSITION.RIGHT && (
-                        <ListSelectionButton
-                            role={canSelectMultiple ? CONST.ROLE.CHECKBOX : CONST.ROLE.RADIO}
-                            item={item}
-                            onSelectRow={onCheckboxPress ?? onSelectRow}
-                            // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-                            disabled={isDisabled || item.isDisabledCheckbox}
-                            style={styles.ml3}
-                        />
                     )}
 
                     {rightHandSideComponentRender()}

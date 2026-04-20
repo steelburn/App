@@ -18,7 +18,7 @@ import {isSelectedManagerMcTest} from '@libs/ReportUtils';
 import variables from '@styles/variables';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
-import BaseListItem from './BaseListItem';
+import SelectableListItem from './SelectableListItem';
 import type {InviteMemberListItemProps, ListItem} from './types';
 
 /**
@@ -70,7 +70,7 @@ function InviteMemberListItem<TItem extends ListItem>({
     const accountID = !item.reportID ? item.accountID || firstItemIconID : undefined;
 
     return (
-        <BaseListItem
+        <SelectableListItem
             item={item}
             wrapperStyle={[styles.flex1, styles.justifyContentBetween, styles.sidebarLinkInner, styles.userSelectNone, styles.peopleRow, wrapperStyle]}
             isFocused={isFocused}
@@ -153,7 +153,7 @@ function InviteMemberListItem<TItem extends ListItem>({
                     </View>
                 </EducationalTooltip>
             )}
-        </BaseListItem>
+        </SelectableListItem>
     );
 }
 

@@ -9,7 +9,7 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import {areEmailsFromSamePrivateDomain} from '@libs/LoginUtils';
 import {getDisplayNameForParticipant} from '@libs/ReportUtils';
 import CONST from '@src/CONST';
-import BaseListItem from './BaseListItem';
+import SelectableListItem from './SelectableListItem';
 import type {ListItem, UserSelectionListItemProps} from './types';
 
 /**
@@ -56,7 +56,7 @@ function UserSelectionListItem<TItem extends ListItem>({
     }, [formatPhoneNumber, item.accountID]);
 
     return (
-        <BaseListItem
+        <SelectableListItem
             item={item}
             wrapperStyle={[styles.flex1, styles.sidebarLinkInner, styles.userSelectNone, wrapperStyle]}
             isFocused={isFocused}
@@ -106,7 +106,7 @@ function UserSelectionListItem<TItem extends ListItem>({
                     )}
                 </View>
             </View>
-        </BaseListItem>
+        </SelectableListItem>
     );
 }
 

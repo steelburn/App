@@ -4,7 +4,7 @@ import TextWithTooltip from '@components/TextWithTooltip';
 import useLocalize from '@hooks/useLocalize';
 import useThemeStyles from '@hooks/useThemeStyles';
 import CONST from '@src/CONST';
-import BaseListItem from './BaseListItem';
+import SelectableListItem from './SelectableListItem';
 import type {ListItem, TravelDomainListItemProps} from './types';
 
 /**
@@ -16,31 +16,34 @@ function TravelDomainListItem<TItem extends ListItem>({
     isFocused,
     showTooltip,
     isDisabled,
+    canSelectMultiple,
     onSelectRow,
     onCheckboxPress,
     onFocus,
     shouldSyncFocus,
     shouldShowSelectionButton = true,
+    selectionButtonPosition = CONST.SELECTION_BUTTON_POSITION.LEFT,
 }: TravelDomainListItemProps<TItem>) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const showRecommendedTag = item.isRecommended ?? false;
 
     return (
-        <BaseListItem
+        <SelectableListItem
             item={item}
             wrapperStyle={[styles.flex1, styles.sidebarLinkInner, styles.userSelectNone, styles.optionRow]}
             isFocused={isFocused}
             isDisabled={isDisabled}
             showTooltip={showTooltip}
+            canSelectMultiple={canSelectMultiple}
             onSelectRow={onSelectRow}
             onCheckboxPress={onCheckboxPress}
             keyForList={item.keyForList}
             onFocus={onFocus}
             shouldSyncFocus={shouldSyncFocus}
-            shouldShowSelectionButton={shouldShowSelectionButton}
-            selectionButtonPosition={CONST.SELECTION_BUTTON_POSITION.LEFT}
             rightHandSideComponent={showRecommendedTag ? <Badge text={translate('travel.domainSelector.recommended')} /> : undefined}
+            shouldShowSelectionButton={shouldShowSelectionButton}
+            selectionButtonPosition={selectionButtonPosition}
         >
             <TextWithTooltip
                 shouldShowTooltip={showTooltip}
@@ -53,7 +56,7 @@ function TravelDomainListItem<TItem extends ListItem>({
                     styles.pre,
                 ]}
             />
-        </BaseListItem>
+        </SelectableListItem>
     );
 }
 

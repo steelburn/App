@@ -4,7 +4,7 @@ import TextWithTooltip from '@components/TextWithTooltip';
 import useThemeStyles from '@hooks/useThemeStyles';
 import variables from '@styles/variables';
 import CONST from '@src/CONST';
-import BaseListItem from './BaseListItem';
+import SelectableListItem from './SelectableListItem';
 import type {BaseSelectListItemProps, ListItem} from './types';
 
 /**
@@ -40,7 +40,7 @@ function BaseSelectListItem<TItem extends ListItem>({
     const paddingLeft = Math.floor(indentsLength / CONST.INDENTS.length) * styles.ml3.marginLeft;
     const alternateTextMaxWidth = variables.sideBarWidth - styles.ph5.paddingHorizontal * 2 - styles.ml3.marginLeft - variables.iconSizeNormal;
     return (
-        <BaseListItem
+        <SelectableListItem
             item={item}
             wrapperStyle={[styles.flex1, styles.justifyContentBetween, styles.sidebarLinkInner, styles.userSelectNone, styles.optionRow, wrapperStyle]}
             isFocused={isFocused}
@@ -96,7 +96,7 @@ function BaseSelectListItem<TItem extends ListItem>({
                 </View>
                 {!!item.rightElement && item.rightElement}
             </>
-        </BaseListItem>
+        </SelectableListItem>
     );
 }
 

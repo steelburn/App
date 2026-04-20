@@ -15,8 +15,8 @@ import variables from '@styles/variables';
 import CONST from '@src/CONST';
 import type {PersonalDetails} from '@src/types/onyx';
 import type {BankIcon} from '@src/types/onyx/Bank';
-import BaseListItem from './BaseListItem';
-import type {BaseListItemProps, ListItem} from './types';
+import SelectableListItem from './SelectableListItem';
+import type {ListItem, SelectableListItemProps} from './types';
 
 type AdditionalCardProps = {
     shouldShowOwnersAvatar?: boolean;
@@ -27,7 +27,7 @@ type AdditionalCardProps = {
     cardName?: string;
     plaidUrl?: string;
 };
-type CardListItemProps<TItem extends ListItem> = BaseListItemProps<TItem & AdditionalCardProps>;
+type CardListItemProps<TItem extends ListItem> = SelectableListItemProps<TItem & AdditionalCardProps>;
 
 /**
  * A row with a bank/card icon (or owner avatar with card miniature), card name, and last-four
@@ -67,7 +67,7 @@ function CardListItem<TItem extends ListItem>({
         `${item.isVirtual ? ` ${CONST.DOT_SEPARATOR} ${translate('workspace.expensifyCard.virtual')}` : ''}`;
 
     return (
-        <BaseListItem
+        <SelectableListItem
             item={item}
             wrapperStyle={[styles.flex1, styles.justifyContentBetween, styles.sidebarLinkInner, styles.userSelectNone, styles.peopleRow]}
             isFocused={isFocused}
@@ -164,7 +164,7 @@ function CardListItem<TItem extends ListItem>({
                     </View>
                 </View>
             </>
-        </BaseListItem>
+        </SelectableListItem>
     );
 }
 
