@@ -96,9 +96,16 @@ function Composer({
     /**
      *  Adds the cursor position to the selection change event.
      */
-    const addCursorPositionToSelectionChange = (event: TextInputSelectionChangeEvent) => {
-        const sel = window.getSelection();
-        if (shouldCalculateCaretPosition && isRendered && sel) {
+    const addCursorPositionToSelectionChange = useCallback(
+        (event: TextInputSelectionChangeEvent) => {
+            const sel = window.getSelection();
+            const canCalculateCaretPosition = shouldCalculateCaretPosition && isRendered && sel;
+            if (!canCalculateCaretPosition) {
+                onSelectionChange(event);
+                setSelection(event.nativeEvent.selection);
+                return;
+            }
+
             const range = sel.getRangeAt(0).cloneRange();
             range.collapse(true);
             const rect = range.getClientRects()[0] || range.startContainer.parentElement?.getClientRects()[0];
@@ -126,11 +133,12 @@ function Composer({
                 },
             });
             setSelection(selectionValue);
-        } else {
+
             onSelectionChange(event);
             setSelection(event.nativeEvent.selection);
-        }
-    };
+        },
+        [isRendered, onSelectionChange, shouldCalculateCaretPosition],
+    );
 
     /**
      * Check the paste event for an attachment, parse the data and call onPasteFile from props with the selected file,
@@ -213,16 +221,20 @@ function Composer({
         if (!textInputRef.current) {
             return;
         }
+
+        const inputRef = textInputRef.current;
+
         const debouncedSetPrevScroll = lodashDebounce(() => {
-            if (!textInputRef.current) {
+            if (!inputRef) {
                 return;
             }
-            setPrevScroll(textInputRef.current.scrollTop);
+            setPrevScroll(inputRef.scrollTop);
         }, 100);
 
-        textInputRef.current.addEventListener('scroll', debouncedSetPrevScroll);
+        inputRef.addEventListener('scroll', debouncedSetPrevScroll);
+
         return () => {
-            textInputRef.current?.removeEventListener('scroll', debouncedSetPrevScroll);
+            inputRef?.removeEventListener('scroll', debouncedSetPrevScroll);
         };
     }, []);
 
@@ -235,6 +247,8 @@ function Composer({
     }, []);
 
     useEffect(() => {
+        const inputRef = textInputRef.current;
+
         const handleWheel = (e: MouseEvent) => {
             if (isReportFlatListScrolling.current) {
                 e.preventDefault();
@@ -243,15 +257,15 @@ function Composer({
 
             // When the composer has no scrollable content, the stopPropagation will prevent the inverted wheel event handler on the Chat body
             // which defaults to the browser wheel behavior. This causes the chat body to scroll in the opposite direction creating jerky behavior.
-            if (textInputRef.current && textInputRef.current.scrollHeight <= textInputRef.current.clientHeight) {
+            if (inputRef && inputRef.scrollHeight <= inputRef.clientHeight) {
                 return;
             }
             e.stopPropagation();
         };
-        textInputRef.current?.addEventListener('wheel', handleWheel, {passive: false});
+        inputRef?.addEventListener('wheel', handleWheel, {passive: false});
 
         return () => {
-            textInputRef.current?.removeEventListener('wheel', handleWheel);
+            inputRef?.removeEventListener('wheel', handleWheel);
         };
     }, []);
 
