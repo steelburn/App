@@ -1,7 +1,7 @@
 import {cardByIdSelector} from '@selectors/Card';
 import {Str} from 'expensify-common';
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {InteractionManager, View} from 'react-native';
+import {View} from 'react-native';
 import cardScarf from '@assets/images/card-scarf.svg';
 import Badge from '@components/Badge';
 import ConfirmModal from '@components/ConfirmModal';
@@ -11,10 +11,12 @@ import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import ImageSVG from '@components/ImageSVG';
 import MenuItem from '@components/MenuItem';
 import MenuItemWithTopDescription from '@components/MenuItemWithTopDescription';
+import {ModalActions} from '@components/Modal/Global/ModalContext';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
 import ScreenWrapper from '@components/ScreenWrapper';
 import ScrollView from '@components/ScrollView';
 import useCardFeeds from '@hooks/useCardFeeds';
+import useConfirmModal from '@hooks/useConfirmModal';
 import useCurrencyForExpensifyCard from '@hooks/useCurrencyForExpensifyCard';
 import {useCurrencyListActions} from '@hooks/useCurrencyList';
 import useDefaultFundID from '@hooks/useDefaultFundID';
@@ -53,7 +55,7 @@ function WorkspaceExpensifyCardDetailsPage({route}: WorkspaceExpensifyCardDetail
     const {convertToDisplayString} = useCurrencyListActions();
     const defaultFundID = useDefaultFundID(policyID);
 
-    const [isDeactivateModalVisible, setIsDeactivateModalVisible] = useState(false);
+    // const [isDeactivateModalVisible, setIsDeactivateModalVisible] = useState(false);
     const [isOfflineModalVisible, setIsOfflineModalVisible] = useState(false);
     const [isFreezeModalVisible, setIsFreezeModalVisible] = useState(false);
     const [isUnfreezeModalVisible, setIsUnfreezeModalVisible] = useState(false);
@@ -65,6 +67,7 @@ function WorkspaceExpensifyCardDetailsPage({route}: WorkspaceExpensifyCardDetail
     const {isSmallScreenWidth} = useResponsiveLayout();
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
+    const {showConfirmModal} = useConfirmModal();
 
     const [personalDetails] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST);
     const [session] = useOnyx(ONYXKEYS.SESSION);
@@ -97,13 +100,20 @@ function WorkspaceExpensifyCardDetailsPage({route}: WorkspaceExpensifyCardDetail
 
     useEffect(() => fetchCardDetails(), [fetchCardDetails]);
 
-    const deactivateCard = () => {
-        setIsDeactivateModalVisible(false);
+    const deactivateCard = async () => {
         shouldGoBack.current = true;
-        // eslint-disable-next-line @typescript-eslint/no-deprecated
-        InteractionManager.runAfterInteractions(() => {
-            deactivateCardAction(defaultFundID, card);
+        const {action} = await showConfirmModal({
+            title: translate('workspace.card.deactivateCardModal.deactivateCard'),
+            shouldSetModalVisibility: false,
+            prompt: translate('workspace.card.deactivateCardModal.deactivateConfirmation'),
+            confirmText: translate('workspace.card.deactivateCardModal.deactivate'),
+            cancelText: translate('common.cancel'),
+            danger: true,
+            onModalHide: () => shouldGoBack.current && Navigation.goBack(),
         });
+        if (action === ModalActions.CONFIRM) {
+            deactivateCardAction(defaultFundID, card);
+        }
     };
 
     const handleFreezePress = () => {
@@ -310,9 +320,9 @@ function WorkspaceExpensifyCardDetailsPage({route}: WorkspaceExpensifyCardDetail
                         icon={expensifyIcons.Trashcan}
                         title={translate('workspace.expensifyCard.deactivate')}
                         style={styles.mb1}
-                        onPress={() => (isOffline ? setIsOfflineModalVisible(true) : setIsDeactivateModalVisible(true))}
+                        onPress={() => (isOffline ? setIsOfflineModalVisible(true) : deactivateCard())}
                     />
-                    <ConfirmModal
+                    {/* <ConfirmModal
                         title={translate('workspace.card.deactivateCardModal.deactivateCard')}
                         isVisible={isDeactivateModalVisible}
                         onConfirm={deactivateCard}
@@ -323,7 +333,7 @@ function WorkspaceExpensifyCardDetailsPage({route}: WorkspaceExpensifyCardDetail
                         cancelText={translate('common.cancel')}
                         danger
                         onModalHide={() => shouldGoBack.current && Navigation.goBack()}
-                    />
+                    /> */}
                     <DecisionModal
                         title={translate('common.youAppearToBeOffline')}
                         prompt={translate('common.offlinePrompt')}

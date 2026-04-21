@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import {InteractionManager, View} from 'react-native';
+import {View} from 'react-native';
 import ActivityIndicator from '@components/ActivityIndicator';
 import Button from '@components/Button';
 import ButtonWithDropdownMenu from '@components/ButtonWithDropdownMenu';
@@ -249,10 +249,7 @@ function WorkspaceTaxesPage({
         }
         deletePolicyTaxes(policy, selectedTaxesIDs, localeCompare);
 
-        // eslint-disable-next-line @typescript-eslint/no-deprecated
-        InteractionManager.runAfterInteractions(() => {
-            setSelectedTaxesIDs([]);
-        });
+        setSelectedTaxesIDs([]);
     }, [policy, selectedTaxesIDs, localeCompare]);
 
     const toggleTaxes = useCallback(

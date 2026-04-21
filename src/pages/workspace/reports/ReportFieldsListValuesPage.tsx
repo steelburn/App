@@ -1,5 +1,5 @@
 import React, {useCallback, useMemo, useState} from 'react';
-import {InteractionManager, View} from 'react-native';
+import {View} from 'react-native';
 import Button from '@components/Button';
 import ButtonWithDropdownMenu from '@components/ButtonWithDropdownMenu';
 import type {DropdownOption} from '@components/ButtonWithDropdownMenu/types';
@@ -188,10 +188,7 @@ function ReportFieldsListValuesPage({
             });
         }
 
-        // eslint-disable-next-line @typescript-eslint/no-deprecated
-        InteractionManager.runAfterInteractions(() => {
-            setSelectedValues({});
-        });
+        setSelectedValues({});
     };
 
     const openListValuePage = (valueItem: ValueListItem) => {

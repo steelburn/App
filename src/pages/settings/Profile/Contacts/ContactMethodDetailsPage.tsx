@@ -203,10 +203,7 @@ function ContactMethodDetailsPage({route}: ContactMethodDetailsPageProps) {
     const turnOnDeleteModal = useCallback(() => {
         const openDeleteModal = async () => {
             const result = await showRemoveContactMethodModal();
-            // eslint-disable-next-line @typescript-eslint/no-deprecated
-            InteractionManager.runAfterInteractions(() => {
-                validateCodeFormRef.current?.focusLastSelected?.();
-            });
+            validateCodeFormRef.current?.focusLastSelected?.();
             if (result.action !== ModalActions.CONFIRM) {
                 return;
             }
