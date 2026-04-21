@@ -1,14 +1,14 @@
 import React from 'react';
 import type {OnyxEntry} from 'react-native-onyx';
-import type {MultiSelectItem} from '@components/Search/FilterComponents/MultiSelect';
-import MultiSelect from '@components/Search/FilterComponents/MultiSelect';
+import useFilterCountChange from '@components/Search/hooks/useFilterCountChange';
 import useAdvancedSearchFilters from '@hooks/useAdvancedSearchFilters';
 import useOnyx from '@hooks/useOnyx';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {SearchAdvancedFiltersForm} from '@src/types/form';
 import type {Icon} from '@src/types/onyx/OnyxCommon';
-import useFilterCountChange from '../hooks/useFilterCountChange';
-import type {FilterComponentProps} from './types';
+import type {MultiSelectItem} from './MultiSelect';
+import MultiSelect from './MultiSelect';
+import type FilterComponentProps from './types';
 
 type WorkspaceSelectorProps = FilterComponentProps & {
     policyIDQuery: string[] | undefined;

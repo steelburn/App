@@ -1,8 +1,8 @@
 import React from 'react';
+import useFilterCountChange from '@components/Search/hooks/useFilterCountChange';
 import useFilterFeedData from '@components/Search/hooks/useFilterFeedData';
-import useFilterCountChange from '../hooks/useFilterCountChange';
 import MultiSelect from './MultiSelect';
-import type {FilterComponentProps} from './types';
+import type FilterComponentProps from './types';
 
 type FeedSelectorProps = FilterComponentProps & {
     onChange: (item: string[]) => void;

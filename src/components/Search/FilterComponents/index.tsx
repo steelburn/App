@@ -1,17 +1,18 @@
 import React, {useState} from 'react';
 import type {OnyxEntry} from 'react-native-onyx';
+import useFilterCountChange from '@components/Search/hooks/useFilterCountChange';
 import TextInput from '@components/TextInput';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {FILTER_LABEL_MAP, getMultiSelectFilterOptions, getSingleSelectFilterOptions} from '@libs/SearchUIUtils';
+import type {SearchFilter} from '@libs/SearchUIUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
-import FILTER_KEYS from '@src/types/form/SearchAdvancedFiltersForm';
+import type FILTER_KEYS from '@src/types/form/SearchAdvancedFiltersForm';
 import type {SearchAdvancedFiltersForm} from '@src/types/form/SearchAdvancedFiltersForm';
 import type {SearchDataTypes} from '@src/types/onyx/SearchResults';
-import useFilterCountChange from '../hooks/useFilterCountChange';
-import type {SyntaxFilterKey} from '../types';
+import getEmptyArray from '@src/types/utils/getEmptyArray';
 import CardSelector from './CardSelector';
 import CategorySelector from './CategorySelector';
 import CurrencySelector from './CurrencySelector';
@@ -22,13 +23,13 @@ import MultiSelect from './MultiSelect';
 import SingleSelect from './SingleSelect';
 import TagSelector from './TagSelector';
 import TaxRateSelector from './TaxRateSelector';
-import type {FilterComponentProps} from './types';
+import type FilterComponentProps from './types';
 import TypeSelector from './TypeSelector';
 import UserSelector from './UserSelector';
 import WorkspaceSelector from './WorkspaceSelector';
 
 type FilterComponentsProps = FilterComponentProps & {
-    filterKey: SyntaxFilterKey;
+    filterKey: SearchFilter['key'];
     policyIDQuery: string[] | undefined;
     onChange: (value: string | string[]) => void;
 };
@@ -107,7 +108,9 @@ function MultiSelectFilterComponents({filterKey, onChange, onCountChange}: Multi
 
         return [type, Array.isArray(values) ? values : values.split(',')];
     };
-    const [[type = CONST.SEARCH.DATA_TYPES.EXPENSE, formValues = []] = []] = useOnyx(ONYXKEYS.FORMS.SEARCH_ADVANCED_FILTERS_FORM, {selector: formValuesSelector});
+    const [[type = CONST.SEARCH.DATA_TYPES.EXPENSE, formValues = []] = getEmptyArray<SearchDataTypes & string[]>()] = useOnyx(ONYXKEYS.FORMS.SEARCH_ADVANCED_FILTERS_FORM, {
+        selector: formValuesSelector,
+    });
     const items = getMultiSelectFilterOptions(filterKey, type, translate);
 
     useFilterCountChange(items.length, onCountChange);
@@ -224,6 +227,8 @@ function FilterComponents({filterKey, policyIDQuery, onChange, onCountChange}: F
                     onCountChange={onCountChange}
                 />
             );
+        default:
+            return null;
     }
 }
 

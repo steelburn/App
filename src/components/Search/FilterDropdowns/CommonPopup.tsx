@@ -1,5 +1,6 @@
-import React from 'react';
-import {useState} from 'react';
+import React, {useState} from 'react';
+import FilterComponents from '@components/Search/FilterComponents';
+import type {SearchAmountFilterKeys, SearchDateFilterKeys, SyntaxFilterKey} from '@components/Search/types';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
 import useWindowDimensions from '@hooks/useWindowDimensions';
@@ -7,8 +8,6 @@ import type {SearchFilter} from '@libs/SearchUIUtils';
 import variables from '@styles/variables';
 import CONST from '@src/CONST';
 import type {SearchAdvancedFiltersForm} from '@src/types/form/SearchAdvancedFiltersForm';
-import FilterComponents from '../FilterComponents';
-import type {SearchAmountFilterKeys, SearchDateFilterKeys, SyntaxFilterKey} from '../types';
 import BasePopup from './BasePopup';
 import type {PopoverComponentProps} from './DropdownButton';
 

@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {usePersonalDetails} from '@components/OnyxListItemProvider';
 import {useOptionsList} from '@components/OptionListContextProvider';
+import useFilterCountChange from '@components/Search/hooks/useFilterCountChange';
 import InviteMemberListItem from '@components/SelectionList/ListItem/InviteMemberListItem';
 import SelectionListWithSections from '@components/SelectionList/SelectionListWithSections';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
@@ -20,8 +21,7 @@ import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import passthroughPolicyTagListSelector from '@src/selectors/PolicyTagList';
 import type {SearchAdvancedFiltersForm} from '@src/types/form';
-import useFilterCountChange from '../hooks/useFilterCountChange';
-import {FilterComponentProps} from './types';
+import type FilterComponentProps from './types';
 
 type InSelectorProps = FilterComponentProps & {
     onChange: (ins: string[]) => void;

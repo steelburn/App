@@ -1,13 +1,13 @@
 import React from 'react';
 import type {OnyxEntry} from 'react-native-onyx';
 import {useCurrencyListActions, useCurrencyListState} from '@components/CurrencyListContextProvider';
+import type {SingleSelectItem} from '@components/Search/FilterComponents/SingleSelect';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {getCurrencyOptions} from '@libs/SearchUIUtils';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {SearchAdvancedFiltersForm} from '@src/types/form';
-import type {SingleSelectItem} from '../FilterComponents/SingleSelect';
 import SingleSelectPopup from './SingleSelectPopup';
 
 type GroupCurrencyPopupProps = {

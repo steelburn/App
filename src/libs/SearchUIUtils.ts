@@ -4941,6 +4941,14 @@ function shouldShowFilter(skipFilters: Set<SearchAdvancedFiltersKey> | undefined
     return !skipFilters?.has(key) && isFilterSupported(key, type) && value && (!Array.isArray(value) || value.length > 0);
 }
 
+const isAmountFilterKey = (key: SearchFilter['key']): key is SearchAmountFilterKeys => {
+    return AMOUNT_FILTER_KEYS.includes(key as SearchAmountFilterKeys);
+};
+
+const isDateFilterKey = (key: SearchFilter['key']): key is Exclude<SearchDateFilterKeys, ReportFieldTextKey> => {
+    return DATE_FILTER_KEYS.includes(key as SearchDateFilterKeys);
+};
+
 type SearchFilter = {
     key: keyof typeof FILTER_LABEL_MAP;
     label: string;
@@ -5013,14 +5021,6 @@ function mapFiltersFormToLabelValueList<T extends Record<string, unknown>>(
 
     return filters;
 }
-
-const isAmountFilterKey = (key: SearchFilter['key']): key is SearchAmountFilterKeys => {
-    return AMOUNT_FILTER_KEYS.includes(key as SearchAmountFilterKeys);
-};
-
-const isDateFilterKey = (key: SearchFilter['key']): key is Exclude<SearchDateFilterKeys, ReportFieldTextKey> => {
-    return DATE_FILTER_KEYS.includes(key as SearchDateFilterKeys);
-};
 
 function getSingleSelectFilterOptions(filterKey: SearchAdvancedFiltersKey, translate: LocalizedTranslate) {
     if (filterKey === FILTER_KEYS.BILLABLE || filterKey === FILTER_KEYS.REIMBURSABLE) {

@@ -1,3 +1,4 @@
+import type {SearchQueryJSON} from '@components/Search/types';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import {close} from '@libs/actions/Modal';
@@ -8,7 +9,6 @@ import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {SearchAdvancedFiltersForm} from '@src/types/form';
 import {getEmptyObject} from '@src/types/utils/EmptyObject';
-import type {SearchQueryJSON} from '../types';
 
 function useUpdateFilterQuery(queryJSON: SearchQueryJSON, shouldCloseAfterUpdate: boolean) {
     const {translate} = useLocalize();

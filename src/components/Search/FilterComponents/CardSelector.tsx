@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {View} from 'react-native';
 import ActivityIndicator from '@components/ActivityIndicator';
 import {usePersonalDetails} from '@components/OnyxListItemProvider';
+import useFilterCountChange from '@components/Search/hooks/useFilterCountChange';
 import CardListItem from '@components/SelectionList/ListItem/CardListItem';
 import SelectionListWithSections from '@components/SelectionList/SelectionListWithSections';
 import type {Section} from '@components/SelectionList/SelectionListWithSections/types';
@@ -20,8 +21,7 @@ import type {SkeletonSpanReasonAttributes} from '@libs/telemetry/useSkeletonSpan
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import isLoadingOnyxValue from '@src/types/utils/isLoadingOnyxValue';
-import useFilterCountChange from '../hooks/useFilterCountChange';
-import type {FilterComponentProps} from './types';
+import type FilterComponentProps from './types';
 
 type CardSelectorProps = FilterComponentProps & {
     onChange: (cards: string[]) => void;

@@ -1,6 +1,10 @@
 import React from 'react';
 import type {ReactNode} from 'react';
+import AmountPopup from '@components/Search/FilterDropdowns/AmountPopup';
+import CommonPopup from '@components/Search/FilterDropdowns/CommonPopup';
 import type {PopoverComponentProps} from '@components/Search/FilterDropdowns/DropdownButton';
+import ReportFieldPopup from '@components/Search/FilterDropdowns/ReportFieldPopup';
+import useUpdateFilterQuery from '@components/Search/hooks/useUpdateFilterQuery';
 import {useSearchStateContext} from '@components/Search/SearchContext';
 import type {ReportFieldKey, SearchFilterKey, SearchQueryJSON} from '@components/Search/types';
 import useLocalize from '@hooks/useLocalize';
@@ -15,10 +19,6 @@ import FILTER_KEYS from '@src/types/form/SearchAdvancedFiltersForm';
 import type {SearchAdvancedFiltersKey} from '@src/types/form/SearchAdvancedFiltersForm';
 import {getEmptyObject} from '@src/types/utils/EmptyObject';
 import type WithSentryLabel from '@src/types/utils/SentryLabel';
-import AmountPopup from '../FilterDropdowns/AmountPopup';
-import CommonPopup from '../FilterDropdowns/CommonPopup';
-import ReportFieldPopup from '../FilterDropdowns/ReportFieldPopup';
-import useUpdateFilterQuery from '../hooks/useUpdateFilterQuery';
 import DatePickerFilterPopup from './DatePickerFilterPopup';
 
 type FilterItem = WithSentryLabel & {

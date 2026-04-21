@@ -1,6 +1,6 @@
 import React from 'react';
 import type {OnyxCollection} from 'react-native-onyx';
-import MultiSelect from '@components/Search/FilterComponents/MultiSelect';
+import useFilterCountChange from '@components/Search/hooks/useFilterCountChange';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import {getDecodedCategoryName} from '@libs/CategoryUtils';
@@ -8,8 +8,8 @@ import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {PolicyCategories, PolicyCategory} from '@src/types/onyx';
 import {getEmptyObject} from '@src/types/utils/EmptyObject';
-import useFilterCountChange from '../hooks/useFilterCountChange';
-import type {FilterComponentProps} from './types';
+import MultiSelect from './MultiSelect';
+import type FilterComponentProps from './types';
 
 type CategorySelectorProps = FilterComponentProps & {
     onChange: (categories: string[]) => void;

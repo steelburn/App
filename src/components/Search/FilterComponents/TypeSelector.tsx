@@ -1,5 +1,6 @@
 import React from 'react';
 import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
+import useFilterCountChange from '@components/Search/hooks/useFilterCountChange';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import {getTypeOptions} from '@libs/SearchUIUtils';
@@ -8,9 +9,8 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import {emailSelector} from '@src/selectors/Session';
 import type {SearchAdvancedFiltersForm} from '@src/types/form';
 import type {Policy} from '@src/types/onyx';
-import useFilterCountChange from '../hooks/useFilterCountChange';
 import SingleSelect from './SingleSelect';
-import type {FilterComponentProps} from './types';
+import type FilterComponentProps from './types';
 
 type TypeSelectorProps = FilterComponentProps & {
     onChange: (item: string) => void;

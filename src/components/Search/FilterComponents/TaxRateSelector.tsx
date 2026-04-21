@@ -1,12 +1,12 @@
 import React from 'react';
-import MultiSelect from '@components/Search/FilterComponents/MultiSelect';
+import useFilterCountChange from '@components/Search/hooks/useFilterCountChange';
 import useOnyx from '@hooks/useOnyx';
 import {getAllTaxRates} from '@libs/PolicyUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {Policy} from '@src/types/onyx';
-import useFilterCountChange from '../hooks/useFilterCountChange';
-import type {FilterComponentProps} from './types';
+import MultiSelect from './MultiSelect';
+import type FilterComponentProps from './types';
 
 type TaxRateSelectorProps = FilterComponentProps & {
     onChange: (taxRates: string[]) => void;
