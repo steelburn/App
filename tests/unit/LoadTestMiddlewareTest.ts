@@ -38,8 +38,11 @@ beforeEach(async () => {
     setLoadTestParameters(null);
 });
 
-function getMockCallsForTestUrl() {
-    return (global.fetch as jest.Mock).mock.calls.filter((call) => call[0] === TEST_URL);
+type FetchMockCall = [string, RequestInit];
+
+function getMockCallsForTestUrl(): FetchMockCall[] {
+    const calls = (global.fetch as jest.Mock).mock.calls as FetchMockCall[];
+    return calls.filter((call) => call[0] === TEST_URL);
 }
 
 function getFormBodyAt(index: number): TestHelper.FormData {
@@ -87,7 +90,7 @@ describe('LoadTest middleware', () => {
         expect(realBody.mockRequest).toBeUndefined();
 
         // And every duplicate should carry mockRequest=true so the server treats them as load-test traffic
-        // (sent as a form param rather than a header to avoid CORS preflights for cross-origin requests)
+        // (sent as a form param rather than a header to avoid CORS preflight requests for cross-origin traffic)
         const firstDuplicateBody = formBodyToObject(getFormBodyAt(1));
         const secondDuplicateBody = formBodyToObject(getFormBodyAt(2));
         expect(firstDuplicateBody.mockRequest).toBe('true');
@@ -167,7 +170,7 @@ describe('LoadTest middleware', () => {
         (global.fetch as jest.Mock).mockImplementationOnce(() =>
             Promise.resolve({
                 ok: true,
-                headers: new Headers({'X-Load-Test': JSON.stringify({multiplier: 3, expire: FUTURE})}),
+                headers: new Headers([['X-Load-Test', JSON.stringify({multiplier: 3, expire: FUTURE})]]),
                 json: () => Promise.resolve({jsonCode: 200}),
             }),
         );

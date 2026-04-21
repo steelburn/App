@@ -7,8 +7,8 @@ import {getDuplicateRequestCount} from './LoadTestState';
 
 /**
  * Fires N-1 duplicate API calls marked with mockRequest=true so the server can identify them as load-test traffic.
- * The marker is sent as a form parameter (not a header) to avoid triggering CORS preflights for cross-origin requests.
- * Bypasses the middleware pipeline so duplicates do not apply Onyx updates or recurse.
+ * The marker is sent as a form parameter (not a header) to avoid triggering CORS preflight requests for cross-origin
+ * traffic. Bypasses the middleware pipeline so duplicates do not apply Onyx updates or recurse.
  */
 function triggerDuplicates<TKey extends OnyxKey>(request: Request<TKey> | PaginatedRequest<TKey>): void {
     const count = getDuplicateRequestCount();

@@ -45,7 +45,7 @@ describe('LoadTestState', () => {
             // Given an active load-test configuration
             setLoadTestParameters(JSON.stringify({multiplier: 5, expire: FUTURE}));
 
-            // When the next response carries an unparseable X-Load-Test header
+            // When the next response carries a malformed X-Load-Test header that cannot be JSON parsed
             setLoadTestParameters('not-json');
 
             // Then load testing is turned off (we should never crash on bad JSON)
@@ -97,7 +97,7 @@ describe('LoadTestState', () => {
             expect(getDuplicateRequestCount()).toBe(0);
         });
 
-        it('returns 0 when expire is unparseable', () => {
+        it('returns 0 when expire cannot be parsed as a date', () => {
             // Given a load-test payload whose expire is not a valid date
             setLoadTestParameters(JSON.stringify({multiplier: 10, expire: 'not-a-date'}));
 

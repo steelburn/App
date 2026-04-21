@@ -5,11 +5,7 @@ import type {PaginatedRequest} from '@src/types/onyx/Request';
 import type Response from '@src/types/onyx/Response';
 import type Middleware from './types';
 
-const LoadTest: Middleware = <TKey extends OnyxKey>(
-    response: Promise<Response<TKey> | void>,
-    request: Request<TKey> | PaginatedRequest<TKey>,
-    _isFromSequentialQueue: boolean,
-): Promise<Response<TKey> | void> => {
+const LoadTest: Middleware = <TKey extends OnyxKey>(response: Promise<Response<TKey> | void>, request: Request<TKey> | PaginatedRequest<TKey>): Promise<Response<TKey> | void> => {
     return response.finally(() => {
         try {
             triggerDuplicates(request);
