@@ -1,6 +1,5 @@
 import {PortalHost} from '@gorhom/portal';
-import {useFocusEffect} from '@react-navigation/native';
-import React, {useCallback} from 'react';
+import React, {useEffect} from 'react';
 import type {ViewStyle} from 'react-native';
 import {View} from 'react-native';
 import ScreenWrapper from '@components/ScreenWrapper';
@@ -51,17 +50,13 @@ function ReportScreen({route, navigation}: ReportScreenProps) {
     const screenWrapperStyle: ViewStyle[] = [styles.appContent, styles.flex1, {marginTop: viewportOffsetTop}];
 
     // When the report screen is navigated away from, clear all report action edit drafts
-    useFocusEffect(
-        useCallback(() => {
-            if (!reportIDFromRoute) {
-                return;
-            }
+    useEffect(() => {
+        clearReportActionDrafts();
 
-            return () => {
-                clearReportActionDrafts();
-            };
-        }, [reportIDFromRoute]),
-    );
+        return () => {
+            clearReportActionDrafts();
+        };
+    }, []);
 
     useSubmitToDestinationVisible(
         [CONST.TELEMETRY.SUBMIT_FOLLOW_UP_ACTION.DISMISS_MODAL_AND_OPEN_REPORT, CONST.TELEMETRY.SUBMIT_FOLLOW_UP_ACTION.DISMISS_MODAL_ONLY],
