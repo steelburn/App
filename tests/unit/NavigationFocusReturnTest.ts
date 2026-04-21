@@ -1538,4 +1538,59 @@ describe('teardown / setup lifecycle', () => {
             navigationRef.isReady = originalIsReady;
         }
     });
+
+    it('teardown clears cached nav state so a later setup re-seeds against the new container (logout → login / HMR remount)', () => {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports, import/extensions
+        const navigationRefModule = require<{default: {getRootState: () => unknown; isReady: () => boolean}}>('../../src/libs/Navigation/navigationRef.ts');
+        const navigationRef = navigationRefModule.default;
+        const originalGetRootState = navigationRef.getRootState.bind(navigationRef);
+        const originalIsReady = navigationRef.isReady.bind(navigationRef);
+
+        // Lifecycle 1: cache prevState + a trigger against the old route tree.
+        const firstLifecycleState = stackState(0, [{key: 'old-home', name: 'Home'}]);
+        navigationRef.isReady = () => true;
+        navigationRef.getRootState = () => firstLifecycleState;
+        try {
+            resetForTests();
+            setupNavigationFocusReturn();
+
+            simulateTab();
+            const stale = appendButton();
+            stale.focus();
+            setLastInteractiveElementForTests(stale);
+            captureTriggerForRoute('old-home');
+            expect(restoreTriggerForRoute('old-home')).toBe(true);
+
+            // Re-capture so triggerMap has an entry going into teardown.
+            stale.focus();
+            setLastInteractiveElementForTests(stale);
+            captureTriggerForRoute('old-home');
+
+            teardownNavigationFocusReturn();
+
+            // Lifecycle 2: fresh container, new route keys.
+            const secondLifecycleState = stackState(0, [{key: 'new-home', name: 'Home'}]);
+            navigationRef.getRootState = () => secondLifecycleState;
+            setupNavigationFocusReturn();
+
+            simulateTab();
+            const freshTrigger = appendButton();
+            freshTrigger.focus();
+            setLastInteractiveElementForTests(freshTrigger);
+            handleStateChange(
+                stackState(1, [
+                    {key: 'new-home', name: 'Home'},
+                    {key: 'new-settings', name: 'Settings'},
+                ]),
+            );
+
+            freshTrigger.blur();
+            expect(restoreTriggerForRoute('new-home')).toBe(true);
+            // Prior-lifecycle trigger must not leak.
+            expect(restoreTriggerForRoute('old-home')).toBe(false);
+        } finally {
+            navigationRef.getRootState = originalGetRootState;
+            navigationRef.isReady = originalIsReady;
+        }
+    });
 });

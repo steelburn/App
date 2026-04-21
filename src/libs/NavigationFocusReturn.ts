@@ -391,6 +391,11 @@ function teardownNavigationFocusReturn(): void {
     cancelPendingRestore();
     cancelReturnHoldRelease();
     lastRestoreTarget = null;
+    // Reset cached state so a remount (logout/HMR) re-seeds — setup's `!prevState` gate would otherwise skip the seed and diff against stale routes.
+    prevState = undefined;
+    triggerMap.clear();
+    lastInteractiveElement = null;
+    lastMouseTrigger = null;
     if (typeof document !== 'undefined') {
         if (focusinHandler) {
             document.removeEventListener('focusin', focusinHandler, true);
