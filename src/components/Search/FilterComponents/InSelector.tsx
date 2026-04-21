@@ -9,6 +9,7 @@ import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import usePrivateIsArchivedMap from '@hooks/usePrivateIsArchivedMap';
 import useReportAttributes from '@hooks/useReportAttributes';
+import useSortedActions from '@hooks/useSortedActions';
 import {searchInServer} from '@libs/actions/Report';
 import {canUseTouchScreen} from '@libs/DeviceCapabilities';
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
@@ -52,6 +53,8 @@ function InSelector({onChange, onCountChange}: InSelectorProps) {
     const [loginList] = useOnyx(ONYXKEYS.LOGIN_LIST);
     const [allPolicies] = useOnyx(ONYXKEYS.COLLECTION.POLICY);
     const [inReportIDs] = useOnyx(ONYXKEYS.FORMS.SEARCH_ADVANCED_FILTERS_FORM, {selector: inSelector});
+    const sortedActions = useSortedActions();
+
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const currentUserAccountID = currentUserPersonalDetails.accountID;
     const currentUserEmail = currentUserPersonalDetails.email ?? '';
@@ -93,6 +96,7 @@ function InSelector({onChange, onCountChange}: InSelectorProps) {
               currentUserEmail,
               personalDetails,
               policyCollection: allPolicies,
+              sortedActions,
               conciergeReportID,
           });
 
