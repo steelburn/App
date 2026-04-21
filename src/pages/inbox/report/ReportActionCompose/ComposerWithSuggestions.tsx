@@ -319,7 +319,7 @@ function ComposerWithSuggestions({
         setValue(nextValue);
     }, []);
 
-    const {wasEditingRef} = useEditComposerToggle({
+    useEditComposerToggle({
         selection,
         draftComment,
         composerRef,
@@ -530,14 +530,13 @@ function ComposerWithSuggestions({
                     syncSelectionWithOnChangeTextRef.current = {position, value: newComment};
                 }
 
-                if (!wasEditingRef.current) {
-                    setSelection((prevSelection) => ({
-                        ...prevSelection,
-                        start: position,
-                        end: position,
-                    }));
-                    setCurrentEditMessageSelection((prevSelection) => ({...prevSelection, start: position, end: position}));
-                }
+                // Keep selection in sync after emoji conversion / insertion while editing (e.g. emoji picker on web);
+                setSelection((prevSelection) => ({
+                    ...prevSelection,
+                    start: position,
+                    end: position,
+                }));
+                setCurrentEditMessageSelection((prevSelection) => ({...prevSelection, start: position, end: position}));
             }
 
             commentRef.current = newCommentConverted;
@@ -581,7 +580,6 @@ function ComposerWithSuggestions({
             setCurrentEditMessageSelection,
             setEditingMessage,
             shouldUseNarrowLayout,
-            wasEditingRef,
         ],
     );
 

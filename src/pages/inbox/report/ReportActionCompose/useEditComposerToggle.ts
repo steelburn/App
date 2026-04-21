@@ -135,8 +135,6 @@ function useEditComposerToggle({selection, draftComment, composerRef, onFocus, o
 
         previousEditingReportActionIDRef.current = editingReportActionID;
     }, [applyComposerValue, composerRef, draftComment, editingMessage, editingReportActionID, editingState, selection, shouldUseNarrowLayout]);
-
-    return {wasEditingRef};
 }
 
 export default useEditComposerToggle;
