@@ -6,7 +6,6 @@ import {isChatThread} from '@libs/ReportUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {PersonalDetailsList, Report, ReportAction} from '@src/types/onyx';
-import {useReportActionActiveEdit} from './ReportActionEditMessageContext';
 import ReportActionItem from './ReportActionItem';
 import ReportActionItemParentAction from './ReportActionItemParentAction';
 
@@ -101,9 +100,6 @@ function ReportActionsListItemRenderer({
     reportNameValuePairsOrigin,
     reportNameValuePairsOriginalID,
 }: ReportActionsListItemRendererProps) {
-    const {editingReportActionID, editingMessage} = useReportActionActiveEdit();
-    const draftMessage = !!editingReportActionID && editingReportActionID === reportAction.reportActionID ? (editingMessage ?? undefined) : undefined;
-
     const originalMessage = useMemo(() => getOriginalMessage(reportAction), [reportAction]);
 
     const [emojiReactions] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS_REACTIONS}${reportAction.reportActionID}`);
@@ -222,7 +218,6 @@ function ReportActionsListItemRenderer({
             userWalletTierName={userWalletTierName}
             isUserValidated={isUserValidated}
             personalDetails={personalDetails}
-            draftMessage={draftMessage}
             emojiReactions={emojiReactions}
             userBillingFundID={userBillingFundID}
             isTryNewDotNVPDismissed={isTryNewDotNVPDismissed}

@@ -8,7 +8,6 @@ import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import {getOriginalMessage, getReportAction, isMoneyRequestAction} from '@libs/ReportActionsUtils';
-import {useReportActionActiveEdit} from '@pages/inbox/report/ReportActionEditMessageContext';
 import ReportActionItem from '@pages/inbox/report/ReportActionItem';
 import {ReportActionItemActionsContext, ReportActionItemStateContext} from '@pages/inbox/report/ReportActionItemContext';
 import CONST from '@src/CONST';
@@ -53,10 +52,6 @@ function DuplicateTransactionItem({transaction, index, onPreviewPressed}: Duplic
     const stateValue = useMemo(() => ({shouldOpenReportInRHP: true}), []);
     const actionsValue = useMemo(() => ({onPreviewPressed}), [onPreviewPressed]);
 
-    const {editingMessage, editingReportAction} = useReportActionActiveEdit();
-
-    const draftMessage = editingReportAction && action && editingReportAction.reportActionID === action.reportActionID ? (editingMessage ?? undefined) : undefined;
-
     if (!action || !report) {
         return null;
     }
@@ -77,7 +72,6 @@ function DuplicateTransactionItem({transaction, index, onPreviewPressed}: Duplic
                         userWalletTierName={userWalletTierName}
                         isUserValidated={isUserValidated}
                         personalDetails={personalDetails}
-                        draftMessage={draftMessage}
                         emojiReactions={emojiReactions}
                         linkedTransactionRouteError={linkedTransactionRouteError}
                         userBillingFundID={userBillingFundID}

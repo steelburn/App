@@ -25,12 +25,6 @@ import type {PureReportActionItemProps} from './PureReportActionItem';
 import PureReportActionItem from './PureReportActionItem';
 
 type ReportActionItemProps = Omit<PureReportActionItemProps, 'taskReport' | 'linkedReport' | 'iouReportOfLinkedReport' | 'currentUserAccountID' | 'personalPolicyID' | 'betas'> & {
-    /** Whether to show the draft message or not */
-    shouldShowDraftMessage?: boolean;
-
-    /** Draft message for the report action */
-    draftMessage?: string;
-
     /** Emoji reactions for the report action */
     emojiReactions?: OnyxEntry<ReportActionReactions>;
 
@@ -53,7 +47,6 @@ type ReportActionItemProps = Omit<PureReportActionItemProps, 'taskReport' | 'lin
 function ReportActionItem({
     action,
     report,
-    draftMessage,
     emojiReactions,
     userWalletTierName,
     isUserValidated,
@@ -112,7 +105,6 @@ function ReportActionItem({
             report={report}
             policy={policy}
             currentUserAccountID={currentUserAccountID}
-            draftMessage={draftMessage}
             iouReport={iouReport}
             taskReport={taskReport}
             cardList={cardList}

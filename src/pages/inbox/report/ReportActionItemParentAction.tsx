@@ -23,7 +23,6 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import type {PersonalDetailsList, Report, ReportAction, ReportActionReactions, ReportNameValuePairs, Transaction} from '@src/types/onyx';
 import AnimatedEmptyStateBackground from './AnimatedEmptyStateBackground';
 import RepliesDivider from './RepliesDivider';
-import {useReportActionActiveEdit} from './ReportActionEditMessageContext';
 import ReportActionItem from './ReportActionItem';
 import ThreadDivider from './ThreadDivider';
 
@@ -132,8 +131,6 @@ function ReportActionItemParentAction({
         [ancestors],
     );
 
-    const {editingMessage, editingReportAction} = useReportActionActiveEdit();
-
     const ancestorReactionSelector = useCallback(
         (allReactions: OnyxCollection<ReportActionReactions>) => {
             if (!allReactions) {
@@ -171,8 +168,6 @@ function ReportActionItemParentAction({
                     const canUserPerformWriteAction = canUserPerformWriteActionReportUtils(ancestorReport, isReportArchived);
                     const shouldDisplayThreadDivider = !isTripPreview(ancestorReportAction);
                     const isAncestorReportArchived = isArchivedReport(ancestorsReportNameValuePairs?.[`${ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS}${ancestorReport.reportID}`]);
-
-                    const draftMessage = editingReportAction?.reportActionID === ancestorReportAction.reportActionID ? (editingMessage ?? undefined) : undefined;
 
                     const actionEmojiReactions = ancestorReactions?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS_REACTIONS}${ancestorReportAction.reportActionID}`];
 
@@ -212,7 +207,6 @@ function ReportActionItemParentAction({
                                 userWalletTierName={userWalletTierName}
                                 isUserValidated={isUserValidated}
                                 personalDetails={personalDetails}
-                                draftMessage={draftMessage}
                                 emojiReactions={actionEmojiReactions}
                                 linkedTransactionRouteError={linkedTransactionRouteError}
                                 userBillingFundID={userBillingFundID}
