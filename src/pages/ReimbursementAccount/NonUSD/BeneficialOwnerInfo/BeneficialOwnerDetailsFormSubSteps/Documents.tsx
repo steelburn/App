@@ -125,6 +125,7 @@ function Documents({onNext, isEditing, ownerBeingModifiedID}: DocumentsProps) {
                             setUploadError(error, proofOfOwnershipInputID);
                         }}
                         fileLimit={CONST.NON_USD_BANK_ACCOUNT.FILE_LIMIT}
+                        maxFileSize={CONST.NON_USD_BANK_ACCOUNT.MAX_FILE_SIZE}
                         acceptedFileTypes={[...CONST.NON_USD_BANK_ACCOUNT.ALLOWED_FILE_TYPES]}
                         value={defaultValues[proofOfOwnershipInputID]}
                         inputID={proofOfOwnershipInputID}
@@ -153,6 +154,7 @@ function Documents({onNext, isEditing, ownerBeingModifiedID}: DocumentsProps) {
                             setUploadError(error, copyOfIDInputID);
                         }}
                         fileLimit={CONST.NON_USD_BANK_ACCOUNT.FILE_LIMIT}
+                        maxFileSize={CONST.NON_USD_BANK_ACCOUNT.MAX_FILE_SIZE}
                         acceptedFileTypes={[...CONST.NON_USD_BANK_ACCOUNT.ALLOWED_FILE_TYPES]}
                         value={defaultValues[copyOfIDInputID]}
                         inputID={copyOfIDInputID}
@@ -179,6 +181,7 @@ function Documents({onNext, isEditing, ownerBeingModifiedID}: DocumentsProps) {
                             setUploadError(error, addressProofInputID);
                         }}
                         fileLimit={CONST.NON_USD_BANK_ACCOUNT.FILE_LIMIT}
+                        maxFileSize={CONST.NON_USD_BANK_ACCOUNT.MAX_FILE_SIZE}
                         acceptedFileTypes={[...CONST.NON_USD_BANK_ACCOUNT.ALLOWED_FILE_TYPES]}
                         value={defaultValues[addressProofInputID]}
                         inputID={addressProofInputID}
@@ -205,6 +208,7 @@ function Documents({onNext, isEditing, ownerBeingModifiedID}: DocumentsProps) {
                             setUploadError(error, codiceFiscaleInputID);
                         }}
                         fileLimit={CONST.NON_USD_BANK_ACCOUNT.FILE_LIMIT}
+                        maxFileSize={CONST.NON_USD_BANK_ACCOUNT.MAX_FILE_SIZE}
                         acceptedFileTypes={[...CONST.NON_USD_BANK_ACCOUNT.ALLOWED_FILE_TYPES]}
                         value={defaultValues[codiceFiscaleInputID]}
                         inputID={codiceFiscaleInputID}

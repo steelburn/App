@@ -149,6 +149,7 @@ function UploadDocuments({onNext, isEditing}: UploadDocumentsProps) {
                             setUploadError(error, copyOfIDInputID);
                         }}
                         fileLimit={CONST.NON_USD_BANK_ACCOUNT.FILE_LIMIT}
+                        maxFileSize={CONST.NON_USD_BANK_ACCOUNT.MAX_FILE_SIZE}
                     />
                     <Text style={[styles.mutedTextLabel, styles.mt6]}>{translate('ownershipInfoStep.copyOfIDDescription')}</Text>
                     {(isDocumentNeededStatus.isAddressProofNeeded ||
@@ -177,6 +178,7 @@ function UploadDocuments({onNext, isEditing}: UploadDocumentsProps) {
                             setUploadError(error, addressProofInputID);
                         }}
                         fileLimit={CONST.NON_USD_BANK_ACCOUNT.FILE_LIMIT}
+                        maxFileSize={CONST.NON_USD_BANK_ACCOUNT.MAX_FILE_SIZE}
                     />
                     <Text style={[styles.mutedTextLabel, styles.mt6]}>{translate('ownershipInfoStep.proofOfAddressDescription')}</Text>
                     {(isDocumentNeededStatus.isProofOfDirectorsNeeded || isDocumentNeededStatus.isCodiceFiscaleNeeded || isDocumentNeededStatus.isPRDAndFSGNeeded) && (
@@ -204,6 +206,7 @@ function UploadDocuments({onNext, isEditing}: UploadDocumentsProps) {
                             setUploadError(error, directorsProofInputID);
                         }}
                         fileLimit={CONST.NON_USD_BANK_ACCOUNT.FILE_LIMIT}
+                        maxFileSize={CONST.NON_USD_BANK_ACCOUNT.MAX_FILE_SIZE}
                     />
                     <Text style={[styles.mutedTextLabel, styles.mt6]}>{translate('signerInfoStep.proofOfDirectorsDescription')}</Text>
                     {(isDocumentNeededStatus.isCodiceFiscaleNeeded || isDocumentNeededStatus.isPRDAndFSGNeeded) && <View style={[styles.sectionDividerLine, styles.mt6, styles.mb6]} />}
@@ -229,6 +232,7 @@ function UploadDocuments({onNext, isEditing}: UploadDocumentsProps) {
                             setUploadError(error, codiceFiscaleInputID);
                         }}
                         fileLimit={CONST.NON_USD_BANK_ACCOUNT.FILE_LIMIT}
+                        maxFileSize={CONST.NON_USD_BANK_ACCOUNT.MAX_FILE_SIZE}
                     />
                     <Text style={[styles.mutedTextLabel, styles.mt6]}>{translate('signerInfoStep.codiceFiscaleDescription')}</Text>
                     {isDocumentNeededStatus.isPRDAndFSGNeeded && <View style={[styles.sectionDividerLine, styles.mt6, styles.mb6]} />}
