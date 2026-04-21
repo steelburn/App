@@ -1,8 +1,9 @@
 import {CommonActions} from '@react-navigation/native';
 import type {NavigationRoute, ParamListBase, PartialState, Router, RouterConfigOptions, StackActionType} from '@react-navigation/native';
+import compoundParamsKey from '@libs/compoundParamsKey';
 import type {PlatformStackNavigationState, PlatformStackRouterFactory, PlatformStackRouterOptions} from '@libs/Navigation/PlatformStackNavigation/types';
 import type {GoBackAction, SetParamsAction} from '@libs/Navigation/types';
-import {cancelPendingFocusRestore, compoundParamsKey, notifyPushParamsBackward, notifyPushParamsForward} from '@libs/NavigationFocusReturn';
+import {cancelPendingFocusRestore, notifyPushParamsBackward, notifyPushParamsForward} from '@libs/NavigationFocusReturn';
 import CONST from '@src/CONST';
 import type {CustomHistoryEntry, PushParamsActionType, PushParamsRouterAction} from './types';
 import {enhanceStateWithHistory} from './utils';
@@ -112,17 +113,18 @@ function addPushParamsRouterExtension<RouterOptions extends PlatformStackRouterO
             configOptions: RouterConfigOptions,
         ) => {
             if (isPushParamsAction(action)) {
-                // Capture against outgoing (pre-update) params so GO_BACK can restore to it.
-                const outgoingRoute = state.routes.at(-1);
-                if (outgoingRoute?.key) {
-                    notifyPushParamsForward(outgoingRoute.key, outgoingRoute.params);
-                }
-
                 const setParamsAction = CommonActions.setParams(action.payload.params);
                 const stateWithUpdatedParams = router.getStateForAction(state, setParamsAction, configOptions);
 
                 if (!stateWithUpdatedParams?.history) {
+                    // Skip capture — the update didn't commit usable history, so any captured trigger would be orphan.
                     return stateWithUpdatedParams;
+                }
+
+                // Capture against outgoing (pre-update) params so GO_BACK can restore to them.
+                const outgoingRoute = state.routes.at(-1);
+                if (outgoingRoute?.key) {
+                    notifyPushParamsForward(outgoingRoute.key, outgoingRoute.params);
                 }
 
                 const lastRoute = stateWithUpdatedParams.routes.at(-1);

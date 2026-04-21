@@ -1,6 +1,7 @@
 import {findFocusedRoute} from '@react-navigation/core';
 import type {NavigationState, PartialState} from '@react-navigation/native';
 import {InteractionManager} from 'react-native';
+import compoundParamsKey, {COMPOUND_KEY_DELIMITER} from './compoundParamsKey';
 import FOCUSABLE_SELECTOR from './focusableSelector';
 import {hasFocusableAttributes} from './focusGuards';
 import getHadTabNavigation from './hadTabNavigation';
@@ -17,12 +18,27 @@ type DiffAction = {type: 'forward'; captureKey: string} | {type: 'backward'; res
 // Fallback is the surrounding trap's launcher, used when primary can't accept focus at restore.
 type TriggerEntry = {primary: HTMLElement; fallback?: HTMLElement};
 
-const COMPOUND_KEY_DELIMITER = '::';
+// Bound triggerMap so forward-only PUSH_PARAMS sessions can't pin detached DOM nodes indefinitely.
+const TRIGGER_MAP_MAX = 64;
 
 let lastInteractiveElement: HTMLElement | null = null;
 // Cross-modality: mouse-click-forward → keyboard-back still needs focus returned (WCAG 2.4.3).
 let lastMouseTrigger: HTMLElement | null = null;
 const triggerMap = new Map<string, TriggerEntry>();
+
+// Refresh insertion order on re-set so FIFO eviction doesn't drop a recently-active key.
+function setTriggerEntry(routeKey: string, entry: TriggerEntry): void {
+    triggerMap.delete(routeKey);
+    triggerMap.set(routeKey, entry);
+    while (triggerMap.size > TRIGGER_MAP_MAX) {
+        const oldest = triggerMap.keys().next().value;
+        if (oldest === undefined) {
+            break;
+        }
+        triggerMap.delete(oldest);
+    }
+}
+
 let prevState: NavigationState | undefined;
 let pendingRestore: {cancel: () => void} | null = null;
 let focusinHandler: ((e: FocusEvent) => void) | null = null;
@@ -93,9 +109,9 @@ function captureTriggerForRoute(routeKey: string): void {
     if (launcher) {
         // Prefer the in-trap element; fall back to the launcher when primary is removed on trap close.
         if (inner && inner !== launcher) {
-            triggerMap.set(routeKey, {primary: inner, fallback: launcher});
+            setTriggerEntry(routeKey, {primary: inner, fallback: launcher});
         } else {
-            triggerMap.set(routeKey, {primary: launcher});
+            setTriggerEntry(routeKey, {primary: launcher});
         }
         consumeLauncher(launcher);
         return;
@@ -104,67 +120,7 @@ function captureTriggerForRoute(routeKey: string): void {
     if (!inner) {
         return;
     }
-    triggerMap.set(routeKey, {primary: inner});
-}
-
-// Sentinel so JSON.stringify can't collapse [undefined] → [null].
-const UNDEFINED_SENTINEL = '\u0000undefined';
-
-// URL-rehydrated params are always strings; PUSH_PARAMS dispatches may use numbers/booleans.
-// Top-level undefined is dropped by the caller's filter; nested undefined is preserved via UNDEFINED_SENTINEL — asymmetric but inert (URL params are flat).
-function normalizeForKey(value: unknown): unknown {
-    if (value === null) {
-        return null;
-    }
-    if (value === undefined) {
-        return UNDEFINED_SENTINEL;
-    }
-    if (typeof value === 'number' || typeof value === 'boolean') {
-        return String(value);
-    }
-    if (Array.isArray(value)) {
-        return value.map(normalizeForKey);
-    }
-    if (typeof value === 'object') {
-        // Recursively sort so differently-ordered nested keys produce the same compound.
-        const entries = Object.entries(value as Record<string, unknown>)
-            .sort(([a], [b]) => {
-                if (a < b) {
-                    return -1;
-                }
-                if (a > b) {
-                    return 1;
-                }
-                return 0;
-            })
-            .map(([k, v]) => [k, normalizeForKey(v)]);
-        return Object.fromEntries(entries);
-    }
-    return value;
-}
-
-/** Compound key for PUSH_PARAMS history (same route.key across params snapshots). */
-function compoundParamsKey(routeKey: string, params: unknown): string {
-    if (params == null) {
-        return `${routeKey}${COMPOUND_KEY_DELIMITER}`;
-    }
-    if (typeof params !== 'object') {
-        return `${routeKey}${COMPOUND_KEY_DELIMITER}${JSON.stringify(normalizeForKey(params))}`;
-    }
-    // Explicit-undefined fields must match path-rehydrated (omitted) params.
-    const entries = Object.entries(params as Record<string, unknown>)
-        .filter(([, value]) => value !== undefined)
-        .map(([k, v]) => [k, normalizeForKey(v)] as const)
-        .sort(([a], [b]) => {
-            if (a < b) {
-                return -1;
-            }
-            if (a > b) {
-                return 1;
-            }
-            return 0;
-        });
-    return `${routeKey}${COMPOUND_KEY_DELIMITER}${JSON.stringify(entries)}`;
+    setTriggerEntry(routeKey, {primary: inner});
 }
 
 function notifyPushParamsForward(routeKey: string, prevParams: unknown): void {
@@ -205,6 +161,8 @@ function pickRestoreTarget(entry: TriggerEntry): RestorePick {
 // Grace window after a successful restore: vetoes in-flight AUTO/INITIAL, then releases so unrelated later claimers aren't blocked for CYCLE_TIMEOUT_MS.
 const RETURN_HOLD_MS = 500;
 let returnHoldTimerId: ReturnType<typeof setTimeout> | undefined;
+// Set on successful RETURN; consulted at hold-release time to decide whether to eagerly reset the cycle or defer.
+let lastRestoreTarget: HTMLElement | null = null;
 
 function scheduleReturnHoldRelease(): void {
     if (returnHoldTimerId !== undefined) {
@@ -212,6 +170,11 @@ function scheduleReturnHoldRelease(): void {
     }
     returnHoldTimerId = setTimeout(() => {
         returnHoldTimerId = undefined;
+        // Target still focused → defer to the arbiter's own CYCLE_TIMEOUT_MS; an early reset would let a slow AUTO chain steal after the target briefly drops focusable-attributes.
+        if (typeof document !== 'undefined' && lastRestoreTarget && (document.activeElement === lastRestoreTarget || lastRestoreTarget.contains(document.activeElement))) {
+            return;
+        }
+        lastRestoreTarget = null;
         resetCycle();
     }, RETURN_HOLD_MS);
 }
@@ -260,11 +223,13 @@ function restoreTriggerForRoute(routeKey: string): boolean {
         candidate.focus(focusOptions);
         const after = document.activeElement;
         if (after === candidate) {
+            lastRestoreTarget = candidate;
             scheduleReturnHoldRelease();
             return true;
         }
         // Only accept as onFocus redirect when focus actually moved — pre-existing focus with a silent no-op must fall through to the fallback.
         if (after !== before && after && after !== document.body) {
+            lastRestoreTarget = after instanceof HTMLElement ? after : candidate;
             scheduleReturnHoldRelease();
             return true;
         }
@@ -341,6 +306,7 @@ function handleStateChange(newState: NavigationState | undefined): void {
     }
     // A stale return-hold timer would reset the new cycle's priority.
     cancelReturnHoldRelease();
+    lastRestoreTarget = null;
     resetCycle();
     const {action, removedKeys} = diffNavigationState(prevState, newState);
 
@@ -424,6 +390,7 @@ function setupNavigationFocusReturn(): void {
 function teardownNavigationFocusReturn(): void {
     cancelPendingRestore();
     cancelReturnHoldRelease();
+    lastRestoreTarget = null;
     if (typeof document !== 'undefined') {
         if (focusinHandler) {
             document.removeEventListener('focusin', focusinHandler, true);
@@ -448,6 +415,7 @@ function resetForTests(): void {
     prevState = undefined;
     lastInteractiveElement = null;
     lastMouseTrigger = null;
+    lastRestoreTarget = null;
 }
 
 function setLastInteractiveElementForTests(element: HTMLElement | null): void {

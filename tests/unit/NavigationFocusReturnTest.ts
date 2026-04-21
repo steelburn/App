@@ -578,6 +578,77 @@ describe('captureTriggerForRoute', () => {
             expect(restoreTriggerForRoute('route-profile')).toBe(true);
             expect(spy).toHaveBeenCalled();
         });
+
+        it('mouse-click into a [contenteditable] region captures it as the trigger (rich-text composer / Markdown input)', () => {
+            const editable = document.createElement('div');
+            editable.setAttribute('contenteditable', 'true');
+            document.body.appendChild(editable);
+            editable.dispatchEvent(new MouseEvent('pointerdown', {bubbles: true}));
+
+            captureTriggerForRoute('route-chat');
+            const spy = jest.spyOn(editable, 'focus');
+            expect(restoreTriggerForRoute('route-chat')).toBe(true);
+            expect(spy).toHaveBeenCalled();
+        });
+    });
+
+    describe('FIFO eviction', () => {
+        beforeEach(() => {
+            simulateTab();
+        });
+
+        it('evicts the oldest entry when triggerMap exceeds TRIGGER_MAP_MAX, preventing unbounded growth', () => {
+            const TRIGGER_MAP_MAX = 64;
+            const buttons: HTMLButtonElement[] = [];
+            for (let i = 0; i < TRIGGER_MAP_MAX + 3; i += 1) {
+                const btn = appendButton();
+                buttons.push(btn);
+                btn.focus();
+                setLastInteractiveElementForTests(btn);
+                captureTriggerForRoute(`route-${i}`);
+                btn.blur();
+            }
+            expect(restoreTriggerForRoute('route-0')).toBe(false);
+            expect(restoreTriggerForRoute('route-1')).toBe(false);
+            expect(restoreTriggerForRoute('route-2')).toBe(false);
+
+            const lastIdx = TRIGGER_MAP_MAX + 2;
+            const last = buttons.at(lastIdx);
+            if (!last) {
+                throw new Error('setup failure: last button missing');
+            }
+            const lastSpy = jest.spyOn(last, 'focus');
+            expect(restoreTriggerForRoute(`route-${lastIdx}`)).toBe(true);
+            expect(lastSpy).toHaveBeenCalled();
+        });
+
+        it('re-setting the same route key refreshes insertion order so a still-active key is not evicted', () => {
+            const TRIGGER_MAP_MAX = 64;
+            const firstBtn = appendButton();
+            firstBtn.focus();
+            setLastInteractiveElementForTests(firstBtn);
+            captureTriggerForRoute('route-persistent');
+            firstBtn.blur();
+
+            for (let i = 0; i < TRIGGER_MAP_MAX; i += 1) {
+                if (i === TRIGGER_MAP_MAX - 10) {
+                    // Re-set mid-fill so route-persistent moves to the tail.
+                    firstBtn.focus();
+                    setLastInteractiveElementForTests(firstBtn);
+                    captureTriggerForRoute('route-persistent');
+                    firstBtn.blur();
+                }
+                const btn = appendButton();
+                btn.focus();
+                setLastInteractiveElementForTests(btn);
+                captureTriggerForRoute(`route-bulk-${i}`);
+                btn.blur();
+            }
+
+            const spy = jest.spyOn(firstBtn, 'focus');
+            expect(restoreTriggerForRoute('route-persistent')).toBe(true);
+            expect(spy).toHaveBeenCalled();
+        });
     });
 });
 
@@ -695,7 +766,27 @@ describe('restoreTriggerForRoute', () => {
         expect(tryClaim(Priorities.AUTO)).toBe(true);
     });
 
-    it('should release the arbiter cycle after RETURN_HOLD_MS so later unrelated AUTO claims are not blocked for 2 seconds', () => {
+    it('releases the cycle at RETURN_HOLD_MS when the user has moved focus elsewhere so unrelated later AUTO claims are not blocked for 2s', () => {
+        withFakeTimers(() => {
+            const trigger = appendButton();
+            const other = appendInput();
+            trigger.focus();
+            setLastInteractiveElementForTests(trigger);
+            captureTriggerForRoute('route-a');
+            trigger.blur();
+
+            expect(restoreTriggerForRoute('route-a')).toBe(true);
+            expect(tryClaim(Priorities.AUTO)).toBe(false);
+
+            // User moves on before hold fires.
+            other.focus();
+
+            jest.advanceTimersByTime(600);
+            expect(tryClaim(Priorities.AUTO)).toBe(true);
+        });
+    });
+
+    it('KEEPS the hold past RETURN_HOLD_MS when the restored target still holds focus — closes the late-AUTO steal race', () => {
         withFakeTimers(() => {
             const trigger = appendButton();
             trigger.focus();
@@ -704,11 +795,13 @@ describe('restoreTriggerForRoute', () => {
             trigger.blur();
 
             expect(restoreTriggerForRoute('route-a')).toBe(true);
-            // Immediately after RETURN lands, AUTO is blocked (destination screen's mount-time useAutoFocusInput loses, correctly).
+            expect(document.activeElement).toBe(trigger);
+
+            jest.advanceTimersByTime(600);
             expect(tryClaim(Priorities.AUTO)).toBe(false);
 
-            // After the hold window, the cycle is released so a later unrelated AUTO (e.g. side-panel open) can succeed.
-            jest.advanceTimersByTime(600);
+            // Arbiter's own 2s lazy timeout eventually releases.
+            jest.advanceTimersByTime(1500);
             expect(tryClaim(Priorities.AUTO)).toBe(true);
         });
     });
@@ -842,16 +935,12 @@ describe('restoreTriggerForRoute', () => {
             handleStateChange(onStatusClearAfter);
             clearAfterButton.blur();
 
-            // Esc → backward → scheduled restore fires first (short IM+rAF chain), focuses Clear after, then RETURN_HOLD_MS timer fires and releases the cycle.
+            // Esc → backward → scheduled restore refocuses Clear after. Hold extends because the target is still focused.
             handleStateChange(onStatus);
             jest.runAllTimers();
             expect(document.activeElement).toBe(clearAfterButton);
-            // Cycle is now 0; AUTO would succeed at the arbiter.
-            const returnReleased = tryClaim(Priorities.AUTO);
-            expect(returnReleased).toBe(true);
-            resetArbiter();
 
-            // Now simulate useAutoFocusInput's guarded late-fire. The guard must prevent input.focus().
+            // Late useAutoFocusInput: the guard catches it before it reaches tryClaim.
             const messageSpy = jest.spyOn(messageInput, 'focus');
             const guardSaysSkip = shouldSkipAutoFocusDueToExistingFocus();
             expect(guardSaysSkip).toBe(true);

@@ -3,19 +3,14 @@ import type {NavigationRoute, ParamListBase, PartialState, Router, RouterConfigO
 import addPushParamsRouterExtension, {resolveCursorForReset} from '@libs/Navigation/AppNavigator/routerExtensions/addPushParamsRouterExtension';
 import type {CustomHistoryEntry, PushParamsRouterAction} from '@libs/Navigation/AppNavigator/routerExtensions/types';
 import type {PlatformStackRouterOptions} from '@libs/Navigation/PlatformStackNavigation/types';
-import {cancelPendingFocusRestore} from '@libs/NavigationFocusReturn';
+import {cancelPendingFocusRestore, notifyPushParamsForward} from '@libs/NavigationFocusReturn';
 import CONST from '@src/CONST';
 
-jest.mock('@libs/NavigationFocusReturn', () => {
-    // Use the real compoundParamsKey so its normalization/sorting stays in sync with the extension's callers.
-    const actual = jest.requireActual<{compoundParamsKey: (routeKey: string, params: unknown) => string}>('@libs/NavigationFocusReturn');
-    return {
-        compoundParamsKey: actual.compoundParamsKey,
-        cancelPendingFocusRestore: jest.fn(),
-        notifyPushParamsBackward: jest.fn(),
-        notifyPushParamsForward: jest.fn(),
-    };
-});
+jest.mock('@libs/NavigationFocusReturn', () => ({
+    cancelPendingFocusRestore: jest.fn(),
+    notifyPushParamsBackward: jest.fn(),
+    notifyPushParamsForward: jest.fn(),
+}));
 
 type TestState = StackNavigationState<ParamListBase> & {history?: CustomHistoryEntry[]};
 
@@ -374,6 +369,39 @@ describe('addPushParamsRouterExtension', () => {
 
         expect(newState).not.toBeNull();
         expect(newState?.history).toBeUndefined();
+    });
+
+    it('PUSH_PARAMS does NOT capture a trigger when the inner router returns state without history', () => {
+        // Capture must follow the history-presence check — otherwise a no-commit PUSH_PARAMS leaves a stale entry in triggerMap.
+        const factory = createMockRouterFactory((state, action) => {
+            if (action.type === 'SET_PARAMS') {
+                return {...state, history: undefined} as TestState;
+            }
+            return state;
+        });
+        const enhancedRouter = addPushParamsRouterExtension(factory)({} as PlatformStackRouterOptions);
+        (notifyPushParamsForward as jest.Mock).mockClear();
+
+        const route = makeRoute('Search', 'search-1', {q: 'initial'});
+        const state = makeState([route], {history: [{...route}] as CustomHistoryEntry[]});
+
+        enhancedRouter.getStateForAction(state, {type: CONST.NAVIGATION.ACTION_TYPE.PUSH_PARAMS, payload: {params: {q: 'updated'}}}, CONFIG_OPTIONS);
+
+        expect(notifyPushParamsForward).not.toHaveBeenCalled();
+    });
+
+    it('PUSH_PARAMS captures on the positive path (history present)', () => {
+        const factory = createMockRouterFactory();
+        const enhancedRouter = addPushParamsRouterExtension(factory)({} as PlatformStackRouterOptions);
+        (notifyPushParamsForward as jest.Mock).mockClear();
+
+        const route = makeRoute('Search', 'search-1', {q: 'initial'});
+        const state = makeState([route], {history: [{...route}] as CustomHistoryEntry[]});
+
+        enhancedRouter.getStateForAction(state, {type: CONST.NAVIGATION.ACTION_TYPE.PUSH_PARAMS, payload: {params: {q: 'updated'}}}, CONFIG_OPTIONS);
+
+        expect(notifyPushParamsForward).toHaveBeenCalledTimes(1);
+        expect(notifyPushParamsForward).toHaveBeenCalledWith('search-1', {q: 'initial'});
     });
 
     it('GO_BACK with surplus history returns null when single route and underlying router returns null', () => {

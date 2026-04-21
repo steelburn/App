@@ -257,6 +257,11 @@ describe('focusFirstInteractiveElement', () => {
             a.setAttribute('href', '#');
             return a;
         }
+        function makeContentEditable(value: string): HTMLElement {
+            const el = document.createElement('div');
+            el.setAttribute('contenteditable', value);
+            return el;
+        }
         it.each<[label: string, create: () => HTMLElement]>([
             ['button', () => document.createElement('button')],
             ['a[href]', makeLink],
@@ -265,11 +270,22 @@ describe('focusFirstInteractiveElement', () => {
             ['select', () => document.createElement('select')],
             ['[role="button"]', () => makeRoleEl('button')],
             ['[role="link"]', () => makeRoleEl('link')],
+            ['[role="textbox"]', () => makeRoleEl('textbox')],
+            ['[contenteditable="true"]', () => makeContentEditable('true')],
+            ['[contenteditable=""]', () => makeContentEditable('')],
         ])('should find %s', (_label, create) => {
             const el = create();
             const spy = jest.spyOn(el, 'focus');
             focusFirstInteractiveElement(createContainer(el));
             expect(spy).toHaveBeenCalled();
+        });
+
+        it('should NOT match [contenteditable="false"] — explicit opt-out is respected', () => {
+            const el = document.createElement('div');
+            el.setAttribute('contenteditable', 'false');
+            const spy = jest.spyOn(el, 'focus');
+            focusFirstInteractiveElement(createContainer(el));
+            expect(spy).not.toHaveBeenCalled();
         });
     });
 
