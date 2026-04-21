@@ -17,6 +17,7 @@ function ListRadioButton<TItem extends ListItem>({
     containerStyle,
     shouldStopMouseDownPropagation,
     testID,
+    tabIndex,
 }: ListSelectionButtonProps<TItem>) {
     return (
         <ListSelectionButton
@@ -29,6 +30,7 @@ function ListRadioButton<TItem extends ListItem>({
             containerStyle={containerStyle}
             shouldStopMouseDownPropagation={shouldStopMouseDownPropagation}
             testID={testID}
+            tabIndex={tabIndex ?? -1}
         />
     );
 }

@@ -14,6 +14,7 @@ import type {ListItem, MultiSelectListItemProps} from './types';
 function MultiSelectListItem<TItem extends ListItem>({
     item,
     isFocused,
+    isFocusVisible,
     showTooltip,
     isDisabled,
     onSelectRow,
@@ -42,6 +43,7 @@ function MultiSelectListItem<TItem extends ListItem>({
             item={itemWithAvatar}
             keyForList={item.keyForList}
             isFocused={isFocused}
+            isFocusVisible={isFocusVisible}
             showTooltip={showTooltip}
             isDisabled={isDisabled}
             canSelectMultiple

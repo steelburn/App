@@ -89,6 +89,7 @@ function BaseListItem<TItem extends ListItem>({
     FooterComponent,
     children,
     isFocused,
+    isFocusVisible = isFocused,
     shouldSyncFocus = true,
     shouldDisplayRBR = true,
     shouldShowBlueBorderOnFocus = false,
@@ -209,10 +210,10 @@ function BaseListItem<TItem extends ListItem>({
                 testID={`${CONST.BASE_LIST_ITEM_TEST_ID}${item.keyForList}`}
                 style={[
                     pressableStyle,
-                    isFocused &&
+                    isFocusVisible &&
                         StyleUtils.getItemBackgroundColorStyle(
                             shouldHighlightSelectedItem && !!item.isSelected,
-                            !!isFocused,
+                            !!isFocusVisible,
                             !!item.isDisabled,
                             theme.activeComponentBG,
                             theme.hoverComponentBG,
@@ -233,10 +234,10 @@ function BaseListItem<TItem extends ListItem>({
             >
                 <View
                     style={[
-                        isFocused &&
+                        isFocusVisible &&
                             StyleUtils.getItemBackgroundColorStyle(
                                 shouldHighlightSelectedItem && !!item.isSelected,
-                                !!isFocused,
+                                !!isFocusVisible,
                                 !!item.isDisabled,
                                 theme.activeComponentBG,
                                 theme.hoverComponentBG,

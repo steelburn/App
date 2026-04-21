@@ -28,6 +28,7 @@ import type {InviteMemberListItemProps, ListItem} from './types';
 function InviteMemberListItem<TItem extends ListItem>({
     item,
     isFocused,
+    isFocusVisible,
     showTooltip,
     isDisabled,
     canSelectMultiple,
@@ -60,7 +61,7 @@ function InviteMemberListItem<TItem extends ListItem>({
     );
 
     const focusedBackgroundColor = styles.sidebarLinkActive.backgroundColor;
-    const subscriptAvatarBorderColor = isFocused ? focusedBackgroundColor : theme.sidebar;
+    const subscriptAvatarBorderColor = isFocusVisible ? focusedBackgroundColor : theme.sidebar;
     const hoveredBackgroundColor = !!styles.sidebarLinkHover && 'backgroundColor' in styles.sidebarLinkHover ? styles.sidebarLinkHover.backgroundColor : theme.sidebar;
 
     const firstItemIconID = Number(item?.icons?.at(0)?.id);
@@ -73,6 +74,7 @@ function InviteMemberListItem<TItem extends ListItem>({
             item={item}
             wrapperStyle={[styles.flex1, styles.justifyContentBetween, styles.sidebarLinkInner, styles.userSelectNone, styles.peopleRow, wrapperStyle]}
             isFocused={isFocused}
+            isFocusVisible={isFocusVisible}
             isDisabled={isDisabled}
             showTooltip={showTooltip}
             canSelectMultiple={canSelectMultiple}
@@ -111,12 +113,12 @@ function InviteMemberListItem<TItem extends ListItem>({
                     <View style={[styles.flexRow, styles.alignItemsCenter, styles.flex1]}>
                         {(!!item.reportID || !!accountID || !!item.text || !!item.alternateText) && (
                             <ReportActionAvatars
-                                subscriptAvatarBorderColor={hovered && !isFocused ? hoveredBackgroundColor : subscriptAvatarBorderColor}
+                                subscriptAvatarBorderColor={hovered && !isFocusVisible ? hoveredBackgroundColor : subscriptAvatarBorderColor}
                                 shouldShowTooltip={showTooltip}
                                 secondaryAvatarContainerStyle={[
                                     StyleUtils.getBackgroundAndBorderStyle(theme.sidebar),
-                                    isFocused ? StyleUtils.getBackgroundAndBorderStyle(focusedBackgroundColor) : undefined,
-                                    hovered && !isFocused ? StyleUtils.getBackgroundAndBorderStyle(hoveredBackgroundColor) : undefined,
+                                    isFocusVisible ? StyleUtils.getBackgroundAndBorderStyle(focusedBackgroundColor) : undefined,
+                                    hovered && !isFocusVisible ? StyleUtils.getBackgroundAndBorderStyle(hoveredBackgroundColor) : undefined,
                                 ]}
                                 fallbackDisplayName={item.text ?? item.alternateText ?? undefined}
                                 singleAvatarContainerStyle={[styles.actionAvatar, styles.mr3]}
@@ -132,7 +134,7 @@ function InviteMemberListItem<TItem extends ListItem>({
                                     numberOfLines={isMultilineSupported ? 2 : 1}
                                     style={[
                                         styles.optionDisplayName,
-                                        isFocused ? styles.sidebarLinkActiveText : styles.sidebarLinkText,
+                                        isFocusVisible ? styles.sidebarLinkActiveText : styles.sidebarLinkText,
                                         item.isBold !== false && styles.sidebarLinkTextBold,
                                         isMultilineSupported ? styles.preWrap : styles.pre,
                                         item.alternateText ? styles.mb1 : null,

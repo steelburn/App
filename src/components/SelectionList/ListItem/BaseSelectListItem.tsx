@@ -30,6 +30,7 @@ function BaseSelectListItem<TItem extends ListItem>({
     wrapperStyle,
     titleStyles,
     shouldHighlightSelectedItem,
+    isFocusVisible,
     accessibilityRole,
     selectionButtonPosition,
 }: BaseSelectListItemProps<TItem>) {
@@ -38,11 +39,13 @@ function BaseSelectListItem<TItem extends ListItem>({
     const indentsLength = (item.text?.length ?? 0) - (fullTitle?.length ?? 0);
     const paddingLeft = Math.floor(indentsLength / CONST.INDENTS.length) * styles.ml3.marginLeft;
     const alternateTextMaxWidth = variables.sideBarWidth - styles.ph5.paddingHorizontal * 2 - styles.ml3.marginLeft - variables.iconSizeNormal;
+
     return (
         <SelectableListItem
             item={item}
             wrapperStyle={[styles.flex1, styles.justifyContentBetween, styles.sidebarLinkInner, styles.userSelectNone, styles.optionRow, wrapperStyle]}
             isFocused={isFocused}
+            isFocusVisible={isFocusVisible}
             isDisabled={isDisabled}
             showTooltip={showTooltip}
             onSelectRow={onSelectRow}
@@ -67,7 +70,7 @@ function BaseSelectListItem<TItem extends ListItem>({
                         text={fullTitle ?? ''}
                         style={[
                             styles.optionDisplayName,
-                            isFocused ? styles.sidebarLinkActiveText : styles.sidebarLinkText,
+                            isFocusVisible ? styles.sidebarLinkActiveText : styles.sidebarLinkText,
                             styles.sidebarLinkTextBold,
                             isMultilineSupported ? styles.preWrap : styles.pre,
                             item.alternateText ? styles.mb1 : null,

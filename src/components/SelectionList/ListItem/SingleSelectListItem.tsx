@@ -23,6 +23,7 @@ function SingleSelectListItem<TItem extends ListItem>({
     wrapperStyle,
     titleStyles,
     shouldHighlightSelectedItem,
+    isFocusVisible,
     rightHandSideComponent,
     selectionButtonPosition,
 }: SingleSelectListItemProps<TItem>) {
@@ -47,6 +48,7 @@ function SingleSelectListItem<TItem extends ListItem>({
             wrapperStyle={[styles.optionRow, wrapperStyle]}
             titleStyles={titleStyles}
             shouldHighlightSelectedItem={shouldHighlightSelectedItem}
+            isFocusVisible={isFocusVisible}
             selectionButtonPosition={selectionButtonPosition}
         />
     );

@@ -19,6 +19,7 @@ import type {ListItem, UserSelectionListItemProps} from './types';
 function UserSelectionListItem<TItem extends ListItem>({
     item,
     isFocused,
+    isFocusVisible,
     showTooltip,
     isDisabled,
     canSelectMultiple,
@@ -59,6 +60,7 @@ function UserSelectionListItem<TItem extends ListItem>({
             item={item}
             wrapperStyle={[styles.flex1, styles.sidebarLinkInner, styles.userSelectNone, wrapperStyle]}
             isFocused={isFocused}
+            isFocusVisible={isFocusVisible}
             isDisabled={isDisabled}
             showTooltip={showTooltip}
             canSelectMultiple={canSelectMultiple}
@@ -92,7 +94,7 @@ function UserSelectionListItem<TItem extends ListItem>({
                     <TextWithTooltip
                         shouldShowTooltip={showTooltip}
                         text={userDisplayName}
-                        style={[styles.flexShrink0, styles.optionDisplayName, isFocused ? styles.sidebarLinkActiveText : styles.sidebarLinkText, styles.sidebarLinkTextBold, styles.pre]}
+                        style={[styles.flexShrink0, styles.optionDisplayName, isFocusVisible ? styles.sidebarLinkActiveText : styles.sidebarLinkText, styles.sidebarLinkTextBold, styles.pre]}
                     />
                     {!!userHandle && (
                         <TextWithTooltip

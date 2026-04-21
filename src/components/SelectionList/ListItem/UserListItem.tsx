@@ -13,6 +13,7 @@ import UserListItemContent from './UserListItemContent';
 function UserListItem<TItem extends ListItem>({
     item,
     isFocused,
+    isFocusVisible,
     showTooltip,
     isDisabled,
     canSelectMultiple,
@@ -42,6 +43,7 @@ function UserListItem<TItem extends ListItem>({
             item={item}
             wrapperStyle={[styles.flex1, styles.justifyContentBetween, styles.sidebarLinkInner, styles.userSelectNone, styles.peopleRow, wrapperStyle]}
             isFocused={isFocused}
+            isFocusVisible={isFocusVisible}
             isDisabled={isDisabled}
             showTooltip={showTooltip}
             canSelectMultiple={canSelectMultiple}

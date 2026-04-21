@@ -20,6 +20,7 @@ import type {ListItem, TableListItemProps} from './types';
 function TableListItem<TItem extends ListItem>({
     item,
     isFocused,
+    isFocusVisible,
     showTooltip,
     isDisabled,
     canSelectMultiple,
@@ -58,8 +59,8 @@ function TableListItem<TItem extends ListItem>({
                     shouldShowTooltip={showTooltip}
                     secondaryAvatarContainerStyle={[
                         StyleUtils.getBackgroundAndBorderStyle(theme.sidebar),
-                        isFocused ? StyleUtils.getBackgroundAndBorderStyle(focusedBackgroundColor) : undefined,
-                        hovered && !isFocused ? StyleUtils.getBackgroundAndBorderStyle(hoveredBackgroundColor) : undefined,
+                        isFocusVisible ? StyleUtils.getBackgroundAndBorderStyle(focusedBackgroundColor) : undefined,
+                        hovered && !isFocusVisible ? StyleUtils.getBackgroundAndBorderStyle(hoveredBackgroundColor) : undefined,
                     ]}
                 />
             )}
@@ -69,7 +70,7 @@ function TableListItem<TItem extends ListItem>({
                     text={item.text ?? ''}
                     style={[
                         styles.optionDisplayName,
-                        isFocused ? styles.sidebarLinkActiveText : styles.sidebarLinkText,
+                        isFocusVisible ? styles.sidebarLinkActiveText : styles.sidebarLinkText,
                         styles.sidebarLinkTextBold,
                         styles.pre,
                         !item.shouldHideAlternateText && item.alternateText ? styles.mb1 : null,
@@ -103,6 +104,7 @@ function TableListItem<TItem extends ListItem>({
                 wrapperStyle={[styles.flexRow, styles.flex1, styles.justifyContentBetween, styles.userSelectNone, styles.alignItemsCenter]}
                 containerStyle={styles.mb2}
                 isFocused={isFocused}
+                isFocusVisible={isFocusVisible}
                 isDisabled={isDisabled}
                 showTooltip={showTooltip}
                 canSelectMultiple={canSelectMultiple}
@@ -140,6 +142,7 @@ function TableListItem<TItem extends ListItem>({
             wrapperStyle={[styles.flexRow, styles.flex1, styles.justifyContentBetween, styles.userSelectNone, styles.alignItemsCenter]}
             containerStyle={styles.mb2}
             isFocused={isFocused}
+            isFocusVisible={isFocusVisible}
             isDisabled={isDisabled}
             showTooltip={showTooltip}
             canSelectMultiple={canSelectMultiple}

@@ -14,6 +14,7 @@ import type {ListItem, TravelDomainListItemProps} from './types';
 function TravelDomainListItem<TItem extends ListItem>({
     item,
     isFocused,
+    isFocusVisible,
     showTooltip,
     isDisabled,
     canSelectMultiple,
@@ -32,6 +33,7 @@ function TravelDomainListItem<TItem extends ListItem>({
             item={item}
             wrapperStyle={[styles.flex1, styles.sidebarLinkInner, styles.userSelectNone, styles.optionRow]}
             isFocused={isFocused}
+            isFocusVisible={isFocusVisible}
             isDisabled={isDisabled}
             showTooltip={showTooltip}
             canSelectMultiple={canSelectMultiple}
@@ -49,7 +51,7 @@ function TravelDomainListItem<TItem extends ListItem>({
                 style={[
                     styles.flex1,
                     styles.optionDisplayName,
-                    isFocused ? styles.sidebarLinkActiveText : styles.sidebarLinkText,
+                    isFocusVisible ? styles.sidebarLinkActiveText : styles.sidebarLinkText,
                     item.isBold !== false && styles.sidebarLinkTextBold,
                     styles.pre,
                 ]}

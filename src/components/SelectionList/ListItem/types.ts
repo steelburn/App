@@ -199,6 +199,13 @@ type CommonListItemProps<TItem extends ListItem> = {
     /** Handles what to do when the item is focused */
     onFocus?: ListItemFocusEventHandler;
 
+    /**
+     * Whether the focus indicator should be visually shown.
+     * Pass explicitly to decouple the visual highlight from logical focus,
+     * e.g. to suppress the initial highlight until the user starts keyboard navigation.
+     */
+    isFocusVisible?: boolean;
+
     /** Callback to fire when the item is long pressed */
     onLongPressRow?: (item: TItem, itemTransactions?: TransactionListItemType[]) => void;
 

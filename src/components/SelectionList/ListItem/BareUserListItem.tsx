@@ -16,6 +16,7 @@ import UserListItemContent from './UserListItemContent';
 function BareUserListItem<TItem extends ListItem>({
     item,
     isFocused,
+    isFocusVisible,
     showTooltip,
     isDisabled,
     onSelectRow,
@@ -42,6 +43,7 @@ function BareUserListItem<TItem extends ListItem>({
             item={item}
             wrapperStyle={[styles.flex1, styles.justifyContentBetween, styles.sidebarLinkInner, styles.userSelectNone, styles.peopleRow, wrapperStyle]}
             isFocused={isFocused}
+            isFocusVisible={isFocusVisible}
             isDisabled={isDisabled}
             showTooltip={showTooltip}
             onSelectRow={onSelectRow}

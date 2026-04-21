@@ -36,6 +36,7 @@ type CardListItemProps<TItem extends ListItem> = SelectableListItemProps<TItem &
 function CardListItem<TItem extends ListItem>({
     item,
     isFocused,
+    isFocusVisible,
     showTooltip,
     isDisabled,
     canSelectMultiple,
@@ -70,6 +71,7 @@ function CardListItem<TItem extends ListItem>({
             item={item}
             wrapperStyle={[styles.flex1, styles.justifyContentBetween, styles.sidebarLinkInner, styles.userSelectNone, styles.peopleRow]}
             isFocused={isFocused}
+            isFocusVisible={isFocusVisible}
             isDisabled={isDisabled}
             showTooltip={showTooltip}
             canSelectMultiple={canSelectMultiple}
@@ -146,7 +148,7 @@ function CardListItem<TItem extends ListItem>({
                             text={Str.removeSMSDomain(item.text ?? '')}
                             style={[
                                 styles.optionDisplayName,
-                                isFocused ? styles.sidebarLinkActiveText : styles.sidebarLinkText,
+                                isFocusVisible ? styles.sidebarLinkActiveText : styles.sidebarLinkText,
                                 item.isBold !== false && styles.sidebarLinkTextBold,
                                 styles.pre,
                                 item.alternateText ? styles.mb1 : null,

@@ -28,6 +28,9 @@ type ListSelectionButtonProps<TItem extends ListItem> = {
 
     /** Test ID */
     testID?: string;
+
+    /** Tab index for the button, pass -1 to remove it from the tab order */
+    tabIndex?: -1 | 0;
 };
 
 function ListSelectionButton<TItem extends ListItem>({
@@ -40,6 +43,7 @@ function ListSelectionButton<TItem extends ListItem>({
     containerStyle,
     shouldStopMouseDownPropagation = true,
     testID,
+    tabIndex,
 }: ListSelectionButtonProps<TItem> & {role: typeof CONST.ROLE.CHECKBOX | typeof CONST.ROLE.RADIO}) {
     return (
         <SelectionButton
@@ -54,6 +58,7 @@ function ListSelectionButton<TItem extends ListItem>({
             shouldStopMouseDownPropagation={shouldStopMouseDownPropagation}
             sentryLabel={CONST.SENTRY_LABEL.USER_LIST_ITEM.CHECKBOX}
             testID={testID}
+            tabIndex={tabIndex}
         />
     );
 }

@@ -159,11 +159,21 @@ function BaseSelectionList<TItem extends ListItem>({
         hasKeyBeenPressed.current = true;
     }, []);
 
-    useEffect(() => {
-        addKeyDownPressListener(setHasKeyBeenPressed);
+    // Only handle Tab as keyboard navigation here, arrow keys are already handled via useArrowKeyFocusManager.
+    const handleNavigationKeyDown = useCallback(
+        (event: KeyboardEvent) => {
+            if (event.key !== CONST.KEYBOARD_SHORTCUTS.TAB.shortcutKey) {
+                return;
+            }
+            setHasKeyBeenPressed();
+        },
+        [setHasKeyBeenPressed],
+    );
 
-        return () => removeKeyDownPressListener(setHasKeyBeenPressed);
-    }, [setHasKeyBeenPressed]);
+    useEffect(() => {
+        addKeyDownPressListener(handleNavigationKeyDown);
+        return () => removeKeyDownPressListener(handleNavigationKeyDown);
+    }, [handleNavigationKeyDown]);
 
     const scrollToIndex = useCallback(
         (index: number) => {
@@ -334,9 +344,6 @@ function BaseSelectionList<TItem extends ListItem>({
         const isItemDisabled = isDisabled || item.isDisabled;
         const selected = isItemSelected(item);
         const isItemFocused = (!isDisabled || selected) && focusedIndex === index;
-        // isItemFocused tracks keyboard focus (whether the item responds to Enter/arrows).
-        // The visual highlight is intentionally suppressed on initial focus until the user
-        // starts navigating via keyboard.
         const isItemVisuallyFocused = isItemFocused && (shouldHighlightInitiallyFocusedItem || hasKeyBeenPressed.current);
         const isItemHighlighted = !!itemsToHighlight?.has(item.keyForList);
 
@@ -352,7 +359,8 @@ function BaseSelectionList<TItem extends ListItem>({
                 }}
                 setFocusedIndex={setFocusedIndex}
                 index={index}
-                isFocused={isItemVisuallyFocused}
+                isFocused={isItemFocused}
+                isFocusVisible={isItemVisuallyFocused}
                 isDisabled={isItemDisabled}
                 canSelectMultiple={canSelectMultiple}
                 onDismissError={onDismissError}
