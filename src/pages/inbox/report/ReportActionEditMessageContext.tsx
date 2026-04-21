@@ -1,4 +1,3 @@
-import {useIsFocused} from '@react-navigation/native';
 import React, {createContext, useCallback, useContext, useState} from 'react';
 import type {Dispatch, SetStateAction} from 'react';
 import type {OnyxCollection} from 'react-native-onyx';
@@ -56,8 +55,6 @@ type ReportActionEditMessageContextProviderProps = {
 };
 
 function ReportActionEditMessageContextProvider({reportID, children}: ReportActionEditMessageContextProviderProps) {
-    const isFocused = useIsFocused();
-
     const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportID}`);
     const [reportActions] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${reportID}`, {
         canEvict: false,
@@ -119,70 +116,68 @@ function ReportActionEditMessageContextProvider({reportID, children}: ReportActi
     let editingReportActionID: string | null = null;
     let editingReportAction: OnyxTypes.ReportAction | null = null;
 
-    if (isFocused) {
-        const ancestorWithDraft = [...ancestors]
-            .slice()
-            .reverse()
-            .find(({report: ancestorReport, reportAction}) => {
-                const reportActionsForAncestor = ancestorsReportActions?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${ancestorReport.reportID}`];
-                const origID = getOriginalReportID(ancestorReport.reportID, reportAction, reportActionsForAncestor);
-                if (!origID) {
-                    return false;
-                }
-                const ancestorDrafts = reportActionDrafts?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS_DRAFTS}${origID}`];
-                const ancestorDraft = ancestorDrafts?.[reportAction.reportActionID];
-
-                return ancestorDraft?.message !== undefined;
-            });
-
-        const updateMessage = (nextMessage: string | null) => {
-            if (nextMessage == null) {
-                return;
-            }
-
-            const didReportActionChange = prevEditingReportActionID !== editingReportActionID;
-            if (didReportActionChange) {
-                setEditingMessage(nextMessage);
-                setPrevEditingReportActionID(editingReportActionID);
-                const defaultSelection: TextSelection = {start: nextMessage.length, end: nextMessage.length};
-                setCurrentEditMessageSelectionState(defaultSelection);
-            }
-        };
-
-        if (ancestorWithDraft) {
-            const {report: ancestorReport, reportAction: ancestorReportAction} = ancestorWithDraft;
+    const ancestorWithDraft = [...ancestors]
+        .slice()
+        .reverse()
+        .find(({report: ancestorReport, reportAction}) => {
             const reportActionsForAncestor = ancestorsReportActions?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${ancestorReport.reportID}`];
-            const ancestorOrigReportID = getOriginalReportID(ancestorReport.reportID, ancestorReportAction, reportActionsForAncestor);
-            const ancestorDrafts = ancestorOrigReportID ? reportActionDrafts?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS_DRAFTS}${ancestorOrigReportID}`] : undefined;
-            const ancestorReportActionDraft = ancestorDrafts?.[ancestorReportAction.reportActionID];
+            const origID = getOriginalReportID(ancestorReport.reportID, reportAction, reportActionsForAncestor);
+            if (!origID) {
+                return false;
+            }
+            const ancestorDrafts = reportActionDrafts?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS_DRAFTS}${origID}`];
+            const ancestorDraft = ancestorDrafts?.[reportAction.reportActionID];
 
-            editingReportID = ancestorReport.reportID;
-            editingReportActionID = ancestorReportAction.reportActionID;
-            editingReportAction = ancestorReportAction;
+            return ancestorDraft?.message !== undefined;
+        });
+
+    const updateMessage = (nextMessage: string | null) => {
+        if (nextMessage == null) {
+            return;
+        }
+
+        const didReportActionChange = prevEditingReportActionID !== editingReportActionID;
+        if (didReportActionChange) {
+            setEditingMessage(nextMessage);
+            setPrevEditingReportActionID(editingReportActionID);
+            const defaultSelection: TextSelection = {start: nextMessage.length, end: nextMessage.length};
+            setCurrentEditMessageSelectionState(defaultSelection);
+        }
+    };
+
+    if (ancestorWithDraft) {
+        const {report: ancestorReport, reportAction: ancestorReportAction} = ancestorWithDraft;
+        const reportActionsForAncestor = ancestorsReportActions?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${ancestorReport.reportID}`];
+        const ancestorOrigReportID = getOriginalReportID(ancestorReport.reportID, ancestorReportAction, reportActionsForAncestor);
+        const ancestorDrafts = ancestorOrigReportID ? reportActionDrafts?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS_DRAFTS}${ancestorOrigReportID}`] : undefined;
+        const ancestorReportActionDraft = ancestorDrafts?.[ancestorReportAction.reportActionID];
+
+        editingReportID = ancestorReport.reportID;
+        editingReportActionID = ancestorReportAction.reportActionID;
+        editingReportAction = ancestorReportAction;
+
+        if (editingState === 'off') {
+            setEditingState('editing');
+        }
+
+        const nextMessage = ancestorReportActionDraft?.message ?? null;
+        updateMessage(nextMessage);
+    } else if (reportDrafts) {
+        const reportDraftEntry = Object.entries(reportDrafts).find(([, draft]) => draft?.message !== undefined);
+
+        if (reportDraftEntry) {
+            const [reportActionIDOfDraft, reportActionDraft] = reportDraftEntry;
+
+            editingReportID = reportID ?? null;
+            editingReportActionID = reportActionIDOfDraft;
+            editingReportAction = reportActions?.[reportActionIDOfDraft] ?? null;
 
             if (editingState === 'off') {
                 setEditingState('editing');
             }
 
-            const nextMessage = ancestorReportActionDraft?.message ?? null;
+            const nextMessage = reportActionDraft?.message ?? null;
             updateMessage(nextMessage);
-        } else if (reportDrafts) {
-            const reportDraftEntry = Object.entries(reportDrafts).find(([, draft]) => draft?.message !== undefined);
-
-            if (reportDraftEntry) {
-                const [reportActionIDOfDraft, reportActionDraft] = reportDraftEntry;
-
-                editingReportID = reportID ?? null;
-                editingReportActionID = reportActionIDOfDraft;
-                editingReportAction = reportActions?.[reportActionIDOfDraft] ?? null;
-
-                if (editingState === 'off') {
-                    setEditingState('editing');
-                }
-
-                const nextMessage = reportActionDraft?.message ?? null;
-                updateMessage(nextMessage);
-            }
         }
     }
 
