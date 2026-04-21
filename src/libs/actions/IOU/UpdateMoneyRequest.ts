@@ -104,7 +104,7 @@ function updateMoneyRequestDate({
             transactionChanges,
             policy,
             policyTagList: policyTags,
-            // TODO: Replace getPolicyTagsData (https://github.com/Expensify/App/issues/72721) and getPolicyRecentlyUsedTagsData (https://github.com/Expensify/App/issues/71491) with useOnyx hook
+            // TODO: Replace getPolicyTagsData (https://github.com/Expensify/App/issues/72721) with useOnyx hook
             // eslint-disable-next-line @typescript-eslint/no-deprecated
             reportPolicyTags: getPolicyTagsData(parentReport?.policyID),
             policyCategories,
@@ -158,7 +158,7 @@ function updateMoneyRequestBillable({
         transactionChanges,
         policy,
         policyTagList,
-        // TODO: Replace getPolicyTagsData (https://github.com/Expensify/App/issues/72721) and getPolicyRecentlyUsedTagsData (https://github.com/Expensify/App/issues/71491) with useOnyx hook
+        // TODO: Replace getPolicyTagsData (https://github.com/Expensify/App/issues/72721) with useOnyx hook
         // eslint-disable-next-line @typescript-eslint/no-deprecated
         reportPolicyTags: getPolicyTagsData(parentReport?.policyID),
         policyCategories,
@@ -208,7 +208,7 @@ function updateMoneyRequestReimbursable({
         transactionChanges,
         policy,
         policyTagList,
-        // TODO: Replace getPolicyTagsData (https://github.com/Expensify/App/issues/72721) and getPolicyRecentlyUsedTagsData (https://github.com/Expensify/App/issues/71491) with useOnyx hook
+        // TODO: Replace getPolicyTagsData (https://github.com/Expensify/App/issues/72721) with useOnyx hook
         // eslint-disable-next-line @typescript-eslint/no-deprecated
         reportPolicyTags: getPolicyTagsData(parentReport?.policyID),
         policyCategories,
@@ -261,7 +261,7 @@ function updateMoneyRequestMerchant({
             transactionChanges,
             policy,
             policyTagList,
-            // TODO: Replace getPolicyTagsData (https://github.com/Expensify/App/issues/72721) and getPolicyRecentlyUsedTagsData (https://github.com/Expensify/App/issues/71491) with useOnyx hook
+            // TODO: Replace getPolicyTagsData (https://github.com/Expensify/App/issues/72721) with useOnyx hook
             // eslint-disable-next-line @typescript-eslint/no-deprecated
             reportPolicyTags: getPolicyTagsData(parentReport?.policyID),
             policyCategories,
@@ -313,7 +313,7 @@ function updateMoneyRequestAttendees({
         transactionChanges,
         policy,
         policyTagList,
-        // TODO: Replace getPolicyTagsData (https://github.com/Expensify/App/issues/72721) and getPolicyRecentlyUsedTagsData (https://github.com/Expensify/App/issues/71491) with useOnyx hook
+        // TODO: Replace getPolicyTagsData (https://github.com/Expensify/App/issues/72721) with useOnyx hook
         // eslint-disable-next-line @typescript-eslint/no-deprecated
         reportPolicyTags: getPolicyTagsData(parentReport?.policyID),
         policyCategories,
@@ -369,7 +369,7 @@ function updateMoneyRequestTag({
         transactionChanges,
         policy,
         policyTagList,
-        // TODO: Replace getPolicyTagsData (https://github.com/Expensify/App/issues/72721) and getPolicyRecentlyUsedTagsData (https://github.com/Expensify/App/issues/71491) with useOnyx hook
+        // TODO: Replace getPolicyTagsData (https://github.com/Expensify/App/issues/72721) with useOnyx hook
         // eslint-disable-next-line @typescript-eslint/no-deprecated
         reportPolicyTags: getPolicyTagsData(parentReport?.policyID),
         policyRecentlyUsedTags,
@@ -419,7 +419,7 @@ function updateMoneyRequestTaxAmount({
         transactionChanges,
         policy,
         policyTagList,
-        // TODO: Replace getPolicyTagsData (https://github.com/Expensify/App/issues/72721) and getPolicyRecentlyUsedTagsData (https://github.com/Expensify/App/issues/71491) with useOnyx hook
+        // TODO: Replace getPolicyTagsData (https://github.com/Expensify/App/issues/72721) with useOnyx hook
         // eslint-disable-next-line @typescript-eslint/no-deprecated
         reportPolicyTags: getPolicyTagsData(parentReport?.policyID),
         policyCategories,
@@ -475,7 +475,7 @@ function updateMoneyRequestTaxRate({
         transactionChanges,
         policy,
         policyTagList,
-        // TODO: Replace getPolicyTagsData (https://github.com/Expensify/App/issues/72721) and getPolicyRecentlyUsedTagsData (https://github.com/Expensify/App/issues/71491) with useOnyx hook
+        // TODO: Replace getPolicyTagsData (https://github.com/Expensify/App/issues/72721) with useOnyx hook
         // eslint-disable-next-line @typescript-eslint/no-deprecated
         reportPolicyTags: getPolicyTagsData(parentReport?.policyID),
         policyCategories,
@@ -549,7 +549,7 @@ function updateMoneyRequestDistance({
             transactionChanges,
             policy,
             policyTagList,
-            // TODO: Replace getPolicyTagsData (https://github.com/Expensify/App/issues/72721) and getPolicyRecentlyUsedTagsData (https://github.com/Expensify/App/issues/71491) with useOnyx hook
+            // TODO: Replace getPolicyTagsData (https://github.com/Expensify/App/issues/72721) with useOnyx hook
             // eslint-disable-next-line @typescript-eslint/no-deprecated
             reportPolicyTags: getPolicyTagsData(parentReport?.policyID),
             policyCategories,
@@ -652,7 +652,7 @@ function updateMoneyRequestCategory({
         transactionChanges,
         policy,
         policyTagList,
-        // TODO: Replace getPolicyTagsData (https://github.com/Expensify/App/issues/72721) and getPolicyRecentlyUsedTagsData (https://github.com/Expensify/App/issues/71491) with useOnyx hook
+        // TODO: Replace getPolicyTagsData (https://github.com/Expensify/App/issues/72721) with useOnyx hook
         // eslint-disable-next-line @typescript-eslint/no-deprecated
         reportPolicyTags: getPolicyTagsData(parentReport?.policyID),
         policyCategories,
@@ -708,7 +708,7 @@ function updateMoneyRequestDescription({
             transactionChanges,
             policy,
             policyTagList,
-            // TODO: Replace getPolicyTagsData (https://github.com/Expensify/App/issues/72721) and getPolicyRecentlyUsedTagsData (https://github.com/Expensify/App/issues/71491) with useOnyx hook
+            // TODO: Replace getPolicyTagsData (https://github.com/Expensify/App/issues/72721) with useOnyx hook
             // eslint-disable-next-line @typescript-eslint/no-deprecated
             reportPolicyTags: getPolicyTagsData(parentReport?.policyID),
             policyCategories,
@@ -787,7 +787,7 @@ function updateMoneyRequestDistanceRate({
             transactionChanges,
             policy,
             policyTagList,
-            // TODO: Replace getPolicyTagsData (https://github.com/Expensify/App/issues/72721) and getPolicyRecentlyUsedTagsData (https://github.com/Expensify/App/issues/71491) with useOnyx hook
+            // TODO: Replace getPolicyTagsData (https://github.com/Expensify/App/issues/72721) with useOnyx hook
             // eslint-disable-next-line @typescript-eslint/no-deprecated
             reportPolicyTags: getPolicyTagsData(parentReport?.policyID),
             policyCategories,
@@ -867,7 +867,7 @@ function updateMoneyRequestAmountAndCurrency({
             transactionChanges,
             policy,
             policyTagList,
-            // TODO: Replace getPolicyTagsData (https://github.com/Expensify/App/issues/72721) and getPolicyRecentlyUsedTagsData (https://github.com/Expensify/App/issues/71491) with useOnyx hook
+            // TODO: Replace getPolicyTagsData (https://github.com/Expensify/App/issues/72721) with useOnyx hook
             // eslint-disable-next-line @typescript-eslint/no-deprecated
             reportPolicyTags: getPolicyTagsData(parentReport?.policyID),
             policyCategories: policyCategories ?? null,
