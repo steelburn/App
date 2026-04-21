@@ -28,7 +28,7 @@ function Checkbox({
     sentryLabel,
     tabIndex,
     accessible,
-}: Omit<CheckboxProps, 'role'>) {
+}: CheckboxProps) {
     return (
         <SelectionButton
             role={CONST.ROLE.CHECKBOX}

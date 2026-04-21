@@ -225,7 +225,7 @@ type ExtendedTargetedEvent = TargetedEvent & {
 
 type TRightHandSideComponent<TItem extends ListItem> = {
     /** Component to display on the right side */
-    rightHandSideComponent?: ((item: TItem, isFocused?: boolean) => ReactElement | null | undefined) | ReactElement | null;
+    rightHandSideComponent?: ((item: TItem, isFocused?: boolean) => ReactNode | null | undefined) | ReactNode | null;
 };
 
 type ListItemProps<TItem extends ListItem> = CommonListItemProps<TItem> & {

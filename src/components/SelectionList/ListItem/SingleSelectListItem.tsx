@@ -23,7 +23,7 @@ function SingleSelectListItem<TItem extends ListItem>({
     wrapperStyle,
     titleStyles,
     shouldHighlightSelectedItem,
-    rightHandSideComponent = undefined,
+    rightHandSideComponent,
     selectionButtonPosition,
 }: SingleSelectListItemProps<TItem>) {
     const styles = useThemeStyles();

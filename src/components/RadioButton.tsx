@@ -27,7 +27,7 @@ function RadioButton({
     sentryLabel = CONST.SENTRY_LABEL.RADIO_BUTTON.BUTTON,
     tabIndex,
     accessible,
-}: Omit<RadioButtonProps, 'role'>) {
+}: RadioButtonProps) {
     return (
         <SelectionButton
             role={CONST.ROLE.RADIO}

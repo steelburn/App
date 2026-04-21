@@ -69,9 +69,6 @@ type BaseSelectionButtonProps = Partial<ChildrenProps> &
     };
 
 type CheckboxProps = BaseSelectionButtonProps & {
-    /** Whether this renders as a checkbox (square) — defaults to checkbox when role is omitted */
-    role?: typeof CONST.ROLE.CHECKBOX;
-
     /** Whether the button is in the indeterminate ("mixed") state */
     isIndeterminate?: boolean;
 
@@ -80,9 +77,6 @@ type CheckboxProps = BaseSelectionButtonProps & {
 };
 
 type RadioButtonProps = BaseSelectionButtonProps & {
-    /** Whether this renders as a radio button (circular) */
-    role: typeof CONST.ROLE.RADIO;
-
     /** Not applicable for radio buttons */
     isIndeterminate?: never;
 
@@ -90,13 +84,22 @@ type RadioButtonProps = BaseSelectionButtonProps & {
     isChecked: boolean;
 };
 
-type SelectionButtonProps = CheckboxProps | RadioButtonProps;
+type SelectionButtonProps =
+    | ({
+          /** Whether this renders as a checkbox (square) */
+          role: typeof CONST.ROLE.CHECKBOX;
+      } & CheckboxProps)
+    | ({
+          /** Whether this renders as a radio button (circular) */
+          role: typeof CONST.ROLE.RADIO;
+      } & RadioButtonProps);
 
 /**
  * Selection button that renders as either a checkbox (square) or radio button (circular)
  * based on the role prop. Border radius is automatically derived from role.
  */
 function SelectionButton({
+    role,
     isChecked = false,
     isIndeterminate = false,
     hasError = false,
@@ -117,7 +120,6 @@ function SelectionButton({
     ref,
     sentryLabel,
     tabIndex,
-    role = CONST.ROLE.CHECKBOX,
     accessible,
 }: SelectionButtonProps) {
     const theme = useTheme();

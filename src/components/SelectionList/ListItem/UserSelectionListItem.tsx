@@ -66,8 +66,7 @@ function UserSelectionListItem<TItem extends ListItem>({
             onSelectionButtonPress={onSelectionButtonPress}
             onDismissError={onDismissError}
             shouldPreventEnterKeySubmit={shouldPreventEnterKeySubmit}
-            // eslint-disable-next-line react/jsx-no-useless-fragment
-            rightHandSideComponent={item.rightElement ? <>{item.rightElement}</> : null}
+            rightHandSideComponent={item.rightElement}
             errors={item.errors}
             pendingAction={item.pendingAction}
             pressableStyle={pressableStyle}

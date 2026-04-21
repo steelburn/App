@@ -59,4 +59,4 @@ function ListSelectionButton<TItem extends ListItem>({
 }
 
 export default ListSelectionButton;
-export type {ListSelectionButtonProps as BaseListSelectionButtonProps, ListSelectionButtonProps};
+export type {ListSelectionButtonProps};
