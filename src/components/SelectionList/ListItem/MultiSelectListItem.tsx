@@ -34,7 +34,7 @@ function MultiSelectListItem<TItem extends ListItem>({
 
     const itemWithAvatar = {
         ...item,
-        leftElement: icon ? <AvatarLeftElement icon={icon} /> : undefined,
+        leftElement: icon ? <AvatarLeftElement icon={icon} /> : item.leftElement,
     };
     const computedWrapperStyle = [wrapperStyle, icon ? [styles.pv0, styles.mnh13] : styles.optionRowCompact];
 
