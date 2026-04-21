@@ -4277,6 +4277,10 @@ describe('updateSplitTransactions', () => {
         expect(remainingTransactionCommentAction?.reportActionID).toBeDefined();
         expect(remainingTransactionHoldAction?.reportActionID).toBeDefined();
 
+        const APIlib = require('@libs/API') as {write: (...args: unknown[]) => Promise<void>};
+        const originalWrite = APIlib.write;
+        const writeSpy = jest.spyOn(APIlib, 'write').mockImplementation((...args) => originalWrite(...args));
+
         const remainingSplitTransaction = await getOnyxValue(`${ONYXKEYS.COLLECTION.TRANSACTION}${splitTransactionID1}`);
         const {allTransactions, allReports, allReportNameValuePairs} = await getCollections();
         const policyTags = await getPolicyTags(expenseReport.reportID);
@@ -4310,6 +4314,23 @@ describe('updateSplitTransactions', () => {
             expenseReport: reports.expenseReport,
         });
         await waitForBatchedUpdates();
+
+        const reverseSplitCall = writeSpy.mock.calls.find(([command]) => command === WRITE_COMMANDS.REVERT_SPLIT_TRANSACTION);
+        expect(reverseSplitCall).toBeDefined();
+        const [, params, requestData] = reverseSplitCall ?? [];
+        expect((params as {copiedComments?: unknown}).copiedComments === undefined || typeof (params as {copiedComments?: unknown}).copiedComments === 'string').toBe(true);
+
+        const isParentMetadataUpdate = (update: {key: string; value?: Record<string, unknown>}) =>
+            update.key === `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${expenseReport.reportID}` &&
+            Object.values(update.value ?? {}).some((value) => (value as {childVisibleActionCount?: number})?.childVisibleActionCount !== undefined);
+
+        const parentActionOptimisticUpdates = ((requestData as {optimisticData?: Array<{key: string; value?: Record<string, unknown>}>})?.optimisticData ?? []).filter(
+            isParentMetadataUpdate,
+        );
+        const parentActionFailureUpdates = ((requestData as {failureData?: Array<{key: string; value?: Record<string, unknown>}>})?.failureData ?? []).filter(isParentMetadataUpdate);
+        expect(parentActionOptimisticUpdates).toHaveLength(1);
+        expect(parentActionFailureUpdates).toHaveLength(1);
+        writeSpy.mockRestore();
 
         // The reverted transaction should include the comments and hold state from the remaining transaction.
         const revertedThreadReportID = getIOUActionForReportID(expenseReport.reportID, originalTransactionID)?.childReportID;

@@ -1130,14 +1130,15 @@ function updateSplitTransactions({
         splitExpenses.length === 1 && originalChildTransactions.length > 0 && hasEditableSplitExpensesLeft && allChildTransactions.length === originalChildTransactions.length;
 
     let splitThreadComments: OnyxTypes.ReportAction[] = [];
+    let splitThreadReportAction: OnyxTypes.ReportAction | undefined;
     let splitTransactionThreadReportID: string | undefined;
 
     if (isReverseSplitOperation) {
         const revertSplitTransactionID = splitExpenses.at(0)?.transactionID;
         const revertSplitTransaction = allTransactionsList?.[`${ONYXKEYS.COLLECTION.TRANSACTION}${revertSplitTransactionID}`];
         const revertSplitReportActions = getAllReportActions(revertSplitTransaction?.reportID);
-        const revertSplitIOUAction = revertSplitTransactionID ? getIOUActionForTransactionID(Object.values(revertSplitReportActions ?? {}), revertSplitTransactionID) : undefined;
-        splitTransactionThreadReportID = revertSplitIOUAction?.childReportID;
+        splitThreadReportAction = revertSplitTransactionID ? getIOUActionForTransactionID(Object.values(revertSplitReportActions ?? {}), revertSplitTransactionID) : undefined;
+        splitTransactionThreadReportID = splitThreadReportAction?.childReportID;
         if (splitTransactionThreadReportID) {
             const splitTransactionThreadActions = getAllReportActions(splitTransactionThreadReportID);
             splitThreadComments = Object.values(splitTransactionThreadActions).filter(
@@ -1271,6 +1272,37 @@ function updateSplitTransactions({
         }
 
         return updatedIOUAction;
+    };
+    const updateParentActionsFromSourceThread = (
+        sourceThreadReportAction: OnyxEntry<OnyxTypes.ReportAction>,
+        sourceThreadCommentActions: OnyxTypes.ReportAction[],
+        isSourceTransactionOnHold: boolean,
+    ) => {
+        const childVisibleActionCount = sourceThreadReportAction?.childVisibleActionCount ?? sourceThreadCommentActions.length + (isSourceTransactionOnHold ? 1 : 0);
+
+        if (childVisibleActionCount <= 0) {
+            return undefined;
+        }
+
+        const commenterAccountIDs = new Set<number>();
+        let latestCommentCreated = sourceThreadReportAction?.childLastVisibleActionCreated ?? '';
+
+        for (const sourceThreadCommentAction of sourceThreadCommentActions) {
+            if (sourceThreadCommentAction.actorAccountID && sourceThreadCommentAction.actorAccountID > 0) {
+                commenterAccountIDs.add(sourceThreadCommentAction.actorAccountID);
+            }
+
+            if (!sourceThreadReportAction?.childLastVisibleActionCreated && sourceThreadCommentAction.created > latestCommentCreated) {
+                latestCommentCreated = sourceThreadCommentAction.created;
+            }
+        }
+
+        return {
+            childVisibleActionCount,
+            childCommenterCount: sourceThreadReportAction?.childCommenterCount ?? commenterAccountIDs.size,
+            childLastVisibleActionCreated: latestCommentCreated,
+            childOldestFourAccountIDs: sourceThreadReportAction?.childOldestFourAccountIDs ?? [...commenterAccountIDs].slice(0, 4).join(','),
+        };
     };
     const pushUpdatedReportPreviewActionToOnyxData = () => {
         if (!updatedReportPreviewAction) {
@@ -1706,11 +1738,13 @@ function updateSplitTransactions({
             const optimisticActionsData: OnyxTypes.ReportActions = {};
             const successActionsData: Record<string, Record<string, null>> = {};
             const failureActionsData: Record<string, null> = {};
+            const remainingCommentActions: OnyxTypes.ReportAction[] = [];
 
             for (const action of Object.values(allReportActions)) {
                 if (!isAddCommentAction(action) || isDeletedAction(action) || action.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE) {
                     continue;
                 }
+                remainingCommentActions.push(action);
                 optimisticActionsData[action.reportActionID] = {...action, pendingAction: CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD};
                 successActionsData[action.reportActionID] = {pendingAction: null, isOptimisticAction: null};
                 failureActionsData[action.reportActionID] = null;
@@ -1765,7 +1799,10 @@ function updateSplitTransactions({
                 value: failureActionsData,
             });
 
-            updatedIOUAction = updateParentActions(iouAction, remainTransactionThreadReportAction?.childVisibleActionCount ?? 0);
+            const sourceThreadReportAction = remainTransactionThreadReportAction ?? splitThreadReportAction;
+            const sourceThreadCommentActions = remainingCommentActions.length > 0 ? remainingCommentActions : splitThreadComments;
+            updateParentActions(iouAction, sourceThreadReportAction?.childVisibleActionCount ?? sourceThreadCommentActions.length + (isRemainingTransactionOnHold ? 1 : 0));
+            updatedIOUAction = updateParentActionsFromSourceThread(sourceThreadReportAction, sourceThreadCommentActions, isRemainingTransactionOnHold);
         }
 
         if (updatedIOUAction) {
@@ -2100,16 +2137,12 @@ function updateSplitTransactions({
         }
 
         const originalTransactionThreadReportID = splits.at(0)?.transactionThreadReportID;
-        const iouActionReportActionID = splits.at(0)?.splitReportActionID;
-        if (splitThreadComments.length > 0 && originalTransactionThreadReportID && splitTransactionThreadReportID && iouActionReportActionID && expenseReportID) {
+        if (splitThreadComments.length > 0 && originalTransactionThreadReportID && splitTransactionThreadReportID) {
             const optimisticMovedComments: Record<string, OnyxTypes.ReportAction> = {};
             const optimisticRemovedComments: Record<string, null> = {};
             const successMovedComments: OnyxCollection<NullishDeep<OnyxTypes.ReportAction>> = {};
             const failureMovedCommentsRemoval: Record<string, null> = {};
             const failureRestoredComments: Record<string, OnyxTypes.ReportAction> = {};
-
-            const commenterAccountIDs = new Set<number>();
-            let latestCommentCreated = '';
 
             for (const comment of splitThreadComments) {
                 optimisticMovedComments[comment.reportActionID] = {
@@ -2121,13 +2154,6 @@ function updateSplitTransactions({
                 successMovedComments[comment.reportActionID] = {pendingAction: null};
                 failureMovedCommentsRemoval[comment.reportActionID] = null;
                 failureRestoredComments[comment.reportActionID] = comment;
-
-                if (comment.actorAccountID && comment.actorAccountID > 0) {
-                    commenterAccountIDs.add(comment.actorAccountID);
-                }
-                if (comment.created && comment.created > latestCommentCreated) {
-                    latestCommentCreated = comment.created;
-                }
             }
 
             onyxData.optimisticData?.push(
@@ -2140,18 +2166,6 @@ function updateSplitTransactions({
                     onyxMethod: Onyx.METHOD.MERGE,
                     key: `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${splitTransactionThreadReportID}`,
                     value: optimisticRemovedComments,
-                },
-                {
-                    onyxMethod: Onyx.METHOD.MERGE,
-                    key: `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${expenseReportID}`,
-                    value: {
-                        [iouActionReportActionID]: {
-                            childVisibleActionCount: splitThreadComments.length,
-                            childCommenterCount: commenterAccountIDs.size,
-                            childLastVisibleActionCreated: latestCommentCreated,
-                            childOldestFourAccountIDs: [...commenterAccountIDs].slice(0, 4).join(','),
-                        },
-                    },
                 },
             );
 
@@ -2172,18 +2186,6 @@ function updateSplitTransactions({
                     key: `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${splitTransactionThreadReportID}`,
                     value: failureRestoredComments,
                 },
-                {
-                    onyxMethod: Onyx.METHOD.MERGE,
-                    key: `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${expenseReportID}`,
-                    value: {
-                        [iouActionReportActionID]: {
-                            childVisibleActionCount: 0,
-                            childCommenterCount: 0,
-                            childLastVisibleActionCreated: '',
-                            childOldestFourAccountIDs: '',
-                        },
-                    },
-                },
             );
         }
     }
@@ -2193,6 +2195,7 @@ function updateSplitTransactions({
             ...splits.at(0),
             comment: splits.at(0)?.comment?.comment,
             waypoints: splits.at(0)?.waypoints ? JSON.stringify(splits.at(0)?.waypoints) : undefined,
+            copiedComments: splits.at(0)?.copiedComments ? JSON.stringify(splits.at(0)?.copiedComments) : undefined,
         } as RevertSplitTransactionParams;
         API.write(WRITE_COMMANDS.REVERT_SPLIT_TRANSACTION, parameters, onyxData);
     } else {
