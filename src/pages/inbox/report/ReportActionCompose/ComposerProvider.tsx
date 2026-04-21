@@ -42,16 +42,23 @@ function ComposerProvider({children, reportID}: ComposerProviderProps) {
     const [draftComment] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_DRAFT_COMMENT}${reportID}`);
     const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportID}`);
     const [isComposerFullSize = false] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_IS_COMPOSER_FULL_SIZE}${reportID}`);
-
     const [rawReportActions] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${report?.reportID}`, {
         canEvict: false,
     });
 
     const reportActionKeys = rawReportActions ? Object.keys(rawReportActions) : [];
-
     const shouldFocusComposerOnScreenFocus = shouldFocusInputOnScreenFocus || !!draftComment;
-
     const initialFocused = shouldFocusComposerOnScreenFocus && !initialModalState?.isVisible && !initialModalState?.willAlertModalBecomeVisible;
+
+    const includesConcierge = chatIncludesConcierge({participants: report?.participants});
+    const userBlockedFromConcierge = isBlockedFromConciergeUserAction(blockedFromConcierge);
+    const isBlockedFromConcierge = includesConcierge && userBlockedFromConcierge;
+
+    const [isFullComposerAvailable, setIsFullComposerAvailable] = useState(isComposerFullSize);
+    const [isMenuVisible, setMenuVisibility] = useState(false);
+    const [text, setText] = useState(() => {
+        return draftComment ?? '';
+    });
 
     const containerRef = useRef<View>(null);
     const suggestionsRef = useRef<SuggestionsRef>(null);
@@ -61,19 +68,7 @@ function ComposerProvider({children, reportID}: ComposerProviderProps) {
 
     const composerRefShared = useSharedValue<Partial<ComposerWithSuggestionsRef>>({});
 
-    const [isFullComposerAvailable, setIsFullComposerAvailable] = useState(isComposerFullSize);
-    const [isMenuVisible, setMenuVisibility] = useState(false);
-
-    const [text, setText] = useState(() => {
-        return draftComment ?? '';
-    });
-
-    const includesConcierge = chatIncludesConcierge({participants: report?.participants});
-    const userBlockedFromConcierge = isBlockedFromConciergeUserAction(blockedFromConcierge);
-    const isBlockedFromConcierge = includesConcierge && userBlockedFromConcierge;
-
     const {editingState, editingReportID, editingReportActionID, editingReportAction, editingMessage} = useReportActionActiveEdit();
-
     const isEditingLastReportAction = editingReportActionID === reportActionKeys.at(-1);
 
     const [didResetComposerHeight, setDidResetComposerHeight] = useState(false);
@@ -86,9 +81,7 @@ function ComposerProvider({children, reportID}: ComposerProviderProps) {
     }, [didResetComposerHeight, editingState]);
 
     const isEditingInComposer = shouldUseNarrowLayout && editingState !== 'off' && !didResetComposerHeight;
-
     const effectiveDraft = isEditingInComposer ? editingMessage : draftComment;
-    const isEmpty = !isEditingInComposer && (!effectiveDraft || !!text.match(CONST.REGEX.EMPTY_COMMENT));
 
     const {debouncedCommentMaxLengthValidation, exceededMaxLength, isExceedingMaxLength, isTaskTitle} = useDebouncedCommentMaxLengthValidation({
         reportID,
@@ -106,7 +99,8 @@ function ComposerProvider({children, reportID}: ComposerProviderProps) {
         composerRef,
     });
 
-    const isSubmittingDraftCommentDisabled = isBlockedFromConcierge || isExceedingMaxLength || isEmpty;
+    const isDraftCommentEmpty = !text || !!text.match(CONST.REGEX.EMPTY_COMMENT);
+    const isSubmittingDraftCommentDisabled = isBlockedFromConcierge || isExceedingMaxLength || isDraftCommentEmpty;
     const isSendDisabled = !isEditingInComposer && isSubmittingDraftCommentDisabled;
 
     const {isFocused, onBlur, onFocus, onAddActionPressed, onItemSelected, onTriggerAttachmentPicker, isNextModalWillOpenRef} = useComposerFocus({
