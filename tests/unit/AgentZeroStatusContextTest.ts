@@ -241,7 +241,12 @@ describe('AgentZeroStatusContext', () => {
             expect(result.current.statusLabel).toBe('Thinking...');
         });
 
-        it('should cancel timeout when server label arrives before 2 minutes', async () => {
+        it('should keep indicator visible while server label is active within the safety window', async () => {
+            // Server-label arrival restarts the polling safety timer (startPolling is called
+            // in the label-sync effect). Indicator stays visible for up to MAX_POLL_DURATION_MS
+            // from the last label update; as long as the label keeps updating (or reasoning
+            // events stream in), the timer keeps resetting. This test verifies the indicator
+            // remains visible in the window following a server-label arrival.
             jest.useFakeTimers();
 
             const {result} = renderHook(() => ({...useAgentZeroStatus(), ...useAgentZeroStatusActions()}), {wrapper});
@@ -262,7 +267,7 @@ describe('AgentZeroStatusContext', () => {
             await waitForBatchedUpdates();
 
             act(() => {
-                jest.advanceTimersByTime(120000);
+                jest.advanceTimersByTime(60000);
             });
             await waitForBatchedUpdates();
 
