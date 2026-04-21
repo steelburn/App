@@ -133,9 +133,6 @@ function Composer({
                 },
             });
             setSelection(selectionValue);
-
-            onSelectionChange(event);
-            setSelection(event.nativeEvent.selection);
         },
         [isRendered, onSelectionChange, shouldCalculateCaretPosition],
     );
