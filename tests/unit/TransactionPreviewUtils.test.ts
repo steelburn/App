@@ -2,6 +2,7 @@ import Onyx from 'react-native-onyx';
 import {convertAmountToDisplayString} from '@libs/CurrencyUtils';
 import {buildOptimisticIOUReport, buildOptimisticIOUReportAction} from '@libs/ReportUtils';
 import {
+    compareByRBR,
     createTransactionPreviewConditionals,
     getReviewNavigationRoute,
     getTransactionPreviewTextAndTranslationPaths,
@@ -842,6 +843,70 @@ describe('TransactionPreviewUtils', () => {
         it('should return false for notice-type violations only', () => {
             const violations = [{name: CONST.VIOLATIONS.CUSTOM_RULES, type: CONST.VIOLATION_TYPES.NOTICE, showInReview: true}];
             expect(transactionHasRBR(basicProps.transaction, violations, rbrEmail, rbrAccountID, rbrReport, rbrPolicy)).toBe(false);
+        });
+
+        it('should return false for dismissed violation-type violations', () => {
+            const userEmail = 'user@example.com';
+            const violations = [{name: CONST.VIOLATIONS.MISSING_CATEGORY, type: CONST.VIOLATION_TYPES.VIOLATION, showInReview: true}];
+            const transactionWithDismissal = {
+                ...basicProps.transaction,
+                comment: {
+                    ...basicProps.transaction.comment,
+                    dismissedViolations: {
+                        [CONST.VIOLATIONS.MISSING_CATEGORY]: {[userEmail]: 'dismissed'},
+                    },
+                },
+            };
+            expect(transactionHasRBR(transactionWithDismissal, violations, userEmail, rbrAccountID, rbrReport, rbrPolicy)).toBe(false);
+        });
+
+        it('should return false for held transaction on a fully settled report', async () => {
+            const settledReport = {
+                ...basicProps.iouReport,
+                statusNum: CONST.REPORT.STATUS_NUM.REIMBURSED,
+            };
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT}${settledReport.reportID}`, settledReport);
+            await waitForBatchedUpdates();
+            const heldTransaction = {...basicProps.transaction, comment: {hold: 'true'}};
+            expect(transactionHasRBR(heldTransaction, [], rbrEmail, rbrAccountID, settledReport, rbrPolicy)).toBe(false);
+        });
+
+        it('should return false for held transaction on a fully approved report', () => {
+            const approvedReport = {
+                ...basicProps.iouReport,
+                stateNum: CONST.REPORT.STATE_NUM.APPROVED,
+                statusNum: CONST.REPORT.STATUS_NUM.APPROVED,
+            };
+            const heldTransaction = {...basicProps.transaction, comment: {hold: 'true'}};
+            expect(transactionHasRBR(heldTransaction, [], rbrEmail, rbrAccountID, approvedReport, rbrPolicy)).toBe(false);
+        });
+    });
+
+    describe('compareByRBR', () => {
+        const cbrEmail = basicProps.currentUserEmail;
+        const cbrAccountID = basicProps.currentUserAccountID;
+        const cbrReport = basicProps.iouReport;
+        const cbrPolicy = basicProps.policy;
+
+        const cleanTransaction = basicProps.transaction;
+        const rbrTransaction = {...basicProps.transaction, transactionID: 'rbr_txn', comment: {hold: 'true'}};
+
+        it('should return 0 when both transactions have RBR', () => {
+            const anotherRbrTransaction = {...basicProps.transaction, transactionID: 'rbr_txn_2', comment: {hold: 'true'}};
+            expect(compareByRBR(rbrTransaction, anotherRbrTransaction, undefined, cbrEmail, cbrAccountID, cbrReport, cbrPolicy)).toBe(0);
+        });
+
+        it('should return 0 when neither transaction has RBR', () => {
+            const anotherCleanTransaction = {...basicProps.transaction, transactionID: 'clean_txn_2'};
+            expect(compareByRBR(cleanTransaction, anotherCleanTransaction, undefined, cbrEmail, cbrAccountID, cbrReport, cbrPolicy)).toBe(0);
+        });
+
+        it('should return -1 when only the first transaction has RBR', () => {
+            expect(compareByRBR(rbrTransaction, cleanTransaction, undefined, cbrEmail, cbrAccountID, cbrReport, cbrPolicy)).toBe(-1);
+        });
+
+        it('should return 1 when only the second transaction has RBR', () => {
+            expect(compareByRBR(cleanTransaction, rbrTransaction, undefined, cbrEmail, cbrAccountID, cbrReport, cbrPolicy)).toBe(1);
         });
     });
 });
