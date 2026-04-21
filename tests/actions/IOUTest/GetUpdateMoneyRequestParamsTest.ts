@@ -1,5 +1,5 @@
 import Onyx from 'react-native-onyx';
-import {getUpdateMoneyRequestParams} from '@libs/actions/IOU';
+import {getUpdateMoneyRequestParams} from '@libs/actions/IOU/UpdateMoneyRequest';
 import initOnyxDerivedValues from '@libs/actions/OnyxDerived';
 import CONST from '@src/CONST';
 import IntlStore from '@src/languages/IntlStore';
@@ -107,6 +107,7 @@ describe('getUpdateMoneyRequestParams — policyTagList', () => {
             transactionChanges: {merchant: 'Some Merchant'},
             policy: undefined,
             policyTagList,
+            reportPolicyTags: policyTagList,
             policyCategories: undefined,
             currentUserAccountIDParam: RORY_ACCOUNT_ID,
             currentUserEmailParam: RORY_EMAIL,
@@ -141,6 +142,7 @@ describe('getUpdateMoneyRequestParams — policyTagList', () => {
             transactionChanges: {tag: tag1},
             policy: undefined,
             policyTagList,
+            reportPolicyTags: policyTagList,
             policyCategories: undefined,
             currentUserAccountIDParam: RORY_ACCOUNT_ID,
             currentUserEmailParam: RORY_EMAIL,
@@ -177,6 +179,7 @@ describe('getUpdateMoneyRequestParams — policyTagList', () => {
             transactionChanges: {tag: tag2},
             policy: undefined,
             policyTagList,
+            reportPolicyTags: policyTagList,
             policyRecentlyUsedTags: {[tagListName]: [tag1]},
             policyCategories: undefined,
             currentUserAccountIDParam: RORY_ACCOUNT_ID,
@@ -215,6 +218,7 @@ describe('getUpdateMoneyRequestParams — policyTagList', () => {
             transactionChanges: {tag: tag1},
             policy: undefined,
             policyTagList,
+            reportPolicyTags: policyTagList,
             policyRecentlyUsedTags: {[tagListName]: [tag1, tag2]},
             policyCategories: undefined,
             currentUserAccountIDParam: RORY_ACCOUNT_ID,
@@ -243,6 +247,7 @@ describe('getUpdateMoneyRequestParams — policyTagList', () => {
             transactionChanges: {tag: tag1},
             policy: undefined,
             policyTagList: undefined,
+            reportPolicyTags: undefined,
             policyCategories: undefined,
             currentUserAccountIDParam: RORY_ACCOUNT_ID,
             currentUserEmailParam: RORY_EMAIL,
@@ -258,6 +263,7 @@ describe('getUpdateMoneyRequestParams — policyTagList', () => {
             transactionChanges: {tag: tag1},
             policy: undefined,
             policyTagList: {},
+            reportPolicyTags: {},
             policyCategories: undefined,
             currentUserAccountIDParam: RORY_ACCOUNT_ID,
             currentUserEmailParam: RORY_EMAIL,
