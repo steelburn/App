@@ -23,6 +23,7 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import type {PersonalDetailsList, ReportActionReactions, Transaction} from '@src/types/onyx';
 import type {PureReportActionItemProps} from './PureReportActionItem';
 import PureReportActionItem from './PureReportActionItem';
+import {useReportActionActiveEdit} from './ReportActionEditMessageContext';
 
 type ReportActionItemProps = Omit<PureReportActionItemProps, 'taskReport' | 'linkedReport' | 'iouReportOfLinkedReport' | 'currentUserAccountID' | 'personalPolicyID' | 'betas'> & {
     /** Emoji reactions for the report action */
@@ -94,6 +95,9 @@ function ReportActionItem({
     const targetReport = isChatThread(report) ? parentReport : report;
     const missingPaymentMethod = getIndicatedMissingPaymentMethod(userWalletTierName, targetReport?.reportID, action, bankAccountList);
 
+    const {editingMessage, editingReportAction} = useReportActionActiveEdit();
+    const draftMessage = editingReportAction && action && editingReportAction.reportActionID === action.reportActionID ? (editingMessage ?? undefined) : undefined;
+
     return (
         <PureReportActionItem
             // eslint-disable-next-line react/jsx-props-no-spreading
@@ -105,6 +109,7 @@ function ReportActionItem({
             report={report}
             policy={policy}
             currentUserAccountID={currentUserAccountID}
+            draftMessage={draftMessage}
             iouReport={iouReport}
             taskReport={taskReport}
             cardList={cardList}

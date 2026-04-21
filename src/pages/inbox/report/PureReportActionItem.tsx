@@ -158,7 +158,6 @@ import MiniReportActionContextMenu from './ContextMenu/MiniReportActionContextMe
 import type {ContextMenuAnchor} from './ContextMenu/ReportActionContextMenu';
 import {hideContextMenu, hideDeleteModal, isActiveReportAction, showContextMenu} from './ContextMenu/ReportActionContextMenu';
 import LinkPreviewer from './LinkPreviewer';
-import {useReportActionActiveEdit} from './ReportActionEditMessageContext';
 import ReportActionItemBasicMessage from './ReportActionItemBasicMessage';
 import ReportActionItemContentCreated from './ReportActionItemContentCreated';
 import ReportActionItemDraft from './ReportActionItemDraft';
@@ -227,6 +226,9 @@ type PureReportActionItemProps = {
 
     /** Whether context menu should be displayed */
     shouldDisplayContextMenu?: boolean;
+
+    /** ReportAction draft message */
+    draftMessage?: string;
 
     /** The IOU/Expense report we are paying */
     iouReport?: OnyxTypes.Report;
@@ -375,6 +377,7 @@ function PureReportActionItem({
     shouldUseThreadDividerLine = false,
     shouldDisplayContextMenu = true,
     parentReportActionForTransactionThread,
+    draftMessage,
     iouReport,
     taskReport,
     linkedReport,
@@ -433,14 +436,10 @@ function PureReportActionItem({
     const composerTextInputRef = useRef<ComposerRef | null>(null);
     const popoverAnchorRef = useRef<Exclude<ContextMenuAnchor, TextInput>>(null);
     const downloadedPreviews = useRef<string[]>([]);
+    const prevDraftMessage = usePrevious(draftMessage);
     const isReportActionLinked = linkedReportActionID && action.reportActionID && linkedReportActionID === action.reportActionID;
     const [isReportActionActive, setIsReportActionActive] = useState(!!isReportActionLinked);
     const isReportArchived = useReportIsArchived(reportID);
-
-    const {editingMessage, editingReportAction} = useReportActionActiveEdit();
-    const draftMessage = editingReportAction && action && editingReportAction.reportActionID === action.reportActionID ? (editingMessage ?? undefined) : undefined;
-
-    const prevDraftMessage = usePrevious(draftMessage);
     const isEditingInline = !shouldUseNarrowLayout && draftMessage !== undefined;
 
     const isHarvestCreatedExpenseReport = isHarvestCreatedExpenseReportUtils(reportNameValuePairsOrigin, reportNameValuePairsOriginalID);
@@ -680,15 +679,15 @@ function PureReportActionItem({
         },
         [
             action.reportActionID,
-            disabledActions,
-            handleShowContextMenu,
-            isArchivedRoom,
-            isChronosReport,
-            isContextMenuDisabled,
-            isThreadReportParentAction,
-            originalReportID,
             reportID,
             toggleContextMenuFromActiveReportAction,
+            originalReportID,
+            disabledActions,
+            isArchivedRoom,
+            isChronosReport,
+            handleShowContextMenu,
+            isContextMenuDisabled,
+            isThreadReportParentAction,
         ],
     );
 
@@ -1291,6 +1290,7 @@ function PureReportActionItem({
     if (isWhisperActionTargetedToOthers(action)) {
         return null;
     }
+
     const whisperedTo = getWhisperedTo(action);
     const isMultipleParticipant = whisperedTo.length > 1;
 
@@ -1483,6 +1483,7 @@ export default memo(PureReportActionItem, (prevProps, nextProps) => {
         deepEqual(prevProps.report?.fieldList, nextProps.report?.fieldList) &&
         deepEqual(prevProps.transactionThreadReport, nextProps.transactionThreadReport) &&
         deepEqual(prevParentReportAction, nextParentReportAction) &&
+        prevProps.draftMessage === nextProps.draftMessage &&
         prevProps.iouReport?.reportID === nextProps.iouReport?.reportID &&
         deepEqual(prevProps.emojiReactions, nextProps.emojiReactions) &&
         deepEqual(prevProps.linkedTransactionRouteError, nextProps.linkedTransactionRouteError) &&
