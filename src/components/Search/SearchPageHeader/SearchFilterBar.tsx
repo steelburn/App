@@ -103,7 +103,7 @@ const FILTER_COMPONENT_MAP: Partial<Record<SearchAdvancedFiltersKey, React.Compo
 };
 
 function SearchFilterBar({item}: {item: SearchFilter & FilterItem}) {
-    const Component = FILTER_COMPONENT_MAP[item.key] ?? DropdownButton;
+    const Component = item.key in FILTER_COMPONENT_MAP ? (FILTER_COMPONENT_MAP[item.key as keyof typeof FILTER_COMPONENT_MAP] ?? DropdownButton) : DropdownButton;
     return (
         <Component
             key={item.key}

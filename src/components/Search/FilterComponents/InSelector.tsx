@@ -9,25 +9,21 @@ import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import usePrivateIsArchivedMap from '@hooks/usePrivateIsArchivedMap';
 import useReportAttributes from '@hooks/useReportAttributes';
-import useResponsiveLayout from '@hooks/useResponsiveLayout';
-import useThemeStyles from '@hooks/useThemeStyles';
-import useWindowDimensions from '@hooks/useWindowDimensions';
 import {searchInServer} from '@libs/actions/Report';
 import {canUseTouchScreen} from '@libs/DeviceCapabilities';
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import {createOptionFromReport, filterAndOrderOptions, formatSectionsFromSearchTerm, getAlternateText, getSearchOptions} from '@libs/OptionsListUtils';
 import type {Option, OptionWithKey, SelectionListSections} from '@libs/OptionsListUtils/types';
 import type {OptionData} from '@libs/ReportUtils';
-import variables from '@styles/variables';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import passthroughPolicyTagListSelector from '@src/selectors/PolicyTagList';
 import type {SearchAdvancedFiltersForm} from '@src/types/form';
-import BasePopup from './BasePopup';
+import useFilterCountChange from '../hooks/useFilterCountChange';
+import {FilterComponentProps} from './types';
 
-type InSelectPopupProps = {
-    closeOverlay: () => void;
-    updateFilterForm: (values: Partial<SearchAdvancedFiltersForm>) => void;
+type InSelectorProps = FilterComponentProps & {
+    onChange: (ins: string[]) => void;
 };
 
 const defaultListOptions = {
@@ -46,11 +42,8 @@ function inSelector(searchAdvancedFiltersForm: SearchAdvancedFiltersForm | undef
     return searchAdvancedFiltersForm?.in;
 }
 
-function InSelectPopup({closeOverlay, updateFilterForm}: InSelectPopupProps) {
+function InSelector({onChange, onCountChange}: InSelectorProps) {
     const {translate} = useLocalize();
-    const styles = useThemeStyles();
-    const {shouldUseNarrowLayout, isInLandscapeMode} = useResponsiveLayout();
-    const {windowHeight} = useWindowDimensions();
     const personalDetails = usePersonalDetails();
     const {options, areOptionsInitialized} = useOptionsList();
 
@@ -143,30 +136,24 @@ function InSelectPopup({closeOverlay, updateFilterForm}: InSelectPopupProps) {
         searchInServer(debouncedSearchTerm.trim());
     }, [debouncedSearchTerm]);
 
+    useFilterCountChange(sections.flatMap((section) => section.data).length, onCountChange);
+
     const handleParticipantSelection = (selectedOption: OptionWithKey) => {
         const optionReportID = selectedOption.reportID;
         if (!optionReportID) {
             return;
         }
-        setSelectedReportIDs((prev) => {
-            const foundOptionIndex = prev.findIndex((reportID: string) => {
-                return reportID && reportID !== '' && selectedOption.reportID === reportID;
-            });
-            if (foundOptionIndex < 0) {
-                return [...prev, optionReportID];
-            }
-            return [...prev.slice(0, foundOptionIndex), ...prev.slice(foundOptionIndex + 1)];
+        const foundOptionIndex = selectedReportIDs.findIndex((reportID) => {
+            return reportID && reportID !== '' && selectedOption.reportID === reportID;
         });
-    };
-
-    const applyChanges = () => {
-        updateFilterForm({in: selectedReportIDs});
-        closeOverlay();
-    };
-
-    const resetChanges = () => {
-        updateFilterForm({in: []});
-        closeOverlay();
+        let newSelectedReportIDs;
+        if (foundOptionIndex < 0) {
+            newSelectedReportIDs = [...selectedReportIDs, optionReportID];
+        } else {
+            newSelectedReportIDs = [...selectedReportIDs.slice(0, foundOptionIndex), ...selectedReportIDs.slice(foundOptionIndex + 1)];
+        }
+        setSelectedReportIDs(newSelectedReportIDs);
+        onChange(newSelectedReportIDs);
     };
 
     const isLoadingNewOptions = !!isSearchingForReports;
@@ -179,29 +166,19 @@ function InSelectPopup({closeOverlay, updateFilterForm}: InSelectPopupProps) {
         headerMessage,
     };
 
-    const itemCount = sections.flatMap((section) => section.data).length || 1;
     return (
-        <BasePopup
-            label={translate('common.in')}
-            onReset={resetChanges}
-            onApply={applyChanges}
-            resetSentryLabel={CONST.SENTRY_LABEL.SEARCH.FILTER_POPUP_RESET_REPORT}
-            applySentryLabel={CONST.SENTRY_LABEL.SEARCH.FILTER_POPUP_APPLY_REPORT}
-            style={[styles.getCommonSelectionListPopoverHeight(itemCount, variables.optionRowHeight, windowHeight, shouldUseNarrowLayout, isInLandscapeMode, true)]}
-        >
-            <SelectionListWithSections
-                sections={sections}
-                onSelectRow={handleParticipantSelection}
-                ListItem={InviteMemberListItem}
-                canSelectMultiple
-                shouldPreventDefaultFocusOnSelectRow={!canUseTouchScreen()}
-                textInputOptions={textInputOptions}
-                isLoadingNewOptions={isLoadingNewOptions}
-                shouldShowLoadingPlaceholder={shouldShowLoadingPlaceholder}
-                shouldShowTextInput
-            />
-        </BasePopup>
+        <SelectionListWithSections
+            sections={sections}
+            onSelectRow={handleParticipantSelection}
+            ListItem={InviteMemberListItem}
+            canSelectMultiple
+            shouldPreventDefaultFocusOnSelectRow={!canUseTouchScreen()}
+            textInputOptions={textInputOptions}
+            isLoadingNewOptions={isLoadingNewOptions}
+            shouldShowLoadingPlaceholder={shouldShowLoadingPlaceholder}
+            shouldShowTextInput
+        />
     );
 }
 
-export default InSelectPopup;
+export default InSelector;

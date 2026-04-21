@@ -1,26 +1,25 @@
 import React from 'react';
 import type {OnyxEntry} from 'react-native-onyx';
+import type {MultiSelectItem} from '@components/Search/FilterComponents/MultiSelect';
+import MultiSelect from '@components/Search/FilterComponents/MultiSelect';
 import useAdvancedSearchFilters from '@hooks/useAdvancedSearchFilters';
-import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {SearchAdvancedFiltersForm} from '@src/types/form';
 import type {Icon} from '@src/types/onyx/OnyxCommon';
-import type {MultiSelectItem} from './MultiSelectPopup';
-import MultiSelectPopup from './MultiSelectPopup';
+import useFilterCountChange from '../hooks/useFilterCountChange';
+import type {FilterComponentProps} from './types';
 
-type WorkspaceSelectPopupProps = {
+type WorkspaceSelectorProps = FilterComponentProps & {
     policyIDQuery: string[] | undefined;
-    updateFilterForm: (values: Partial<SearchAdvancedFiltersForm>) => void;
-    closeOverlay: () => void;
+    onChange: (item: string[]) => void;
 };
 
 function filterPolicyIDSelector(searchAdvancedFiltersForm: OnyxEntry<SearchAdvancedFiltersForm>) {
     return searchAdvancedFiltersForm?.policyID;
 }
 
-function WorkspaceSelectPopup({policyIDQuery, updateFilterForm, closeOverlay}: WorkspaceSelectPopupProps) {
-    const {translate} = useLocalize();
+function WorkspaceSelector({policyIDQuery, onChange, onCountChange}: WorkspaceSelectorProps) {
     const {workspaces, shouldShowWorkspaceSearchInput} = useAdvancedSearchFilters();
     const [policyID] = useOnyx(ONYXKEYS.FORMS.SEARCH_ADVANCED_FILTERS_FORM, {selector: filterPolicyIDSelector});
     const workspaceOptions: Array<MultiSelectItem<string>> = workspaces
@@ -32,23 +31,18 @@ function WorkspaceSelectPopup({policyIDQuery, updateFilterForm, closeOverlay}: W
             icons: workspace.icons,
         }));
 
-    const policyIDs = policyID ?? policyIDQuery;
-    const selectedWorkspaceOptions = policyIDs ? workspaceOptions.filter((option) => (Array.isArray(policyIDs) ? policyIDs : [policyIDs]).includes(option.value)) : [];
+    const policyIDs = policyID ?? policyIDQuery ?? [];
 
-    const handleWorkspaceChange = (items: Array<MultiSelectItem<string>>) => {
-        updateFilterForm({policyID: items.map((item) => item.value)});
-    };
+    useFilterCountChange(workspaceOptions.length, onCountChange);
 
     return (
-        <MultiSelectPopup
-            label={translate('workspace.common.workspace')}
+        <MultiSelect
             items={workspaceOptions}
-            value={selectedWorkspaceOptions}
-            closeOverlay={closeOverlay}
-            onChange={handleWorkspaceChange}
+            value={policyIDs}
+            onChange={onChange}
             isSearchable={shouldShowWorkspaceSearchInput}
         />
     );
 }
 
-export default WorkspaceSelectPopup;
+export default WorkspaceSelector;

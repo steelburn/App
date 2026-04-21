@@ -7,8 +7,8 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import {getCurrencyOptions} from '@libs/SearchUIUtils';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {SearchAdvancedFiltersForm} from '@src/types/form';
+import type {SingleSelectItem} from '../FilterComponents/SingleSelect';
 import SingleSelectPopup from './SingleSelectPopup';
-import type {SingleSelectItem} from './SingleSelectPopup';
 
 type GroupCurrencyPopupProps = {
     closeOverlay: () => void;

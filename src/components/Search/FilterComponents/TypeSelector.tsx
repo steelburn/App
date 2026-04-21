@@ -1,0 +1,73 @@
+import React from 'react';
+import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
+import useLocalize from '@hooks/useLocalize';
+import useOnyx from '@hooks/useOnyx';
+import {getTypeOptions} from '@libs/SearchUIUtils';
+import CONST from '@src/CONST';
+import ONYXKEYS from '@src/ONYXKEYS';
+import {emailSelector} from '@src/selectors/Session';
+import type {SearchAdvancedFiltersForm} from '@src/types/form';
+import type {Policy} from '@src/types/onyx';
+import useFilterCountChange from '../hooks/useFilterCountChange';
+import SingleSelect from './SingleSelect';
+import type {FilterComponentProps} from './types';
+
+type TypeSelectorProps = FilterComponentProps & {
+    onChange: (item: string) => void;
+};
+
+/**
+ * Extracts only the fields needed by getTypeOptions (canSendInvoice check).
+ * Strips heavyweight fields like customUnits, connections, taxRates, fieldList, rules, exportLayouts.
+ */
+function typeOptionsPoliciesSelector(policies: OnyxCollection<Policy>): OnyxCollection<Policy> {
+    if (!policies) {
+        return policies;
+    }
+    const result: OnyxCollection<Policy> = {};
+    for (const [key, policy] of Object.entries(policies)) {
+        if (!policy) {
+            continue;
+        }
+        result[key] = {
+            id: policy.id,
+            name: policy.name,
+            type: policy.type,
+            role: policy.role,
+            employeeList: policy.employeeList,
+            pendingAction: policy.pendingAction,
+            errors: policy.errors,
+            areInvoicesEnabled: policy.areInvoicesEnabled,
+            isJoinRequestPending: policy.isJoinRequestPending,
+            owner: policy.owner,
+        } as Policy;
+    }
+    return result;
+}
+
+function typeSelector(searchAdvancedFiltersForm: OnyxEntry<SearchAdvancedFiltersForm>) {
+    return searchAdvancedFiltersForm?.type;
+}
+
+function TypeSelector({onChange, onCountChange}: TypeSelectorProps) {
+    const {translate} = useLocalize();
+    const [allPolicies] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {selector: typeOptionsPoliciesSelector});
+    const [sessionEmail] = useOnyx(ONYXKEYS.SESSION, {selector: emailSelector});
+    const [type = CONST.SEARCH.DATA_TYPES.EXPENSE] = useOnyx(ONYXKEYS.FORMS.SEARCH_ADVANCED_FILTERS_FORM, {selector: typeSelector});
+
+    const types = getTypeOptions(translate, allPolicies, sessionEmail);
+
+    useFilterCountChange(types.length, onCountChange);
+
+    return (
+        <SingleSelect
+            // text is only needed when the list is searchable
+            value={{value: type, text: ''}}
+            items={types}
+            onChange={onChange}
+        />
+    );
+}
+
+export {typeOptionsPoliciesSelector};
+export default TypeSelector;

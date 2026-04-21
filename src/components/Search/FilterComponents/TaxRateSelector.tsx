@@ -1,19 +1,18 @@
 import React from 'react';
-import MultiSelectFilterPopup from '@components/Search/SearchPageHeader/MultiSelectFilterPopup';
+import MultiSelect from '@components/Search/FilterComponents/MultiSelect';
 import useOnyx from '@hooks/useOnyx';
 import {getAllTaxRates} from '@libs/PolicyUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
-import type {SearchAdvancedFiltersForm} from '@src/types/form';
 import type {Policy} from '@src/types/onyx';
-import type {MultiSelectItem} from './MultiSelectPopup';
+import useFilterCountChange from '../hooks/useFilterCountChange';
+import type {FilterComponentProps} from './types';
 
-type TaxRateSelectPopupProps = {
-    closeOverlay: () => void;
-    updateFilterForm: (values: Partial<SearchAdvancedFiltersForm>) => void;
+type TaxRateSelectorProps = FilterComponentProps & {
+    onChange: (taxRates: string[]) => void;
 };
 
-function TaxRateSelectPopup({closeOverlay, updateFilterForm}: TaxRateSelectPopupProps) {
+function TaxRateSelector({onChange, onCountChange}: TaxRateSelectorProps) {
     const [searchAdvancedFiltersForm] = useOnyx(ONYXKEYS.FORMS.SEARCH_ADVANCED_FILTERS_FORM);
     const [policies] = useOnyx(ONYXKEYS.COLLECTION.POLICY);
 
@@ -33,22 +32,17 @@ function TaxRateSelectPopup({closeOverlay, updateFilterForm}: TaxRateSelectPopup
         text: taxRateName,
         value: taxRateKeys.toString(),
     }));
-    const selectedTaxRates = taxItems.filter((tax) => taxRates?.includes(tax.value.toString()));
 
-    const updateTaxRateFilterForm = (items: Array<MultiSelectItem<string>>) => {
-        updateFilterForm({taxRate: items.map((item) => item.value)});
-    };
+    useFilterCountChange(taxItems.length, onCountChange);
 
     return (
-        <MultiSelectFilterPopup
-            closeOverlay={closeOverlay}
-            translationKey="iou.taxRate"
+        <MultiSelect
+            value={taxRates ?? []}
             items={taxItems}
-            value={selectedTaxRates}
             isSearchable={taxItems.length >= CONST.STANDARD_LIST_ITEM_LIMIT}
-            onChangeCallback={updateTaxRateFilterForm}
+            onChange={onChange}
         />
     );
 }
 
-export default TaxRateSelectPopup;
+export default TaxRateSelector;

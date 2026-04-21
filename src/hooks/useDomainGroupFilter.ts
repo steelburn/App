@@ -1,7 +1,7 @@
 import {groupsSelector} from '@selectors/Domain';
 import type {DomainSecurityGroupWithID} from '@selectors/Domain';
 import {useEffect, useState} from 'react';
-import type {SingleSelectItem} from '@components/Search/FilterDropdowns/SingleSelectPopup';
+import type {SingleSelectItem} from '@components/Search/FilterComponents/SingleSelect';
 import type {MemberOption} from '@pages/domain/BaseDomainMembersPage';
 import ONYXKEYS from '@src/ONYXKEYS';
 import useLocalize from './useLocalize';

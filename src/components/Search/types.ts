@@ -150,6 +150,7 @@ type TableColumnSize = ValueOf<typeof CONST.SEARCH.TABLE_COLUMN_SIZES>;
 type SearchDatePreset = ValueOf<typeof CONST.SEARCH.DATE_PRESETS>;
 type SearchWithdrawalType = ValueOf<typeof CONST.SEARCH.WITHDRAWAL_TYPE>;
 type SearchAction = ValueOf<typeof CONST.SEARCH.ACTION_FILTERS>;
+type SyntaxFilterKey = ValueOf<typeof CONST.SEARCH.SYNTAX_FILTER_KEYS>;
 
 type SearchCustomColumnIds =
     | ValueOf<typeof CONST.SEARCH.TYPE_CUSTOM_COLUMNS.EXPENSE>
@@ -213,7 +214,7 @@ type SearchActionsContextValue = {
 
 type ASTNode = {
     operator: ValueOf<typeof CONST.SEARCH.SYNTAX_OPERATORS>;
-    left: ValueOf<typeof CONST.SEARCH.SYNTAX_FILTER_KEYS> | ASTNode;
+    left: SyntaxFilterKey | ASTNode;
     right: string | ASTNode | string[];
 };
 
@@ -260,7 +261,7 @@ type SearchCurrencyFilterKeys =
     | typeof CONST.SEARCH.SYNTAX_FILTER_KEYS.GROUP_CURRENCY;
 
 type SearchFilterKey =
-    | ValueOf<typeof CONST.SEARCH.SYNTAX_FILTER_KEYS>
+    | SyntaxFilterKey
     | typeof CONST.SEARCH.SYNTAX_ROOT_KEYS.TYPE
     | typeof CONST.SEARCH.SYNTAX_ROOT_KEYS.STATUS
     | typeof CONST.SEARCH.SYNTAX_ROOT_KEYS.GROUP_BY
@@ -277,7 +278,7 @@ type QueryFilters = Array<{
     filters: QueryFilter[];
 }>;
 
-type RawFilterKey = ValueOf<typeof CONST.SEARCH.SYNTAX_FILTER_KEYS> | ValueOf<typeof CONST.SEARCH.SYNTAX_ROOT_KEYS>;
+type RawFilterKey = SyntaxFilterKey | ValueOf<typeof CONST.SEARCH.SYNTAX_ROOT_KEYS>;
 
 type RawQueryFilter = {
     key: RawFilterKey;
@@ -399,6 +400,7 @@ export type {
     ASTNode,
     QueryFilter,
     QueryFilters,
+    SyntaxFilterKey,
     RawFilterKey,
     RawQueryFilter,
     SearchFilterKey,

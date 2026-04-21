@@ -2,7 +2,7 @@ import React from 'react';
 import {View} from 'react-native';
 import type {TupleToUnion} from 'type-fest';
 import Icon from '@components/Icon';
-import MultiSelectFilterPopup from '@components/Search/SearchPageHeader/MultiSelectFilterPopup';
+import MultiSelect from '@components/Search/FilterComponents/MultiSelect';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
@@ -17,11 +17,11 @@ import variables from '@styles/variables';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {SearchAdvancedFiltersForm} from '@src/types/form';
-import type {MultiSelectItem} from './MultiSelectPopup';
+import useFilterCountChange from '../hooks/useFilterCountChange';
+import type {FilterComponentProps} from './types';
 
-type ExportedToSelectPopupProps = {
-    closeOverlay: () => void;
-    updateFilterForm: (values: Partial<SearchAdvancedFiltersForm>) => void;
+type ExportedToSelectorProps = FilterComponentProps & {
+    onChange: (exportedTo: string[]) => void;
 };
 
 const STANDARD_EXPORT_TEMPLATE_ID_TO_DISPLAY_LABEL: Record<string, string> = {
@@ -33,7 +33,7 @@ function filterExportedToSelector(searchAdvancedFiltersForm: SearchAdvancedFilte
     return searchAdvancedFiltersForm?.exportedTo;
 }
 
-function ExportedToSelectPopup({closeOverlay, updateFilterForm}: ExportedToSelectPopupProps) {
+function ExportedToSelector({onChange, onCountChange}: ExportedToSelectorProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const StyleUtils = useStyleUtils();
@@ -123,22 +123,17 @@ function ExportedToSelectPopup({closeOverlay, updateFilterForm}: ExportedToSelec
 
         return [...connectedIntegrationPickerItems, ...standardAndIntegrationCustomTemplatePickerItems];
     })();
-    const selectedExportedTo = exportedToPickerOptions.filter((option) => exportedTo?.includes(option.value));
 
-    const updateExportedToFilterForm = (items: Array<MultiSelectItem<string>>) => {
-        updateFilterForm({exportedTo: items.map((item) => item.value)});
-    };
+    useFilterCountChange(exportedToPickerOptions.length, onCountChange);
 
     return (
-        <MultiSelectFilterPopup
-            closeOverlay={closeOverlay}
-            translationKey="search.exportedTo"
+        <MultiSelect
+            value={exportedTo ?? []}
             items={exportedToPickerOptions}
-            value={selectedExportedTo}
             isSearchable={exportedToPickerOptions.length >= CONST.STANDARD_LIST_ITEM_LIMIT}
-            onChangeCallback={updateExportedToFilterForm}
+            onChange={onChange}
         />
     );
 }
 
-export default ExportedToSelectPopup;
+export default ExportedToSelector;

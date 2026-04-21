@@ -1,33 +1,26 @@
 import React from 'react';
 import type {OnyxCollection} from 'react-native-onyx';
-import MultiSelectFilterPopup from '@components/Search/SearchPageHeader/MultiSelectFilterPopup';
+import MultiSelect from '@components/Search/FilterComponents/MultiSelect';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import {getDecodedCategoryName} from '@libs/CategoryUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
-import type {SearchAdvancedFiltersForm} from '@src/types/form';
 import type {PolicyCategories, PolicyCategory} from '@src/types/onyx';
 import {getEmptyObject} from '@src/types/utils/EmptyObject';
-import type {MultiSelectItem} from './MultiSelectPopup';
+import useFilterCountChange from '../hooks/useFilterCountChange';
+import type {FilterComponentProps} from './types';
 
-type CategorySelectPopupProps = {
-    closeOverlay: () => void;
-    updateFilterForm: (values: Partial<SearchAdvancedFiltersForm>) => void;
+type CategorySelectorProps = FilterComponentProps & {
+    onChange: (categories: string[]) => void;
 };
 
-function CategorySelectPopup({closeOverlay, updateFilterForm}: CategorySelectPopupProps) {
+function CategorySelector({onChange, onCountChange}: CategorySelectorProps) {
     const {translate} = useLocalize();
     const [searchAdvancedFiltersForm] = useOnyx(ONYXKEYS.FORMS.SEARCH_ADVANCED_FILTERS_FORM);
     const [personalPolicyID] = useOnyx(ONYXKEYS.PERSONAL_POLICY_ID);
     const policyIDs = searchAdvancedFiltersForm?.policyID ?? [];
-
-    const selectedCategoriesItems = searchAdvancedFiltersForm?.category?.map((category) => {
-        if (category === CONST.SEARCH.CATEGORY_EMPTY_VALUE) {
-            return {text: translate('search.noCategory'), value: category};
-        }
-        return {text: category, value: category};
-    });
+    const selectedCategoriesItems = searchAdvancedFiltersForm?.category ?? [];
 
     const availableNonPersonalPolicyCategoriesSelector = (policyCategories: OnyxCollection<PolicyCategories>) =>
         Object.fromEntries(
@@ -73,20 +66,17 @@ function CategorySelectPopup({closeOverlay, updateFilterForm}: CategorySelectPop
             }),
     );
 
-    const updateCategoryFilterForm = (items: Array<MultiSelectItem<string>>) => {
-        updateFilterForm({category: items.map((item) => item.value)});
-    };
+    useFilterCountChange(categoryItems.length, onCountChange);
 
     return (
-        <MultiSelectFilterPopup
-            closeOverlay={closeOverlay}
-            translationKey="common.category"
+        <MultiSelect
+            value={selectedCategoriesItems}
             items={categoryItems}
-            value={selectedCategoriesItems ?? []}
             isSearchable={categoryItems.length >= CONST.STANDARD_LIST_ITEM_LIMIT}
-            onChangeCallback={updateCategoryFilterForm}
+            searchPlaceholder={translate('common.category')}
+            onChange={onChange}
         />
     );
 }
 
-export default CategorySelectPopup;
+export default CategorySelector;

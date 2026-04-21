@@ -16,8 +16,8 @@ import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import {columnsSelector} from '@src/selectors/AdvancedSearchFiltersForm';
 import type {SearchResults} from '@src/types/onyx';
+import type {SingleSelectItem} from '../FilterComponents/SingleSelect';
 import SingleSelectPopup from './SingleSelectPopup';
-import type {SingleSelectItem} from './SingleSelectPopup';
 
 type SortByPopupProps = {
     searchResults: OnyxEntry<SearchResults>;

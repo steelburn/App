@@ -20,6 +20,7 @@ import type {
     SearchQueryString,
     SearchStatus,
     SearchWithdrawalType,
+    SyntaxFilterKey,
     UserFriendlyKey,
     UserFriendlyValue,
 } from '@components/Search/types';
@@ -386,7 +387,7 @@ function getFilters(queryJSON: SearchQueryJSON) {
  * - for `AMOUNT` it formats value to "backend" amount
  * - for personal filters it tries to substitute any user emails with accountIDs
  */
-function getUpdatedFilterValue(filterName: ValueOf<typeof CONST.SEARCH.SYNTAX_FILTER_KEYS>, filterValue: string | string[], shouldSkipAmountConversion = false) {
+function getUpdatedFilterValue(filterName: SyntaxFilterKey, filterValue: string | string[], shouldSkipAmountConversion = false) {
     if (AMOUNT_FILTER_KEYS.includes(filterName as SearchAmountFilterKeys)) {
         if (shouldSkipAmountConversion) {
             return filterValue;
@@ -700,11 +701,11 @@ function getSanitizedRawFilters(queryJSON: SearchQueryJSON): RawQueryFilter[] | 
 
         const rawValue = rawFilter.value;
         const filterKey = rawFilter.key;
-        const isRecognizedFilterKey = Object.values(CONST.SEARCH.SYNTAX_FILTER_KEYS).includes(filterKey as ValueOf<typeof CONST.SEARCH.SYNTAX_FILTER_KEYS>);
+        const isRecognizedFilterKey = Object.values(CONST.SEARCH.SYNTAX_FILTER_KEYS).includes(filterKey as SyntaxFilterKey);
         let updatedValue: string | string[] = Array.isArray(rawValue) ? rawValue.map((value) => value?.toString() ?? '') : (rawValue?.toString() ?? '');
 
         if (isRecognizedFilterKey) {
-            updatedValue = getUpdatedFilterValue(filterKey as ValueOf<typeof CONST.SEARCH.SYNTAX_FILTER_KEYS>, updatedValue);
+            updatedValue = getUpdatedFilterValue(filterKey as SyntaxFilterKey, updatedValue);
         }
 
         accumulator.push({
@@ -1738,7 +1739,7 @@ const sortOptionsWithEmptyValue = (a: string, b: string, localeCompare: LocaleCo
 /**
  *  Given a search query, this function will standardize the query by replacing display values with their corresponding IDs.
  */
-function traverseAndUpdatedQuery(queryJSON: SearchQueryJSON, computeNodeValue: (left: ValueOf<typeof CONST.SEARCH.SYNTAX_FILTER_KEYS>, right: string | string[]) => string | string[]) {
+function traverseAndUpdatedQuery(queryJSON: SearchQueryJSON, computeNodeValue: (left: SyntaxFilterKey, right: string | string[]) => string | string[]) {
     const standardQuery = cloneDeep(queryJSON);
     const filters = standardQuery.filters;
     const traverse = (node: ASTNode) => {
@@ -1778,7 +1779,7 @@ function getQueryWithUpdatedValues(query: string, shouldSkipAmountConversion = f
         return;
     }
 
-    const computeNodeValue = (left: ValueOf<typeof CONST.SEARCH.SYNTAX_FILTER_KEYS>, right: string | string[]) => getUpdatedFilterValue(left, right, shouldSkipAmountConversion);
+    const computeNodeValue = (left: SyntaxFilterKey, right: string | string[]) => getUpdatedFilterValue(left, right, shouldSkipAmountConversion);
     const standardizedQuery = traverseAndUpdatedQuery(queryJSON, computeNodeValue);
     return buildSearchQueryString(standardizedQuery);
 }
@@ -2033,10 +2034,6 @@ function serializeQueryJSONForBackend<T extends {filters?: ASTNode | null; rawFi
     return JSON.stringify({...queryData, filters: normalizedFilters, rawFilterList: normalizedRawFilterList});
 }
 
-const isAmountFilterKey = (key: SearchDateFilterKeys | SearchAmountFilterKeys): key is SearchAmountFilterKeys => {
-    return AMOUNT_FILTER_KEYS.includes(key as SearchAmountFilterKeys);
-};
-
 export {
     getDateRangeDisplayValueFromFormValue,
     getRangeBoundariesFromFormValue,
@@ -2074,7 +2071,6 @@ export {
     getDateModifierTitle,
     applyContainsOperatorToTextFields,
     serializeQueryJSONForBackend,
-    isAmountFilterKey,
 };
 
 export type {SearchDateValues};

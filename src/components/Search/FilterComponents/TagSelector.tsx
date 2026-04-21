@@ -1,33 +1,26 @@
 import React from 'react';
 import type {OnyxCollection} from 'react-native-onyx';
-import MultiSelectFilterPopup from '@components/Search/SearchPageHeader/MultiSelectFilterPopup';
+import MultiSelect from '@components/Search/FilterComponents/MultiSelect';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import {getCleanedTagName, getTagNamesFromTagsLists} from '@libs/PolicyUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import passthroughPolicyTagListSelector from '@src/selectors/PolicyTagList';
-import type {SearchAdvancedFiltersForm} from '@src/types/form';
 import type {PolicyTagLists} from '@src/types/onyx';
 import {getEmptyObject} from '@src/types/utils/EmptyObject';
-import type {MultiSelectItem} from './MultiSelectPopup';
+import useFilterCountChange from '../hooks/useFilterCountChange';
+import type {FilterComponentProps} from './types';
 
-type TagSelectPopupProps = {
-    closeOverlay: () => void;
-    updateFilterForm: (values: Partial<SearchAdvancedFiltersForm>) => void;
+type TagSelectorProps = FilterComponentProps & {
+    onChange: (tags: string[]) => void;
 };
 
-function TagSelectPopup({closeOverlay, updateFilterForm}: TagSelectPopupProps) {
+function TagSelector({onChange, onCountChange}: TagSelectorProps) {
     const {translate} = useLocalize();
     const [searchAdvancedFiltersForm] = useOnyx(ONYXKEYS.FORMS.SEARCH_ADVANCED_FILTERS_FORM);
     const policyIDs = searchAdvancedFiltersForm?.policyID ?? [];
-
-    const selectedTagsItems = searchAdvancedFiltersForm?.tag?.map((tag) => {
-        if (tag === CONST.SEARCH.TAG_EMPTY_VALUE) {
-            return {text: translate('search.noTag'), value: tag};
-        }
-        return {text: getCleanedTagName(tag), value: tag};
-    });
+    const selectedTagsItems = searchAdvancedFiltersForm?.tag ?? [];
 
     const [allPolicyTagLists = getEmptyObject<NonNullable<OnyxCollection<PolicyTagLists>>>()] = useOnyx(ONYXKEYS.COLLECTION.POLICY_TAGS, {selector: passthroughPolicyTagListSelector});
     const selectedPoliciesTagLists = Object.keys(allPolicyTagLists ?? {})
@@ -49,20 +42,16 @@ function TagSelectPopup({closeOverlay, updateFilterForm}: TagSelectPopupProps) {
     }
     tagItems.push(...Array.from(uniqueTagNames).map((tagName) => ({text: getCleanedTagName(tagName), value: tagName})));
 
-    const updateTagFilterForm = (items: Array<MultiSelectItem<string>>) => {
-        updateFilterForm({tag: items.map((item) => item.value)});
-    };
+    useFilterCountChange(tagItems.length, onCountChange);
 
     return (
-        <MultiSelectFilterPopup
-            closeOverlay={closeOverlay}
-            translationKey="common.tag"
+        <MultiSelect
+            value={selectedTagsItems}
             items={tagItems}
-            value={selectedTagsItems ?? []}
             isSearchable={tagItems.length >= CONST.STANDARD_LIST_ITEM_LIMIT}
-            onChangeCallback={updateTagFilterForm}
+            onChange={onChange}
         />
     );
 }
 
-export default TagSelectPopup;
+export default TagSelector;
