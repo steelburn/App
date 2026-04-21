@@ -1268,7 +1268,7 @@ async function serializeOdometerDraftImage(image: FileObject | string | null | u
     }
 
     try {
-        return await convertFileObjectOrUriToBase64DataURL(typeof image === 'string' ? image : image);
+        return await convertFileObjectOrUriToBase64DataURL(image);
     } catch (error) {
         Log.warn('Failed to serialize odometer draft image to base64', {error});
         return imageURI;
