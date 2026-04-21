@@ -446,8 +446,6 @@ function ReportActionItemMessageEdit({action, reportID, originalReportID, policy
                                 if (isMobileChrome() && reportScrollManager.ref?.current) {
                                     reportScrollManager.ref.current.scrollToIndex({index, animated: false});
                                 }
-                                // The last composer that had focus should re-gain focus
-                                // setUpComposeFocusManager();
 
                                 // Clear active report action when another action gets focused
                                 if (!isEmojiPickerActive(action.reportActionID)) {

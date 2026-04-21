@@ -95,21 +95,6 @@ const renderReportActionItemMessageEdit = (props?: Partial<ReportActionItemMessa
     );
 };
 
-// const renderReportActionItemMessageEdit = (props?: Partial<ReportActionItemMessageEditProps>) => {
-//     return render(
-//         <ReportScreenProviders>
-//             {/* <ComposeProviders components={[OnyxListItemProvider, LocaleContextProvider]}> */}
-//             <ReportActionItemMessageEdit
-//                 // eslint-disable-next-line react/jsx-props-no-spreading
-//                 {...defaultProps}
-//                 // eslint-disable-next-line react/jsx-props-no-spreading
-//                 {...props}
-//             />
-//             {/* </ComposeProviders>, */}
-//         </ReportScreenProviders>,
-//     );
-// };
-
 describe('ReportActionCompose Integration Tests', () => {
     beforeAll(() => {
         Onyx.init({

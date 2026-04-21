@@ -12,10 +12,6 @@ function refocusComposerAfterPreventFirstResponder(composerToRefocusOnClose: Com
     }
 
     return focusComposerWithDelay(composerRef)(true);
-
-    // return isWindowReadyToFocus().then(() => {
-    //     composerRef?.focus();
-    // });
 }
 
 export default refocusComposerAfterPreventFirstResponder;
