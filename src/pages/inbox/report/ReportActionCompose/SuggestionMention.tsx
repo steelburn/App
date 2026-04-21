@@ -186,8 +186,7 @@ function SuggestionMention({
             return false;
         }
         const currentLogin = currentUserPersonalDetails.login ?? '';
-        const details = weightedPersonalDetails ?? personalDetails;
-        return Object.values(details ?? {}).some(
+        return Object.values(personalDetails ?? {}).some(
             (detail) =>
                 !!detail?.login &&
                 areEmailsFromSamePrivateDomain(detail.login, currentLogin) &&
