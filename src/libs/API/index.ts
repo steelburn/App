@@ -26,7 +26,7 @@ import {READ_COMMANDS} from './types';
 // Logging - Logs request details and errors.
 addMiddleware(Logging);
 
-// Duplicates API calls with X-Mock-Request when the server sends load-test parameters with the X-Load-Test header.
+// Duplicates API calls (tagged with mockRequest=true) when the server sends load-test parameters via the X-Load-Test response header.
 addMiddleware(LoadTest);
 
 // FailureTracking - Observes request outcomes and feeds them to FailureTracker for sustained failure detection.

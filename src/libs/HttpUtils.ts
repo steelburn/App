@@ -11,8 +11,8 @@ import {alertUser} from './actions/UpdateRequired';
 import {READ_COMMANDS, SIDE_EFFECT_REQUEST_COMMANDS, WRITE_COMMANDS} from './API/types';
 import {getCommandURL} from './ApiUtils';
 import HttpsError from './Errors/HttpsError';
-import prepareRequestPayload from './prepareRequestPayload';
 import {setLoadTestParameters} from './Network/LoadTestState';
+import prepareRequestPayload from './prepareRequestPayload';
 
 let shouldFailAllRequests = false;
 let shouldForceOffline = false;
@@ -62,7 +62,6 @@ function processHTTPRequest<TKey extends OnyxKey>(
     method: RequestType = 'get',
     body: FormData | null = null,
     abortSignal: AbortSignal | undefined = undefined,
-    extraHeaders?: Record<string, string>,
 ): Promise<Response<TKey>> {
     const startTime = new Date().valueOf();
     return fetch(url, {
@@ -75,7 +74,6 @@ function processHTTPRequest<TKey extends OnyxKey>(
         // this avoids us sending specially the expensifyWeb cookie, which makes a CSRF token required
         // more on that here: https://stackoverflowteams.com/c/expensify/questions/93
         credentials: 'omit',
-        ...(extraHeaders ? {headers: extraHeaders} : {}),
     })
         .then((response) => {
             if (response.headers) {
@@ -180,13 +178,12 @@ function xhr<TKey extends OnyxKey>(
     type: RequestType = CONST.NETWORK.METHOD.POST,
     shouldUseSecure = false,
     initiatedOffline = false,
-    extraHeaders?: Record<string, string>,
 ): Promise<Response<TKey>> {
     return prepareRequestPayload(command, data, initiatedOffline).then((formData) => {
         const url = getCommandURL({shouldUseSecure, command});
         const abortSignalController = data.canCancel ? (abortControllerMap.get(command as AbortCommand) ?? abortControllerMap.get(ABORT_COMMANDS.All)) : undefined;
 
-        return processHTTPRequest(url, type, formData, abortSignalController?.signal, extraHeaders);
+        return processHTTPRequest(url, type, formData, abortSignalController?.signal);
     });
 }
 

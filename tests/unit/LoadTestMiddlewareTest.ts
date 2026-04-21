@@ -42,6 +42,21 @@ function getMockCallsForTestUrl() {
     return (global.fetch as jest.Mock).mock.calls.filter((call) => call[0] === TEST_URL);
 }
 
+function getFormBodyAt(index: number): TestHelper.FormData {
+    const calls = getMockCallsForTestUrl();
+    return (calls.at(index) as [string, {body: TestHelper.FormData}])[1].body;
+}
+
+function formBodyToObject(formData: TestHelper.FormData): Record<string, string | Blob> {
+    return Array.from(formData.entries()).reduce(
+        (acc, [key, val]) => {
+            acc[key] = val;
+            return acc;
+        },
+        {} as Record<string, string | Blob>,
+    );
+}
+
 describe('LoadTest middleware', () => {
     it('does not fire any duplicate requests when load testing is inactive', async () => {
         // Given the LoadTest middleware is registered and no X-Load-Test parameters are set
@@ -55,7 +70,7 @@ describe('LoadTest middleware', () => {
         expect(getMockCallsForTestUrl()).toHaveLength(1);
     });
 
-    it('fires multiplier - 1 duplicate requests with X-Mock-Request header when active', async () => {
+    it('fires multiplier - 1 duplicate requests with mockRequest=true form param when active', async () => {
         // Given the LoadTest middleware is registered and load testing is active with multiplier 3
         Request.addMiddleware(LoadTest);
         setLoadTestParameters(JSON.stringify({multiplier: 3, expire: FUTURE}));
@@ -65,18 +80,18 @@ describe('LoadTest middleware', () => {
         await waitForNetworkPromises();
 
         // Then we should see 1 real request + 2 duplicates (multiplier - 1)
-        const calls = getMockCallsForTestUrl();
-        expect(calls).toHaveLength(3);
+        expect(getMockCallsForTestUrl()).toHaveLength(3);
 
-        // And the real request should NOT carry an X-Mock-Request header
-        const realRequestHeaders = (calls.at(0) as [string, RequestInit])[1].headers;
-        expect(realRequestHeaders).toBeUndefined();
+        // And the real request should NOT carry mockRequest in its form body
+        const realBody = formBodyToObject(getFormBodyAt(0));
+        expect(realBody.mockRequest).toBeUndefined();
 
-        // And every duplicate should carry X-Mock-Request: true so the server treats them as load-test traffic
-        const firstDuplicateHeaders = (calls.at(1) as [string, RequestInit])[1].headers;
-        const secondDuplicateHeaders = (calls.at(2) as [string, RequestInit])[1].headers;
-        expect(firstDuplicateHeaders).toEqual({'X-Mock-Request': 'true'});
-        expect(secondDuplicateHeaders).toEqual({'X-Mock-Request': 'true'});
+        // And every duplicate should carry mockRequest=true so the server treats them as load-test traffic
+        // (sent as a form param rather than a header to avoid CORS preflights for cross-origin requests)
+        const firstDuplicateBody = formBodyToObject(getFormBodyAt(1));
+        const secondDuplicateBody = formBodyToObject(getFormBodyAt(2));
+        expect(firstDuplicateBody.mockRequest).toBe('true');
+        expect(secondDuplicateBody.mockRequest).toBe('true');
     });
 
     it('does not duplicate when the load-test window has expired', async () => {
@@ -105,10 +120,9 @@ describe('LoadTest middleware', () => {
         await waitForNetworkPromises();
 
         // Then duplicates should still have been fired (mirrors Web-Expensify's deferred.always behavior)
-        const calls = getMockCallsForTestUrl();
-        expect(calls).toHaveLength(3);
-        expect((calls.at(1) as [string, RequestInit])[1].headers).toEqual({'X-Mock-Request': 'true'});
-        expect((calls.at(2) as [string, RequestInit])[1].headers).toEqual({'X-Mock-Request': 'true'});
+        expect(getMockCallsForTestUrl()).toHaveLength(3);
+        expect(formBodyToObject(getFormBodyAt(1)).mockRequest).toBe('true');
+        expect(formBodyToObject(getFormBodyAt(2)).mockRequest).toBe('true');
     });
 
     it('duplicates do not themselves trigger another round of duplicates (no infinite loop)', async () => {
@@ -134,11 +148,15 @@ describe('LoadTest middleware', () => {
         await Request.processWithMiddleware({command: TEST_COMMAND, data: {authToken: 'testToken', reportID: '99'}});
         await waitForNetworkPromises();
 
-        // Then the duplicate should hit the same URL and carry the same form data as the real request
-        const calls = getMockCallsForTestUrl();
-        expect(calls).toHaveLength(2);
-        TestHelper.assertFormDataMatchesObject({reportID: '99'}, ((calls.at(0) as [string, {body: TestHelper.FormData}])[1] as {body: TestHelper.FormData}).body);
-        TestHelper.assertFormDataMatchesObject({reportID: '99'}, ((calls.at(1) as [string, {body: TestHelper.FormData}])[1] as {body: TestHelper.FormData}).body);
+        // Then the duplicate should hit the same URL and carry the same reportID as the real request
+        expect(getMockCallsForTestUrl()).toHaveLength(2);
+        const realBody = formBodyToObject(getFormBodyAt(0));
+        const duplicateBody = formBodyToObject(getFormBodyAt(1));
+        expect(realBody.reportID).toBe('99');
+        expect(duplicateBody.reportID).toBe('99');
+        // And the duplicate is the only one tagged with mockRequest=true
+        expect(realBody.mockRequest).toBeUndefined();
+        expect(duplicateBody.mockRequest).toBe('true');
     });
 
     it('reads the X-Load-Test response header and applies it to subsequent fan-out', async () => {

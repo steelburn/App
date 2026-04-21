@@ -5,11 +5,9 @@ import type {PaginatedRequest} from '@src/types/onyx/Request';
 import enhanceParameters from './enhanceParameters';
 import {getDuplicateRequestCount} from './LoadTestState';
 
-const MOCK_REQUEST_HEADER_KEY = 'X-Mock-Request';
-const MOCK_REQUEST_HEADER_VALUE = 'true';
-
 /**
- * Fires N-1 duplicate API calls with X-Mock-Request for server-side load testing.
+ * Fires N-1 duplicate API calls marked with mockRequest=true so the server can identify them as load-test traffic.
+ * The marker is sent as a form parameter (not a header) to avoid triggering CORS preflights for cross-origin requests.
  * Bypasses the middleware pipeline so duplicates do not apply Onyx updates or recurse.
  */
 function triggerDuplicates<TKey extends OnyxKey>(request: Request<TKey> | PaginatedRequest<TKey>): void {
@@ -18,14 +16,13 @@ function triggerDuplicates<TKey extends OnyxKey>(request: Request<TKey> | Pagina
         return;
     }
 
-    const finalParameters = enhanceParameters(request.command, request.data ?? {});
+    const finalParameters = enhanceParameters(request.command, {
+        ...(request.data ?? {}),
+        mockRequest: true,
+    });
 
     for (let i = 0; i < count; i++) {
-        // Use HttpUtils.xhr directly to bypass the middleware pipeline ensuring that there is no infinite loop where the duplicate
-        // request triggers more and more duplicates.
-        HttpUtils.xhr(request.command, finalParameters, request.type, request.shouldUseSecure, request.initiatedOffline, {
-            [MOCK_REQUEST_HEADER_KEY]: MOCK_REQUEST_HEADER_VALUE,
-        }).catch(() => {
+        HttpUtils.xhr(request.command, finalParameters, request.type, request.shouldUseSecure, request.initiatedOffline).catch(() => {
             // Load-test mock traffic is fire-and-forget; failures should not affect the app.
         });
     }
