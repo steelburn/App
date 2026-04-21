@@ -1289,6 +1289,12 @@ type SageIntacctExportConfig = {
 
     /** Accounting method for Sage Intacct */
     accountingMethod: ValueOf<typeof COMMON_CONST.INTEGRATIONS.ACCOUNTING_METHOD>;
+
+    /** The vendor to use for Expensify Travel expenses when exporting to Sage Intacct */
+    travelInvoicingVendorID?: string;
+
+    /** The payable account to use for Expensify Travel expenses when exporting to Sage Intacct */
+    travelInvoicingPayableAccountID?: string;
 };
 
 /**

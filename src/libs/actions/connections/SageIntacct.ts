@@ -3,7 +3,7 @@ import type {OnyxUpdate} from 'react-native-onyx';
 import Onyx from 'react-native-onyx';
 import type {ValueOf} from 'type-fest';
 import * as API from '@libs/API';
-import type {ConnectPolicyToSageIntacctParams} from '@libs/API/parameters';
+import type {ConnectPolicyToSageIntacctParams, UpdateManyPolicyConnectionConfigurationsParams} from '@libs/API/parameters';
 import type UpdateSageIntacctAccountingMethodParams from '@libs/API/parameters/UpdateSageIntacctAccountingMethodParams';
 import {WRITE_COMMANDS} from '@libs/API/types';
 import * as ErrorUtils from '@libs/ErrorUtils';
@@ -623,6 +623,31 @@ function updateSageIntacctDefaultVendor(policyID: string, settingName: keyof Sag
         updateSageIntacctNonreimbursableExpensesExportVendor(policyID, vendor, oldVendor);
     }
 }
+// Looks like command UPDATE_MANY_POLICY_CONNECTION_CONFIGS is deprecated.
+function updateSageIntacctTravelInvoicingVendor(policyID: string, vendorID: string, oldVendorID?: string) {
+    const onyxData = prepareOnyxDataForExportUpdate(policyID, CONST.SAGE_INTACCT_CONFIG.TRAVEL_INVOICING_VENDOR, vendorID, oldVendorID);
+    const parameters: UpdateManyPolicyConnectionConfigurationsParams = {
+        policyID,
+        connectionName: CONST.POLICY.CONNECTIONS.NAME.SAGE_INTACCT,
+        configUpdate: JSON.stringify({[CONST.SAGE_INTACCT_CONFIG.TRAVEL_INVOICING_VENDOR]: vendorID}),
+        idempotencyKey: CONST.SAGE_INTACCT_CONFIG.TRAVEL_INVOICING_VENDOR,
+    };
+
+    API.write(WRITE_COMMANDS.UPDATE_MANY_POLICY_CONNECTION_CONFIGS, parameters, onyxData);
+}
+
+function updateSageIntacctTravelInvoicingPayableAccount(policyID: string, accountID: string, oldAccountID?: string) {
+    const onyxData = prepareOnyxDataForExportUpdate(policyID, CONST.SAGE_INTACCT_CONFIG.TRAVEL_INVOICING_PAYABLE_ACCOUNT, accountID, oldAccountID);
+    const parameters: UpdateManyPolicyConnectionConfigurationsParams = {
+        policyID,
+        connectionName: CONST.POLICY.CONNECTIONS.NAME.SAGE_INTACCT,
+        configUpdate: JSON.stringify({[CONST.SAGE_INTACCT_CONFIG.TRAVEL_INVOICING_VENDOR]: accountID}),
+        idempotencyKey: CONST.SAGE_INTACCT_CONFIG.TRAVEL_INVOICING_PAYABLE_ACCOUNT,
+    };
+
+    API.write(WRITE_COMMANDS.UPDATE_MANY_POLICY_CONNECTION_CONFIGS, parameters, onyxData);
+}
+
 
 function clearSageIntacctErrorField(policyID: string | undefined, key: SageIntacctOfflineStateKeys | keyof SageIntacctConnectionsConfig) {
     Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`, {connections: {intacct: {config: {errorFields: {[key]: null}}}}});
@@ -977,6 +1002,8 @@ export {
     updateSageIntacctNonreimbursableExpensesExportDestination,
     updateSageIntacctNonreimbursableExpensesExportAccount,
     updateSageIntacctDefaultVendor,
+    updateSageIntacctTravelInvoicingVendor,
+    updateSageIntacctTravelInvoicingPayableAccount,
     updateSageIntacctAutoSync,
     updateSageIntacctImportEmployees,
     updateSageIntacctApprovalMode,
