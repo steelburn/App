@@ -676,12 +676,10 @@ export {
     getWorkspaceCardFeedKey,
     getFeedInfo,
     getLinkedPolicyName,
-    generateDomainFeedData,
     getDomainFeedData,
     getCardFeedsForDisplay,
     getExpensifyCardFeedsForDisplay,
     getCardFeedsForDisplayPerPolicy,
     getCombinedCardFeedsFromAllFeeds,
-    getCardFeedStatus,
     getWorkspaceCardFeedsStatus,
 };
