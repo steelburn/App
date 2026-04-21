@@ -633,6 +633,11 @@ function PureReportActionItem({
 
     const disabledActions = useMemo(() => (!canWriteInReport(report) ? RestrictedReadOnlyContextMenuActions : []), [report]);
 
+    const hasErrors = !isEmptyValueObject(action.errors);
+    const isContextMenuDisabled = useMemo(() => {
+        return draftMessage !== undefined || hasErrors || !shouldDisplayContextMenuValue;
+    }, [draftMessage, hasErrors, shouldDisplayContextMenuValue]);
+
     /**
      * Show the ReportActionContextMenu modal popover.
      *
@@ -641,7 +646,7 @@ function PureReportActionItem({
     const showPopover = useCallback(
         (event: GestureResponderEvent | MouseEvent) => {
             // Block menu on the message being Edited or if the report action item has errors
-            if (draftMessage !== undefined || !isEmptyValueObject(action.errors) || !shouldDisplayContextMenuValue) {
+            if (isContextMenuDisabled) {
                 return;
             }
 
@@ -674,17 +679,15 @@ function PureReportActionItem({
             });
         },
         [
-            draftMessage,
-            action.errors,
             action.reportActionID,
             reportID,
             toggleContextMenuFromActiveReportAction,
             originalReportID,
-            shouldDisplayContextMenuValue,
             disabledActions,
             isArchivedRoom,
             isChronosReport,
             handleShowContextMenu,
+            isContextMenuDisabled,
             isThreadReportParentAction,
         ],
     );
@@ -1354,7 +1357,7 @@ function PureReportActionItem({
                 onPressIn={() => shouldUseNarrowLayout && canUseTouchScreen() && ControlSelection.block()}
                 onPressOut={() => ControlSelection.unblock()}
                 onSecondaryInteraction={showPopover}
-                preventDefaultContextMenu={draftMessage === undefined && !hasErrors}
+                preventDefaultContextMenu={!isContextMenuDisabled}
                 withoutFocusOnSecondaryInteraction
                 accessibilityLabel={accessibilityLabel}
                 accessibilityHint={translate('accessibilityHints.chatMessage')}
