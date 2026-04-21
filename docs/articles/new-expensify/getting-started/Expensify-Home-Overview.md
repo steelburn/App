@@ -99,9 +99,11 @@ This section helps you stay informed about what’s new or recently changed in N
 
 ## How the Assigned cards section works on Home
 
-The **Assigned cards** section shows all Expensify Cards assigned to you, along with the available spending limit for each card.
+The **Assigned cards** section shows your active Expensify Cards along with the available spending limit for each card.
 
 Use this section to quickly check how much you can spend before making a purchase. The available limit updates automatically as transactions are made.
+
+Cards with a custom spending limit of $0 are not shown in this section.
 
 ---
 
@@ -139,5 +141,5 @@ The **Discover** section only appears until you’ve watched the demo. Once you�
 
 The **Assigned cards** section only appears if you have an active **Expensify Card** assigned to you.
 
-If you don’t have an Expensify Card assigned, or your assigned card isn’t active, the **Assigned cards** section won’t be visible.
+If you don’t have an Expensify Card assigned, your assigned card isn’t active, or your card has a custom spending limit of $0, the **Assigned cards** section won’t be visible.
 
