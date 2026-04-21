@@ -1,4 +1,4 @@
-import {getDuplicateRequestCount, setLoadTestParameters} from '@libs/Network/LoadTestState';
+import {getDuplicateRequestCount, MAX_MULTIPLIER, setLoadTestParameters} from '@libs/Network/LoadTestState';
 
 const FUTURE = '2099-01-01T00:00:00';
 const PAST = '2000-01-01T00:00:00';
@@ -119,6 +119,53 @@ describe('LoadTestState', () => {
 
             // Then the duplicate count updates accordingly
             expect(getDuplicateRequestCount()).toBe(9);
+        });
+
+        it('caps the multiplier at MAX_MULTIPLIER to prevent self-DDOS', () => {
+            // Given a malicious or misconfigured X-Load-Test header advertising an absurd multiplier
+            setLoadTestParameters(JSON.stringify({multiplier: 1_000_000, expire: FUTURE}));
+
+            // When we ask for the duplicate count
+            // Then we never fan out to more than MAX_MULTIPLIER - 1 duplicates per real request
+            expect(getDuplicateRequestCount()).toBe(MAX_MULTIPLIER - 1);
+        });
+
+        it('returns 0 when multiplier is Infinity (e.g. multiplier: 1e309 in JSON)', () => {
+            // Given a header where multiplier parses to Infinity (a JS number large enough to overflow)
+            setLoadTestParameters('{"multiplier": 1e309, "expire": "2099-01-01T00:00:00"}');
+
+            // When we ask for the duplicate count
+            // Then we MUST not return Infinity (which would hang the JS thread inside the duplicate-firing loop)
+            const count = getDuplicateRequestCount();
+            expect(Number.isFinite(count)).toBe(true);
+            expect(count).toBeLessThanOrEqual(MAX_MULTIPLIER - 1);
+        });
+
+        it('returns 0 when multiplier is NaN', () => {
+            // Given a header where multiplier ends up as NaN (e.g. wrong type)
+            setLoadTestParameters(JSON.stringify({multiplier: 'three', expire: FUTURE}));
+
+            // When we ask for the duplicate count
+            // Then no duplicates should fire (we should never crash on bad types)
+            expect(getDuplicateRequestCount()).toBe(0);
+        });
+
+        it('returns 0 when multiplier is negative', () => {
+            // Given a header where multiplier is negative
+            setLoadTestParameters(JSON.stringify({multiplier: -5, expire: FUTURE}));
+
+            // When we ask for the duplicate count
+            // Then no duplicates should fire (negative values are nonsense and must not loop in reverse or wrap around)
+            expect(getDuplicateRequestCount()).toBe(0);
+        });
+
+        it('floors fractional multipliers', () => {
+            // Given a header where multiplier is a fraction (e.g. 3.9)
+            setLoadTestParameters(JSON.stringify({multiplier: 3.9, expire: FUTURE}));
+
+            // When we ask for the duplicate count
+            // Then it floors to multiplier 3, so 2 duplicates fire (we must never feed a non-integer to a for loop counter)
+            expect(getDuplicateRequestCount()).toBe(2);
         });
     });
 });
