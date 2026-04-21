@@ -16,6 +16,10 @@ function preserveHistoryForRoutes(oldHistory: CustomHistoryEntry[], routes: Arra
 // noop=match at cursor; backward/forward=move cursor to match; unknown=target not in history.
 type ResetOutcome = {type: 'noop'; cursor: number} | {type: 'backward'; cursor: number} | {type: 'forward'; cursor: number} | {type: 'unknown'};
 
+/**
+ * Classifies a RESET's target against our PUSH_PARAMS history + cursor so the caller fires the right focus-return notification and updates the cursor.
+ * Without the 'noop' branch, `useNavigationResetOnLayoutChange`'s reflexive `reset(getState())` on window resize would be treated as a real navigation — cancelling any pending Esc-triggered focus restore so focus never returns to the trigger.
+ */
 function resolveCursorForReset(history: CustomHistoryEntry[], currentCursor: number, newFocused: {key: string; params: unknown}): ResetOutcome {
     const inRange = currentCursor >= 0 && currentCursor < history.length;
     // Snapped cursor drives direction inference only; adjacent probes are gated on inRange.
