@@ -1,6 +1,9 @@
-/** True when the user is keyboard-navigating; false when typing or using a mouse. Typing/printable keys clear; Tab/Arrow/named keys preserve. */
+/** True when the user is keyboard-navigating; false when typing or using a mouse. Typing/printable keys clear; Tab/Escape/Arrow/named navigation keys set true (ensures WCAG 2.4.7 visible focus after keyboard-triggered navigation, even mid-typing). */
 let hadTabNavigation = false;
 let teardown: (() => void) | null = null;
+
+// Named keys that are unambiguously keyboard navigation intent — pressing any of these should restore keyboard modality even if typing had cleared it.
+const KEYBOARD_NAV_KEYS = new Set(['Escape', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Home', 'End', 'PageUp', 'PageDown']);
 
 function setup(): void {
     if (teardown || typeof document === 'undefined') {
@@ -12,7 +15,7 @@ function setup(): void {
         if (typeof e.key !== 'string') {
             return;
         }
-        if (e.key === 'Tab') {
+        if (e.key === 'Tab' || KEYBOARD_NAV_KEYS.has(e.key)) {
             hadTabNavigation = true;
             return;
         }
