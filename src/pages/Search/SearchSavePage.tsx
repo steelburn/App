@@ -25,7 +25,6 @@ import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {SearchAdvancedFiltersForm} from '@src/types/form';
 import {FILTER_KEYS} from '@src/types/form/SearchAdvancedFiltersForm';
-import type {SearchAdvancedFiltersKey} from '@src/types/form/SearchAdvancedFiltersForm';
 import INPUT_IDS from '@src/types/form/SearchSaveForm';
 import {getEmptyObject} from '@src/types/utils/EmptyObject';
 
@@ -34,7 +33,7 @@ type FilterValueProps = {
 };
 
 type FilterValueWithKeyProps = FilterValueProps & {
-    filterKey: SearchAdvancedFiltersKey;
+    filterKey: SearchFilter['key'];
 };
 
 function FilterUserValue({value}: FilterValueProps) {
