@@ -10,6 +10,7 @@ import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type * as OnyxTypes from '@src/types/onyx';
+import isLoadingOnyxValue from '@src/types/utils/isLoadingOnyxValue';
 import useCreateEmptyReportConfirmation from './useCreateEmptyReportConfirmation';
 import useHasEmptyReportsForPolicy from './useHasEmptyReportsForPolicy';
 import useOnyx from './useOnyx';
@@ -44,6 +45,7 @@ type UseCreateReportActionResult = {
 export default function useCreateReportAction({onCreateReport, groupPoliciesWithChatEnabled, shouldHandleNavigationBack = true}: UseCreateReportActionParams): UseCreateReportActionResult {
     const [activePolicyID] = useOnyx(ONYXKEYS.NVP_ACTIVE_POLICY_ID);
     const [activePolicy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${activePolicyID}`);
+    const [, policiesMeta] = useOnyx(ONYXKEYS.COLLECTION.POLICY);
     const [ownerBillingGracePeriodEnd] = useOnyx(ONYXKEYS.NVP_PRIVATE_OWNER_BILLING_GRACE_PERIOD_END);
     const [userBillingGracePeriodEnds] = useOnyx(ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_USER_BILLING_GRACE_PERIOD_END);
     const [amountOwed] = useOnyx(ONYXKEYS.NVP_PRIVATE_AMOUNT_OWED);
@@ -51,9 +53,11 @@ export default function useCreateReportAction({onCreateReport, groupPoliciesWith
 
     const {shouldRedirectToExpensifyClassic, canUseAction, showRedirectToExpensifyClassicModal} = useRedirectToExpensifyClassic();
 
-    // Visible whenever clicking the button would do something meaningful (upgrade flow, workspace selection, direct create, or classic redirect).
-    // Hidden only when classic redirect is required but currently suppressed (e.g. TryNewDot loading / hybrid app state).
-    const isVisible = canUseAction;
+    // Gate visibility and routing on policy hydration. Without this, during Onyx cold-start
+    // groupPoliciesWithChatEnabled.length === 0 would be true even for users who actually have
+    // workspaces, sending them to MONEY_REQUEST_UPGRADE as if they had none.
+    const arePoliciesLoaded = !isLoadingOnyxValue(policiesMeta);
+    const isVisible = arePoliciesLoaded && canUseAction;
     const shouldNavigateToUpgradePath = !shouldRedirectToExpensifyClassic && groupPoliciesWithChatEnabled.length === 0;
 
     const defaultChatEnabledPolicy = getDefaultChatEnabledPolicy(groupPoliciesWithChatEnabled as Array<OnyxEntry<OnyxTypes.Policy>>, activePolicy);
@@ -71,6 +75,10 @@ export default function useCreateReportAction({onCreateReport, groupPoliciesWith
 
     const createReportAction = useCallback(() => {
         interceptAnonymousUser(() => {
+            if (!arePoliciesLoaded) {
+                return;
+            }
+
             if (shouldRedirectToExpensifyClassic) {
                 showRedirectToExpensifyClassicModal();
                 return;
@@ -117,6 +125,7 @@ export default function useCreateReportAction({onCreateReport, groupPoliciesWith
             Navigation.navigate(ROUTES.RESTRICTED_ACTION.getRoute(workspaceIDForReportCreation));
         });
     }, [
+        arePoliciesLoaded,
         shouldRedirectToExpensifyClassic,
         showRedirectToExpensifyClassicModal,
         shouldNavigateToUpgradePath,

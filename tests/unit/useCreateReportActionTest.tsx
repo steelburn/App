@@ -408,4 +408,51 @@ describe('useCreateReportAction', () => {
             expect(result.current.isVisible).toBe(false);
         });
     });
+
+    describe('policy hydration gate', () => {
+        it('isVisible is false while the policy collection is still loading', () => {
+            const impl = ((_key: string, options?: {selector?: (value: unknown) => unknown}) => {
+                const value = options?.selector ? options.selector(undefined) : undefined;
+                return [value, {status: 'loading'}];
+            }) as typeof useOnyx;
+            mockUseOnyx.mockImplementation(impl);
+
+            const onCreateReport = jest.fn();
+
+            const {result} = renderHook(() =>
+                useCreateReportAction({
+                    onCreateReport,
+                    groupPoliciesWithChatEnabled: [],
+                }),
+            );
+
+            expect(result.current.isVisible).toBe(false);
+        });
+
+        it('does not navigate to upgrade path when the user actually has policies but Onyx is still loading', () => {
+            // Simulates cold start: consumer defaulted groupPoliciesWithChatEnabled to [] because Onyx
+            // hasn't hydrated yet. The hook should NOT treat this as "no policies" and misroute to upgrade.
+            const impl = ((_key: string, options?: {selector?: (value: unknown) => unknown}) => {
+                const value = options?.selector ? options.selector(undefined) : undefined;
+                return [value, {status: 'loading'}];
+            }) as typeof useOnyx;
+            mockUseOnyx.mockImplementation(impl);
+
+            const onCreateReport = jest.fn();
+
+            const {result} = renderHook(() =>
+                useCreateReportAction({
+                    onCreateReport,
+                    groupPoliciesWithChatEnabled: [],
+                }),
+            );
+
+            act(() => {
+                result.current.createReportAction();
+            });
+
+            expect(Navigation.navigate).not.toHaveBeenCalled();
+            expect(onCreateReport).not.toHaveBeenCalled();
+        });
+    });
 });
