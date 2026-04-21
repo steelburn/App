@@ -10,6 +10,7 @@ import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails'
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import usePermissions from '@hooks/usePermissions';
+import usePolicyForMovingExpenses from '@hooks/usePolicyForMovingExpenses';
 import usePolicyForTransaction from '@hooks/usePolicyForTransaction';
 import useShowNotFoundPageInIOUStep from '@hooks/useShowNotFoundPageInIOUStep';
 import useThemeStyles from '@hooks/useThemeStyles';
@@ -66,6 +67,7 @@ function IOURequestStepDistanceRate({
     const [splitDraftTransaction] = useOnyx(`${ONYXKEYS.COLLECTION.SPLIT_TRANSACTION_DRAFT}${transactionID}`);
 
     const {policy} = usePolicyForTransaction({transaction, reportPolicyID: report?.policyID, action, iouType, policyDraft});
+    const {policyForMovingExpenses} = usePolicyForMovingExpenses();
 
     const styles = useThemeStyles();
     const {translate, toLocaleDigit, localeCompare} = useLocalize();
@@ -76,7 +78,8 @@ function IOURequestStepDistanceRate({
     const {getCurrencySymbol, getCurrencyDecimals} = useCurrencyListActions();
     const isPolicyExpenseChat = isReportInGroupPolicy(report);
     const isTrackExpense = iouType === CONST.IOU.TYPE.TRACK;
-    const shouldShowTax = isTaxTrackingEnabled(isPolicyExpenseChat || isTrackExpense || isExpenseUnreported(currentTransaction), policy, isDistanceRequest);
+    const isUnreportedExpense = isExpenseUnreported(currentTransaction);
+    const shouldShowTax = isTaxTrackingEnabled(isPolicyExpenseChat || isTrackExpense || isUnreportedExpense, policy, isDistanceRequest);
 
     const currentRateID = getRateID(currentTransaction);
     const transactionCurrency = getCurrency(currentTransaction);
@@ -91,7 +94,11 @@ function IOURequestStepDistanceRate({
     // This keeps the problematic rate shown as selected so the user understands what they need to change.
     const [pendingRateID, setPendingRateID] = useState<string | undefined>();
 
-    const rates = DistanceRequestUtils.getMileageRates(policy, false, currentRateID);
+    // For unreported distance expenses, use the default policy for the rate picker list
+    // so users see rates from their default workspace, not the original non-default workspace.
+    // The `policy` (from usePolicyForTransaction) still reflects the original policy for display purposes.
+    const policyForRates = isUnreportedExpense && isDistanceRequest && policyForMovingExpenses ? policyForMovingExpenses : policy;
+    const rates = DistanceRequestUtils.getMileageRates(policyForRates, false, currentRateID);
     const isMovingTransactionFromTrackExpense = isMovingTransactionFromTrackExpenseUtil(action);
     const transactionUnit = transaction?.comment?.customUnit?.distanceUnit;
     const sortedRates = useMemo(() => Object.values(rates).sort((a, b) => localeCompare(a.name ?? '', b.name ?? '')), [rates, localeCompare]);
@@ -109,7 +116,7 @@ function IOURequestStepDistanceRate({
         const effectiveRateID = pendingRateID ?? currentRateID;
         const isSelected = effectiveRateID
             ? effectiveRateID === rate.customUnitRateID && !hasUnitMismatchForMovingTrackExpense
-            : DistanceRequestUtils.getDefaultMileageRate(policy)?.customUnitRateID === rate.customUnitRateID;
+            : DistanceRequestUtils.getDefaultMileageRate(policyForRates)?.customUnitRateID === rate.customUnitRateID;
         const rateForDisplay = DistanceRequestUtils.getFormattedRateValue(unit, rate.rate, isSelected ? transactionCurrency : rate.currency, translate, toLocaleDigit, getCurrencySymbol);
         return {
             text: rate.name ?? rateForDisplay,
@@ -152,12 +159,12 @@ function IOURequestStepDistanceRate({
         let taxRateExternalID;
         let taxValue;
         if (shouldShowTax) {
-            const policyCustomUnitRate = getDistanceRateCustomUnitRate(policy, customUnitRateID);
-            const defaultTaxCode = getDefaultTaxCode(policy, currentTransaction) ?? '';
+            const policyCustomUnitRate = getDistanceRateCustomUnitRate(policyForRates, customUnitRateID);
+            const defaultTaxCode = getDefaultTaxCode(policyForRates, currentTransaction) ?? '';
             // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
             taxRateExternalID = policyCustomUnitRate?.attributes?.taxRateExternalID || defaultTaxCode;
-            const taxableAmount = DistanceRequestUtils.getTaxableAmount(policy, customUnitRateID, getDistanceInMeters(currentTransaction, currentUnit));
-            taxValue = taxRateExternalID ? getTaxValue(policy, currentTransaction, taxRateExternalID) : undefined;
+            const taxableAmount = DistanceRequestUtils.getTaxableAmount(policyForRates, customUnitRateID, getDistanceInMeters(currentTransaction, currentUnit));
+            taxValue = taxRateExternalID ? getTaxValue(policyForRates, currentTransaction, taxRateExternalID) : undefined;
             taxAmount = convertToBackendAmount(calculateTaxAmount(taxValue, taxableAmount, getCurrencyDecimals(rates[customUnitRateID].currency)));
             setMoneyRequestTaxAmount(transactionID, taxAmount, shouldUseTransactionDraft(action));
             setMoneyRequestTaxRate(transactionID, taxRateExternalID ?? null, shouldUseTransactionDraft(action));
@@ -167,12 +174,12 @@ function IOURequestStepDistanceRate({
         if (currentRateID !== customUnitRateID || (isMovingTransactionFromTrackExpense && transactionUnit !== selectedRateUnit)) {
             // In the split flow, when editing we use SPLIT_TRANSACTION_DRAFT to save draft value
             if (isEditingSplit && transaction) {
-                setDraftSplitTransaction(transaction.transactionID, splitDraftTransaction, {customUnitRateID}, policy);
+                setDraftSplitTransaction(transaction.transactionID, splitDraftTransaction, {customUnitRateID}, policyForRates);
                 navigateBack();
                 return;
             }
 
-            setMoneyRequestDistanceRate(transaction, customUnitRateID, policy, shouldUseTransactionDraft(action));
+            setMoneyRequestDistanceRate(transaction, customUnitRateID, policyForRates, shouldUseTransactionDraft(action));
 
             if (isEditing && transaction?.transactionID) {
                 updateMoneyRequestDistanceRate({
@@ -181,7 +188,7 @@ function IOURequestStepDistanceRate({
                     parentReport,
                     parentReportNextStep,
                     rateID: customUnitRateID,
-                    policy,
+                    policy: policyForRates,
                     policyTagList: policyTags,
                     policyCategories,
                     currentUserAccountIDParam,
