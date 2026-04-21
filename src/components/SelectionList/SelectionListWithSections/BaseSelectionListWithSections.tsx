@@ -275,7 +275,6 @@ function BaseSelectionListWithSections<TItem extends ListItem>({
         if (event.nativeEvent.key !== CONST.KEYBOARD_SHORTCUTS.TAB.shortcutKey) {
             return;
         }
-        event.preventDefault();
         setHasKeyBeenPressed();
         focusedItemRef?.focus();
     };

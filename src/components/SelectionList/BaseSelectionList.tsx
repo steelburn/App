@@ -107,6 +107,7 @@ function BaseSelectionList<TItem extends ListItem>({
     const innerTextInputRef = useRef<BaseTextInputRef | null>(null);
     const isTextInputFocusedRef = useRef<boolean>(false);
     const hasKeyBeenPressed = useRef(false);
+    const [isKeyboardNavigating, setIsKeyboardNavigating] = useState(false);
     const listRef = useRef<FlashListRef<TItem> | null>(null);
     const itemFocusTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const keyboardListenerRef = useRef<ReturnType<typeof Keyboard.addListener> | null>(null);
@@ -157,6 +158,7 @@ function BaseSelectionList<TItem extends ListItem>({
             return;
         }
         hasKeyBeenPressed.current = true;
+        setIsKeyboardNavigating(true);
     }, []);
 
     // Only handle Tab as keyboard navigation here, arrow keys are already handled via useArrowKeyFocusManager.
@@ -306,12 +308,16 @@ function BaseSelectionList<TItem extends ListItem>({
             isActive: !disableKeyboardShortcuts && isFocused && !confirmButtonOptions?.isDisabled,
         },
     );
-    const textInputKeyPress = useCallback((event: TextInputKeyPressEvent) => {
-        const key = event.nativeEvent.key;
-        if (key === CONST.KEYBOARD_SHORTCUTS.TAB.shortcutKey) {
+    const textInputKeyPress = useCallback(
+        (event: TextInputKeyPressEvent) => {
+            if (event.nativeEvent.key !== CONST.KEYBOARD_SHORTCUTS.TAB.shortcutKey) {
+                return;
+            }
+            setHasKeyBeenPressed();
             focusedItemRef?.focus();
-        }
-    }, []);
+        },
+        [setHasKeyBeenPressed],
+    );
 
     const focusTextInput = useCallback(() => {
         innerTextInputRef.current?.focus();
@@ -344,7 +350,7 @@ function BaseSelectionList<TItem extends ListItem>({
         const isItemDisabled = isDisabled || item.isDisabled;
         const selected = isItemSelected(item);
         const isItemFocused = (!isDisabled || selected) && focusedIndex === index;
-        const isItemVisuallyFocused = isItemFocused && (shouldHighlightInitiallyFocusedItem || hasKeyBeenPressed.current);
+        const isItemVisuallyFocused = isItemFocused && (shouldHighlightInitiallyFocusedItem || isKeyboardNavigating);
         const isItemHighlighted = !!itemsToHighlight?.has(item.keyForList);
 
         return (
@@ -378,7 +384,7 @@ function BaseSelectionList<TItem extends ListItem>({
                 errorRowStyles={style?.listItemErrorRowStyles}
                 singleExecution={singleExecution}
                 shouldHighlightSelectedItem={shouldHighlightSelectedItem}
-                shouldSyncFocus={!isTextInputFocusedRef.current && hasKeyBeenPressed.current}
+                shouldSyncFocus={!isTextInputFocusedRef.current && isKeyboardNavigating}
                 shouldDisableHoverStyle={shouldDisableHoverStyle}
                 shouldShowRightCaret={shouldShowRightCaret}
                 isLastItem={index === data.length - 1}
