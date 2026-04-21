@@ -1,5 +1,5 @@
 import agentZeroProcessingIndicatorSelector from '@selectors/ReportNameValuePairs';
-import {useEffect, useRef, useState, useSyncExternalStore} from 'react';
+import {useCallback, useEffect, useRef, useState, useSyncExternalStore} from 'react';
 import type {OnyxEntry} from 'react-native-onyx';
 import {clearAgentZeroProcessingIndicator, getNewerActions, subscribeToReportReasoningEvents, unsubscribeFromReportReasoningChannel} from '@libs/actions/Report';
 import ConciergeReasoningStore from '@libs/ConciergeReasoningStore';
@@ -125,8 +125,12 @@ function useAgentZeroStatusIndicator(reportID: string): AgentZeroStatusState {
     /**
      * Clear the polling interval and safety timer. Called when the indicator clears normally,
      * when a new processing cycle starts, or when the component unmounts.
+     *
+     * Kept in useCallback because it's referenced in several useEffect dep arrays below. The
+     * react-compiler-compat ESLint processor (which would otherwise suppress the exhaustive-deps
+     * false positive) only runs on .tsx/.jsx files, not .ts.
      */
-    const clearPolling = () => {
+    const clearPolling = useCallback(() => {
         if (pollIntervalRef.current) {
             clearInterval(pollIntervalRef.current);
             pollIntervalRef.current = null;
@@ -135,13 +139,13 @@ function useAgentZeroStatusIndicator(reportID: string): AgentZeroStatusState {
             clearTimeout(pollSafetyTimerRef.current);
             pollSafetyTimerRef.current = null;
         }
-    };
+    }, []);
 
     /**
      * Hard-clear the indicator by resetting local state and clearing the Onyx NVP.
      * Called as a safety net after MAX_POLL_DURATION_MS if no response has arrived.
      */
-    const hardClearIndicator = () => {
+    const hardClearIndicator = useCallback(() => {
         // If offline, don't clear — the response may arrive when reconnected
         if (isOfflineRef.current) {
             return;
@@ -152,7 +156,7 @@ function useAgentZeroStatusIndicator(reportID: string): AgentZeroStatusState {
         setDisplayedLabel('');
         clearAgentZeroProcessingIndicator(reportID);
         getNewerActions(reportID, newestReportActionRef.current?.reportActionID);
-    };
+    }, [clearPolling, reportID]);
 
     /**
      * Start polling for missed actions every POLL_INTERVAL_MS. Every time processing
@@ -164,7 +168,7 @@ function useAgentZeroStatusIndicator(reportID: string): AgentZeroStatusState {
      *
      * Polling stops when: indicator clears, component unmounts, or user goes offline.
      */
-    const startPolling = () => {
+    const startPolling = useCallback(() => {
         clearPolling();
 
         // Poll every 30s for missed actions. Track the newest action ID before polling
@@ -193,7 +197,7 @@ function useAgentZeroStatusIndicator(reportID: string): AgentZeroStatusState {
         pollSafetyTimerRef.current = setTimeout(() => {
             hardClearIndicator();
         }, MAX_POLL_DURATION_MS);
-    };
+    }, [clearPolling, hardClearIndicator, reportID]);
 
     // On reconnect, defensively clear any stale NVP, refetch missed actions, and keep polling
     // running through the reconnect window.
