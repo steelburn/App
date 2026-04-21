@@ -195,29 +195,29 @@ function useAgentZeroStatusIndicator(reportID: string): AgentZeroStatusState {
         }, MAX_POLL_DURATION_MS);
     };
 
-    // On reconnect, proactively clear stale optimistic state + NVP and refetch missed actions.
+    // On reconnect, defensively clear any stale NVP, refetch missed actions, and keep polling
+    // running through the reconnect window.
     //
-    // If the server processed the request and cleared the NVP while Pusher was disconnected,
-    // Onyx sync can deliver the stale (uncleared) NVP on reconnect. Clearing the NVP locally
-    // ensures we don't show a stuck indicator while we wait for polling to detect the reply.
-    // If the server is still genuinely processing, its next Pusher/Onyx update will repopulate
-    // the NVP and re-trigger the indicator + polling via the label-sync effect.
+    // If the server SET+CLEARED the NVP while Pusher was disconnected, Onyx sync can deliver
+    // only the stale SET on reconnect. Clearing the NVP locally when we were optimistic-only
+    // prevents a stuck label.
+    //
+    // Polling must continue even when only optimistic state is active (no server label yet).
+    // If the client reconnected before the server wrote any label and Pusher events keep
+    // getting missed, polling via getNewerActions is our only way to catch the eventual reply.
+    // The safety timer inside startPolling is the hard backstop.
     const {isOffline} = useNetwork({
         onReconnect: () => {
             const wasOptimistic = pendingOptimisticRequests > 0;
 
             if (wasOptimistic) {
-                setPendingOptimisticRequests(0);
                 clearAgentZeroProcessingIndicator(reportID);
             }
 
             // Fetch missed actions so the Onyx-driven Concierge-reply detection can fire.
             getNewerActions(reportID, newestReportActionRef.current?.reportActionID);
 
-            // Only restart polling if we still have a server-driven label after the clear —
-            // otherwise there's nothing to poll for and the next serverLabel arrival will
-            // restart polling via the label-sync effect below.
-            if (serverLabel) {
+            if (serverLabel || wasOptimistic) {
                 startPolling();
             }
         },

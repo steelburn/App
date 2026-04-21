@@ -844,11 +844,12 @@ describe('AgentZeroStatusContext', () => {
             expect(result.current.statusLabel).toBe(serverLabel);
         });
 
-        it('should clear stale NVP on reconnect when only optimistic state was active', async () => {
-            // Regression test: when reconnecting with only optimistic state (no serverLabel),
-            // the NVP may have been set by the server and the CLEAR event lost during the
-            // Pusher disconnect. On reconnect we proactively clear the stale NVP so the
-            // indicator doesn't stay stuck until the 120s safety timeout.
+        it('should keep optimistic state and continue polling on reconnect to catch a late reply', async () => {
+            // Regression test: when the client reconnects while only optimistic state is active
+            // (no serverLabel yet), polling must continue. Without this, a late Concierge reply
+            // arriving while Pusher keeps dropping events would never be detected — the one-shot
+            // getNewerActions fetch in onReconnect is not enough. The stale NVP is still cleared
+            // locally (defensive, in case the server SET+CLEARED during offline).
 
             const {result} = renderHook(() => useAgentZeroStatusIndicator(reportID));
             await waitForBatchedUpdates();
@@ -866,13 +867,52 @@ describe('AgentZeroStatusContext', () => {
             act(() => setForceOffline(false));
             await waitForBatchedUpdates();
 
-            // onReconnect proactively clears the NVP locally because optimistic state was active.
-            // The label-sync effect can also clear via reasoning store cleanup; either way,
-            // clearAgentZeroProcessingIndicator must have been invoked for this reportID.
+            // Stale NVP is cleared defensively
             await waitFor(() => {
                 expect(mockClearAgentZeroProcessingIndicator).toHaveBeenCalledWith(reportID);
             });
-            expect(result.current.isProcessing).toBe(false);
+
+            // Indicator stays visible so polling keeps running until reply or safety timeout
+            expect(result.current.isProcessing).toBe(true);
+            expect(result.current.statusLabel).toBe('Thinking...');
+        });
+
+        it('should clear indicator after reconnect when a Concierge reply finally arrives', async () => {
+            // Full recovery path: optimistic state is preserved through reconnect, polling keeps
+            // running, and when a new Concierge action lands (via polling catch-up or Pusher
+            // recovery) the detection effect clears everything.
+
+            const {result} = renderHook(() => useAgentZeroStatusIndicator(reportID));
+            await waitForBatchedUpdates();
+
+            act(() => {
+                result.current.kickoffWaitingIndicator();
+            });
+            await waitForBatchedUpdates();
+
+            act(() => setForceOffline(true));
+            await waitForBatchedUpdates();
+            act(() => setForceOffline(false));
+            await waitForBatchedUpdates();
+
+            await waitFor(() => {
+                expect(result.current.isProcessing).toBe(true);
+            });
+
+            // A new Concierge action arrives (simulating polling or Pusher catch-up)
+            const replyActionID = '999';
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${reportID}`, {
+                [replyActionID]: {
+                    reportActionID: replyActionID,
+                    actorAccountID: CONST.ACCOUNT_ID.CONCIERGE,
+                    created: '2099-01-01 00:00:00.000',
+                    message: [{type: 'TEXT', text: 'Reply'}],
+                },
+            });
+
+            await waitFor(() => {
+                expect(result.current.isProcessing).toBe(false);
+            });
         });
     });
 
