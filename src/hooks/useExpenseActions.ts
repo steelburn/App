@@ -400,6 +400,7 @@ function useExpenseActions({reportID, isReportInSearch = false, backTo, onDuplic
                         transactionViolations: allTransactionViolations,
                         translate,
                         recentWaypoints: recentWaypoints ?? [],
+                        conciergeReportID,
                     });
                 });
             },
