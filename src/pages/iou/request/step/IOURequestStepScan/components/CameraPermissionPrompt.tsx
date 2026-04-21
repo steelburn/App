@@ -10,8 +10,13 @@ import CONST from '@src/CONST';
 import type IconAsset from '@src/types/utils/IconAsset';
 
 type CameraPermissionPromptProps = {
+    /** Whether the device is currently in landscape orientation */
     isInLandscapeMode: boolean;
+
+    /** The hand illustration asset shown to prompt for camera access */
     handIllustration: IconAsset | undefined;
+
+    /** Callback fired when the continue button is pressed */
     onPress: () => void;
 };
 

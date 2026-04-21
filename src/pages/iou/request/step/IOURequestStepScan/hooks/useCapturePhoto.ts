@@ -1,4 +1,5 @@
 import type {RefObject} from 'react';
+import {useCallback, useRef} from 'react';
 import {Alert} from 'react-native';
 import {RESULTS} from 'react-native-permissions';
 import type {Camera, PhotoFile} from 'react-native-vision-camera';
@@ -18,25 +19,61 @@ import type Transaction from '@src/types/onyx/Transaction';
 import type {FileObject} from '@src/types/utils/Attachment';
 
 type UseCapturePhotoParams = {
+    /** Ref to the underlying Camera instance */
     cameraRef: RefObject<Camera | null>;
-    isCapturingPhotoRef: RefObject<boolean>;
+
+    /** Current camera permission status from react-native-permissions */
     cameraPermissionStatus: string | null;
+
+    /** Whether the camera flash is currently on */
     flash: boolean;
+
+    /** Whether the camera device supports flash */
     hasFlash: boolean;
+
+    /** Whether the platform requires muted audio during capture */
     isPlatformMuted: boolean | undefined;
+
+    /** Whether the device is currently in landscape orientation */
     isInLandscapeMode: boolean;
+
+    /** Prompts the user to grant camera permissions */
     askForPermissions: () => void;
+
+    /** Sets whether a photo has been captured */
     setDidCapturePhoto: (value: boolean) => void;
+
+    /** Whether multi-scan mode is currently active */
     isMultiScanEnabled: boolean;
+
+    /** Whether the user is editing an existing receipt */
     isEditing: boolean;
+
+    /** The initial transaction associated with this scan */
     initialTransaction: Transaction | null | undefined;
+
+    /** The transaction ID to use when no optimistic transaction is created */
     initialTransactionID: string;
+
+    /** The current user's personal details for optimistic transaction creation */
     currentUserPersonalDetails: CurrentUserPersonalDetails;
+
+    /** The report ID associated with this expense */
     reportID: string;
+
+    /** Array of receipt files captured so far in the current session */
     receiptFiles: ReceiptFile[];
+
+    /** Updates the array of captured receipt files */
     setReceiptFiles: (value: ReceiptFile[]) => void;
+
+    /** Replaces the receipt on an existing transaction and navigates back */
     updateScanAndNavigate: (file: FileObject, source: string) => void;
+
+    /** Submits all captured receipts and navigates to the confirmation step */
     submitReceipts: (files: ReceiptFile[]) => void;
+
+    /** Triggers the post-capture blink animation */
     showBlink: () => void;
 };
 
@@ -47,7 +84,6 @@ type UseCapturePhotoParams = {
  */
 function useCapturePhoto({
     cameraRef,
-    isCapturingPhotoRef,
     cameraPermissionStatus,
     flash,
     hasFlash,
@@ -68,6 +104,11 @@ function useCapturePhoto({
     showBlink,
 }: UseCapturePhotoParams) {
     const {translate} = useLocalize();
+    const isCapturingPhoto = useRef(false);
+
+    const resetCapturingState = useCallback(() => {
+        isCapturingPhoto.current = false;
+    }, []);
 
     const maybeCancelShutterSpan = () => {
         if (isMultiScanEnabled) {
@@ -103,7 +144,7 @@ function useCapturePhoto({
             return;
         }
 
-        if (isCapturingPhotoRef.current) {
+        if (isCapturingPhoto.current) {
             maybeCancelShutterSpan();
             return;
         }
@@ -115,8 +156,7 @@ function useCapturePhoto({
             attributes: {[CONST.TELEMETRY.ATTRIBUTE_PLATFORM]: 'native'},
         });
 
-        // eslint-disable-next-line no-param-reassign -- isCapturingPhotoRef is a React ref passed from the parent component
-        isCapturingPhotoRef.current = true;
+        isCapturingPhoto.current = true;
         showBlink();
 
         const path = getReceiptsUploadFolderPath();
@@ -158,8 +198,7 @@ function useCapturePhoto({
                 if (isMultiScanEnabled) {
                     setMoneyRequestReceipt(transactionID, source, filename, !isEditing, 'image/jpeg');
                     setDidCapturePhoto(false);
-                    // eslint-disable-next-line no-param-reassign -- isCapturingPhotoRef is a React ref passed from the parent component
-                    isCapturingPhotoRef.current = false;
+                    isCapturingPhoto.current = false;
                     return;
                 }
 
@@ -171,8 +210,7 @@ function useCapturePhoto({
                 });
             })
             .catch((error: string) => {
-                // eslint-disable-next-line no-param-reassign -- isCapturingPhotoRef is a React ref passed from the parent component
-                isCapturingPhotoRef.current = false;
+                isCapturingPhoto.current = false;
                 cancelSpan(CONST.TELEMETRY.SPAN_RECEIPT_CAPTURE);
                 maybeCancelShutterSpan();
                 showCameraAlert();
@@ -180,7 +218,7 @@ function useCapturePhoto({
             });
     };
 
-    return {capturePhoto};
+    return {capturePhoto, resetCapturingState};
 }
 
 export default useCapturePhoto;

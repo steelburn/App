@@ -14,23 +14,58 @@ import type {FileObject} from '@src/types/utils/Attachment';
 import type IconAsset from '@src/types/utils/IconAsset';
 
 type ScannerControlsBarProps = {
+    /** Whether the device is currently in landscape orientation */
     isInLandscapeMode: boolean;
+
+    /** Whether multi-scan mode is currently active */
     isMultiScanEnabled: boolean;
+
+    /** Whether the multi-scan feature is available */
     canUseMultiScan: boolean;
+
+    /** Whether the attachment picker should allow selecting multiple files */
     shouldAcceptMultipleFiles: boolean;
+
+    /** Current camera permission status from react-native-permissions */
     cameraPermissionStatus: string | null;
+
+    /** Whether the camera flash is currently on */
     flash: boolean;
+
+    /** Whether the camera device supports flash */
     hasFlash: boolean;
+
+    /** Updater function to toggle flash state */
     setFlash: (updater: (prev: boolean) => boolean) => void;
+
+    /** Sets whether the attachment picker modal is open */
     setIsAttachmentPickerActive: (value: boolean) => void;
+
+    /** Sets visibility of the full-screen loading indicator */
     setIsLoaderVisible: (value: boolean) => void;
+
+    /** Validates picked files and begins the receipt upload flow */
     validateFiles: (files: FileObject[], items?: DataTransferItem[]) => void;
+
+    /** Triggers photo capture from the camera */
     capturePhoto: () => void;
+
+    /** Toggles multi-scan mode on or off */
     toggleMultiScan: () => void;
+
+    /** The shutter button illustration asset */
     shutterIllustration: IconAsset | undefined;
+
+    /** The gallery icon asset for the file picker button */
     galleryIcon: IconAsset | undefined;
+
+    /** The multi-receipt icon asset for the multi-scan toggle */
     receiptMultipleIcon: IconAsset | undefined;
+
+    /** The bolt icon asset (flash on) */
     boltIcon: IconAsset | undefined;
+
+    /** The bolt-slash icon asset (flash off) */
     boltSlashIcon: IconAsset | undefined;
 };
 

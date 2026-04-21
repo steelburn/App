@@ -1,4 +1,4 @@
-import React, {useCallback, useMemo, useRef} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef} from 'react';
 import {View} from 'react-native';
 import {RESULTS} from 'react-native-permissions';
 import {useCameraFormat} from 'react-native-vision-camera';
@@ -57,8 +57,9 @@ function IOURequestStepScan({
     const {setIsLoaderVisible} = useFullScreenLoaderActions();
     const {windowWidth, windowHeight} = useWindowDimensions();
 
-    // Ref for double-tap protection (doesn't trigger re-render)
-    const isCapturingPhoto = useRef(false);
+    // Ref bridging resetCapturingState (from useCapturePhoto) into onFocusStart (used by useNativeCamera).
+    // Both hooks depend on each other's outputs, so we use a ref to break the initialization cycle.
+    const resetCapturingStateRef = useRef(() => {});
 
     const {
         camera,
@@ -78,9 +79,7 @@ function IOURequestStepScan({
         cameraLoadingReasonAttributes,
     } = useNativeCamera({
         context: 'IOURequestStepScan',
-        onFocusStart: () => {
-            isCapturingPhoto.current = false;
-        },
+        onFocusStart: () => resetCapturingStateRef.current(),
         onFocusCleanup: () => {
             cancelSpan(CONST.TELEMETRY.SPAN_RECEIPT_CAPTURE);
             cancelSpan(CONST.TELEMETRY.SPAN_SHUTTER_TO_CONFIRMATION);
@@ -179,9 +178,8 @@ function IOURequestStepScan({
             setReceiptFiles,
         });
 
-    const {capturePhoto} = useCapturePhoto({
+    const {capturePhoto, resetCapturingState} = useCapturePhoto({
         cameraRef: camera,
-        isCapturingPhotoRef: isCapturingPhoto,
         cameraPermissionStatus,
         flash,
         hasFlash,
@@ -201,6 +199,9 @@ function IOURequestStepScan({
         submitReceipts,
         showBlink,
     });
+    useEffect(() => {
+        resetCapturingStateRef.current = resetCapturingState;
+    }, [resetCapturingState]);
 
     // Wait for camera permission status to render
     if (cameraPermissionStatus == null) {

@@ -8,7 +8,10 @@ import {cancelSpan, endSpan, startSpan} from '@libs/telemetry/activeSpans';
 import CONST from '@src/CONST';
 
 type UseCameraInitTelemetryParams = {
+    /** Current camera permission status from react-native-permissions */
     cameraPermissionStatus: string | null;
+
+    /** The active camera device descriptor, undefined while loading */
     device: CameraDevice | undefined;
 };
 
@@ -71,7 +74,7 @@ function useCameraInitTelemetry({cameraPermissionStatus, device}: UseCameraInitT
 
         // Preload the confirmation screen module so its JS is parsed and ready
         // when we navigate after capture — eliminates cold-start module load cost.
-        require('../../IOURequestStepConfirmation');
+        require('@pages/iou/request/step/IOURequestStepConfirmation');
 
         // Pre-create upload directory to avoid latency during capture
         const path = getReceiptsUploadFolderPath();

@@ -19,22 +19,55 @@ import type IconAsset from '@src/types/utils/IconAsset';
 import NavigationAwareCamera from './NavigationAwareCamera/Camera';
 
 type CameraViewportProps = {
+    /** Ref to the underlying Camera instance */
     camera: RefObject<Camera | null>;
+
+    /** The active camera device descriptor */
     device: CameraDevice;
+
+    /** The selected camera format (resolution / FPS) */
     format: CameraDeviceFormat | undefined;
+
+    /** Target frames-per-second for the camera preview */
     fps: number;
+
+    /** Aspect ratio used to size the camera viewfinder */
     cameraAspectRatio: number | undefined;
+
+    /** Whether the device is currently in landscape orientation */
     isInLandscapeMode: boolean;
+
+    /** Gesture handler for tap-to-focus */
     tapGesture: GestureType;
+
+    /** Animated style driving the focus indicator ring */
     cameraFocusIndicatorAnimatedStyle: AnimatedStyle<ViewStyle>;
+
+    /** Animated style for the post-capture blink overlay */
     blinkStyle: AnimatedStyle<ViewStyle>;
+
+    /** Whether the attachment picker modal is currently open */
     isAttachmentPickerActive: boolean;
+
+    /** Whether a photo has been captured (forces camera inactive) */
     didCapturePhoto: boolean;
+
+    /** Callback fired when the camera finishes initializing */
     onInitialized: () => void;
+
+    /** Whether the multi-scan feature is available */
     canUseMultiScan: boolean;
+
+    /** Whether the camera flash is currently on */
     flash: boolean;
+
+    /** Whether the camera device supports flash */
     hasFlash: boolean;
+
+    /** Updater function to toggle flash state */
     setFlash: (updater: (prev: boolean) => boolean) => void;
+
+    /** The bolt icon asset for the flash toggle button */
     boltIcon: IconAsset | undefined;
 };
 
