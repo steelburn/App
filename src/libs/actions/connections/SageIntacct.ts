@@ -623,13 +623,12 @@ function updateSageIntacctDefaultVendor(policyID: string, settingName: keyof Sag
         updateSageIntacctNonreimbursableExpensesExportVendor(policyID, vendor, oldVendor);
     }
 }
-// Looks like command UPDATE_MANY_POLICY_CONNECTION_CONFIGS is deprecated.
 function updateSageIntacctTravelInvoicingVendor(policyID: string, vendorID: string, oldVendorID?: string) {
     const onyxData = prepareOnyxDataForExportUpdate(policyID, CONST.SAGE_INTACCT_CONFIG.TRAVEL_INVOICING_VENDOR, vendorID, oldVendorID);
     const parameters: UpdateManyPolicyConnectionConfigurationsParams = {
         policyID,
         connectionName: CONST.POLICY.CONNECTIONS.NAME.SAGE_INTACCT,
-        configUpdate: JSON.stringify({[CONST.SAGE_INTACCT_CONFIG.TRAVEL_INVOICING_VENDOR]: vendorID}),
+        configUpdate: JSON.stringify({[CONST.SAGE_INTACCT_CONFIG.EXPORT]: {[CONST.SAGE_INTACCT_CONFIG.TRAVEL_INVOICING_VENDOR]: vendorID}}),
         idempotencyKey: CONST.SAGE_INTACCT_CONFIG.TRAVEL_INVOICING_VENDOR,
     };
 
@@ -641,7 +640,7 @@ function updateSageIntacctTravelInvoicingPayableAccount(policyID: string, accoun
     const parameters: UpdateManyPolicyConnectionConfigurationsParams = {
         policyID,
         connectionName: CONST.POLICY.CONNECTIONS.NAME.SAGE_INTACCT,
-        configUpdate: JSON.stringify({[CONST.SAGE_INTACCT_CONFIG.TRAVEL_INVOICING_VENDOR]: accountID}),
+        configUpdate: JSON.stringify({[CONST.SAGE_INTACCT_CONFIG.EXPORT]: {[CONST.SAGE_INTACCT_CONFIG.TRAVEL_INVOICING_PAYABLE_ACCOUNT]: accountID}}),
         idempotencyKey: CONST.SAGE_INTACCT_CONFIG.TRAVEL_INVOICING_PAYABLE_ACCOUNT,
     };
 

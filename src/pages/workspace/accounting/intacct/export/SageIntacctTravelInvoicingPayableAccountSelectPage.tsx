@@ -26,14 +26,13 @@ function SageIntacctTravelInvoicingPayableAccountSelectPage({policy}: WithPolicy
     const styles = useThemeStyles();
     const illustrations = useMemoizedLazyIllustrations(['Telescope']);
 
-    const {payableList} = policy?.connections?.intacct?.options?.data ?? {};
-    const config = policy?.connections?.intacct?.options?.config;
-
     const policyID = policy?.id ?? String(CONST.DEFAULT_NUMBER_ID);
-    const selectedAccountID = config?.travelInvoicingPayableAccountID;
+    const config = policy?.connections?.intacct?.config;
+    const {bankAccounts} = policy?.connections?.intacct?.data ?? {};
+    const selectedAccountID = config?.export?.travelInvoicingPayableAccountID;
 
     const data: PayableAccountListItem[] =
-        payableList?.map((account) => ({
+        bankAccounts?.map((account) => ({
             value: account.id,
             text: account.name,
             keyForList: account.id,

@@ -1,5 +1,3 @@
-// Maybe we dont need this file
-
 import React from 'react';
 import BlockingView from '@components/BlockingViews/BlockingView';
 import RadioListItem from '@components/SelectionList/ListItem/RadioListItem';
@@ -28,23 +26,22 @@ function SageIntacctTravelInvoicingVendorSelectPage({policy}: WithPolicyConnecti
     const styles = useThemeStyles();
     const illustrations = useMemoizedLazyIllustrations(['Telescope']);
 
-    const {vendors} = policy?.connections?.intacct?.options?.data ?? {};
-    const config = policy?.connections?.intacct?.options?.config;
-
     const policyID = policy?.id ?? String(CONST.DEFAULT_NUMBER_ID);
-    const selectedAccountID = config?.travelInvoicingVendorID;
+    const config = policy?.connections?.intacct?.config;
+    const {vendors} = policy?.connections?.intacct?.data ?? {};
+    const selectedVendorID = config?.export?.travelInvoicingVendorID;
 
     const data: VendorListItem[] =
         vendors?.map((vendor) => ({
             value: vendor.id,
-            text: vendor.name,
+            text: vendor.value,
             keyForList: vendor.id,
-            isSelected: vendor.id === selectedAccountID,
+            isSelected: vendor.id === selectedVendorID,
         })) ?? [];
 
     const selectVendor = (row: VendorListItem) => {
-        if (row.value !== selectedAccountID) {
-            updateSageIntacctTravelInvoicingVendor(policyID, row.value, selectedAccountID);
+        if (row.value !== selectedVendorID) {
+            updateSageIntacctTravelInvoicingVendor(policyID, row.value, selectedVendorID);
         }
         Navigation.goBack(ROUTES.POLICY_ACCOUNTING_SAGE_INTACCT_TRAVEL_INVOICING_CONFIGURATION.getRoute(policyID));
     };

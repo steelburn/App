@@ -30,8 +30,8 @@ function SageIntacctExportPage({policy}: WithPolicyProps) {
     const route = useRoute<PlatformStackRouteProp<SettingsNavigatorParamList, typeof SCREENS.WORKSPACE.ACCOUNTING.SAGE_INTACCT_EXPORT>>();
     const backTo = route?.params?.backTo;
     const {export: exportConfig, pendingFields, errorFields} = policy?.connections?.intacct?.config ?? {};
-    const {payableList} = policy?.connections?.intacct?.options?.data ?? {};
-    const travelPayableAccount = payableList?.find((account) => account.id === exportConfig?.travelInvoicingPayableAccountID);
+    const {bankAccounts} = policy?.connections?.intacct?.data ?? {};
+    const travelPayableAccount = bankAccounts?.find((account) => account.id === exportConfig?.travelInvoicingPayableAccountID);
     const shouldGoBackToSpecificRoute = exportConfig?.reimbursable === CONST.SAGE_INTACCT_REIMBURSABLE_EXPENSE_TYPE.EXPENSE_REPORT;
 
     const workspaceAccountID = useWorkspaceAccountID(policyID);

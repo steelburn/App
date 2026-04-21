@@ -30,11 +30,11 @@ function SageIntacctTravelInvoicingConfigurationPage({policy}: WithPolicyConnect
     const styles = useThemeStyles();
 
     const policyID = policy?.id ?? String(CONST.DEFAULT_NUMBER_ID);
-    const config = policy?.connections?.intacct?.options?.config;
+    const config = policy?.connections?.intacct?.config;
 
-    const {vendors, payableList} = policy?.connections?.intacct?.options?.data ?? {};
-    const travelVendor = vendors?.find((vendor) => vendor.id === config?.travelInvoicingVendorID);
-    const travelPayableAccount = payableList?.find((account) => account.id === config?.travelInvoicingPayableAccountID);
+    const {vendors, bankAccounts} = policy?.connections?.intacct?.data ?? {};
+    const travelVendor = vendors?.find((vendor) => vendor.id === config?.export?.travelInvoicingVendorID);
+    const travelPayableAccount = bankAccounts?.find((account) => account.id === config?.export?.travelInvoicingPayableAccountID);
 
     const sections: SageIntacctSectionType[] = [
         {
