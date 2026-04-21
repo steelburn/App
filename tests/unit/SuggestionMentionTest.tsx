@@ -244,4 +244,127 @@ describe('SuggestionMention', () => {
         expect(updateComment).toHaveBeenCalledWith('@adam@example.com thanks', true);
         expect(setSelection).toHaveBeenCalledWith({start: 18, end: 18});
     });
+
+    it('preserves the first mention when a second mention is inserted before it', async () => {
+        mockPersonalDetails = {};
+        mockPersonalDetails[2] = {
+            accountID: 2,
+            login: 'adam@example.com',
+            firstName: 'Adam',
+            lastName: 'Tester',
+        };
+        mockPersonalDetails[3] = {
+            accountID: 3,
+            login: 'bob@example.com',
+            firstName: 'Bob',
+            lastName: 'Tester',
+        };
+
+        const updateComment = jest.fn();
+        const {setSelection} = renderSuggestionMention('@b@adam@example.com ', updateComment, {start: 2, end: 2});
+
+        await waitFor(() => expect(mockMentionSuggestionsSpy).toHaveBeenCalled());
+        const {onSelect} = getLastMentionSuggestionsProps();
+
+        act(() => onSelect(0));
+
+        expect(updateComment).toHaveBeenCalledWith('@bob@example.com @adam@example.com ', true);
+        expect(setSelection).toHaveBeenCalledWith({start: 17, end: 17});
+    });
+
+    it('preserves a trailing @here mention when inserting a new mention before it', async () => {
+        mockPersonalDetails = {};
+        mockPersonalDetails[2] = {
+            accountID: 2,
+            login: 'adam@example.com',
+            firstName: 'Adam',
+            lastName: 'Tester',
+        };
+
+        const updateComment = jest.fn();
+        const {setSelection} = renderSuggestionMention('@adam@here', updateComment, {start: 5, end: 5});
+
+        await waitFor(() => expect(mockMentionSuggestionsSpy).toHaveBeenCalled());
+        const {onSelect} = getLastMentionSuggestionsProps();
+
+        act(() => onSelect(0));
+
+        expect(updateComment).toHaveBeenCalledWith('@adam@example.com @here', true);
+        expect(setSelection).toHaveBeenCalledWith({start: 18, end: 18});
+    });
+
+    it('preserves a trailing phone number mention when inserting a new mention before it', async () => {
+        mockPersonalDetails = {};
+        mockPersonalDetails[2] = {
+            accountID: 2,
+            login: 'adam@example.com',
+            firstName: 'Adam',
+            lastName: 'Tester',
+        };
+
+        const updateComment = jest.fn();
+        const {setSelection} = renderSuggestionMention('@adam@+14404589784', updateComment, {start: 5, end: 5});
+
+        await waitFor(() => expect(mockMentionSuggestionsSpy).toHaveBeenCalled());
+        const {onSelect} = getLastMentionSuggestionsProps();
+
+        act(() => onSelect(0));
+
+        expect(updateComment).toHaveBeenCalledWith('@adam@example.com @+14404589784', true);
+        expect(setSelection).toHaveBeenCalledWith({start: 18, end: 18});
+    });
+
+    it('preserves a trailing private domain short mention when inserting a new mention before it', async () => {
+        mockPersonalDetails = {};
+        mockPersonalDetails[2] = {
+            accountID: 2,
+            login: 'adam@example.com',
+            firstName: 'Adam',
+            lastName: 'Tester',
+        };
+        mockPersonalDetails[3] = {
+            accountID: 3,
+            login: 'charlie@company.com',
+            firstName: 'Charlie',
+            lastName: 'Tester',
+        };
+
+        // Override to a private domain so charlie@company.com shows as @charlie in the composer
+        mockUseCurrentUserPersonalDetails.mockReturnValue({accountID: 1, login: 'current@company.com'});
+
+        const updateComment = jest.fn();
+        const {setSelection} = renderSuggestionMention('@adam@charlie', updateComment, {start: 5, end: 5});
+
+        await waitFor(() => expect(mockMentionSuggestionsSpy).toHaveBeenCalled());
+        const {onSelect} = getLastMentionSuggestionsProps();
+
+        act(() => onSelect(0));
+
+        expect(updateComment).toHaveBeenCalledWith('@adam@example.com @charlie', true);
+        expect(setSelection).toHaveBeenCalledWith({start: 18, end: 18});
+    });
+
+    it('removes junk between the new mention and a trailing complete mention', async () => {
+        mockPersonalDetails = {};
+        mockPersonalDetails[2] = {
+            accountID: 2,
+            login: 'alice@example.com',
+            firstName: 'Alice',
+            lastName: 'Tester',
+        };
+
+        const updateComment = jest.fn();
+        // "@alice@exam@alice@example.com" — cursor at index 6 (after "@alice").
+        // The user partially typed "alice" before a stale/duplicate mention.
+        // Inserting the full mention should drop the "@exam" junk and keep the trailing mention.
+        const {setSelection} = renderSuggestionMention('@alice@exam@alice@example.com', updateComment, {start: 6, end: 6});
+
+        await waitFor(() => expect(mockMentionSuggestionsSpy).toHaveBeenCalled());
+        const {onSelect} = getLastMentionSuggestionsProps();
+
+        act(() => onSelect(0));
+
+        expect(updateComment).toHaveBeenCalledWith('@alice@example.com @alice@example.com', true);
+        expect(setSelection).toHaveBeenCalledWith({start: 19, end: 19});
+    });
 });
