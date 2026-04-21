@@ -5,6 +5,7 @@ import type {Emoji} from '@assets/emojis/types';
 import type {Mention} from '@components/MentionSuggestions';
 import type {FileObject} from '@src/types/utils/Attachment';
 import type {ComposerWithSuggestionsRef} from './ComposerWithSuggestions';
+import type useDebouncedCommentMaxLengthValidation from './useDebouncedCommentMaxLengthValidation';
 
 type SuggestionsRef = {
     resetSuggestions: () => void;
@@ -32,12 +33,14 @@ type ComposerEditState = {
     editingReportActionID: string | null;
     editingMessage: string | null;
     editingState: 'off' | 'editing' | 'submitted';
+    draftComment: string | null | undefined;
+    effectiveDraft: string | null | undefined;
 };
 
 // Warm — changes based on content + policy
 type ComposerSendState = {
     isSendDisabled: boolean;
-    debouncedCommentMaxLengthValidation: (value: string) => void;
+    debouncedCommentMaxLengthValidation: ReturnType<typeof useDebouncedCommentMaxLengthValidation>['debouncedCommentMaxLengthValidation'] | null;
     isExceedingMaxLength: boolean;
     exceededMaxLength: number | null;
     isBlockedFromConcierge: boolean;
@@ -56,6 +59,7 @@ type ComposerActions = {
     onItemSelected: () => void;
     onTriggerAttachmentPicker: () => void;
     clearComposer: () => void;
+    setDidResetComposerHeight: (v: boolean) => void;
 };
 
 type ComposerEditActions = {
@@ -93,7 +97,7 @@ const ComposerStateContext = createContext<ComposerState>(defaultState);
 
 const defaultSendState: ComposerSendState = {
     isSendDisabled: true,
-    debouncedCommentMaxLengthValidation: noop,
+    debouncedCommentMaxLengthValidation: null,
     isExceedingMaxLength: false,
     exceededMaxLength: null,
     isBlockedFromConcierge: false,
@@ -105,6 +109,8 @@ const defaultEditState: ComposerEditState = {
     editingReportActionID: null,
     editingMessage: null,
     editingState: 'off',
+    draftComment: undefined,
+    effectiveDraft: undefined,
 };
 const ComposerEditStateContext = createContext<ComposerEditState>(defaultEditState);
 
@@ -121,6 +127,7 @@ const defaultActions: ComposerActions = {
     onItemSelected: noop,
     onTriggerAttachmentPicker: noop,
     clearComposer: noop,
+    setDidResetComposerHeight: noop,
 };
 const ComposerActionsContext = createContext<ComposerActions>(defaultActions);
 
@@ -129,12 +136,6 @@ const defaultEditActions: ComposerEditActions = {
     deleteDraft: noop,
 };
 const ComposerEditActionsContext = createContext<ComposerEditActions>(defaultEditActions);
-
-const defaultSendActions: ComposerSendActions = {
-    validateAndSubmitDraft: noop,
-    submitDraftAndClearComposer: noop,
-};
-const ComposerSendActionsContext = createContext<ComposerSendActions>(defaultSendActions);
 
 const ComposerMetaContext = createContext<ComposerMeta | null>(null);
 
@@ -162,10 +163,6 @@ function useComposerEditActions() {
     return useContext(ComposerEditActionsContext);
 }
 
-function useComposerSendActions() {
-    return useContext(ComposerSendActionsContext);
-}
-
 function useComposerMeta() {
     const ctx = useContext(ComposerMetaContext);
     if (!ctx) {
@@ -181,7 +178,6 @@ export {
     ComposerSendStateContext,
     ComposerActionsContext,
     ComposerEditActionsContext,
-    ComposerSendActionsContext,
     ComposerMetaContext,
     useComposerText,
     useComposerState,
@@ -189,7 +185,6 @@ export {
     useComposerSendState,
     useComposerActions,
     useComposerEditActions,
-    useComposerSendActions,
     useComposerMeta,
 };
 export type {SuggestionsRef, ComposerText, ComposerState, ComposerSendState, ComposerActions, ComposerSendActions, ComposerMeta};

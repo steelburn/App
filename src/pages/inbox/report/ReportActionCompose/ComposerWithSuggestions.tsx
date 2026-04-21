@@ -13,7 +13,6 @@ import type {
 } from 'react-native';
 import {DeviceEventEmitter, InteractionManager, NativeModules, StyleSheet, View} from 'react-native';
 import {useFocusedInputHandler} from 'react-native-keyboard-controller';
-import type {OnyxEntry} from 'react-native-onyx';
 import {useAnimatedRef, useSharedValue} from 'react-native-reanimated';
 import type {Emoji} from '@assets/emojis/types';
 import type {MeasureParentContainerAndCursorCallback} from '@components/AutoCompleteSuggestions/types';
@@ -70,6 +69,7 @@ import ReportActionComposeUtils from './ReportActionComposeUtils';
 import SilentCommentUpdater from './SilentCommentUpdater';
 import Suggestions from './Suggestions';
 import useEditComposerToggle from './useEditComposerToggle';
+import useLastEditableAction from './useLastEditableAction';
 
 type SyncSelection = {
     position: number;
@@ -136,9 +136,6 @@ type ComposerWithSuggestionsProps = Partial<ChildrenProps> &
         /** Whether the input is disabled, defaults to false */
         disabled?: boolean;
 
-        /** Function to set whether the comment is empty */
-        setIsCommentEmpty?: (isCommentEmpty: boolean) => void;
-
         /** Function to handle sending a message */
         onEnterKeyPress: () => void;
 
@@ -156,9 +153,6 @@ type ComposerWithSuggestionsProps = Partial<ChildrenProps> &
 
         /** The ref to the next modal will open */
         isNextModalWillOpenRef: RefObject<boolean | null>;
-
-        /** The last report action */
-        lastReportAction?: OnyxEntry<OnyxTypes.ReportAction>;
 
         /** Whether to include chronos */
         includeChronos?: boolean;
@@ -212,7 +206,6 @@ function ComposerWithSuggestions({
     // Props: Report
     reportID,
     includeChronos,
-    lastReportAction,
     isGroupPolicyReport,
     policyID,
 
@@ -228,7 +221,6 @@ function ComposerWithSuggestions({
     inputPlaceholder,
     onPasteFile,
     disabled,
-    setIsCommentEmpty,
     onEnterKeyPress,
     measureParentContainer = () => {},
     isScrollLikelyLayoutTriggered,
@@ -247,6 +239,7 @@ function ComposerWithSuggestions({
     // Fullstory
     forwardedFSClass,
 }: ComposerWithSuggestionsProps) {
+    const lastReportAction = useLastEditableAction(reportID);
     const route = useRoute();
     const {isKeyboardShown} = useKeyboardState();
     const theme = useTheme();
@@ -315,10 +308,6 @@ function ComposerWithSuggestions({
         focusComposerWithDelay(composerRef.current, delay)(shouldDelay, forcedSelectionRange, forceKeyboardIfAlreadyFocused).catch(() => {});
     }, []);
 
-    const updateIsCommentEmptyOnEditEnd = useCallback(() => {
-        setIsCommentEmpty?.(ReportActionComposeUtils.getIsCommentEmpty(draftComment ?? ''));
-    }, [draftComment, setIsCommentEmpty]);
-
     const handleEditFocus = useCallback(() => {
         focus(true, undefined, true);
     }, [focus]);
@@ -334,7 +323,6 @@ function ComposerWithSuggestions({
         selection,
         draftComment,
         composerRef,
-        onEditEnd: updateIsCommentEmptyOnEditEnd,
         onFocus: handleEditFocus,
         onValueChange: handleEditValueChange,
         onSelectionChange: setSelection,
@@ -529,16 +517,9 @@ function ComposerWithSuggestions({
 
             const newComment = insertTextVSBetweenDigitAndEmoji(emojiConvertedText);
             const newCommentConverted = convertToLTRForComposer(newComment);
+            emojisPresentBefore.current = emojis;
 
             const textVSOffset = getTextVSCursorOffset(emojiConvertedText, cursorPosition);
-            const isNewCommentEmpty = ReportActionComposeUtils.getIsCommentEmpty(newCommentConverted);
-            const isPrevCommentEmpty = ReportActionComposeUtils.getIsCommentEmpty(commentRef.current);
-
-            /** Only update isCommentEmpty state if it's different from previous one */
-            if (!isEditingInComposer && isNewCommentEmpty !== isPrevCommentEmpty) {
-                setIsCommentEmpty?.(isNewCommentEmpty);
-            }
-            emojisPresentBefore.current = emojis;
 
             setValue(newCommentConverted);
             if (commentValue !== newComment) {
@@ -590,18 +571,16 @@ function ComposerWithSuggestions({
             editingReportActionID,
             editingState,
             findNewlyAddedChars,
-            isEditingInComposer,
             preferredLocale,
             preferredSkinTone,
-            raiseIsScrollLikelyLayoutTriggered,
             reportID,
+            suggestionsRef,
+            raiseIsScrollLikelyLayoutTriggered,
             selection.end,
             selection?.start,
             setCurrentEditMessageSelection,
             setEditingMessage,
-            setIsCommentEmpty,
             shouldUseNarrowLayout,
-            suggestionsRef,
             wasEditingRef,
         ],
     );

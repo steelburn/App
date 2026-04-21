@@ -1,4 +1,4 @@
-import React, {useMemo, useState} from 'react';
+import React, {useState} from 'react';
 import {View} from 'react-native';
 import {scheduleOnUI} from 'react-native-worklets';
 import DragAndDropConsumer from '@components/DragAndDrop/Consumer';
@@ -99,7 +99,7 @@ function ReportActionComposeInner({reportID}: ReportActionComposeProps) {
     const isTransactionThreadView = isReportTransactionThread(report);
     const isExpensesReport = reportTransactions && reportTransactions.length > 1;
 
-    const reportActionValues = useMemo(() => (rawReportActions ? Object.values(rawReportActions) : []), [rawReportActions]);
+    const reportActionValues = rawReportActions ? Object.values(rawReportActions) : [];
     const iouAction = reportActionValues.find((action) => isMoneyRequestAction(action));
     const linkedTransactionID = iouAction && !isExpensesReport ? getLinkedTransactionID(iouAction) : undefined;
     const transactionID = getTransactionID(report) ?? linkedTransactionID;
@@ -202,7 +202,7 @@ function ReportActionComposeInner({reportID}: ReportActionComposeProps) {
                         </DragAndDropConsumer>
                     )}
                     <ComposerEmojiPicker reportID={reportID} />
-                    <ComposerSendButton />
+                    <ComposerSendButton reportID={reportID} />
                 </ComposerBox>
                 {ErrorModal}
                 <ComposerFooter>

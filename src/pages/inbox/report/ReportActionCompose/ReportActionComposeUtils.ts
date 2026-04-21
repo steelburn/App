@@ -5,10 +5,6 @@ import CONST from '@src/CONST';
 
 const isIOSNative = getPlatform() === CONST.PLATFORM.IOS;
 
-function getIsCommentEmpty(comment: string) {
-    return !!comment.match(/^(\s)*$/);
-}
-
 const updateNativeSelectionValue = (composerRef: React.RefObject<ComposerRef | null>, start: number, end: number) => {
     if (!isIOSNative) {
         return;
@@ -24,7 +20,6 @@ const updateNativeSelectionValue = (composerRef: React.RefObject<ComposerRef | n
 };
 
 const ReportActionComposeUtils = {
-    getIsCommentEmpty,
     updateNativeSelectionValue,
 };
 

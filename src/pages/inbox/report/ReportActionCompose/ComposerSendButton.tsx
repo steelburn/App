@@ -5,16 +5,17 @@ import useLocalize from '@hooks/useLocalize';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
 import CONST from '@src/CONST';
-import {useComposerEditState, useComposerSendActions, useComposerSendState} from './ComposerContext';
+import {useComposerEditState, useComposerSendState} from './ComposerContext';
 import SendOrSaveButton from './SendOrSaveButton';
+import useComposerSubmit from './useComposerSubmit';
 
-function ComposerSendButton() {
+function ComposerSendButton({reportID}: {reportID: string}) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
 
     const {isEditingInComposer} = useComposerEditState();
     const {isSendDisabled} = useComposerSendState();
-    const {submitDraftAndClearComposer} = useComposerSendActions();
+    const {submitDraftAndClearComposer} = useComposerSubmit(reportID);
 
     // We need to use isSmallScreenWidth instead of shouldUseNarrowLayout to manage GestureDetector correctly
     // eslint-disable-next-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidth

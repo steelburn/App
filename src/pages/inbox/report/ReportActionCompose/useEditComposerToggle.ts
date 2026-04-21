@@ -13,7 +13,6 @@ type UseEditComposerToggleProps = {
     selection: TextSelection;
     draftComment: string;
     composerRef: RefObject<ComposerRef | null>;
-    onEditEnd?: () => void;
     onSelectionChange?: (selection: TextSelection) => void;
     onFocus?: () => void;
     onValueChange?: (value: string) => void;
@@ -27,7 +26,7 @@ type UseEditComposerToggleProps = {
  * to update the value of the composer when the editing state is toggled on,
  * and to update the selection of the composer when the editing state is toggled on.
  */
-function useEditComposerToggle({selection, draftComment, composerRef, onEditEnd, onFocus, onValueChange, onSelectionChange}: UseEditComposerToggleProps) {
+function useEditComposerToggle({selection, draftComment, composerRef, onFocus, onValueChange, onSelectionChange}: UseEditComposerToggleProps) {
     const {shouldUseNarrowLayout} = useResponsiveLayout();
 
     const {editingState, editingReportActionID, editingMessage, currentEditMessageSelection} = useReportActionActiveEdit();
@@ -83,7 +82,6 @@ function useEditComposerToggle({selection, draftComment, composerRef, onEditEnd,
             if (wasEditingRef.current && wasEditingInComposerRef.current) {
                 // Editing just ended in the composer – restore the draft comment and its previous selection.
                 applyComposerValue(draftComment ?? '', {selection: previousDraftSelectionRef.current, shouldForceNativeValueUpdate: true});
-                onEditEnd?.();
 
                 if (!wasComposerFocusedBeforeEditingRef.current) {
                     composerRef.current?.blur();
@@ -136,7 +134,7 @@ function useEditComposerToggle({selection, draftComment, composerRef, onEditEnd,
         }
 
         previousEditingReportActionIDRef.current = editingReportActionID;
-    }, [applyComposerValue, composerRef, draftComment, editingMessage, editingReportActionID, editingState, selection, onEditEnd, shouldUseNarrowLayout]);
+    }, [applyComposerValue, composerRef, draftComment, editingMessage, editingReportActionID, editingState, selection, shouldUseNarrowLayout]);
 
     return {wasEditingRef};
 }
