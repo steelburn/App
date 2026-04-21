@@ -8,7 +8,7 @@ import type CONST from '@src/CONST';
 type GoogleTagManagerEvent = ValueOf<typeof CONST.ANALYTICS.EVENT>;
 
 type GoogleTagManagerModule = {
-    publishEvent: (event: GoogleTagManagerEvent, accountID: number) => void;
+    publishEvent: (event: GoogleTagManagerEvent, accountID: number, email: string) => void;
 };
 
 export default GoogleTagManagerModule;

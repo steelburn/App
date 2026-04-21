@@ -16,16 +16,17 @@ type WindowWithDataLayer = Window & {
 type DataLayerPushParams = {
     event: GoogleTagManagerEvent;
     user_id: number;
+    user_data: {email: string};
 };
 
 declare const window: WindowWithDataLayer;
 
-function publishEvent(event: GoogleTagManagerEvent, accountID: number) {
+function publishEvent(event: GoogleTagManagerEvent, accountID: number, email: string) {
     if (!window.dataLayer) {
         return;
     }
 
-    const params = {event, user_id: accountID};
+    const params = {event, user_id: accountID, user_data: {email}};
 
     // Pass a copy of params here since the dataLayer modifies the object
     window.dataLayer.push({...params});
