@@ -269,8 +269,9 @@ describe('AgentZeroStatusContext', () => {
             act(() => {
                 jest.advanceTimersByTime(60000);
             });
-            await waitForBatchedUpdates();
 
+            // Don't waitForBatchedUpdates() after — it drains all queued timers
+            // (including the future safety timer), which would clear the indicator.
             expect(result.current.isProcessing).toBe(true);
             expect(result.current.statusLabel).toBe(serverLabel);
         });
