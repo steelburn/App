@@ -1,5 +1,5 @@
 import agentZeroProcessingIndicatorSelector from '@selectors/ReportNameValuePairs';
-import {useCallback, useEffect, useRef, useState, useSyncExternalStore} from 'react';
+import {useEffect, useRef, useState, useSyncExternalStore} from 'react';
 import type {OnyxEntry} from 'react-native-onyx';
 import {clearAgentZeroProcessingIndicator, getNewerActions, subscribeToReportReasoningEvents, unsubscribeFromReportReasoningChannel} from '@libs/actions/Report';
 import ConciergeReasoningStore from '@libs/ConciergeReasoningStore';
@@ -46,29 +46,45 @@ const MIN_DISPLAY_TIME = 300; // ms
 // Debounce delay for server label updates
 const DEBOUNCE_DELAY = 150; // ms
 
-/** Selector that extracts the newest report action ID and actor from the report actions collection. */
+/**
+ * Selector that extracts the newest report action ID and actor from the report actions collection.
+ *
+ * Sorts by `created` timestamp (ISO strings compare chronologically), with reportActionID as a
+ * tiebreaker. reportActionID alone is unreliable because optimistic actions use random IDs, so
+ * a purely numeric comparison can rank them ahead of real server actions.
+ */
 function selectNewestReportAction(reportActions: OnyxEntry<ReportActions>): NewestReportAction | undefined {
     if (!reportActions) {
         return undefined;
     }
-    const actionIDs = Object.keys(reportActions);
-    if (actionIDs.length === 0) {
+    const actions = Object.values(reportActions).filter(Boolean);
+    if (actions.length === 0) {
         return undefined;
     }
-    const newestReportActionID = actionIDs.reduce((a, b) => (Number(a) > Number(b) ? a : b));
+    const newest = actions.reduce((a, b) => {
+        const createdA = a.created ?? '';
+        const createdB = b.created ?? '';
+        if (createdA !== createdB) {
+            return createdA > createdB ? a : b;
+        }
+        return a.reportActionID > b.reportActionID ? a : b;
+    });
     return {
-        reportActionID: newestReportActionID,
-        actorAccountID: reportActions[newestReportActionID]?.actorAccountID,
+        reportActionID: newest.reportActionID,
+        actorAccountID: newest.actorAccountID,
     };
 }
 
 /**
  * Hook to manage AgentZero status indicator for chats where AgentZero responds.
- * This includes both Concierge DM chats and policy #admins rooms (where Concierge handles onboarding).
+ *
+ * Callers must gate this hook at the mount level (only mount for AgentZero-enabled chats:
+ * Concierge DMs or policy #admins rooms). The outer `AgentZeroStatusProvider` already
+ * enforces this, so the hook assumes it's always running for an AgentZero chat.
+ *
  * @param reportID - The report ID to monitor
- * @param isAgentZeroChat - Whether the chat is an AgentZero-enabled chat (Concierge DM or #admins room)
  */
-function useAgentZeroStatusIndicator(reportID: string, isAgentZeroChat: boolean): AgentZeroStatusState {
+function useAgentZeroStatusIndicator(reportID: string): AgentZeroStatusState {
     // Server-driven processing label from report name-value pairs (e.g. "Looking up categories...")
     // Uses selector to only re-render when the specific field changes, not on any NVP change.
     const [serverLabel] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS}${reportID}`, {selector: agentZeroProcessingIndicatorSelector});
@@ -110,7 +126,7 @@ function useAgentZeroStatusIndicator(reportID: string, isAgentZeroChat: boolean)
      * Clear the polling interval and safety timer. Called when the indicator clears normally,
      * when a new processing cycle starts, or when the component unmounts.
      */
-    const clearPolling = useCallback(() => {
+    const clearPolling = () => {
         if (pollIntervalRef.current) {
             clearInterval(pollIntervalRef.current);
             pollIntervalRef.current = null;
@@ -119,13 +135,13 @@ function useAgentZeroStatusIndicator(reportID: string, isAgentZeroChat: boolean)
             clearTimeout(pollSafetyTimerRef.current);
             pollSafetyTimerRef.current = null;
         }
-    }, []);
+    };
 
     /**
      * Hard-clear the indicator by resetting local state and clearing the Onyx NVP.
      * Called as a safety net after MAX_POLL_DURATION_MS if no response has arrived.
      */
-    const hardClearIndicator = useCallback(() => {
+    const hardClearIndicator = () => {
         // If offline, don't clear — the response may arrive when reconnected
         if (isOfflineRef.current) {
             return;
@@ -136,7 +152,7 @@ function useAgentZeroStatusIndicator(reportID: string, isAgentZeroChat: boolean)
         setDisplayedLabel('');
         clearAgentZeroProcessingIndicator(reportID);
         getNewerActions(reportID, newestReportActionRef.current?.reportActionID);
-    }, [clearPolling, reportID]);
+    };
 
     /**
      * Start polling for missed actions every POLL_INTERVAL_MS. Every time processing
@@ -148,7 +164,7 @@ function useAgentZeroStatusIndicator(reportID: string, isAgentZeroChat: boolean)
      *
      * Polling stops when: indicator clears, component unmounts, or user goes offline.
      */
-    const startPolling = useCallback(() => {
+    const startPolling = () => {
         clearPolling();
 
         // Poll every 30s for missed actions. Track the newest action ID before polling
@@ -177,7 +193,7 @@ function useAgentZeroStatusIndicator(reportID: string, isAgentZeroChat: boolean)
         pollSafetyTimerRef.current = setTimeout(() => {
             hardClearIndicator();
         }, MAX_POLL_DURATION_MS);
-    }, [clearPolling, hardClearIndicator, reportID]);
+    };
 
     // On reconnect, proactively clear stale optimistic state + NVP and refetch missed actions.
     //
@@ -208,28 +224,21 @@ function useAgentZeroStatusIndicator(reportID: string, isAgentZeroChat: boolean)
     });
 
     // Subscribe to ConciergeReasoningStore using useSyncExternalStore for correct
-    // synchronization with React's render cycle. Both callbacks are memoized on reportID
-    // so useSyncExternalStore doesn't unsubscribe/resubscribe on every render.
-    const subscribeToReasoningStore = useCallback(
-        (onStoreChange: () => void) => {
-            const unsubscribe = ConciergeReasoningStore.subscribe((updatedReportID) => {
-                if (updatedReportID !== reportID) {
-                    return;
-                }
-                onStoreChange();
-            });
-            return unsubscribe;
-        },
-        [reportID],
-    );
-    const getReasoningSnapshot = useCallback(() => ConciergeReasoningStore.getReasoningHistory(reportID), [reportID]);
+    // synchronization with React's render cycle. React Compiler memoizes these closures
+    // based on reportID, so useSyncExternalStore doesn't unsubscribe/resubscribe on every render.
+    const subscribeToReasoningStore = (onStoreChange: () => void) => {
+        const unsubscribe = ConciergeReasoningStore.subscribe((updatedReportID) => {
+            if (updatedReportID !== reportID) {
+                return;
+            }
+            onStoreChange();
+        });
+        return unsubscribe;
+    };
+    const getReasoningSnapshot = () => ConciergeReasoningStore.getReasoningHistory(reportID);
     const reasoningHistory = useSyncExternalStore(subscribeToReasoningStore, getReasoningSnapshot, getReasoningSnapshot);
 
     useEffect(() => {
-        if (!isAgentZeroChat) {
-            return;
-        }
-
         subscribeToReportReasoningEvents(reportID);
 
         // Cleanup: unsubscribeFromReportReasoningChannel handles Pusher unsubscribing,
@@ -237,7 +246,7 @@ function useAgentZeroStatusIndicator(reportID: string, isAgentZeroChat: boolean)
         return () => {
             unsubscribeFromReportReasoningChannel(reportID);
         };
-    }, [isAgentZeroChat, reportID]);
+    }, [reportID]);
 
     // Synchronize the displayed label with debounce and minimum display time.
     // displayedLabelRef mirrors state so the effect can check the current value without depending on displayedLabel.
@@ -322,10 +331,10 @@ function useAgentZeroStatusIndicator(reportID: string, isAgentZeroChat: boolean)
         [clearPolling],
     );
 
-    const kickoffWaitingIndicator = useCallback(() => {
+    const kickoffWaitingIndicator = () => {
         setPendingOptimisticRequests((prev) => prev + 1);
         startPolling();
-    }, [startPolling]);
+    };
 
     // Capture the newest reportActionID as a baseline whenever the indicator transitions
     // from inactive to active (serverLabel or optimistic). The baseline survives offline

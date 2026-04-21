@@ -161,8 +161,9 @@ const config = defineConfig([
 
     // Suppress lint rules that are unnecessary for files successfully compiled by React Compiler.
     // The processor runs React Compiler on each file and filters out redundant lint messages.
+    // Covers .ts/.js hooks too, since React Compiler memoizes functions regardless of extension.
     {
-        files: ['**/*.tsx', '**/*.jsx'],
+        files: ['**/*.tsx', '**/*.jsx', '**/*.ts', '**/*.js'],
         processor: reactCompilerCompat.processors['react-compiler-compat'],
     },
 

@@ -63,7 +63,7 @@ function AgentZeroStatusProvider({reportID, children}: React.PropsWithChildren<{
 }
 
 function AgentZeroStatusGate({reportID, children}: React.PropsWithChildren<{reportID: string}>) {
-    const {kickoffWaitingIndicator, ...stateValue} = useAgentZeroStatusIndicator(reportID, true);
+    const {kickoffWaitingIndicator, ...stateValue} = useAgentZeroStatusIndicator(reportID);
     const actionsValue = {kickoffWaitingIndicator};
 
     return (
