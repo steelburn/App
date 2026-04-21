@@ -16,9 +16,8 @@ import type {SearchQueryJSON} from '@components/Search/types';
 import Text from '@components/Text';
 import TextLink from '@components/TextLink';
 import useConfirmModal from '@hooks/useConfirmModal';
-import useCreateEmptyReportConfirmation from '@hooks/useCreateEmptyReportConfirmation';
+import useCreateReportAction from '@hooks/useCreateReportAction';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
-import useHasEmptyReportsForPolicy from '@hooks/useHasEmptyReportsForPolicy';
 import useIsInLandscapeMode from '@hooks/useIsInLandscapeMode';
 import {useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
@@ -37,7 +36,6 @@ import {generateReportID, hasViolations as hasViolationsReportUtils} from '@libs
 import {isDefaultExpenseReportsQuery, isDefaultExpensesQuery} from '@libs/SearchQueryUtils';
 import type {SearchTypeMenuSection} from '@libs/SearchUIUtils';
 import {TODO_SEARCH_KEYS} from '@libs/SearchUIUtils';
-import {shouldRestrictUserBillableActions} from '@libs/SubscriptionUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
@@ -144,9 +142,6 @@ function EmptySearchViewContent({
     });
     const hasViolations = hasViolationsReportUtils(undefined, transactionViolations, accountID ?? CONST.DEFAULT_NUMBER_ID, '');
     const [draftTransactionIDs] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION_DRAFT, {selector: validTransactionDraftIDsSelector});
-    const [userBillingGracePeriodEnds] = useOnyx(ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_USER_BILLING_GRACE_PERIOD_END);
-    const [ownerBillingGracePeriodEnd] = useOnyx(ONYXKEYS.NVP_PRIVATE_OWNER_BILLING_GRACE_PERIOD_END);
-    const [amountOwed] = useOnyx(ONYXKEYS.NVP_PRIVATE_AMOUNT_OWED);
     const [hasTransactions] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION, {
         selector: hasTransactionsSelector,
     });
@@ -157,12 +152,6 @@ function EmptySearchViewContent({
     const shouldRedirectToExpensifyClassic = areAllGroupPoliciesExpenseChatDisabled(allPolicies ?? {});
 
     const defaultChatEnabledPolicy = getDefaultChatEnabledPolicy(groupPoliciesWithChatEnabled as Array<OnyxEntry<Policy>>, activePolicy);
-
-    const defaultChatEnabledPolicyID = defaultChatEnabledPolicy?.id;
-
-    const hasEmptyReport = useHasEmptyReportsForPolicy(defaultChatEnabledPolicyID);
-    const [hasDismissedEmptyReportsConfirmation] = useOnyx(ONYXKEYS.NVP_EMPTY_REPORTS_CONFIRMATION_DISMISSED);
-    const shouldShowEmptyReportConfirmation = hasEmptyReport && hasDismissedEmptyReportsConfirmation !== true;
 
     const filteredPolicyID = queryJSON?.policyID;
     let isFilteredWorkspaceAccessible = true;
@@ -196,19 +185,10 @@ function EmptySearchViewContent({
         });
     };
 
-    const {openCreateReportConfirmation: openCreateReportFromSearch} = useCreateEmptyReportConfirmation({
-        policyID: defaultChatEnabledPolicyID,
-        policyName: defaultChatEnabledPolicy?.name ?? '',
-        onConfirm: handleCreateWorkspaceReport,
+    const {createReportAction, isVisible: isCreateReportVisible} = useCreateReportAction({
+        onCreateReport: handleCreateWorkspaceReport,
+        groupPoliciesWithChatEnabled,
     });
-
-    const handleCreateReportClick = () => {
-        if (shouldShowEmptyReportConfirmation) {
-            openCreateReportFromSearch();
-        } else {
-            handleCreateWorkspaceReport(false);
-        }
-    };
 
     const handleRedirectToExpensifyClassic = () => {
         showConfirmModal({
@@ -323,31 +303,11 @@ function EmptySearchViewContent({
                                       },
                                   ]
                                 : []),
-                            ...(groupPoliciesWithChatEnabled.length > 0
+                            ...(isCreateReportVisible
                                 ? [
                                       {
                                           buttonText: translate('quickAction.createReport'),
-                                          buttonAction: () => {
-                                              interceptAnonymousUser(() => {
-                                                  const workspaceIDForReportCreation = defaultChatEnabledPolicyID;
-
-                                                  if (
-                                                      !workspaceIDForReportCreation ||
-                                                      (shouldRestrictUserBillableActions(workspaceIDForReportCreation, ownerBillingGracePeriodEnd, userBillingGracePeriodEnds, amountOwed) &&
-                                                          groupPoliciesWithChatEnabled.length > 1)
-                                                  ) {
-                                                      // If we couldn't guess the workspace to create the report, or a guessed workspace is past it's grace period and we have other workspaces to choose from
-                                                      Navigation.navigate(ROUTES.NEW_REPORT_WORKSPACE_SELECTION.getRoute());
-                                                      return;
-                                                  }
-
-                                                  if (!shouldRestrictUserBillableActions(workspaceIDForReportCreation, ownerBillingGracePeriodEnd, userBillingGracePeriodEnds, amountOwed)) {
-                                                      handleCreateReportClick();
-                                                  } else {
-                                                      Navigation.navigate(ROUTES.RESTRICTED_ACTION.getRoute(workspaceIDForReportCreation));
-                                                  }
-                                              });
-                                          },
+                                          buttonAction: createReportAction,
                                           success: true,
                                       },
                                   ]

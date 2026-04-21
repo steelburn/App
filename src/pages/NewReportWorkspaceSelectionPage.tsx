@@ -1,5 +1,5 @@
 import {accountIDSelector, emailSelector} from '@selectors/Session';
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {View} from 'react-native';
 import type {OnyxCollection} from 'react-native-onyx';
 import ActivityIndicator from '@components/ActivityIndicator';
@@ -51,7 +51,7 @@ type WorkspaceListItem = {
 type NewReportWorkspaceSelectionPageProps = PlatformStackScreenProps<NewReportWorkspaceSelectionNavigatorParamList, typeof SCREENS.NEW_REPORT_WORKSPACE_SELECTION.ROOT>;
 
 function NewReportWorkspaceSelectionPage({route}: NewReportWorkspaceSelectionPageProps) {
-    const {isMovingExpenses, backTo} = route.params ?? {};
+    const {isMovingExpenses, backTo, selectedPolicyID} = route.params ?? {};
     const {isOffline} = useNetwork();
     const icons = useMemoizedLazyExpensifyIcons(['FallbackWorkspaceAvatar']);
     const {selectedTransactions, selectedTransactionIDs} = useSearchStateContext();
@@ -82,15 +82,16 @@ function NewReportWorkspaceSelectionPage({route}: NewReportWorkspaceSelectionPag
     const shouldShowLoadingIndicator = isLoadingApp && !isOffline;
     const [pendingPolicySelection, setPendingPolicySelection] = useState<{policy: WorkspaceListItem; shouldShowEmptyReportConfirmation: boolean} | null>(null);
 
-    const [policiesWithEmptyReports] = useOnyx(ONYXKEYS.COLLECTION.REPORT, {
-        selector: (reports: OnyxCollection<OnyxTypes.Report>) => {
+    const policiesWithEmptyReportsSelector = useCallback(
+        (reports: OnyxCollection<OnyxTypes.Report>) => {
             if (!accountID) {
                 return {};
             }
-
             return getPolicyIDsWithEmptyReportsForAccount(reports, accountID);
         },
-    });
+        [accountID],
+    );
+    const [policiesWithEmptyReports] = useOnyx(ONYXKEYS.COLLECTION.REPORT, {selector: policiesWithEmptyReportsSelector});
 
     const navigateToNewReport = (optimisticReportID: string) => {
         if (isRHPOnReportInSearch) {
@@ -242,6 +243,27 @@ function NewReportWorkspaceSelectionPage({route}: NewReportWorkspaceSelectionPag
         }
         usersWorkspaces = result.sort((a, b) => localeCompare(a.text, b.text));
     }
+
+    // Auto-select path: when callers pass selectedPolicyID (e.g. IOURequestStepUpgrade after creating a
+    // workspace), create the report directly without making the user pick from a list or dismiss an
+    // empty-report confirmation — they already confirmed intent on the previous screen.
+    const didAutoSelectRef = useRef(false);
+    useEffect(() => {
+        if (didAutoSelectRef.current || !selectedPolicyID || shouldShowLoadingIndicator) {
+            return;
+        }
+        const targetPolicy = usersWorkspaces.find((policy) => policy.policyID === selectedPolicyID);
+        if (!targetPolicy?.policyID) {
+            return;
+        }
+        didAutoSelectRef.current = true;
+
+        if (shouldRestrictUserBillableActions(targetPolicy.policyID, ownerBillingGracePeriodEnd, userBillingGracePeriods, amountOwed)) {
+            Navigation.navigate(ROUTES.RESTRICTED_ACTION.getRoute(targetPolicy.policyID));
+            return;
+        }
+        createReport(targetPolicy.policyID, false);
+    }, [selectedPolicyID, usersWorkspaces, shouldShowLoadingIndicator, ownerBillingGracePeriodEnd, userBillingGracePeriods, amountOwed, createReport]);
 
     const filteredAndSortedUserWorkspaces: WorkspaceListItem[] = usersWorkspaces.filter((policy) => policy.text?.toLowerCase().includes(debouncedSearchTerm?.toLowerCase() ?? ''));
 

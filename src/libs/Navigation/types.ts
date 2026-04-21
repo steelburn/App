@@ -1679,6 +1679,8 @@ type ProfileNavigatorParamList = {
 type NewReportWorkspaceSelectionNavigatorParamList = {
     [SCREENS.NEW_REPORT_WORKSPACE_SELECTION.ROOT]: {
         isMovingExpenses?: boolean;
+        /** When provided, the page auto-selects this policy on mount and creates the report without waiting for user input */
+        selectedPolicyID?: string;
         // eslint-disable-next-line no-restricted-syntax -- `backTo` usages in this file are legacy. Do not add new `backTo` params to screens. See contributingGuides/NAVIGATION.md
         backTo?: Routes;
     };

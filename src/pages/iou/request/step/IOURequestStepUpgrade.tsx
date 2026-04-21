@@ -123,8 +123,10 @@ function IOURequestStepUpgrade({
             case CONST.UPGRADE_PATHS.REPORTS:
                 Navigation.goBack();
                 if (action === CONST.IOU.ACTION.CREATE) {
-                    // Coming from "Create report" button (no workspace) → go to workspace selection which creates the report
-                    navigateWithMicrotask(ROUTES.NEW_REPORT_WORKSPACE_SELECTION.getRoute());
+                    // Coming from "Create report" button (no workspace) → workspace selection.
+                    // Pass the just-created policyID so the page auto-selects it and creates the report
+                    // without making the user pick the single workspace they just created.
+                    navigateWithMicrotask(ROUTES.NEW_REPORT_WORKSPACE_SELECTION.getRoute(undefined, undefined, policyID));
                 } else {
                     navigateWithMicrotask(ROUTES.MONEY_REQUEST_STEP_REPORT.getRoute(action, CONST.IOU.TYPE.SUBMIT, transactionID, reportID));
                 }
