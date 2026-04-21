@@ -431,7 +431,7 @@ describe('useCreateReportAction', () => {
 
         it('does not navigate to upgrade path when the user actually has policies but Onyx is still loading', () => {
             // Simulates cold start: consumer defaulted groupPoliciesWithChatEnabled to [] because Onyx
-            // hasn't hydrated yet. The hook should NOT treat this as "no policies" and misroute to upgrade.
+            // hasn't hydrated yet. The hook should NOT treat this as "no policies" and navigate to upgrade.
             const impl = ((_key: string, options?: {selector?: (value: unknown) => unknown}) => {
                 const value = options?.selector ? options.selector(undefined) : undefined;
                 return [value, {status: 'loading'}];
