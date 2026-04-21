@@ -137,7 +137,7 @@ function getRoundedDistanceInUnits(distanceInMeters: number, unit: Unit): string
  * @param useShortFormUnit If true, the unit will be returned in short form (e.g., "mi", "km").
  * @returns A string that displays the rate used for expense calculation
  */
-function getRateForDisplay(
+function getFormattedRateValue(
     unit: Unit | undefined,
     rate: number | undefined,
     currency: string | undefined,
@@ -160,6 +160,33 @@ function getRateForDisplay(
     const currencySymbol = getCurrencySymbol(currency) || `${currency} `;
 
     return `${currencySymbol}${formattedRate} / ${useShortFormUnit ? unit : singularDistanceUnit}`;
+}
+
+/**
+ * Get the rate title to display on the expense page.
+ * If the rate is out of policy, displays "Rate out of policy".
+ * For workspace expenses, shows the rate name (e.g., "Default Rate") so that updating a rate's
+ * value on the workspace does not retroactively change the displayed rate on historical expenses.
+ * For P2P expenses (no rate name), shows the formatted rate value (e.g., "$0.67 / mi").
+ */
+function getRateForExpenseDisplay(
+    rateName: string | undefined,
+    isCustomUnitOutOfPolicy: boolean,
+    unit: Unit | undefined,
+    rate: number | undefined,
+    currency: string | undefined,
+    translate: LocaleContextProps['translate'],
+    toLocaleDigit: LocaleContextProps['toLocaleDigit'],
+    getCurrencySymbol: CurrencyListActionsContextType['getCurrencySymbol'],
+    isOffline?: boolean,
+): string {
+    if (isCustomUnitOutOfPolicy) {
+        return translate('common.rateOutOfPolicy');
+    }
+    if (rateName) {
+        return rateName;
+    }
+    return getFormattedRateValue(unit, rate, currency, translate, toLocaleDigit, getCurrencySymbol, isOffline);
 }
 
 /**
@@ -235,7 +262,7 @@ function getDistanceMerchant(
     }
 
     const distanceInUnits = getDistanceForDisplay(hasRoute, distanceInMeters, unit, rate, translate, true, isZeroDistanceAllowed);
-    const ratePerUnit = getRateForDisplay(unit, rate, currency, translate, toLocaleDigit, getCurrencySymbol, undefined, true);
+    const ratePerUnit = getFormattedRateValue(unit, rate, currency, translate, toLocaleDigit, getCurrencySymbol, undefined, true);
 
     return `${distanceInUnits} ${CONST.DISTANCE_MERCHANT_SEPARATOR} ${ratePerUnit}`;
 }
@@ -326,10 +353,6 @@ function getCustomUnitRateID({
         return customUnitRateID;
     }
 
-    if (reportID === CONST.REPORT.UNREPORTED_REPORT_ID) {
-        return customUnitRateID;
-    }
-
     if (isEmptyObject(policy)) {
         return customUnitRateID;
     }
@@ -365,7 +388,7 @@ function getTaxableAmount(policy: OnyxEntry<Policy>, customUnitRateID: string, d
     const unit = distanceUnit?.attributes?.unit ?? CONST.CUSTOM_UNITS.DISTANCE_UNIT_MILES;
     const rate = customUnitRate?.rate ?? CONST.DEFAULT_NUMBER_ID;
     const amount = getDistanceRequestAmount(distance, unit, rate);
-    const taxClaimablePercentage = customUnitRate.attributes?.taxClaimablePercentage ?? 1;
+    const taxClaimablePercentage = customUnitRate.attributes?.taxClaimablePercentage ?? CONST.DEFAULT_NUMBER_ID;
     return amount * taxClaimablePercentage;
 }
 
@@ -385,12 +408,14 @@ function getRate({
     policyDraft,
     useTransactionDistanceUnit = true,
     policyForMovingExpenses,
+    isFakeP2PRate,
 }: {
     transaction: OnyxEntry<Transaction>;
     policy: OnyxEntry<Policy>;
     policyDraft?: OnyxEntry<Policy>;
     policyForMovingExpenses?: OnyxEntry<Policy>;
     useTransactionDistanceUnit?: boolean;
+    isFakeP2PRate?: boolean;
 }): MileageRate {
     let mileageRates = getMileageRates(policy, true, transaction?.comment?.customUnit?.customUnitRateID);
     if (isEmptyObject(mileageRates) && policyDraft) {
@@ -400,23 +425,17 @@ function getRate({
     // This will be fixed as part of https://github.com/Expensify/App/issues/66397
     // eslint-disable-next-line @typescript-eslint/no-deprecated
     const policyCurrency = policy?.outputCurrency ?? getPersonalPolicy()?.outputCurrency ?? CONST.CURRENCY.USD;
-    const transactionCurrency = getCurrency(transaction);
-
-    // getRateForP2P returns the stored rate only if passed currency is same as the transaction's currency
-    // For unreported transactions (and possibly for all existing transactions?), we always want to use the stored rate.
-    const currency = isExpenseUnreported(transaction) ? transactionCurrency : policyCurrency;
+    const isUnreportedExpense = isExpenseUnreported(transaction);
     const defaultMileageRate = getDefaultMileageRate(policy);
     const customUnitRateID = getRateID(transaction);
-    const isUnreportedExpense = isExpenseUnreported(transaction);
-    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
     const customMileageRate =
         (customUnitRateID && (mileageRates?.[customUnitRateID] ?? mileageRatesForMovingExpenses?.[customUnitRateID])) || (isUnreportedExpense ? undefined : defaultMileageRate);
-    const mileageRate = isCustomUnitRateIDForP2P(transaction) ? getRateForP2P(currency, transaction) : customMileageRate;
+    const mileageRate = isCustomUnitRateIDForP2P(transaction) || isFakeP2PRate ? getRateForP2P(policyCurrency, transaction) : customMileageRate;
     const unit = getDistanceUnit(useTransactionDistanceUnit ? transaction : undefined, mileageRate);
     return {
         ...mileageRate,
         unit,
-        currency: mileageRate?.currency ?? currency,
+        currency: mileageRate?.currency ?? policyCurrency,
     };
 }
 
@@ -455,19 +474,32 @@ function isDistanceAmountWithinLimit(distance: number, rate: number): boolean {
  * Normalize odometer text by standardizing locale digits and stripping all
  * non-numeric characters except the decimal point. fromLocaleDigit converts
  * each locale character to its standard equivalent (e.g. German ',' → '.'
- * for decimal, German '.' → ',' for group separator), then we keep only
- * digits and the standard decimal point.
+ * for decimal, German '.' → ',' for group separator), so after conversion
+ * dots are always decimals and commas are always group separators.
+ * We then strip everything except digits and the standard decimal point.
  */
 function normalizeOdometerText(text: string, fromLocaleDigit: (char: string) => string): string {
     const standardized = replaceAllDigits(text, fromLocaleDigit);
-    return standardized.replaceAll(/[^0-9.]/g, '');
+    const stripped = standardized.replaceAll(/[^0-9.]/g, '');
+    // Remove redundant leading zeroes (e.g. "007" → "7", "000" → "0") but
+    // keep a single zero before a decimal point (e.g. "0.5" stays "0.5").
+    return stripped.replace(/^0+(?=\d)/, '');
+}
+
+/**
+ * Prepare odometer input text for display by removing non-numeric characters
+ * (except the decimal point, comma, and space — which serve as group or
+ * decimal separators depending on locale) and stripping redundant leading zeroes.
+ */
+function prepareTextForDisplay(text: string): string {
+    return text.replaceAll(/[^0-9., ]/g, '').replace(/^0+(?=\d)/, '');
 }
 
 export default {
     getDefaultMileageRate,
     getDistanceMerchant,
     getDistanceRequestAmount,
-    getRateForDisplay,
+    getFormattedRateValue,
     getMileageRates,
     getDistanceForDisplay,
     getRoundedDistanceInUnits,
@@ -481,8 +513,10 @@ export default {
     getRateByCustomUnitRateID,
     getDistanceForDisplayLabel,
     convertDistanceUnit,
+    getRateForExpenseDisplay,
     isDistanceAmountWithinLimit,
     normalizeOdometerText,
+    prepareTextForDisplay,
 };
 
 export type {MileageRate};
