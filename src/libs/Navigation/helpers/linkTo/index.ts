@@ -64,6 +64,17 @@ function isNavigatingToReportWithSameReportID(currentRoute: NavigationPartialRou
     return currentParams?.reportID === newParams?.reportID;
 }
 
+function isNavigatingToReportActionWithinSameReport(currentRoute: NavigationPartialRoute, newRoute: NavigationPartialRoute) {
+    if (currentRoute.name !== SCREENS.REPORT || newRoute.name !== SCREENS.REPORT) {
+        return false;
+    }
+
+    const currentParams = currentRoute.params as ReportsSplitNavigatorParamList[typeof SCREENS.REPORT];
+    const newParams = newRoute?.params as ReportsSplitNavigatorParamList[typeof SCREENS.REPORT];
+
+    return currentParams?.reportID === newParams?.reportID && currentParams.reportActionID !== newParams.reportActionID;
+}
+
 function isRoutePreloaded(currentState: PlatformStackNavigationState<RootNavigatorParamList>, matchingFullScreenRoute: NavigationPartialRoute) {
     const lastRouteInMatchingFullScreen = matchingFullScreenRoute.state?.routes?.at(-1);
 
@@ -152,9 +163,10 @@ export default function linkTo(navigation: NavigationContainerRef<RootNavigatorP
     // Report screen - Also a special case. If we are navigating to the report with same reportID we want to replace it (navigate will do that).
     // This covers the case when we open a specific message in report (reportActionID).
     else if (
-        action.type === CONST.NAVIGATION.ACTION_TYPE.NAVIGATE &&
-        !isNavigatingToAttachmentScreen(focusedRouteFromPath?.name) &&
-        !isNavigatingToReportWithSameReportID(currentFocusedRoute, focusedRouteFromPath)
+        (action.type === CONST.NAVIGATION.ACTION_TYPE.NAVIGATE &&
+            !isNavigatingToAttachmentScreen(focusedRouteFromPath?.name) &&
+            !isNavigatingToReportWithSameReportID(currentFocusedRoute, focusedRouteFromPath)) ||
+        isNavigatingToReportActionWithinSameReport(currentFocusedRoute, focusedRouteFromPath)
     ) {
         // We want to PUSH by default to add entries to the browser history.
         action.type = CONST.NAVIGATION.ACTION_TYPE.PUSH;
