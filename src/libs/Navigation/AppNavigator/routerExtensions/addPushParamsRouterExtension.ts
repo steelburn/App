@@ -13,8 +13,8 @@ function preserveHistoryForRoutes(oldHistory: CustomHistoryEntry[], routes: Arra
     return oldHistory.filter((entry) => typeof entry === 'string' || remainingKeys.has(entry.key));
 }
 
-// noop=match at cursor; backward/forward=move cursor to match; unknown=target not in history.
-type ResetOutcome = {type: 'noop'; cursor: number} | {type: 'backward'; cursor: number} | {type: 'forward'; cursor: number} | {type: 'unknown'};
+// noop=match at cursor; backward/forward=move cursor to match; ambiguous=same compound at cursor±1 (see ambiguous branch); unknown=target not in history.
+type ResetOutcome = {type: 'noop'; cursor: number} | {type: 'backward'; cursor: number} | {type: 'forward'; cursor: number} | {type: 'ambiguous'; cursor: number} | {type: 'unknown'};
 
 /**
  * Classifies a RESET's target against our PUSH_PARAMS history + cursor so the caller fires the right focus-return notification and updates the cursor.
@@ -42,11 +42,16 @@ function resolveCursorForReset(history: CustomHistoryEntry[], currentCursor: num
             // Same compound at cursor (e.g. useNavigationResetOnLayoutChange).
             return {type: 'noop', cursor};
         }
-        // Forward preferred for duplicate compounds — browser-forward through [A, B, A] from cursor=1 must land at cursor=2, not cursor=0.
-        if (matchAt(cursor + 1)) {
+        const forwardMatches = matchAt(cursor + 1);
+        const backwardMatches = matchAt(cursor - 1);
+        if (forwardMatches && backwardMatches) {
+            // Direction unknowable from state — cursor forward (keeps goBack alive), caller fires backward notify (WCAG 2.4.3).
+            return {type: 'ambiguous', cursor: cursor + 1};
+        }
+        if (forwardMatches) {
             return {type: 'forward', cursor: cursor + 1};
         }
-        if (matchAt(cursor - 1)) {
+        if (backwardMatches) {
             return {type: 'backward', cursor: cursor - 1};
         }
     }
@@ -141,7 +146,8 @@ function addPushParamsRouterExtension<RouterOptions extends PlatformStackRouterO
                     notifyPushParamsForward(outgoingRoute.key, outgoingRoute.params);
                 }
 
-                const focusedRoute = stateWithUpdatedParams.routes.at(stateWithUpdatedParams.index) ?? stateWithUpdatedParams.routes.at(-1);
+                // `index` is typed optional on partial state — at(-1) fallback recovers the last route.
+                const focusedRoute = stateWithUpdatedParams.routes.at(stateWithUpdatedParams.index ?? -1) ?? stateWithUpdatedParams.routes.at(-1);
 
                 if (focusedRoute) {
                     // Mirror window.history.pushState: pushing mid-cursor discards forward entries.
@@ -244,7 +250,7 @@ function addPushParamsRouterExtension<RouterOptions extends PlatformStackRouterO
                 const history = state.history as CustomHistoryEntry[];
                 if (newFocused?.key) {
                     const outcome = resolveCursorForReset(history, pushParamsHistoryPosition, {key: newFocused.key, params: newFocused.params});
-                    if (outcome.type === 'backward') {
+                    if (outcome.type === 'backward' || outcome.type === 'ambiguous') {
                         notifyPushParamsBackward(newFocused.key, newFocused.params);
                         pushParamsHistoryPosition = outcome.cursor;
                     } else if (outcome.type === 'forward') {

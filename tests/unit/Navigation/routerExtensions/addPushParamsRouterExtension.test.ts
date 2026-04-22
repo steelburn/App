@@ -803,6 +803,39 @@ describe('addPushParamsRouterExtension', () => {
         expect(notifyPushParamsBackward).toHaveBeenCalledWith('search-1', {q: 'A'});
     });
 
+    it('ambiguous RESET (duplicate compound at cursor±1) fires backward focus-restore and advances cursor forward', () => {
+        const factory = createMockRouterFactory();
+        const enhancedRouter = addPushParamsRouterExtension(factory)({} as PlatformStackRouterOptions);
+        const initial = makeRoute('Search', 'search-1', {q: 'A'});
+        let state: TestState = makeState([initial], {history: [{...initial}] as CustomHistoryEntry[]});
+
+        // Build [A, B, A] via two PUSH_PARAMS.
+        state = enhancedRouter.getStateForAction(state, {type: CONST.NAVIGATION.ACTION_TYPE.PUSH_PARAMS, payload: {params: {q: 'B'}}}, CONFIG_OPTIONS) as TestState;
+        state = enhancedRouter.getStateForAction(state, {type: CONST.NAVIGATION.ACTION_TYPE.PUSH_PARAMS, payload: {params: {q: 'A'}}}, CONFIG_OPTIONS) as TestState;
+
+        // Simulate one browser-back to B (cursor 2 → 1 via adjacent-backward probe).
+        state = enhancedRouter.getStateForAction(
+            state,
+            {type: CONST.NAVIGATION.ACTION_TYPE.RESET, payload: {routes: [{name: 'Search', key: 'search-1', params: {q: 'B'}}], index: 0}},
+            CONFIG_OPTIONS,
+        ) as TestState;
+
+        (notifyPushParamsBackward as jest.Mock).mockClear();
+        (cancelPendingFocusRestore as jest.Mock).mockClear();
+
+        // RESET to A with cursor=1: duplicates at indices 0 and 2 — the ambiguous case.
+        enhancedRouter.getStateForAction(
+            state,
+            {type: CONST.NAVIGATION.ACTION_TYPE.RESET, payload: {routes: [{name: 'Search', key: 'search-1', params: {q: 'A'}}], index: 0}},
+            CONFIG_OPTIONS,
+        );
+
+        // WCAG 2.4.3: backward notification fires regardless of direction ambiguity.
+        expect(notifyPushParamsBackward).toHaveBeenCalledTimes(1);
+        expect(notifyPushParamsBackward).toHaveBeenCalledWith('search-1', {q: 'A'});
+        expect(cancelPendingFocusRestore).not.toHaveBeenCalled();
+    });
+
     it('RESET to unseen params on the same route key re-seeds history so subsequent PUSH_PARAMS branches from the current screen', () => {
         // Reproduces Search's setParams-driven typing + `reset(getState())` on layout change. Without the re-seed, history stays at the initial snapshot and the next PUSH_PARAMS / GO_BACK reverts past the user's current state.
         const factory = createMockRouterFactory();
@@ -849,10 +882,10 @@ describe('resolveCursorForReset (pure function)', () => {
         expect(resolveCursorForReset(history, 0, {key: 'search-1', params: {q: 'B'}})).toEqual({type: 'forward', cursor: 1});
     });
 
-    it("prefers 'forward' over 'backward' for duplicate compounds at cursor±1 (browser-forward case)", () => {
-        // [A, B, A] at cursor=1 targeting A: both 0 and 2 match; forward (2) preferred so browser-forward from B doesn't land on the earlier A.
+    it("returns 'ambiguous' for duplicate compounds at cursor±1 (direction unknowable from state)", () => {
+        // [A, B, A] cursor=1 targeting A: matches at 0 and 2. Cursor advances to 2; caller fires backward notify.
         const history = mkHistory('A', 'B', 'A');
-        expect(resolveCursorForReset(history, 1, {key: 'search-1', params: {q: 'A'}})).toEqual({type: 'forward', cursor: 2});
+        expect(resolveCursorForReset(history, 1, {key: 'search-1', params: {q: 'A'}})).toEqual({type: 'ambiguous', cursor: 2});
     });
 
     it("returns 'backward' for a non-adjacent jump to an earlier entry (history.go(-2))", () => {
