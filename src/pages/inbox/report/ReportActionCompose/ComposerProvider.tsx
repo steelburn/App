@@ -42,11 +42,7 @@ function ComposerProvider({children, reportID}: ComposerProviderProps) {
     const [draftComment] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_DRAFT_COMMENT}${reportID}`);
     const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportID}`);
     const [isComposerFullSize = false] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_IS_COMPOSER_FULL_SIZE}${reportID}`);
-    const [rawReportActions] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${report?.reportID}`, {
-        canEvict: false,
-    });
 
-    const reportActionKeys = rawReportActions ? Object.keys(rawReportActions) : [];
     const shouldFocusComposerOnScreenFocus = shouldFocusInputOnScreenFocus || !!draftComment;
     const initialFocused = shouldFocusComposerOnScreenFocus && !initialModalState?.isVisible && !initialModalState?.willAlertModalBecomeVisible;
 
@@ -69,7 +65,6 @@ function ComposerProvider({children, reportID}: ComposerProviderProps) {
     const composerRefShared = useSharedValue<Partial<ComposerWithSuggestionsRef>>({});
 
     const {editingState, editingReportID, editingReportActionID, editingReportAction, editingMessage} = useReportActionActiveEdit();
-    const isEditingLastReportAction = editingReportActionID === reportActionKeys.at(-1);
 
     const [didResetComposerHeight, setDidResetComposerHeight] = useState(false);
     useEffect(() => {
@@ -94,7 +89,7 @@ function ComposerProvider({children, reportID}: ComposerProviderProps) {
         reportID: editingReportID ?? undefined,
         originalReportID,
         reportAction: editingReportAction,
-        shouldScrollToLastMessage: isEditingLastReportAction,
+        shouldScrollToLastMessage: false,
         debouncedCommentMaxLengthValidation,
         composerRef,
     });
