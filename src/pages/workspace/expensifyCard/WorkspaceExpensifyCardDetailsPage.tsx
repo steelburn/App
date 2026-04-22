@@ -16,6 +16,7 @@ import ScreenWrapper from '@components/ScreenWrapper';
 import ScrollView from '@components/ScrollView';
 import useCardFeeds from '@hooks/useCardFeeds';
 import useCurrencyForExpensifyCard from '@hooks/useCurrencyForExpensifyCard';
+import {useCurrencyListActions} from '@hooks/useCurrencyList';
 import useDefaultFundID from '@hooks/useDefaultFundID';
 import useExpensifyCardFeeds from '@hooks/useExpensifyCardFeeds';
 import {useMemoizedLazyExpensifyIcons, useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
@@ -26,7 +27,6 @@ import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useStyleUtils from '@hooks/useStyleUtils';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {getAllCardsForWorkspace, getCardHintText, getTranslationKeyForLimitType, isCardFrozen, maskCard} from '@libs/CardUtils';
-import {convertToDisplayString} from '@libs/CurrencyUtils';
 import createDynamicRoute from '@libs/Navigation/helpers/dynamicRoutesUtils/createDynamicRoute';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
 import type {SettingsNavigatorParamList} from '@libs/Navigation/types';
@@ -51,6 +51,7 @@ type WorkspaceExpensifyCardDetailsPageProps = PlatformStackScreenProps<
 
 function WorkspaceExpensifyCardDetailsPage({route}: WorkspaceExpensifyCardDetailsPageProps) {
     const {policyID, cardID, backTo} = route.params;
+    const {convertToDisplayString} = useCurrencyListActions();
     const defaultFundID = useDefaultFundID(policyID);
 
     const [isDeactivateModalVisible, setIsDeactivateModalVisible] = useState(false);
