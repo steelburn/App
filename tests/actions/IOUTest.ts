@@ -7606,12 +7606,13 @@ describe('actions/IOU', () => {
                 participants?: IOUParticipant[];
                 existingSplitChatReportID?: string;
                 transactionParamOverrides?: Partial<typeof baseTransactionParams>;
+                policyTagsCollection?: OnyxCollection<PolicyTagLists>;
             } = {},
         ) => ({
             participants: overrides.participants ?? [{accountID: CARLOS_ACCOUNT_ID, login: CARLOS_EMAIL}],
             currentUserLogin: RORY_EMAIL,
             currentUserAccountID: RORY_ACCOUNT_ID,
-            existingSplitChatReportID: overrides.existingSplitChatReportID ?? '',
+            existingSplitChatReportID: overrides.existingSplitChatReportID,
             transactionParams: {
                 ...baseTransactionParams,
                 ...overrides.transactionParamOverrides,
@@ -7624,6 +7625,7 @@ describe('actions/IOU', () => {
             policyRecentlyUsedCurrencies: [],
             betas: [CONST.BETAS.ALL],
             personalDetails: mockPersonalDetails,
+            policyTagsCollection: overrides.policyTagsCollection ?? undefined,
         });
 
         it('returns valid splitData with chatReportID, transactionID, and reportActionID', () => {
@@ -7804,7 +7806,7 @@ describe('actions/IOU', () => {
         });
 
         it('sets policy recently used tags in optimisticData for a policy expense chat participant with a tag', async () => {
-            // Given a workspace expense chat with a known tag list in Onyx
+            // Given a workspace expense chat with a known tag list
             const policyID = 'test_policy_999';
             const tagListName = 'Department';
             const tagName = 'Engineering';
@@ -7820,13 +7822,14 @@ describe('actions/IOU', () => {
                     participants: {[RORY_ACCOUNT_ID]: RORY_PARTICIPANT},
                 },
             } as OnyxMergeCollectionInput<typeof ONYXKEYS.COLLECTION.REPORT>);
-            await Onyx.set(`${ONYXKEYS.COLLECTION.POLICY_TAGS}${policyID}`, {
+            await waitForBatchedUpdates();
+
+            const policyTagsList = {
                 [tagListName]: {
                     name: tagListName,
                     tags: {[tagName]: {name: tagName, enabled: true}},
                 },
-            });
-            await waitForBatchedUpdates();
+            };
 
             // When splitting an expense with a tag inside that workspace chat
             const result = createSplitsAndOnyxData(
@@ -7842,6 +7845,7 @@ describe('actions/IOU', () => {
                         },
                     ],
                     transactionParamOverrides: {tag: tagName},
+                    policyTagsCollection: {[`${ONYXKEYS.COLLECTION.POLICY_TAGS}${policyID}`]: policyTagsList} as unknown as OnyxCollection<PolicyTagLists>,
                 }),
             );
 

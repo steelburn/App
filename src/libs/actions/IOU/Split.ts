@@ -101,6 +101,7 @@ import {
     getMoneyRequestParticipantsFromReport,
     getMoneyRequestPolicyTags,
     getOrCreateOptimisticSplitChatReport,
+    getPolicyTags,
     getReceiptError,
     getReportPreviewAction,
     getUserAccountID,
@@ -237,6 +238,8 @@ function splitBill({
         policyRecentlyUsedCurrencies,
         betas,
         personalDetails,
+        // eslint-disable-next-line @typescript-eslint/no-deprecated
+        policyTagsCollection: getPolicyTags(),
     });
 
     const parameters: SplitBillParams = {
@@ -332,6 +335,8 @@ function splitBillAndOpenReport({
         policyRecentlyUsedCurrencies,
         betas,
         personalDetails,
+        // eslint-disable-next-line @typescript-eslint/no-deprecated
+        policyTagsCollection: getPolicyTags(),
     });
 
     const parameters: SplitBillParams = {

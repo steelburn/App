@@ -372,6 +372,7 @@ type CreateSplitsAndOnyxDataParams = {
     policyRecentlyUsedCurrencies: string[];
     betas: OnyxEntry<OnyxTypes.Beta[]>;
     personalDetails: OnyxEntry<OnyxTypes.PersonalDetailsList>;
+    policyTagsCollection?: OnyxCollection<OnyxTypes.PolicyTagLists>;
 };
 
 let allPersonalDetails: OnyxTypes.PersonalDetailsList = {};
@@ -2664,6 +2665,7 @@ function createSplitsAndOnyxData({
     policyRecentlyUsedCurrencies,
     betas,
     personalDetails,
+    policyTagsCollection,
 }: CreateSplitsAndOnyxDataParams): SplitsAndOnyxData {
     const currentUserEmailForIOUSplit = addSMSDomainIfPhoneNumber(currentUserLogin);
     const participantAccountIDs = participants.map((participant) => Number(participant.accountID));
@@ -2888,6 +2890,7 @@ function createSplitsAndOnyxData({
         // participant.login is undefined when the request is initiated from a group DM with an unknown user, so we need to add a default
         const email = isOwnPolicyExpenseChat || isPolicyExpenseChat ? '' : addSMSDomainIfPhoneNumber(participant.login ?? '').toLowerCase();
         const accountID = isOwnPolicyExpenseChat || isPolicyExpenseChat ? 0 : Number(participant.accountID);
+        const participantPolicyTags = policyTagsCollection?.[`${ONYXKEYS.COLLECTION.POLICY_TAGS}${participant.policyID}`];
 
         if (isPendingDistanceSplitBill) {
             const individualSplit = {
@@ -3058,9 +3061,7 @@ function createSplitsAndOnyxData({
         // Add tag to optimistic policy recently used tags when a participant is a workspace
         const optimisticPolicyRecentlyUsedTags = isPolicyExpenseChat
             ? buildOptimisticPolicyRecentlyUsedTags({
-                  // TODO: Replace getPolicyTagsData (https://github.com/Expensify/App/issues/72721) and getPolicyRecentlyUsedTagsData (https://github.com/Expensify/App/issues/71491) with useOnyx hook
-                  // eslint-disable-next-line @typescript-eslint/no-deprecated
-                  policyTags: getPolicyTagsData(participant.policyID),
+                  policyTags: participantPolicyTags ?? {},
                   policyRecentlyUsedTags,
                   transactionTags: tag,
               })
@@ -3265,6 +3266,7 @@ function createDistanceRequest(distanceRequestInformation: CreateDistanceRequest
             policyRecentlyUsedCurrencies,
             betas,
             personalDetails,
+            policyTagsCollection: allPolicyTags,
         });
         onyxData = splitOnyxData;
 
