@@ -46,15 +46,7 @@ type NotAllowedExtensionParams = {allowedExtensions: string[]};
 
 type StepCounterParams = {step: number; total?: number; text?: string};
 
-// type UserIsAlreadyMemberParams = {login: string; name: string};
-
 type ParentNavigationSummaryParams = {reportName?: string; workspaceName?: string};
-
-// type UpdatedTheRequestParams = {valueName: string; newValueToDisplay: string; oldValueToDisplay: string};
-
-// type UpdatedTheDistanceMerchantParams = {translatedChangedField: string; newMerchant: string; oldMerchant: string; newAmountToDisplay: string; oldAmountToDisplay: string};
-
-// type ViolationsMissingTagParams = {tagName?: string} | undefined;
 
 type ViolationsModifiedAmountParams = {type?: ViolationDataType; displayPercentVariance?: number};
 
