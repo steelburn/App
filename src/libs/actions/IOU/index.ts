@@ -372,7 +372,7 @@ type CreateSplitsAndOnyxDataParams = {
     policyRecentlyUsedCurrencies: string[];
     betas: OnyxEntry<OnyxTypes.Beta[]>;
     personalDetails: OnyxEntry<OnyxTypes.PersonalDetailsList>;
-    policyTagsCollection?: OnyxCollection<OnyxTypes.PolicyTagLists>;
+    participantsPolicyTags?: Record<string, OnyxTypes.PolicyTagLists>;
 };
 
 let allPersonalDetails: OnyxTypes.PersonalDetailsList = {};
@@ -589,6 +589,18 @@ function getRecentAttendees(): OnyxEntry<Attendee[]> {
  */
 function getPolicyTags(): OnyxCollection<OnyxTypes.PolicyTagLists> {
     return allPolicyTags;
+}
+
+function buildParticipantsPolicyTags(participants: Participant[], policyTagsSource: OnyxCollection<OnyxTypes.PolicyTagLists>): Record<string, OnyxTypes.PolicyTagLists> {
+    return participants.reduce<Record<string, OnyxTypes.PolicyTagLists>>((acc, participant) => {
+        if (participant.policyID) {
+            const tags = policyTagsSource?.[`${ONYXKEYS.COLLECTION.POLICY_TAGS}${participant.policyID}`];
+            if (tags) {
+                acc[participant.policyID] = tags;
+            }
+        }
+        return acc;
+    }, {});
 }
 
 /**
@@ -2665,7 +2677,7 @@ function createSplitsAndOnyxData({
     policyRecentlyUsedCurrencies,
     betas,
     personalDetails,
-    policyTagsCollection,
+    participantsPolicyTags,
 }: CreateSplitsAndOnyxDataParams): SplitsAndOnyxData {
     const currentUserEmailForIOUSplit = addSMSDomainIfPhoneNumber(currentUserLogin);
     const participantAccountIDs = participants.map((participant) => Number(participant.accountID));
@@ -2890,7 +2902,7 @@ function createSplitsAndOnyxData({
         // participant.login is undefined when the request is initiated from a group DM with an unknown user, so we need to add a default
         const email = isOwnPolicyExpenseChat || isPolicyExpenseChat ? '' : addSMSDomainIfPhoneNumber(participant.login ?? '').toLowerCase();
         const accountID = isOwnPolicyExpenseChat || isPolicyExpenseChat ? 0 : Number(participant.accountID);
-        const participantPolicyTags = policyTagsCollection?.[`${ONYXKEYS.COLLECTION.POLICY_TAGS}${participant.policyID}`];
+        const participantPolicyTags = participant.policyID ? participantsPolicyTags?.[participant.policyID] : undefined;
 
         if (isPendingDistanceSplitBill) {
             const individualSplit = {
@@ -3266,7 +3278,7 @@ function createDistanceRequest(distanceRequestInformation: CreateDistanceRequest
             policyRecentlyUsedCurrencies,
             betas,
             personalDetails,
-            policyTagsCollection: allPolicyTags,
+            participantsPolicyTags: buildParticipantsPolicyTags(participants, allPolicyTags),
         });
         onyxData = splitOnyxData;
 
@@ -3804,6 +3816,7 @@ export {
     maybeUpdateReportNameForFormulaTitle,
     getSearchOnyxUpdate,
     getPolicyTags,
+    buildParticipantsPolicyTags,
     // eslint-disable-next-line @typescript-eslint/no-deprecated
     getMoneyRequestPolicyTags,
     setMoneyRequestTimeRate,

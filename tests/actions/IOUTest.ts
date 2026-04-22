@@ -7606,7 +7606,7 @@ describe('actions/IOU', () => {
                 participants?: IOUParticipant[];
                 existingSplitChatReportID?: string;
                 transactionParamOverrides?: Partial<typeof baseTransactionParams>;
-                policyTagsCollection?: OnyxCollection<PolicyTagLists>;
+                participantsPolicyTags?: Record<string, PolicyTagLists>;
             } = {},
         ) => ({
             participants: overrides.participants ?? [{accountID: CARLOS_ACCOUNT_ID, login: CARLOS_EMAIL}],
@@ -7625,7 +7625,7 @@ describe('actions/IOU', () => {
             policyRecentlyUsedCurrencies: [],
             betas: [CONST.BETAS.ALL],
             personalDetails: mockPersonalDetails,
-            policyTagsCollection: overrides.policyTagsCollection ?? undefined,
+            participantsPolicyTags: overrides.participantsPolicyTags,
         });
 
         it('returns valid splitData with chatReportID, transactionID, and reportActionID', () => {
@@ -7845,7 +7845,7 @@ describe('actions/IOU', () => {
                         },
                     ],
                     transactionParamOverrides: {tag: tagName},
-                    policyTagsCollection: {[`${ONYXKEYS.COLLECTION.POLICY_TAGS}${policyID}`]: policyTagsList} as unknown as OnyxCollection<PolicyTagLists>,
+                    participantsPolicyTags: {[policyID]: policyTagsList} as unknown as Record<string, PolicyTagLists>,
                 }),
             );
 

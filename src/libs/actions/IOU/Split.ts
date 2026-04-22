@@ -92,6 +92,7 @@ import {getCleanUpTransactionThreadReportOnyxData} from './DeleteMoneyRequest';
 import {
     buildMinimalTransactionForFormula,
     buildOnyxDataForMoneyRequest,
+    buildParticipantsPolicyTags,
     createSplitsAndOnyxData,
     dismissModalAndOpenReportInInboxTab,
     getAllPersonalDetails,
@@ -239,7 +240,7 @@ function splitBill({
         betas,
         personalDetails,
         // eslint-disable-next-line @typescript-eslint/no-deprecated
-        policyTagsCollection: getPolicyTags(),
+        participantsPolicyTags: buildParticipantsPolicyTags(participants, getPolicyTags()),
     });
 
     const parameters: SplitBillParams = {
@@ -336,7 +337,7 @@ function splitBillAndOpenReport({
         betas,
         personalDetails,
         // eslint-disable-next-line @typescript-eslint/no-deprecated
-        policyTagsCollection: getPolicyTags(),
+        participantsPolicyTags: buildParticipantsPolicyTags(participants, getPolicyTags()),
     });
 
     const parameters: SplitBillParams = {
