@@ -7,6 +7,7 @@ const UNDEFINED_SENTINEL = '\u0000undefined';
 
 // URL-rehydrated params are always strings; PUSH_PARAMS dispatches may use numbers/booleans.
 // Top-level undefined is dropped by the caller's filter; nested undefined is preserved via UNDEFINED_SENTINEL — asymmetric but inert (URL params are flat).
+// Assumes JSON-serializable params — non-plain objects (Date/RegExp) collapse to {} via Object.entries, acceptable since PUSH_PARAMS only carries URL-backed params.
 function normalizeForKey(value: unknown): unknown {
     if (value === null) {
         return null;

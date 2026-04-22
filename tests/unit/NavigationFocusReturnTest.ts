@@ -579,6 +579,32 @@ describe('captureTriggerForRoute', () => {
             expect(restoreTriggerForRoute('route-a')).toBe(false);
         });
 
+        it('ignores lastMouseTrigger past its TTL so a timer-driven nav long after a click cannot reuse that click', () => {
+            withFakeTimers(() => {
+                const button = appendButton();
+                button.dispatchEvent(new MouseEvent('pointerdown', {bubbles: true}));
+                jest.advanceTimersByTime(11_000);
+
+                captureTriggerForRoute('route-a');
+                const spy = jest.spyOn(button, 'focus');
+                expect(restoreTriggerForRoute('route-a')).toBe(false);
+                expect(spy).not.toHaveBeenCalled();
+            });
+        });
+
+        it('honors lastMouseTrigger within its TTL so typical click → deferred-nav still captures', () => {
+            withFakeTimers(() => {
+                const button = appendButton();
+                button.dispatchEvent(new MouseEvent('pointerdown', {bubbles: true}));
+                jest.advanceTimersByTime(2_000);
+
+                captureTriggerForRoute('route-a');
+                const spy = jest.spyOn(button, 'focus');
+                expect(restoreTriggerForRoute('route-a')).toBe(true);
+                expect(spy).toHaveBeenCalled();
+            });
+        });
+
         it('clears lastMouseTrigger on a non-focusable activation so a prior focusable click does not leak into the next capture', () => {
             // setupNavigationFocusReturn is installed at module load; dispatch pointerdown events through the real handler to exercise the update path.
             const earlierFocusable = appendButton();
@@ -1069,6 +1095,17 @@ describe('shouldSkipAutoFocusDueToExistingFocus', () => {
         inertScreen.appendChild(staleInput);
         document.body.appendChild(inertScreen);
         staleInput.focus();
+        expect(shouldSkipAutoFocusDueToExistingFocus()).toBe(false);
+    });
+
+    it.each<[label: string, prop: 'display' | 'visibility', value: string]>([
+        ['display:none', 'display', 'none'],
+        ['visibility:hidden', 'visibility', 'hidden'],
+    ])('returns false when active element is %s', (_label, prop, value) => {
+        const input = document.createElement('input');
+        document.body.appendChild(input);
+        input.style[prop] = value;
+        input.focus();
         expect(shouldSkipAutoFocusDueToExistingFocus()).toBe(false);
     });
 });

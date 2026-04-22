@@ -5,12 +5,21 @@ function hasFocusableAttributes(el: Element): boolean {
     return !el.matches(':disabled') && el.getAttribute('aria-disabled') !== 'true' && !el.closest('[aria-hidden="true"]') && !el.closest('[inert]');
 }
 
-/** AUTO's async chain can outlive RETURN_HOLD_MS; skip when another element (e.g. a restored RETURN target) already holds focus. Stale focus on a transitioning-out screen (inert / aria-hidden / disabled ancestor) isn't a real competing target, so only block when the active element is attribute-focusable. */
+/** Skip AUTO when another element (e.g. a restored RETURN target) already holds focus. Attribute + computed-style checks reject stragglers (inert / aria-hidden / disabled / display:none / visibility:hidden) from a transitioning-out screen. */
 function shouldSkipAutoFocusDueToExistingFocus(): boolean {
     if (typeof document === 'undefined' || !document.activeElement || document.activeElement === document.body) {
         return false;
     }
-    return hasFocusableAttributes(document.activeElement);
+    if (!hasFocusableAttributes(document.activeElement)) {
+        return false;
+    }
+    if (typeof window !== 'undefined' && document.activeElement instanceof HTMLElement) {
+        const style = window.getComputedStyle(document.activeElement);
+        if (style.display === 'none' || style.visibility === 'hidden') {
+            return false;
+        }
+    }
+    return true;
 }
 
 export {shouldSkipAutoFocusDueToExistingFocus, hasFocusableAttributes};
