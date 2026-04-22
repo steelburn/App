@@ -1,9 +1,10 @@
-import {act, renderHook} from '@testing-library/react-native';
-import type {ComposerRef, TextSelection} from '@components/Composer/types';
+/* eslint-disable @typescript-eslint/naming-convention */
+import {renderHook} from '@testing-library/react-native';
 import type {RefObject} from 'react';
+import type {ComposerRef, TextSelection} from '@components/Composer/types';
 import ReportActionComposeUtils from '@pages/inbox/report/ReportActionCompose/ReportActionComposeUtils';
 import useEditComposerToggle from '@pages/inbox/report/ReportActionCompose/useEditComposerToggle';
-import type {ReportActionActiveEdit} from '@pages/inbox/report/ReportActionEditMessageContext';
+import type {ReportActionEditMessageContextValue} from '@pages/inbox/report/ReportActionEditMessageContext';
 import * as ReportActionEditMessageContext from '@pages/inbox/report/ReportActionEditMessageContext';
 
 jest.mock('@pages/inbox/report/ReportActionEditMessageContext', () => {
@@ -47,7 +48,7 @@ const mockUseReportActionActiveEdit = jest.mocked(ReportActionEditMessageContext
 const mockUseResponsiveLayout = jest.requireMock('@hooks/useResponsiveLayout').default as jest.Mock;
 const mockUpdateNativeSelectionValue = jest.mocked(ReportActionComposeUtils.updateNativeSelectionValue);
 
-type ActiveEdit = ReportActionActiveEdit & {editingState: 'off' | 'editing' | 'submitted'};
+type ActiveEdit = ReportActionEditMessageContextValue & {editingState: 'off' | 'editing' | 'submitted'};
 
 function makeComposerRef(overrides?: Partial<ComposerRef>): RefObject<ComposerRef | null> {
     return {
@@ -149,15 +150,13 @@ describe('useEditComposerToggle', () => {
             {initialProps: {selection: priorSelection, draft: 'keep my draft'}},
         );
 
-        act(() => {
-            activeEditRef.current = defaultActiveEdit({
-                editingState: 'editing',
-                editingMessage: 'edited body',
-                editingReportActionID: '100',
-                currentEditMessageSelection: {start: 1, end: 2},
-            });
-            rerender({selection: priorSelection, draft: 'keep my draft'});
+        activeEditRef.current = defaultActiveEdit({
+            editingState: 'editing',
+            editingMessage: 'edited body',
+            editingReportActionID: '100',
+            currentEditMessageSelection: {start: 1, end: 2},
         });
+        rerender({selection: priorSelection, draft: 'keep my draft'});
 
         const expectedEnd = 'edited body'.length;
         expect(onValueChange).toHaveBeenCalledWith('edited body');
@@ -180,13 +179,11 @@ describe('useEditComposerToggle', () => {
             }),
         );
 
-        act(() => {
-            activeEditRef.current = defaultActiveEdit({
-                editingState: 'editing',
-                editingMessage: 'from thread',
-            });
-            rerender();
+        activeEditRef.current = defaultActiveEdit({
+            editingState: 'editing',
+            editingMessage: 'from thread',
         });
+        rerender({});
 
         expect(onValueChange).not.toHaveBeenCalled();
     });
@@ -200,11 +197,7 @@ describe('useEditComposerToggle', () => {
         // Start with edit off so wasEditingRef is false; then turn editing on to capture previousDraftSelectionRef.
         const {rerender} = renderHook(
             (props: {selection: TextSelection; draft: string; editing: boolean}) => {
-                activeEditRef.current = defaultActiveEdit(
-                    props.editing
-                        ? {editingState: 'editing', editingMessage: 'e', editingReportActionID: '1'}
-                        : {editingState: 'off'},
-                );
+                activeEditRef.current = defaultActiveEdit(props.editing ? {editingState: 'editing', editingMessage: 'e', editingReportActionID: '1'} : {editingState: 'off'});
                 return useEditComposerToggle({
                     selection: props.selection,
                     draftComment: props.draft,
@@ -216,16 +209,12 @@ describe('useEditComposerToggle', () => {
             {initialProps: {selection: priorSelection, draft: 'restored', editing: false}},
         );
 
-        act(() => {
-            rerender({selection: priorSelection, draft: 'restored', editing: true});
-        });
+        rerender({selection: priorSelection, draft: 'restored', editing: true});
 
         onValueChange.mockClear();
         onSelectionChange.mockClear();
 
-        act(() => {
-            rerender({selection: priorSelection, draft: 'restored', editing: false});
-        });
+        rerender({selection: priorSelection, draft: 'restored', editing: false});
 
         expect(onValueChange).toHaveBeenCalledWith('restored');
         expect(onSelectionChange).toHaveBeenCalledWith(priorSelection);
@@ -264,9 +253,7 @@ describe('useEditComposerToggle', () => {
         onValueChange.mockClear();
         onFocus.mockClear();
 
-        act(() => {
-            rerender('b');
-        });
+        rerender('b');
 
         expect(onValueChange).toHaveBeenCalledWith('second');
         expect(onFocus).toHaveBeenCalled();
@@ -296,10 +283,8 @@ describe('useEditComposerToggle', () => {
 
         onValueChange.mockClear();
 
-        act(() => {
-            mockUseResponsiveLayout.mockReturnValue(narrowLayoutResult());
-            rerender();
-        });
+        mockUseResponsiveLayout.mockReturnValue(narrowLayoutResult());
+        rerender({});
 
         expect(onValueChange).toHaveBeenCalledWith('wide first');
         expect(onFocus).toHaveBeenCalled();
@@ -329,9 +314,7 @@ describe('useEditComposerToggle', () => {
 
         onValueChange.mockClear();
 
-        act(() => {
-            rerender(false);
-        });
+        rerender(false);
 
         expect(onValueChange).toHaveBeenCalledWith('plain draft for wide');
     });
@@ -343,9 +326,7 @@ describe('useEditComposerToggle', () => {
 
         const {rerender} = renderHook(
             (editing: boolean) => {
-                activeEditRef.current = defaultActiveEdit(
-                    editing ? {editingState: 'editing', editingMessage: 'hi', editingReportActionID: '1'} : {editingState: 'off'},
-                );
+                activeEditRef.current = defaultActiveEdit(editing ? {editingState: 'editing', editingMessage: 'hi', editingReportActionID: '1'} : {editingState: 'off'});
                 return useEditComposerToggle({
                     selection: {start: 0, end: 0},
                     draftComment: 'd',
@@ -357,9 +338,7 @@ describe('useEditComposerToggle', () => {
             {initialProps: false},
         );
 
-        act(() => {
-            rerender(true);
-        });
+        rerender(true);
 
         expect(mockUpdateNativeSelectionValue).toHaveBeenCalled();
     });
