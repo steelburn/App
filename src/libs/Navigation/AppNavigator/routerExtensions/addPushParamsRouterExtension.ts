@@ -258,11 +258,13 @@ function addPushParamsRouterExtension<RouterOptions extends PlatformStackRouterO
                         pushParamsHistoryPosition = outcome.cursor;
                     } else if (outcome.type === 'unknown') {
                         cancelPendingFocusRestore();
-                        // Same-key RESET to unseen params (Search `reset(getState())` after setParams-driven typing) — re-seed so PUSH/GO_BACK branch from the current screen, not stale snapshots.
-                        pushParamsHistoryPosition = 0;
+                        // Focused route+params is unseen: preserve entries for other surviving routes (still relevant), drop stale entries for the focused key, append the new focused entry.
+                        const otherRoutesHistory = preserveHistoryForRoutes(history, rehydratedState.routes).filter((e) => typeof e === 'string' || e.key !== newFocused.key);
+                        const newHistory = [...otherRoutesHistory, newFocused];
+                        pushParamsHistoryPosition = newHistory.length - 1;
                         return {
                             ...rehydratedState,
-                            history: [newFocused],
+                            history: newHistory,
                         };
                     }
                     // 'noop' — pending restore and cursor left intact.

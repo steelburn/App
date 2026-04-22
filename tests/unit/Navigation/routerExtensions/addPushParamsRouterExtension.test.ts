@@ -836,6 +836,40 @@ describe('addPushParamsRouterExtension', () => {
         expect(cancelPendingFocusRestore).not.toHaveBeenCalled();
     });
 
+    it('unknown RESET preserves history entries for OTHER surviving routes while replacing stale entries for the focused key', () => {
+        // Multi-route stack: RESET keeps both routes but installs unseen params on the focused one. The non-focused route's history must survive; only the focused-key entries are refreshed.
+        const factory = createMockRouterFactory();
+        const enhancedRouter = addPushParamsRouterExtension(factory)({} as PlatformStackRouterOptions);
+        const routeA = makeRoute('ScreenA', 'a-1', {p: 1});
+        const routeB = makeRoute('ScreenB', 'b-1', {q: 'orig'});
+        const originalHistory: CustomHistoryEntry[] = [
+            {key: 'a-1', name: 'ScreenA', params: {p: 1}} as NavigationRoute<ParamListBase, string>,
+            {key: 'b-1', name: 'ScreenB', params: {q: 'orig'}} as NavigationRoute<ParamListBase, string>,
+        ];
+        const state = makeState([routeA, routeB], {history: originalHistory});
+
+        const action: PushParamsRouterAction = {
+            type: CONST.NAVIGATION.ACTION_TYPE.RESET,
+            payload: {
+                routes: [
+                    {name: 'ScreenA', key: 'a-1', params: {p: 1}},
+                    {name: 'ScreenB', key: 'b-1', params: {q: 'new'}},
+                ],
+                index: 1,
+            },
+        };
+
+        const newState = enhancedRouter.getStateForAction(state, action, CONFIG_OPTIONS) as TestState;
+        const history = newState.history ?? [];
+
+        // A's entry survives (different key, still in routes); B's stale entry is replaced by the new focused entry.
+        expect(history).toHaveLength(2);
+        expect(asRouteEntry(history.at(0) as CustomHistoryEntry).key).toBe('a-1');
+        const lastEntry = asRouteEntry(history.at(1) as CustomHistoryEntry);
+        expect(lastEntry.key).toBe('b-1');
+        expect((lastEntry.params as {q: string}).q).toBe('new');
+    });
+
     it('RESET to unseen params on the same route key re-seeds history so subsequent PUSH_PARAMS branches from the current screen', () => {
         // Reproduces Search's setParams-driven typing + `reset(getState())` on layout change. Without the re-seed, history stays at the initial snapshot and the next PUSH_PARAMS / GO_BACK reverts past the user's current state.
         const factory = createMockRouterFactory();
