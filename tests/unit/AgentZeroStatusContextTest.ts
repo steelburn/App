@@ -5,6 +5,7 @@ import React from 'react';
 import Onyx from 'react-native-onyx';
 import useAgentZeroStatusIndicator from '@hooks/useAgentZeroStatusIndicator';
 import {clearAgentZeroProcessingIndicator, subscribeToReportReasoningEvents, unsubscribeFromReportReasoningChannel} from '@libs/actions/Report';
+import AgentZeroOptimisticStore from '@libs/AgentZeroOptimisticStore';
 import ConciergeReasoningStore from '@libs/ConciergeReasoningStore';
 import {setForceOffline} from '@libs/NetworkState';
 import {AgentZeroStatusProvider, useAgentZeroStatus, useAgentZeroStatusActions} from '@pages/inbox/AgentZeroStatusContext';
@@ -63,6 +64,10 @@ describe('AgentZeroStatusContext', () => {
 
         // Clear ConciergeReasoningStore between tests
         ConciergeReasoningStore.clearReasoning(reportID);
+
+        // Clear AgentZeroOptimisticStore between tests so a leftover entry from a prior
+        // test doesn't hydrate the next hook mount with unexpected optimistic state.
+        AgentZeroOptimisticStore.clear(reportID);
 
         // Make clearAgentZeroProcessingIndicator actually clear the Onyx NVP
         // so safety timeout and reconnect tests can verify the full clearing flow
@@ -979,6 +984,84 @@ describe('AgentZeroStatusContext', () => {
             await waitFor(() => {
                 expect(mockClearAgentZeroProcessingIndicator).toHaveBeenCalledWith(reportID);
             });
+        });
+    });
+
+    describe('mount persistence across chat switches', () => {
+        it('should keep the thinking indicator after unmount/remount while still processing', async () => {
+            // Regression test for situchan's video report (PR 85620): sending a message,
+            // switching to another chat, and coming back before Concierge replies caused the
+            // indicator to disappear. The optimistic counter used to live in React state
+            // scoped to the mounted provider; it now lives in AgentZeroOptimisticStore so it
+            // survives a ReportScreen unmount/remount.
+            const {result: firstResult, unmount} = renderHook(() => ({...useAgentZeroStatus(), ...useAgentZeroStatusActions()}), {wrapper});
+            await waitForBatchedUpdates();
+
+            act(() => {
+                firstResult.current.kickoffWaitingIndicator();
+            });
+            await waitForBatchedUpdates();
+            expect(firstResult.current.isProcessing).toBe(true);
+            expect(firstResult.current.statusLabel).toBe('Thinking...');
+
+            // User navigates to another chat — ReportScreen unmounts
+            unmount();
+            await waitForBatchedUpdates();
+
+            // User returns to Concierge — ReportScreen remounts
+            const {result: secondResult} = renderHook(() => useAgentZeroStatus(), {wrapper});
+            await waitForBatchedUpdates();
+
+            // The indicator should still be showing on remount
+            expect(secondResult.current.isProcessing).toBe(true);
+            expect(secondResult.current.statusLabel).toBe('Thinking...');
+        });
+
+        it('should clear the restored indicator when a Concierge reply arrived during the chat switch', async () => {
+            // If Concierge actually replied while the user was on another chat, the newest
+            // action on return is the Concierge reply. The reply-detection effect must still
+            // fire, which requires the baselineActionID to be restored from the store (not
+            // recaptured on remount as the reply itself).
+            const priorActionID = '100';
+            const replyActionID = '200';
+            const buildAction = (id: string, created: string, actorAccountID: number) => ({
+                reportActionID: id,
+                actorAccountID,
+                created,
+                message: [{type: 'TEXT', text: 'msg'}],
+            });
+
+            // Concierge DM usually has a previous Concierge reply as the newest action.
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${reportID}`, {
+                [priorActionID]: buildAction(priorActionID, '2024-01-01 00:00:00.000', CONST.ACCOUNT_ID.CONCIERGE),
+            });
+
+            const {result: firstResult, unmount} = renderHook(() => ({...useAgentZeroStatus(), ...useAgentZeroStatusActions()}), {wrapper});
+            await waitForBatchedUpdates();
+
+            act(() => {
+                firstResult.current.kickoffWaitingIndicator();
+            });
+            await waitForBatchedUpdates();
+            expect(firstResult.current.isProcessing).toBe(true);
+
+            // While the provider is unmounted (user on another chat), the Concierge reply lands
+            unmount();
+            await waitForBatchedUpdates();
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${reportID}`, {
+                [replyActionID]: buildAction(replyActionID, '2024-01-01 00:00:01.000', CONST.ACCOUNT_ID.CONCIERGE),
+            });
+
+            // User returns to Concierge
+            const {result: secondResult} = renderHook(() => useAgentZeroStatus(), {wrapper});
+            await waitForBatchedUpdates();
+
+            // The reply-detection effect should see the new action ID != stored baseline,
+            // clear the NVP and optimistic entry, and hide the indicator
+            await waitFor(() => {
+                expect(mockClearAgentZeroProcessingIndicator).toHaveBeenCalledWith(reportID);
+            });
+            expect(secondResult.current.isProcessing).toBe(false);
         });
     });
 
