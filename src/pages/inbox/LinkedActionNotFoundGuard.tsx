@@ -53,7 +53,7 @@ function LinkedActionNotFoundGate({reportActionIDFromRoute, children}: LinkedAct
     const route = useRoute();
     const routeParams = route.params as {reportID?: string; reportActionID?: string} | undefined;
     const reportIDFromRoute = getNonEmptyStringOnyxID(routeParams?.reportID);
-    const navigation = useNavigation();
+    const {canGoBack} = useNavigation();
 
     const styles = useThemeStyles();
     const {accountID: currentUserAccountID} = useCurrentUserPersonalDetails();
@@ -166,7 +166,7 @@ function LinkedActionNotFoundGate({reportActionIDFromRoute, children}: LinkedAct
 
     // Just go back where we came from if there's navigation history. If there is no history, fallback to the report for
     // this action.
-    const goBack = () => (navigation.canGoBack() ? Navigation.goBack() : Navigation.goBack(ROUTES.REPORT_WITH_ID.getRoute(reportIDFromRoute)));
+    const goBack = () => (canGoBack() ? Navigation.goBack() : Navigation.goBack(ROUTES.REPORT_WITH_ID.getRoute(reportIDFromRoute)));
 
     return (
         <FullPageNotFoundView
