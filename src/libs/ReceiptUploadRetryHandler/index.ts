@@ -15,8 +15,6 @@ export default function handleRetryPress(message: ReceiptError, dismissError: ()
             handleFileRetry(message, reconstructedFile, dismissError, setShouldShowErrorModal);
         })
         .catch(() => {
-            console.error('retry fetch failed:', message.source);
-            console.error('message:', message);
             setShouldShowErrorModal(true);
         });
 }
