@@ -228,7 +228,8 @@ function addPushParamsRouterExtension<RouterOptions extends PlatformStackRouterO
 
             // RESET (e.g. web URL sync) would wipe PUSH_PARAMS snapshots via 1:1 rehydration — preserve entries for surviving routes.
             if (action.type === CONST.NAVIGATION.ACTION_TYPE.RESET && state.history) {
-                const newFocused = rehydratedState.routes.at(-1);
+                // CommonActions.reset can install any index — pick the focused route, not routes.at(-1).
+                const newFocused = rehydratedState.routes.at(rehydratedState.index) ?? rehydratedState.routes.at(-1);
                 const history = state.history as CustomHistoryEntry[];
                 if (newFocused?.key) {
                     const outcome = resolveCursorForReset(history, pushParamsHistoryPosition, {key: newFocused.key, params: newFocused.params});

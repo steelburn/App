@@ -3,7 +3,7 @@ import type {NavigationRoute, ParamListBase, PartialState, Router, RouterConfigO
 import addPushParamsRouterExtension, {resolveCursorForReset} from '@libs/Navigation/AppNavigator/routerExtensions/addPushParamsRouterExtension';
 import type {CustomHistoryEntry, PushParamsRouterAction} from '@libs/Navigation/AppNavigator/routerExtensions/types';
 import type {PlatformStackRouterOptions} from '@libs/Navigation/PlatformStackNavigation/types';
-import {cancelPendingFocusRestore, notifyPushParamsForward} from '@libs/NavigationFocusReturn';
+import {cancelPendingFocusRestore, notifyPushParamsBackward, notifyPushParamsForward} from '@libs/NavigationFocusReturn';
 import CONST from '@src/CONST';
 
 jest.mock('@libs/NavigationFocusReturn', () => ({
@@ -55,6 +55,8 @@ function createMockRouterFactory(actionHandler?: (state: TestState, action: Push
                 })) as Array<NavigationRoute<ParamListBase, string>>;
                 return makeState(routes, {
                     history: partialState.history as CustomHistoryEntry[] | undefined,
+                    // Preserve explicit index — RESET can install non-terminal focus.
+                    ...(typeof partialState.index === 'number' ? {index: partialState.index} : {}),
                 });
             },
 
@@ -674,6 +676,32 @@ describe('addPushParamsRouterExtension', () => {
         const afterPush = enhancedRouter.getStateForAction(state, {type: CONST.NAVIGATION.ACTION_TYPE.PUSH_PARAMS, payload: {params: {tab: 'bar'}}}, CONFIG_OPTIONS) as TestState;
         expect(afterPush.history?.length).toBeGreaterThanOrEqual(1);
         expect((afterPush.routes.at(0)?.params as {tab: string}).tab).toBe('bar');
+    });
+
+    it('RESET with a non-terminal index resolves cursor direction against the focused route (not routes.at(-1))', () => {
+        const factory = createMockRouterFactory();
+        const enhancedRouter = addPushParamsRouterExtension(factory)({} as PlatformStackRouterOptions);
+        const initial = makeRoute('Search', 'search-1', {q: 'A'});
+        let state: TestState = makeState([initial], {history: [{...initial}] as CustomHistoryEntry[]});
+
+        state = enhancedRouter.getStateForAction(state, {type: CONST.NAVIGATION.ACTION_TYPE.PUSH_PARAMS, payload: {params: {q: 'B'}}}, CONFIG_OPTIONS) as TestState;
+        (notifyPushParamsBackward as jest.Mock).mockClear();
+
+        // Focused is 'A' at index 0; 'B' is last-in-array. at(-1) would misfire against 'B'.
+        const resetWithNonTerminalIndex: PushParamsRouterAction = {
+            type: CONST.NAVIGATION.ACTION_TYPE.RESET,
+            payload: {
+                routes: [
+                    {name: 'Search', key: 'search-1', params: {q: 'A'}},
+                    {name: 'Search', key: 'search-2', params: {q: 'B'}},
+                ],
+                index: 0,
+            },
+        };
+        enhancedRouter.getStateForAction(state, resetWithNonTerminalIndex, CONFIG_OPTIONS);
+
+        expect(notifyPushParamsBackward).toHaveBeenCalledTimes(1);
+        expect(notifyPushParamsBackward).toHaveBeenCalledWith('search-1', {q: 'A'});
     });
 });
 
