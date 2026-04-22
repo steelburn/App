@@ -2,7 +2,7 @@ import type {ForwardedRef} from 'react';
 import React, {useCallback, useEffect, useImperativeHandle, useRef, useState} from 'react';
 /* eslint-disable no-restricted-imports */
 import type {EmitterSubscription, GestureResponderEvent, NativeTouchEvent, View} from 'react-native';
-import {DeviceEventEmitter, Dimensions, InteractionManager} from 'react-native';
+import {DeviceEventEmitter, Dimensions} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';
 import {Actions, useActionSheetAwareScrollViewActions} from '@components/ActionSheetAwareScrollView';
 import ConfirmModal from '@components/ConfirmModal';
@@ -384,8 +384,7 @@ function PopoverReportActionContextMenu({ref}: PopoverReportActionContextMenuPro
                 hash: currentSearchHash,
             });
         } else if (reportAction) {
-            // eslint-disable-next-line @typescript-eslint/no-deprecated
-            InteractionManager.runAfterInteractions(() => {
+            callbackWhenDeleteModalHide.current = () => {
                 deleteReportComment(
                     report,
                     reportAction,
@@ -396,7 +395,7 @@ function PopoverReportActionContextMenu({ref}: PopoverReportActionContextMenuPro
                     visibleReportActionsData ?? undefined,
                     reportActionsRef.current ?? undefined,
                 );
-            });
+            };
         }
 
         DeviceEventEmitter.emit(`deletedReportAction_${reportIDRef.current}`, reportAction?.reportActionID);
