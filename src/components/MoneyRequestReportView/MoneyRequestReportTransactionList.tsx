@@ -285,18 +285,30 @@ function MoneyRequestReportTransactionList({
     const {sortBy, sortOrder} = sortConfig;
     const isDefaultSort = sortBy === CONST.SEARCH.TABLE_COLUMNS.DATE && sortOrder === CONST.SEARCH.SORT_ORDER.ASC;
 
+    // Convert reportActions array to a record keyed by reportActionID for compareByRBR
+    const reportActionsMap = useMemo(() => Object.fromEntries(reportActions.map((ra) => [ra.reportActionID, ra])), [reportActions]);
+
     const sortedTransactions: TransactionWithOptionalHighlight[] = useMemo(() => {
         return [...transactions].sort((a, b) => {
             // When on default sort (Date/ASC), prioritize RBR-flagged transactions
             if (isDefaultSort && allTransactionViolations) {
-                const rbrComparison = compareByRBR(a, b, allTransactionViolations, currentUserDetails?.login ?? '', currentUserDetails?.accountID ?? CONST.DEFAULT_NUMBER_ID, report, policy);
+                const rbrComparison = compareByRBR(
+                    a,
+                    b,
+                    allTransactionViolations,
+                    currentUserDetails?.login ?? '',
+                    currentUserDetails?.accountID ?? CONST.DEFAULT_NUMBER_ID,
+                    report,
+                    policy,
+                    reportActionsMap,
+                );
                 if (rbrComparison !== 0) {
                     return rbrComparison;
                 }
             }
             return compareValues(getTransactionSortValue(a, sortBy, report, policy), getTransactionSortValue(b, sortBy, report, policy), sortOrder, sortBy, localeCompare, true);
         });
-    }, [sortBy, sortOrder, transactions, localeCompare, report, policy, isDefaultSort, allTransactionViolations, currentUserDetails?.login, currentUserDetails?.accountID]);
+    }, [sortBy, sortOrder, transactions, localeCompare, report, policy, isDefaultSort, allTransactionViolations, currentUserDetails?.login, currentUserDetails?.accountID, reportActionsMap]);
 
     const resolvedTransactions = useMemo(() => resolveTransactionCardFields(sortedTransactions, cardList, translate), [sortedTransactions, cardList, translate]);
 

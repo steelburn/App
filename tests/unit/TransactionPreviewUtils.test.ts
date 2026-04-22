@@ -880,6 +880,93 @@ describe('TransactionPreviewUtils', () => {
             const heldTransaction = {...basicProps.transaction, comment: {hold: 'true'}};
             expect(transactionHasRBR(heldTransaction, [], rbrEmail, rbrAccountID, approvedReport, rbrPolicy)).toBe(false);
         });
+
+        it('should return true for notice-type violations on a paid group policy', async () => {
+            const paidGroupPolicy = {
+                ...createRandomPolicy(1),
+                type: CONST.POLICY.TYPE.CORPORATE,
+            };
+            const expenseReport = {
+                ...basicProps.iouReport,
+                type: CONST.REPORT.TYPE.EXPENSE,
+                policyID: paidGroupPolicy.id,
+            };
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}${paidGroupPolicy.id}`, paidGroupPolicy);
+            await waitForBatchedUpdates();
+            const violations = [{name: CONST.VIOLATIONS.CUSTOM_RULES, type: CONST.VIOLATION_TYPES.NOTICE, showInReview: true}];
+            expect(transactionHasRBR(basicProps.transaction, violations, rbrEmail, rbrAccountID, expenseReport, paidGroupPolicy)).toBe(true);
+        });
+
+        it('should return true for a distance request with MODIFIED_AMOUNT violation', () => {
+            const distanceTransaction = {
+                ...basicProps.transaction,
+                comment: {
+                    type: CONST.TRANSACTION.TYPE.CUSTOM_UNIT,
+                    customUnit: {customUnitRateID: 'rate1', name: CONST.CUSTOM_UNITS.NAME_DISTANCE},
+                },
+            };
+            const violations = [{name: CONST.VIOLATIONS.MODIFIED_AMOUNT, type: CONST.VIOLATION_TYPES.NOTICE, showInReview: true}];
+            expect(transactionHasRBR(distanceTransaction, violations, rbrEmail, rbrAccountID, rbrReport, rbrPolicy)).toBe(true);
+        });
+
+        it('should return true when there are report action errors for the transaction', () => {
+            const reportActionsWithErrors = {
+                action1: {
+                    reportActionID: 'action1',
+                    actionName: CONST.REPORT.ACTIONS.TYPE.IOU,
+                    originalMessage: {IOUTransactionID: basicProps.transaction.transactionID, type: CONST.IOU.REPORT_ACTION_TYPE.CREATE},
+                    errors: {error1: 'Something went wrong'},
+                    created: '2024-01-01',
+                    message: [],
+                    pendingAction: null,
+                },
+            } as unknown as ReportActions;
+            expect(transactionHasRBR(basicProps.transaction, [], rbrEmail, rbrAccountID, rbrReport, rbrPolicy, reportActionsWithErrors)).toBe(true);
+        });
+
+        it('should return true when policy has DEW and there is a submit failure', () => {
+            const dewPolicy = {
+                ...createRandomPolicy(1),
+                approvalMode: CONST.POLICY.APPROVAL_MODE.DYNAMICEXTERNAL,
+            };
+            const dewReportActions = {
+                action1: {
+                    reportActionID: 'action1',
+                    actionName: CONST.REPORT.ACTIONS.TYPE.DEW_SUBMIT_FAILED,
+                    created: '2024-01-02',
+                    message: [{type: 'TEXT', text: 'Failed to submit'}],
+                    originalMessage: {message: 'Failed to submit'},
+                    pendingAction: null,
+                },
+            } as unknown as ReportActions;
+            expect(transactionHasRBR(basicProps.transaction, [], rbrEmail, rbrAccountID, rbrReport, dewPolicy, dewReportActions)).toBe(true);
+        });
+
+        it('should return false for a distance request with missing merchant (guarded by hasMissingSmartscanFields)', () => {
+            const distanceTransaction = {
+                ...basicProps.transaction,
+                merchant: '',
+                modifiedMerchant: '',
+                comment: {
+                    type: CONST.TRANSACTION.TYPE.CUSTOM_UNIT,
+                    customUnit: {customUnitRateID: 'rate1', name: CONST.CUSTOM_UNITS.NAME_DISTANCE},
+                },
+            };
+            const expenseReport = {...basicProps.iouReport, type: CONST.REPORT.TYPE.EXPENSE};
+            expect(transactionHasRBR(distanceTransaction, [], rbrEmail, rbrAccountID, expenseReport, rbrPolicy)).toBe(false);
+        });
+
+        it('should return false for a scanning receipt with missing fields (guarded by hasMissingSmartscanFields)', () => {
+            const scanningTransaction = {
+                ...basicProps.transaction,
+                merchant: '',
+                modifiedMerchant: '',
+                receipt: {state: CONST.IOU.RECEIPT_STATE.SCANNING},
+                created: '2024-01-01',
+            };
+            const expenseReport = {...basicProps.iouReport, type: CONST.REPORT.TYPE.EXPENSE};
+            expect(transactionHasRBR(scanningTransaction, [], rbrEmail, rbrAccountID, expenseReport, rbrPolicy)).toBe(false);
+        });
     });
 
     describe('compareByRBR', () => {
