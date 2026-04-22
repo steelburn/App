@@ -804,7 +804,7 @@ describe('addPushParamsRouterExtension', () => {
     });
 
     it('RESET to unseen params on the same route key re-seeds history so subsequent PUSH_PARAMS branches from the current screen', () => {
-        // Repros Search's setParams-driven typing + `reset(getState())` on layout change. Without the re-seed, history stays at the initial snapshot and the next PUSH_PARAMS / GO_BACK reverts past the user's current state.
+        // Reproduces Search's setParams-driven typing + `reset(getState())` on layout change. Without the re-seed, history stays at the initial snapshot and the next PUSH_PARAMS / GO_BACK reverts past the user's current state.
         const factory = createMockRouterFactory();
         const enhancedRouter = addPushParamsRouterExtension(factory)({} as PlatformStackRouterOptions);
         const initial = makeRoute('Search', 'search-1', {q: ''});
