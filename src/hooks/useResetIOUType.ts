@@ -5,7 +5,7 @@ import {useRef} from 'react';
 import {Keyboard} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';
 import type {IOURequestType} from '@userActions/IOU';
-import {initMoneyRequest} from '@userActions/IOU';
+import {hydrateOdometerDraftToTransaction, initMoneyRequest} from '@userActions/IOU';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {Policy, Report, Transaction} from '@src/types/onyx';
@@ -63,6 +63,7 @@ function useResetIOUType({
     const [lastSelectedDistanceRates] = useOnyx(ONYXKEYS.NVP_LAST_SELECTED_DISTANCE_RATES);
     const [currentDate] = useOnyx(ONYXKEYS.CURRENT_DATE);
     const [draftTransactionIDs] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION_DRAFT, {selector: validTransactionDraftIDsSelector});
+    const [odometerDraft] = useOnyx(ONYXKEYS.ODOMETER_DRAFT);
 
     const personalPolicy = usePersonalPolicy();
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
@@ -95,6 +96,10 @@ function useResetIOUType({
             hasOnlyPersonalPolicies: hasOnlyPersonalPolicies ?? true,
             draftTransactionIDs,
         });
+        // Re-queue hydration so it runs after initMoneyRequest's Onyx.set and restores any saved images
+        if (newIOUType === CONST.IOU.REQUEST_TYPE.DISTANCE_ODOMETER && odometerDraft) {
+            hydrateOdometerDraftToTransaction(CONST.IOU.OPTIMISTIC_TRANSACTION_ID, true, odometerDraft);
+        }
     };
 
     const tabSelectedTypeRef = useRef<IOURequestType | null>(null);
