@@ -7,6 +7,7 @@ import useWindowDimensionsForAutoCompleteSuggestions from '@hooks/useWindowDimen
 import {hasHoverSupport} from '@libs/DeviceCapabilities';
 import CONST from '@src/CONST';
 import AutoCompleteSuggestionsPortal from './AutoCompleteSuggestionsPortal';
+import getLeftOffset from './getSuggestionsLeftOffset';
 import type {AutoCompleteSuggestionsProps, MeasureParentContainerAndCursor} from './types';
 
 const measureHeightOfSuggestionRows = (numRows: number, canBeBig: boolean, isInLandscapeMode: boolean): number => {
@@ -49,13 +50,6 @@ const initialContainerState = {
     bottom: 0,
     cursorCoordinates: {x: 0, y: 0},
 };
-
-function getLeftOffset(x: number, leftInset: number, bigScreenLeftOffset: number, shouldUseNarrowLayout: boolean, isInLandscapeMode: boolean): number {
-    if (shouldUseNarrowLayout) {
-        return isInLandscapeMode ? x - leftInset : x;
-    }
-    return bigScreenLeftOffset;
-}
 
 /**
  * On the mobile-web platform, when long-pressing on auto-complete suggestions,
