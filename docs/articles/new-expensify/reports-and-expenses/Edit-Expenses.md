@@ -2,7 +2,7 @@
 title: Edit Expenses
 description: Learn how to edit individual expenses, and edit multiple expenses at once.
 keywords: [bulk edit expenses, edit multiple expenses Expensify, update expenses in bulk, modify multiple expenses]
-internalScope: Audience is all members. Covers editing expenses individually and in bulkediting multiple expenses at once. Does not cover creating, submitting or reopening reports. 
+internalScope: Audience is all members. Covers editing expenses individually and in bulk editing multiple expenses at once. Does not cover creating, submitting or reopening reports. 
 ---
 
 # Edit Expenses 
