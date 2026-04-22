@@ -394,7 +394,7 @@ function NewChatPage({ref}: NewChatPageProps) {
                     onSelectRow={toggleOption}
                     disabled={!!item.isDisabled}
                     accessibilityLabel={item.text ? translate('selectionList.userSelected', item.text) : ''}
-                    containerStyle={styles.ml5}
+                    style={styles.ml5}
                 />
             );
         }
