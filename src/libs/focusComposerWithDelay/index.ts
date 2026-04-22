@@ -30,18 +30,22 @@ function focusComposerWithDelay(textInput: InputType | null, delay: number = CON
             return;
         }
 
-        if (!shouldDelay) {
+        function focusAndUpdateSelection(input: InputType) {
             if (getIsFocused()) {
                 if (forceKeyboardIfAlreadyFocused) {
-                    requestKeyboardForFocusedComposer(textInput, forcedSelectionRange);
+                    requestKeyboardForFocusedComposer(input, forcedSelectionRange);
                 }
                 return;
             }
 
-            textInput.focus();
+            input.focus();
             if (forcedSelectionRange) {
-                setTextInputSelection(textInput, forcedSelectionRange);
+                setTextInputSelection(input, forcedSelectionRange);
             }
+        }
+
+        if (!shouldDelay) {
+            focusAndUpdateSelection(textInput);
             return;
         }
 
@@ -50,21 +54,10 @@ function focusComposerWithDelay(textInput: InputType | null, delay: number = CON
         if (!textInput) {
             return;
         }
+
         // When the closing modal has a focused text input focus() needs a delay to properly work.
         // Setting 150ms here is a temporary workaround for the Android HybridApp. It should be reverted once we identify the real root cause of this issue: https://github.com/Expensify/App/issues/56311.
-        setTimeout(() => {
-            if (getIsFocused()) {
-                if (forceKeyboardIfAlreadyFocused) {
-                    // Selection is applied synchronously below; only request focus
-                    requestKeyboardForFocusedComposer(textInput);
-                }
-                return;
-            }
-            textInput.focus();
-        }, delay);
-        if (forcedSelectionRange) {
-            setTextInputSelection(textInput, forcedSelectionRange);
-        }
+        setTimeout(() => focusAndUpdateSelection(textInput), delay);
     };
 }
 
