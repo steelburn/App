@@ -223,7 +223,8 @@ function KeyboardShortcutComponent({
             priority: enterKeyEventListenerPriority,
             shouldPreventDefault: false,
         }),
-        [pressOnEnter, shouldDisableEnterShortcut, isFocused, isPressOnEnterActive, allowBubble, enterKeyEventListenerPriority],
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [shouldDisableEnterShortcut, isFocused],
     );
 
     useKeyboardShortcut(CONST.KEYBOARD_SHORTCUTS.ENTER, keyboardShortcutCallback, config);
