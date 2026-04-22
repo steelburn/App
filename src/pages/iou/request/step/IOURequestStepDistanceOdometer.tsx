@@ -616,7 +616,7 @@ function IOURequestStepDistanceOdometer({
 
         if (!hasAnyInput) {
             clearOdometerDraft();
-            navigateBack();
+            Navigation.closeRHPFlow();
             return;
         }
 
@@ -630,8 +630,8 @@ function IOURequestStepDistanceOdometer({
         } catch {
             // If draft save fails, we still close to match "save for later" flow behavior.
         }
-        navigateBack();
-    }, [fromLocaleDigit, startReading, endReading, odometerStartImage, odometerEndImage, navigateBack]);
+        Navigation.closeRHPFlow();
+    }, [fromLocaleDigit, startReading, endReading, odometerStartImage, odometerEndImage]);
 
     useDiscardChangesConfirmation({
         isEnabled: shouldEnableDiscardConfirmation,
