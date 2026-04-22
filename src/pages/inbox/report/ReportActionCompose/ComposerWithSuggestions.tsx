@@ -1115,7 +1115,7 @@ function ComposerWithSuggestions({
                 resetKeyboardInput={resetKeyboardInput}
             />
 
-            {isValidReportIDFromPath(reportID) && !shouldUseNarrowLayout && (
+            {isValidReportIDFromPath(reportID) && (
                 <SilentCommentUpdater
                     reportID={reportID}
                     value={value}
