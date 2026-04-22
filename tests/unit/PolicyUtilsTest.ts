@@ -8,6 +8,9 @@ import {
     areAllGroupPoliciesExpenseChatDisabled,
     canSendInvoiceFromWorkspace,
     getActivePolicies,
+    getActivePoliciesWithExpenseChatAndPerDiemEnabled,
+    getActivePoliciesWithExpenseChatAndPerDiemEnabledAndHasRates,
+    getAllTaxRates,
     getAllTaxRatesNamesAndValues,
     getConnectedIntegrationNamesForPolicies,
     getCustomUnitsForDuplication,
@@ -23,6 +26,7 @@ import {
     getTagListByOrderWeight,
     getUberConnectionErrorDirectlyFromPolicy,
     getUnitRateValue,
+    hasConfiguredRules,
     hasDependentTags,
     hasDynamicExternalWorkflow,
     hasIndependentTags,
@@ -271,7 +275,9 @@ describe('PolicyUtils', () => {
             await Onyx.set(`${ONYXKEYS.COLLECTION.POLICY}2`, policy);
             await Onyx.set(`${ONYXKEYS.COLLECTION.LAST_SELECTED_EXPENSIFY_CARD_FEED}2`, lastSelectedExpensifyCardFeed);
             await Onyx.set(`${ONYXKEYS.COLLECTION.PRIVATE_EXPENSIFY_CARD_SETTINGS}${lastSelectedExpensifyCardFeed}`, {
-                paymentBankAccountID: 1234,
+                [CONST.COUNTRY.US]: {
+                    paymentBankAccountID: 1234,
+                },
             });
             const {result} = renderHook(() => useDefaultFundID(policy.id));
 
@@ -326,25 +332,27 @@ describe('PolicyUtils', () => {
         };
 
         it('returns undefined if neither option is selected', () => {
-            expect(getCustomUnitsForDuplication(policy, false, false)).toBeUndefined();
+            expect(getCustomUnitsForDuplication(policy, false, false, {distanceCustomUnitID: otherUnit.customUnitID, perDiemCustomUnitID: perDiemUnit.customUnitID})).toBeUndefined();
         });
 
         it('returns all custom units if both options are selected', () => {
-            const result = getCustomUnitsForDuplication(policy, true, true);
+            const result = getCustomUnitsForDuplication(policy, true, true, {distanceCustomUnitID: otherUnit.customUnitID, perDiemCustomUnitID: perDiemUnit.customUnitID});
             expect(result).toEqual(policy.customUnits);
         });
         it('returns only non-per-diem units if only custom units option is selected', () => {
-            const result = getCustomUnitsForDuplication(policy, true, false);
+            const result = getCustomUnitsForDuplication(policy, true, false, {distanceCustomUnitID: otherUnit.customUnitID, perDiemCustomUnitID: perDiemUnit.customUnitID});
             expect(result).toEqual({[otherUnit.customUnitID]: otherUnit});
         });
 
         it('returns only per diem unit if only per diem option is selected', () => {
-            const result = getCustomUnitsForDuplication(policy, false, true);
+            const result = getCustomUnitsForDuplication(policy, false, true, {distanceCustomUnitID: otherUnit.customUnitID, perDiemCustomUnitID: perDiemUnit.customUnitID});
             expect(result).toEqual({[perDiemUnit.customUnitID]: perDiemUnit});
         });
 
         it('returns undefined if customUnits is empty', () => {
-            expect(getCustomUnitsForDuplication(policyWithoutCustomUnits, true, true)).toBeUndefined();
+            expect(
+                getCustomUnitsForDuplication(policyWithoutCustomUnits, true, true, {distanceCustomUnitID: otherUnit.customUnitID, perDiemCustomUnitID: perDiemUnit.customUnitID}),
+            ).toBeUndefined();
         });
     });
     describe('getRateDisplayValue', () => {
@@ -1818,6 +1826,136 @@ describe('PolicyUtils', () => {
         });
     });
 
+    describe('getAllTaxRates (getAllTaxRatesNamesAndKeys)', () => {
+        it('returns empty object when there are no policies or no tax rates', () => {
+            expect(getAllTaxRates(undefined)).toEqual({});
+            expect(getAllTaxRates({})).toEqual({});
+            const policiesWithoutTaxes: OnyxCollection<Policy> = {
+                policy1: {
+                    ...createRandomPolicy(1, CONST.POLICY.TYPE.TEAM),
+                    taxRates: undefined,
+                },
+            };
+            expect(getAllTaxRates(policiesWithoutTaxes)).toEqual({});
+        });
+
+        it('maps tax rate names to their keys across policies', () => {
+            const policies: OnyxCollection<Policy> = {
+                p1: {
+                    ...createRandomPolicy(1, CONST.POLICY.TYPE.TEAM),
+                    taxRates: {
+                        taxes: {
+                            id_vat: {name: 'VAT', value: '20'},
+                            id_gst: {name: 'GST', value: '10'},
+                        },
+                        name: '',
+                        defaultExternalID: '',
+                        defaultValue: '',
+                        foreignTaxDefault: '',
+                    },
+                },
+                p2: {
+                    ...createRandomPolicy(2, CONST.POLICY.TYPE.TEAM),
+                    taxRates: {
+                        taxes: {
+                            id_sales: {name: 'Sales Tax', value: '8'},
+                        },
+                        name: '',
+                        defaultExternalID: '',
+                        defaultValue: '',
+                        foreignTaxDefault: '',
+                    },
+                },
+            };
+            const result = getAllTaxRates(policies);
+            expect(result).toEqual({
+                VAT: ['id_vat'],
+                GST: ['id_gst'],
+                'Sales Tax': ['id_sales'],
+            });
+        });
+
+        it('groups different keys under the same tax name', () => {
+            const policies: OnyxCollection<Policy> = {
+                p1: {
+                    ...createRandomPolicy(1, CONST.POLICY.TYPE.TEAM),
+                    taxRates: {
+                        taxes: {
+                            key_a: {name: 'VAT', value: '20'},
+                        },
+                        name: '',
+                        defaultExternalID: '',
+                        defaultValue: '',
+                        foreignTaxDefault: '',
+                    },
+                },
+                p2: {
+                    ...createRandomPolicy(2, CONST.POLICY.TYPE.TEAM),
+                    taxRates: {
+                        taxes: {
+                            key_b: {name: 'VAT', value: '15'},
+                        },
+                        name: '',
+                        defaultExternalID: '',
+                        defaultValue: '',
+                        foreignTaxDefault: '',
+                    },
+                },
+            };
+            const result = getAllTaxRates(policies);
+            expect(result.VAT).toEqual(['key_a', 'key_b']);
+        });
+
+        it('deduplicates identical keys for the same tax name', () => {
+            const policies: OnyxCollection<Policy> = {
+                p1: {
+                    ...createRandomPolicy(1, CONST.POLICY.TYPE.TEAM),
+                    taxRates: {
+                        taxes: {
+                            same_key: {name: 'VAT', value: '20'},
+                        },
+                        name: '',
+                        defaultExternalID: '',
+                        defaultValue: '',
+                        foreignTaxDefault: '',
+                    },
+                },
+                p2: {
+                    ...createRandomPolicy(2, CONST.POLICY.TYPE.TEAM),
+                    taxRates: {
+                        taxes: {
+                            same_key: {name: 'VAT', value: '20'},
+                        },
+                        name: '',
+                        defaultExternalID: '',
+                        defaultValue: '',
+                        foreignTaxDefault: '',
+                    },
+                },
+            };
+            const result = getAllTaxRates(policies);
+            expect(result.VAT).toEqual(['same_key']);
+        });
+
+        it('skips undefined policy entries', () => {
+            const policies: OnyxCollection<Policy> = {
+                p1: {
+                    ...createRandomPolicy(1, CONST.POLICY.TYPE.TEAM),
+                    taxRates: {
+                        taxes: {id_vat: {name: 'VAT', value: '20'}},
+                        name: '',
+                        defaultExternalID: '',
+                        defaultValue: '',
+                        foreignTaxDefault: '',
+                    },
+                },
+                p2: undefined,
+            };
+            const result = getAllTaxRates(policies);
+            expect(result).toEqual({VAT: ['id_vat']});
+        });
+    });
+
     describe('canSendInvoiceFromWorkspace', () => {
         it('returns true when areInvoicesEnabled is true', () => {
             const policy = {areInvoicesEnabled: true} as Policy;
@@ -1973,6 +2111,91 @@ describe('PolicyUtils', () => {
         it('should return undefined when the rate is not defined on the policy', () => {
             const policy = createRandomPolicy(1);
             expect(getDefaultTimeTrackingRate(policy)).toBeUndefined();
+        });
+    });
+
+    describe('per diem policy filters', () => {
+        const perDiemCustomUnit = {
+            name: CONST.CUSTOM_UNITS.NAME_PER_DIEM_INTERNATIONAL,
+            customUnitID: 'ABCDEF',
+            enabled: true,
+            rates: {
+                London: {
+                    customUnitRateID: 'London',
+                    name: 'London',
+                },
+            },
+        };
+
+        it('returns only control policies from getActivePoliciesWithExpenseChatAndPerDiemEnabled', () => {
+            const policies: OnyxCollection<Policy> = {
+                corporate: {
+                    ...createRandomPolicy(1, CONST.POLICY.TYPE.CORPORATE),
+                    role: CONST.POLICY.ROLE.USER,
+                    pendingAction: null,
+                    isPolicyExpenseChatEnabled: true,
+                    arePerDiemRatesEnabled: true,
+                    customUnits: {
+                        ABCDEF: perDiemCustomUnit,
+                    },
+                },
+                collect: {
+                    ...createRandomPolicy(2, CONST.POLICY.TYPE.TEAM),
+                    role: CONST.POLICY.ROLE.USER,
+                    pendingAction: null,
+                    isPolicyExpenseChatEnabled: true,
+                    arePerDiemRatesEnabled: true,
+                    customUnits: {
+                        ABCDEF: perDiemCustomUnit,
+                    },
+                },
+            };
+
+            const result = getActivePoliciesWithExpenseChatAndPerDiemEnabled(policies, undefined);
+            expect(result).toHaveLength(1);
+            expect(result.at(0)?.type).toBe(CONST.POLICY.TYPE.CORPORATE);
+        });
+
+        it('returns only control policies with rates from getActivePoliciesWithExpenseChatAndPerDiemEnabledAndHasRates', () => {
+            const policies: OnyxCollection<Policy> = {
+                corporateWithRates: {
+                    ...createRandomPolicy(1, CONST.POLICY.TYPE.CORPORATE),
+                    role: CONST.POLICY.ROLE.USER,
+                    pendingAction: null,
+                    isPolicyExpenseChatEnabled: true,
+                    arePerDiemRatesEnabled: true,
+                    customUnits: {
+                        ABCDEF: perDiemCustomUnit,
+                    },
+                },
+                corporateWithoutRates: {
+                    ...createRandomPolicy(2, CONST.POLICY.TYPE.CORPORATE),
+                    role: CONST.POLICY.ROLE.USER,
+                    pendingAction: null,
+                    isPolicyExpenseChatEnabled: true,
+                    arePerDiemRatesEnabled: true,
+                    customUnits: {
+                        ABCDEF: {
+                            ...perDiemCustomUnit,
+                            rates: {},
+                        },
+                    },
+                },
+                collectWithRates: {
+                    ...createRandomPolicy(3, CONST.POLICY.TYPE.TEAM),
+                    role: CONST.POLICY.ROLE.USER,
+                    pendingAction: null,
+                    isPolicyExpenseChatEnabled: true,
+                    arePerDiemRatesEnabled: true,
+                    customUnits: {
+                        ABCDEF: perDiemCustomUnit,
+                    },
+                },
+            };
+
+            const result = getActivePoliciesWithExpenseChatAndPerDiemEnabledAndHasRates(policies, undefined);
+            expect(result).toHaveLength(1);
+            expect(result.at(0)?.id).toBe('1');
         });
     });
 
@@ -2225,6 +2448,197 @@ describe('PolicyUtils', () => {
         it('returns false when policyTagList is undefined', () => {
             const policy = {hasMultipleTagLists: true} as Policy;
             expect(hasIndependentTags(policy, undefined)).toBe(false);
+        });
+    });
+
+    describe('hasConfiguredRules', () => {
+        it('returns false when policy is undefined', () => {
+            expect(hasConfiguredRules(undefined)).toBe(false);
+        });
+
+        it('returns false when policy has no rules configured', () => {
+            expect(hasConfiguredRules({} as Policy)).toBe(false);
+        });
+
+        describe('customRules', () => {
+            it('returns true when customRules is non-empty', () => {
+                expect(hasConfiguredRules({customRules: 'some rule'} as Policy)).toBe(true);
+            });
+
+            it('returns false when customRules is an empty string', () => {
+                expect(hasConfiguredRules({customRules: ''} as Policy)).toBe(false);
+            });
+
+            it('returns false when customRules is only whitespace', () => {
+                expect(hasConfiguredRules({customRules: '   '} as Policy)).toBe(false);
+            });
+        });
+
+        describe('rules.approvalRules', () => {
+            it('returns true when approvalRules has items', () => {
+                const policy = {rules: {approvalRules: [{id: '1', applyWhen: [], approver: 'approver@test.com'}]}} as unknown as Policy;
+                expect(hasConfiguredRules(policy)).toBe(true);
+            });
+
+            it('returns false when approvalRules is empty', () => {
+                expect(hasConfiguredRules({rules: {approvalRules: []}} as unknown as Policy)).toBe(false);
+            });
+        });
+
+        describe('rules.expenseRules', () => {
+            it('returns true when expenseRules has items', () => {
+                const policy = {
+                    rules: {
+                        expenseRules: [
+                            {
+                                id: '1',
+                                applyWhen: [],
+                                tax: {field_id_TAX: {externalID: 'TAX_US'}},
+                            },
+                        ],
+                    },
+                } as unknown as Policy;
+                expect(hasConfiguredRules(policy)).toBe(true);
+            });
+
+            it('returns false when expenseRules is empty', () => {
+                expect(hasConfiguredRules({rules: {expenseRules: []}} as unknown as Policy)).toBe(false);
+            });
+        });
+
+        describe('rules.codingRules', () => {
+            it('returns true when codingRules has entries', () => {
+                const policy = {
+                    rules: {
+                        codingRules: {
+                            rule1: {
+                                ruleID: 'rule1',
+                                filters: {left: 'merchant', operator: CONST.SEARCH.SYNTAX_OPERATORS.EQUAL_TO, right: 'Starbucks'},
+                            },
+                        },
+                    },
+                } as unknown as Policy;
+                expect(hasConfiguredRules(policy)).toBe(true);
+            });
+
+            it('returns false when codingRules is empty', () => {
+                expect(hasConfiguredRules({rules: {codingRules: {}}} as unknown as Policy)).toBe(false);
+            });
+        });
+
+        describe('maxExpenseAmount', () => {
+            it('returns true when maxExpenseAmount is set to a non-default value', () => {
+                expect(hasConfiguredRules({maxExpenseAmount: 500000} as Policy)).toBe(true);
+            });
+
+            it('returns false when maxExpenseAmount is the default value', () => {
+                expect(hasConfiguredRules({maxExpenseAmount: CONST.POLICY.DEFAULT_MAX_EXPENSE_AMOUNT} as Policy)).toBe(false);
+            });
+
+            it('returns false when maxExpenseAmount is the disabled value', () => {
+                expect(hasConfiguredRules({maxExpenseAmount: CONST.DISABLED_MAX_EXPENSE_VALUE} as Policy)).toBe(false);
+            });
+        });
+
+        describe('maxExpenseAge', () => {
+            it('returns true when maxExpenseAge is set to a non-default value', () => {
+                expect(hasConfiguredRules({maxExpenseAge: 30} as Policy)).toBe(true);
+            });
+
+            it('returns false when maxExpenseAge is the default value', () => {
+                expect(hasConfiguredRules({maxExpenseAge: CONST.POLICY.DEFAULT_MAX_EXPENSE_AGE} as Policy)).toBe(false);
+            });
+
+            it('returns false when maxExpenseAge is the disabled value', () => {
+                expect(hasConfiguredRules({maxExpenseAge: CONST.DISABLED_MAX_EXPENSE_VALUE} as Policy)).toBe(false);
+            });
+        });
+
+        describe('maxExpenseAmountNoReceipt', () => {
+            it('returns true when maxExpenseAmountNoReceipt is set to a non-default value', () => {
+                expect(hasConfiguredRules({maxExpenseAmountNoReceipt: 5000} as Policy)).toBe(true);
+            });
+
+            it('returns false when maxExpenseAmountNoReceipt is the default value', () => {
+                expect(hasConfiguredRules({maxExpenseAmountNoReceipt: CONST.POLICY.DEFAULT_MAX_AMOUNT_NO_RECEIPT} as Policy)).toBe(false);
+            });
+
+            it('returns false when maxExpenseAmountNoReceipt is the disabled value', () => {
+                expect(hasConfiguredRules({maxExpenseAmountNoReceipt: CONST.DISABLED_MAX_EXPENSE_VALUE} as Policy)).toBe(false);
+            });
+        });
+
+        describe('maxExpenseAmountNoItemizedReceipt', () => {
+            it('returns true when maxExpenseAmountNoItemizedReceipt is set to a non-default value', () => {
+                expect(hasConfiguredRules({maxExpenseAmountNoItemizedReceipt: 10000} as Policy)).toBe(true);
+            });
+
+            it('returns false when maxExpenseAmountNoItemizedReceipt is the default value', () => {
+                expect(hasConfiguredRules({maxExpenseAmountNoItemizedReceipt: CONST.POLICY.DEFAULT_MAX_AMOUNT_NO_ITEMIZED_RECEIPT} as Policy)).toBe(false);
+            });
+
+            it('returns false when maxExpenseAmountNoItemizedReceipt is the disabled value', () => {
+                expect(hasConfiguredRules({maxExpenseAmountNoItemizedReceipt: CONST.DISABLED_MAX_EXPENSE_VALUE} as Policy)).toBe(false);
+            });
+        });
+
+        describe('defaultBillable', () => {
+            it('returns true when defaultBillable is true', () => {
+                expect(hasConfiguredRules({defaultBillable: true} as Policy)).toBe(true);
+            });
+
+            it('returns false when defaultBillable is false', () => {
+                expect(hasConfiguredRules({defaultBillable: false} as Policy)).toBe(false);
+            });
+        });
+
+        describe('defaultReimbursable', () => {
+            it('returns true when defaultReimbursable is false', () => {
+                expect(hasConfiguredRules({defaultReimbursable: false} as Policy)).toBe(true);
+            });
+
+            it('returns false when defaultReimbursable is true', () => {
+                expect(hasConfiguredRules({defaultReimbursable: true} as Policy)).toBe(false);
+            });
+        });
+
+        describe('eReceipts', () => {
+            it('returns true when eReceipts is true', () => {
+                expect(hasConfiguredRules({eReceipts: true} as Policy)).toBe(true);
+            });
+
+            it('returns false when eReceipts is false', () => {
+                expect(hasConfiguredRules({eReceipts: false} as Policy)).toBe(false);
+            });
+        });
+
+        describe('requireCompanyCardsEnabled', () => {
+            it('returns true when requireCompanyCardsEnabled is true', () => {
+                expect(hasConfiguredRules({requireCompanyCardsEnabled: true} as Policy)).toBe(true);
+            });
+
+            it('returns false when requireCompanyCardsEnabled is false', () => {
+                expect(hasConfiguredRules({requireCompanyCardsEnabled: false} as Policy)).toBe(false);
+            });
+        });
+
+        describe('prohibitedExpenses', () => {
+            it('returns true when a prohibitedExpenses value differs from its default', () => {
+                // alcohol defaults to false — setting it to true triggers the rule
+                expect(hasConfiguredRules({prohibitedExpenses: {alcohol: true}} as Policy)).toBe(true);
+            });
+
+            it('returns true when gambling is disabled (differs from default true)', () => {
+                expect(hasConfiguredRules({prohibitedExpenses: {gambling: false}} as Policy)).toBe(true);
+            });
+
+            it('returns false when prohibitedExpenses matches all defaults', () => {
+                expect(hasConfiguredRules({prohibitedExpenses: {...CONST.POLICY.DEFAULT_PROHIBITED_EXPENSES}} as Policy)).toBe(false);
+            });
+
+            it('returns false when prohibitedExpenses is an empty object', () => {
+                expect(hasConfiguredRules({prohibitedExpenses: {}} as Policy)).toBe(false);
+            });
         });
     });
 });

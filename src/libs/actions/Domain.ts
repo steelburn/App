@@ -1,9 +1,11 @@
 import Onyx from 'react-native-onyx';
 import type {NullishDeep, OnyxUpdate} from 'react-native-onyx';
+import type {LocalizedTranslate} from '@components/LocaleContextProvider';
 import * as API from '@libs/API';
 import type {
     AddAdminToDomainParams,
     AddMemberToDomainParams,
+    ChangeDomainSecurityGroupParams,
     DeleteDomainMemberParams,
     DeleteDomainParams,
     RemoveDomainAdminParams,
@@ -15,11 +17,15 @@ import type {
     ToggleTwoFactorAuthRequiredForDomainParams,
 } from '@libs/API/parameters';
 import {READ_COMMANDS, SIDE_EFFECT_REQUEST_COMMANDS, WRITE_COMMANDS} from '@libs/API/types';
+import {getCommandURL} from '@libs/ApiUtils';
 import {getMicroSecondOnyxErrorWithTranslationKey} from '@libs/ErrorUtils';
+import fileDownload from '@libs/fileDownload';
+import enhanceParameters from '@libs/Network/enhanceParameters';
 import {generateAccountID} from '@libs/UserUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {Domain, DomainSecurityGroup, UserSecurityGroupData} from '@src/types/onyx';
+import type {SecurityGroupKey} from '@src/types/onyx/Domain';
 import type {PendingAction} from '@src/types/onyx/OnyxCommon';
 import type {BaseVacationDelegate} from '@src/types/onyx/VacationDelegate';
 import type PrefixedRecord from '@src/types/utils/PrefixedRecord';
@@ -1672,6 +1678,147 @@ function resetDomainMemberTwoFactorAuth(domainAccountID: number, targetAccountID
     API.write(WRITE_COMMANDS.RESET_DOMAIN_MEMBER_TWO_FACTOR_AUTH, params, {optimisticData, failureData, successData});
 }
 
+function exportMembersToCSV(domainAccountID: number, onDownloadFailed: () => void, translate: LocalizedTranslate) {
+    const finalParameters = enhanceParameters(WRITE_COMMANDS.EXPORT_DOMAIN_MEMBERS_CSV, {
+        domainAccountID,
+    });
+
+    const fileName = 'DomainMembers.csv';
+
+    const formData = new FormData();
+    for (const [key, value] of Object.entries(finalParameters)) {
+        formData.append(key, String(value));
+    }
+
+    fileDownload(translate, getCommandURL({command: WRITE_COMMANDS.EXPORT_DOMAIN_MEMBERS_CSV}), fileName, '', false, formData, CONST.NETWORK.METHOD.POST, onDownloadFailed);
+}
+
+/**
+ * Moves a domain member from one security group to another with optimistic updates.
+ * @param domainAccountID - The account ID of the domain
+ * @param domainName - The name of the domain
+ * @param employeeEmail - The email of the member being moved
+ * @param accountID - The account ID of the member being moved
+ * @param currentSecurityGroupKey - The Onyx key of the member's current security group
+ * @param currentSecurityGroup - The current security group data
+ * @param targetSecurityGroupKey - The Onyx key of the target security group
+ */
+function changeDomainSecurityGroup(
+    domainAccountID: number,
+    domainName: string,
+    employeeEmail: string,
+    accountID: number,
+    currentSecurityGroupKey: SecurityGroupKey,
+    currentSecurityGroup: Partial<DomainSecurityGroup>,
+    targetSecurityGroupKey: SecurityGroupKey,
+) {
+    const accountIDStr = String(accountID);
+
+    const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS | typeof ONYXKEYS.COLLECTION.DOMAIN | typeof ONYXKEYS.COLLECTION.DOMAIN_ERRORS>> = [
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`,
+            value: {
+                [currentSecurityGroupKey]: {
+                    shared: {
+                        [accountIDStr]: null,
+                    },
+                },
+                [targetSecurityGroupKey]: {
+                    shared: {
+                        [accountIDStr]: 'read',
+                    },
+                },
+            } as PrefixedRecord<typeof CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX, Partial<DomainSecurityGroup>>,
+        },
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`,
+            value: {
+                member: {[employeeEmail]: {changeDomainSecurityGroup: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE as PendingAction}},
+            },
+        },
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`,
+            value: {
+                memberErrors: {[employeeEmail]: null},
+            },
+        },
+    ];
+
+    const successData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS | typeof ONYXKEYS.COLLECTION.DOMAIN_ERRORS>> = [
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`,
+            value: {
+                member: {[employeeEmail]: null},
+            },
+        },
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`,
+            value: {
+                memberErrors: {[employeeEmail]: null},
+            },
+        },
+    ];
+
+    const failureData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS | typeof ONYXKEYS.COLLECTION.DOMAIN | typeof ONYXKEYS.COLLECTION.DOMAIN_ERRORS>> = [
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`,
+            value: {
+                [currentSecurityGroupKey]: {
+                    shared: {
+                        [accountIDStr]: currentSecurityGroup.shared?.[accountIDStr],
+                    },
+                },
+                [targetSecurityGroupKey]: {
+                    shared: {
+                        [accountIDStr]: null,
+                    },
+                },
+            } as PrefixedRecord<typeof CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX, Partial<DomainSecurityGroup>>,
+        },
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`,
+            value: {
+                member: {[employeeEmail]: null},
+            },
+        },
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`,
+            value: {
+                memberErrors: {
+                    [employeeEmail]: {changeDomainSecurityGroupErrors: getMicroSecondOnyxErrorWithTranslationKey('domain.members.error.moveMember')},
+                },
+            },
+        },
+    ];
+
+    const newID = targetSecurityGroupKey.replace(CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX, '');
+
+    const parameters: ChangeDomainSecurityGroupParams = {
+        domainName,
+        newID,
+        employeeEmail,
+        domainAccountID,
+    };
+
+    API.write(WRITE_COMMANDS.CHANGE_DOMAIN_SECURITY_GROUP, parameters, {optimisticData, successData, failureData});
+}
+
+function setDomainMembersSelectedForMove(memberAccountIDs: string[]) {
+    Onyx.set(ONYXKEYS.DOMAIN_MEMBERS_SELECTED_FOR_MOVE, memberAccountIDs);
+}
+
+function clearDomainMembersSelectedForMove() {
+    Onyx.set(ONYXKEYS.DOMAIN_MEMBERS_SELECTED_FOR_MOVE, []);
+}
+
 export {
     getDomainValidationCode,
     validateDomain,
@@ -1707,4 +1854,8 @@ export {
     setTwoFactorAuthExemptEmailForDomain,
     clearTwoFactorAuthExemptEmailsErrors,
     resetDomainMemberTwoFactorAuth,
+    exportMembersToCSV,
+    changeDomainSecurityGroup,
+    setDomainMembersSelectedForMove,
+    clearDomainMembersSelectedForMove,
 };

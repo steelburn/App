@@ -1,7 +1,7 @@
 import {Str} from 'expensify-common';
 import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
 import Onyx from 'react-native-onyx';
-import type {ValueOf} from 'type-fest';
+import type {TupleToUnion, ValueOf} from 'type-fest';
 import type {LocaleContextProps, LocalizedTranslate} from '@components/LocaleContextProvider';
 import type {SelectorType} from '@components/SelectionScreen';
 import CONST from '@src/CONST';
@@ -23,6 +23,7 @@ import type {
 } from '@src/types/onyx';
 import type {ErrorFields, PendingAction, PendingFields} from '@src/types/onyx/OnyxCommon';
 import type {
+    ApprovalRule,
     ConnectionLastSync,
     ConnectionName,
     Connections,
@@ -49,16 +50,19 @@ import {shouldShowQBOReimbursableExportDestinationAccountError} from './actions/
 import {getCategoryApproverRule} from './CategoryUtils';
 import {convertToBackendAmount} from './CurrencyUtils';
 import Navigation from './Navigation/Navigation';
-import {isOffline as isOfflineNetworkStore} from './Network/NetworkStore';
+import {getIsOffline} from './NetworkState';
 import {formatMemberForList} from './OptionsListUtils';
 import type {MemberForList} from './OptionsListUtils';
-import {getAccountIDsByLogins, getLoginsByAccountIDs, getPersonalDetailByEmail} from './PersonalDetailsUtils';
+import {getAccountIDsByLogins, getLoginByAccountID, getLoginsByAccountIDs, getPersonalDetailByEmail} from './PersonalDetailsUtils';
 import {getAllSortedTransactions, getCategory, getTag, getTagArrayFromName} from './TransactionUtils';
 import {isPublicDomain} from './ValidationUtils';
 
 type MemberEmailsToAccountIDs = Record<string, number>;
 
 type TravelStep = ValueOf<typeof CONST.TRAVEL.STEPS>;
+
+type AccountingConnectionName = TupleToUnion<typeof CONST.POLICY.CONNECTIONS.ACCOUNTING_CONNECTION_NAMES>;
+type HRConnectionName = TupleToUnion<typeof CONST.POLICY.CONNECTIONS.HR_CONNECTION_NAMES>;
 
 type WorkspaceDetails = {
     policyID: string | undefined;
@@ -116,13 +120,13 @@ function getActivePoliciesWithExpenseChat(policies: OnyxCollection<Policy> | nul
 }
 
 function getActivePoliciesWithExpenseChatAndPerDiemEnabled(policies: OnyxCollection<Policy> | null, currentUserLogin: string | undefined): Policy[] {
-    return getActivePoliciesWithExpenseChat(policies, currentUserLogin).filter((policy) => policy?.arePerDiemRatesEnabled);
+    return getActivePoliciesWithExpenseChat(policies, currentUserLogin).filter((policy) => policy?.arePerDiemRatesEnabled && isControlPolicy(policy));
 }
 
 function getActivePoliciesWithExpenseChatAndPerDiemEnabledAndHasRates(policies: OnyxCollection<Policy> | null, currentUserLogin: string | undefined): Policy[] {
     return getActivePoliciesWithExpenseChat(policies, currentUserLogin).filter((policy) => {
         const perDiemCustomUnit = getPerDiemCustomUnit(policy);
-        return policy?.arePerDiemRatesEnabled && !isEmptyObject(perDiemCustomUnit?.rates);
+        return policy?.arePerDiemRatesEnabled && isControlPolicy(policy) && !isEmptyObject(perDiemCustomUnit?.rates);
     });
 }
 
@@ -163,8 +167,9 @@ function hasPolicyCategoriesError(policyCategories: OnyxEntry<PolicyCategories>)
 /**
  * Checks if the policy had a sync error.
  */
-function shouldShowSyncError(policy: OnyxEntry<Policy>, isSyncInProgress: boolean): boolean {
-    return isPolicyAdmin(policy) && (Object.keys(policy?.connections ?? {}) as ConnectionName[]).some((connection) => !!hasSynchronizationErrorMessage(policy, connection, isSyncInProgress));
+function shouldShowSyncError(policy: OnyxEntry<Policy>, isSyncInProgress: boolean, connectionNames?: readonly ConnectionName[]): boolean {
+    const connectionsToCheck = connectionNames ?? (Object.keys(policy?.connections ?? {}) as ConnectionName[]);
+    return isPolicyAdmin(policy) && connectionsToCheck.some((connection) => !!hasSynchronizationErrorMessage(policy, connection, isSyncInProgress));
 }
 
 /**
@@ -304,29 +309,46 @@ function hasEligibleActiveAdminFromWorkspaces(policies: OnyxCollection<Policy> |
     return false;
 }
 
-function getCustomUnitsForDuplication(policy: Policy, isDistanceRatesOptionSelected: boolean, isPerDiemOptionSelected: boolean): Record<string, CustomUnit> | undefined {
+function getCustomUnitsForDuplication(
+    policy: Policy,
+    isDistanceRatesOptionSelected: boolean,
+    isPerDiemOptionSelected: boolean,
+    customUnitIDs: {
+        distanceCustomUnitID: string;
+        perDiemCustomUnitID: string;
+    },
+): Record<string, CustomUnit> | undefined {
     const customUnits = policy?.customUnits;
+    const {distanceCustomUnitID, perDiemCustomUnitID} = customUnitIDs ?? {};
+
     if ((!isDistanceRatesOptionSelected && !isPerDiemOptionSelected) || !customUnits || Object.keys(customUnits).length === 0) {
         return undefined;
     }
 
     if (isDistanceRatesOptionSelected && isPerDiemOptionSelected) {
-        return customUnits;
+        const distanceCustomUnit = Object.values(customUnits).find((customUnit) => customUnit.name === CONST.CUSTOM_UNITS.NAME_DISTANCE);
+        const perDiemUnit = Object.values(customUnits).find((customUnit) => customUnit.name === CONST.CUSTOM_UNITS.NAME_PER_DIEM_INTERNATIONAL);
+
+        if (!perDiemUnit || !distanceCustomUnit || !perDiemCustomUnitID || !distanceCustomUnitID) {
+            return undefined;
+        }
+
+        return {[distanceCustomUnitID]: distanceCustomUnit, [perDiemCustomUnitID]: perDiemUnit};
     }
 
-    if (isDistanceRatesOptionSelected) {
+    if (isDistanceRatesOptionSelected && distanceCustomUnitID) {
         const distanceCustomUnit = Object.values(customUnits).find((customUnit) => customUnit.name === CONST.CUSTOM_UNITS.NAME_DISTANCE);
         if (!distanceCustomUnit) {
             return undefined;
         }
-        return {[distanceCustomUnit.customUnitID]: distanceCustomUnit};
+        return {[distanceCustomUnitID]: distanceCustomUnit};
     }
 
     const perDiemUnit = Object.values(customUnits).find((customUnit) => customUnit.name === CONST.CUSTOM_UNITS.NAME_PER_DIEM_INTERNATIONAL);
-    if (!perDiemUnit) {
+    if (!perDiemUnit || !perDiemCustomUnitID) {
         return undefined;
     }
-    return {[perDiemUnit.customUnitID]: perDiemUnit};
+    return {[perDiemCustomUnitID]: perDiemUnit};
 }
 
 /**
@@ -365,7 +387,7 @@ function getPolicyBrickRoadIndicatorStatus(policy: OnyxEntry<Policy>, isConnecti
         shouldShowEmployeeListError(policy) ||
         shouldShowCustomUnitsError(policy) ||
         shouldShowPolicyErrorFields(policy) ||
-        shouldShowSyncError(policy, isConnectionInProgress) ||
+        shouldShowSyncError(policy, isConnectionInProgress, getAccountingConnectionNames()) ||
         shouldShowQBOReimbursableExportDestinationAccountError(policy)
     ) {
         return CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR;
@@ -441,6 +463,16 @@ function isPolicyPayer(policy: OnyxEntry<Policy>, currentUserLogin: string | und
     return false;
 }
 
+/** Check if the passed employee is an approver in the policy's employeeList */
+function isPolicyApprover(policy: OnyxEntry<Policy>, employeeLogin: string) {
+    if (policy?.approver === employeeLogin) {
+        return true;
+    }
+    return Object.values(policy?.employeeList ?? {}).some(
+        (employee) => employee?.submitsTo === employeeLogin || employee?.forwardsTo === employeeLogin || employee?.overLimitForwardsTo === employeeLogin,
+    );
+}
+
 function getUberConnectionErrorDirectlyFromPolicy(policy: OnyxEntry<Policy>) {
     const receiptUber = policy?.receiptPartners?.uber;
 
@@ -450,6 +482,11 @@ function getUberConnectionErrorDirectlyFromPolicy(policy: OnyxEntry<Policy>) {
 function isExpensifyTeam(email: string | undefined): boolean {
     const emailDomain = Str.extractEmailDomain(email ?? '');
     return emailDomain === CONST.EXPENSIFY_PARTNER_NAME || emailDomain === CONST.EMAIL.GUIDES_DOMAIN;
+}
+
+/** Whether Expensify team members should be hidden from the given policy/user combination. */
+function shouldFilterExpensifyTeam(policyOwner: string | undefined, currentUserLogin: string | undefined): boolean {
+    return !!policyOwner && !!currentUserLogin && !isExpensifyTeam(policyOwner) && !isExpensifyTeam(currentUserLogin);
 }
 
 /**
@@ -660,6 +697,73 @@ function hasCustomCategories(policyCategories: OnyxEntry<PolicyCategories>): boo
 }
 
 /**
+ * Checks if a policy has any rules configured (structured rules, individual expense limits, or prohibited expenses).
+ */
+function hasConfiguredRules(policy: OnyxEntry<Policy>): boolean {
+    if (!policy) {
+        return false;
+    }
+
+    if (!!policy.customRules && policy.customRules.trim().length > 0) {
+        return true;
+    }
+
+    const {rules} = policy;
+    if (!!rules?.approvalRules && rules.approvalRules.length > 0) {
+        return true;
+    }
+    if (!!rules?.expenseRules && rules.expenseRules.length > 0) {
+        return true;
+    }
+    if (!!rules?.codingRules && Object.keys(rules.codingRules).length > 0) {
+        return true;
+    }
+
+    if (!!policy.maxExpenseAmount && policy.maxExpenseAmount !== CONST.DISABLED_MAX_EXPENSE_VALUE && policy.maxExpenseAmount !== CONST.POLICY.DEFAULT_MAX_EXPENSE_AMOUNT) {
+        return true;
+    }
+    if (!!policy.maxExpenseAge && policy.maxExpenseAge !== CONST.DISABLED_MAX_EXPENSE_VALUE && policy.maxExpenseAge !== CONST.POLICY.DEFAULT_MAX_EXPENSE_AGE) {
+        return true;
+    }
+    if (
+        !!policy.maxExpenseAmountNoReceipt &&
+        policy.maxExpenseAmountNoReceipt !== CONST.DISABLED_MAX_EXPENSE_VALUE &&
+        policy.maxExpenseAmountNoReceipt !== CONST.POLICY.DEFAULT_MAX_AMOUNT_NO_RECEIPT
+    ) {
+        return true;
+    }
+    if (
+        !!policy.maxExpenseAmountNoItemizedReceipt &&
+        policy.maxExpenseAmountNoItemizedReceipt !== CONST.DISABLED_MAX_EXPENSE_VALUE &&
+        policy.maxExpenseAmountNoItemizedReceipt !== CONST.POLICY.DEFAULT_MAX_AMOUNT_NO_ITEMIZED_RECEIPT
+    ) {
+        return true;
+    }
+
+    if (policy.defaultBillable) {
+        return true;
+    }
+    if (policy.defaultReimbursable === false) {
+        return true;
+    }
+    if (policy.eReceipts) {
+        return true;
+    }
+    if (policy.requireCompanyCardsEnabled) {
+        return true;
+    }
+
+    const {prohibitedExpenses} = policy;
+    return (
+        !!prohibitedExpenses &&
+        Object.entries(CONST.POLICY.DEFAULT_PROHIBITED_EXPENSES).some(([key, defaultValue]) => {
+            const value = prohibitedExpenses[key as keyof typeof CONST.POLICY.DEFAULT_PROHIBITED_EXPENSES];
+            return value !== undefined && value !== defaultValue;
+        })
+    );
+}
+
+/**
  * Gets a tag list of a policy by a tag index
  */
 function getTagList(policyTagList: OnyxEntry<PolicyTagLists>, tagIndex: number): ValueOf<PolicyTagLists> {
@@ -785,6 +889,33 @@ function isControlPolicy(policy: OnyxEntry<Policy>): boolean {
     return policy?.type === CONST.POLICY.TYPE.CORPORATE;
 }
 
+/**
+ * For backwards compatibility with Expensify Classic, attendee tracking defaults to enabled
+ * on Control policies when the property is undefined.
+ */
+function isAttendeeTrackingEnabled(policy: OnyxEntry<Policy>): boolean {
+    return (isControlPolicy(policy) && policy?.isAttendeeTrackingEnabled) ?? true;
+}
+
+/**
+ * Whether the policy can access a feature based on plan level.
+ * Corporate-only features are restricted to control (Corporate) policies.
+ */
+function canPolicyAccessFeature(policy: OnyxEntry<Policy>, featureName: PolicyFeatureName): boolean {
+    if (!isPaidGroupPolicy(policy)) {
+        return false;
+    }
+    const corporateOnlyFeatures = new Set<PolicyFeatureName>([
+        CONST.POLICY.MORE_FEATURES.ARE_RULES_ENABLED,
+        CONST.POLICY.MORE_FEATURES.ARE_PER_DIEM_RATES_ENABLED,
+        CONST.POLICY.MORE_FEATURES.IS_HR_ENABLED,
+    ]);
+    if (corporateOnlyFeatures.has(featureName)) {
+        return isControlPolicy(policy);
+    }
+    return true;
+}
+
 function isCollectPolicy(policy: OnyxEntry<Policy>): boolean {
     return policy?.type === CONST.POLICY.TYPE.TEAM;
 }
@@ -876,6 +1007,10 @@ function hasAccountingConnections(policy: OnyxEntry<Policy>) {
     return !!getCurrentConnectionName(policy) || hasSupportedOnlyOnOldDotIntegration(policy);
 }
 
+function hasAccountingFeatureConnection(policy: OnyxEntry<Policy>) {
+    return hasAccountingConnections(policy) || hasUnsupportedIntegration(policy);
+}
+
 function getPolicyEmployeeListByIdWithoutCurrentUser(policies: OnyxCollection<Pick<Policy, 'employeeList'>>, currentPolicyID?: string, currentUserAccountID?: number) {
     const policy = policies?.[`${ONYXKEYS.COLLECTION.POLICY}${currentPolicyID}`] ?? null;
     const policyMemberEmailsToAccountIDs = getMemberAccountIDsForWorkspace(policy?.employeeList);
@@ -908,6 +1043,7 @@ function getTaxByID(policy: OnyxEntry<Policy>, taxID: string): TaxRate | undefin
  * We want to allow user to choose over TaxRateName and there might be a situation when one TaxRateName has two possible keys in different policies */
 function getAllTaxRatesNamesAndKeys(policies: OnyxCollection<Policy>): Record<string, string[]> {
     const allTaxRates: Record<string, string[]> = {};
+    const seenKeys: Record<string, Set<string>> = {};
 
     for (const policy of Object.values(policies ?? {})) {
         if (!policy?.taxRates?.taxes) {
@@ -917,11 +1053,13 @@ function getAllTaxRatesNamesAndKeys(policies: OnyxCollection<Policy>): Record<st
         for (const [taxRateKey, taxRate] of Object.entries(policy?.taxRates?.taxes ?? {})) {
             if (!allTaxRates[taxRate.name]) {
                 allTaxRates[taxRate.name] = [taxRateKey];
+                seenKeys[taxRate.name] = new Set([taxRateKey]);
                 continue;
             }
-            if (allTaxRates[taxRate.name].includes(taxRateKey)) {
+            if (seenKeys[taxRate.name].has(taxRateKey)) {
                 continue;
             }
+            seenKeys[taxRate.name].add(taxRateKey);
             allTaxRates[taxRate.name].push(taxRateKey);
         }
     }
@@ -960,13 +1098,19 @@ function isPolicyFeatureEnabled(policy: OnyxEntry<Policy>, featureName: PolicyFe
         return !!policy?.tax?.trackingEnabled;
     }
     if (featureName === CONST.POLICY.MORE_FEATURES.ARE_CONNECTIONS_ENABLED) {
-        return policy?.[featureName] ? !!policy?.[featureName] : !isEmptyObject(policy?.connections);
+        return policy?.[featureName] ? !!policy?.[featureName] : hasAccountingFeatureConnection(policy);
+    }
+    if (featureName === CONST.POLICY.MORE_FEATURES.IS_HR_ENABLED) {
+        return policy?.isHREnabled === true || !!policy?.connections?.gusto;
     }
     if (featureName === CONST.POLICY.MORE_FEATURES.ARE_RECEIPT_PARTNERS_ENABLED) {
         return policy?.receiptPartners?.enabled ?? false;
     }
     if (featureName === CONST.POLICY.MORE_FEATURES.IS_TIME_TRACKING_ENABLED) {
         return isTimeTrackingEnabled(policy);
+    }
+    if (featureName === CONST.POLICY.MORE_FEATURES.IS_ATTENDEE_TRACKING_ENABLED) {
+        return isAttendeeTrackingEnabled(policy);
     }
 
     return !!policy?.[featureName];
@@ -1011,9 +1155,72 @@ function getRuleApprovers(policy: OnyxEntry<Policy>, expenseReport: OnyxEntry<Re
     return [...new Set([...categoryApprovers, ...tagApprovers])];
 }
 
+function getFirstRuleApprover(approvalRules: ApprovalRule[], expenseReport: OnyxEntry<Report>) {
+    // Pre-build a lookup map of { category: { value → approver }, tag: { value → approver } }
+    // from the policy's approval rules so that each transaction's category/tag can be resolved in O(1).
+    const rulesMap: Record<'category' | 'tag', Record<string, string>> = {category: {}, tag: {}};
+
+    for (let i = 0; i < approvalRules.length; i++) {
+        const rule = approvalRules.at(i);
+        if (!rule) {
+            continue;
+        }
+        for (let j = 0; j < rule.applyWhen.length; j++) {
+            const applyWhen = rule.applyWhen.at(j);
+            if (applyWhen?.condition !== CONST.POLICY.RULE_CONDITIONS.MATCHES) {
+                continue;
+            }
+            if (applyWhen.field === CONST.POLICY.FIELDS.CATEGORY || applyWhen.field === CONST.POLICY.FIELDS.TAG) {
+                rulesMap[applyWhen.field][applyWhen.value] = rule.approver;
+            }
+        }
+    }
+
+    if (isEmptyObject(rulesMap.category) && isEmptyObject(rulesMap.tag)) {
+        return '';
+    }
+
+    const allReportTransactions = getAllSortedTransactions(expenseReport?.reportID);
+
+    if (!allReportTransactions.length) {
+        return '';
+    }
+
+    const employeeAccountID = expenseReport?.ownerAccountID ?? CONST.DEFAULT_NUMBER_ID;
+    const employeeLogin = getLoginByAccountID(employeeAccountID);
+
+    let firstCategoryApprover = '';
+    let firstTagApprover = '';
+
+    for (let i = 0; i < allReportTransactions.length; i++) {
+        const transaction = allReportTransactions.at(i);
+        const category = getCategory(transaction);
+        const categoryApprover = rulesMap.category[category];
+
+        // Category approvers take strict priority over tag approvers.
+        // Break immediately on the first match so we don't keep scanning transactions unnecessarily.
+        if (categoryApprover && categoryApprover !== employeeLogin) {
+            firstCategoryApprover = categoryApprover;
+            break;
+        }
+
+        // Only look for a tag approver if we haven't found one yet — no need to re-check on subsequent transactions.
+        if (!firstTagApprover) {
+            const tag = getTag(transaction);
+            const tagApprover = rulesMap.tag[tag];
+
+            if (tagApprover && tagApprover !== employeeLogin) {
+                firstTagApprover = tagApprover;
+            }
+        }
+    }
+
+    return firstCategoryApprover || firstTagApprover;
+}
+
 function getManagerAccountID(policy: OnyxEntry<Policy>, expenseReport: OnyxEntry<Report> | {ownerAccountID: number}) {
     const employeeAccountID = expenseReport?.ownerAccountID ?? CONST.DEFAULT_NUMBER_ID;
-    const employeeLogin = getLoginsByAccountIDs([employeeAccountID]).at(0) ?? '';
+    const employeeLogin = getLoginByAccountID(employeeAccountID) ?? '';
     const defaultApprover = getDefaultApprover(policy);
 
     // For policy using the optional or basic workflow, the manager is the policy default approver.
@@ -1033,14 +1240,13 @@ function getManagerAccountID(policy: OnyxEntry<Policy>, expenseReport: OnyxEntry
  * Returns the accountID to whom the given expenseReport submits reports to in the given Policy.
  */
 function getSubmitToAccountID(policy: OnyxEntry<Policy>, expenseReport: OnyxEntry<Report>): number {
-    const ruleApprovers = getRuleApprovers(policy, expenseReport);
-    const employeeAccountID = expenseReport?.ownerAccountID ?? CONST.DEFAULT_NUMBER_ID;
-    const employeeLogin = getLoginsByAccountIDs([employeeAccountID]).at(0) ?? '';
-    if (ruleApprovers.length > 0 && ruleApprovers.at(0) === employeeLogin) {
-        ruleApprovers.shift();
-    }
-    if (ruleApprovers.length > 0 && !isSubmitAndClose(policy)) {
-        return getAccountIDsByLogins([ruleApprovers.at(0) ?? '']).at(0) ?? -1;
+    const approvalRules = policy?.rules?.approvalRules;
+
+    if (!isSubmitAndClose(policy) && approvalRules?.length) {
+        const ruleApprover = getFirstRuleApprover(approvalRules, expenseReport);
+        if (ruleApprover) {
+            return getAccountIDsByLogins([ruleApprover]).at(0) ?? -1;
+        }
     }
 
     return getManagerAccountID(policy, expenseReport);
@@ -1086,7 +1292,7 @@ function getPersonalPolicy() {
 }
 
 function getAdminEmployees(policy: OnyxEntry<Policy>): PolicyEmployee[] {
-    if (!policy || !policy.employeeList) {
+    if (!policy?.employeeList) {
         return [];
     }
     return Object.keys(policy.employeeList)
@@ -1094,27 +1300,16 @@ function getAdminEmployees(policy: OnyxEntry<Policy>): PolicyEmployee[] {
         .filter((employee) => employee.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE && employee.role === CONST.POLICY.ROLE.ADMIN);
 }
 
-/**
- * Returns the policy of the report
- * @deprecated Get the data straight from Onyx - This will be fixed as part of https://github.com/Expensify/Expensify/issues/507850
- */
-function getPolicy(policyID: string | undefined, policies: OnyxCollection<Policy> = allPolicies): OnyxEntry<Policy> {
-    if (!policies || !policyID) {
-        return undefined;
-    }
-    return policies[`${ONYXKEYS.COLLECTION.POLICY}${policyID}`];
-}
-
 /** Return active policies where current user is an admin */
 function getActiveAdminWorkspaces(policies: OnyxCollection<Policy> | null, currentUserLogin: string | undefined): Policy[] {
     const activePolicies = getActivePolicies(policies, currentUserLogin);
-    return activePolicies.filter((policy) => shouldShowPolicy(policy, isOfflineNetworkStore(), currentUserLogin) && isPolicyAdmin(policy, currentUserLogin));
+    return activePolicies.filter((policy) => shouldShowPolicy(policy, getIsOffline(), currentUserLogin) && isPolicyAdmin(policy, currentUserLogin));
 }
 
 /** Return active policies where current user is an employee (of the role "user") */
 function getActiveEmployeeWorkspaces(policies: OnyxCollection<Policy> | null, currentUserLogin: string | undefined): Policy[] {
     const activePolicies = getActivePolicies(policies, currentUserLogin);
-    return activePolicies.filter((policy) => shouldShowPolicy(policy, isOfflineNetworkStore(), currentUserLogin) && isPolicyUser(policy, currentUserLogin));
+    return activePolicies.filter((policy) => shouldShowPolicy(policy, getIsOffline(), currentUserLogin) && isPolicyUser(policy, currentUserLogin));
 }
 
 /**
@@ -1164,12 +1359,7 @@ function hasIndependentTags(policy: OnyxEntry<Policy>, policyTagList: OnyxEntry<
 
 /** Get the Xero organizations connected to the policy */
 function getXeroTenants(policy: Policy | undefined): Tenant[] {
-    // Due to the way optional chain is being handled in this useMemo we are forced to use this approach to properly handle undefined values
-    // eslint-disable-next-line @typescript-eslint/prefer-optional-chain
-    if (!policy || !policy.connections || !policy.connections.xero || !policy.connections.xero.data) {
-        return [];
-    }
-    return policy.connections.xero.data.tenants ?? [];
+    return policy?.connections?.xero?.data?.tenants ?? [];
 }
 
 function findCurrentXeroOrganization(tenants: Tenant[] | undefined, organizationID: string | undefined): Tenant | undefined {
@@ -1447,8 +1637,7 @@ function getIntegrationLastSuccessfulDate(
     const connectionSyncTimeStamp = getLocalDateFromDatetime(connectionSyncProgress?.timestamp).toISOString();
 
     if (
-        connectionSyncProgress &&
-        connectionSyncProgress.stageInProgress === CONST.POLICY.CONNECTIONS.SYNC_STAGE_NAME.JOB_DONE &&
+        connectionSyncProgress?.stageInProgress === CONST.POLICY.CONNECTIONS.SYNC_STAGE_NAME.JOB_DONE &&
         syncSuccessfulDate &&
         connectionSyncTimeStamp > getLocalDateFromDatetime(syncSuccessfulDate).toISOString()
     ) {
@@ -1542,9 +1731,9 @@ function removePendingFieldsFromCustomUnit(customUnit: CustomUnit): CustomUnit {
     return cleanedCustomUnit;
 }
 
-function goBackWhenEnableFeature(policyID: string) {
+function goBackWhenEnableFeature() {
     setTimeout(() => {
-        Navigation.goBack(ROUTES.WORKSPACE_INITIAL.getRoute(policyID));
+        Navigation.goBack();
     }, CONST.WORKSPACE_ENABLE_FEATURE_REDIRECT_DELAY);
 }
 
@@ -1554,14 +1743,28 @@ function navigateToExpensifyCardPage(policyID: string) {
     });
 }
 
-function getConnectedIntegration(policy: Policy | undefined, accountingIntegrations?: ConnectionName[]) {
-    return (accountingIntegrations ?? Object.values(CONST.POLICY.CONNECTIONS.NAME)).find((integration) => !!policy?.connections?.[integration]);
+function getAccountingConnectionNames(): AccountingConnectionName[] {
+    return [...CONST.POLICY.CONNECTIONS.ACCOUNTING_CONNECTION_NAMES];
 }
 
-function getValidConnectedIntegration(policy: Policy | undefined, accountingIntegrations?: ConnectionName[]) {
-    return (accountingIntegrations ?? Object.values(CONST.POLICY.CONNECTIONS.NAME)).find(
-        (integration) => !!policy?.connections?.[integration] && !isConnectionUnverified(policy, integration),
-    );
+function isAccountingConnectionName(connectionName?: ConnectionName): connectionName is AccountingConnectionName {
+    return connectionName !== undefined && getAccountingConnectionNames().some((accountingConnectionName) => accountingConnectionName === connectionName);
+}
+
+function getHRConnectionNames(): HRConnectionName[] {
+    return [...CONST.POLICY.CONNECTIONS.HR_CONNECTION_NAMES];
+}
+
+function isGustoConnected(policy?: OnyxEntry<Policy>) {
+    return !!policy?.connections?.gusto;
+}
+
+function getConnectedIntegration(policy: Policy | undefined, connectionNames: readonly ConnectionName[] = getAccountingConnectionNames()) {
+    return connectionNames.find((integration) => !!policy?.connections?.[integration]);
+}
+
+function getValidConnectedIntegration(policy: Policy | undefined, connectionNames: readonly ConnectionName[] = getAccountingConnectionNames()) {
+    return connectionNames.find((integration) => !!policy?.connections?.[integration] && !isConnectionUnverified(policy, integration));
 }
 
 /**
@@ -1579,7 +1782,7 @@ function getConnectedIntegrationNamesForPolicies(policies: OnyxCollection<Policy
     const policiesToCheck = hasWorkspaceFilter ? policyIDs.map((id) => policies[`${ONYXKEYS.COLLECTION.POLICY}${id}`]) : Object.values(policies);
 
     for (const policy of policiesToCheck) {
-        const connectedIntegration = getValidConnectedIntegration(policy);
+        const connectedIntegration = getValidConnectedIntegration(policy, getAccountingConnectionNames());
         if (connectedIntegration) {
             connectedIntegrationNames.add(connectedIntegration);
         }
@@ -1589,7 +1792,11 @@ function getConnectedIntegrationNamesForPolicies(policies: OnyxCollection<Policy
 }
 
 function hasIntegrationAutoSync(policy: Policy | undefined, connectedIntegration?: ConnectionName) {
-    return (connectedIntegration && policy?.connections?.[connectedIntegration]?.config?.autoSync?.enabled) ?? false;
+    if (!isAccountingConnectionName(connectedIntegration)) {
+        return false;
+    }
+
+    return policy?.connections?.[connectedIntegration]?.config?.autoSync?.enabled ?? false;
 }
 
 function hasUnsupportedIntegration(policy: Policy | undefined) {
@@ -1601,7 +1808,7 @@ function hasSupportedOnlyOnOldDotIntegration(policy: Policy | undefined) {
 }
 
 function getCurrentConnectionName(policy: Policy | undefined): string | undefined {
-    const accountingIntegrations = Object.values(CONST.POLICY.CONNECTIONS.NAME);
+    const accountingIntegrations = getAccountingConnectionNames();
     const connectionKey = accountingIntegrations.find((integration) => !!policy?.connections?.[integration]);
     return connectionKey ? CONST.POLICY.CONNECTIONS.NAME_USER_FRIENDLY[connectionKey] : undefined;
 }
@@ -1947,9 +2154,11 @@ function sortPoliciesByName(policies: Policy[], localeCompare: (a: string, b: st
 
 export {
     canEditTaxRate,
+    canPolicyAccessFeature,
     escapeTagName,
     getActivePolicies,
     getAdminEmployees,
+    getAccountingConnectionNames,
     getCleanedTagName,
     getCommaSeparatedTagNameWithSanitizedColons,
     getConnectedIntegration,
@@ -1959,6 +2168,7 @@ export {
     getCountOfEnabledTagsOfList,
     getIneligibleInvitees,
     getMemberAccountIDsForWorkspace,
+    getHRConnectionNames,
     getGuideAndAccountManagerInfo,
     getSoftExclusionsForGuideAndAccountManager,
     filterGuideAndAccountManager,
@@ -1967,9 +2177,6 @@ export {
     // This will be fixed as part of https://github.com/Expensify/App/issues/66397
     // eslint-disable-next-line @typescript-eslint/no-deprecated
     getPersonalPolicy,
-    // This will be fixed as part of https://github.com/Expensify/Expensify/issues/507850
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
-    getPolicy,
     getPolicyBrickRoadIndicatorStatus,
     getPolicyEmployeeListByIdWithoutCurrentUser,
     getSortedTagKeys,
@@ -1979,10 +2186,12 @@ export {
     getTagLists,
     hasTags,
     hasCustomCategories,
+    hasConfiguredRules,
     getTaxByID,
     getUnitRateValue,
     getRateDisplayValue,
     goBackFromInvalidPolicy,
+    hasAccountingFeatureConnection,
     hasAccountingConnections,
     shouldShowSyncError,
     shouldShowCustomUnitsError,
@@ -1994,6 +2203,7 @@ export {
     shouldShowTaxRateError,
     isControlOnAdvancedApprovalMode,
     isExpensifyTeam,
+    shouldFilterExpensifyTeam,
     isDeletedPolicyEmployee,
     isInstantSubmitEnabled,
     isDelayedSubmissionEnabled,
@@ -2066,7 +2276,9 @@ export {
     getApprovalWorkflow,
     getReimburserAccountID,
     isControlPolicy,
+    isAttendeeTrackingEnabled,
     isCollectPolicy,
+    isGustoConnected,
     isNetSuiteCustomSegmentRecord,
     getNameFromNetSuiteCustomField,
     isNetSuiteCustomFieldPropertyEditable,
@@ -2122,6 +2334,7 @@ export {
     getActivePoliciesWithExpenseChatAndTimeEnabled,
     isPolicyTaxEnabled,
     sortPoliciesByName,
+    isPolicyApprover,
 };
 
 export type {MemberEmailsToAccountIDs};

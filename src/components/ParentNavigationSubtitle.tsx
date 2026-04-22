@@ -21,6 +21,7 @@ import NAVIGATORS from '@src/NAVIGATORS';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import SCREENS from '@src/SCREENS';
+import StatusBadge from './StatusBadge';
 import Text from './Text';
 import TextLink from './TextLink';
 
@@ -59,6 +60,12 @@ type ParentNavigationSubtitleProps = {
 
     /** The number of lines for the subtitle */
     subtitleNumberOfLines?: number;
+
+    /** AccountID of the human agent assisting Concierge, gates the "- assisted by [...]" suffix */
+    humanAgentAccountID?: number;
+
+    /** Display name of the human agent; falls back to a generic label when missing */
+    humanAgentName?: string;
 };
 
 function ParentNavigationSubtitle({
@@ -74,6 +81,8 @@ function ParentNavigationSubtitle({
     statusTextColor,
     statusTextContainerStyles,
     subtitleNumberOfLines = 1,
+    humanAgentAccountID,
+    humanAgentName,
 }: ParentNavigationSubtitleProps) {
     const currentRoute = useRoute();
     const styles = useThemeStyles();
@@ -189,18 +198,12 @@ function ParentNavigationSubtitle({
     return (
         <View style={[styles.flexRow, styles.alignItemsCenter, styles.w100]}>
             {!!statusText && (
-                <View
-                    style={[
-                        styles.reportStatusContainer,
-                        styles.mr1,
-                        {
-                            backgroundColor: statusTextBackgroundColor,
-                        },
-                        statusTextContainerStyles,
-                    ]}
-                >
-                    <Text style={[styles.reportStatusText, {color: statusTextColor}]}>{statusText}</Text>
-                </View>
+                <StatusBadge
+                    text={statusText}
+                    backgroundColor={statusTextBackgroundColor}
+                    textColor={statusTextColor}
+                    badgeStyles={[styles.mr1, statusTextContainerStyles]}
+                />
             )}
             <Text
                 style={[styles.optionAlternateText, styles.textLabelSupporting, styles.flexShrink1, styles.mnw0, textStyles]}
@@ -231,6 +234,11 @@ function ParentNavigationSubtitle({
                             <Text style={[styles.optionAlternateText, styles.textLabelSupporting, textStyles]}>{reportName}</Text>
                         )}
                     </>
+                )}
+                {!!humanAgentAccountID && (
+                    <Text style={[styles.optionAlternateText, styles.textLabelSupporting, textStyles]}>
+                        {` - ${translate('reportAction.assistedBy', humanAgentName ?? translate('reportAction.humanSupportAgent'))}`}
+                    </Text>
                 )}
                 {!!workspaceName && workspaceName !== reportName && (
                     <Text style={[styles.optionAlternateText, styles.textLabelSupporting, textStyles]}>{` ${translate('threads.in')} ${workspaceName}`}</Text>
