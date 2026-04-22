@@ -4,7 +4,7 @@ import {useCurrencyListActions, useCurrencyListState} from '@components/Currency
 import useFilterCountChange from '@components/Search/hooks/useFilterCountChange';
 import useOnyx from '@hooks/useOnyx';
 import {getCurrencyOptions} from '@libs/SearchUIUtils';
-import CONST from '@src/CONST';
+import type CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {SearchAdvancedFiltersForm} from '@src/types/form';
 import getEmptyArray from '@src/types/utils/getEmptyArray';
