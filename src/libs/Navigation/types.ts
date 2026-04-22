@@ -2604,9 +2604,6 @@ type ReportsSplitNavigatorParamList = {
         backTo?: Routes;
     };
     [SCREENS.REPORT_ATTACHMENTS]: AttachmentModalScreensParamList[typeof SCREENS.REPORT_ATTACHMENTS];
-    [SCREENS.REPORT_ACTION_NOT_FOUND]: {
-        reportID: string;
-    };
 };
 
 type SettingsSplitNavigatorParamList = {

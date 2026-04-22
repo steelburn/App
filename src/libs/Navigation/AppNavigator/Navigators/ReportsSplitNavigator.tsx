@@ -18,8 +18,6 @@ import type ReactComponentModule from '@src/types/utils/ReactComponentModule';
 
 const loadReportScreen = () => require<ReactComponentModule>('@pages/inbox/ReportScreen').default;
 const loadSidebarScreen = () => require<ReactComponentModule>('@pages/inbox/sidebar/BaseSidebarScreen').default;
-// eslint-disable-next-line rulesdir/no-negated-variables
-const loadReportActionNotFoundScreen = () => require<ReactComponentModule>('@pages/ErrorPage/ReportActionNotFoundPage').default;
 const Split = createSplitNavigator<ReportsSplitNavigatorParamList>();
 
 /**
@@ -84,10 +82,6 @@ function ReportsSplitNavigator({route}: PlatformStackScreenProps<AuthScreensPara
                     name={SCREENS.REPORT}
                     initialParams={reportScreenInitialParams}
                     getComponent={loadReportScreen}
-                />
-                <Split.Screen
-                    name={SCREENS.REPORT_ACTION_NOT_FOUND}
-                    getComponent={loadReportActionNotFoundScreen}
                 />
             </Split.Navigator>
         </FreezeWrapper>

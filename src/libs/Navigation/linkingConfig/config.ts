@@ -2177,10 +2177,6 @@ const config: LinkingOptions<RootNavigatorParamList>['config'] = {
                         reportID: (reportID: string | undefined) => reportID ?? '',
                     },
                 },
-                [SCREENS.REPORT_ACTION_NOT_FOUND]: {
-                    path: ROUTES.REPORT_ACTION_NOT_FOUND.route,
-                    exact: true,
-                },
             },
         },
 
