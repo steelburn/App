@@ -93,9 +93,6 @@ type ButtonStyleProps = {
     /** Any additional styles to pass to the content container wrapping all children (icons + text). */
     contentContainerStyle?: StyleProp<ViewStyle>;
 
-    /** Additional hover styles */
-    hoverStyles?: StyleProp<ViewStyle>;
-
     /** Additional styles to add to the component when it's disabled */
     disabledStyle?: StyleProp<ViewStyle>;
 

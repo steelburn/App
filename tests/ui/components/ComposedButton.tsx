@@ -375,17 +375,6 @@ describe('ButtonComposed — Button', () => {
             expect(screen.getByLabelText(LABEL)).toHaveStyle({backgroundColor: colors.productDark400});
         });
 
-        it('applies custom hoverStyles when hovered', () => {
-            // Given a Button with a custom hover border
-            renderButton({hoverStyles: {borderWidth: 3}});
-
-            // When the pointer enters
-            fireEvent(getButton(), 'hoverIn');
-
-            // Then the custom style is applied
-            expect(screen.getByLabelText(LABEL)).toHaveStyle({borderWidth: 3});
-        });
-
         it.each([
             {variant: 'success' as const, expectedHoverBg: colors.greenHover},
             {variant: 'danger' as const, expectedHoverBg: colors.redHover},

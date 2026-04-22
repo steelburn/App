@@ -49,7 +49,6 @@ function ButtonWithIcons({
     disabledStyle,
     innerStyles = [],
     shouldUseDefaultHover = true,
-    hoverStyles = undefined,
     variant,
     shouldRemoveBorderRadius,
     shouldEnableHapticFeedback = false,
@@ -96,7 +95,6 @@ function ButtonWithIcons({
             disabledStyle={disabledStyle}
             innerStyles={[buttonPaddingStyle, !!text && !!iconRight && styles.alignItemsStretch, innerStyles]}
             shouldUseDefaultHover={shouldUseDefaultHover}
-            hoverStyles={hoverStyles}
             variant={variant}
             shouldRemoveBorderRadius={shouldRemoveBorderRadius}
             shouldEnableHapticFeedback={shouldEnableHapticFeedback}
