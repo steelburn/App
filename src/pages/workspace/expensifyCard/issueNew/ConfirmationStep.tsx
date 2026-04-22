@@ -83,7 +83,7 @@ function ConfirmationStep({policyID, stepNames, startStepIndex}: ConfirmationSte
             // Redirect to the magic code page when there is an error with the user's validateCode authentication
             if (errorMessage.toLowerCase().includes('request a new code')) {
                 clearIssueNewCardError(policyID);
-                Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.WORKSPACE_EXPENSIFY_CARD_ISSUE_NEW_CONFIRM_MAGIC_CODE.path));
+                Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.WORKSPACE_EXPENSIFY_CARD_ISSUE_NEW_CONFIRM_MAGIC_CODE.path, ROUTES.WORKSPACE_EXPENSIFY_CARD.getRoute(policyID)));
             }
         }
     }, [issueNewCard, isSuccessful, policyID]);
@@ -99,7 +99,7 @@ function ConfirmationStep({policyID, stepNames, startStepIndex}: ConfirmationSte
             issueExpensifyCard(defaultFundID, policyID, isBetaEnabled(CONST.BETAS.EXPENSIFY_CARD_EU_UK) ? '' : CONST.COUNTRY.US, '', assigneeTimeZone, data);
         } else {
             // Navigate to magic code page
-            Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.WORKSPACE_EXPENSIFY_CARD_ISSUE_NEW_CONFIRM_MAGIC_CODE.path));
+            Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.WORKSPACE_EXPENSIFY_CARD_ISSUE_NEW_CONFIRM_MAGIC_CODE.path, ROUTES.WORKSPACE_EXPENSIFY_CARD.getRoute(policyID)));
         }
     }, [policyID, data, account, defaultFundID, isBetaEnabled, assigneeTimeZone]);
 
