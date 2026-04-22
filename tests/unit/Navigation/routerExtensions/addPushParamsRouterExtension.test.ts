@@ -270,7 +270,7 @@ describe('addPushParamsRouterExtension', () => {
         const factory = createMockRouterFactory();
         const enhancedRouter = addPushParamsRouterExtension(factory)({} as PlatformStackRouterOptions);
 
-        const routeA = makeRoute('ScreenA', 'a-1', {p: 1});
+        const routeA = makeRoute('ScreenA', 'a-1', {p: 2});
         const routeB = makeRoute('ScreenB', 'b-1');
         const originalHistory: CustomHistoryEntry[] = [
             {key: 'a-1', name: 'ScreenA', params: {p: 1}} as NavigationRoute<ParamListBase, string>,
@@ -279,10 +279,11 @@ describe('addPushParamsRouterExtension', () => {
         ];
         const state = makeState([routeA, routeB], {history: originalHistory});
 
+        // RESET to a snapshot that IS in history ({a-1, p:2}) — outcome is 'noop' (or matches), so preserveHistoryForRoutes keeps the same-key entries.
         const resetAction: PushParamsRouterAction = {
             type: 'RESET',
             payload: {
-                routes: [{name: 'ScreenA', key: 'a-1'}],
+                routes: [{name: 'ScreenA', key: 'a-1', params: {p: 2}}],
                 index: 0,
             },
         };
@@ -801,6 +802,33 @@ describe('addPushParamsRouterExtension', () => {
         expect(notifyPushParamsBackward).toHaveBeenCalledTimes(1);
         expect(notifyPushParamsBackward).toHaveBeenCalledWith('search-1', {q: 'A'});
     });
+
+    it('RESET to unseen params on the same route key re-seeds history so subsequent PUSH_PARAMS branches from the current screen', () => {
+        // Repros Search's setParams-driven typing + `reset(getState())` on layout change. Without the re-seed, history stays at the initial snapshot and the next PUSH_PARAMS / GO_BACK reverts past the user's current state.
+        const factory = createMockRouterFactory();
+        const enhancedRouter = addPushParamsRouterExtension(factory)({} as PlatformStackRouterOptions);
+        const initial = makeRoute('Search', 'search-1', {q: ''});
+        let state: TestState = makeState([initial], {history: [{...initial}] as CustomHistoryEntry[]});
+
+        // Simulate layout-change RESET with live params (setParams-typed) that were never pushed to history.
+        state = enhancedRouter.getStateForAction(
+            state,
+            {type: CONST.NAVIGATION.ACTION_TYPE.RESET, payload: {routes: [{name: 'Search', key: 'search-1', params: {q: 'typed'}}], index: 0}},
+            CONFIG_OPTIONS,
+        ) as TestState;
+        expect(state.history).toHaveLength(1);
+        expect((asRouteEntry(state.history?.at(0) as CustomHistoryEntry).params as {q: string}).q).toBe('typed');
+
+        // Next PUSH_PARAMS must branch from 'typed', not from the stale initial snapshot.
+        state = enhancedRouter.getStateForAction(state, {type: CONST.NAVIGATION.ACTION_TYPE.PUSH_PARAMS, payload: {params: {q: 'pushed'}}}, CONFIG_OPTIONS) as TestState;
+        expect(state.history).toHaveLength(2);
+        expect((asRouteEntry(state.history?.at(0) as CustomHistoryEntry).params as {q: string}).q).toBe('typed');
+        expect((asRouteEntry(state.history?.at(1) as CustomHistoryEntry).params as {q: string}).q).toBe('pushed');
+
+        // GO_BACK reverts to 'typed' (the state after the layout-change RESET), not the pre-RESET stale snapshot.
+        state = enhancedRouter.getStateForAction(state, CommonActions.goBack(), CONFIG_OPTIONS) as TestState;
+        expect((state.routes.at(0)?.params as {q: string}).q).toBe('typed');
+    });
 });
 
 describe('resolveCursorForReset (pure function)', () => {
@@ -821,10 +849,10 @@ describe('resolveCursorForReset (pure function)', () => {
         expect(resolveCursorForReset(history, 0, {key: 'search-1', params: {q: 'B'}})).toEqual({type: 'forward', cursor: 1});
     });
 
-    it("prefers 'backward' over 'forward' for duplicate compounds at cursor±1", () => {
-        // [A, B, A] at cursor=1 targeting A: both 0 and 2 match; backward (0) preferred.
+    it("prefers 'forward' over 'backward' for duplicate compounds at cursor±1 (browser-forward case)", () => {
+        // [A, B, A] at cursor=1 targeting A: both 0 and 2 match; forward (2) preferred so browser-forward from B doesn't land on the earlier A.
         const history = mkHistory('A', 'B', 'A');
-        expect(resolveCursorForReset(history, 1, {key: 'search-1', params: {q: 'A'}})).toEqual({type: 'backward', cursor: 0});
+        expect(resolveCursorForReset(history, 1, {key: 'search-1', params: {q: 'A'}})).toEqual({type: 'forward', cursor: 2});
     });
 
     it("returns 'backward' for a non-adjacent jump to an earlier entry (history.go(-2))", () => {

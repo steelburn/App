@@ -42,12 +42,12 @@ function resolveCursorForReset(history: CustomHistoryEntry[], currentCursor: num
             // Same compound at cursor (e.g. useNavigationResetOnLayoutChange).
             return {type: 'noop', cursor};
         }
-        // Backward preferred for duplicate compounds ([A, B, A] at cursor 1 targeting A).
-        if (matchAt(cursor - 1)) {
-            return {type: 'backward', cursor: cursor - 1};
-        }
+        // Forward preferred for duplicate compounds — browser-forward through [A, B, A] from cursor=1 must land at cursor=2, not cursor=0.
         if (matchAt(cursor + 1)) {
             return {type: 'forward', cursor: cursor + 1};
+        }
+        if (matchAt(cursor - 1)) {
+            return {type: 'backward', cursor: cursor - 1};
         }
     }
     // Non-adjacent jump or out-of-range cursor: scan whole history.
@@ -242,6 +242,12 @@ function addPushParamsRouterExtension<RouterOptions extends PlatformStackRouterO
                         pushParamsHistoryPosition = outcome.cursor;
                     } else if (outcome.type === 'unknown') {
                         cancelPendingFocusRestore();
+                        // Same-key RESET to unseen params (Search `reset(getState())` after setParams-driven typing) — re-seed so PUSH/GO_BACK branch from the current screen, not stale snapshots.
+                        pushParamsHistoryPosition = 0;
+                        return {
+                            ...rehydratedState,
+                            history: [newFocused],
+                        };
                     }
                     // 'noop' — pending restore and cursor left intact.
                 }
