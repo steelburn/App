@@ -1,6 +1,7 @@
+import {useIsFocused} from '@react-navigation/native';
 import lodashIsEmpty from 'lodash/isEmpty';
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {View} from 'react-native';
+import {InteractionManager, View} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';
 import Button from '@components/Button';
 import FormHelpMessage from '@components/FormHelpMessage';
@@ -80,12 +81,14 @@ function IOURequestStepDistanceOdometer({
 
     const startReadingInputRef = useRef<BaseTextInputRef | null>(null);
     const endReadingInputRef = useRef<BaseTextInputRef | null>(null);
+    const lastFocusedInputRef = useRef<BaseTextInputRef | null>(null);
 
     const [startReading, setStartReading] = useState<string>('');
     const [endReading, setEndReading] = useState<string>('');
     const [formError, setFormError] = useState<string>('');
     // Key to force TextInput remount when resetting state after tab switch
     const [inputKey, setInputKey] = useState<number>(0);
+    const [isDiscardModalVisible, setIsDiscardModalVisible] = useState(false);
 
     // Track initial values for DiscardChangesConfirmation
     const initialStartReadingRef = useRef<string>('');
@@ -99,6 +102,8 @@ function IOURequestStepDistanceOdometer({
     const prevSelectedTabRef = useRef<string | undefined>(undefined);
     const prevSelectedTabForHydrationRef = useRef<string | undefined>(undefined);
     const transactionWasSaved = useRef(false);
+    const didSaveEditingConfirmationRef = useRef(false);
+    const shouldBypassDiscardConfirmationRef = useRef(false);
     const backupHandledManually = useRef(false);
 
     const isArchived = useReportIsArchived(report?.reportID);
@@ -140,7 +145,7 @@ function IOURequestStepDistanceOdometer({
     const isTransactionDraft = shouldUseTransactionDraft(action, iouType);
     const currentUserAccountIDParam = currentUserPersonalDetails.accountID;
     const currentUserEmailParam = currentUserPersonalDetails.login ?? '';
-    const [shouldEnableDiscardConfirmation, setShouldEnableDiscardConfirmation] = useState(!isEditingConfirmation && !isEditing);
+    const isFocused = useIsFocused();
 
     const shouldUseDefaultExpensePolicy = useMemo(
         () => shouldUseDefaultExpensePolicyUtil(iouType, defaultExpensePolicy, amountOwed, userBillingGracePeriodEnds, ownerBillingGracePeriodEnd),
@@ -154,10 +159,6 @@ function IOURequestStepDistanceOdometer({
     const shouldSkipConfirmation: boolean = !skipConfirmation || !report?.reportID ? false : !(isArchived || isPolicyExpenseChatUtils(report));
 
     const confirmationRoute = ROUTES.MONEY_REQUEST_STEP_CONFIRMATION.getRoute(action, iouType, transactionID, reportID, backToReport);
-
-    useEffect(() => {
-        setShouldEnableDiscardConfirmation(!isEditingConfirmation && !isEditing);
-    }, [isEditing, isEditingConfirmation]);
 
     // Get odometer images from transaction (only for display, not for initialization)
     const odometerStartImage = transaction?.comment?.odometerStartImage;
@@ -293,7 +294,7 @@ function IOURequestStepDistanceOdometer({
             if (backupHandledManually.current) {
                 return;
             }
-            if (transactionWasSaved.current) {
+            if (didSaveEditingConfirmationRef.current) {
                 removeBackupTransactionWithImageCleanup(transactionID, isTransactionDraft);
                 return;
             }
@@ -420,14 +421,11 @@ function IOURequestStepDistanceOdometer({
 
     const navigateBack = useCallback(() => {
         if (isEditingConfirmation) {
-            backupHandledManually.current = true;
-            restoreOriginalTransactionFromBackupWithImageCleanup(transactionID, isTransactionDraft, () => {
-                Navigation.goBack(confirmationRoute);
-            });
+            Navigation.goBack(confirmationRoute);
             return;
         }
         Navigation.goBack();
-    }, [isEditingConfirmation, confirmationRoute, transactionID, isTransactionDraft]);
+    }, [confirmationRoute, isEditingConfirmation]);
 
     const handlePressStartImage = useCallback(() => {
         if (odometerStartImage) {
@@ -505,13 +503,14 @@ function IOURequestStepDistanceOdometer({
         }
 
         if (isEditingConfirmation) {
-            transactionWasSaved.current = true;
+            didSaveEditingConfirmationRef.current = true;
             Navigation.goBack(confirmationRoute);
             return;
         }
 
         if (shouldSkipConfirmation) {
-            setShouldEnableDiscardConfirmation(false);
+            // Skip-confirmation submit navigates away and should never be blocked by discard modal.
+            shouldBypassDiscardConfirmationRef.current = true;
         }
 
         startSpan(CONST.TELEMETRY.SPAN_ODOMETER_TO_CONFIRMATION, {
@@ -634,14 +633,29 @@ function IOURequestStepDistanceOdometer({
     }, [fromLocaleDigit, startReading, endReading, odometerStartImage, odometerEndImage]);
 
     useDiscardChangesConfirmation({
-        isEnabled: shouldEnableDiscardConfirmation,
+        onCancel: () => {
+            // eslint-disable-next-line @typescript-eslint/no-deprecated
+            InteractionManager.runAfterInteractions(() => {
+                lastFocusedInputRef.current?.focus();
+            });
+        },
         getHasUnsavedChanges: () => {
+            if (!isFocused || isEditing || shouldBypassDiscardConfirmationRef.current || didSaveEditingConfirmationRef.current) {
+                return false;
+            }
             const hasReadingChanges = startReadingRef.current !== initialStartReadingRef.current || endReadingRef.current !== initialEndReadingRef.current;
             const hasImageChanges =
                 getOdometerImageUri(transaction?.comment?.odometerStartImage) !== getOdometerImageUri(initialStartImageRef.current) ||
                 getOdometerImageUri(transaction?.comment?.odometerEndImage) !== getOdometerImageUri(initialEndImageRef.current);
             return hasReadingChanges || hasImageChanges;
         },
+        onConfirm: isEditingConfirmation
+            ? async () => {
+                  await restoreOriginalTransactionFromBackupWithImageCleanup(transactionID, isTransactionDraft);
+                  backupHandledManually.current = true;
+              }
+            : undefined,
+        onVisibilityChange: setIsDiscardModalVisible,
     });
 
     return (
@@ -667,6 +681,10 @@ function IOURequestStepDistanceOdometer({
                                 onChangeText={handleStartReadingChange}
                                 keyboardType={CONST.KEYBOARD_TYPE.DECIMAL_PAD}
                                 inputMode={CONST.INPUT_MODE.DECIMAL}
+                                editable={!isDiscardModalVisible}
+                                onFocus={() => {
+                                    lastFocusedInputRef.current = startReadingInputRef.current;
+                                }}
                             />
                         </View>
                         {!isEditing && (
@@ -709,6 +727,10 @@ function IOURequestStepDistanceOdometer({
                                 onChangeText={handleEndReadingChange}
                                 keyboardType={CONST.KEYBOARD_TYPE.DECIMAL_PAD}
                                 inputMode={CONST.INPUT_MODE.DECIMAL}
+                                editable={!isDiscardModalVisible}
+                                onFocus={() => {
+                                    lastFocusedInputRef.current = endReadingInputRef.current;
+                                }}
                             />
                         </View>
                         {!isEditing && (
