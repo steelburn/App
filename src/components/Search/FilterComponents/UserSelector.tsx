@@ -16,12 +16,16 @@ import {getParticipantsOption} from '@libs/OptionsListUtils';
 import type {OptionData} from '@libs/ReportUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
-import type {FILTER_KEYS, SearchAdvancedFiltersForm} from '@src/types/form/SearchAdvancedFiltersForm';
+import type {SearchAdvancedFiltersForm} from '@src/types/form/SearchAdvancedFiltersForm';
 import getEmptyArray from '@src/types/utils/getEmptyArray';
 import type FilterComponentProps from './types';
 
 type UserSelectorProps = FilterComponentProps & {
-    filterKey: typeof FILTER_KEYS.ASSIGNEE | typeof FILTER_KEYS.ATTENDEE | typeof FILTER_KEYS.TO | typeof FILTER_KEYS.FROM;
+    filterKey:
+        | typeof CONST.SEARCH.SYNTAX_FILTER_KEYS.ASSIGNEE
+        | typeof CONST.SEARCH.SYNTAX_FILTER_KEYS.ATTENDEE
+        | typeof CONST.SEARCH.SYNTAX_FILTER_KEYS.TO
+        | typeof CONST.SEARCH.SYNTAX_FILTER_KEYS.FROM;
     onChange: (options: string[]) => void;
 };
 

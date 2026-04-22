@@ -4,15 +4,15 @@ import {useCurrencyListActions, useCurrencyListState} from '@components/Currency
 import useFilterCountChange from '@components/Search/hooks/useFilterCountChange';
 import useOnyx from '@hooks/useOnyx';
 import {getCurrencyOptions} from '@libs/SearchUIUtils';
+import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {SearchAdvancedFiltersForm} from '@src/types/form';
-import type {FILTER_KEYS} from '@src/types/form/SearchAdvancedFiltersForm';
 import getEmptyArray from '@src/types/utils/getEmptyArray';
 import MultiSelect from './MultiSelect';
 import type FilterComponentProps from './types';
 
 type CurrencySelectorProps = FilterComponentProps & {
-    filterKey: typeof FILTER_KEYS.CURRENCY | typeof FILTER_KEYS.PURCHASE_CURRENCY;
+    filterKey: typeof CONST.SEARCH.SYNTAX_FILTER_KEYS.CURRENCY | typeof CONST.SEARCH.SYNTAX_FILTER_KEYS.PURCHASE_CURRENCY;
     onChange: (item: string[]) => void;
 };
 

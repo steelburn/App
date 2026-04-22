@@ -9,7 +9,6 @@ import {FILTER_LABEL_MAP, getMultiSelectFilterOptions, getSingleSelectFilterOpti
 import type {SearchFilter} from '@libs/SearchUIUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
-import type FILTER_KEYS from '@src/types/form/SearchAdvancedFiltersForm';
 import type {SearchAdvancedFiltersForm} from '@src/types/form/SearchAdvancedFiltersForm';
 import type {SearchDataTypes} from '@src/types/onyx/SearchResults';
 import getEmptyArray from '@src/types/utils/getEmptyArray';
@@ -36,22 +35,26 @@ type FilterComponentsProps = FilterComponentProps & {
 
 type TextInputFilterComponentsProps = {
     filterKey:
-        | typeof FILTER_KEYS.MERCHANT
-        | typeof FILTER_KEYS.DESCRIPTION
-        | typeof FILTER_KEYS.REPORT_ID
-        | typeof FILTER_KEYS.KEYWORD
-        | typeof FILTER_KEYS.TITLE
-        | typeof FILTER_KEYS.WITHDRAWAL_ID;
+        | typeof CONST.SEARCH.SYNTAX_FILTER_KEYS.MERCHANT
+        | typeof CONST.SEARCH.SYNTAX_FILTER_KEYS.DESCRIPTION
+        | typeof CONST.SEARCH.SYNTAX_FILTER_KEYS.REPORT_ID
+        | typeof CONST.SEARCH.SYNTAX_FILTER_KEYS.KEYWORD
+        | typeof CONST.SEARCH.SYNTAX_FILTER_KEYS.TITLE
+        | typeof CONST.SEARCH.SYNTAX_FILTER_KEYS.WITHDRAWAL_ID;
     onChange: (value: string) => void;
 };
 
 type SingleSelectFilterComponentsProps = FilterComponentProps & {
-    filterKey: typeof FILTER_KEYS.BILLABLE | typeof FILTER_KEYS.REIMBURSABLE | typeof FILTER_KEYS.WITHDRAWAL_TYPE;
+    filterKey: typeof CONST.SEARCH.SYNTAX_FILTER_KEYS.BILLABLE | typeof CONST.SEARCH.SYNTAX_FILTER_KEYS.REIMBURSABLE | typeof CONST.SEARCH.SYNTAX_FILTER_KEYS.WITHDRAWAL_TYPE;
     onChange: (value: string) => void;
 };
 
 type MultiSelectFilterComponentsProps = FilterComponentProps & {
-    filterKey: typeof FILTER_KEYS.HAS | typeof FILTER_KEYS.IS | typeof FILTER_KEYS.EXPENSE_TYPE | typeof FILTER_KEYS.STATUS;
+    filterKey:
+        | typeof CONST.SEARCH.SYNTAX_FILTER_KEYS.HAS
+        | typeof CONST.SEARCH.SYNTAX_FILTER_KEYS.IS
+        | typeof CONST.SEARCH.SYNTAX_FILTER_KEYS.EXPENSE_TYPE
+        | typeof CONST.SEARCH.SYNTAX_FILTER_KEYS.STATUS;
     onChange: (values: string[] | string) => void;
 };
 

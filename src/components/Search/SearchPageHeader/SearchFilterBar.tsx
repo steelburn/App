@@ -8,8 +8,7 @@ import useFilterTaxRateValue from '@components/Search/hooks/useFilterTaxRateValu
 import useFilterUserValue from '@components/Search/hooks/useFilterUserValue';
 import useFilterWorkspaceValue from '@components/Search/hooks/useFilterWorkspaceValue';
 import type {SearchFilter} from '@libs/SearchUIUtils';
-import FILTER_KEYS from '@src/types/form/SearchAdvancedFiltersForm';
-import type {SearchAdvancedFiltersKey} from '@src/types/form/SearchAdvancedFiltersForm';
+import CONST from '@src/CONST';
 import type {FilterItem} from './useSearchFiltersBar';
 
 type SearchDropdownProps = Omit<DropdownButtonProps, 'viewportOffsetTop'>;
@@ -86,24 +85,24 @@ function ReportDropdown({label, value, PopoverComponent, sentryLabel}: SearchDro
     );
 }
 
-const FILTER_COMPONENT_MAP: Partial<Record<SearchAdvancedFiltersKey, React.ComponentType<SearchDropdownProps>>> = {
-    [FILTER_KEYS.FROM]: UserDropdown,
-    [FILTER_KEYS.TO]: UserDropdown,
-    [FILTER_KEYS.ATTENDEE]: UserDropdown,
-    [FILTER_KEYS.ASSIGNEE]: UserDropdown,
+const FILTER_COMPONENT_MAP: Partial<Record<SearchFilter['key'], React.ComponentType<SearchDropdownProps>>> = {
+    [CONST.SEARCH.SYNTAX_FILTER_KEYS.FROM]: UserDropdown,
+    [CONST.SEARCH.SYNTAX_FILTER_KEYS.TO]: UserDropdown,
+    [CONST.SEARCH.SYNTAX_FILTER_KEYS.ATTENDEE]: UserDropdown,
+    [CONST.SEARCH.SYNTAX_FILTER_KEYS.ASSIGNEE]: UserDropdown,
 
-    [FILTER_KEYS.POLICY_ID]: WorkspaceDropdown,
+    [CONST.SEARCH.SYNTAX_FILTER_KEYS.POLICY_ID]: WorkspaceDropdown,
 
-    [FILTER_KEYS.FEED]: FeedDropdown,
-    [FILTER_KEYS.CARD_ID]: CardDropdown,
+    [CONST.SEARCH.SYNTAX_FILTER_KEYS.FEED]: FeedDropdown,
+    [CONST.SEARCH.SYNTAX_FILTER_KEYS.CARD_ID]: CardDropdown,
 
-    [FILTER_KEYS.TAX_RATE]: TaxRateDropdown,
+    [CONST.SEARCH.SYNTAX_FILTER_KEYS.TAX_RATE]: TaxRateDropdown,
 
-    [FILTER_KEYS.IN]: ReportDropdown,
+    [CONST.SEARCH.SYNTAX_FILTER_KEYS.IN]: ReportDropdown,
 };
 
 function SearchFilterBar({item}: {item: SearchFilter & FilterItem}) {
-    const Component = item.key in FILTER_COMPONENT_MAP ? (FILTER_COMPONENT_MAP[item.key as keyof typeof FILTER_COMPONENT_MAP] ?? DropdownButton) : DropdownButton;
+    const Component = FILTER_COMPONENT_MAP[item.key] ?? DropdownButton;
     return (
         <Component
             key={item.key}
