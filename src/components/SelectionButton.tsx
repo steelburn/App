@@ -127,7 +127,7 @@ function SelectionButton({
     const StyleUtils = useStyleUtils();
     const icons = useMemoizedLazyExpensifyIcons(['Checkmark', 'Minus']);
 
-    const effectiveBorderRadius = containerBorderRadius ?? (role === CONST.ROLE.RADIO ? variables.componentBorderRadiusCircle : 4);
+    const borderRadius = containerBorderRadius ?? (role === CONST.ROLE.RADIO ? variables.componentBorderRadiusCircle : variables.componentBorderRadiusSmall);
 
     const handleSpaceOrEnterKey = (event?: ReactKeyboardEvent) => {
         if (event?.code !== 'Space' && event?.code !== 'Enter') {
@@ -161,7 +161,7 @@ function SelectionButton({
                 onMouseDown?.(e);
             }}
             ref={ref as PressableRef}
-            style={[StyleUtils.getSelectionButtonPressableStyle(effectiveBorderRadius + 2), style]}
+            style={[StyleUtils.getSelectionButtonPressableStyle(borderRadius + 2), style]}
             onKeyDown={handleSpaceOrEnterKey}
             tabIndex={tabIndex}
             role={role}
@@ -179,7 +179,7 @@ function SelectionButton({
             {children ?? (
                 <View
                     style={[
-                        StyleUtils.getSelectionButtonContainerStyle(containerSize, effectiveBorderRadius),
+                        StyleUtils.getSelectionButtonContainerStyle(containerSize, borderRadius),
                         containerStyle,
                         (isChecked || isIndeterminate) && styles.checkedContainer,
                         hasError && styles.borderColorDanger,

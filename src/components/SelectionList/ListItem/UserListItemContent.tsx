@@ -64,7 +64,7 @@ function UserListItemContent<TItem extends ListItem>({
     });
 
     const reportExists = isReportInOnyx && !!item.reportID;
-    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- accountID being 0 is also not valid, so we prefer to use the icon ID if it exists
     const itemAccountID = Number(item.accountID || item.icons?.at(1)?.id) || 0;
 
     const isThereOnlyWorkspaceIcon = item.icons?.length === 1 && item.icons?.at(0)?.type === CONST.ICON_TYPE_WORKSPACE;
@@ -91,7 +91,6 @@ function UserListItemContent<TItem extends ListItem>({
                         isHovered && !isFocused ? StyleUtils.getBackgroundAndBorderStyle(hoveredBackgroundColor) : undefined,
                     ]}
                     reportID={reportExists ? item.reportID : undefined}
-                    /* eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing */
                     accountIDs={!reportExists && !!itemAccountID ? [itemAccountID] : []}
                     policyID={!reportExists && !!policyID ? policyID : undefined}
                     singleAvatarContainerStyle={[styles.actionAvatar, styles.mr3]}
