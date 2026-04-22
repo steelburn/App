@@ -327,7 +327,7 @@ const DYNAMIC_ROUTES = {
     },
     WORKSPACE_EXPENSIFY_CARD_ISSUE_NEW_CONFIRM_MAGIC_CODE: {
         path: 'confirm-magic-code',
-        entryScreens: [SCREENS.WORKSPACE.EXPENSIFY_CARD],
+        entryScreens: [SCREENS.WORKSPACE.DYNAMIC_WORKSPACE_EXPENSIFY_CARD_ISSUE_NEW],
     },
     WORKSPACE_EXPENSIFY_CARD_ISSUE_NEW: {
         path: 'issue-new',
