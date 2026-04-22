@@ -3,8 +3,8 @@ import type {ForwardedRef} from 'react';
 // eslint-disable-next-line no-restricted-imports
 import type {ListRenderItem, ListRenderItemInfo, FlatList as RNFlatList} from 'react-native';
 import {View} from 'react-native';
-import RenderTaskQueue from '@components/FlatList/InvertedFlatList/RenderTaskQueue';
-import type {RenderInfo} from '@components/FlatList/InvertedFlatList/RenderTaskQueue';
+import type {RenderInfo} from '@components/FlatList/RenderTaskQueue';
+import RenderTaskQueue from '@components/FlatList/RenderTaskQueue';
 import type {FlatListInnerRefType} from '@components/FlatList/types';
 import type {ScrollViewProps} from '@components/ScrollView';
 import usePrevious from '@hooks/usePrevious';
