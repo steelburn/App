@@ -79,6 +79,8 @@ function useResetIOUType({
 
         const isFromGlobalCreate = !report?.reportID;
 
+        // Capture before initMoneyRequest wipes the transaction via Onyx.set
+        const previousComment = transaction?.comment;
         initMoneyRequest({
             reportID,
             policy,
@@ -98,7 +100,7 @@ function useResetIOUType({
         });
         // Re-queue hydration so it runs after initMoneyRequest's Onyx.set and restores any saved images
         if (newIOUType === CONST.IOU.REQUEST_TYPE.DISTANCE_ODOMETER && odometerDraft) {
-            hydrateOdometerDraftToTransaction(CONST.IOU.OPTIMISTIC_TRANSACTION_ID, true, odometerDraft);
+            hydrateOdometerDraftToTransaction(CONST.IOU.OPTIMISTIC_TRANSACTION_ID, true, odometerDraft, previousComment);
         }
     };
 

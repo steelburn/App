@@ -209,7 +209,7 @@ function IOURequestStepDistanceOdometer({
             return;
         }
 
-        const hydratedComment = hydrateOdometerDraftToTransaction(transactionID, isTransactionDraft, odometerDraft);
+        const hydratedComment = hydrateOdometerDraftToTransaction(transactionID, isTransactionDraft, odometerDraft, transaction?.comment);
         if (!hydratedComment) {
             return;
         }
@@ -227,7 +227,7 @@ function IOURequestStepDistanceOdometer({
         initialEndImageRef.current = hydratedComment.odometerEndImage;
         hasInitializedRefs.current = true;
         setFormError('');
-    }, [isCreatingNewRequest, isLoadingSelectedTab, isLoadingOdometerDraft, selectedTab, odometerDraft, transactionID, isTransactionDraft]);
+    }, [isCreatingNewRequest, isLoadingSelectedTab, isLoadingOdometerDraft, selectedTab, odometerDraft, transactionID, isTransactionDraft, transaction?.comment]);
 
     // Initialize initial values refs on mount for DiscardChangesConfirmation
     // These should never be updated after mount - they represent the "baseline" state

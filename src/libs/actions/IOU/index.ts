@@ -1188,7 +1188,12 @@ async function saveOdometerDraft({startReading, endReading, startImage, endImage
     Onyx.set(ONYXKEYS.ODOMETER_DRAFT, odometerDraft);
 }
 
-function hydrateOdometerDraftToTransaction(transactionID: string, isDraft: boolean, odometerDraft: OnyxEntry<OnyxTypes.OdometerDraft>): Partial<Comment> | undefined {
+function hydrateOdometerDraftToTransaction(
+    transactionID: string,
+    isDraft: boolean,
+    odometerDraft: OnyxEntry<OnyxTypes.OdometerDraft>,
+    currentComment?: Partial<Comment>,
+): Partial<Comment> | undefined {
     if (!odometerDraft) {
         return;
     }
@@ -1205,11 +1210,13 @@ function hydrateOdometerDraftToTransaction(transactionID: string, isDraft: boole
 
     const startImage = deserializeOdometerDraftImage(odometerDraft.odometerStartImage, transactionID, CONST.IOU.ODOMETER_IMAGE_TYPE.START);
     if (startImage !== undefined) {
+        revokeOdometerImageUri(currentComment?.odometerStartImage, startImage);
         commentUpdate.odometerStartImage = startImage;
     }
 
     const endImage = deserializeOdometerDraftImage(odometerDraft.odometerEndImage, transactionID, CONST.IOU.ODOMETER_IMAGE_TYPE.END);
     if (endImage !== undefined) {
+        revokeOdometerImageUri(currentComment?.odometerEndImage, endImage);
         commentUpdate.odometerEndImage = endImage;
     }
 
