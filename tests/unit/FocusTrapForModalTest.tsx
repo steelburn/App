@@ -33,7 +33,7 @@ function withActiveElement<T>(element: HTMLElement, fn: () => T): T {
     }
 }
 
-describe('FocusTrapForModal — shouldReturnFocus gate on launcher capture', () => {
+describe('FocusTrapForModal — launcher capture', () => {
     beforeEach(() => {
         capturedOptions = null;
         (setActivePopoverLauncher as jest.Mock).mockClear();
@@ -41,7 +41,7 @@ describe('FocusTrapForModal — shouldReturnFocus gate on launcher capture', () 
         document.body.innerHTML = '';
     });
 
-    it('caches the launcher and schedules the deferred clear when shouldReturnFocus is true (default)', () => {
+    it('caches the launcher and schedules the deferred clear on activate/deactivate', () => {
         const launcher = document.createElement('button');
         document.body.appendChild(launcher);
 
@@ -56,7 +56,8 @@ describe('FocusTrapForModal — shouldReturnFocus gate on launcher capture', () 
         expect(scheduleClearActivePopoverLauncher).toHaveBeenCalled();
     });
 
-    it('skips launcher capture and deferred clear when shouldReturnFocus is false (e.g. DatePickerModal)', () => {
+    it('captures the launcher even when shouldReturnFocus is false (PopoverMenu / ThreeDotsMenu / ReanimatedModal with new focus management)', () => {
+        // The clicked menu item unmounts on close — without the launcher on the stack, nav-back has nothing to restore.
         const launcher = document.createElement('button');
         document.body.appendChild(launcher);
 
@@ -70,6 +71,18 @@ describe('FocusTrapForModal — shouldReturnFocus gate on launcher capture', () 
         );
 
         withActiveElement(launcher, () => {
+            capturedOptions?.onActivate?.();
+            capturedOptions?.onPostDeactivate?.();
+        });
+
+        expect(setActivePopoverLauncher).toHaveBeenCalledWith(launcher);
+        expect(scheduleClearActivePopoverLauncher).toHaveBeenCalled();
+    });
+
+    it('skips launcher capture when activeElement is document.body (nothing to capture)', () => {
+        render(<FocusTrapForModal active>{null}</FocusTrapForModal>);
+
+        withActiveElement(document.body, () => {
             capturedOptions?.onActivate?.();
             capturedOptions?.onPostDeactivate?.();
         });

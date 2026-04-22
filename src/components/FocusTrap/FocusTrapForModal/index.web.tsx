@@ -14,10 +14,10 @@ function FocusTrapForModal({children, active, initialFocus = false, shouldPreven
             active={active}
             focusTrapOptions={{
                 onActivate: () => {
-                    // Capture before blur — items inside the trap get removed on close. Only fires if a nav state change follows; setReturnFocus handles same-screen close.
+                    // Capture for nav-back return — independent of shouldReturnFocus (which gates only focus-trap-react's same-screen return below).
                     const launcher = document.activeElement;
                     blurActiveElement();
-                    if (shouldReturnFocus && launcher instanceof HTMLElement && launcher !== document.body) {
+                    if (launcher instanceof HTMLElement && launcher !== document.body) {
                         cachedLauncherRef.current = launcher;
                         setActivePopoverLauncher(launcher);
                     }
@@ -25,7 +25,7 @@ function FocusTrapForModal({children, active, initialFocus = false, shouldPreven
                 onPostDeactivate: () => {
                     const launcher = cachedLauncherRef.current;
                     cachedLauncherRef.current = null;
-                    if (!shouldReturnFocus || !launcher) {
+                    if (!launcher) {
                         return;
                     }
                     // Deferred so popover paths that navigate after modal-hide can still consume.
