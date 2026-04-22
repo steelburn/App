@@ -13,6 +13,9 @@ export default function handleFileRetry(message: ReceiptError, file: File, dismi
 
     switch (message.action) {
         case CONST.IOU.ACTION_PARAMS.REPLACE_RECEIPT: {
+            console.log('message: ', message);
+            console.log('retryParams: ', retryParams);
+
             dismissError();
             const replaceReceiptParams = {...retryParams} as IOU.ReplaceReceipt;
             replaceReceiptParams.file = file;

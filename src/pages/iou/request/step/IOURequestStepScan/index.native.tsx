@@ -217,7 +217,14 @@ function IOURequestStepScan({
             } else {
                 navigateBack();
             }
-            replaceReceipt({transactionID: initialTransactionID, file: file as File, source, transactionPolicy: policy, transactionPolicyCategories: policyCategories, policyTagList});
+            replaceReceipt({
+                transactionID: initialTransactionID,
+                file: file as File,
+                source,
+                transactionPolicy: policy,
+                transactionPolicyCategories: policyCategories,
+                transactionPolicyTagList: policyTagList,
+            });
         },
         [initialTransactionID, policy, policyCategories, backTo, navigateBack, policyTagList],
     );

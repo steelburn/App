@@ -300,7 +300,7 @@ function TransactionReceiptModalContent({navigation, route}: AttachmentModalScre
                         source: durableUri,
                         transactionPolicyCategories: policyCategories,
                         transactionPolicy: policy,
-                        policyTagList,
+                        transactionPolicyTagList: policyTagList,
                         ...(isSameReceipt ? {state: transaction?.receipt?.state, isSameReceipt: true} : {}),
                     });
                 }

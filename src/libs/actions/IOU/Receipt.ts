@@ -160,7 +160,7 @@ function detachReceipt(
     );
 }
 
-function replaceReceipt({transactionID, file, source, state, transactionPolicy, transactionPolicyCategories, isSameReceipt, policyTagList}: ReplaceReceipt) {
+function replaceReceipt({transactionID, file, source, state, transactionPolicy, transactionPolicyCategories, isSameReceipt, transactionPolicyTagList}: ReplaceReceipt) {
     if (!file) {
         return;
     }
@@ -179,7 +179,7 @@ function replaceReceipt({transactionID, file, source, state, transactionPolicy, 
         filename: file.name,
     };
     const newTransaction = transaction && {...transaction, receipt: receiptOptimistic};
-    const retryParams: ReplaceReceipt = {transactionID, file: undefined, source, transactionPolicy, transactionPolicyCategories, policyTagList};
+    const retryParams: ReplaceReceipt = {transactionID, file: undefined, source, transactionPolicy, transactionPolicyCategories, transactionPolicyTagList};
     const currentSearchQueryJSON = getCurrentSearchQueryJSON();
 
     const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.TRANSACTION | typeof ONYXKEYS.COLLECTION.SNAPSHOT | typeof ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS>> = [
@@ -228,9 +228,9 @@ function replaceReceipt({transactionID, file, source, state, transactionPolicy, 
             newTransaction,
             currentTransactionViolations,
             transactionPolicy,
-            policyTagList ?? {},
+            transactionPolicyTagList ?? {},
             transactionPolicyCategories ?? {},
-            hasDependentTags(transactionPolicy, policyTagList ?? {}),
+            hasDependentTags(transactionPolicy, transactionPolicyTagList ?? {}),
             isInvoiceReportReportUtils(expenseReport),
         );
         optimisticData.push(violationsOnyxData);

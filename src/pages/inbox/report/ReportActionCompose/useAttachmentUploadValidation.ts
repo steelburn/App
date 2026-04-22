@@ -95,7 +95,14 @@ function useAttachmentUploadValidation({
 
         if (shouldAddOrReplaceReceipt && transactionID) {
             const source = URL.createObjectURL(files.at(0) as Blob);
-            replaceReceipt({transactionID, file: files.at(0) as File, source, transactionPolicy: policy, transactionPolicyCategories: policyCategories, policyTagList});
+            replaceReceipt({
+                transactionID,
+                file: files.at(0) as File,
+                source,
+                transactionPolicy: policy,
+                transactionPolicyCategories: policyCategories,
+                transactionPolicyTagList: policyTagList,
+            });
             return;
         }
 
