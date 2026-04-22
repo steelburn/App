@@ -1,0 +1,366 @@
+import {act, renderHook} from '@testing-library/react-native';
+import type {ComposerRef, TextSelection} from '@components/Composer/types';
+import type {RefObject} from 'react';
+import ReportActionComposeUtils from '@pages/inbox/report/ReportActionCompose/ReportActionComposeUtils';
+import useEditComposerToggle from '@pages/inbox/report/ReportActionCompose/useEditComposerToggle';
+import type {ReportActionActiveEdit} from '@pages/inbox/report/ReportActionEditMessageContext';
+import * as ReportActionEditMessageContext from '@pages/inbox/report/ReportActionEditMessageContext';
+
+jest.mock('@pages/inbox/report/ReportActionEditMessageContext', () => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const actual = jest.requireActual('@pages/inbox/report/ReportActionEditMessageContext');
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    return {
+        ...actual,
+        useReportActionActiveEdit: jest.fn(),
+    };
+});
+
+jest.mock('@hooks/useResponsiveLayout', () => ({
+    __esModule: true,
+    default: jest.fn(() => ({
+        shouldUseNarrowLayout: true,
+        isSmallScreenWidth: true,
+        isInNarrowPaneModal: false,
+        isExtraSmallScreenHeight: false,
+        isExtraSmallScreenWidth: false,
+        isMediumScreenWidth: false,
+        onboardingIsMediumOrLargerScreenWidth: false,
+        isLargeScreenWidth: false,
+        isSmallScreen: true,
+    })),
+}));
+
+jest.mock('@pages/inbox/report/ReportActionCompose/ReportActionComposeUtils', () => ({
+    __esModule: true,
+    default: {
+        updateNativeSelectionValue: jest.fn(),
+    },
+}));
+
+jest.mock('@libs/getPlatform', () => ({
+    __esModule: true,
+    default: () => 'web',
+}));
+
+const mockUseReportActionActiveEdit = jest.mocked(ReportActionEditMessageContext.useReportActionActiveEdit);
+const mockUseResponsiveLayout = jest.requireMock('@hooks/useResponsiveLayout').default as jest.Mock;
+const mockUpdateNativeSelectionValue = jest.mocked(ReportActionComposeUtils.updateNativeSelectionValue);
+
+type ActiveEdit = ReportActionActiveEdit & {editingState: 'off' | 'editing' | 'submitted'};
+
+function makeComposerRef(overrides?: Partial<ComposerRef>): RefObject<ComposerRef | null> {
+    return {
+        current: {
+            blur: jest.fn(),
+            isFocused: jest.fn(() => false),
+            setNativeProps: jest.fn(),
+            setSelection: jest.fn(),
+            focus: jest.fn(),
+            ...overrides,
+        } as unknown as ComposerRef,
+    };
+}
+
+function defaultActiveEdit(overrides?: Partial<ActiveEdit>): ActiveEdit {
+    return {
+        editingReportID: null,
+        editingReportActionID: null,
+        editingReportAction: null,
+        editingMessage: null,
+        currentEditMessageSelection: null,
+        editingState: 'off',
+        ...overrides,
+    };
+}
+
+function wideLayoutResult() {
+    return {
+        shouldUseNarrowLayout: false,
+        isSmallScreenWidth: false,
+        isInNarrowPaneModal: false,
+        isExtraSmallScreenHeight: false,
+        isExtraSmallScreenWidth: false,
+        isMediumScreenWidth: false,
+        onboardingIsMediumOrLargerScreenWidth: true,
+        isLargeScreenWidth: true,
+        isSmallScreen: false,
+    };
+}
+
+function narrowLayoutResult() {
+    return {
+        shouldUseNarrowLayout: true,
+        isSmallScreenWidth: true,
+        isInNarrowPaneModal: false,
+        isExtraSmallScreenHeight: false,
+        isExtraSmallScreenWidth: false,
+        isMediumScreenWidth: false,
+        onboardingIsMediumOrLargerScreenWidth: false,
+        isLargeScreenWidth: false,
+        isSmallScreen: true,
+    };
+}
+
+describe('useEditComposerToggle', () => {
+    const activeEditRef = {current: defaultActiveEdit()};
+
+    beforeEach(() => {
+        jest.clearAllMocks();
+        activeEditRef.current = defaultActiveEdit();
+        mockUseReportActionActiveEdit.mockImplementation(() => activeEditRef.current);
+        mockUseResponsiveLayout.mockReturnValue(narrowLayoutResult());
+    });
+
+    it('does not run apply logic while editingState is submitted', () => {
+        const onValueChange = jest.fn();
+        const composerRef = makeComposerRef();
+        activeEditRef.current = defaultActiveEdit({editingState: 'submitted', editingMessage: 'hello'});
+
+        renderHook(() =>
+            useEditComposerToggle({
+                selection: {start: 0, end: 0},
+                draftComment: 'draft',
+                composerRef,
+                onValueChange,
+            }),
+        );
+
+        expect(onValueChange).not.toHaveBeenCalled();
+    });
+
+    it('on narrow layout, when editing starts, applies editing message, selection at end, and focus', () => {
+        const onValueChange = jest.fn();
+        const onSelectionChange = jest.fn();
+        const onFocus = jest.fn();
+        const composerRef = makeComposerRef();
+        const priorSelection: TextSelection = {start: 0, end: 0};
+
+        const {rerender} = renderHook(
+            (props: {selection: TextSelection; draft: string}) =>
+                useEditComposerToggle({
+                    selection: props.selection,
+                    draftComment: props.draft,
+                    composerRef,
+                    onValueChange,
+                    onSelectionChange,
+                    onFocus,
+                }),
+            {initialProps: {selection: priorSelection, draft: 'keep my draft'}},
+        );
+
+        act(() => {
+            activeEditRef.current = defaultActiveEdit({
+                editingState: 'editing',
+                editingMessage: 'edited body',
+                editingReportActionID: '100',
+                currentEditMessageSelection: {start: 1, end: 2},
+            });
+            rerender({selection: priorSelection, draft: 'keep my draft'});
+        });
+
+        const expectedEnd = 'edited body'.length;
+        expect(onValueChange).toHaveBeenCalledWith('edited body');
+        expect(onSelectionChange).toHaveBeenCalledWith({start: expectedEnd, end: expectedEnd});
+        expect(onFocus).toHaveBeenCalled();
+    });
+
+    it('on wide layout, when editing starts, leaves composer value unchanged (inline editor handles edit)', () => {
+        mockUseResponsiveLayout.mockReturnValue(wideLayoutResult());
+
+        const onValueChange = jest.fn();
+        const composerRef = makeComposerRef();
+
+        const {rerender} = renderHook(() =>
+            useEditComposerToggle({
+                selection: {start: 0, end: 0},
+                draftComment: 'draft in composer',
+                composerRef,
+                onValueChange,
+            }),
+        );
+
+        act(() => {
+            activeEditRef.current = defaultActiveEdit({
+                editingState: 'editing',
+                editingMessage: 'from thread',
+            });
+            rerender();
+        });
+
+        expect(onValueChange).not.toHaveBeenCalled();
+    });
+
+    it('on narrow, when edit ends, restores prior draft and selection; blurs if composer was not focused before', () => {
+        const onValueChange = jest.fn();
+        const onSelectionChange = jest.fn();
+        const composerRef = makeComposerRef();
+        const priorSelection: TextSelection = {start: 2, end: 5};
+
+        // Start with edit off so wasEditingRef is false; then turn editing on to capture previousDraftSelectionRef.
+        const {rerender} = renderHook(
+            (props: {selection: TextSelection; draft: string; editing: boolean}) => {
+                activeEditRef.current = defaultActiveEdit(
+                    props.editing
+                        ? {editingState: 'editing', editingMessage: 'e', editingReportActionID: '1'}
+                        : {editingState: 'off'},
+                );
+                return useEditComposerToggle({
+                    selection: props.selection,
+                    draftComment: props.draft,
+                    composerRef,
+                    onValueChange,
+                    onSelectionChange,
+                });
+            },
+            {initialProps: {selection: priorSelection, draft: 'restored', editing: false}},
+        );
+
+        act(() => {
+            rerender({selection: priorSelection, draft: 'restored', editing: true});
+        });
+
+        onValueChange.mockClear();
+        onSelectionChange.mockClear();
+
+        act(() => {
+            rerender({selection: priorSelection, draft: 'restored', editing: false});
+        });
+
+        expect(onValueChange).toHaveBeenCalledWith('restored');
+        expect(onSelectionChange).toHaveBeenCalledWith(priorSelection);
+        expect(composerRef.current?.blur).toHaveBeenCalled();
+    });
+
+    it('on narrow, when switching the message being edited, applies the new message', () => {
+        const onValueChange = jest.fn();
+        const onFocus = jest.fn();
+        const composerRef = makeComposerRef();
+
+        activeEditRef.current = defaultActiveEdit({
+            editingState: 'editing',
+            editingMessage: 'first',
+            editingReportActionID: 'a',
+        });
+
+        const {rerender} = renderHook(
+            (id: string) => {
+                activeEditRef.current = defaultActiveEdit({
+                    editingState: 'editing',
+                    editingMessage: id === 'a' ? 'first' : 'second',
+                    editingReportActionID: id,
+                });
+                return useEditComposerToggle({
+                    selection: {start: 0, end: 0},
+                    draftComment: 'x',
+                    composerRef,
+                    onValueChange,
+                    onFocus,
+                });
+            },
+            {initialProps: 'a'},
+        );
+
+        onValueChange.mockClear();
+        onFocus.mockClear();
+
+        act(() => {
+            rerender('b');
+        });
+
+        expect(onValueChange).toHaveBeenCalledWith('second');
+        expect(onFocus).toHaveBeenCalled();
+    });
+
+    it('when layout goes from wide to narrow while editing, loads editing message into the composer', () => {
+        mockUseResponsiveLayout.mockReturnValue(wideLayoutResult());
+
+        const onValueChange = jest.fn();
+        const onFocus = jest.fn();
+        const composerRef = makeComposerRef();
+
+        activeEditRef.current = defaultActiveEdit({
+            editingState: 'editing',
+            editingMessage: 'wide first',
+        });
+
+        const {rerender} = renderHook(() =>
+            useEditComposerToggle({
+                selection: {start: 0, end: 0},
+                draftComment: 'composer draft',
+                composerRef,
+                onValueChange,
+                onFocus,
+            }),
+        );
+
+        onValueChange.mockClear();
+
+        act(() => {
+            mockUseResponsiveLayout.mockReturnValue(narrowLayoutResult());
+            rerender();
+        });
+
+        expect(onValueChange).toHaveBeenCalledWith('wide first');
+        expect(onFocus).toHaveBeenCalled();
+    });
+
+    it('when layout goes from narrow to wide while editing, restores the normal draft in the composer', () => {
+        const onValueChange = jest.fn();
+        const composerRef = makeComposerRef();
+
+        activeEditRef.current = defaultActiveEdit({
+            editingState: 'editing',
+            editingMessage: 'editing in narrow',
+        });
+
+        const {rerender} = renderHook(
+            (narrow: boolean) => {
+                mockUseResponsiveLayout.mockReturnValue(narrow ? narrowLayoutResult() : wideLayoutResult());
+                return useEditComposerToggle({
+                    selection: {start: 0, end: 0},
+                    draftComment: 'plain draft for wide',
+                    composerRef,
+                    onValueChange,
+                });
+            },
+            {initialProps: true},
+        );
+
+        onValueChange.mockClear();
+
+        act(() => {
+            rerender(false);
+        });
+
+        expect(onValueChange).toHaveBeenCalledWith('plain draft for wide');
+    });
+
+    it('passes selection through to ReportActionComposeUtils when toggling (non-iOS / web mock)', () => {
+        const onValueChange = jest.fn();
+        const onSelectionChange = jest.fn();
+        const composerRef = makeComposerRef();
+
+        const {rerender} = renderHook(
+            (editing: boolean) => {
+                activeEditRef.current = defaultActiveEdit(
+                    editing ? {editingState: 'editing', editingMessage: 'hi', editingReportActionID: '1'} : {editingState: 'off'},
+                );
+                return useEditComposerToggle({
+                    selection: {start: 0, end: 0},
+                    draftComment: 'd',
+                    composerRef,
+                    onValueChange,
+                    onSelectionChange,
+                });
+            },
+            {initialProps: false},
+        );
+
+        act(() => {
+            rerender(true);
+        });
+
+        expect(mockUpdateNativeSelectionValue).toHaveBeenCalled();
+    });
+});
