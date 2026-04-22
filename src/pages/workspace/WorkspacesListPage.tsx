@@ -1,7 +1,7 @@
 import {useIsFocused, useRoute} from '@react-navigation/native';
 import {Str} from 'expensify-common';
 import React, {useEffect, useRef, useState} from 'react';
-import {FlatList, InteractionManager, View} from 'react-native';
+import {FlatList, View} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';
 import type {ValueOf} from 'type-fest';
 import ActivityIndicator from '@components/ActivityIndicator';
@@ -631,13 +631,14 @@ function WorkspacesListPage() {
             return;
         }
         const duplicateWorkspaceIndex = filteredWorkspaces.findIndex((workspace) => workspace.policyID === duplicatedWSPolicyID);
-        if (duplicateWorkspaceIndex >= 0) {
-            flatlistRef.current?.scrollToIndex({index: duplicateWorkspaceIndex, animated: false});
-            // eslint-disable-next-line @typescript-eslint/no-deprecated
-            InteractionManager.runAfterInteractions(() => {
-                clearDuplicateWorkspace();
-            });
+        if (duplicateWorkspaceIndex < 0) {
+            return;
         }
+        flatlistRef.current?.scrollToIndex({index: duplicateWorkspaceIndex, animated: false});
+        const rafID = requestAnimationFrame(() => {
+            clearDuplicateWorkspace();
+        });
+        return () => cancelAnimationFrame(rafID);
     }, [duplicateWorkspace?.policyID, isFocused, filteredWorkspaces]);
 
     const listHeaderComponent = (

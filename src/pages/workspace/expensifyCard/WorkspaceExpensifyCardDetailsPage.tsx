@@ -1,6 +1,6 @@
 import {cardByIdSelector} from '@selectors/Card';
 import {Str} from 'expensify-common';
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {View} from 'react-native';
 import cardScarf from '@assets/images/card-scarf.svg';
 import Badge from '@components/Badge';
@@ -90,8 +90,6 @@ function WorkspaceExpensifyCardDetailsPage({route}: WorkspaceExpensifyCardDetail
     const translationForLimitType = getTranslationKeyForLimitType(card?.nameValuePairs?.limitType);
     const isAdmin = isPolicyAdmin(policy, session?.email);
 
-    const shouldGoBack = useRef(false);
-
     const fetchCardDetails = useCallback(() => {
         openCardDetailsPage(Number(cardID));
     }, [cardID]);
@@ -101,7 +99,6 @@ function WorkspaceExpensifyCardDetailsPage({route}: WorkspaceExpensifyCardDetail
     useEffect(() => fetchCardDetails(), [fetchCardDetails]);
 
     const deactivateCard = async () => {
-        shouldGoBack.current = true;
         const {action} = await showConfirmModal({
             title: translate('workspace.card.deactivateCardModal.deactivateCard'),
             shouldSetModalVisibility: false,
@@ -109,10 +106,10 @@ function WorkspaceExpensifyCardDetailsPage({route}: WorkspaceExpensifyCardDetail
             confirmText: translate('workspace.card.deactivateCardModal.deactivate'),
             cancelText: translate('common.cancel'),
             danger: true,
-            onModalHide: () => shouldGoBack.current && Navigation.goBack(),
         });
         if (action === ModalActions.CONFIRM) {
             deactivateCardAction(defaultFundID, card);
+            Navigation.goBack();
         }
     };
 
