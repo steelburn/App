@@ -1,10 +1,8 @@
 import React, {memo, useMemo} from 'react';
 import type {OnyxEntry} from 'react-native-onyx';
-import useOnyx from '@hooks/useOnyx';
 import {getOriginalMessage, isSentMoneyReportAction, isTransactionThread} from '@libs/ReportActionsUtils';
 import {isChatThread} from '@libs/ReportUtils';
 import CONST from '@src/CONST';
-import ONYXKEYS from '@src/ONYXKEYS';
 import type {PersonalDetailsList, Report, ReportAction} from '@src/types/onyx';
 import ReportActionItem from './ReportActionItem';
 import ReportActionItemParentAction from './ReportActionItemParentAction';
@@ -101,8 +99,6 @@ function ReportActionsListItemRenderer({
     reportNameValuePairsOriginalID,
 }: ReportActionsListItemRendererProps) {
     const originalMessage = useMemo(() => getOriginalMessage(reportAction), [reportAction]);
-
-    const [emojiReactions] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS_REACTIONS}${reportAction.reportActionID}`);
 
     /**
      * Create a lightweight ReportAction so as to keep the re-rendering as light as possible by
@@ -218,7 +214,6 @@ function ReportActionsListItemRenderer({
             userWalletTierName={userWalletTierName}
             isUserValidated={isUserValidated}
             personalDetails={personalDetails}
-            emojiReactions={emojiReactions}
             userBillingFundID={userBillingFundID}
             isTryNewDotNVPDismissed={isTryNewDotNVPDismissed}
             reportNameValuePairsOrigin={reportNameValuePairsOrigin}

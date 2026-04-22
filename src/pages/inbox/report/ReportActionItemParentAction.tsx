@@ -20,7 +20,7 @@ import {
 } from '@libs/ReportUtils';
 import {navigateToConciergeChatAndDeleteReport} from '@userActions/Report';
 import ONYXKEYS from '@src/ONYXKEYS';
-import type {PersonalDetailsList, Report, ReportAction, ReportActionReactions, ReportNameValuePairs, Transaction} from '@src/types/onyx';
+import type {PersonalDetailsList, Report, ReportAction, ReportNameValuePairs, Transaction} from '@src/types/onyx';
 import AnimatedEmptyStateBackground from './AnimatedEmptyStateBackground';
 import RepliesDivider from './RepliesDivider';
 import ReportActionItem from './ReportActionItem';
@@ -131,23 +131,6 @@ function ReportActionItemParentAction({
         [ancestors],
     );
 
-    const ancestorReactionSelector = useCallback(
-        (allReactions: OnyxCollection<ReportActionReactions>) => {
-            if (!allReactions) {
-                return {};
-            }
-            const result: OnyxCollection<ReportActionReactions> = {};
-            for (const ancestor of ancestors) {
-                const key = `${ONYXKEYS.COLLECTION.REPORT_ACTIONS_REACTIONS}${ancestor.reportAction.reportActionID}`;
-                result[key] = allReactions[key];
-            }
-            return result;
-        },
-        [ancestors],
-    );
-
-    const [ancestorReactions] = useOnyx(ONYXKEYS.COLLECTION.REPORT_ACTIONS_REACTIONS, {selector: ancestorReactionSelector}, [ancestors]);
-
     const [conciergeReportID] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID);
     const [introSelected] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED);
     const [isSelfTourViewed] = useOnyx(ONYXKEYS.NVP_ONBOARDING, {selector: hasSeenTourSelector});
@@ -168,8 +151,6 @@ function ReportActionItemParentAction({
                     const canUserPerformWriteAction = canUserPerformWriteActionReportUtils(ancestorReport, isReportArchived);
                     const shouldDisplayThreadDivider = !isTripPreview(ancestorReportAction);
                     const isAncestorReportArchived = isArchivedReport(ancestorsReportNameValuePairs?.[`${ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS}${ancestorReport.reportID}`]);
-
-                    const actionEmojiReactions = ancestorReactions?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS_REACTIONS}${ancestorReportAction.reportActionID}`];
 
                     return (
                         <OfflineWithFeedback
@@ -207,7 +188,6 @@ function ReportActionItemParentAction({
                                 userWalletTierName={userWalletTierName}
                                 isUserValidated={isUserValidated}
                                 personalDetails={personalDetails}
-                                emojiReactions={actionEmojiReactions}
                                 linkedTransactionRouteError={linkedTransactionRouteError}
                                 userBillingFundID={userBillingFundID}
                                 isTryNewDotNVPDismissed={isTryNewDotNVPDismissed}
