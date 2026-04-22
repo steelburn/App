@@ -17,6 +17,7 @@ import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavig
 import type {SettingsNavigatorParamList} from '@libs/Navigation/types';
 import type {SkeletonSpanReasonAttributes} from '@libs/telemetry/useSkeletonSpan';
 import openBankConnection from '@pages/settings/Wallet/PersonalCards/steps/BankConnection/openBankConnection';
+import {handleRestrictedEvent} from '@userActions/App';
 import {setPlaidEvent} from '@userActions/BankAccounts';
 import {addPersonalPlaidCard, openPlaidCompanyCardLogin} from '@userActions/Plaid';
 import CONST from '@src/CONST';
@@ -134,6 +135,10 @@ function FixPersonalCardConnectionPage({route}: FixPersonalCardConnectionPagePro
             },
             onEvent: (eventName: string) => {
                 setPlaidEvent(eventName);
+                // Limit the number of times a user can submit Plaid credentials (24-hour lockout)
+                if (eventName === 'SUBMIT_CREDENTIALS') {
+                    handleRestrictedEvent(eventName);
+                }
             },
         });
         handler.open();
