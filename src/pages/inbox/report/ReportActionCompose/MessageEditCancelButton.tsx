@@ -15,7 +15,7 @@ type MessageEditCancelButtonProps = ViewProps & {
     testID?: string;
 };
 
-function MessageEditCancelButton({onCancel, ...restProps}: MessageEditCancelButtonProps) {
+function MessageEditCancelButton({onCancel, testID, ...restProps}: MessageEditCancelButtonProps) {
     const styles = useThemeStyles();
     const theme = useTheme();
     const {translate} = useLocalize();
@@ -28,6 +28,7 @@ function MessageEditCancelButton({onCancel, ...restProps}: MessageEditCancelButt
         <View {...restProps}>
             <Tooltip text={translate('common.cancel')}>
                 <PressableWithFeedback
+                    testID={testID}
                     onPress={onCancel}
                     style={closeButtonStyles}
                     role={CONST.ROLE.BUTTON}
