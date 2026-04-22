@@ -363,10 +363,11 @@ function setupNavigationFocusReturn(): void {
             if (!(e.target instanceof Element)) {
                 return;
             }
-            const target = e.target.closest(FOCUSABLE_SELECTOR);
-            // SVG role="button" matches would return SVGElement; instanceof filters to HTMLElement to match the rest of the module's typing.
-            if (target instanceof HTMLElement && target !== lastMouseTrigger) {
-                lastMouseTrigger = target;
+            const closest = e.target.closest(FOCUSABLE_SELECTOR);
+            // SVG role="button" matches would return SVGElement; instanceof filters to HTMLElement. A non-focusable activation (e.g. a <div onClick>) clears the cache so a prior focusable click can't leak into an unrelated capture.
+            const next = closest instanceof HTMLElement ? closest : null;
+            if (next !== lastMouseTrigger) {
+                lastMouseTrigger = next;
             }
         };
         for (const event of MOUSE_ACTIVATION_EVENTS) {

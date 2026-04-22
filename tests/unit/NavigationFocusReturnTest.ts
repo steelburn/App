@@ -578,6 +578,23 @@ describe('captureTriggerForRoute', () => {
             captureTriggerForRoute('route-a');
             expect(restoreTriggerForRoute('route-a')).toBe(false);
         });
+
+        it('clears lastMouseTrigger on a non-focusable activation so a prior focusable click does not leak into the next capture', () => {
+            // setupNavigationFocusReturn is installed at module load; dispatch pointerdown events through the real handler to exercise the update path.
+            const earlierFocusable = appendButton();
+            earlierFocusable.dispatchEvent(new MouseEvent('pointerdown', {bubbles: true}));
+
+            // Next click hits a non-focusable wrapper (div with onClick, no role / no tabindex).
+            const wrapper = document.createElement('div');
+            document.body.appendChild(wrapper);
+            wrapper.dispatchEvent(new MouseEvent('pointerdown', {bubbles: true}));
+
+            // Navigation fires against the wrapper click — capture must not reach for the stale button.
+            captureTriggerForRoute('route-a');
+            const spy = jest.spyOn(earlierFocusable, 'focus');
+            expect(restoreTriggerForRoute('route-a')).toBe(false);
+            expect(spy).not.toHaveBeenCalled();
+        });
     });
 
     describe('cross-modality capture', () => {
