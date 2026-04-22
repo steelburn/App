@@ -6,8 +6,8 @@ import SelectionScreen from '@components/SelectionScreen';
 import {useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useThemeStyles from '@hooks/useThemeStyles';
-import {clearSageIntacctErrorField} from '@libs/actions/Policy/Policy';
 import {updateSageIntacctTravelInvoicingVendor} from '@libs/actions/connections/SageIntacct';
+import {clearSageIntacctErrorField} from '@libs/actions/Policy/Policy';
 import {getLatestErrorField} from '@libs/ErrorUtils';
 import {settingsPendingAction} from '@libs/PolicyUtils';
 import Navigation from '@navigation/Navigation';
@@ -51,8 +51,8 @@ function SageIntacctTravelInvoicingVendorSelectPage({policy}: WithPolicyConnecti
             icon={illustrations.Telescope}
             iconWidth={variables.emptyListIconWidth}
             iconHeight={variables.emptyListIconHeight}
-            title={translate('workspace.sageIntacct.noVendorsFound')}
-            subtitle={translate('workspace.sageIntacct.noVendorsFoundDescription')}
+            title={translate('workspace.sageIntacct.noAccountsFound')}
+            subtitle={translate('workspace.sageIntacct.noAccountsFoundDescription')}
             containerStyle={styles.pb10}
         />
     );
@@ -63,7 +63,7 @@ function SageIntacctTravelInvoicingVendorSelectPage({policy}: WithPolicyConnecti
             accessVariants={[CONST.POLICY.ACCESS_VARIANTS.ADMIN]}
             featureName={CONST.POLICY.MORE_FEATURES.ARE_CONNECTIONS_ENABLED}
             displayName="SageIntacctTravelInvoicingVendorSelectPage"
-            title="workspace.sageIntacct.travelInvoicingVendor"
+            title="workspace.common.travelInvoicingVendor"
             data={data}
             listItem={RadioListItem}
             onSelectRow={selectVendor}

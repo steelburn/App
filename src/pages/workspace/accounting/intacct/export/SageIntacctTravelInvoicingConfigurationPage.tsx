@@ -39,7 +39,7 @@ function SageIntacctTravelInvoicingConfigurationPage({policy}: WithPolicyConnect
     const sections: SageIntacctSectionType[] = [
         {
             title: travelVendor?.value,
-            description: translate('workspace.sageIntacct.travelInvoicingVendor'),
+            description: translate('workspace.common.travelInvoicingVendor'),
             onPress: () => {
                 if (!policyID) {
                     return;
@@ -52,7 +52,7 @@ function SageIntacctTravelInvoicingConfigurationPage({policy}: WithPolicyConnect
         },
         {
             title: travelPayableAccount?.name,
-            description: translate('workspace.sageIntacct.travelInvoicingPayableAccount'),
+            description: translate('workspace.common.travelInvoicingPayableAccount'),
             onPress: () => {
                 if (!policyID) {
                     return;
@@ -68,7 +68,7 @@ function SageIntacctTravelInvoicingConfigurationPage({policy}: WithPolicyConnect
     return (
         <ConnectionLayout
             displayName="SageIntacctTravelInvoicingConfigurationPage"
-            headerTitle="workspace.sageIntacct.travelInvoicing"
+            headerTitle="workspace.common.travelInvoicing"
             accessVariants={[CONST.POLICY.ACCESS_VARIANTS.ADMIN]}
             policyID={policyID}
             featureName={CONST.POLICY.MORE_FEATURES.ARE_CONNECTIONS_ENABLED}

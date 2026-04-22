@@ -647,7 +647,6 @@ function updateSageIntacctTravelInvoicingPayableAccount(policyID: string, accoun
     API.write(WRITE_COMMANDS.UPDATE_MANY_POLICY_CONNECTION_CONFIGS, parameters, onyxData);
 }
 
-
 function clearSageIntacctErrorField(policyID: string | undefined, key: SageIntacctOfflineStateKeys | keyof SageIntacctConnectionsConfig) {
     Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`, {connections: {intacct: {config: {errorFields: {[key]: null}}}}});
 }

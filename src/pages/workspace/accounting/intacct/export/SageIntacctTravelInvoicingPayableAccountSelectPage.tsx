@@ -6,8 +6,8 @@ import SelectionScreen from '@components/SelectionScreen';
 import {useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useThemeStyles from '@hooks/useThemeStyles';
-import {clearSageIntacctErrorField} from '@libs/actions/Policy/Policy';
 import {updateSageIntacctTravelInvoicingPayableAccount} from '@libs/actions/connections/SageIntacct';
+import {clearSageIntacctErrorField} from '@libs/actions/Policy/Policy';
 import {getLatestErrorField} from '@libs/ErrorUtils';
 import {settingsPendingAction} from '@libs/PolicyUtils';
 import Navigation from '@navigation/Navigation';
@@ -63,7 +63,7 @@ function SageIntacctTravelInvoicingPayableAccountSelectPage({policy}: WithPolicy
             accessVariants={[CONST.POLICY.ACCESS_VARIANTS.ADMIN]}
             featureName={CONST.POLICY.MORE_FEATURES.ARE_CONNECTIONS_ENABLED}
             displayName="SageIntacctTravelInvoicingPayableAccountSelectPage"
-            title="workspace.sageIntacct.travelInvoicingPayableAccount"
+            title="workspace.common.travelInvoicingPayableAccount"
             data={data}
             listItem={RadioListItem}
             onSelectRow={selectAccount}
