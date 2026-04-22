@@ -784,6 +784,25 @@ describe('restoreTriggerForRoute', () => {
         expect(tryClaim(Priorities.AUTO)).toBe(true);
     });
 
+    it('should preserve the trigger entry on silent-focus failure so a retry attempt can succeed (transient display:none resolves mid-transition)', () => {
+        const trigger = appendButton();
+        trigger.focus();
+        setLastInteractiveElementForTests(trigger);
+        captureTriggerForRoute('route-a');
+        trigger.blur();
+
+        // First attempt: .focus() silently no-ops; entry must survive.
+        const focusSpy = jest.spyOn(trigger, 'focus').mockImplementation(() => {});
+        expect(restoreTriggerForRoute('route-a')).toBe(false);
+        expect(focusSpy).toHaveBeenCalledTimes(1);
+
+        // Transient state resolves — retry lands.
+        focusSpy.mockRestore();
+        const secondSpy = jest.spyOn(trigger, 'focus');
+        expect(restoreTriggerForRoute('route-a')).toBe(true);
+        expect(secondSpy).toHaveBeenCalled();
+    });
+
     it('releases the cycle at RETURN_HOLD_MS when the user has moved focus elsewhere so unrelated later AUTO claims are not blocked for 2s', () => {
         withFakeTimers(() => {
             const trigger = appendButton();

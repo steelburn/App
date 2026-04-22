@@ -205,7 +205,6 @@ function restoreTriggerForRoute(routeKey: string): boolean {
         return false;
     }
 
-    triggerMap.delete(routeKey);
     if (!tryClaim(Priorities.RETURN)) {
         return false;
     }
@@ -223,19 +222,21 @@ function restoreTriggerForRoute(routeKey: string): boolean {
         candidate.focus(focusOptions);
         const after = document.activeElement;
         if (after === candidate) {
+            triggerMap.delete(routeKey);
             lastRestoreTarget = candidate;
             scheduleReturnHoldRelease();
             return true;
         }
         // Only accept as onFocus redirect when focus actually moved — pre-existing focus with a silent no-op must fall through to the fallback.
         if (after !== before && after && after !== document.body) {
+            triggerMap.delete(routeKey);
             lastRestoreTarget = after instanceof HTMLElement ? after : candidate;
             scheduleReturnHoldRelease();
             return true;
         }
     }
 
-    // All silent no-ops — release so AUTO/INITIAL can try.
+    // Silent no-op (transient display:none / visibility:hidden ancestor) — leave the entry for scheduleRestore to retry; release the cycle so AUTO/INITIAL aren't blocked during the window.
     resetCycle();
     return false;
 }
