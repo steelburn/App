@@ -7,7 +7,7 @@ import type GoogleTagManagerModule from './types';
 const analytics = getAnalytics();
 
 function publishEvent(event: GoogleTagManagerEvent, accountID: number, email: string) {
-    logEvent(analytics, event as string, {user_id: accountID, user_data: {email}});
+    logEvent(analytics, event as string, {user_id: accountID, email});
     Log.info('[GTM] event published', false, {event, user_id: accountID, user_data: {email}});
 }
 
