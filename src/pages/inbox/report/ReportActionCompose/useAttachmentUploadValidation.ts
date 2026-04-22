@@ -62,6 +62,8 @@ function useAttachmentUploadValidation({
     const [userBillingGracePeriodEnds] = useOnyx(ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_USER_BILLING_GRACE_PERIOD_END);
     const [draftTransactionIDs] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION_DRAFT, {selector: validTransactionDraftIDsSelector});
 
+    const [policyTagList] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_TAGS}${policy?.id}`);
+
     const reportAttachmentsContext = useContext(AttachmentModalContext);
     const showAttachmentModalScreen = useCallback(
         (file: FileObject | FileObject[], dataTransferItems?: DataTransferItem[]) => {
@@ -93,7 +95,7 @@ function useAttachmentUploadValidation({
 
         if (shouldAddOrReplaceReceipt && transactionID) {
             const source = URL.createObjectURL(files.at(0) as Blob);
-            replaceReceipt({transactionID, file: files.at(0) as File, source, transactionPolicy: policy, transactionPolicyCategories: policyCategories});
+            replaceReceipt({transactionID, file: files.at(0) as File, source, transactionPolicy: policy, transactionPolicyCategories: policyCategories, policyTagList});
             return;
         }
 

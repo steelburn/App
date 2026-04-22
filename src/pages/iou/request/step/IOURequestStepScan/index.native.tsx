@@ -127,6 +127,8 @@ function IOURequestStepScan({
 
     const [policyCategories] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${report?.policyID}`);
 
+    const [policyTagList] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_TAGS}${policy?.id}`);
+
     // Track camera init telemetry
     const cameraInitSpanStarted = useRef(false);
     const cameraInitialized = useRef(false);
@@ -215,9 +217,9 @@ function IOURequestStepScan({
             } else {
                 navigateBack();
             }
-            replaceReceipt({transactionID: initialTransactionID, file: file as File, source, transactionPolicy: policy, transactionPolicyCategories: policyCategories});
+            replaceReceipt({transactionID: initialTransactionID, file: file as File, source, transactionPolicy: policy, transactionPolicyCategories: policyCategories, policyTagList});
         },
-        [initialTransactionID, policy, policyCategories, backTo, navigateBack],
+        [initialTransactionID, policy, policyCategories, backTo, navigateBack, policyTagList],
     );
 
     const getSource = useCallback((file: FileObject) => file.uri ?? '', []);
