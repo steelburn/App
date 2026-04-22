@@ -131,7 +131,7 @@ import variables from '@styles/variables';
 import {openPersonalBankAccountSetupView} from '@userActions/BankAccounts';
 import type {IgnoreDirection} from '@userActions/ClearReportActionErrors';
 import {hideEmojiPicker, isActive} from '@userActions/EmojiPickerAction';
-import {clearReportActionDrafts, createTransactionThreadReport, expandURLPreview} from '@userActions/Report';
+import {clearAllReportActionDrafts, createTransactionThreadReport, expandURLPreview} from '@userActions/Report';
 import {isAnonymousUser, signOutAndRedirectToSignIn} from '@userActions/Session';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -578,7 +578,7 @@ function PureReportActionItem({
         if (draftMessage === undefined || !isDeletedAction(action)) {
             return;
         }
-        clearReportActionDrafts();
+        clearAllReportActionDrafts();
     }, [draftMessage, action, reportID]);
 
     // Hide the message if it is being moderated for a higher offense, or is hidden by a moderator

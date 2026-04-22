@@ -11,7 +11,7 @@ import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useSubmitToDestinationVisible from '@hooks/useSubmitToDestinationVisible';
 import useThemeStyles from '@hooks/useThemeStyles';
 import useViewportOffsetTop from '@hooks/useViewportOffsetTop';
-import {clearReportActionDrafts} from '@libs/actions/Report';
+import {clearAllReportActionDrafts} from '@libs/actions/Report';
 import {flushDeferredWrite, hasDeferredWrite} from '@libs/deferredLayoutWrite';
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
@@ -56,10 +56,10 @@ function ReportScreen({route, navigation}: ReportScreenProps) {
 
     // When the report screen is navigated away from, clear all report action edit drafts
     useEffect(() => {
-        clearReportActionDrafts();
+        clearAllReportActionDrafts();
 
         return () => {
-            clearReportActionDrafts();
+            clearAllReportActionDrafts();
         };
     }, []);
 

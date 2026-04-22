@@ -7,7 +7,7 @@ import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails'
 import useOnyx from '@hooks/useOnyx';
 import useReportIsArchived from '@hooks/useReportIsArchived';
 import useReportScrollManager from '@hooks/useReportScrollManager';
-import {clearReportActionDrafts, editReportComment} from '@libs/actions/Report';
+import {clearAllReportActionDrafts, editReportComment} from '@libs/actions/Report';
 import focusEditAfterCancelDelete from '@libs/focusEditAfterCancelDelete';
 import {getOriginalReportID} from '@libs/ReportUtils';
 import * as ReportActionContextMenu from '@pages/inbox/report/ContextMenu/ReportActionContextMenu';
@@ -49,7 +49,7 @@ function useEditMessage({reportID, originalReportID, reportAction, shouldScrollT
 
         stopEditing();
 
-        clearReportActionDrafts();
+        clearAllReportActionDrafts();
 
         // Scroll to the last comment after editing to make sure the whole comment is clearly visible in the report.
         if (shouldScrollToLastMessage) {

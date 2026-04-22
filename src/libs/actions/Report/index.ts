@@ -2947,8 +2947,8 @@ function editReportComment(
     );
 }
 
-/** Clears drafts for all comment report action in a report. */
-function clearReportActionDrafts() {
+/** Clears drafts for all comment report action across all reports */
+function clearAllReportActionDrafts() {
     Onyx.setCollection(ONYXKEYS.COLLECTION.REPORT_ACTIONS_DRAFTS, {});
 }
 
@@ -7380,7 +7380,7 @@ export {
     extractRHPVariantFromResponse,
     createNewReport,
     deleteReport,
-    clearReportActionDrafts,
+    clearAllReportActionDrafts,
     deleteReportComment,
     deleteReportField,
     dismissTrackExpenseActionableWhisper,
