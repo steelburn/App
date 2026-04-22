@@ -50,13 +50,23 @@ function resolveCursorForReset(history: CustomHistoryEntry[], currentCursor: num
             return {type: 'backward', cursor: cursor - 1};
         }
     }
-    // Non-adjacent jump or out-of-range cursor: scan whole history.
+    // Non-adjacent jump or out-of-range cursor: scan for the NEAREST match to cursor. Forward wins on distance ties.
+    let bestIdx = -1;
+    let bestDist = Infinity;
     for (let i = 0; i < history.length; i += 1) {
-        if (matchAt(i)) {
-            return i < cursor ? {type: 'backward', cursor: i} : {type: 'forward', cursor: i};
+        if (!matchAt(i)) {
+            continue;
+        }
+        const dist = Math.abs(i - cursor);
+        if (dist < bestDist || (dist === bestDist && i > cursor)) {
+            bestIdx = i;
+            bestDist = dist;
         }
     }
-    return {type: 'unknown'};
+    if (bestIdx === -1) {
+        return {type: 'unknown'};
+    }
+    return bestIdx < cursor ? {type: 'backward', cursor: bestIdx} : {type: 'forward', cursor: bestIdx};
 }
 
 function isSetParamsAction(action: PushParamsRouterAction): action is SetParamsAction {

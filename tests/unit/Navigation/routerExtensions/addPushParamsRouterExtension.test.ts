@@ -865,6 +865,26 @@ describe('resolveCursorForReset (pure function)', () => {
         expect(resolveCursorForReset(history, 0, {key: 'search-1', params: {q: 'D'}})).toEqual({type: 'forward', cursor: 3});
     });
 
+    it('non-adjacent scan picks the nearest match, not the first — browser back from E in [A,B,C,A,D,E] lands on the later A', () => {
+        // Without nearest-wins, the scan would stop at index 0 and leave the cursor stuck there, breaking subsequent in-app GO_BACK.
+        const history = mkHistory('A', 'B', 'C', 'A', 'D', 'E');
+        expect(resolveCursorForReset(history, 5, {key: 'search-1', params: {q: 'A'}})).toEqual({type: 'backward', cursor: 3});
+    });
+
+    it('non-adjacent scan tiebreaks forward when two matches are equidistant from cursor', () => {
+        // [A, X, X, Y, X, X, A] cursor=3 — both A's at distance 3. Forward (index 6) preferred, consistent with the cursor+1 adjacent probe preference.
+        const history: CustomHistoryEntry[] = [
+            makeRoute('Search', 'search-1', {q: 'A'}),
+            makeRoute('Search', 'search-1', {q: 'X1'}),
+            makeRoute('Search', 'search-1', {q: 'X2'}),
+            makeRoute('Search', 'search-1', {q: 'Y'}),
+            makeRoute('Search', 'search-1', {q: 'X3'}),
+            makeRoute('Search', 'search-1', {q: 'X4'}),
+            makeRoute('Search', 'search-1', {q: 'A'}),
+        ] as CustomHistoryEntry[];
+        expect(resolveCursorForReset(history, 3, {key: 'search-1', params: {q: 'A'}})).toEqual({type: 'forward', cursor: 6});
+    });
+
     it("returns 'unknown' when the target compound isn't in history at all", () => {
         const history = mkHistory('A', 'B', 'C');
         expect(resolveCursorForReset(history, 1, {key: 'search-1', params: {q: 'Z'}})).toEqual({type: 'unknown'});
