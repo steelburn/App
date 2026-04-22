@@ -8,6 +8,7 @@ import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import {getOriginalMessage, getReportAction, isMoneyRequestAction} from '@libs/ReportActionsUtils';
+import {getOriginalReportID} from '@libs/ReportUtils';
 import ReportActionItem from '@pages/inbox/report/ReportActionItem';
 import {ReportActionItemActionsContext, ReportActionItemStateContext} from '@pages/inbox/report/ReportActionItemContext';
 import CONST from '@src/CONST';
@@ -40,6 +41,10 @@ function DuplicateTransactionItem({transaction, index, onPreviewPressed}: Duplic
         return IOUTransactionID === transaction?.transactionID;
     });
 
+    const originalReportID = getOriginalReportID(report?.reportID, action, reportActions);
+
+    const [draftMessage] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS_DRAFTS}${originalReportID}`);
+
     const [emojiReactions] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS_REACTIONS}${action?.reportActionID}`);
 
     const [linkedTransactionRouteError] = useOnyx(
@@ -55,6 +60,9 @@ function DuplicateTransactionItem({transaction, index, onPreviewPressed}: Duplic
     if (!action || !report) {
         return null;
     }
+
+    const reportDraftMessage = draftMessage?.[action.reportActionID];
+    const matchingDraftMessage = reportDraftMessage?.message;
 
     return (
         <View style={styles.pb2}>
@@ -72,6 +80,7 @@ function DuplicateTransactionItem({transaction, index, onPreviewPressed}: Duplic
                         userWalletTierName={userWalletTierName}
                         isUserValidated={isUserValidated}
                         personalDetails={personalDetails}
+                        draftMessage={matchingDraftMessage}
                         emojiReactions={emojiReactions}
                         linkedTransactionRouteError={linkedTransactionRouteError}
                         userBillingFundID={userBillingFundID}

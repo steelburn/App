@@ -26,6 +26,9 @@ import PureReportActionItem from './PureReportActionItem';
 import {useReportActionActiveEdit} from './ReportActionEditMessageContext';
 
 type ReportActionItemProps = Omit<PureReportActionItemProps, 'taskReport' | 'linkedReport' | 'iouReportOfLinkedReport' | 'currentUserAccountID' | 'personalPolicyID' | 'betas'> & {
+    /** Draft message for the report action */
+    draftMessage?: string;
+
     /** Emoji reactions for the report action */
     emojiReactions?: OnyxEntry<ReportActionReactions>;
 
@@ -48,6 +51,7 @@ type ReportActionItemProps = Omit<PureReportActionItemProps, 'taskReport' | 'lin
 function ReportActionItem({
     action,
     report,
+    draftMessage: draftMessageProp,
     emojiReactions,
     userWalletTierName,
     isUserValidated,
@@ -96,7 +100,8 @@ function ReportActionItem({
     const missingPaymentMethod = getIndicatedMissingPaymentMethod(userWalletTierName, targetReport?.reportID, action, bankAccountList);
 
     const {editingMessage, editingReportAction} = useReportActionActiveEdit();
-    const draftMessage = editingReportAction && action && editingReportAction.reportActionID === action.reportActionID ? (editingMessage ?? undefined) : undefined;
+    const draftMessageFromEditingContext = editingReportAction && action && editingReportAction.reportActionID === action.reportActionID ? (editingMessage ?? undefined) : undefined;
+    const draftMessage = draftMessageProp ?? draftMessageFromEditingContext;
 
     return (
         <PureReportActionItem
