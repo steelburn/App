@@ -452,7 +452,7 @@ function BasePopoverMenu({
                     badgeStyle={StyleSheet.flatten(badgeStyle)}
                     wrapperStyle={[
                         StyleUtils.getItemBackgroundColorStyle(
-                            shouldShowRadioButton ? false : !!item.isSelected,
+                            !shouldShowRadioButton && !!item.isSelected,
                             isVisuallyFocused,
                             item.disabled ?? false,
                             theme.activeComponentBG,
