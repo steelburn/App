@@ -93,6 +93,17 @@ describe('LauncherStack', () => {
             });
         });
 
+        it('re-activating a mid-stack entry moves it to the top so pickLauncher sees it as most-recent', () => {
+            // A pushed+deactivated → B pushed → A reactivated. Without the refresh, pickLauncher would return B instead of the just-reactivated A.
+            const a = appendButton();
+            const b = appendButton();
+            setActivePopoverLauncher(a);
+            scheduleClearActivePopoverLauncher(a);
+            setActivePopoverLauncher(b);
+            setActivePopoverLauncher(a);
+            expect(pickLauncher()).toBe(a);
+        });
+
         it('caps the stack at LAUNCHER_STACK_MAX and drops the oldest on overflow', () => {
             const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
             const launchers = Array.from({length: 10}, () => appendButton());

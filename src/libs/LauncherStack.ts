@@ -63,10 +63,10 @@ function setActivePopoverLauncher(element: HTMLElement): void {
     if (typeof document === 'undefined') {
         return;
     }
-    const existing = launcherStack.find((e) => e.element === element);
-    if (existing) {
-        existing.deactivatedAt = undefined;
-        return;
+    // Reactivation must move the entry to the tail — pickLauncher scans end-first, so leaving a reactivated entry mid-stack lets newer (still-active) entries shadow it.
+    const existingIdx = launcherStack.findIndex((e) => e.element === element);
+    if (existingIdx >= 0) {
+        launcherStack.splice(existingIdx, 1);
     }
     launcherStack.push({element});
     if (launcherStack.length > LAUNCHER_STACK_MAX) {
