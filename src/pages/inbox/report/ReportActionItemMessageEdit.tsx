@@ -396,6 +396,7 @@ function ReportActionItemMessageEdit({action, reportID, originalReportID, policy
     return (
         <>
             <View
+                testID={CONST.COMPOSER.TEST_ID.REPORT_ACTION_ITEM_MESSAGE_EDIT}
                 style={[styles.chatItemMessage, styles.flexRow]}
                 ref={containerRef}
             >
@@ -409,6 +410,7 @@ function ReportActionItemMessageEdit({action, reportID, originalReportID, policy
                     ]}
                 >
                     <MessageEditCancelButton
+                        testID={CONST.COMPOSER.TEST_ID.MESSAGE_EDIT_CANCEL_INLINE}
                         onCancel={deleteDraft}
                         style={[styles.justifyContentEnd, styles.mb1]}
                     />

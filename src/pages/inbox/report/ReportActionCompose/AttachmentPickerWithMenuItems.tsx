@@ -110,6 +110,8 @@ type AttachmentPickerWithMenuItemsProps = {
     reportParticipantIDs?: number[];
 
     shouldDisableAttachmentItem?: boolean;
+
+    testID?: string;
 };
 
 /**
@@ -135,6 +137,7 @@ function AttachmentPickerWithMenuItems({
     actionButtonRef,
     raiseIsScrollLikelyLayoutTriggered,
     shouldDisableAttachmentItem,
+    testID,
 }: AttachmentPickerWithMenuItemsProps) {
     const icons = useMemoizedLazyExpensifyIcons([
         'Cash',
@@ -446,7 +449,10 @@ function AttachmentPickerWithMenuItems({
                 ];
                 return (
                     <>
-                        <View style={outerContainerStyles}>
+                        <View
+                            testID={testID}
+                            style={outerContainerStyles}
+                        >
                             <View style={innerContainerStyles}>
                                 <View style={createButtonContainerStyles}>
                                     <Tooltip text={translate('common.create')}>

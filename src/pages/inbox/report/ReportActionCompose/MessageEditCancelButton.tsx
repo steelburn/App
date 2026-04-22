@@ -12,6 +12,7 @@ import CONST from '@src/CONST';
 
 type MessageEditCancelButtonProps = ViewProps & {
     onCancel: () => void;
+    testID?: string;
 };
 
 function MessageEditCancelButton({onCancel, ...restProps}: MessageEditCancelButtonProps) {

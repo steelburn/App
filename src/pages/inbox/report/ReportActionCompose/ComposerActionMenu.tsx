@@ -5,6 +5,7 @@ import useOnyx from '@hooks/useOnyx';
 import canFocusInputOnScreenFocus from '@libs/canFocusInputOnScreenFocus';
 import {chatIncludesConcierge} from '@libs/ReportUtils';
 import {isBlockedFromConcierge as isBlockedFromConciergeUserAction} from '@userActions/User';
+import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {FileObject} from '@src/types/utils/Attachment';
 import AttachmentPickerWithMenuItems from './AttachmentPickerWithMenuItems';
@@ -39,6 +40,7 @@ function ComposerActionMenu({reportID, onAttachmentPicked}: ComposerActionMenuPr
 
     return (
         <AttachmentPickerWithMenuItems
+            testID={CONST.COMPOSER.TEST_ID.DRAFT_MESSAGE_ACTION_ROW}
             onAttachmentPicked={onAttachmentPicked}
             reportID={reportID}
             report={report}

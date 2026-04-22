@@ -165,7 +165,10 @@ function ReportActionComposeInner({reportID}: ReportActionComposeProps) {
     }
 
     return (
-        <View style={[isComposerFullSize && styles.chatItemFullComposeRow]}>
+        <View
+            testID={CONST.COMPOSER.TEST_ID.REPORT_ACTION_COMPOSE}
+            style={[isComposerFullSize && styles.chatItemFullComposeRow]}
+        >
             <ComposerLocalTime reportID={reportID} />
             <View style={isComposerFullSize ? styles.flex1 : {}}>
                 <ComposerBox reportID={reportID}>
