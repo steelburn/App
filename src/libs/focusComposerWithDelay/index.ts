@@ -1,34 +1,10 @@
-import {KeyboardController} from 'react-native-keyboard-controller';
 import ComposerFocusManager from '@libs/ComposerFocusManager';
-import getPlatform from '@libs/getPlatform';
 import isWindowReadyToFocus from '@libs/isWindowReadyToFocus';
 import * as EmojiPickerAction from '@userActions/EmojiPickerAction';
 import CONST from '@src/CONST';
+import requestKeyboardForFocusedComposer from './requestKeyboardForFocusedComposer';
 import setTextInputSelection from './setTextInputSelection';
-import type {FocusComposerWithDelay, InputType, Selection} from './types';
-
-/**
- * When the field already has focus, RN's `focus()` often does not show the IME again.
- * `KeyboardController.setFocusTo('current')` re-applies focus via native (`requestFocusFromJS` on Android,
- * `reloadInputViews` + `focus` on iOS) without blurring first.
- *
- * @see https://kirillzyusko.github.io/react-native-keyboard-controller/docs/api/keyboard-controller#setfocusto
- */
-function requestKeyboardForFocusedComposer(textInput: InputType, forcedSelectionRange?: Selection) {
-    const platform = getPlatform();
-    const isNative = platform === CONST.PLATFORM.IOS || platform === CONST.PLATFORM.ANDROID;
-
-    if (!isNative) {
-        return;
-    }
-
-    requestIdleCallback(() => {
-        KeyboardController.setFocusTo('current');
-        if (forcedSelectionRange) {
-            setTextInputSelection(textInput, forcedSelectionRange);
-        }
-    });
-}
+import type {FocusComposerWithDelay, InputType} from './types';
 
 /**
  * Create a function that focuses the composer.
