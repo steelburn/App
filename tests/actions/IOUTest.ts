@@ -4,7 +4,7 @@ import {renderHook, waitFor} from '@testing-library/react-native';
 import {format} from 'date-fns';
 import {deepEqual} from 'fast-equals';
 import Onyx from 'react-native-onyx';
-import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
+import type {OnyxCollection, OnyxEntry, OnyxMergeCollectionInput} from 'react-native-onyx';
 import type {SearchQueryJSON, SearchStatus} from '@components/Search/types';
 import useOnyx from '@hooks/useOnyx';
 import {clearAllRelatedReportActionErrors} from '@libs/actions/ClearReportActionErrors';
@@ -124,6 +124,9 @@ jest.mock('@libs/deferredLayoutWrite', () => ({
     cancelDeferredWrite: jest.fn(),
     hasDeferredWrite: () => false,
     getOptimisticWatchKey: () => undefined,
+    deferOrExecuteWrite: (apiWrite: () => void) => apiWrite(),
+    reserveDeferredWriteChannel: jest.fn(),
+    resetForTesting: jest.fn(),
 }));
 jest.mock('@hooks/useCardFeedsForDisplay', () => jest.fn(() => ({defaultCardFeed: null, cardFeedsByPolicy: {}})));
 
@@ -3929,17 +3932,13 @@ describe('actions/IOU', () => {
                 (item) => item[julesChatCreatedAction.reportActionID].reportID,
             );
 
-            // @ts-expect-error - will be solved in https://github.com/Expensify/App/issues/73830
-            return Onyx.mergeCollection(ONYXKEYS.COLLECTION.REPORT, {
-                ...reportCollectionDataSet,
-            })
+            return Onyx.mergeCollection(ONYXKEYS.COLLECTION.REPORT, reportCollectionDataSet as OnyxMergeCollectionInput<typeof ONYXKEYS.COLLECTION.REPORT>)
                 .then(() =>
-                    // @ts-expect-error - will be solved in https://github.com/Expensify/App/issues/73830
                     Onyx.mergeCollection(ONYXKEYS.COLLECTION.REPORT_ACTIONS, {
                         ...carlosActionsCollectionDataSet,
                         ...julesCreatedActionsCollectionDataSet,
                         ...julesActionsCollectionDataSet,
-                    }),
+                    } as OnyxMergeCollectionInput<typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS>),
                 )
                 .then(() => Onyx.set(`${ONYXKEYS.COLLECTION.TRANSACTION}${julesExistingTransaction?.transactionID}`, julesExistingTransaction))
                 .then(() => {
@@ -6176,6 +6175,8 @@ describe('actions/IOU', () => {
                 expect(result.current.report).toBeDefined();
             });
 
+            const policyTagList = (await getOnyxValue(`${ONYXKEYS.COLLECTION.POLICY_TAGS}${mockPolicy.id}`)) ?? {};
+
             changeTransactionsReport({
                 transactionIDs: [transaction?.transactionID],
                 isASAPSubmitBetaEnabled: false,
@@ -6184,6 +6185,7 @@ describe('actions/IOU', () => {
                 newReport: result.current.report,
                 policy: mockPolicy,
                 allTransactions,
+                policyTagList,
             });
 
             let updatedTransaction: OnyxEntry<Transaction>;
@@ -6364,7 +6366,7 @@ describe('actions/IOU', () => {
                 });
 
                 const reportID = draftTransaction?.reportID ?? String(CONST.DEFAULT_NUMBER_ID);
-                const policyTags = await getPolicyTags(reportID);
+                const policyTags = (await getOnyxValue(`${ONYXKEYS.COLLECTION.POLICY_TAGS}${reportID}`)) ?? {};
                 const reports = getTransactionAndExpenseReports(reportID);
 
                 updateSplitTransactionsFromSplitExpensesFlow({
@@ -6540,7 +6542,7 @@ describe('actions/IOU', () => {
                 });
 
                 const reportID = draftTransaction?.reportID ?? String(CONST.DEFAULT_NUMBER_ID);
-                const policyTags = await getPolicyTags(reportID);
+                const policyTags = (await getOnyxValue(`${ONYXKEYS.COLLECTION.POLICY_TAGS}${reportID}`)) ?? {};
                 const reports = getTransactionAndExpenseReports(reportID);
 
                 updateSplitTransactionsFromSplitExpensesFlow({
@@ -6729,7 +6731,7 @@ describe('actions/IOU', () => {
                 });
 
                 const reportID = draftTransaction?.reportID ?? String(CONST.DEFAULT_NUMBER_ID);
-                const policyTags = await getPolicyTags(reportID);
+                const policyTags = (await getOnyxValue(`${ONYXKEYS.COLLECTION.POLICY_TAGS}${reportID}`)) ?? {};
                 const reports = getTransactionAndExpenseReports(reportID);
 
                 // it should use splitExpensesTotal in its calculation
@@ -6942,7 +6944,7 @@ describe('actions/IOU', () => {
                 });
 
                 const reportID = draftTransaction?.reportID ?? String(CONST.DEFAULT_NUMBER_ID);
-                const policyTags = await getPolicyTags(reportID);
+                const policyTags = (await getOnyxValue(`${ONYXKEYS.COLLECTION.POLICY_TAGS}${reportID}`)) ?? {};
                 const reports = getTransactionAndExpenseReports(reportID);
 
                 // When splitting the held expense
