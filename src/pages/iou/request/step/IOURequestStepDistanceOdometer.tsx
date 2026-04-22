@@ -600,7 +600,7 @@ function IOURequestStepDistanceOdometer({
     };
 
     const handleSaveForLater = useCallback(async () => {
-        setShouldEnableDiscardConfirmation(false);
+        shouldBypassDiscardConfirmationRef.current = true;
 
         const normalizedStart = DistanceRequestUtils.normalizeOdometerText(startReading, fromLocaleDigit);
         const normalizedEnd = DistanceRequestUtils.normalizeOdometerText(endReading, fromLocaleDigit);
