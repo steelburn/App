@@ -2,6 +2,8 @@
 import {renderHook} from '@testing-library/react-native';
 import type {RefObject} from 'react';
 import type {ComposerRef, TextSelection} from '@components/Composer/types';
+import useResponsiveLayout from '@hooks/useResponsiveLayout';
+import type ResponsiveLayoutResult from '@hooks/useResponsiveLayout/types';
 import ReportActionComposeUtils from '@pages/inbox/report/ReportActionCompose/ReportActionComposeUtils';
 import useEditComposerToggle from '@pages/inbox/report/ReportActionCompose/useEditComposerToggle';
 import type {ReportActionEditMessageContextValue} from '@pages/inbox/report/ReportActionEditMessageContext';
@@ -17,20 +19,7 @@ jest.mock('@pages/inbox/report/ReportActionEditMessageContext', () => {
     };
 });
 
-jest.mock('@hooks/useResponsiveLayout', () => ({
-    __esModule: true,
-    default: jest.fn(() => ({
-        shouldUseNarrowLayout: true,
-        isSmallScreenWidth: true,
-        isInNarrowPaneModal: false,
-        isExtraSmallScreenHeight: false,
-        isExtraSmallScreenWidth: false,
-        isMediumScreenWidth: false,
-        onboardingIsMediumOrLargerScreenWidth: false,
-        isLargeScreenWidth: false,
-        isSmallScreen: true,
-    })),
-}));
+jest.mock('@hooks/useResponsiveLayout', () => jest.fn());
 
 jest.mock('@pages/inbox/report/ReportActionCompose/ReportActionComposeUtils', () => ({
     __esModule: true,
@@ -45,7 +34,7 @@ jest.mock('@libs/getPlatform', () => ({
 }));
 
 const mockUseReportActionActiveEdit = jest.mocked(ReportActionEditMessageContext.useReportActionActiveEdit);
-const mockUseResponsiveLayout = jest.requireMock('@hooks/useResponsiveLayout').default as jest.Mock;
+const mockUseResponsiveLayout = useResponsiveLayout as jest.MockedFunction<typeof useResponsiveLayout>;
 const mockUpdateNativeSelectionValue = jest.mocked(ReportActionComposeUtils.updateNativeSelectionValue);
 
 type ActiveEdit = ReportActionEditMessageContextValue & {editingState: 'off' | 'editing' | 'submitted'};
@@ -75,7 +64,7 @@ function defaultActiveEdit(overrides?: Partial<ActiveEdit>): ActiveEdit {
     };
 }
 
-function wideLayoutResult() {
+function wideLayoutResult(): ResponsiveLayoutResult {
     return {
         shouldUseNarrowLayout: false,
         isSmallScreenWidth: false,
@@ -85,11 +74,13 @@ function wideLayoutResult() {
         isMediumScreenWidth: false,
         onboardingIsMediumOrLargerScreenWidth: true,
         isLargeScreenWidth: true,
+        isExtraLargeScreenWidth: false,
         isSmallScreen: false,
+        isInLandscapeMode: false,
     };
 }
 
-function narrowLayoutResult() {
+function narrowLayoutResult(): ResponsiveLayoutResult {
     return {
         shouldUseNarrowLayout: true,
         isSmallScreenWidth: true,
@@ -99,7 +90,9 @@ function narrowLayoutResult() {
         isMediumScreenWidth: false,
         onboardingIsMediumOrLargerScreenWidth: false,
         isLargeScreenWidth: false,
+        isExtraLargeScreenWidth: false,
         isSmallScreen: true,
+        isInLandscapeMode: false,
     };
 }
 
