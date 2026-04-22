@@ -755,7 +755,19 @@ function IOURequestStepDistanceOdometer({
                             message={formError}
                         />
                     )}
-
+                    {/* Save for later Button */}
+                    {isCreatingNewRequest && (
+                        <Button
+                            allowBubble
+                            medium={isExtraSmallScreenHeight}
+                            large={!isExtraSmallScreenHeight}
+                            style={[styles.w100, styles.mb3]}
+                            onPress={handleSaveForLater}
+                            text={translate('distance.odometer.saveForLater')}
+                            testID="save-for-later-button"
+                            sentryLabel={CONST.SENTRY_LABEL.IOU_REQUEST_STEP.DISTANCE_ODOMETER_SAVE_FOR_LATER_BUTTON}
+                        />
+                    )}
                     {/* Next/Save Button */}
                     <Button
                         success
@@ -769,17 +781,6 @@ function IOURequestStepDistanceOdometer({
                         testID="next-save-button"
                         sentryLabel={CONST.SENTRY_LABEL.IOU_REQUEST_STEP.DISTANCE_ODOMETER_NEXT_BUTTON}
                     />
-                    {isCreatingNewRequest && (
-                        <Button
-                            allowBubble
-                            medium={isExtraSmallScreenHeight}
-                            large={!isExtraSmallScreenHeight}
-                            style={[styles.w100, styles.mt3]}
-                            onPress={handleSaveForLater}
-                            text={translate('distance.odometer.saveForLater')}
-                            testID="save-for-later-button"
-                        />
-                    )}
                 </View>
             </View>
         </StepScreenWrapper>

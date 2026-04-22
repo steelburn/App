@@ -9189,6 +9189,7 @@ const CONST = {
             DISTANCE_MAP_NEXT_BUTTON: 'IOURequestStep-DistanceMapNextButton',
             DISTANCE_MANUAL_NEXT_BUTTON: 'IOURequestStep-DistanceManualNextButton',
             DISTANCE_ODOMETER_NEXT_BUTTON: 'IOURequestStep-DistanceOdometerNextButton',
+            DISTANCE_ODOMETER_SAVE_FOR_LATER_BUTTON: 'IOURequestStep-DistanceOdometerSaveForLaterButton',
             ODOMETER_CHOOSE_FILE_BUTTON: 'IOURequestStep-OdometerChooseFileButton',
             GPS_START_STOP_BUTTON: 'IOURequestStep-GPSStartStopButton',
             GPS_DISCARD_BUTTON: 'IOURequestStep-GPSDiscardButton',
