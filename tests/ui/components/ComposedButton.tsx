@@ -261,7 +261,7 @@ describe('ButtonComposed — Button', () => {
             // Real-world use-case: a "Save" button that is functionally disabled
             // (e.g., while a form is being validated) but must not look grayed-out to
             // avoid confusing the user. shouldStayNormalOnDisable preserves the normal
-            // appearance while the button remains unclickable.
+            // appearance while the button remains not clickable.
             renderButton({isDisabled: true, shouldStayNormalOnDisable: true});
 
             // Then there is no opacity reduction — the button looks fully active
