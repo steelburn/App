@@ -602,7 +602,7 @@ function NumberWithSymbolForm({
                                     iconRight={icons.DownArrow}
                                     onPress={onSymbolButtonPress}
                                     style={styles.minWidth18}
-                                    isContentCentered
+                                    iconWrapperStyles={styles.justifyContentCenter}
                                     text={currency}
                                     accessibilityLabel={`${translate('common.selectCurrency')}, ${currency}`}
                                 />
@@ -614,7 +614,7 @@ function NumberWithSymbolForm({
                                     iconRight={icons.PlusMinus}
                                     onPress={toggleNegative}
                                     style={styles.minWidth18}
-                                    isContentCentered
+                                    iconWrapperStyles={styles.justifyContentCenter}
                                     text={translate('iou.flip')}
                                     accessibilityLabel={translate('iou.flip')}
                                 />
