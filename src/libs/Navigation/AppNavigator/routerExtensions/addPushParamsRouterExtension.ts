@@ -125,20 +125,20 @@ function addPushParamsRouterExtension<RouterOptions extends PlatformStackRouterO
                     return stateWithUpdatedParams;
                 }
 
-                // Capture against outgoing (pre-update) params so GO_BACK can restore to them.
-                const outgoingRoute = state.routes.at(-1);
+                // setParams targets routes[state.index]; capture must follow or GO_BACK's compound-key lookup misses when focus is non-terminal (post-RESET).
+                const outgoingRoute = state.routes.at(state.index) ?? state.routes.at(-1);
                 if (outgoingRoute?.key) {
                     notifyPushParamsForward(outgoingRoute.key, outgoingRoute.params);
                 }
 
-                const lastRoute = stateWithUpdatedParams.routes.at(-1);
+                const focusedRoute = stateWithUpdatedParams.routes.at(stateWithUpdatedParams.index) ?? stateWithUpdatedParams.routes.at(-1);
 
-                if (lastRoute) {
+                if (focusedRoute) {
                     // Mirror window.history.pushState: pushing mid-cursor discards forward entries.
                     const existingHistory = stateWithUpdatedParams.history;
                     const baseHistory =
                         pushParamsHistoryPosition >= 0 && pushParamsHistoryPosition < existingHistory.length - 1 ? existingHistory.slice(0, pushParamsHistoryPosition + 1) : existingHistory;
-                    const newHistory = [...baseHistory, lastRoute];
+                    const newHistory = [...baseHistory, focusedRoute];
                     pushParamsHistoryPosition = newHistory.length - 1;
                     return {...stateWithUpdatedParams, history: newHistory};
                 }
@@ -151,18 +151,19 @@ function addPushParamsRouterExtension<RouterOptions extends PlatformStackRouterO
                 const routeHistoryEntries = state.history.filter((entry): entry is NavigationRoute<ParamListBase, string> => typeof entry !== 'string');
 
                 if (routeHistoryEntries.length > state.routes.length) {
-                    const lastRoute = state.routes.at(-1);
-                    if (lastRoute) {
+                    // Index-based, not at(-1) — must match the key PUSH_PARAMS captured under.
+                    const focusedRoute = state.routes.at(state.index) ?? state.routes.at(-1);
+                    if (focusedRoute) {
                         // Cursor-relative, not last-two: last-two drifts out of sync after a mid-cursor browser-back RESET.
                         const history = state.history as CustomHistoryEntry[];
                         const currentIdx = pushParamsHistoryPosition >= 0 && pushParamsHistoryPosition < history.length ? pushParamsHistoryPosition : history.length - 1;
                         const currentEntry = history.at(currentIdx);
 
-                        if (currentEntry && typeof currentEntry !== 'string' && currentEntry.key === lastRoute.key) {
+                        if (currentEntry && typeof currentEntry !== 'string' && currentEntry.key === focusedRoute.key) {
                             let prevIdx = -1;
                             for (let i = currentIdx - 1; i >= 0; i -= 1) {
                                 const e = history.at(i);
-                                if (e && typeof e !== 'string' && e.key === lastRoute.key) {
+                                if (e && typeof e !== 'string' && e.key === focusedRoute.key) {
                                     prevIdx = i;
                                     break;
                                 }
@@ -172,13 +173,13 @@ function addPushParamsRouterExtension<RouterOptions extends PlatformStackRouterO
                                 const prevEntry = history.at(prevIdx) as NavigationRoute<ParamListBase, string>;
                                 const targetParams = prevEntry.params;
                                 const routes = [...state.routes];
-                                routes[state.routes.length - 1] = {
-                                    ...lastRoute,
+                                routes[state.index] = {
+                                    ...focusedRoute,
                                     params: targetParams,
                                 };
 
-                                if (lastRoute.key) {
-                                    notifyPushParamsBackward(lastRoute.key, targetParams);
+                                if (focusedRoute.key) {
+                                    notifyPushParamsBackward(focusedRoute.key, targetParams);
                                 }
 
                                 // Pop only when cursor was at the end; mid-cursor preserves so browser-forward can still reach skipped entries.

@@ -678,6 +678,104 @@ describe('addPushParamsRouterExtension', () => {
         expect((afterPush.routes.at(0)?.params as {tab: string}).tab).toBe('bar');
     });
 
+    it('PUSH_PARAMS on a non-terminal-index state captures the focused route (not routes.at(-1))', () => {
+        const factory = createMockRouterFactory((state, action) => {
+            if (action.type === 'SET_PARAMS') {
+                const routes = [...state.routes];
+                const focused = routes.at(state.index);
+                if (!focused) {
+                    return state;
+                }
+                routes[state.index] = {
+                    ...focused,
+                    params: {...(focused.params as Record<string, unknown>), ...(action.payload as {params?: Record<string, unknown>}).params},
+                } as NavigationRoute<ParamListBase, string>;
+                return makeState(routes, {history: state.history, index: state.index});
+            }
+            return state;
+        });
+        const enhancedRouter = addPushParamsRouterExtension(factory)({} as PlatformStackRouterOptions);
+
+        const focused = makeRoute('Search', 'search-focused', {q: 'original'});
+        const trailing = makeRoute('Other', 'other-trailing', {kind: 'unrelated'});
+        const state = makeState([focused, trailing], {
+            index: 0,
+            history: [{...focused}, {...trailing}] as CustomHistoryEntry[],
+        });
+        (notifyPushParamsForward as jest.Mock).mockClear();
+
+        enhancedRouter.getStateForAction(state, {type: CONST.NAVIGATION.ACTION_TYPE.PUSH_PARAMS, payload: {params: {q: 'updated'}}}, CONFIG_OPTIONS);
+
+        expect(notifyPushParamsForward).toHaveBeenCalledTimes(1);
+        expect(notifyPushParamsForward).toHaveBeenCalledWith('search-focused', {q: 'original'});
+    });
+
+    it('PUSH_PARAMS on a non-terminal-index state appends the focused route to history (not routes.at(-1))', () => {
+        const factory = createMockRouterFactory((state, action) => {
+            if (action.type === 'SET_PARAMS') {
+                const routes = [...state.routes];
+                const focused = routes.at(state.index);
+                if (!focused) {
+                    return state;
+                }
+                routes[state.index] = {
+                    ...focused,
+                    params: {...(focused.params as Record<string, unknown>), ...(action.payload as {params?: Record<string, unknown>}).params},
+                } as NavigationRoute<ParamListBase, string>;
+                return makeState(routes, {history: state.history, index: state.index});
+            }
+            return state;
+        });
+        const enhancedRouter = addPushParamsRouterExtension(factory)({} as PlatformStackRouterOptions);
+
+        const focused = makeRoute('Search', 'search-focused', {q: 'original'});
+        const trailing = makeRoute('Other', 'other-trailing', {kind: 'unrelated'});
+        const state = makeState([focused, trailing], {
+            index: 0,
+            history: [{...focused}, {...trailing}] as CustomHistoryEntry[],
+        });
+
+        const newState = enhancedRouter.getStateForAction(state, {type: CONST.NAVIGATION.ACTION_TYPE.PUSH_PARAMS, payload: {params: {q: 'updated'}}}, CONFIG_OPTIONS) as TestState;
+
+        const appended = asRouteEntry(newState.history?.at(-1) as CustomHistoryEntry);
+        expect(appended.key).toBe('search-focused');
+        expect((appended.params as {q: string}).q).toBe('updated');
+    });
+
+    it('GO_BACK on a non-terminal-index state reverts the focused route (not routes.at(-1))', () => {
+        const factory = createMockRouterFactory((state, action) => {
+            if (action.type === 'SET_PARAMS') {
+                const routes = [...state.routes];
+                const focused = routes.at(state.index);
+                if (!focused) {
+                    return state;
+                }
+                routes[state.index] = {
+                    ...focused,
+                    params: {...(focused.params as Record<string, unknown>), ...(action.payload as {params?: Record<string, unknown>}).params},
+                } as NavigationRoute<ParamListBase, string>;
+                return makeState(routes, {history: state.history, index: state.index});
+            }
+            return state;
+        });
+        const enhancedRouter = addPushParamsRouterExtension(factory)({} as PlatformStackRouterOptions);
+
+        const focused = makeRoute('Search', 'search-focused', {q: 'v1'});
+        const trailing = makeRoute('Other', 'other-trailing', {kind: 'unrelated'});
+        let state: TestState = makeState([focused, trailing], {
+            index: 0,
+            history: [{...focused}, {...trailing}] as CustomHistoryEntry[],
+        });
+
+        state = enhancedRouter.getStateForAction(state, {type: CONST.NAVIGATION.ACTION_TYPE.PUSH_PARAMS, payload: {params: {q: 'v2'}}}, CONFIG_OPTIONS) as TestState;
+        expect((state.routes.at(0)?.params as {q: string}).q).toBe('v2');
+
+        state = enhancedRouter.getStateForAction(state, CommonActions.goBack(), CONFIG_OPTIONS) as TestState;
+        // Focused route reverts; trailing route untouched.
+        expect((state.routes.at(0)?.params as {q: string}).q).toBe('v1');
+        expect((state.routes.at(1)?.params as {kind: string}).kind).toBe('unrelated');
+    });
+
     it('RESET with a non-terminal index resolves cursor direction against the focused route (not routes.at(-1))', () => {
         const factory = createMockRouterFactory();
         const enhancedRouter = addPushParamsRouterExtension(factory)({} as PlatformStackRouterOptions);
