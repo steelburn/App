@@ -47,7 +47,11 @@ function getMockCallsForTestUrl(): FetchMockCall[] {
 
 function getFormBodyAt(index: number): TestHelper.FormData {
     const calls = getMockCallsForTestUrl();
-    return (calls.at(index) as [string, {body: TestHelper.FormData}])[1].body;
+    const call = calls.at(index);
+    if (!call) {
+        throw new Error(`Expected a fetch call at index ${index}, but only ${calls.length} call(s) were made`);
+    }
+    return call[1].body as unknown as TestHelper.FormData;
 }
 
 function formBodyToObject(formData: TestHelper.FormData): Record<string, string | Blob> {
