@@ -23,7 +23,6 @@ type IssueNewCardConfirmMagicCodePageProps = PlatformStackScreenProps<SettingsNa
 function IssueNewCardConfirmMagicCodePage({route}: IssueNewCardConfirmMagicCodePageProps) {
     const {translate} = useLocalize();
     const policyID = route.params.policyID;
-    const backTo = route.params.backTo;
     const [account] = useOnyx(ONYXKEYS.ACCOUNT);
     const [session] = useOnyx(ONYXKEYS.SESSION);
     const primaryLogin = account?.primaryLogin ?? session?.email ?? '';
@@ -44,14 +43,14 @@ function IssueNewCardConfirmMagicCodePage({route}: IssueNewCardConfirmMagicCodeP
         if (!isSuccessful) {
             return;
         }
-        if (backTo && shouldUseBackToParam) {
-            Navigation.goBack(backTo, {compareParams: false});
+        if (backPath && shouldUseBackToParam) {
+            Navigation.goBack(backPath, {compareParams: false});
         } else {
             Navigation.closeRHPFlow();
             Navigation.navigate(ROUTES.WORKSPACE_EXPENSIFY_CARD.getRoute(policyID), {forceReplace: true});
         }
         clearIssueNewCardFlow(policyID);
-    }, [backTo, isSuccessful, policyID, shouldUseBackToParam]);
+    }, [backPath, isSuccessful, policyID, shouldUseBackToParam]);
 
     const handleSubmit = useCallback(
         (validateCode: string) => {
