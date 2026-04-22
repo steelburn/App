@@ -50,7 +50,7 @@ function DynamicSageIntacctNonReimbursableExpensesDestinationPage({policy}: With
 
     return (
         <SelectionScreen
-            displayName="DynamicSageIntacctNonReimbursableExpensesDestinationPage"
+            displayName="SageIntacctNonReimbursableExpensesDestinationPage"
             title="workspace.accounting.exportAs"
             data={data}
             onSelectRow={(selection: SelectorType) => selectDestination(selection as MenuListItem)}
