@@ -412,7 +412,7 @@ type ReplaceReceipt = {
     transactionPolicyCategories?: OnyxEntry<OnyxTypes.PolicyCategories>;
     transactionPolicy: OnyxEntry<OnyxTypes.Policy>;
     isSameReceipt?: boolean;
-    transactionPolicyTagList: OnyxEntry<OnyxTypes.PolicyTagLists>;
+    transactionPolicyTagList?: OnyxEntry<OnyxTypes.PolicyTagLists>;
 };
 
 type GetSearchOnyxUpdateParams = {
