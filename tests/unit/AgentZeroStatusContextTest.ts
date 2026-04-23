@@ -1017,6 +1017,47 @@ describe('AgentZeroStatusContext', () => {
             expect(secondResult.current.statusLabel).toBe('Thinking...');
         });
 
+        it('should bump startedAt on each kickoff so the safety window measures from the most recent', () => {
+            // Multi-message case: a second kickoff should extend the safety window so that a
+            // remount well past 120s from the first kickoff — but within 120s of the second —
+            // still restores the indicator. Matches the in-memory behavior where each
+            // startPolling call resets the safety timer.
+            //
+            // Exercised at the store level to avoid fake-timer interaction with the hook's
+            // 120s safety timeout (waitForBatchedUpdates drains pending timers and would
+            // clear the entry before we could inspect it).
+            const nowSpy = jest.spyOn(Date, 'now');
+            try {
+                nowSpy.mockReturnValue(10_000);
+                AgentZeroOptimisticStore.increment(reportID, 'baseline-action');
+                const afterFirst = AgentZeroOptimisticStore.getEntry(reportID);
+                expect(afterFirst?.count).toBe(1);
+                expect(afterFirst?.startedAt).toBe(10_000);
+                expect(afterFirst?.baselineActionID).toBe('baseline-action');
+
+                // 60s later, still within the first window → second kickoff.
+                nowSpy.mockReturnValue(70_000);
+                AgentZeroOptimisticStore.increment(reportID, 'new-baseline-ignored');
+
+                const afterSecond = AgentZeroOptimisticStore.getEntry(reportID);
+                expect(afterSecond?.count).toBe(2);
+                // startedAt must bump — otherwise an unmount/remount past MAX_AGE_MS from the
+                // first kickoff would expire the entry even though the in-memory safety timer
+                // was reset on the second kickoff.
+                expect(afterSecond?.startedAt).toBe(70_000);
+                // Baseline stays fixed at the first kickoff's capture; we still want to detect
+                // a Concierge reply that's newer than the *first* optimistic message.
+                expect(afterSecond?.baselineActionID).toBe('baseline-action');
+
+                // 90s after the second kickoff (150s from the first): entry is still fresh
+                // because isFresh measures from startedAt, which was bumped.
+                nowSpy.mockReturnValue(160_000);
+                expect(AgentZeroOptimisticStore.getEntry(reportID)?.count).toBe(2);
+            } finally {
+                nowSpy.mockRestore();
+            }
+        });
+
         it('should clear the restored indicator when a Concierge reply arrived during the chat switch', async () => {
             // If Concierge actually replied while the user was on another chat, the newest
             // action on return is the Concierge reply. The reply-detection effect must still

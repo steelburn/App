@@ -16,13 +16,18 @@ type OptimisticEntry = {
     /** Number of pending optimistic kickoffs (one per user message). */
     count: number;
 
-    /** First kickoff timestamp (ms). Used to drive the remaining safety window across remounts. */
+    /**
+     * Timestamp of the most recent kickoff (ms). Drives the remaining safety window across
+     * remounts. Bumped on every `increment` — matches the in-memory behavior where each
+     * kickoff call to `startPolling` resets the 120s safety timer.
+     */
     startedAt: number;
 
     /**
      * Newest reportActionID captured at the moment the indicator transitioned inactive→active.
      * Persisted so the Concierge-reply-detection effect still fires after a remount, even if
-     * the reply arrived while the provider was unmounted.
+     * the reply arrived while the provider was unmounted. Unlike `startedAt`, this stays fixed
+     * at the *first* kickoff's baseline — any new Concierge action afterwards is a new reply.
      */
     baselineActionID: string | null;
 };
@@ -60,19 +65,24 @@ function getEntry(reportID: string): OptimisticEntry | undefined {
  * existing one is stale. `baselineActionID` is only recorded on a fresh start — subsequent
  * kickoffs within the same window keep the original baseline (we care about replies newer
  * than the *first* optimistic message).
+ *
+ * `startedAt` is bumped on every call so the safety window always measures from the most
+ * recent kickoff — this matches the in-memory `startPolling` behavior where each call
+ * resets the 120s timer.
  */
 function increment(reportID: string, baselineActionID: string | null) {
     const existing = store.get(reportID);
+    const now = Date.now();
     if (existing && isFresh(existing)) {
         store.set(reportID, {
             count: existing.count + 1,
-            startedAt: existing.startedAt,
+            startedAt: now,
             baselineActionID: existing.baselineActionID,
         });
     } else {
         store.set(reportID, {
             count: 1,
-            startedAt: Date.now(),
+            startedAt: now,
             baselineActionID,
         });
     }
