@@ -979,13 +979,13 @@ describe('TransactionPreviewUtils', () => {
         const rbrTransaction = {...basicProps.transaction, transactionID: 'rbr_txn', comment: {hold: 'true'}};
 
         it('should return 0 when both transactions have RBR', () => {
-            const anotherRbrTransaction = {...basicProps.transaction, transactionID: 'rbr_txn_2', comment: {hold: 'true'}};
-            expect(compareByRBR(rbrTransaction, anotherRbrTransaction, undefined, cbrEmail, cbrAccountID, cbrReport, cbrPolicy)).toBe(0);
+            const secondRbrTransaction = {...basicProps.transaction, transactionID: 'rbr_txn_2', comment: {hold: 'true'}};
+            expect(compareByRBR(rbrTransaction, secondRbrTransaction, undefined, cbrEmail, cbrAccountID, cbrReport, cbrPolicy)).toBe(0);
         });
 
         it('should return 0 when neither transaction has RBR', () => {
-            const anotherCleanTransaction = {...basicProps.transaction, transactionID: 'clean_txn_2'};
-            expect(compareByRBR(cleanTransaction, anotherCleanTransaction, undefined, cbrEmail, cbrAccountID, cbrReport, cbrPolicy)).toBe(0);
+            const secondCleanTransaction = {...basicProps.transaction, transactionID: 'clean_txn_2'};
+            expect(compareByRBR(cleanTransaction, secondCleanTransaction, undefined, cbrEmail, cbrAccountID, cbrReport, cbrPolicy)).toBe(0);
         });
 
         it('should return -1 when only the first transaction has RBR', () => {
