@@ -82,4 +82,5 @@ function getReportFieldOptionsSection({
     return reportFieldOptionsSections;
 }
 
-export {getReportFieldOptionsSection, getReportFieldOptions};
+// eslint-disable-next-line import/prefer-default-export
+export {getReportFieldOptionsSection};
