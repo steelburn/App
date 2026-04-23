@@ -1,6 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
 import type {View} from 'react-native';
-import {useSharedValue} from 'react-native-reanimated';
 import {scheduleOnUI} from 'react-native-worklets';
 import useOnyx from '@hooks/useOnyx';
 import useOriginalReportID from '@hooks/useOriginalReportID';
@@ -62,8 +61,6 @@ function ComposerProvider({children, reportID}: ComposerProviderProps) {
     const actionButtonRef = useRef<View | HTMLDivElement | null>(null);
     const attachmentFileRef = useRef<FileObject | FileObject[] | null>(null);
 
-    const composerRefShared = useSharedValue<Partial<ComposerWithSuggestionsRef>>({});
-
     const {editingState, editingReportID, editingReportActionID, editingReportAction, editingMessage} = useReportActionActiveEdit();
 
     const [didResetComposerHeight, setDidResetComposerHeight] = useState(false);
@@ -106,7 +103,7 @@ function ComposerProvider({children, reportID}: ComposerProviderProps) {
     });
 
     const clearComposer = () => {
-        const clearWorklet = composerRefShared.get().clearWorklet;
+        const clearWorklet = composerRef.current?.clearWorklet;
         if (!clearWorklet) {
             throw new Error('The composerRef.clearWorklet function is not set yet. This should never happen, and indicates a developer error.');
         }
@@ -115,9 +112,6 @@ function ComposerProvider({children, reportID}: ComposerProviderProps) {
 
     const setComposerRef = (ref: ComposerWithSuggestionsRef | null) => {
         composerRef.current = ref;
-        composerRefShared.set({
-            clearWorklet: ref?.clearWorklet,
-        });
     };
 
     const composerState = {
