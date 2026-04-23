@@ -969,6 +969,7 @@ const translations: TranslationDeepObject<typeof en> = {
             connectAccounting: ({integrationName}: {integrationName: string}) => `Conectar con ${integrationName}`,
             connectAccountingDefault: 'Conectar a contabilidad',
             customizeCategories: 'Personalizar categorías contables',
+            inviteAccountant: 'Invita a tu contador',
             linkCompanyCards: 'Vincular tarjetas corporativas',
             setupRules: 'Configurar reglas de gasto',
         },
