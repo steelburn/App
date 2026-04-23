@@ -45,9 +45,7 @@ function IssueNewCardConfirmMagicCodePage({route}: IssueNewCardConfirmMagicCodeP
             return;
         }
         if (backPath && shouldUseBackToParam) {
-            const path = (
-                backPath.includes(DYNAMIC_ROUTES.WORKSPACE_EXPENSIFY_CARD_ISSUE_NEW.path) ? backPath.replace(DYNAMIC_ROUTES.WORKSPACE_EXPENSIFY_CARD_ISSUE_NEW.path, '') : backPath
-            ) as Route;
+            const path = (backPath.includes(DYNAMIC_ROUTES.WORKSPACE_EXPENSIFY_CARD_ISSUE_NEW.path) ? ROUTES.WORKSPACE_EXPENSIFY_CARD.getRoute(policyID) : backPath) as Route;
             Navigation.goBack(path, {compareParams: false});
         } else {
             Navigation.closeRHPFlow();

@@ -314,7 +314,7 @@ const DYNAMIC_ROUTES = {
         entryScreens: [SCREENS.WORKSPACE.EXPENSIFY_CARD_DETAILS],
     },
     WORKSPACE_EXPENSIFY_CARD_SETTINGS_ACCOUNT: {
-        path: 'settings-account',
+        path: 'account',
         entryScreens: [
             SCREENS.WORKSPACE.EXPENSIFY_CARD_SETTINGS,
             SCREENS.WORKSPACE.DYNAMIC_WORKSPACE_EXPENSIFY_CARD_SETTINGS_ACCOUNT,
