@@ -6,6 +6,7 @@ import type {ListItem, SingleSelectListItemProps} from './types';
 /**
  * A standard row with an optional (but default) radio button, used in single-choice picker lists
  * (e.g. language, theme, timezone).
+ * Use in place of the removed RadioListItem.
  */
 function SingleSelectListItem<TItem extends ListItem>({
     item,
