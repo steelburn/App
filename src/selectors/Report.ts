@@ -1,6 +1,7 @@
-import type {OnyxEntry} from 'react-native-onyx';
+import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
 import type {ValueOf} from 'type-fest';
 import {getOriginalMessage, isClosedAction} from '@libs/ReportActionsUtils';
+import {getPolicyIDsWithEmptyReportsForAccount} from '@libs/ReportUtils';
 import CONST from '@src/CONST';
 import type {Report, ReportActions} from '@src/types/onyx';
 import {getLastClosedReportAction} from './ReportAction';
@@ -27,4 +28,11 @@ function getReportOwnerAccountID(report: OnyxEntry<Report>) {
     return report?.ownerAccountID;
 }
 
-export {getArchiveReason, getReportChatType, getReportOwnerAccountID, getReportPolicyID};
+const policyIDsWithEmptyReportsSelector = (accountID: number | undefined) => (reports: OnyxCollection<Report>) => {
+    if (!accountID) {
+        return {};
+    }
+    return getPolicyIDsWithEmptyReportsForAccount(reports, accountID);
+};
+
+export {getArchiveReason, getReportChatType, getReportOwnerAccountID, getReportPolicyID, policyIDsWithEmptyReportsSelector};
