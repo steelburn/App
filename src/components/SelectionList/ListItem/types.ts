@@ -19,6 +19,7 @@ import type BaseListItem from './BaseListItem';
 import type InviteMemberListItem from './InviteMemberListItem';
 import type MultiSelectListItem from './MultiSelectListItem';
 import type SingleSelectListItem from './SingleSelectListItem';
+import type SingleSelectWithAvatarListItem from './SingleSelectWithAvatarListItem';
 import type SpendCategorySelectorListItem from './SpendCategorySelectorListItem';
 import type SplitListItem from './SplitListItem';
 import type TableListItem from './TableListItem';
@@ -306,6 +307,7 @@ type ValidListItem =
     | typeof MultiSelectListItem
     | typeof SearchRouterItem
     | typeof SingleSelectListItem
+    | typeof SingleSelectWithAvatarListItem
     | typeof SpendCategorySelectorListItem
     | typeof SplitListItem
     | typeof TableListItem

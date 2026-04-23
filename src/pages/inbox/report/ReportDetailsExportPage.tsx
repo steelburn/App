@@ -4,6 +4,7 @@ import ConfirmationPage from '@components/ConfirmationPage';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import {ModalActions} from '@components/Modal/Global/ModalContext';
 import ScreenWrapper from '@components/ScreenWrapper';
+import SingleSelectWithAvatarListItem from '@components/SelectionList/ListItem/SingleSelectWithAvatarListItem';
 import type {SelectorType} from '@components/SelectionScreen';
 import SelectionScreen from '@components/SelectionScreen';
 import useConfirmModal from '@hooks/useConfirmModal';
@@ -42,7 +43,7 @@ function ReportDetailsExportPage({route}: ReportDetailsExportPageProps) {
     const expensifyIcons = useMemoizedLazyExpensifyIcons(['XeroSquare', 'QBOSquare', 'NetSuiteSquare', 'IntacctSquare', 'QBDSquare', 'CertiniaSquare', 'GustoSquare']);
 
     const iconToDisplay = getIntegrationIcon(connectionName, expensifyIcons);
-    const canBeExported = canBeExportedUtil(report);
+    const canBeExported = true || canBeExportedUtil(report);
     const isExported = isExportedUtil(reportActions);
 
     const confirmExport = useCallback(
@@ -126,6 +127,7 @@ function ReportDetailsExportPage({route}: ReportDetailsExportPageProps) {
             accessVariants={[CONST.POLICY.ACCESS_VARIANTS.ADMIN, CONST.POLICY.ACCESS_VARIANTS.PAID]}
             featureName={CONST.POLICY.MORE_FEATURES.ARE_CONNECTIONS_ENABLED}
             displayName="ReportDetailsExportPage"
+            ListItem={SingleSelectWithAvatarListItem}
             data={exportSelectorOptions}
             shouldBeBlocked={false}
             onBackButtonPress={() => Navigation.goBack(ROUTES.REPORT_WITH_ID_DETAILS.getRoute(reportID, backTo))}

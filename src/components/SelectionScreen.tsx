@@ -1,6 +1,7 @@
 import isEmpty from 'lodash/isEmpty';
 import React from 'react';
 import type {StyleProp, ViewStyle} from 'react-native';
+import type SingleSelectWithAvatarListItem from '@components/SelectionList/ListItem/SingleSelectWithAvatarListItem';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
@@ -43,6 +44,9 @@ type SelectionScreenProps<T = string> = {
 
     /** Sections for the section list */
     data: Array<SelectorType<T>>;
+
+    /** Renderer for every item in the list. Defaults to SingleSelectListItem. */
+    ListItem?: typeof SingleSelectListItem | typeof SingleSelectWithAvatarListItem;
 
     /** The style is applied for the wrap component of list item */
     listItemWrapperStyle?: StyleProp<ViewStyle>;
@@ -114,6 +118,7 @@ function SelectionScreen<T = string>({
     listEmptyContent,
     listFooterContent,
     data,
+    ListItem = SingleSelectListItem,
     listItemWrapperStyle,
     initiallyFocusedOptionKey,
     onSelectRow,
@@ -163,7 +168,7 @@ function SelectionScreen<T = string>({
                 >
                     <SelectionList
                         data={data}
-                        ListItem={SingleSelectListItem}
+                        ListItem={ListItem}
                         onSelectRow={onSelectRow}
                         showScrollIndicator
                         shouldShowTooltips={false}
