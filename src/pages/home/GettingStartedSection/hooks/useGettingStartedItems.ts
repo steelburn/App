@@ -59,7 +59,7 @@ function useGettingStartedItems(): UseGettingStartedItemsResult {
     const emptyResult: UseGettingStartedItemsResult = {shouldShowSection: false, items: []};
 
     const intent = introSelected?.choice ?? onboardingPurpose;
-    if (intent !== CONST.ONBOARDING_CHOICES.MANAGE_TEAM) {
+    if (intent !== CONST.ONBOARDING_CHOICES.MANAGE_TEAM && intent !== CONST.ONBOARDING_CHOICES.TRACK_WORKSPACE) {
         return emptyResult;
     }
 
@@ -83,6 +83,27 @@ function useGettingStartedItems(): UseGettingStartedItemsResult {
         isComplete: true,
         route: shouldUseNarrowLayout ? ROUTES.WORKSPACE_INITIAL.getRoute(activePolicyID, Navigation.getActiveRoute()) : ROUTES.WORKSPACE_OVERVIEW.getRoute(activePolicyID),
     });
+
+    if (intent === CONST.ONBOARDING_CHOICES.TRACK_WORKSPACE) {
+        items.push({
+            key: 'customizeCategories',
+            label: translate('homePage.gettingStartedSection.customizeCategories'),
+            isComplete: hasCustomCategories(policyCategories),
+            route: ROUTES.WORKSPACE_CATEGORIES.getRoute(activePolicyID),
+            isFeatureEnabled: policy.areCategoriesEnabled,
+            enableFeature: () => enablePolicyCategories({policy, categories: policyCategories ?? {}, tags: {}, reports: [], transactionsAndViolations: {}}, true, false),
+        });
+
+        const activeMemberCount = Object.values(policy.employeeList ?? {}).filter((member) => member?.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE).length;
+        items.push({
+            key: 'inviteAccountant',
+            label: translate('homePage.gettingStartedSection.inviteAccountant'),
+            isComplete: activeMemberCount >= 2,
+            route: ROUTES.WORKSPACE_MEMBERS.getRoute(activePolicyID),
+        });
+
+        return {shouldShowSection: true, items};
+    }
 
     const isDirectConnect = !!reportedIntegration && DIRECT_CONNECT_INTEGRATIONS.has(reportedIntegration);
 
