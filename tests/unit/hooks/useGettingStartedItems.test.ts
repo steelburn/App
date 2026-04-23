@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import {renderHook} from '@testing-library/react-native';
 import Onyx from 'react-native-onyx';
 import useGettingStartedItems from '@pages/home/GettingStartedSection/hooks/useGettingStartedItems';
@@ -44,9 +45,7 @@ function buildPolicy(overrides: Partial<Policy> = {}): Policy {
     };
 }
 
-async function setupTrackWorkspaceScenario(
-    overrides: {policy?: Partial<Policy>; firstDayTrial?: string; lastDayTrial?: string; intentSource?: 'introSelected' | 'onboardingPurpose'} = {},
-) {
+async function setupTrackWorkspaceScenario(overrides: {policy?: Partial<Policy>; firstDayTrial?: string; lastDayTrial?: string; intentSource?: 'introSelected' | 'onboardingPurpose'} = {}) {
     const policy = buildPolicy(overrides.policy);
     await Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}${POLICY_ID}`, policy);
 
