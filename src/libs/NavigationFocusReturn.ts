@@ -25,7 +25,7 @@ let lastInteractiveElement: HTMLElement | null = null;
 // Cross-modality: mouse-click-forward → keyboard-back still needs focus returned (WCAG 2.4.3).
 let lastMouseTrigger: HTMLElement | null = null;
 let lastMouseTriggerAt = 0;
-// A click long before a timer-triggered nav shouldn't get captured as that nav's trigger. 3s comfortably covers typical click→nav latency while rejecting unrelated later navs.
+// A click long before a timer-triggered nav shouldn't get captured as that nav's trigger. 3s comfortably covers typical click→nav latency while rejecting unrelated later navigations.
 const MOUSE_TRIGGER_TTL_MS = 3_000;
 const triggerMap = new Map<string, TriggerEntry>();
 
