@@ -334,7 +334,19 @@ function BasePopoverMenu({
             return;
         }
         setHasKeyBeenPressed(false);
-        const handleKeyDown = () => setHasKeyBeenPressed(true);
+        const handleKeyDown = (e: KeyboardEvent) => {
+            const isNavigationKey = [
+                CONST.KEYBOARD_SHORTCUTS.ARROW_UP,
+                CONST.KEYBOARD_SHORTCUTS.ARROW_DOWN,
+                CONST.KEYBOARD_SHORTCUTS.ARROW_LEFT,
+                CONST.KEYBOARD_SHORTCUTS.ARROW_RIGHT,
+                CONST.KEYBOARD_SHORTCUTS.TAB,
+            ].some(({shortcutKey}) => shortcutKey === e.key);
+            if (!isNavigationKey) {
+                return;
+            }
+            setHasKeyBeenPressed(true);
+        };
         addKeyDownPressListener(handleKeyDown);
         return () => removeKeyDownPressListener(handleKeyDown);
     }, [isVisible, shouldShowRadioButton]);

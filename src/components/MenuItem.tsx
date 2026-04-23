@@ -1138,7 +1138,7 @@ function MenuItem({
                                                 {shouldShowRadioButton && (
                                                     <View
                                                         pointerEvents="none"
-                                                        style={styles.alignSelfCenter}
+                                                        style={[styles.alignSelfCenter, styles.ml3]}
                                                     >
                                                         <RadioButton
                                                             isChecked={isSelected}
