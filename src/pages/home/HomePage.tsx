@@ -15,6 +15,7 @@ import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
 import usePreloadFullScreenNavigators from '@libs/Navigation/AppNavigator/usePreloadFullScreenNavigators';
 import variables from '@styles/variables';
+import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import AnnouncementSection from './AnnouncementSection';
 import AssignedCardsSection from './AssignedCardsSection';
@@ -34,6 +35,10 @@ function HomePage() {
     useDocumentTitle(translate('common.home'));
     const [isLoadingApp = true] = useOnyx(ONYXKEYS.IS_LOADING_APP);
     const [isLoadingReportData = false] = useOnyx(ONYXKEYS.IS_LOADING_REPORT_DATA);
+    const [introSelected] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED);
+    const [onboardingPurpose] = useOnyx(ONYXKEYS.ONBOARDING_PURPOSE_SELECTED);
+    const intent = introSelected?.choice ?? onboardingPurpose;
+    const shouldSwapForYouAndGettingStarted = intent === CONST.ONBOARDING_CHOICES.TRACK_WORKSPACE;
     const isForYouLoading = !!(isLoadingApp || isLoadingReportData);
     const receiptDropTargetRef = useRef<View>(null);
 
@@ -80,8 +85,17 @@ function HomePage() {
                                 <>
                                     <FreeTrialSection />
                                     <TimeSensitiveSection />
-                                    <GettingStartedSection />
-                                    <ForYouSection />
+                                    {shouldSwapForYouAndGettingStarted ? (
+                                        <>
+                                            <ForYouSection />
+                                            <GettingStartedSection />
+                                        </>
+                                    ) : (
+                                        <>
+                                            <GettingStartedSection />
+                                            <ForYouSection />
+                                        </>
+                                    )}
                                     <UpcomingTravelSection />
                                     <AssignedCardsSection />
                                     <SpendOverTimeSection />
