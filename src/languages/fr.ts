@@ -8204,6 +8204,8 @@ Ajoutez davantage de règles de dépenses pour protéger la trésorerie de l’e
         stopped: 'Arrêté',
         start: 'Démarrer',
         stop: 'Arrêter',
+        save: 'Save',
+        resume: 'Resume',
         discard: 'Ignorer',
         stopGpsTrackingModal: {
             title: 'Arrêter le suivi GPS',

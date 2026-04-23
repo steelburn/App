@@ -8170,6 +8170,8 @@ Aggiungi altre regole di spesa per proteggere il flusso di cassa aziendale.`,
         stopped: 'Interrotto',
         start: 'Avvia',
         stop: 'Interrompi',
+        save: 'Save',
+        resume: 'Resume',
         discard: 'Scarta',
         stopGpsTrackingModal: {
             title: 'Interrompi tracciamento GPS',

@@ -1,65 +1,61 @@
 import {hasStartedLocationUpdatesAsync, reverseGeocodeAsync, stopLocationUpdatesAsync} from 'expo-location';
 import OnyxUtils from 'react-native-onyx/dist/OnyxUtils';
+import type {SetRequired} from 'type-fest';
 import {BACKGROUND_LOCATION_TRACKING_TASK_NAME} from '@pages/iou/request/step/IOURequestStepDistanceGPS/const';
 import {stopGpsTripNotification} from '@pages/iou/request/step/IOURequestStepDistanceGPS/GPSNotifications';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {GpsDraftDetails} from '@src/types/onyx';
 import type {Unit} from '@src/types/onyx/Policy';
-import type {Routes, WaypointCollection} from '@src/types/onyx/Transaction';
-import {setEndAddress, setIsTracking} from './actions/GPSDraftDetails';
+import type {Routes, Waypoint} from '@src/types/onyx/Transaction';
+import {isLastSegmentEmptyOrHasOnlyOnePoint, setEndAddress, setIsTracking} from './actions/GPSDraftDetails';
 import DistanceRequestUtils from './DistanceRequestUtils';
 import {roundToTwoDecimalPlaces} from './NumberUtils';
 
-function getGPSWaypoints(gpsDraftDetails: GpsDraftDetails | undefined): WaypointCollection {
-    const gpsCoordinates = gpsDraftDetails?.gpsPoints ?? [];
-    const firstPoint = gpsCoordinates.at(0);
-    const lastPoint = gpsCoordinates.at(-1);
-    const startAddress = gpsDraftDetails?.startAddress.value ?? '';
-    const endAddress = gpsDraftDetails?.endAddress.value ?? '';
+type GPSWaypointCollection = Record<string, SetRequired<Waypoint, 'keyForList' | 'lat' | 'lng' | 'address'>>;
 
-    return {
-        ...(firstPoint
-            ? {
-                  waypoint0: {
-                      keyForList: 'gps_start', // temporary for hasGPSWaypoints()
-                      lat: firstPoint.lat,
-                      lng: firstPoint.long,
-                      address: startAddress,
-                      name: startAddress,
-                  },
-              }
-            : {}),
-        ...(lastPoint
-            ? {
-                  waypoint1: {
-                      keyForList: 'gps_stop', // temporary for hasGPSWaypoints()
-                      lat: lastPoint.lat,
-                      lng: lastPoint.long,
-                      address: endAddress,
-                      name: endAddress,
-                  },
-              }
-            : {}),
-    };
+function getGPSWaypoints(gpsDraftDetails: GpsDraftDetails | undefined): GPSWaypointCollection {
+    const gpsCoordinates = getGpsPoints(gpsDraftDetails);
+
+    const waypointCollection: GPSWaypointCollection = {};
+    let waypointsCounter = 0;
+
+    for (const point of gpsCoordinates.flat()) {
+        if (!point.address) {
+            continue;
+        }
+
+        const key = `gps${waypointsCounter}`;
+        waypointsCounter++;
+
+        waypointCollection[`waypoint${waypointsCounter}`] = {
+            keyForList: key,
+            lat: point.lat,
+            lng: point.long,
+            address: point.address.value || coordinatesToString(point),
+        };
+    }
+
+    return waypointCollection;
 }
 
 function getGPSRoutes(gpsDraftDetails: GpsDraftDetails | undefined): Routes {
     const distanceInMeters = roundToTwoDecimalPlaces(gpsDraftDetails?.distanceInMeters ?? 0);
-    const gpsCoordinates = gpsDraftDetails?.gpsPoints ?? [];
+    const gpsCoordinates = getGpsPoints(gpsDraftDetails);
+    const coordinates: Array<Array<[number, number]>> = gpsCoordinates.map((points) => points.map(({lat, long}) => [long, lat]));
 
     return {
         route0: {
             distance: distanceInMeters,
             geometry: {
                 type: 'LineString',
-                coordinates: gpsCoordinates.map(({lat, long}) => [long, lat]),
+                coordinates,
             },
         },
     };
 }
 
 function getGPSCoordinates(gpsDraftDetails: GpsDraftDetails | undefined): string | undefined {
-    return gpsDraftDetails?.gpsPoints ? JSON.stringify(gpsDraftDetails.gpsPoints.map((val) => ({lng: val.long, lat: val.lat}))) : undefined;
+    return gpsDraftDetails?.gpsPoints ? JSON.stringify(gpsDraftDetails.gpsPoints.map((points) => points.map(({lat, long}) => ({lng: long, lat})))) : undefined;
 }
 
 function calculateGPSDistance(distanceInMeters: number, unit: Unit): number {
@@ -95,10 +91,10 @@ function coordinatesToString(gpsPoint: {lat: number; long: number}): string {
 async function getLastPoint() {
     const gpsTrip = await OnyxUtils.get(ONYXKEYS.GPS_DRAFT_DETAILS);
 
-    return gpsTrip?.gpsPoints?.at(-1);
+    return gpsTrip?.gpsPoints?.at(-1)?.at(-1);
 }
 
-async function stopGpsTrip(isOffline: boolean, skipLastPointAddressFetching = false) {
+async function stopGpsTrip(isOffline: boolean, gpsPoints: GpsDraftDetails['gpsPoints'], skipLastPointAddressFetching = false) {
     const isBackgroundTaskRunning = await hasStartedLocationUpdatesAsync(BACKGROUND_LOCATION_TRACKING_TASK_NAME);
 
     if (isBackgroundTaskRunning) {
@@ -108,6 +104,10 @@ async function stopGpsTrip(isOffline: boolean, skipLastPointAddressFetching = fa
     setIsTracking(false);
     stopGpsTripNotification();
 
+    if (isLastSegmentEmptyOrHasOnlyOnePoint(gpsPoints)) {
+        return;
+    }
+
     if (skipLastPointAddressFetching) {
         const lastPoint = await getLastPoint();
 
@@ -116,7 +116,7 @@ async function stopGpsTrip(isOffline: boolean, skipLastPointAddressFetching = fa
         }
 
         const formattedCoordinates = coordinatesToString(lastPoint);
-        setEndAddress({value: formattedCoordinates, type: 'coordinates'});
+        setEndAddress({value: formattedCoordinates, type: 'coordinates'}, gpsPoints);
         return;
     }
 
@@ -130,17 +130,52 @@ async function stopGpsTrip(isOffline: boolean, skipLastPointAddressFetching = fa
         const endAddress = await addressFromGpsPoint(lastPoint);
 
         if (endAddress !== null) {
-            setEndAddress({value: endAddress, type: 'address'});
+            setEndAddress({value: endAddress, type: 'address'}, gpsPoints);
             return;
         }
     }
 
     const formattedCoordinates = coordinatesToString(lastPoint);
-    setEndAddress({value: formattedCoordinates, type: 'coordinates'});
+    setEndAddress({value: formattedCoordinates, type: 'coordinates'}, gpsPoints);
 }
 
-function isTripCaptured(gpsDraftDetails: GpsDraftDetails | undefined): boolean {
-    return !gpsDraftDetails?.isTracking && (gpsDraftDetails?.gpsPoints?.length ?? 0) > 0;
+function getTotalGpsTripPoints(gpsDraftDetails: GpsDraftDetails | undefined): number {
+    return gpsDraftDetails?.gpsPoints?.flat().length ?? 0;
 }
 
-export {getGPSRoutes, getGPSWaypoints, stopGpsTrip, getGPSConvertedDistance, getGPSCoordinates, addressFromGpsPoint, coordinatesToString, isTripCaptured};
+function getTotalGpsTripPointsInLastSegment(gpsDraftDetails: GpsDraftDetails | undefined): number {
+    return gpsDraftDetails?.gpsPoints?.at(-1)?.length ?? 0;
+}
+
+function isTripStopped(gpsDraftDetails: GpsDraftDetails | undefined): boolean {
+    return !gpsDraftDetails?.isTracking && getTotalGpsTripPoints(gpsDraftDetails) > 0;
+}
+
+function getGpsPoints(gpsDraftDetails: GpsDraftDetails | undefined): GpsDraftDetails['gpsPoints'] {
+    return gpsDraftDetails?.gpsPoints ?? [[]];
+}
+
+function getFirstGpsPoint(gpsDraftDetails: GpsDraftDetails | undefined): GpsDraftDetails['gpsPoints'][number][number] | undefined {
+    return gpsDraftDetails?.gpsPoints?.at(0)?.at(0);
+}
+
+function getLastGpsPoint(gpsDraftDetails: GpsDraftDetails | undefined): GpsDraftDetails['gpsPoints'][number][number] | undefined {
+    return gpsDraftDetails?.gpsPoints?.at(-1)?.at(-1);
+}
+
+export {
+    getGPSRoutes,
+    getGPSWaypoints,
+    stopGpsTrip,
+    getGPSConvertedDistance,
+    getGPSCoordinates,
+    addressFromGpsPoint,
+    coordinatesToString,
+    calculateGPSDistance,
+    isTripStopped,
+    getTotalGpsTripPoints,
+    getTotalGpsTripPointsInLastSegment,
+    getGpsPoints,
+    getFirstGpsPoint,
+    getLastGpsPoint,
+};

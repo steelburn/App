@@ -35,13 +35,18 @@ function MapView({
     pitchEnabled,
     initialState,
     waypoints,
-    directionCoordinates,
+    directionCoordinates: directionCoordinatesProp,
     onMapReady,
     interactive = true,
     distanceInMeters,
     unit,
     ref,
 }: MapViewProps) {
+    const directionCoordinates = useMemo(
+        () => (!directionCoordinatesProp || utils.isSingleRoute(directionCoordinatesProp) ? directionCoordinatesProp : directionCoordinatesProp.flat()),
+        [directionCoordinatesProp],
+    );
+
     const [userLocation] = useOnyx(ONYXKEYS.USER_LOCATION);
     const navigation = useNavigation();
     const {isOffline} = useNetwork();
@@ -319,9 +324,9 @@ function MapView({
                     );
                 })}
 
-                {!!directionCoordinates && (
+                {!!directionCoordinatesProp && (
                     <Direction
-                        coordinates={directionCoordinates}
+                        coordinates={directionCoordinatesProp}
                         belowLayerID={interactive ? CONST.MAP_VIEW_LAYERS.USER_LOCATION : undefined}
                     />
                 )}

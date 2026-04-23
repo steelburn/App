@@ -8134,6 +8134,8 @@ Dodaj więcej zasad wydatków, żeby chronić płynność finansową firmy.`,
         stopped: 'Zatrzymano',
         start: 'Start',
         stop: 'Zatrzymaj',
+        save: 'Zapisz',
+        resume: 'Wznów',
         discard: 'Odrzuć',
         stopGpsTrackingModal: {
             title: 'Zatrzymaj śledzenie GPS',

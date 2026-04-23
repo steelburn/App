@@ -8145,6 +8145,8 @@ Voeg meer bestedingsregels toe om de kasstroom van het bedrijf te beschermen.`,
         stopped: 'Gestopt',
         start: 'Start',
         stop: 'Stop',
+        save: 'Save',
+        resume: 'Resume',
         discard: 'Weggooien',
         stopGpsTrackingModal: {
             title: 'GPS-tracking stoppen',

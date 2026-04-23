@@ -8071,6 +8071,8 @@ ${reportName}
         stopped: '停止済み',
         start: '開始',
         stop: '停止',
+        save: 'Save',
+        resume: 'Resume',
         discard: '破棄',
         stopGpsTrackingModal: {
             title: 'GPS追跡を停止',

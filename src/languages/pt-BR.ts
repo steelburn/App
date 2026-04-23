@@ -8137,6 +8137,8 @@ Adicione mais regras de gasto para proteger o fluxo de caixa da empresa.`,
         stopped: 'Parado',
         start: 'Iniciar',
         stop: 'Parar',
+        save: 'Save',
+        resume: 'Resume',
         discard: 'Descartar',
         stopGpsTrackingModal: {
             title: 'Parar rastreamento por GPS',

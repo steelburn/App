@@ -4,8 +4,7 @@ import {View} from 'react-native';
 import DistanceMapView from '@components/DistanceMapView';
 import DotIndicatorMessage from '@components/DotIndicatorMessage';
 import ImageSVG from '@components/ImageSVG';
-import type {MapViewHandle, WayPoint} from '@components/MapView/MapViewTypes';
-import mapUtils from '@components/MapView/utils';
+import type {Coordinate, MapViewHandle, WayPoint} from '@components/MapView/MapViewTypes';
 import withCurrentUserPersonalDetails from '@components/withCurrentUserPersonalDetails';
 import useDefaultExpensePolicy from '@hooks/useDefaultExpensePolicy';
 import useIsInLandscapeMode from '@hooks/useIsInLandscapeMode';
@@ -26,7 +25,7 @@ import {setGPSTransactionDraftData} from '@libs/actions/IOU';
 import {handleMoneyRequestStepDistanceNavigation} from '@libs/actions/IOU/MoneyRequest';
 import {init as initMapboxToken, stop as stopMapboxToken} from '@libs/actions/MapboxToken';
 import DistanceRequestUtils from '@libs/DistanceRequestUtils';
-import {getGPSConvertedDistance, getGPSCoordinates, getGPSWaypoints, isTripCaptured as isTripCapturedUtil} from '@libs/GPSDraftDetailsUtils';
+import {getGPSConvertedDistance, getGPSCoordinates, getGpsPoints, getGPSWaypoints, getLastGpsPoint, isTripStopped as isTripStoppedUtil} from '@libs/GPSDraftDetailsUtils';
 import Navigation from '@libs/Navigation/Navigation';
 import {isPolicyExpenseChat as isPolicyExpenseChatUtils} from '@libs/ReportUtils';
 import shouldUseDefaultExpensePolicyUtil from '@libs/shouldUseDefaultExpensePolicy';
@@ -56,7 +55,7 @@ function IOURequestStepDistanceGPS({
 
     const {translate} = useLocalize();
     const {isBetaEnabled} = usePermissions();
-    const {DotIndicatorUnfilled, Location} = useMemoizedLazyExpensifyIcons(['DotIndicatorUnfilled', 'Location']);
+    const {DotIndicatorUnfilled, Location, DotIndicator} = useMemoizedLazyExpensifyIcons(['DotIndicatorUnfilled', 'Location', 'DotIndicator']);
     const isInLandscapeMode = useIsInLandscapeMode();
 
     const mapRef = useRef<MapViewHandle>(null);
@@ -174,14 +173,14 @@ function IOURequestStepDistanceGPS({
         if (!gpsDraftDetails?.isTracking) {
             return;
         }
-        const latestPoint = gpsDraftDetails.gpsPoints?.at(-1);
+        const latestPoint = getLastGpsPoint(gpsDraftDetails);
         if (!latestPoint) {
             return;
         }
         mapRef.current?.flyTo([latestPoint.long, latestPoint.lat], CONST.MAPBOX.DEFAULT_ZOOM, 1000);
-    }, [gpsDraftDetails?.gpsPoints, gpsDraftDetails?.isTracking]);
+    }, [gpsDraftDetails]);
 
-    const isTripCaptured = isTripCapturedUtil(gpsDraftDetails);
+    const isTripStopped = isTripStoppedUtil(gpsDraftDetails);
 
     const getMarkerComponent = (icon: IconAsset): ReactNode => (
         <ImageSVG
@@ -192,46 +191,36 @@ function IOURequestStepDistanceGPS({
         />
     );
 
+    const gpsWaypoints = getGPSWaypoints(gpsDraftDetails);
+
     const getWaypointMarkers = (): WayPoint[] => {
-        const points = gpsDraftDetails?.gpsPoints ?? [];
-        const firstPoint = points.at(0);
-        const lastPoint = points.at(-1);
-        const markers: WayPoint[] = [];
+        const waypointMarkers = Object.entries(gpsWaypoints).map(([key, waypoint], index): WayPoint | null => {
+            const tripSegmentsCount = getGpsPoints(gpsDraftDetails).length;
+            // eslint-disable-next-line no-nested-ternary
+            let icon = DotIndicator;
+            if (index === 0) {
+                icon = DotIndicatorUnfilled;
+            } else if (index === tripSegmentsCount * 2 - 1) {
+                icon = Location;
 
-        if (firstPoint) {
-            markers.push({
-                id: 'gps-start',
-                coordinate: [firstPoint.long, firstPoint.lat],
-                markerComponent: (): ReactNode => getMarkerComponent(DotIndicatorUnfilled),
-            });
-        }
+                if (!isTripStopped) {
+                    return null;
+                }
+            }
 
-        if (lastPoint && lastPoint !== firstPoint && isTripCaptured) {
-            markers.push({
-                id: 'gps-end',
-                coordinate: [lastPoint.long, lastPoint.lat],
-                markerComponent: (): ReactNode => getMarkerComponent(Location),
-            });
-        }
+            return {
+                id: key,
+                coordinate: [waypoint.lng, waypoint.lat],
+                markerComponent: (): ReactNode => getMarkerComponent(icon),
+            };
+        });
 
-        return markers;
+        return waypointMarkers.filter((waypoint): waypoint is WayPoint => !!waypoint);
     };
 
     const waypointMarkers = getWaypointMarkers();
 
-    const directionCoordinates: Array<[number, number]> = (gpsDraftDetails?.gpsPoints ?? []).map(({lat, long}) => [long, lat]);
-
-    // Show the full route after stopping the trip
-    const showFullRouteAfterStopping = () => {
-        if (directionCoordinates.length < 2) {
-            return;
-        }
-        const {northEast, southWest} = mapUtils.getBounds(
-            waypointMarkers.map((waypoint) => waypoint.coordinate),
-            directionCoordinates,
-        );
-        mapRef.current?.fitBounds(northEast, southWest, CONST.MAPBOX.PADDING, 1000);
-    };
+    const directionCoordinates: Coordinate[][] = getGpsPoints(gpsDraftDetails).map((points): Coordinate[] => points.map(({lat, long}) => [long, lat]));
 
     return (
         <StepScreenWrapper
@@ -275,9 +264,9 @@ function IOURequestStepDistanceGPS({
                             navigateToNextStep={navigateToNextStep}
                             setShouldShowStartError={setShouldShowStartError}
                             setShouldShowPermissionsError={setShouldShowPermissionsError}
-                            onTripStopped={showFullRouteAfterStopping}
                             reportID={reportID}
                             unit={unit}
+                            gpsPoints={getGpsPoints(gpsDraftDetails)}
                         />
                     </View>
                 </View>

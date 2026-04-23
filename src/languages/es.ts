@@ -9381,6 +9381,8 @@ ${amount} para ${merchant} - ${date}`,
         stopped: 'Detenido',
         start: 'Iniciar',
         stop: 'Detener',
+        save: 'Save',
+        resume: 'Resume',
         discard: 'Descartar',
         stopGpsTrackingModal: {
             title: 'Detener seguimiento por GPS',

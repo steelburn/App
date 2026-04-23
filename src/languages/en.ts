@@ -8166,6 +8166,8 @@ const translations = {
         stopped: 'Stopped',
         start: 'Start',
         stop: 'Stop',
+        save: 'Save',
+        resume: 'Resume',
         discard: 'Discard',
         stopGpsTrackingModal: {
             title: 'Stop GPS tracking',

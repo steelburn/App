@@ -8181,6 +8181,8 @@ Fügen Sie weitere Ausgabelimits hinzu, um den Cashflow Ihres Unternehmens zu sc
         stopped: 'Angehalten',
         start: 'Start',
         stop: 'Stopp',
+        save: 'Save',
+        resume: 'Resume',
         discard: 'Verwerfen',
         stopGpsTrackingModal: {
             title: 'GPS-Tracking stoppen',

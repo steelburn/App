@@ -2,8 +2,8 @@ import NetInfo from '@react-native-community/netinfo';
 import type {LocationObject} from 'expo-location';
 import {defineTask} from 'expo-task-manager';
 import OnyxUtils from 'react-native-onyx/dist/OnyxUtils';
-import {addGpsPoints, setStartAddress} from '@libs/actions/GPSDraftDetails';
-import {addressFromGpsPoint, coordinatesToString} from '@libs/GPSDraftDetailsUtils';
+import {addGpsPoints, setStartWaypointAddress} from '@libs/actions/GPSDraftDetails';
+import {addressFromGpsPoint, coordinatesToString, getTotalGpsTripPointsInLastSegment} from '@libs/GPSDraftDetailsUtils';
 import {BACKGROUND_LOCATION_TRACKING_TASK_NAME} from '@pages/iou/request/step/IOURequestStepDistanceGPS/const';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {GpsDraftDetails} from '@src/types/onyx';
@@ -23,15 +23,21 @@ defineTask<BackgroundLocationTrackingTaskData>(BACKGROUND_LOCATION_TRACKING_TASK
     const gpsDraftDetails = gpsDraftDetailsPromiseResult ?? undefined;
     const isOffline = netInfoState.isConnected === false;
 
-    updateStartAddress(gpsDraftDetails?.gpsPoints ?? [], data.locations.at(0), isOffline);
+    updateStartAddress(gpsDraftDetails, data.locations.at(0), isOffline);
 
     const newGpsPoints = data.locations.map((location) => ({lat: location.coords.latitude, long: location.coords.longitude}));
 
     addGpsPoints(gpsDraftDetails, newGpsPoints);
 });
 
-async function updateStartAddress(currentGpsPoints: GpsDraftDetails['gpsPoints'], startPoint: LocationObject | undefined, isOffline: boolean) {
-    if (currentGpsPoints.length !== 0 || !startPoint) {
+async function updateStartAddress(gpsDraftDetails: GpsDraftDetails | undefined, startPoint: LocationObject | undefined, isOffline: boolean) {
+    if (getTotalGpsTripPointsInLastSegment(gpsDraftDetails) !== 0 || !startPoint) {
+        return;
+    }
+
+    const tripSegmentIndex = (gpsDraftDetails?.gpsPoints?.length ?? 0) - 1;
+
+    if (tripSegmentIndex === -1) {
         return;
     }
 
@@ -39,10 +45,10 @@ async function updateStartAddress(currentGpsPoints: GpsDraftDetails['gpsPoints']
         const address = await addressFromGpsPoint({lat: startPoint.coords.latitude, long: startPoint.coords.longitude});
 
         if (address !== null) {
-            setStartAddress({value: address, type: 'address'});
+            setStartWaypointAddress({value: address, type: 'address'}, tripSegmentIndex, gpsDraftDetails);
             return;
         }
     }
 
-    setStartAddress({value: coordinatesToString({lat: startPoint.coords.latitude, long: startPoint.coords.longitude}), type: 'coordinates'});
+    setStartWaypointAddress({value: coordinatesToString({lat: startPoint.coords.latitude, long: startPoint.coords.longitude}), type: 'coordinates'}, tripSegmentIndex, gpsDraftDetails);
 }

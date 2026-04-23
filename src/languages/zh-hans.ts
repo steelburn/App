@@ -7935,6 +7935,8 @@ ${reportName}
         stopped: '已停止',
         start: '开始',
         stop: '停止',
+        save: 'Save',
+        resume: 'Resume',
         discard: '丢弃',
         stopGpsTrackingModal: {
             title: '停止 GPS 跟踪',

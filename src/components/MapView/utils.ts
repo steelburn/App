@@ -1,5 +1,10 @@
 import type {LngLat} from 'react-map-gl';
+import getArrayDepth from '@libs/getArrayDepth';
 import type {Coordinate} from './MapViewTypes';
+
+function isSingleRoute(directionCoordinates: Coordinate[] | Coordinate[][]): directionCoordinates is Coordinate[] {
+    return getArrayDepth(directionCoordinates) === 2;
+}
 
 function getBounds(waypoints: Coordinate[], directionCoordinates: undefined | Coordinate[]): {southWest: Coordinate; northEast: Coordinate} {
     const longitudes = waypoints.map((waypoint) => waypoint[0]);
@@ -122,4 +127,5 @@ export default {
     areSameCoordinate,
     findClosestCoordinateOnLineFromCenter,
     getBoundsCenter,
+    isSingleRoute,
 };
