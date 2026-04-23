@@ -323,18 +323,19 @@ function getCustomUnitsForDuplication(
         return undefined;
     }
 
-    const getUnitWithoutPendingDeleteRates = (customUnit: CustomUnit | undefined) => {
+    const getUnitWithoutPendingDeleteRates = (customUnit: CustomUnit | undefined, customUnitID: string) => {
         if (!customUnit) {
             return undefined;
         }
         return {
             ...customUnit,
+            customUnitID,
             rates: Object.fromEntries(Object.entries(customUnit.rates).filter(([, rate]) => rate.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE)),
         };
     };
 
-    const distanceCustomUnit = getUnitWithoutPendingDeleteRates(Object.values(customUnits).find((customUnit) => customUnit.name === CONST.CUSTOM_UNITS.NAME_DISTANCE));
-    const perDiemUnit = getUnitWithoutPendingDeleteRates(Object.values(customUnits).find((customUnit) => customUnit.name === CONST.CUSTOM_UNITS.NAME_PER_DIEM_INTERNATIONAL));
+    const distanceCustomUnit = getUnitWithoutPendingDeleteRates(Object.values(customUnits).find((customUnit) => customUnit.name === CONST.CUSTOM_UNITS.NAME_DISTANCE), distanceCustomUnitID);
+    const perDiemUnit = getUnitWithoutPendingDeleteRates(Object.values(customUnits).find((customUnit) => customUnit.name === CONST.CUSTOM_UNITS.NAME_PER_DIEM_INTERNATIONAL), perDiemCustomUnitID);
 
     if (isDistanceRatesOptionSelected && isPerDiemOptionSelected) {
         if (!perDiemUnit || !distanceCustomUnit || !perDiemCustomUnitID || !distanceCustomUnitID) {
