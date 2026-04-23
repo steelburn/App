@@ -15,6 +15,7 @@ import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavig
 import type {SettingsNavigatorParamList} from '@libs/Navigation/types';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
+import type {Route} from '@src/ROUTES';
 import ROUTES, {DYNAMIC_ROUTES} from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
 
@@ -44,7 +45,10 @@ function IssueNewCardConfirmMagicCodePage({route}: IssueNewCardConfirmMagicCodeP
             return;
         }
         if (backPath && shouldUseBackToParam) {
-            Navigation.goBack(backPath, {compareParams: false});
+            const path = (
+                backPath.includes(DYNAMIC_ROUTES.WORKSPACE_EXPENSIFY_CARD_ISSUE_NEW.path) ? backPath.replace(DYNAMIC_ROUTES.WORKSPACE_EXPENSIFY_CARD_ISSUE_NEW.path, '') : backPath
+            ) as Route;
+            Navigation.goBack(path, {compareParams: false});
         } else {
             Navigation.closeRHPFlow();
             Navigation.navigate(ROUTES.WORKSPACE_EXPENSIFY_CARD.getRoute(policyID), {forceReplace: true});
