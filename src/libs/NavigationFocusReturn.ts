@@ -25,8 +25,8 @@ let lastInteractiveElement: HTMLElement | null = null;
 // Cross-modality: mouse-click-forward → keyboard-back still needs focus returned (WCAG 2.4.3).
 let lastMouseTrigger: HTMLElement | null = null;
 let lastMouseTriggerAt = 0;
-// A click long before a timer-triggered nav shouldn't get captured as that nav's trigger.
-const MOUSE_TRIGGER_TTL_MS = 10_000;
+// A click long before a timer-triggered nav shouldn't get captured as that nav's trigger. 3s comfortably covers typical click→nav latency while rejecting unrelated later navs.
+const MOUSE_TRIGGER_TTL_MS = 3_000;
 const triggerMap = new Map<string, TriggerEntry>();
 
 // Refresh insertion order on re-set so FIFO eviction doesn't drop a recently-active key.
@@ -328,7 +328,7 @@ function handleStateChange(newState: NavigationState | undefined): void {
 
     for (const key of removedKeys) {
         triggerMap.delete(key);
-        // Also drop compound PUSH_PARAMS entries for this route.
+        // Also drop compound PUSH_PARAMS entries for this route. Map iteration is safe under in-loop delete per ES6 spec — already-visited and deleted-before-visit entries are skipped correctly.
         const compoundPrefix = `${key}${COMPOUND_KEY_DELIMITER}`;
         for (const mapKey of triggerMap.keys()) {
             if (mapKey.startsWith(compoundPrefix)) {
