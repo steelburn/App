@@ -372,7 +372,7 @@ type CreateSplitsAndOnyxDataParams = {
     policyRecentlyUsedCurrencies: string[];
     betas: OnyxEntry<OnyxTypes.Beta[]>;
     personalDetails: OnyxEntry<OnyxTypes.PersonalDetailsList>;
-    participantsPolicyTags?: Record<string, OnyxTypes.PolicyTagLists>;
+    participantsPolicyTags: Record<string, OnyxTypes.PolicyTagLists>;
 };
 
 let allPersonalDetails: OnyxTypes.PersonalDetailsList = {};
@@ -591,10 +591,10 @@ function getPolicyTags(): OnyxCollection<OnyxTypes.PolicyTagLists> {
     return allPolicyTags;
 }
 
-function buildParticipantsPolicyTags(participants: Participant[], policyTagsSource: OnyxCollection<OnyxTypes.PolicyTagLists>): Record<string, OnyxTypes.PolicyTagLists> {
+function buildParticipantsPolicyTags(participants: Participant[]): Record<string, OnyxTypes.PolicyTagLists> {
     return participants.reduce<Record<string, OnyxTypes.PolicyTagLists>>((acc, participant) => {
         if (participant.policyID) {
-            const tags = policyTagsSource?.[`${ONYXKEYS.COLLECTION.POLICY_TAGS}${participant.policyID}`];
+            const tags = allPolicyTags?.[`${ONYXKEYS.COLLECTION.POLICY_TAGS}${participant.policyID}`];
             if (tags) {
                 acc[participant.policyID] = tags;
             }
@@ -2902,7 +2902,7 @@ function createSplitsAndOnyxData({
         // participant.login is undefined when the request is initiated from a group DM with an unknown user, so we need to add a default
         const email = isOwnPolicyExpenseChat || isPolicyExpenseChat ? '' : addSMSDomainIfPhoneNumber(participant.login ?? '').toLowerCase();
         const accountID = isOwnPolicyExpenseChat || isPolicyExpenseChat ? 0 : Number(participant.accountID);
-        const participantPolicyTags = participant.policyID ? participantsPolicyTags?.[participant.policyID] : undefined;
+        const participantPolicyTags = participant.policyID ? participantsPolicyTags?.[participant.policyID] : {};
 
         if (isPendingDistanceSplitBill) {
             const individualSplit = {
@@ -3073,7 +3073,7 @@ function createSplitsAndOnyxData({
         // Add tag to optimistic policy recently used tags when a participant is a workspace
         const optimisticPolicyRecentlyUsedTags = isPolicyExpenseChat
             ? buildOptimisticPolicyRecentlyUsedTags({
-                  policyTags: participantPolicyTags ?? {},
+                  policyTags: participantPolicyTags,
                   policyRecentlyUsedTags,
                   transactionTags: tag,
               })
@@ -3278,7 +3278,7 @@ function createDistanceRequest(distanceRequestInformation: CreateDistanceRequest
             policyRecentlyUsedCurrencies,
             betas,
             personalDetails,
-            participantsPolicyTags: buildParticipantsPolicyTags(participants, allPolicyTags),
+            participantsPolicyTags: buildParticipantsPolicyTags(participants),
         });
         onyxData = splitOnyxData;
 

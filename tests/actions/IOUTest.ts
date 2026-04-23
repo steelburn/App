@@ -7625,7 +7625,7 @@ describe('actions/IOU', () => {
             policyRecentlyUsedCurrencies: [],
             betas: [CONST.BETAS.ALL],
             personalDetails: mockPersonalDetails,
-            participantsPolicyTags: overrides.participantsPolicyTags,
+            participantsPolicyTags: overrides.participantsPolicyTags ?? {},
         });
 
         it('returns valid splitData with chatReportID, transactionID, and reportActionID', () => {
