@@ -1079,9 +1079,27 @@ function inviteMemberToWorkspace(policyID: string, inviterEmail?: string) {
 /**
  * Add member to the selected private domain workspace based on policyID
  */
-function joinAccessiblePolicy(policyID: string) {
+function joinAccessiblePolicy(policyID: string, isSubmitWorkspace = false) {
     const memberJoinKey = `${ONYXKEYS.COLLECTION.POLICY_JOIN_MEMBER}${policyID}` as const;
     const policyKey = `${ONYXKEYS.COLLECTION.POLICY}${policyID}` as const;
+
+    const optimisticPolicyValue: Partial<Policy> = isSubmitWorkspace
+        ? {
+              isLoading: true,
+              type: CONST.POLICY.TYPE.SUBMIT,
+              role: CONST.POLICY.ROLE.EDITOR,
+              areCategoriesEnabled: true,
+              areTagsEnabled: true,
+              areWorkflowsEnabled: true,
+              areDistanceRatesEnabled: true,
+              areReportFieldsEnabled: false,
+              areCompanyCardsEnabled: false,
+              areConnectionsEnabled: false,
+              areExpensifyCardsEnabled: false,
+              areInvoicesEnabled: false,
+              areRulesEnabled: false,
+          }
+        : {isLoading: true};
 
     const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.POLICY_JOIN_MEMBER | typeof ONYXKEYS.COLLECTION.POLICY>> = [
         {
@@ -1092,7 +1110,7 @@ function joinAccessiblePolicy(policyID: string) {
         {
             onyxMethod: Onyx.METHOD.MERGE,
             key: policyKey,
-            value: {isLoading: true},
+            value: optimisticPolicyValue,
         },
     ];
 
@@ -1110,11 +1128,17 @@ function joinAccessiblePolicy(policyID: string) {
             key: memberJoinKey,
             value: {policyID, errors: ErrorUtils.getMicroSecondOnyxErrorWithTranslationKey('workspace.people.error.genericAdd')},
         },
-        {
-            onyxMethod: Onyx.METHOD.MERGE,
-            key: policyKey,
-            value: {isLoading: false},
-        },
+        isSubmitWorkspace
+            ? {
+                  onyxMethod: Onyx.METHOD.SET,
+                  key: policyKey,
+                  value: null,
+              }
+            : {
+                  onyxMethod: Onyx.METHOD.MERGE,
+                  key: policyKey,
+                  value: {isLoading: false},
+              },
     ];
 
     API.write(WRITE_COMMANDS.JOIN_ACCESSIBLE_POLICY, {policyID}, {optimisticData, successData, failureData});

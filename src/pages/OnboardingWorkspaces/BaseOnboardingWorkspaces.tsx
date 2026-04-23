@@ -78,18 +78,19 @@ function BaseOnboardingWorkspaces({route, shouldUseNativeStyles}: BaseOnboarding
     const onboardingStep = useOnboardingStepCounter(SCREENS.ONBOARDING.WORKSPACES);
 
     const handleJoinWorkspace = (policy: JoinablePolicy) => {
-        if (policy.automaticJoiningEnabled) {
-            joinAccessiblePolicy(policy.policyID);
-        } else {
-            askToJoinPolicy(policy.policyID);
-        }
-
         // Mirror the EMPLOYER ("Get paid back by my employer") + Submit-2026 onboarding flow
         // for any user auto-joining a workspace during onboarding while the Submit-2026 beta
         // is enabled, including private-domain signups that reach this screen without
         // selecting a Purpose. JoinablePolicy doesn't carry policy.type from the backend
         // today, so the beta is our best local signal for Submit-era onboarding.
         const shouldUseSubmitFlow = canUseSubmit2026;
+
+        if (policy.automaticJoiningEnabled) {
+            joinAccessiblePolicy(policy.policyID, shouldUseSubmitFlow);
+        } else {
+            askToJoinPolicy(policy.policyID);
+        }
+
         const engagementChoice = shouldUseSubmitFlow ? CONST.ONBOARDING_CHOICES.EMPLOYER : CONST.ONBOARDING_CHOICES.LOOKING_AROUND;
         completeOnboarding({
             engagementChoice,
