@@ -23,6 +23,7 @@ import type {SettingsNavigatorParamList} from '@libs/Navigation/types';
 import type {SkeletonSpanReasonAttributes} from '@libs/telemetry/useSkeletonSpan';
 import {handleRestrictedEvent} from '@userActions/App';
 import {setPlaidEvent} from '@userActions/BankAccounts';
+import {updatePersonalCardConnection} from '@userActions/PersonalCards';
 import {addPersonalPlaidCard, openPlaidCompanyCardLogin} from '@userActions/Plaid';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -39,7 +40,7 @@ function FixPersonalCardConnectionPage({route}: FixPersonalCardConnectionPagePro
     const {translate} = useLocalize();
     const webViewRef = useRef<WebView>(null);
     const [isConnectionCompleted, setConnectionCompleted] = useState(false);
-    const {url, isPlaid, country} = useFixPersonalCardConnection(cardID);
+    const {card, url, isPlaid, country} = useFixPersonalCardConnection(cardID);
     const {isOffline} = useNetwork();
     const hasRequestedPlaidToken = useRef(false);
 
@@ -97,6 +98,10 @@ function FixPersonalCardConnectionPage({route}: FixPersonalCardConnectionPagePro
             return;
         }
         addPersonalPlaidCard(publicToken, plaidConnectedFeed, country, JSON.stringify(plaidAccounts));
+        // Trigger a scrape so the broken-connection error clears immediately.
+        // The non-Plaid flow relies on useFixPersonalCardConnection's effect, which
+        // doesn't fire here because we navigate away before isCardBroken flips.
+        updatePersonalCardConnection(cardID, card?.lastScrapeResult);
         Navigation.goBack(ROUTES.SETTINGS_WALLET_PERSONAL_CARD_DETAILS.getRoute(cardID));
     };
 

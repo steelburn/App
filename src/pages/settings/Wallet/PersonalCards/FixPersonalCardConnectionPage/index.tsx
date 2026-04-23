@@ -19,6 +19,7 @@ import type {SkeletonSpanReasonAttributes} from '@libs/telemetry/useSkeletonSpan
 import openBankConnection from '@pages/settings/Wallet/PersonalCards/steps/BankConnection/openBankConnection';
 import {handleRestrictedEvent} from '@userActions/App';
 import {setPlaidEvent} from '@userActions/BankAccounts';
+import {updatePersonalCardConnection} from '@userActions/PersonalCards';
 import {addPersonalPlaidCard, openPlaidCompanyCardLogin} from '@userActions/Plaid';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -36,13 +37,17 @@ function FixPersonalCardConnectionPage({route}: FixPersonalCardConnectionPagePro
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const illustrations = useMemoizedLazyIllustrations(['PendingBank']);
-    const {bankDisplayName, url, isOffline, isPlaid, country} = useFixPersonalCardConnection(cardID);
+    const {card, bankDisplayName, url, isOffline, isPlaid, country} = useFixPersonalCardConnection(cardID);
 
     const [plaidLinkToken] = useOnyx(ONYXKEYS.PLAID_LINK_TOKEN);
     const [plaidData] = useOnyx(ONYXKEYS.PLAID_DATA);
     const [isPlaidDisabled] = useOnyx(ONYXKEYS.IS_PLAID_DISABLED);
 
     const hasRequestedPlaidToken = useRef(false);
+    const lastScrapeResultRef = useRef(card?.lastScrapeResult);
+    useEffect(() => {
+        lastScrapeResultRef.current = card?.lastScrapeResult;
+    }, [card?.lastScrapeResult]);
     // Snapshot any stale Plaid token left over in Onyx from a previous Plaid flow.
     // We only open Plaid once we receive a token that differs from this snapshot — otherwise an
     // initial mount with the stale token starts a create/destroy cycle that leaves the SDK stuck.
@@ -128,6 +133,10 @@ function FixPersonalCardConnectionPage({route}: FixPersonalCardConnectionPagePro
                     return;
                 }
                 addPersonalPlaidCard(publicToken, plaidConnectedFeed, country, JSON.stringify(plaidAccounts));
+                // Trigger a scrape so the broken-connection error clears immediately.
+                // The non-Plaid flow relies on useFixPersonalCardConnection's effect, which
+                // doesn't fire here because we navigate away before isCardBroken flips.
+                updatePersonalCardConnection(cardID, lastScrapeResultRef.current);
                 Navigation.goBack(ROUTES.SETTINGS_WALLET_PERSONAL_CARD_DETAILS.getRoute(cardID));
             },
             onExit: () => {
