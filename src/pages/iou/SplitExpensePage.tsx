@@ -21,6 +21,7 @@ import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails'
 import useGetIOUReportFromReportAction from '@hooks/useGetIOUReportFromReportAction';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
+import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
 import usePermissions from '@hooks/usePermissions';
 import usePolicy from '@hooks/usePolicy';
@@ -37,7 +38,7 @@ import {
     updateSplitExpenseAmountField,
     updateSplitTransactionsFromSplitExpensesFlow,
 } from '@libs/actions/IOU/Split';
-import {convertToBackendAmount, convertToDisplayString} from '@libs/CurrencyUtils';
+import {convertToBackendAmount} from '@libs/CurrencyUtils';
 import DateUtils from '@libs/DateUtils';
 import {canUseTouchScreen} from '@libs/DeviceCapabilities';
 import DistanceRequestUtils from '@libs/DistanceRequestUtils';
@@ -78,12 +79,13 @@ function SplitExpensePage({route}: SplitExpensePageProps) {
 
     const {shouldUseNarrowLayout, isInLandscapeMode} = useResponsiveLayout();
     const {showConfirmModal} = useConfirmModal();
+    const {isOffline} = useNetwork();
 
     const [errorMessage, setErrorMessage] = React.useState<string>('');
     const {currentSearchResults, currentSearchHash, currentSearchQueryJSON} = useSearchStateContext();
     const {clearSelectedTransactions} = useSearchActionsContext();
 
-    const {getCurrencySymbol} = useCurrencyListActions();
+    const {convertToDisplayString, getCurrencySymbol} = useCurrencyListActions();
 
     const [selectedTab] = useOnyx(`${ONYXKEYS.COLLECTION.SELECTED_TAB}${CONST.TAB.SPLIT_EXPENSE_TAB_TYPE}`);
     const [draftTransaction, draftTransactionMetadata] = useOnyx(`${ONYXKEYS.COLLECTION.SPLIT_TRANSACTION_DRAFT}${transactionID}`);
@@ -310,6 +312,7 @@ function SplitExpensePage({route}: SplitExpensePageProps) {
             personalDetails,
             transactionReport: draftTransactionReport,
             expenseReport,
+            isOffline,
         });
     };
 
@@ -338,7 +341,7 @@ function SplitExpensePage({route}: SplitExpensePageProps) {
         const currentItemReport = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${currentTransaction?.reportID}`];
         const isApproved = isReportApproved({report: currentItemReport});
         const isSettled = isSettledReportUtils(currentItemReport?.reportID);
-        const isCancelled = currentItemReport && currentItemReport?.isCancelledIOU;
+        const isCancelled = currentItemReport?.isCancelledIOU;
         const percentage = adjustedPercentages.at(index) ?? 0;
 
         const date = DateUtils.formatWithUTCTimeZone(
