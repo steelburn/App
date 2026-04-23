@@ -1,7 +1,7 @@
 import type {ImageContentFit} from 'expo-image';
 import type {SourceLoadEventPayload} from 'expo-video';
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {Image, InteractionManager, View} from 'react-native';
+import {Image, View} from 'react-native';
 // eslint-disable-next-line no-restricted-imports
 import type {ImageResizeMode, ImageSourcePropType, LayoutChangeEvent, ScrollView as RNScrollView, StyleProp, TextStyle, ViewStyle} from 'react-native';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
@@ -223,6 +223,7 @@ function FeatureTrainingModal({
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const {isOffline} = useNetwork();
     const hasHelpButtonBeenPressed = useRef(false);
+    const pendingCloseRef = useRef(false);
     const scrollViewRef = useRef<RNScrollView>(null);
     const [containerHeight, setContainerHeight] = useState(0);
     const [contentHeight, setContentHeight] = useState(0);
@@ -233,14 +234,7 @@ function FeatureTrainingModal({
     const shouldUseScrollView = shouldUseScrollViewProp || isInLandscapeMode;
 
     useEffect(() => {
-        // eslint-disable-next-line @typescript-eslint/no-deprecated
-        InteractionManager.runAfterInteractions(() => {
-            if (!isModalDisabled) {
-                setIsModalVisible(false);
-                return;
-            }
-            setIsModalVisible(true);
-        });
+        setIsModalVisible(isModalDisabled);
     }, [isModalDisabled]);
 
     useEffect(() => {
@@ -358,6 +352,20 @@ function FeatureTrainingModal({
 
     const toggleWillShowAgain = useCallback(() => setWillShowAgain((prevWillShowAgain) => !prevWillShowAgain), []);
 
+    const pendingCloseModalAction = () => {
+        Log.hmmm(`[FeatureTrainingModal] Modal hidden - shouldGoBack: ${shouldGoBack}, hasOnClose: ${!!onClose}`);
+        if (shouldGoBack) {
+            Log.hmmm('[FeatureTrainingModal] Navigating back');
+            Navigation.goBack();
+        }
+        if (onClose) {
+            Log.hmmm('[FeatureTrainingModal] Calling onClose callback');
+            onClose();
+        } else {
+            Log.hmmm('[FeatureTrainingModal] No onClose callback provided');
+        }
+    };
+
     const closeModal = useCallback(() => {
         Log.hmmm(`[FeatureTrainingModal] closeModal called - willShowAgain: ${willShowAgain}, shouldGoBack: ${shouldGoBack}, hasOnClose: ${!!onClose}`);
 
@@ -367,24 +375,8 @@ function FeatureTrainingModal({
         }
 
         Log.hmmm('[FeatureTrainingModal] Setting modal invisible');
+        pendingCloseRef.current = true;
         setIsModalVisible(false);
-
-        // eslint-disable-next-line @typescript-eslint/no-deprecated
-        InteractionManager.runAfterInteractions(() => {
-            Log.hmmm(`[FeatureTrainingModal] Running after interactions - shouldGoBack: ${shouldGoBack}, hasOnClose: ${!!onClose}`);
-
-            if (shouldGoBack) {
-                Log.hmmm('[FeatureTrainingModal] Navigating back');
-                Navigation.goBack();
-            }
-
-            if (onClose) {
-                Log.hmmm('[FeatureTrainingModal] Calling onClose callback');
-                onClose();
-            } else {
-                Log.hmmm('[FeatureTrainingModal] No onClose callback provided');
-            }
-        });
     }, [onClose, shouldGoBack, willShowAgain]);
 
     const closeAndConfirmModal = useCallback(() => {
@@ -439,6 +431,10 @@ function FeatureTrainingModal({
                 ...modalInnerContainerStyle,
             }}
             onModalHide={() => {
+                if (pendingCloseRef.current) {
+                    pendingCloseRef.current = false;
+                    pendingCloseModalAction();
+                }
                 if (!shouldCallOnHelpWhenModalHidden || !hasHelpButtonBeenPressed.current) {
                     return;
                 }
