@@ -989,11 +989,11 @@ describe('AgentZeroStatusContext', () => {
 
     describe('mount persistence across chat switches', () => {
         it('should keep the thinking indicator after unmount/remount while still processing', async () => {
-            // Regression test for situchan's video report (PR 85620): sending a message,
-            // switching to another chat, and coming back before Concierge replies caused the
-            // indicator to disappear. The optimistic counter used to live in React state
-            // scoped to the mounted provider; it now lives in AgentZeroOptimisticStore so it
-            // survives a ReportScreen unmount/remount.
+            // Regression test for the video report on PR 85620: sending a message, switching
+            // to another chat, and coming back before Concierge replies caused the indicator
+            // to disappear. The optimistic counter used to live in React state scoped to the
+            // mounted provider; it now lives in AgentZeroOptimisticStore so it survives a
+            // ReportScreen unmount/remount.
             const {result: firstResult, unmount} = renderHook(() => ({...useAgentZeroStatus(), ...useAgentZeroStatusActions()}), {wrapper});
             await waitForBatchedUpdates();
 

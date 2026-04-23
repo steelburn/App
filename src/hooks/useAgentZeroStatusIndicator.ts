@@ -138,10 +138,12 @@ function useAgentZeroStatusIndicator(reportID: string): AgentZeroStatusState {
     // Seeded from the optimistic store so a remount mid-thinking (chat switch) restores the
     // original baseline instead of capturing the current newest action — otherwise a reply
     // that landed while the provider was unmounted would be adopted as the baseline and go
-    // undetected.
-    const restoredOptimisticOnMountRef = useRef<ReturnType<typeof AgentZeroOptimisticStore.getEntry>>(AgentZeroOptimisticStore.getEntry(reportID));
-    const indicatorBaselineActionIDRef = useRef<string | null>(restoredOptimisticOnMountRef.current?.baselineActionID ?? null);
-    const wasIndicatorActiveRef = useRef<boolean>(!!restoredOptimisticOnMountRef.current);
+    // undetected. `initialRestoredEntry` is read on every render (cheap Map lookup), but the
+    // refs only consume the first-render value.
+    const initialRestoredEntry = AgentZeroOptimisticStore.getEntry(reportID);
+    const restoredOptimisticOnMountRef = useRef<ReturnType<typeof AgentZeroOptimisticStore.getEntry>>(initialRestoredEntry);
+    const indicatorBaselineActionIDRef = useRef<string | null>(initialRestoredEntry?.baselineActionID ?? null);
+    const wasIndicatorActiveRef = useRef<boolean>(!!initialRestoredEntry);
 
     /**
      * Clear the polling interval and safety timer. Called when the indicator clears normally,
@@ -300,6 +302,7 @@ function useAgentZeroStatusIndicator(reportID: string): AgentZeroStatusState {
 
         // Start/reset polling when server label arrives (acts as a lease renewal)
         if (hasServerLabel) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect -- startPolling transitively updates displayedLabel via the safety timeout; the synchronous call here only schedules timers
             startPolling();
             if (pendingOptimisticRequests > 0) {
                 AgentZeroOptimisticStore.clear(reportID);
@@ -369,8 +372,12 @@ function useAgentZeroStatusIndicator(reportID: string): AgentZeroStatusState {
 
     // If we restored optimistic state from a previous mount (e.g. user switched chats and
     // came back mid-thinking), resume polling with whatever time remains on the safety
-    // window. Server-label-only restores are handled by the label-sync effect; this covers
-    // the optimistic-only case where no NVP is set yet.
+    // window. If a server label is also present on mount, the label-sync effect runs in
+    // the same commit and restarts polling with a fresh window — `startPolling` clears any
+    // prior timer, so that restart wins naturally.
+    //
+    // `startPolling` is a stable useCallback (keyed by reportID), so this effect runs once
+    // per mount and doesn't re-fire on unrelated renders.
     useEffect(() => {
         const restored = restoredOptimisticOnMountRef.current;
         if (!restored) {
@@ -378,15 +385,8 @@ function useAgentZeroStatusIndicator(reportID: string): AgentZeroStatusState {
         }
         const elapsed = Date.now() - restored.startedAt;
         const remaining = MAX_POLL_DURATION_MS - elapsed;
-        if (serverLabel) {
-            // Label-sync effect will start polling with a fresh safety window — leave it alone.
-            return;
-        }
         startPolling(remaining);
-        // Mount-only: we only want to resume the timer once. Subsequent polling decisions
-        // flow through kickoffWaitingIndicator, the label-sync effect, or onReconnect.
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [startPolling]);
 
     const kickoffWaitingIndicator = () => {
         AgentZeroOptimisticStore.increment(reportID, newestReportActionRef.current?.reportActionID ?? null);
