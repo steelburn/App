@@ -23,6 +23,7 @@ import {isExpenseUnreported, isPerDiemRequest} from '@libs/TransactionUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {Report, ReportAction, ReportActions} from '@src/types/onyx';
+import useNetwork from './useNetwork';
 import useOnyx from './useOnyx';
 import usePolicyForTransaction from './usePolicyForTransaction';
 
@@ -143,6 +144,7 @@ function useTransactionInlineEdit({
     const [originalTransaction] = useOnyx(`${ONYXKEYS.COLLECTION.TRANSACTION}${getNonEmptyStringOnyxID(originalTransactionID)}`);
 
     const {hasSelectedTransactions} = useSearchStateContext();
+    const {isOffline} = useNetwork();
 
     const permissions = getTransactionEditPermissions({
         transaction,
@@ -176,7 +178,7 @@ function useTransactionInlineEdit({
     };
 
     const onEditDate = (newDate: string) => {
-        editTransactionDateInline(getEditParams(), newDate);
+        editTransactionDateInline(getEditParams(), newDate, isOffline);
     };
 
     const onEditMerchant = (newMerchant: string) => {

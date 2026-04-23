@@ -72,6 +72,7 @@ type UpdateMoneyRequestDateParams = {
     isASAPSubmitBetaEnabled: boolean;
     parentReportNextStep: OnyxEntry<OnyxTypes.ReportNextStepDeprecated>;
     hash?: number;
+    isOffline: boolean;
 };
 
 /** Updates the created date of an expense */
@@ -90,6 +91,7 @@ function updateMoneyRequestDate({
     isASAPSubmitBetaEnabled,
     parentReportNextStep,
     hash,
+    isOffline,
 }: UpdateMoneyRequestDateParams) {
     const transactionChanges: TransactionChanges = {
         created: value,
@@ -112,6 +114,7 @@ function updateMoneyRequestDate({
             isASAPSubmitBetaEnabled,
             iouReportNextStep: parentReportNextStep,
             hash,
+            isOffline,
         });
         removeTransactionFromDuplicateTransactionViolation(data.onyxData, transactionID, transactions, transactionViolations);
     }
@@ -132,6 +135,7 @@ function updateMoneyRequestBillable({
     currentUserEmailParam,
     isASAPSubmitBetaEnabled,
     parentReportNextStep,
+    isOffline,
 }: {
     transactionID: string | undefined;
     transactionThreadReport: OnyxEntry<OnyxTypes.Report>;
@@ -144,6 +148,7 @@ function updateMoneyRequestBillable({
     currentUserEmailParam: string;
     isASAPSubmitBetaEnabled: boolean;
     parentReportNextStep: OnyxEntry<OnyxTypes.ReportNextStepDeprecated>;
+    isOffline: boolean;
 }) {
     if (!transactionID || !transactionThreadReport?.reportID) {
         return;
@@ -163,6 +168,7 @@ function updateMoneyRequestBillable({
         currentUserEmailParam,
         isASAPSubmitBetaEnabled,
         iouReportNextStep: parentReportNextStep,
+        isOffline,
     });
     API.write(WRITE_COMMANDS.UPDATE_MONEY_REQUEST_BILLABLE, params, onyxData);
 }

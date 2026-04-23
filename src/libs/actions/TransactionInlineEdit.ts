@@ -175,7 +175,7 @@ function getIouParamsForTransaction({
 }
 
 /** Updates the date of an expense from the Search results table or the Expense Report page. */
-function editTransactionDateInline(params: TransactionInlineEditParams, newDate: string) {
+function editTransactionDateInline(params: TransactionInlineEditParams, newDate: string, isOffline: boolean) {
     const iouParams = getIouParamsForTransaction(params);
     updateMoneyRequestDate({
         ...iouParams,
@@ -185,6 +185,7 @@ function editTransactionDateInline(params: TransactionInlineEditParams, newDate:
         transactions: allTransactions,
         transactionViolations: allTransactionViolations,
         hash: params.hash,
+        isOffline,
     });
 }
 
