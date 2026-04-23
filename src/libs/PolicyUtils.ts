@@ -334,8 +334,14 @@ function getCustomUnitsForDuplication(
         };
     };
 
-    const distanceCustomUnit = getUnitWithoutPendingDeleteRates(Object.values(customUnits).find((customUnit) => customUnit.name === CONST.CUSTOM_UNITS.NAME_DISTANCE), distanceCustomUnitID);
-    const perDiemUnit = getUnitWithoutPendingDeleteRates(Object.values(customUnits).find((customUnit) => customUnit.name === CONST.CUSTOM_UNITS.NAME_PER_DIEM_INTERNATIONAL), perDiemCustomUnitID);
+    const distanceCustomUnit = getUnitWithoutPendingDeleteRates(
+        Object.values(customUnits).find((customUnit) => customUnit.name === CONST.CUSTOM_UNITS.NAME_DISTANCE),
+        distanceCustomUnitID,
+    );
+    const perDiemUnit = getUnitWithoutPendingDeleteRates(
+        Object.values(customUnits).find((customUnit) => customUnit.name === CONST.CUSTOM_UNITS.NAME_PER_DIEM_INTERNATIONAL),
+        perDiemCustomUnitID,
+    );
 
     if (isDistanceRatesOptionSelected && isPerDiemOptionSelected) {
         if (!perDiemUnit || !distanceCustomUnit || !perDiemCustomUnitID || !distanceCustomUnitID) {
