@@ -310,21 +310,25 @@ function MoneyRequestConfirmationList({
     const customUnitRateID = getRateID(transaction);
 
     const subRates = transaction?.comment?.customUnit?.subRates ?? [];
+    const prevSubRates = usePrevious(subRates);
     const defaultRate = defaultMileageRate?.customUnitRateID;
 
     const mileageRate = DistanceRequestUtils.getRate({
         transaction,
         policy,
         ...(isMovingTransactionFromTrackExpense && {policyForMovingExpenses}),
+        isMovingTransactionFromTrackExpense,
         policyDraft,
     });
-    const rate = mileageRate.rate;
+    const distanceRate = mileageRate.rate;
+    const distanceUnit = mileageRate.unit;
+    const calculateFromTransactionData = isMovingTransactionFromTrackExpense && !distanceRate;
+    const unit = calculateFromTransactionData ? transaction?.comment?.customUnit?.distanceUnit : distanceUnit;
+    const rate = calculateFromTransactionData ? Math.abs(iouAmount) / (transaction?.comment?.customUnit?.quantity ?? 1) : distanceRate;
+    const currency = calculateFromTransactionData ? iouCurrencyCode : (mileageRate.currency ?? CONST.CURRENCY.USD);
     const prevRate = usePrevious(rate);
-    const unit = mileageRate.unit;
     const prevUnit = usePrevious(unit);
-    const currency = mileageRate.currency ?? CONST.CURRENCY.USD;
     const prevCurrency = usePrevious(currency);
-    const prevSubRates = usePrevious(subRates);
 
     const shouldShowCategories = isTrackExpense
         ? !policy || shouldSelectPolicy || !!iouCategory || hasEnabledOptions(Object.values(policyCategories ?? {}))
@@ -458,7 +462,7 @@ function MoneyRequestConfirmationList({
         // Reset the form error whenever the screen gains or loses focus
         // but preserve violation-related errors since those represent real validation issues
         // that can only be resolved by fixing the underlying issue
-        if (!formError.startsWith(CONST.VIOLATIONS_PREFIX)) {
+        if (formError && !formError.startsWith(CONST.VIOLATIONS_PREFIX)) {
             setFormError('');
             return;
         }
@@ -815,7 +819,7 @@ function MoneyRequestConfirmationList({
                 return;
             }
 
-            if (iouCategory && policyCategories && (!policyCategories[iouCategory] || !policyCategories[iouCategory]?.enabled)) {
+            if (iouCategory && policyCategories && !policyCategories[iouCategory]?.enabled) {
                 setFormError('violations.categoryOutOfPolicy');
                 return;
             }
