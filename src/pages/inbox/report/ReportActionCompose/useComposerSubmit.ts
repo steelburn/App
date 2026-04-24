@@ -19,7 +19,6 @@ import {addDomainToShortMention} from '@libs/ParsingUtils';
 import {getFilteredReportActionsForReportView, getOneTransactionThreadReportID, isSentMoneyReportAction} from '@libs/ReportActionsUtils';
 import {startSpan} from '@libs/telemetry/activeSpans';
 import {generateAccountID} from '@libs/UserUtils';
-import {useAgentZeroStatusActions} from '@pages/inbox/AgentZeroStatusContext';
 import {ActionListContext} from '@pages/inbox/ReportScreenContext';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -28,7 +27,6 @@ import {useComposerMeta} from './ComposerContext';
 
 function useComposerSubmit(reportID: string): (comment: string) => void {
     const {isOffline} = useNetwork();
-    const {kickoffWaitingIndicator} = useAgentZeroStatusActions();
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const personalDetails = usePersonalDetails();
     const {availableLoginsList} = useShortMentionsList();
@@ -59,7 +57,6 @@ function useComposerSubmit(reportID: string): (comment: string) => void {
 
     return (newComment: string) => {
         const newCommentTrimmed = newComment.trim();
-        kickoffWaitingIndicator();
 
         if (attachmentFileRef.current) {
             addAttachmentWithComment({
