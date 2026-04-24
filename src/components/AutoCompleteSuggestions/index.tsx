@@ -72,7 +72,6 @@ function AutoCompleteSuggestions<TSuggestion>({measureParentContainerAndReportCu
     const insets = useSafeAreaInsets();
     const {keyboardHeight, isKeyboardAnimatingRef} = useKeyboardState();
     const {paddingBottom: bottomInset, paddingTop: topInset} = StyleUtils.getPlatformSafeAreaPadding(insets ?? undefined);
-    const {left: leftInset} = insets;
 
     useEffect(() => {
         const container = containerRef.current;
@@ -130,7 +129,7 @@ function AutoCompleteSuggestions<TSuggestion>({measureParentContainerAndReportCu
                     topInset,
                 });
 
-            const newLeftOffset = getLeftOffset(x, leftInset, bigScreenLeftOffset, shouldUseNarrowLayout, isInLandscapeMode);
+            const newLeftOffset = getLeftOffset(x, insets, bigScreenLeftOffset, shouldUseNarrowLayout, width, windowWidth, isInLandscapeMode);
             // If the suggested word is longer than 150 (approximately half the width of the suggestion popup), then adjust a new position of popup
             const isAdjustmentNeeded = Math.abs(prevLeftValue.current - bigScreenLeftOffset) > 150;
             if (isInitialRender.current || isAdjustmentNeeded || prevIsInLandscapeModeValue.current !== isInLandscapeMode) {
@@ -173,7 +172,7 @@ function AutoCompleteSuggestions<TSuggestion>({measureParentContainerAndReportCu
         topInset,
         isKeyboardAnimatingRef,
         isInLandscapeMode,
-        leftInset,
+        insets,
     ]);
 
     // Prevent rendering if container dimensions are not set or if we have no suggestions
