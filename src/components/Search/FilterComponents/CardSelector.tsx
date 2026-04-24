@@ -16,7 +16,7 @@ import useThemeIllustrations from '@hooks/useThemeIllustrations';
 import useThemeStyles from '@hooks/useThemeStyles';
 import useWindowDimensions from '@hooks/useWindowDimensions';
 import {openSearchCardFiltersPage} from '@libs/actions/Search';
-import {buildCardFeedsData, buildCardsData, generateSelectedCards, getDomainFeedData} from '@libs/CardFeedUtils';
+import {buildCardsData, generateSelectedCards} from '@libs/CardFeedUtils';
 import type {CardFilterItem} from '@libs/CardFeedUtils';
 import type {SkeletonSpanReasonAttributes} from '@libs/telemetry/useSkeletonSpan';
 import variables from '@styles/variables';
@@ -43,7 +43,6 @@ function CardSelector({onChange}: CardSelectorProps) {
     const [userCardList, userCardListMetadata] = useOnyx(ONYXKEYS.CARD_LIST);
     const [customCardNames] = useOnyx(ONYXKEYS.NVP_EXPENSIFY_COMPANY_CARDS_CUSTOM_NAMES);
     const [workspaceCardFeeds, workspaceCardFeedsMetadata] = useOnyx(ONYXKEYS.COLLECTION.WORKSPACE_CARDS_LIST);
-    const [policies, policiesMetadata] = useOnyx(ONYXKEYS.COLLECTION.POLICY);
     const [searchTerm, debouncedSearchTerm, setSearchTerm] = useDebouncedState('');
     const [searchAdvancedFiltersForm, searchAdvancedFiltersFormMetadata] = useOnyx(ONYXKEYS.FORMS.SEARCH_ADVANCED_FILTERS_FORM);
     const personalDetails = usePersonalDetails();
@@ -84,13 +83,7 @@ function CardSelector({onChange}: CardSelectorProps) {
         customCardNames,
     );
 
-    const domainFeedsData = getDomainFeedData(workspaceCardFeeds);
-
-    const cardFeedsSectionData = buildCardFeedsData(workspaceCardFeeds ?? CONST.EMPTY_OBJECT, domainFeedsData, policies, selectedCards, translate, illustrations, companyCardFeedIcons);
-
-    const shouldShowSearchInput =
-        cardFeedsSectionData.selected.length + cardFeedsSectionData.unselected.length + individualCardsSectionData.selected.length + individualCardsSectionData.unselected.length >=
-        CONST.STANDARD_LIST_ITEM_LIMIT;
+    const shouldShowSearchInput = individualCardsSectionData.selected.length + individualCardsSectionData.unselected.length >= CONST.STANDARD_LIST_ITEM_LIMIT;
 
     const searchFunction = (item: CardFilterItem) =>
         !!item.text?.toLocaleLowerCase().includes(debouncedSearchTerm.toLocaleLowerCase()) ||
@@ -103,13 +96,12 @@ function CardSelector({onChange}: CardSelectorProps) {
     let sectionHeaderCount = 0;
 
     if (searchAdvancedFiltersForm) {
-        const selectedData = [...cardFeedsSectionData.selected, ...individualCardsSectionData.selected, ...closedCardsSectionData.selected].filter(searchFunction);
-        const unselectedCardFeedsData = cardFeedsSectionData.unselected.filter(searchFunction);
+        const selectedData = [...individualCardsSectionData.selected, ...closedCardsSectionData.selected].filter(searchFunction);
         const unselectedIndividualCardsData = individualCardsSectionData.unselected.filter(searchFunction);
         const unselectedClosedCardsData = closedCardsSectionData.unselected.filter(searchFunction);
 
-        itemCount = selectedData.length + unselectedCardFeedsData.length + unselectedIndividualCardsData.length + unselectedClosedCardsData.length;
-        sectionHeaderCount = [unselectedCardFeedsData.length, unselectedIndividualCardsData.length, unselectedClosedCardsData.length].filter(Boolean).length;
+        itemCount = selectedData.length + unselectedIndividualCardsData.length + unselectedClosedCardsData.length;
+        sectionHeaderCount = unselectedClosedCardsData.length > 0 ? 1 : 0;
 
         sections = [
             {
@@ -118,19 +110,14 @@ function CardSelector({onChange}: CardSelectorProps) {
                 sectionIndex: 0,
             },
             {
-                title: translate('search.filters.card.cardFeeds'),
-                data: unselectedCardFeedsData,
-                sectionIndex: 1,
-            },
-            {
-                title: translate('search.filters.card.individualCards'),
+                title: undefined,
                 data: unselectedIndividualCardsData,
-                sectionIndex: 2,
+                sectionIndex: 1,
             },
             {
                 title: translate('search.filters.card.closedCards'),
                 data: unselectedClosedCardsData,
-                sectionIndex: 3,
+                sectionIndex: 2,
             },
         ];
     }
@@ -140,14 +127,12 @@ function CardSelector({onChange}: CardSelectorProps) {
             return;
         }
 
-        const isCardFeed = item?.isCardFeed && item?.correspondingCards;
-
         if (item.isSelected) {
-            const newCardsObject = selectedCards.filter((card) => (isCardFeed ? !item.correspondingCards?.includes(card) : card !== item.keyForList));
+            const newCardsObject = selectedCards.filter((card) => card !== item.keyForList);
             setSelectedCards(newCardsObject);
             onChange(newCardsObject);
         } else {
-            const newCardsObject = isCardFeed ? [...selectedCards, ...(item?.correspondingCards ?? [])] : [...selectedCards, item.keyForList];
+            const newCardsObject = [...selectedCards, item.keyForList];
             setSelectedCards(newCardsObject);
             onChange(newCardsObject);
         }
@@ -160,7 +145,7 @@ function CardSelector({onChange}: CardSelectorProps) {
         headerMessage: debouncedSearchTerm.trim() && sections.every((section) => !section.data.length) ? translate('common.noResultsFound') : '',
     };
 
-    const isLoadingOnyxData = isLoadingOnyxValue(userCardListMetadata, workspaceCardFeedsMetadata, searchAdvancedFiltersFormMetadata, policiesMetadata);
+    const isLoadingOnyxData = isLoadingOnyxValue(userCardListMetadata, workspaceCardFeedsMetadata, searchAdvancedFiltersFormMetadata);
     const shouldShowLoadingState = isLoadingOnyxData || (!areCardsLoaded && !isOffline);
     const reasonAttributes: SkeletonSpanReasonAttributes = {context: 'SearchFiltersCardPage', isLoadingFromOnyx: isLoadingOnyxData};
 
