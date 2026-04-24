@@ -984,6 +984,7 @@ describe('AgentZeroStatusContext', () => {
         it('should clear indicator when a NEW Concierge action arrives after the indicator starts', async () => {
             // Positive case: once a new Concierge reply lands with a different reportActionID
             // than the one captured at indicator activation, the detection effect fires.
+            // serverLabel stays falsy here, so the "intermediate action" guard doesn't block.
 
             await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${reportID}`, {
                 [priorConciergeActionID]: buildConciergeAction(priorConciergeActionID, '2024-01-01 00:00:00.000', 'Previous Concierge reply'),
@@ -1008,6 +1009,45 @@ describe('AgentZeroStatusContext', () => {
             await waitFor(() => {
                 expect(mockClearAgentZeroProcessingIndicator).toHaveBeenCalledWith(reportID);
             });
+        });
+
+        it('should NOT clear indicator when a Concierge action arrives while the server label is still truthy (intermediate)', async () => {
+            // Regression test for the "intermediate Concierge action tears down indicator"
+            // bug surfaced on PR 85620 ad-hoc testing: during a processing cycle, Concierge
+            // can emit intermediate actions (reasoning dumps, status updates) before the
+            // final reply. The old reply-detection fired on any newer Concierge action and
+            // the indicator flickered out mid-stream. Now we require serverLabel to also be
+            // falsy — the server's authoritative "done" signal — before tearing down.
+
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${reportID}`, {
+                [priorConciergeActionID]: buildConciergeAction(priorConciergeActionID, '2024-01-01 00:00:00.000', 'Previous Concierge reply'),
+            });
+
+            const {result} = renderHook(() => useAgentZeroStatusIndicator(reportID));
+            await waitForBatchedUpdates();
+
+            act(() => {
+                result.current.kickoffWaitingIndicator();
+            });
+            await waitForBatchedUpdates();
+            expect(result.current.isProcessing).toBe(true);
+
+            // Server sets the NVP — processing is underway.
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS}${reportID}`, {
+                agentZeroProcessingRequestIndicator: 'Concierge is searching documentation...',
+            });
+            await waitForBatchedUpdates();
+
+            // An intermediate Concierge action lands (reasoning dump / status update).
+            // Server NVP is still truthy — this is NOT the final reply.
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${reportID}`, {
+                [newConciergeActionID]: buildConciergeAction(newConciergeActionID, '2024-01-01 00:00:01.000', 'Intermediate status'),
+            });
+            await waitForBatchedUpdates();
+
+            // The indicator must stay visible — the guard blocks the tear-down.
+            expect(result.current.isProcessing).toBe(true);
+            expect(mockClearAgentZeroProcessingIndicator).not.toHaveBeenCalled();
         });
     });
 

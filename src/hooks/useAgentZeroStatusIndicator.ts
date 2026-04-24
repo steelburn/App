@@ -121,6 +121,12 @@ function useAgentZeroStatusIndicator(reportID: string): AgentZeroStatusState {
     const [displayedLabel, setDisplayedLabel] = useState<string>('');
     const {translate} = useLocalize();
     const prevServerLabelRef = useRef<string>(serverLabel ?? '');
+    // Mirror serverLabel into a ref so the 30s poll callback (captured as a closure at
+    // startPolling time) can check the current NVP state instead of a stale snapshot.
+    const serverLabelRef = useRef<string | null | undefined>(serverLabel);
+    useEffect(() => {
+        serverLabelRef.current = serverLabel;
+    }, [serverLabel]);
     const updateTimerRef = useRef<NodeJS.Timeout | null>(null);
     const lastUpdateTimeRef = useRef<number>(0);
     const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -214,7 +220,12 @@ function useAgentZeroStatusIndicator(reportID: string): AgentZeroStatusState {
                 const didConciergeReplyAfterPollingStarted =
                     currentNewestReportAction?.actorAccountID === CONST.ACCOUNT_ID.CONCIERGE && currentNewestReportAction.reportActionID !== prePollingActionID;
 
-                if (didConciergeReplyAfterPollingStarted) {
+                // Only treat a new Concierge action as the authoritative "done" signal
+                // when the server has also cleared the NVP — otherwise this is an
+                // intermediate processing action (reasoning / status update), not the
+                // final reply, and tearing down the indicator would make it flicker away.
+                // The 120s safety timer below is the backstop when NVP never clears.
+                if (didConciergeReplyAfterPollingStarted && !serverLabelRef.current) {
                     clearAgentZeroProcessingIndicator(reportID);
                     clearPolling();
                     AgentZeroOptimisticStore.clear(reportID);
@@ -407,20 +418,30 @@ function useAgentZeroStatusIndicator(reportID: string): AgentZeroStatusState {
         wasIndicatorActiveRef.current = isIndicatorActive;
     }, [isIndicatorActive]);
 
-    // Immediately clear the indicator when a *new* Concierge response arrives while processing.
-    // In a Concierge DM, the newest action is usually already from Concierge (the previous reply),
-    // so we only clear when the newest action ID is different from the baseline captured when
-    // the indicator activated. This eliminates the 30s delay waiting for the next poll cycle.
+    // Clear the indicator when Concierge has *actually completed* processing. A newer
+    // Concierge action alone isn't enough: during processing, Concierge can post
+    // intermediate actions (reasoning dumps, status updates) that aren't the final reply,
+    // and clearing on those makes the indicator flicker away mid-stream. Only treat the
+    // combination as the real "done" signal: a new Concierge action *and* the server has
+    // cleared its NVP (serverLabel falsy). Safety nets for server-side misses:
+    //   - 120s safety timeout (hardClearIndicator) catches a stuck optimistic entry.
+    //   - The 30s poll's own detection also hard-requires serverLabel falsy before clearing.
+    //   - onReconnect defensively clears the NVP when optimistic-only.
     const newestActorAccountID = newestReportAction?.actorAccountID;
     const newestActionID = newestReportAction?.reportActionID;
     useEffect(() => {
         if (newestActorAccountID !== CONST.ACCOUNT_ID.CONCIERGE) {
             return;
         }
-        if (!serverLabel && pendingOptimisticRequests === 0) {
+        if (pendingOptimisticRequests === 0 && !serverLabel) {
             return;
         }
         if (!newestActionID || newestActionID === indicatorBaselineActionIDRef.current) {
+            return;
+        }
+        // Server hasn't signaled done yet — this is an intermediate Concierge action, not
+        // the final reply. Wait for the NVP to clear before tearing everything down.
+        if (serverLabel) {
             return;
         }
         clearAgentZeroProcessingIndicator(reportID);
