@@ -630,7 +630,7 @@ function WalletPage() {
                 shouldShowOfflineIndicatorInWideScreen
             >
                 {headerWithBackButton}
-                <View style={[styles.flex1, StyleSheet.absoluteFillObject, styles.fullScreenLoading, styles.w100]}>
+                <View style={[styles.flex1, StyleSheet.absoluteFill, styles.fullScreenLoading, styles.w100]}>
                     <ActivityIndicator
                         size={CONST.ACTIVITY_INDICATOR_SIZE.LARGE}
                         reasonAttributes={reasonAttributes}
