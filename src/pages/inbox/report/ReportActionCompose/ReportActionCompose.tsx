@@ -83,9 +83,7 @@ function ReportActionComposeInner({reportID}: ReportActionComposeProps) {
     const [newParentReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${report?.parentReportID}`);
     const [betas] = useOnyx(ONYXKEYS.BETAS);
 
-    const [rawReportActions] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${report?.reportID}`, {
-        canEvict: false,
-    });
+    const [rawReportActions] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${report?.reportID}`);
 
     const [isAttachmentPreviewActive, setIsAttachmentPreviewActive] = useState(false);
 
