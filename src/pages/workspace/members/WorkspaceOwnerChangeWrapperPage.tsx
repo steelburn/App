@@ -102,7 +102,7 @@ function WorkspaceOwnerChangeWrapperPage({route, policy, isLoadingPolicy}: Works
                 />
                 <View style={[styles.containerWithSpaceBetween, error !== CONST.POLICY.OWNERSHIP_ERRORS.NO_BILLING_CARD ? styles.ph5 : styles.ph0, styles.pb0]}>
                     {isLoading && (
-                        <View style={[StyleSheet.absoluteFillObject, styles.fullScreenLoading, styles.w100]}>
+                        <View style={[StyleSheet.absoluteFill, styles.fullScreenLoading, styles.w100]}>
                             <ActivityIndicator
                                 size={CONST.ACTIVITY_INDICATOR_SIZE.LARGE}
                                 reasonAttributes={reasonAttributes}
