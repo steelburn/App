@@ -458,7 +458,7 @@ function ReportActionsList({
         setIsFloatingMessageCounterVisible,
         scrollToEnd: reportScrollManager.scrollToBottom,
         // Include reportID so list-length / last-id baselines reset when the same screen instance shows another report.
-        resetKey: `${report.reportID}:${linkedReportActionID ?? ''}`,
+        resetKey: `${report.reportID}:${linkedReportActionID}`,
     });
 
     useEffect(() => {
