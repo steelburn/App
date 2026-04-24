@@ -1174,6 +1174,7 @@ const staticStyles = (theme: ThemeColors) =>
             ...FontUtils.fontFamily.platform.EXP_NEUE,
             color: theme.textSupporting,
             fontSize: variables.fontSizeNormal,
+            lineHeight: variables.fontSizeNormalHeight,
         },
 
         borderColorFocus: {
