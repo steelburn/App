@@ -104,17 +104,14 @@ function useAgentZeroStatusIndicator(reportID: string): AgentZeroStatusState {
     // detected (via polling, Pusher, reconnect, or safety timeout), the entry is cleared —
     // any signal that a response arrived resolves all pending requests (optimistic state
     // is a display signal, not a queue).
-    const subscribeToOptimisticStore = useCallback(
-        (onStoreChange: () => void) =>
-            AgentZeroOptimisticStore.subscribe((updatedReportID) => {
-                if (updatedReportID !== reportID) {
-                    return;
-                }
-                onStoreChange();
-            }),
-        [reportID],
-    );
-    const getOptimisticSnapshot = useCallback(() => AgentZeroOptimisticStore.getEntry(reportID), [reportID]);
+    const subscribeToOptimisticStore = (onStoreChange: () => void) =>
+        AgentZeroOptimisticStore.subscribe((updatedReportID) => {
+            if (updatedReportID !== reportID) {
+                return;
+            }
+            onStoreChange();
+        });
+    const getOptimisticSnapshot = () => AgentZeroOptimisticStore.getEntry(reportID);
     const optimisticEntry = useSyncExternalStore(subscribeToOptimisticStore, getOptimisticSnapshot, getOptimisticSnapshot);
     const pendingOptimisticRequests = optimisticEntry?.count ?? 0;
     // Debounced label shown to the user — smooths rapid server label changes.
