@@ -7,7 +7,6 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import ToggleSettingOptionRow from '@pages/workspace/workflows/ToggleSettingsOptionRow';
 import {clearDomainSecurityGroupSettingError, updateDomainSecurityGroup} from '@userActions/Domain';
 import ONYXKEYS from '@src/ONYXKEYS';
-import HTMLMessagesRow from './HTMLMessagesRow';
 
 type ExpensifyCardPreferredWorkspaceToggleProps = {
     domainAccountID: number;
@@ -47,10 +46,8 @@ function ExpensifyCardPreferredWorkspaceToggle({domainAccountID, groupID}: Expen
                 }}
                 wrapperStyle={[styles.ph5]}
                 pendingAction={overridePreferredPolicyWithCardPolicyPendingAction}
-            />
-            <HTMLMessagesRow
                 errors={overridePreferredPolicyWithCardPolicyErrors}
-                onDismiss={() => clearDomainSecurityGroupSettingError(domainAccountID, groupID, 'overridePreferredPolicyWithCardPolicyErrors')}
+                onCloseError={() => clearDomainSecurityGroupSettingError(domainAccountID, groupID, 'overridePreferredPolicyWithCardPolicyErrors')}
             />
         </View>
     );
