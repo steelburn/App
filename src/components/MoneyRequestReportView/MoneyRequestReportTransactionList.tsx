@@ -555,8 +555,8 @@ function MoneyRequestReportTransactionList({
 
     const groupByPopoverComponent = useCallback(
         (props: {closeOverlay: () => void}) => (
-            <View style={[!isSmallScreenWidth && styles.pv4]}>
-                <View style={styles.getSelectionListPopoverHeight(groupByOptions.length || 1, windowHeight, false, isInLandscapeMode, false)}>
+            <View style={[styles.pv4]}>
+                <View style={styles.getSelectionListPopoverHeight({itemCount: groupByOptions.length || 1, windowHeight, isInLandscapeMode, hasButton: false})}>
                     <SelectionList
                         data={groupByOptions}
                         shouldSingleExecuteRowSelect
@@ -573,7 +573,7 @@ function MoneyRequestReportTransactionList({
                 </View>
             </View>
         ),
-        [groupByOptions, reportLayoutGroupBy, styles, windowHeight, isSmallScreenWidth, isInLandscapeMode],
+        [groupByOptions, reportLayoutGroupBy, styles, windowHeight, isInLandscapeMode],
     );
 
     const transactionListContent = (
@@ -832,12 +832,14 @@ function MoneyRequestReportTransactionList({
                         </View>
                     )}
 
-                    <MoneyRequestReportTotalSpend
-                        isEmptyTransactions={isEmptyTransactions}
-                        totalDisplaySpend={totalDisplaySpend}
-                        report={report}
-                        hasPendingAction={hasPendingAction}
-                    />
+                    <OfflineWithFeedback pendingAction={report?.pendingFields?.total}>
+                        <MoneyRequestReportTotalSpend
+                            isEmptyTransactions={isEmptyTransactions}
+                            totalDisplaySpend={totalDisplaySpend}
+                            report={report}
+                            hasPendingAction={hasPendingAction}
+                        />
+                    </OfflineWithFeedback>
                 </View>
             </View>
             <Modal
