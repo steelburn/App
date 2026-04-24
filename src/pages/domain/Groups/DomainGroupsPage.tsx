@@ -55,7 +55,7 @@ function DomainGroupsPage({route}: DomainGroupsPageProps) {
                     <Text numberOfLines={1}>{translate('domain.groups.memberCount', {count: Object.keys(group.details.shared).length})}</Text>
                 </View>
             ),
-            pendingAction: pendingActions?.[`${CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX}${group.id}`]?.name ?? undefined,
+            pendingAction: Object.values(pendingActions?.[`${CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX}${group.id}`] ?? {}).find(Boolean),
         };
     });
 
