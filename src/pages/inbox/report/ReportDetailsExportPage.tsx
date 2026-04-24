@@ -43,7 +43,7 @@ function ReportDetailsExportPage({route}: ReportDetailsExportPageProps) {
     const expensifyIcons = useMemoizedLazyExpensifyIcons(['XeroSquare', 'QBOSquare', 'NetSuiteSquare', 'IntacctSquare', 'QBDSquare', 'CertiniaSquare', 'GustoSquare']);
 
     const iconToDisplay = getIntegrationIcon(connectionName, expensifyIcons);
-    const canBeExported = true || canBeExportedUtil(report);
+    const canBeExported = canBeExportedUtil(report);
     const isExported = isExportedUtil(reportActions);
 
     const confirmExport = useCallback(
@@ -127,8 +127,8 @@ function ReportDetailsExportPage({route}: ReportDetailsExportPageProps) {
             accessVariants={[CONST.POLICY.ACCESS_VARIANTS.ADMIN, CONST.POLICY.ACCESS_VARIANTS.PAID]}
             featureName={CONST.POLICY.MORE_FEATURES.ARE_CONNECTIONS_ENABLED}
             displayName="ReportDetailsExportPage"
-            ListItem={SingleSelectWithAvatarListItem}
             data={exportSelectorOptions}
+            ListItem={SingleSelectWithAvatarListItem}
             shouldBeBlocked={false}
             onBackButtonPress={() => Navigation.goBack(ROUTES.REPORT_WITH_ID_DETAILS.getRoute(reportID, backTo))}
             title="common.export"
