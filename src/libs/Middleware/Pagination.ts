@@ -127,18 +127,6 @@ const Pagination: Middleware = (requestResponse, request) => {
         const pagesCollections = pages.get(pageCollectionKey) ?? {};
         const existingPages: Pages = pagesCollections[pageKey] ?? [];
 
-        // Some tooling resolves `@libs/PaginationUtils` as untyped, so we add explicit local types
-        // to avoid unsafe-call/assignment linting while keeping runtime behavior identical.
-        const mergePagesByIDOverlapTyped: <TResource>(sortedItems: TResource[], pages: Pages, getItemID: (item: TResource) => string) => Pages = mergePagesByIDOverlap as unknown as <
-            TResource,
-        >(
-            sortedItems: TResource[],
-            pages: Pages,
-            getItemID: (item: TResource) => string,
-        ) => Pages;
-        const mergeAndSortContinuousPagesTyped: <TResource>(sortedItems: TResource[], pages: Pages, getItemID: (item: TResource) => string) => Pages =
-            mergeAndSortContinuousPages as unknown as <TResource>(sortedItems: TResource[], pages: Pages, getItemID: (item: TResource) => string) => Pages;
-
         const isMiddleInitialSlice = type === 'initial' && !cursorID && response.hasNewerActions === true && response.hasOlderActions === true;
 
         // Only strip PAGINATION_START_ID from cached pages when the server explicitly confirms newer actions exist.
@@ -147,8 +135,8 @@ const Pagination: Middleware = (requestResponse, request) => {
         const sanitizedExistingPages = shouldStripStartMarker ? existingPages.map((page) => page.filter((id) => id !== CONST.PAGINATION_START_ID)) : existingPages;
 
         const mergedPages: Pages = isMiddleInitialSlice
-            ? mergePagesByIDOverlapTyped(sortedAllItems, [...sanitizedExistingPages, newPage], getItemID)
-            : mergeAndSortContinuousPagesTyped(sortedAllItems, [...sanitizedExistingPages, newPage], getItemID);
+            ? mergePagesByIDOverlap(sortedAllItems, [...sanitizedExistingPages, newPage], getItemID)
+            : mergeAndSortContinuousPages(sortedAllItems, [...sanitizedExistingPages, newPage], getItemID);
 
         (response.onyxData as AnyOnyxUpdate[]).push({
             key: pageKey,
