@@ -266,15 +266,13 @@ jest.mock(
     '@components/FlatList/RenderTaskQueue',
     () =>
         class SyncRenderTaskQueue {
-            private handler: ((info: unknown) => void) | undefined = undefined;
+            private handler: (info: unknown) => void = () => {};
 
             add(info: RenderInfo) {
-                this.handler?.(info);
+                this.handler(info);
             }
 
-            start() {}
-
-            setHandler(handler: (info: unknown) => void) {
+            setHandler(handler: () => void) {
                 this.handler = handler;
             }
 
