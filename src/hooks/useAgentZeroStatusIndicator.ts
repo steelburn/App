@@ -297,13 +297,16 @@ function useAgentZeroStatusIndicator(reportID: string): AgentZeroStatusState {
             targetLabel = translate('common.thinking');
         }
 
-        // Start/reset polling when server label arrives (acts as a lease renewal)
+        // Start/reset polling when server label arrives (acts as a lease renewal). Keep the
+        // optimistic store entry alive — the server NVP can briefly go truthy→falsy→truthy
+        // between processing phases (e.g., "thinking..." → (gap) → "searching documentation..."),
+        // and clearing the optimistic floor here means a chat-switch during the gap lands on
+        // "no optimistic, no serverLabel → no indicator." The optimistic entry is cleared by
+        // authoritative signals only: the reply-detection effect (new Concierge action newer
+        // than baseline), the 120s safety timeout, or the onReconnect handler.
         if (hasServerLabel) {
             // eslint-disable-next-line react-hooks/set-state-in-effect -- startPolling transitively updates displayedLabel via the safety timeout; the synchronous call here only schedules timers
             startPolling();
-            if (pendingOptimisticRequests > 0) {
-                AgentZeroOptimisticStore.clear(reportID);
-            }
         }
         // Clear polling when processing ends
         else if (pendingOptimisticRequests === 0) {

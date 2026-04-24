@@ -469,8 +469,14 @@ describe('AgentZeroStatusContext', () => {
             jest.restoreAllMocks();
         });
 
-        it('should clear optimistic state when server SET and CLEAR arrive sequentially', async () => {
-            // Given a Concierge chat where the user triggered optimistic waiting
+        it('should keep optimistic state visible across a server SET and CLEAR flicker', async () => {
+            // The server NVP can briefly go truthy→falsy→truthy between processing phases
+            // (e.g. "Concierge is thinking..." → brief empty → "Concierge is searching
+            // documentation..."). A chat-switch that lands during the brief-empty window
+            // used to show nothing because the optimistic counter had already been cleared
+            // by the SET handoff. Now we keep the optimistic floor alive through server-label
+            // transitions; only authoritative signals (reply detection, 120s safety timeout,
+            // or reconnect) clear the optimistic entry.
 
             const {result} = renderHook(() => useAgentZeroStatusIndicator(reportID));
             await waitForBatchedUpdates();
@@ -483,32 +489,35 @@ describe('AgentZeroStatusContext', () => {
             expect(result.current.isProcessing).toBe(true);
             expect(result.current.statusLabel).toBe('Thinking...');
 
-            // When the server SET arrives, it clears optimistic state and shows server label
+            // Server SET arrives — display switches to server label, but optimistic floor
+            // stays alive so we survive a subsequent flicker.
             await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS}${reportID}`, {
                 agentZeroProcessingRequestIndicator: 'Concierge is looking up categories...',
             });
             await waitForBatchedUpdates();
 
-            // Then server CLEAR arrives (processing complete)
+            // Server CLEAR arrives without a Concierge reply (brief flicker between phases).
             await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS}${reportID}`, {
                 agentZeroProcessingRequestIndicator: '',
             });
             await waitForBatchedUpdates();
 
-            // The indicator should be fully cleared (normal path, no polling needed)
-            // The polling should also have been cancelled
-            await waitFor(() => {
-                expect(result.current.isProcessing).toBe(false);
-            });
-            expect(result.current.statusLabel).toBe('');
-            expect(pollIntervalId).toBeNull();
-            expect(safetyTimerId).toBeNull();
+            // Indicator must stay visible — optimistic floor picks it back up during the
+            // flicker. Authoritative clears (reply detection / safety timeout / reconnect)
+            // are the only paths that drop it.
+            expect(result.current.isProcessing).toBe(true);
+            expect(result.current.statusLabel).toBe('Thinking...');
+            expect(pollIntervalId).not.toBeNull();
+            expect(safetyTimerId).not.toBeNull();
         });
     });
 
     describe('server label transitions', () => {
-        it('should clear optimistic state when server CLEAR arrives after a visible SET', async () => {
-            // Given a Concierge chat where the user triggered optimistic waiting
+        it('should fall back to the optimistic label when server CLEAR arrives without a reply', async () => {
+            // After kickoff, the display prefers the server label once it arrives, but the
+            // optimistic counter stays alive as a floor. If the server CLEAR happens without
+            // a corresponding Concierge reply (flicker between processing phases), display
+            // falls back to the optimistic "Thinking..." label rather than blanking out.
 
             const {result} = renderHook(() => useAgentZeroStatusIndicator(reportID));
             await waitForBatchedUpdates();
@@ -531,15 +540,16 @@ describe('AgentZeroStatusContext', () => {
                 expect(result.current.statusLabel).toBe('Processing...');
             });
 
-            // And then clears it (processing complete)
+            // And then clears it (brief flicker; no Concierge reply action yet)
             await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS}${reportID}`, {
                 agentZeroProcessingRequestIndicator: '',
             });
 
-            // Then the indicator should be fully cleared
+            // Indicator stays visible via the optimistic floor. The displayed label is
+            // debounced so it may still read "Processing..." briefly — the important
+            // invariant is that isProcessing doesn't flip to false during the flicker.
             await waitForBatchedUpdates();
-            expect(result.current.isProcessing).toBe(false);
-            expect(result.current.statusLabel).toBe('');
+            expect(result.current.isProcessing).toBe(true);
         });
     });
 
@@ -578,8 +588,13 @@ describe('AgentZeroStatusContext', () => {
             expect(result.current.reasoningHistory).toEqual([]);
         });
 
-        it('should clear optimistic state when server completes after kickoff', async () => {
-            // Given a Concierge chat where user triggered optimistic waiting
+        it('should clear optimistic state when a Concierge reply arrives alongside server CLEAR', async () => {
+            // End-to-end happy path: kickoff → server SET → server CLEAR + new Concierge
+            // action. The reply-detection effect clears the optimistic store on the new
+            // Concierge action (action ID differs from the baseline captured at kickoff),
+            // so both signals go to zero together and the indicator clears. The server
+            // CLEAR alone (without a new action) keeps the optimistic floor alive — see
+            // the flicker test in the "batched Onyx updates" suite.
             const {result} = renderHook(() => ({...useAgentZeroStatus(), ...useAgentZeroStatusActions()}), {wrapper});
             await waitForBatchedUpdates();
 
@@ -602,12 +617,21 @@ describe('AgentZeroStatusContext', () => {
                 expect(result.current.statusLabel).toBe(serverLabel);
             });
 
-            // When the final response arrives → backend clears indicator
+            // Final Concierge reply lands — new action newer than the baseline captured
+            // at kickoff, plus backend clears the server label.
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${reportID}`, {
+                replyActionID: {
+                    reportActionID: 'replyActionID',
+                    actorAccountID: CONST.ACCOUNT_ID.CONCIERGE,
+                    created: '2099-01-01 00:00:00.000',
+                    message: [{type: 'TEXT', text: 'Done!'}],
+                },
+            });
             await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS}${reportID}`, {
                 agentZeroProcessingRequestIndicator: '',
             });
 
-            // Then all processing state should be cleared
+            // Reply-detection clears both the NVP and the optimistic entry.
             await waitForBatchedUpdates();
             expect(result.current.isProcessing).toBe(false);
             expect(result.current.statusLabel).toBe('');
