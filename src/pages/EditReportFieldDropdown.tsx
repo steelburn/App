@@ -1,13 +1,9 @@
 import React from 'react';
-import Icon from '@components/Icon';
 import SingleSelectListItem from '@components/SelectionList/ListItem/SingleSelectListItem';
 import SelectionListWithSections from '@components/SelectionList/SelectionListWithSections';
-import type {ListItem} from '@components/SelectionList/types';
 import useDebouncedState from '@hooks/useDebouncedState';
-import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
-import useTheme from '@hooks/useTheme';
 import {getHeaderMessageForNonUserList} from '@libs/OptionsListUtils';
 import {getReportFieldOptionsSection} from '@libs/ReportFieldOptionsListUtils';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -31,21 +27,6 @@ function EditReportFieldDropdown({onSubmit, fieldKey, fieldValue, fieldOptions}:
     const [searchValue, debouncedSearchValue, setSearchValue] = useDebouncedState('');
     const {translate, localeCompare} = useLocalize();
     const recentlyUsedOptions = recentlyUsedReportFields?.[fieldKey]?.sort(localeCompare) ?? [];
-    const icons = useMemoizedLazyExpensifyIcons(['Checkmark']);
-    const theme = useTheme();
-
-    const itemRightSideComponent = (item: ListItem) => {
-        if (item.text === fieldValue) {
-            return (
-                <Icon
-                    src={icons.Checkmark}
-                    fill={theme.iconSuccessFill}
-                />
-            );
-        }
-
-        return null;
-    };
 
     const validFieldOptions = fieldOptions?.filter((option) => !!option)?.sort(localeCompare);
 
@@ -81,7 +62,6 @@ function EditReportFieldDropdown({onSubmit, fieldKey, fieldValue, fieldOptions}:
             textInputOptions={textInputOptions}
             onSelectRow={(option) => onSubmit({[fieldKey]: !option?.text || fieldValue === option.text ? '' : option.text})}
             initiallyFocusedItemKey={selectedOptionKey}
-            rightHandSideComponent={itemRightSideComponent}
         />
     );
 }
