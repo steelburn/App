@@ -212,12 +212,8 @@ function getFirstAndLastIndexForPage(page: string[], idToIndex: Map<string, numb
         }
     }
 
-    for (let i = page.length - 1; i >= 0; i--) {
-        const id = page.at(i);
-        if (id === CONST.PAGINATION_END_ID) {
-            lastIndex = lastIndexInSortedItems;
-            break;
-        }
+    if (page.at(-1) === CONST.PAGINATION_END_ID) {
+        lastIndex = lastIndexInSortedItems;
     }
 
     if (firstIndex === undefined || lastIndex === undefined) {
