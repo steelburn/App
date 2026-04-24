@@ -1,4 +1,5 @@
-import React, {useEffect, useState} from 'react';
+import {useFocusEffect} from '@react-navigation/native';
+import React, {useCallback, useEffect, useState} from 'react';
 import type {StyleProp, ViewStyle} from 'react-native';
 import {useSession} from '@components/OnyxListItemProvider';
 import SearchStaticList from '@components/Search/SearchStaticList';
@@ -54,6 +55,17 @@ function useSearchOverlay({
     const onSearchContentReady = () => {
         setIsSearchReady(true);
     };
+
+    // Re-arm the overlay on focus when a new deferred write was registered
+    // (e.g. a subsequent submit flow while Search stays mounted).
+    useFocusEffect(
+        useCallback(() => {
+            if (!hasDeferredWrite(CONST.DEFERRED_LAYOUT_WRITE_KEYS.SEARCH) && !Navigation.getIsFullscreenPreInsertedUnderRHP()) {
+                return;
+            }
+            setIsSearchReady(false);
+        }, []),
+    );
 
     useEffect(() => {
         if (isSearchReady) {

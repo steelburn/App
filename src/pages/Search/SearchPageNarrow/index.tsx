@@ -271,13 +271,9 @@ function SearchPageNarrow({
         </>
     );
 
-    // The overlay (searchOverlayContent) is intentionally omitted here.
-    // The dynamic path runs outside submit-and-navigate flows, where Search's
-    // own skeleton/loading states handle transitions. On wide layout (SearchPageWide),
-    // the overlay is always rendered because wide doesn't have this static/dynamic split.
-    const renderDynamicSearchList = () => {
-        if (shouldShowLoadingSkeleton) {
-            return (
+    const renderDynamicSearchList = () => (
+        <>
+            {shouldShowLoadingSkeleton ? (
                 <SearchLoadingSkeleton
                     containerStyle={styles.searchListContentContainerStyles(hasFilterBars)}
                     reasonAttributes={{
@@ -291,25 +287,31 @@ function SearchPageNarrow({
                         shouldUseLiveData,
                     }}
                 />
-            );
-        }
-
-        return (
-            <Search
-                searchResults={searchResults}
-                queryJSON={queryJSON}
-                key={queryJSON.hash}
-                onSearchListScroll={scrollHandler}
-                contentContainerStyle={contentContainerStyle}
-                handleSearch={handleSearchAction}
-                isMobileSelectionModeEnabled={isMobileSelectionModeEnabled}
-                searchRequestResponseStatusCode={searchRequestResponseStatusCode}
-                onDestinationVisible={endSubmitNavigationSpans}
-                onContentReady={onSearchContentReady}
-                hasFilterBars={hasFilterBars}
-            />
-        );
-    };
+            ) : (
+                <Search
+                    searchResults={searchResults}
+                    queryJSON={queryJSON}
+                    key={queryJSON.hash}
+                    onSearchListScroll={scrollHandler}
+                    contentContainerStyle={contentContainerStyle}
+                    handleSearch={handleSearchAction}
+                    isMobileSelectionModeEnabled={isMobileSelectionModeEnabled}
+                    searchRequestResponseStatusCode={searchRequestResponseStatusCode}
+                    onDestinationVisible={endSubmitNavigationSpans}
+                    onContentReady={onSearchContentReady}
+                    hasFilterBars={hasFilterBars}
+                />
+            )}
+            {!!searchOverlayContent && (
+                <View
+                    style={[StyleSheet.absoluteFill, styles.appBG]}
+                    onLayout={onSearchLayout}
+                >
+                    {searchOverlayContent}
+                </View>
+            )}
+        </>
+    );
 
     return (
         <View

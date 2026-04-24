@@ -4,6 +4,7 @@ import type {TransactionListItemType} from '@components/Search/SearchList/ListIt
 import CONST from '@src/CONST';
 import type {OriginalMessageIOU, Policy, Report, ReportAction, ReportMetadata, Transaction} from '@src/types/onyx';
 import {convertToDisplayString} from './CurrencyUtils';
+import {hasDeferredWrite} from './deferredLayoutWrite';
 import {isPaidGroupPolicy} from './PolicyUtils';
 import {getIOUActionForTransactionID, getOriginalMessage, isDeletedAction, isDeletedParentAction, isMoneyRequestAction} from './ReportActionsUtils';
 import {
@@ -136,7 +137,9 @@ function shouldWaitForTransactions(report: OnyxEntry<Report>, transactions: Tran
 
     const isTransactionDataReady = transactions !== undefined;
     const isTransactionThreadView = isReportTransactionThread(report);
-    const isStillLoadingData = transactions?.length === 0 && ((!!reportMetadata?.isLoadingInitialReportActions && !reportMetadata.hasOnceLoadedReportActions) || report?.total !== 0);
+    const hasPendingDismissWrite = hasDeferredWrite(CONST.DEFERRED_LAYOUT_WRITE_KEYS.DISMISS_MODAL);
+    const isStillLoadingData =
+        transactions?.length === 0 && ((!!reportMetadata?.isLoadingInitialReportActions && !reportMetadata.hasOnceLoadedReportActions) || report?.total !== 0 || hasPendingDismissWrite);
     return (
         (isMoneyRequestReport(report) || isInvoiceReport(report)) &&
         (!isTransactionDataReady || isStillLoadingData) &&

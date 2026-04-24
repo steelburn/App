@@ -274,6 +274,10 @@ function ReportActionsView({reportID, onLayout}: ReportActionsViewProps) {
     const isMissingTransactionThreadReportID = !transactionThreadReport?.reportID;
     const isReportDataIncomplete = isSingleExpenseReport && isMissingTransactionThreadReportID;
     const isMissingReportActions = visibleReportActions.length === 0;
+    // When an expense is added optimistically, the transaction thread report ID is available
+    // before useOnyx returns the report data (new subscription takes one render cycle).
+    // Detect this transient state so we can keep showing a skeleton instead of a partial view.
+    const isWaitingForTransactionThread = isSingleExpenseReport && !!transactionThreadReportID && transactionThreadReportID !== CONST.FAKE_REPORT_ID && !transactionThreadReport?.reportID;
 
     useEffect(() => {
         // update ref with current state
@@ -340,8 +344,13 @@ function ReportActionsView({reportID, onLayout}: ReportActionsViewProps) {
     // onboarding messages. The skeleton avoids flashing wrong content.
     const shouldShowSkeletonForConciergePanel = isConciergeSidePanel && !hasOnceLoadedReportActions && !isOffline;
 
+    // Show skeleton while waiting for the transaction thread report to load after
+    // an optimistic expense creation. This prevents the partial "amount with nothing else"
+    // flash between the orchestrator skeleton and the fully rendered single-expense view.
+    const shouldShowSkeletonForTransactionThread = isWaitingForTransactionThread && !isOffline;
+
     // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-    const shouldShowSkeleton = shouldShowSkeletonForConciergePanel || shouldShowSkeletonForInitialLoad || shouldShowSkeletonForAppLoad;
+    const shouldShowSkeleton = shouldShowSkeletonForConciergePanel || shouldShowSkeletonForInitialLoad || shouldShowSkeletonForAppLoad || shouldShowSkeletonForTransactionThread;
 
     useEffect(() => {
         if (!shouldShowSkeleton || !report) {
