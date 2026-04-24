@@ -1275,35 +1275,67 @@ function updateSplitTransactions({
 
         return updatedIOUAction;
     };
+
     const updateParentActionsFromSourceThread = (
         sourceThreadReportAction: OnyxEntry<OnyxTypes.ReportAction>,
         sourceThreadCommentActions: OnyxTypes.ReportAction[],
         isSourceTransactionOnHold: boolean,
     ) => {
-        const childVisibleActionCount = sourceThreadReportAction?.childVisibleActionCount ?? sourceThreadCommentActions.length + (isSourceTransactionOnHold ? 1 : 0);
+        // Keep positive stored counts when available, but recover from stale zero/negative metadata using the derived fallback.
+        const getMergedPositiveCount = (storedCount: number | undefined, fallbackCount: number) => {
+            if ((storedCount ?? 0) <= 0) {
+                return fallbackCount;
+            }
+
+            return Math.max(storedCount ?? 0, fallbackCount);
+        };
+
+        const fallbackChildVisibleActionCount = sourceThreadCommentActions.length + (isSourceTransactionOnHold ? 1 : 0);
+        const childVisibleActionCount = getMergedPositiveCount(sourceThreadReportAction?.childVisibleActionCount, fallbackChildVisibleActionCount);
 
         if (childVisibleActionCount <= 0) {
             return undefined;
         }
 
         const commenterAccountIDs = new Set<number>();
-        let latestCommentCreated = sourceThreadReportAction?.childLastVisibleActionCreated ?? '';
+        const storedChildLastVisibleActionCreated = sourceThreadReportAction?.childLastVisibleActionCreated ?? '';
+        let latestCommentCreated = storedChildLastVisibleActionCreated;
 
         for (const sourceThreadCommentAction of sourceThreadCommentActions) {
             if (sourceThreadCommentAction.actorAccountID && sourceThreadCommentAction.actorAccountID > 0) {
                 commenterAccountIDs.add(sourceThreadCommentAction.actorAccountID);
             }
 
-            if (!sourceThreadReportAction?.childLastVisibleActionCreated && sourceThreadCommentAction.created > latestCommentCreated) {
+            if (!storedChildLastVisibleActionCreated && sourceThreadCommentAction.created > latestCommentCreated) {
                 latestCommentCreated = sourceThreadCommentAction.created;
             }
         }
 
+        // Reverse split can encounter stale source-thread metadata after offline reconciliation.
+        // Prefer stored child-thread metadata when it is still consistent, but fall back to
+        // recomputing from the visible source comments when counts or commenter IDs are stale.
+        const fallbackThreadMetadata = {
+            childCommenterCount: commenterAccountIDs.size,
+            childOldestFourAccountIDs: [...commenterAccountIDs].slice(0, 4).join(','),
+        };
+        const storedThreadMetadata = {
+            childCommenterCount: sourceThreadReportAction?.childCommenterCount,
+            childOldestFourAccountIDs: sourceThreadReportAction?.childOldestFourAccountIDs ?? '',
+        };
+        const childCommenterCount = getMergedPositiveCount(storedThreadMetadata.childCommenterCount, fallbackThreadMetadata.childCommenterCount);
+        const storedChildOldestFourAccountIDSet = new Set(storedThreadMetadata.childOldestFourAccountIDs.split(',').filter(Boolean));
+        const hasConsistentStoredCommenterIDs =
+            fallbackThreadMetadata.childCommenterCount === 0 || [...commenterAccountIDs].every((accountID) => storedChildOldestFourAccountIDSet.has(String(accountID)));
+        const childOldestFourAccountIDs =
+            (storedThreadMetadata.childCommenterCount ?? 0) > 0 && storedThreadMetadata.childOldestFourAccountIDs && hasConsistentStoredCommenterIDs
+                ? storedThreadMetadata.childOldestFourAccountIDs
+                : fallbackThreadMetadata.childOldestFourAccountIDs;
+
         return {
             childVisibleActionCount,
-            childCommenterCount: sourceThreadReportAction?.childCommenterCount ?? commenterAccountIDs.size,
+            childCommenterCount,
             childLastVisibleActionCreated: latestCommentCreated,
-            childOldestFourAccountIDs: sourceThreadReportAction?.childOldestFourAccountIDs ?? [...commenterAccountIDs].slice(0, 4).join(','),
+            childOldestFourAccountIDs,
         };
     };
     const pushUpdatedReportPreviewActionToOnyxData = () => {

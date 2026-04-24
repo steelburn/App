@@ -4493,6 +4493,90 @@ describe('updateSplitTransactions', () => {
         expect(updatedReportPreviewAction?.childVisibleActionCount).toEqual(2);
     });
 
+    it('should recompute parent child metadata from source comments when reverse split source thread metadata is stale', async () => {
+        const {expenseReport, transactionThreadReportID, originalTransactionID} = await createBaseExpense();
+
+        if (!originalTransactionID || !expenseReport?.reportID || !transactionThreadReportID) {
+            throw new Error('Missing original transaction data');
+        }
+
+        const {splitTransactionID1} = await splitToTwo(expenseReport, originalTransactionID, getIOUActionForReportID(expenseReport?.reportID, originalTransactionID));
+        const splitIOUAction = getIOUActionForReportID(expenseReport.reportID, splitTransactionID1);
+        const splitThreadReportID = splitIOUAction?.childReportID;
+
+        if (!splitThreadReportID || !splitIOUAction?.reportActionID) {
+            throw new Error('Missing split thread data');
+        }
+
+        const {allReports, allReportActions} = await getCollections();
+        const splitThreadReport = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${splitThreadReportID}`];
+        const ancestors = getAncestors(splitThreadReport, allReports, {}, allReportActions);
+        addComment({
+            report: splitThreadReport,
+            notifyReportID: splitThreadReportID,
+            ancestors,
+            text: 'Testing a comment',
+            timezoneParam: CONST.DEFAULT_TIME_ZONE,
+            currentUserAccountID: CARLOS_ACCOUNT_ID,
+        });
+        await waitForBatchedUpdates();
+
+        const splitThreadReportActions = await getOnyxValue(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${splitThreadReportID}`);
+        const remainingTransactionCommentAction = Object.values(splitThreadReportActions ?? {}).find((action) => isAddCommentAction(action));
+        expect(remainingTransactionCommentAction?.reportActionID).toBeDefined();
+
+        await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${expenseReport.reportID}`, {
+            [splitIOUAction.reportActionID]: {
+                childVisibleActionCount: 0,
+                childCommenterCount: 0,
+                childLastVisibleActionCreated: '',
+                childOldestFourAccountIDs: '',
+            },
+        });
+        await waitForBatchedUpdates();
+
+        const remainingSplitTransaction = await getOnyxValue(`${ONYXKEYS.COLLECTION.TRANSACTION}${splitTransactionID1}`);
+        const {allTransactions, allReports: allReports2, allReportNameValuePairs} = await getCollections();
+        const policyTags = await getPolicyTags(expenseReport.reportID);
+        const reports = getTransactionAndExpenseReports(expenseReport.reportID);
+
+        updateSplitTransactions({
+            allTransactionsList: allTransactions,
+            allReportsList: allReports2,
+            allReportNameValuePairsList: allReportNameValuePairs,
+            transactionData: {
+                reportID: expenseReport.reportID,
+                originalTransactionID,
+                splitExpenses: [{transactionID: splitTransactionID1, reportID: remainingSplitTransaction?.reportID, amount, created: DateUtils.getDBTime()}],
+            },
+            searchContext: {currentSearchHash: -2},
+            policyCategories: undefined,
+            policy: undefined,
+            policyRecentlyUsedCategories: [],
+            iouReport: expenseReport,
+            firstIOU: undefined,
+            isASAPSubmitBetaEnabled: false,
+            currentUserPersonalDetails,
+            transactionViolations: {},
+            policyRecentlyUsedCurrencies: [],
+            quickAction: undefined,
+            iouReportNextStep: undefined,
+            betas: [CONST.BETAS.ALL],
+            policyTags,
+            personalDetails: {[RORY_ACCOUNT_ID]: {accountID: RORY_ACCOUNT_ID, login: RORY_EMAIL}},
+            transactionReport: reports.transactionReport,
+            expenseReport: reports.expenseReport,
+            isOffline: false,
+        });
+        await waitForBatchedUpdates();
+
+        const revertedIOUAction = getIOUActionForReportID(expenseReport.reportID, originalTransactionID);
+        expect(revertedIOUAction?.childVisibleActionCount).toEqual(1);
+        expect(revertedIOUAction?.childCommenterCount).toEqual(1);
+        expect(revertedIOUAction?.childOldestFourAccountIDs).toEqual(`${remainingTransactionCommentAction?.actorAccountID}`);
+        expect(revertedIOUAction?.childLastVisibleActionCreated).toEqual(remainingTransactionCommentAction?.created);
+    });
+
     it('should update the report preview action when deleting a split transaction without reverting', async () => {
         const {expenseReport, chatReport, originalTransactionID, transactionThreadReportID} = await createBaseExpense();
 
