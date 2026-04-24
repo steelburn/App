@@ -1,5 +1,6 @@
 import useCardFeeds from '@hooks/useCardFeeds';
 import useLocalize from '@hooks/useLocalize';
+import useOnboardingIntent from '@hooks/useOnboardingIntent';
 import useOnyx from '@hooks/useOnyx';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import {enablePolicyCategories} from '@libs/actions/Policy/Category';
@@ -46,8 +47,7 @@ const DIRECT_CONNECT_INTEGRATIONS = new Set<string>([
 function useGettingStartedItems(): UseGettingStartedItemsResult {
     const {translate} = useLocalize();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
-    const [introSelected] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED);
-    const [onboardingPurpose] = useOnyx(ONYXKEYS.ONBOARDING_PURPOSE_SELECTED);
+    const intent = useOnboardingIntent();
     const [activePolicyID] = useOnyx(ONYXKEYS.NVP_ACTIVE_POLICY_ID);
     const [firstDayFreeTrial] = useOnyx(ONYXKEYS.NVP_FIRST_DAY_FREE_TRIAL);
     const [reportedIntegration] = useOnyx(ONYXKEYS.ONBOARDING_USER_REPORTED_INTEGRATION);
@@ -58,7 +58,6 @@ function useGettingStartedItems(): UseGettingStartedItemsResult {
 
     const emptyResult: UseGettingStartedItemsResult = {shouldShowSection: false, items: []};
 
-    const intent = introSelected?.choice ?? onboardingPurpose;
     if (intent !== CONST.ONBOARDING_CHOICES.MANAGE_TEAM && intent !== CONST.ONBOARDING_CHOICES.TRACK_WORKSPACE) {
         return emptyResult;
     }
