@@ -118,9 +118,6 @@ type ReportActionsListProps = {
     /** The oldest unread report action */
     oldestUnreadReportAction?: OnyxEntry<OnyxTypes.ReportAction> | undefined;
 
-    /** The index of the oldest unread report action */
-    oldestUnreadReportActionIndex?: number;
-
     /** Full sorted report actions for collapsing stale pagination after a live-tail jump */
     sortedAllReportActionsForPagination: OnyxTypes.ReportAction[];
 
@@ -184,7 +181,6 @@ function ReportActionsList({
     loadOlderChats,
     hasNewerActions,
     oldestUnreadReportAction,
-    oldestUnreadReportActionIndex,
     sortedAllReportActionsForPagination,
     reportActionPages,
     treatAsNoPaginationAnchor,
@@ -298,10 +294,17 @@ function ReportActionsList({
         return receivedOfflineMessages.at(-1);
     }, [getLocalDateFromDatetime, isOffline, lastOfflineAt, lastOnlineAt, sortedReportActions]);
 
-    const oldestUnreadReportActionMarker = useMemo<[string, number] | undefined>(
-        () => (!!oldestUnreadReportAction && oldestUnreadReportActionIndex !== undefined ? [oldestUnreadReportAction.reportActionID, oldestUnreadReportActionIndex] : undefined),
-        [oldestUnreadReportAction, oldestUnreadReportActionIndex],
-    );
+    // Index must be in the same domain as FlatList `data` (sortedVisibleReportActions), not the paginated full chain.
+    const oldestUnreadReportActionMarker = useMemo<[string, number] | undefined>(() => {
+        if (!oldestUnreadReportAction) {
+            return undefined;
+        }
+        const visibleIndex = sortedVisibleReportActions.findIndex((action) => action.reportActionID === oldestUnreadReportAction.reportActionID);
+        if (visibleIndex < 0) {
+            return undefined;
+        }
+        return [oldestUnreadReportAction.reportActionID, visibleIndex];
+    }, [oldestUnreadReportAction, sortedVisibleReportActions]);
 
     /**
      * The reportActionID the unread marker should display above
