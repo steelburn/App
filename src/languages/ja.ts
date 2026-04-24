@@ -8074,12 +8074,6 @@ ${reportName}
         save: 'Save',
         resume: 'Resume',
         discard: '破棄',
-        stopGpsTrackingModal: {
-            title: 'GPS追跡を停止',
-            prompt: '本当に終了してもよろしいですか？現在の進行状況が失われます。',
-            cancel: '追跡を再開',
-            confirm: 'GPS追跡を停止',
-        },
         discardDistanceTrackingModal: {
             title: '移動距離の追跡を破棄',
             prompt: '本当によろしいですか？現在の操作は破棄され、元に戻すことはできません。',

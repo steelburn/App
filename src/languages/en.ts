@@ -8169,12 +8169,6 @@ const translations = {
         save: 'Save',
         resume: 'Resume',
         discard: 'Discard',
-        stopGpsTrackingModal: {
-            title: 'Stop GPS tracking',
-            prompt: 'Are you sure? This will end your current journey.',
-            cancel: 'Resume tracking',
-            confirm: 'Stop GPS tracking',
-        },
         discardDistanceTrackingModal: {
             title: 'Discard distance tracking',
             prompt: "Are you sure? This will discard your current journey and can't be undone.",

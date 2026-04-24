@@ -8207,12 +8207,6 @@ Ajoutez davantage de règles de dépenses pour protéger la trésorerie de l’e
         save: 'Save',
         resume: 'Resume',
         discard: 'Ignorer',
-        stopGpsTrackingModal: {
-            title: 'Arrêter le suivi GPS',
-            prompt: 'Êtes-vous sûr(e) ? Cela mettra fin à votre parcours actuel.',
-            cancel: 'Reprendre le suivi',
-            confirm: 'Arrêter le suivi GPS',
-        },
         discardDistanceTrackingModal: {
             title: 'Abandonner le suivi de distance',
             prompt: 'Êtes-vous sûr(e) ? Cela supprimera votre parcours en cours et ne pourra pas être annulé.',

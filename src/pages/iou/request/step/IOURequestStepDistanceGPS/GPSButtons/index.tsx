@@ -44,7 +44,6 @@ type ButtonsProps = {
 function GPSButtons({navigateToNextStep, setShouldShowStartError, setShouldShowPermissionsError, reportID, unit, gpsPoints}: ButtonsProps) {
     const [startPermissionsFlow, setStartPermissionsFlow] = useState(false);
     const [showLocationRequiredModal, setShowLocationRequiredModal] = useState(false);
-    const [showStopConfirmation, setShowStopConfirmation] = useState(false);
     const [showZeroDistanceModal, setShowZeroDistanceModal] = useState(false);
     const [showDisabledServicesModal, setShowDisabledServicesModal] = useState(false);
     const {isOffline} = useNetwork();
@@ -94,7 +93,6 @@ function GPSButtons({navigateToNextStep, setShouldShowStartError, setShouldShowP
     };
 
     const stopGpsTrip = () => {
-        setShowStopConfirmation(false);
         stopGpsTripUtil(isOffline, gpsPoints);
     };
 
@@ -140,7 +138,7 @@ function GPSButtons({navigateToNextStep, setShouldShowStartError, setShouldShowP
                 <GPSTooltip>
                     <View>
                         <Button
-                            onPress={gpsDraftDetails?.isTracking ? () => setShowStopConfirmation(true) : checkSettingsAndPermissions}
+                            onPress={gpsDraftDetails?.isTracking ? stopGpsTrip : checkSettingsAndPermissions}
                             success={!gpsDraftDetails?.isTracking}
                             allowBubble
                             pressOnEnter
@@ -160,17 +158,6 @@ function GPSButtons({navigateToNextStep, setShouldShowStartError, setShouldShowP
                 // eslint-disable-next-line @typescript-eslint/no-misused-promises
                 onGrant={startGpsTrip}
                 onDeny={() => setShowLocationRequiredModal(true)}
-            />
-
-            <ConfirmModal
-                danger
-                title={translate('gps.stopGpsTrackingModal.title')}
-                isVisible={showStopConfirmation}
-                onConfirm={stopGpsTrip}
-                onCancel={() => setShowStopConfirmation(false)}
-                confirmText={translate('gps.stopGpsTrackingModal.confirm')}
-                cancelText={translate('gps.stopGpsTrackingModal.cancel')}
-                prompt={translate('gps.stopGpsTrackingModal.prompt')}
             />
 
             <ConfirmModal

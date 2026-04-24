@@ -9384,12 +9384,6 @@ ${amount} para ${merchant} - ${date}`,
         save: 'Save',
         resume: 'Resume',
         discard: 'Descartar',
-        stopGpsTrackingModal: {
-            title: 'Detener seguimiento por GPS',
-            prompt: '¿Estás seguro? Esto finalizará tu trayecto actual.',
-            cancel: 'Reanudar seguimiento',
-            confirm: 'Detener seguimiento por GPS',
-        },
         discardDistanceTrackingModal: {
             title: 'Descartar seguimiento de distancia',
             prompt: '¿Estás seguro? Esto descartará tu trayecto actual y no se puede deshacer.',
