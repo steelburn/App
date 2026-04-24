@@ -14,6 +14,7 @@ import type {
     ReportFieldTextKey,
     SearchAmountFilterKeys,
     SearchDateFilterKeys,
+    SearchDateKey,
     SearchDatePreset,
     SearchFilterKey,
     SearchQueryJSON,
@@ -2015,7 +2016,12 @@ function buildOptimisticSnapshotData(type: SearchDataTypes, data: Record<string,
  * - For standard date-filter keys (e.g. `"date"`, `"submittedDate"`) the modifier
  *   is appended: `"dateOn"`, `"dateBefore"`, etc.
  */
-function getDateFilterKeys(dateKey: string) {
+function getDateFilterKeys(dateKey: SearchDateFilterKeys): {
+    dateOnKey: SearchDateKey;
+    dateBeforeKey: SearchDateKey;
+    dateAfterKey: SearchDateKey;
+    dateRangeKey: SearchDateKey;
+} {
     if (dateKey.startsWith(CONST.SEARCH.REPORT_FIELD.GLOBAL_PREFIX)) {
         const suffix = dateKey.replace(CONST.SEARCH.REPORT_FIELD.DEFAULT_PREFIX, '');
         return {

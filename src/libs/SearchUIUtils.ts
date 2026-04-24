@@ -167,6 +167,7 @@ import {
     buildSearchQueryJSON,
     buildSearchQueryString,
     getCurrentSearchQueryJSON,
+    getDateFilterKeys,
     getDateRangeDisplayValueFromFormValue,
     getDateRangeForPreset,
     isFilterSupported,
@@ -4741,10 +4742,11 @@ const FILTER_LABEL_MAP = {
 } satisfies Partial<Record<SyntaxFilterKey, TranslationPaths>>;
 
 function getDateDisplayValue(syntaxKey: SearchDateFilterKeys, form: Partial<SearchAdvancedFiltersForm>, translate: LocalizedTranslate): string {
-    const on = form[`${syntaxKey}${CONST.SEARCH.DATE_MODIFIERS.ON}`];
-    const after = form[`${syntaxKey}${CONST.SEARCH.DATE_MODIFIERS.AFTER}`];
-    const before = form[`${syntaxKey}${CONST.SEARCH.DATE_MODIFIERS.BEFORE}`];
-    const range = form[`${syntaxKey}${CONST.SEARCH.DATE_MODIFIERS.RANGE}`];
+    const key = getDateFilterKeys(syntaxKey);
+    const on = form[key.dateOnKey];
+    const after = form[key.dateAfterKey];
+    const before = form[key.dateBeforeKey];
+    const range = form[key.dateRangeKey];
     const parts: string[] = [];
 
     if (on) {
@@ -5797,6 +5799,7 @@ export {
     isTodoSearch,
     getActiveGroupSearchHashes,
     adjustTimeRangeToDateFilters,
+    getDateDisplayValue,
     shouldShowFilter,
     mapFiltersFormToLabelValueList,
     isAmountFilterKey,

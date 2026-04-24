@@ -255,6 +255,8 @@ type SearchDateFilterKeys =
     | typeof CONST.SEARCH.SYNTAX_FILTER_KEYS.WITHDRAWN
     | ReportFieldTextKey;
 
+type SearchDateKey = `${SearchDateFilterKeys}${ValueOf<typeof CONST.SEARCH.DATE_MODIFIERS>}` | ReportFieldDateKey;
+
 type SearchAmountFilterKeys = typeof CONST.SEARCH.SYNTAX_FILTER_KEYS.AMOUNT | typeof CONST.SEARCH.SYNTAX_FILTER_KEYS.TOTAL | typeof CONST.SEARCH.SYNTAX_FILTER_KEYS.PURCHASE_AMOUNT;
 
 type SearchCurrencyFilterKeys =
@@ -387,6 +389,7 @@ export type {
     SearchColumnType,
     SearchBooleanFilterKeys,
     SearchDateFilterKeys,
+    SearchDateKey,
     SearchAmountFilterKeys,
     SearchStatus,
     SearchQueryJSON,
