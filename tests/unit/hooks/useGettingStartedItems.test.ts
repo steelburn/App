@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/naming-convention */
+/* eslint-disable @typescript-eslint/naming-convention -- test fixtures use backend-shaped object keys that don't follow camelCase: email addresses for PolicyEmployeeList entries and human-readable names / 'GL Code' for PolicyCategories */
 import {renderHook} from '@testing-library/react-native';
 import Onyx from 'react-native-onyx';
 import useGettingStartedItems from '@pages/home/GettingStartedSection/hooks/useGettingStartedItems';
@@ -480,13 +480,11 @@ describe('useGettingStartedItems', () => {
 
         it('should be completed when workspace has at least one non-default category', async () => {
             const customCategories: PolicyCategories = {
-                // eslint-disable-next-line @typescript-eslint/naming-convention -- PolicyCategories keys use human-readable names matching the backend API shape
                 'Custom Category': {
                     name: 'Custom Category',
                     enabled: true,
                     unencodedName: 'Custom Category',
                     areCommentsRequired: false,
-                    // eslint-disable-next-line @typescript-eslint/naming-convention -- matches the backend API field name
                     'GL Code': '',
                     externalID: '',
                     origin: '',
@@ -936,13 +934,11 @@ describe('useGettingStartedItems', () => {
 
             it('should have customizeCategories isComplete=true when the workspace has at least one non-default category', async () => {
                 const customCategories: PolicyCategories = {
-                    // eslint-disable-next-line @typescript-eslint/naming-convention -- PolicyCategories keys use human-readable names matching the backend API shape
                     'Custom Category': {
                         name: 'Custom Category',
                         enabled: true,
                         unencodedName: 'Custom Category',
                         areCommentsRequired: false,
-                        // eslint-disable-next-line @typescript-eslint/naming-convention -- matches the backend API field name
                         'GL Code': '',
                         externalID: '',
                         origin: '',
