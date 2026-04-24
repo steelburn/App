@@ -253,6 +253,5 @@ describe('AgentZeroStatusContext', () => {
             expect(result.current.statusLabel).toBe('');
             expect(result.current.reasoningHistory).toEqual([]);
         });
-
     });
 });
