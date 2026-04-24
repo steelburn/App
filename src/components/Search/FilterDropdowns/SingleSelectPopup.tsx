@@ -1,6 +1,7 @@
 import React, {Activity, useCallback, useMemo, useState} from 'react';
 import type {StyleProp, ViewStyle} from 'react-native';
 import {View} from 'react-native';
+import type {SingleSelectItem} from '@components/Search/FilterComponents/SingleSelect';
 import SelectionList from '@components/SelectionList';
 import SingleSelectListItem from '@components/SelectionList/ListItem/SingleSelectListItem';
 import type {ListItem, SelectionListStyle} from '@components/SelectionList/types';
@@ -10,7 +11,6 @@ import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
 import useWindowDimensions from '@hooks/useWindowDimensions';
 import CONST from '@src/CONST';
-import type {SingleSelectItem} from '../FilterComponents/SingleSelect';
 import BasePopup from './BasePopup';
 
 type SingleSelectPopupProps<T> = {
