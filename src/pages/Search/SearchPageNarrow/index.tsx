@@ -19,7 +19,6 @@ import SearchLoadingSkeleton from '@components/Search/SearchLoadingSkeleton';
 import SearchPageFooter from '@components/Search/SearchPageFooter';
 import SearchPageHeaderNarrow from '@components/Search/SearchPageHeader/SearchPageHeaderNarrow';
 import {SKIPPED_FILTERS} from '@components/Search/SearchPageHeader/useSearchFiltersBar';
-import SearchStaticList from '@components/Search/SearchStaticList';
 import type {SearchParams, SearchQueryJSON} from '@components/Search/types';
 import useAndroidBackButtonHandler from '@hooks/useAndroidBackButtonHandler';
 import useEndSubmitNavigationSpans from '@hooks/useEndSubmitNavigationSpans';
@@ -66,6 +65,8 @@ type SearchPageNarrowProps = {
     };
     shouldShowFooter: boolean;
     onSortPressedCallback: () => void;
+    searchOverlayContent: React.ReactNode;
+    onSearchContentReady: () => void;
 };
 
 function hasFilterBarsSelector(searchAdvancedFiltersForm: OnyxEntry<SearchAdvancedFiltersForm>) {
@@ -75,7 +76,17 @@ function hasFilterBarsSelector(searchAdvancedFiltersForm: OnyxEntry<SearchAdvanc
 
 const tabBarContent = <TabBarBottomContent selectedTab={NAVIGATION_TABS.SEARCH} />;
 
-function SearchPageNarrow({queryJSON, searchResults, isMobileSelectionModeEnabled, metadata, footerData, shouldShowFooter, onSortPressedCallback}: SearchPageNarrowProps) {
+function SearchPageNarrow({
+    queryJSON,
+    searchResults,
+    isMobileSelectionModeEnabled,
+    metadata,
+    footerData,
+    shouldShowFooter,
+    onSortPressedCallback,
+    searchOverlayContent,
+    onSearchContentReady,
+}: SearchPageNarrowProps) {
     const shouldShowLoadingSkeleton = useSearchLoadingState(queryJSON, searchResults);
     const {translate} = useLocalize();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
@@ -189,7 +200,6 @@ function SearchPageNarrow({queryJSON, searchResults, isMobileSelectionModeEnable
     });
     const [isInteractive, setIsInteractive] = useState(!useStaticRendering);
     const [isHeaderInteractive, setIsHeaderInteractive] = useState(!useStaticRendering);
-    const [isSearchReady, setIsSearchReady] = useState(!useStaticRendering);
     const isHeaderInteractiveRef = useRef(isHeaderInteractive);
     const [, startTransition] = useTransition();
     useEffect(() => {
@@ -203,10 +213,6 @@ function SearchPageNarrow({queryJSON, searchResults, isMobileSelectionModeEnable
             setIsHeaderInteractive(true);
         });
     }, [startTransition]);
-
-    const onSearchContentReady = useCallback(() => {
-        setIsSearchReady(true);
-    }, []);
 
     const endSubmitNavigationSpans = useEndSubmitNavigationSpans({requireLayout: true});
 
@@ -246,12 +252,6 @@ function SearchPageNarrow({queryJSON, searchResults, isMobileSelectionModeEnable
     const shouldShowLoadingState = !isOffline && (!isDataLoaded || !!metadata?.isLoading);
     const contentContainerStyle = !isMobileSelectionModeEnabled ? styles.searchListContentContainerStyles(hasFilterBars) : undefined;
 
-    // Overlay pattern: SearchStaticList renders as an absolute-fill sibling on
-    // top of Search, so its native views are never unmounted by a tree-structure
-    // swap. Search mounts behind the overlay when isInteractive flips, and once
-    // Search signals readiness (onContentReady -> onLayout), the overlay is removed.
-    const showStaticOverlay = useStaticRendering && !isSearchReady;
-
     const renderStaticSearchList = () => (
         <>
             {isInteractive && (
@@ -269,15 +269,12 @@ function SearchPageNarrow({queryJSON, searchResults, isMobileSelectionModeEnable
                     hasFilterBars={hasFilterBars}
                 />
             )}
-            {showStaticOverlay && (
-                <View style={[StyleSheet.absoluteFill, styles.appBG]}>
-                    <SearchStaticList
-                        searchResults={searchResults}
-                        queryJSON={queryJSON}
-                        contentContainerStyle={contentContainerStyle}
-                        onLayout={onSearchLayout}
-                        onDestinationVisible={endSubmitNavigationSpans}
-                    />
+            {!!searchOverlayContent && (
+                <View
+                    style={[StyleSheet.absoluteFill, styles.appBG]}
+                    onLayout={onSearchLayout}
+                >
+                    {searchOverlayContent}
                 </View>
             )}
         </>
@@ -313,6 +310,7 @@ function SearchPageNarrow({queryJSON, searchResults, isMobileSelectionModeEnable
                 isMobileSelectionModeEnabled={isMobileSelectionModeEnabled}
                 searchRequestResponseStatusCode={searchRequestResponseStatusCode}
                 onDestinationVisible={endSubmitNavigationSpans}
+                onContentReady={onSearchContentReady}
                 hasFilterBars={hasFilterBars}
             />
         );
