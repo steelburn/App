@@ -10,6 +10,7 @@ import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
+import {hasDeferredWrite} from '@libs/deferredLayoutWrite';
 import Navigation from '@libs/Navigation/Navigation';
 import {isChatReport, isCurrentUserInvoiceReceiver, isInvoiceRoom, navigateToDetailsPage, shouldDisableDetailPage as shouldDisableDetailPageReportUtils} from '@libs/ReportUtils';
 import {clearCreateChatError} from '@userActions/Report';
@@ -52,7 +53,7 @@ function ReportActionItemCreated({reportID, policyID}: ReportActionItemCreatedPr
             onClose={() => clearCreateChatError(report, conciergeReportID, introSelected, currentUserAccountID, betas, isSelfTourViewed)}
         >
             <View style={[styles.pRelative]}>
-                <AnimatedEmptyStateBackground />
+                {!hasDeferredWrite(CONST.DEFERRED_LAYOUT_WRITE_KEYS.DISMISS_MODAL) && <AnimatedEmptyStateBackground />}
                 <View
                     accessibilityLabel={translate('accessibilityHints.chatWelcomeMessage')}
                     style={[styles.p5]}
