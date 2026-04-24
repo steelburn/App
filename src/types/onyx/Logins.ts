@@ -32,6 +32,8 @@ type Login = OnyxValueWithOfflineFeedback<{
         /** The device version where this account is logged in */
         deviceVersion?: string;
 
+        infiniteLoginRoot?: string;
+
         /** The device OS where this account is logged in */
         os: string;
 
