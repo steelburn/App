@@ -474,6 +474,11 @@ function ReportActionsList({
         prevReportID = report.reportID;
     }, [report.reportID]);
 
+    // Same-screen report switches reuse this instance; per-report one-shot flags must not leak across reports.
+    useEffect(() => {
+        hasHeaderRendered.current = false;
+    }, [report.reportID]);
+
     const isReportUnread = useMemo(
         () => isUnread(report, transactionThreadReport, isReportArchived) || (lastAction && isCurrentActionUnread(report, lastAction)),
         [report, transactionThreadReport, isReportArchived, lastAction],
@@ -481,6 +486,11 @@ function ReportActionsList({
 
     // Mark the report as read when the user initially opens the report and there are unread messages
     const didMarkReportAsReadInitially = useRef(false);
+
+    useEffect(() => {
+        didMarkReportAsReadInitially.current = false;
+    }, [report.reportID]);
+
     useEffect(() => {
         if (!isReportUnread || didMarkReportAsReadInitially.current) {
             didMarkReportAsReadInitially.current = true;

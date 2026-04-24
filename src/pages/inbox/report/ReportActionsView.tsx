@@ -157,6 +157,10 @@ function ReportActionsView({reportID, onLayout}: ReportActionsViewProps) {
     const reportPreviewAction = useMemo(() => getReportPreviewAction(report?.chatReportID, report?.reportID), [report?.chatReportID, report?.reportID]);
     const didLayout = useRef(false);
 
+    useEffect(() => {
+        didLayout.current = false;
+    }, [reportID]);
+
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const isFocused = useIsFocused();
     const prevShouldUseNarrowLayoutRef = useRef(shouldUseNarrowLayout);
@@ -361,6 +365,14 @@ function ReportActionsView({reportID, onLayout}: ReportActionsViewProps) {
 
     const isReportUnread = isUnread(report, transactionThreadReport, isReportArchived);
     const isReportUnreadInitially = useRef(isReportUnread);
+
+    // Without this, navigating to another report in the same mounted view keeps the previous
+    // report’s “initially unread” value and can block the skeleton or unread-anchor logic for the new report.
+    useEffect(() => {
+        isReportUnreadInitially.current = isUnread(report, transactionThreadReport, isReportArchived);
+        // Intentionally only on navigation: do not resync when read/unread or thread data updates in place.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [reportID]);
 
     // When we first open a report with a linked report action,
     // we need to wait for the results from the OpenReport api call,
