@@ -1,4 +1,5 @@
 import React, {useImperativeHandle, useRef, useState} from 'react';
+import {View} from 'react-native';
 import type {OnyxCollection} from 'react-native-onyx';
 import type {ValueOf} from 'type-fest';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
@@ -158,6 +159,7 @@ function SelectedDateReportField({ref, field, value: initialValue, selectedDateM
             )}
             <DateFilterBase
                 ref={dateFilterRef}
+                style={styles.flexShrink1}
                 shouldShowHeader={false}
                 onDateValuesChange={setValue}
                 selectedDateModifier={selectedDateModifier}
@@ -254,7 +256,7 @@ function ReportFieldBase({ref, selectedField, onFieldSelected}: ReportFieldBaseP
 
     if (selectedField) {
         return (
-            <ScrollView style={[styles.flex1, styles.gap2]}>
+            <View style={[styles.gap2, styles.flexShrink1]}>
                 {!selectedDateModifier && (
                     <HeaderWithBackButton
                         style={[styles.h10]}
@@ -277,7 +279,7 @@ function ReportFieldBase({ref, selectedField, onFieldSelected}: ReportFieldBaseP
                         value={getValue(selectedField.name)}
                     />
                 )}
-            </ScrollView>
+            </View>
         );
     }
 

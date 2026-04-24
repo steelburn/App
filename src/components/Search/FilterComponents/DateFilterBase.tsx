@@ -1,5 +1,6 @@
 import React, {useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState} from 'react';
 import {View} from 'react-native';
+import type {StyleProp, ViewStyle} from 'react-native';
 import Button from '@components/Button';
 import FormAlertWithSubmitButton from '@components/FormAlertWithSubmitButton';
 import FormHelpMessage from '@components/FormHelpMessage';
@@ -53,6 +54,7 @@ type DateFilterBaseProps = {
     shouldShowHeader?: boolean;
     /** The ref handle */
     ref?: React.Ref<DateFilterBaseHandle>;
+    style?: StyleProp<ViewStyle>;
 };
 
 // Component uses ref as a prop, which is supported in modern React.
@@ -72,6 +74,7 @@ function DateFilterBase({
     ref,
     selectedDateModifier: selectedDateModifierProp,
     onSelectDateModifier,
+    style,
 }: DateFilterBaseProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
@@ -204,7 +207,7 @@ function DateFilterBase({
     const shouldShowRangeSummary = selectedDateModifier === CONST.SEARCH.DATE_MODIFIERS.RANGE && !!rangeDisplayText;
 
     return (
-        <View style={styles.flex1}>
+        <View style={style}>
             {shouldShowHeader && (
                 <HeaderWithBackButton
                     title={computedTitle}
