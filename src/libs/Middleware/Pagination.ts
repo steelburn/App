@@ -139,12 +139,6 @@ const Pagination: Middleware = (requestResponse, request) => {
         const mergeAndSortContinuousPagesTyped: <TResource>(sortedItems: TResource[], pages: Pages, getItemID: (item: TResource) => string) => Pages =
             mergeAndSortContinuousPages as unknown as <TResource>(sortedItems: TResource[], pages: Pages, getItemID: (item: TResource) => string) => Pages;
 
-        // When loading the first page of data, make sure to remove the start maker if the backend returns
-        // that there is new data.
-        const firstPage = existingPages.at(0);
-        if (type === 'initial' && !cursorID && firstPage?.at(0) === CONST.PAGINATION_START_ID && response.hasNewerActions === true) {
-            firstPage.shift();
-        }
         const isMiddleInitialSlice = type === 'initial' && !cursorID && response.hasNewerActions === true && response.hasOlderActions === true;
 
         // Only strip PAGINATION_START_ID from cached pages when the server explicitly confirms newer actions exist.
