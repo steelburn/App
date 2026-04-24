@@ -105,10 +105,10 @@ function CardSelector({onChange, onCountChange}: CardSelectorProps) {
     let sectionHeaderCount = 0;
 
     if (searchAdvancedFiltersForm) {
-        const selectedData = [...cardFeedsSectionData.selected, ...individualCardsSectionData.selected, ...closedCardsSectionData.selected];
-        const unselectedCardFeedsData = cardFeedsSectionData.unselected;
-        const unselectedIndividualCardsData = individualCardsSectionData.unselected;
-        const unselectedClosedCardsData = closedCardsSectionData.unselected;
+        const selectedData = [...cardFeedsSectionData.selected, ...individualCardsSectionData.selected, ...closedCardsSectionData.selected].filter(searchFunction);
+        const unselectedCardFeedsData = cardFeedsSectionData.unselected.filter(searchFunction);
+        const unselectedIndividualCardsData = individualCardsSectionData.unselected.filter(searchFunction);
+        const unselectedClosedCardsData = closedCardsSectionData.unselected.filter(searchFunction);
 
         itemCount = selectedData.length + unselectedCardFeedsData.length + unselectedIndividualCardsData.length + unselectedClosedCardsData.length;
         sectionHeaderCount = [unselectedCardFeedsData.length, unselectedIndividualCardsData.length, unselectedClosedCardsData.length].filter(Boolean).length;
@@ -116,22 +116,22 @@ function CardSelector({onChange, onCountChange}: CardSelectorProps) {
         sections = [
             {
                 title: undefined,
-                data: selectedData.filter(searchFunction),
+                data: selectedData,
                 sectionIndex: 0,
             },
             {
                 title: translate('search.filters.card.cardFeeds'),
-                data: unselectedCardFeedsData.filter(searchFunction),
+                data: unselectedCardFeedsData,
                 sectionIndex: 1,
             },
             {
                 title: translate('search.filters.card.individualCards'),
-                data: unselectedIndividualCardsData.filter(searchFunction),
+                data: unselectedIndividualCardsData,
                 sectionIndex: 2,
             },
             {
                 title: translate('search.filters.card.closedCards'),
-                data: unselectedClosedCardsData.filter(searchFunction),
+                data: unselectedClosedCardsData,
                 sectionIndex: 3,
             },
         ];
