@@ -1,8 +1,6 @@
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import Animated from 'react-native-reanimated';
-import {useSession} from '@components/OnyxListItemProvider';
 import {useSearchActionsContext, useSearchStateContext} from '@components/Search/SearchContext';
-import SearchStaticList from '@components/Search/SearchStaticList';
 import type {SearchParams} from '@components/Search/types';
 import {usePlaybackActionsContext} from '@components/VideoPlayerContexts/PlaybackContext';
 import useConfirmReadyToOpenApp from '@hooks/useConfirmReadyToOpenApp';
@@ -12,21 +10,18 @@ import useMobileSelectionMode from '@hooks/useMobileSelectionMode';
 import useOnyx from '@hooks/useOnyx';
 import usePrevious from '@hooks/usePrevious';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
+import useSearchOverlay from '@hooks/useSearchOverlay';
 import useSearchPageSetup from '@hooks/useSearchPageSetup';
 import useSearchShouldCalculateTotals from '@hooks/useSearchShouldCalculateTotals';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {searchInServer} from '@libs/actions/Report';
 import {search} from '@libs/actions/Search';
-import {hasDeferredWrite} from '@libs/deferredLayoutWrite';
-import Navigation from '@libs/Navigation/Navigation';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
 import type {SearchFullscreenNavigatorParamList} from '@libs/Navigation/types';
-import {isDefaultExpensesQuery} from '@libs/SearchQueryUtils';
-import {getColumnsToShow, getValidGroupBy} from '@libs/SearchUIUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type SCREENS from '@src/SCREENS';
-import {columnsSelector} from '@src/selectors/AdvancedSearchFiltersForm';
+import {hasFilterBarsSelector} from '@src/selectors/AdvancedSearchFiltersForm';
 import type {SearchResults} from '@src/types/onyx';
 import SearchPageNarrow from './SearchPageNarrow';
 import SearchPageWide from './SearchPageWide';
@@ -42,9 +37,7 @@ function SearchPage({route}: SearchPageProps) {
     const {clearSelectedTransactions, setLastSearchType} = useSearchActionsContext();
 
     const isMobileSelectionModeEnabled = useMobileSelectionMode(clearSelectedTransactions);
-    const session = useSession();
-    const accountID = session?.accountID ?? CONST.DEFAULT_NUMBER_ID;
-    const [visibleColumns] = useOnyx(ONYXKEYS.FORMS.SEARCH_ADVANCED_FILTERS_FORM, {selector: columnsSelector});
+    const [hasFilterBars] = useOnyx(ONYXKEYS.FORMS.SEARCH_ADVANCED_FILTERS_FORM, {selector: hasFilterBarsSelector});
 
     const lastNonEmptySearchResults = useRef<SearchResults | undefined>(undefined);
 
@@ -142,43 +135,15 @@ function SearchPage({route}: SearchPageProps) {
         setIsSorting(true);
     }, []);
 
-    // Overlay: a single SearchStaticList rendered above the content area.
-    // Shown when an expense-creation flow pre-inserts this page or reserves
-    // a deferred write. Dismissed once Search signals readiness (onContentReady).
-    const [isSearchReady, setIsSearchReady] = useState(() => !hasDeferredWrite(CONST.DEFERRED_LAYOUT_WRITE_KEYS.SEARCH) && !Navigation.getIsFullscreenPreInsertedUnderRHP());
-    const onSearchContentReady = useCallback(() => {
-        setIsSearchReady(true);
-    }, []);
-
-    const isTransactionSearchType = currentSearchQueryJSON?.type === CONST.SEARCH.DATA_TYPES.EXPENSE || currentSearchQueryJSON?.type === CONST.SEARCH.DATA_TYPES.INVOICE;
-    const canSelectMultiple = isTransactionSearchType && (!shouldUseNarrowLayout || isMobileSelectionModeEnabled);
-
-    const validGroupBy = currentSearchQueryJSON ? getValidGroupBy(currentSearchQueryJSON.groupBy) : undefined;
-    const shouldUseStrictDefaultExpenseColumns = currentSearchKey === CONST.SEARCH.SEARCH_KEYS.EXPENSES && !!currentSearchQueryJSON && isDefaultExpensesQuery(currentSearchQueryJSON);
-    const overlayColumns = useMemo(() => {
-        if (!searchResults?.data || !currentSearchQueryJSON) {
-            return [];
-        }
-        return getColumnsToShow({
-            currentAccountID: accountID,
-            data: searchResults.data,
-            visibleColumns: visibleColumns ?? [],
-            type: currentSearchQueryJSON.type,
-            groupBy: validGroupBy,
-            shouldUseStrictDefaultExpenseColumns,
-        });
-    }, [accountID, searchResults?.data, currentSearchQueryJSON, visibleColumns, validGroupBy, shouldUseStrictDefaultExpenseColumns]);
-
-    const searchOverlayContent =
-        !isSearchReady && isTransactionSearchType && !!searchResults?.data && currentSearchQueryJSON ? (
-            <SearchStaticList
-                searchResults={searchResults}
-                queryJSON={currentSearchQueryJSON}
-                shouldUseNarrowLayout={shouldUseNarrowLayout}
-                canSelectMultiple={canSelectMultiple}
-                columns={overlayColumns}
-            />
-        ) : null;
+    const overlayContentContainerStyle = !isMobileSelectionModeEnabled ? styles.searchListContentContainerStyles(!!hasFilterBars) : undefined;
+    const {searchOverlayContent, onSearchContentReady} = useSearchOverlay({
+        searchResults,
+        queryJSON: currentSearchQueryJSON,
+        shouldUseNarrowLayout,
+        isMobileSelectionModeEnabled,
+        currentSearchKey,
+        contentContainerStyle: overlayContentContainerStyle,
+    });
 
     return (
         <Animated.View style={[styles.flex1]}>

@@ -53,6 +53,10 @@ function ReportActionItemCreated({reportID, policyID}: ReportActionItemCreatedPr
             onClose={() => clearCreateChatError(report, conciergeReportID, introSelected, currentUserAccountID, betas, isSelfTourViewed)}
         >
             <View style={[styles.pRelative]}>
+                {/* hasDeferredWrite is non-reactive (reads a module-level Map, not tracked by React).
+                   This is intentional: we only suppress the animation on the initial render while a
+                   DISMISS_MODAL write is pending. The animation re-appears on the next organic
+                   re-render (e.g. Onyx updates after the API write resolves). */}
                 {!hasDeferredWrite(CONST.DEFERRED_LAYOUT_WRITE_KEYS.DISMISS_MODAL) && <AnimatedEmptyStateBackground />}
                 <View
                     accessibilityLabel={translate('accessibilityHints.chatWelcomeMessage')}

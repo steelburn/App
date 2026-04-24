@@ -53,6 +53,7 @@ import {
     isTransactionGroupListItemType,
     isTransactionListItemType,
     isTransactionReportGroupListItemType,
+    isTransactionSearchType,
     shouldShowEmptyState,
     shouldShowYear as shouldShowYearUtil,
 } from '@libs/SearchUIUtils';
@@ -1425,21 +1426,20 @@ function Search({
         searchResults?.data,
     ]);
 
-    const onDeferredLayout = useCallback(() => {
+    const onLayoutBase = useCallback(() => {
         hasHadFirstLayout.current = true;
         onDestinationVisible?.(isSearchResultsEmptyRef.current, 'layout');
         endSpanWithAttributes(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS, {[CONST.TELEMETRY.ATTRIBUTE_IS_WARM]: true});
         flushDeferredWrite(CONST.DEFERRED_LAYOUT_WRITE_KEYS.SEARCH);
     }, [onDestinationVisible]);
 
+    const onDeferredLayout = onLayoutBase;
+
     const onLayout = useCallback(() => {
-        hasHadFirstLayout.current = true;
-        onDestinationVisible?.(isSearchResultsEmptyRef.current, 'layout');
-        endSpanWithAttributes(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS, {[CONST.TELEMETRY.ATTRIBUTE_IS_WARM]: true});
+        onLayoutBase();
         handleSelectionListScroll(stableSortedData, searchListRef.current);
-        flushDeferredWrite(CONST.DEFERRED_LAYOUT_WRITE_KEYS.SEARCH);
         onContentReady?.();
-    }, [handleSelectionListScroll, stableSortedData, onContentReady, onDestinationVisible]);
+    }, [onLayoutBase, handleSelectionListScroll, stableSortedData, onContentReady]);
 
     // Must be a ref, not state: cancelNavigationSpans is called during render
     // (inside conditional returns), so using setState would trigger infinite re-renders.
@@ -1535,12 +1535,12 @@ function Search({
     );
 
     // When heavy work is deferred (e.g. during the RHP dismiss animation after
-    // submitting an expense), skip the expensive render below. The parent
-    // (SearchPage) renders a SearchStaticList overlay that covers this component,
-    // so the user sees real-looking content. The minimal View fires onLayout to
-    // flush the deferred API write and set hasHadFirstLayout.
-    const isTransactionSearchType = type === CONST.SEARCH.DATA_TYPES.EXPENSE || type === CONST.SEARCH.DATA_TYPES.INVOICE;
-    if (isDeferringHeavyWork && searchResults?.data && isTransactionSearchType) {
+    // submitting an expense), skip the expensive render below. The ancestor
+    // SearchPage (via SearchPageNarrow / SearchPageWide) renders a SearchStaticList
+    // overlay that covers this component, so the user sees real-looking content.
+    // The minimal View fires onLayout to flush the deferred API write and set
+    // hasHadFirstLayout.
+    if (isDeferringHeavyWork && searchResults?.data && isTransactionSearchType(type)) {
         return <View onLayout={onDeferredLayout} />;
     }
 

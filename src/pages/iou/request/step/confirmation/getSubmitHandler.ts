@@ -61,7 +61,7 @@ function canUseDismissModalFastPath(snapshot: SubmitNavigationSnapshot): boolean
  *   isPreInserted && !isReportPreInserted  -> SEARCH_PRE_INSERT
  *   isReportPreInserted                    -> REPORT_PRE_INSERT
  *   canUseDismissModalFastPath()           -> DISMISS_MODAL
- *   isFromGlobalCreate && canDismiss       -> SEARCH_DISMISS
+ *   isFromGlobalCreate && canDismissFromSearch && isSearchTopmostFullScreen -> SEARCH_DISMISS
  *   isReportInRHP && destinationReportID   -> REPORT_IN_RHP_DISMISS
  *   else                                   -> DEFAULT
  */
