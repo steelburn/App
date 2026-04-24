@@ -111,7 +111,7 @@ function ReportActionsListWrapper() {
                             report={report}
                             onLayout={mockOnLayout}
                             onScroll={mockOnScroll}
-                            listID={1}
+                            listID="perf-test-list"
                             loadOlderChats={mockLoadChats}
                             loadNewerChats={mockLoadChats}
                             hasNewerActions={false}

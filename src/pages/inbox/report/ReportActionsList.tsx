@@ -132,8 +132,8 @@ type ReportActionsListProps = {
     /** Whether the composer is in full size */
     isComposerFullSize?: boolean;
 
-    /** ID of the list */
-    listID: number;
+    /** Stable key to remount the list when the deep-linked action or unread anchor (or report) changes */
+    listID: string;
 
     /** Whether the optimistic CREATED report action was added */
     hasCreatedActionAdded?: boolean;
