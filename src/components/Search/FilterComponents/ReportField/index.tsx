@@ -4,18 +4,19 @@ import type {ValueOf} from 'type-fest';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import MenuItem from '@components/MenuItem';
 import ScrollView from '@components/ScrollView';
+import DateFilterBase from '@components/Search/FilterComponents/DateFilterBase';
+import type {DateFilterBaseHandle} from '@components/Search/FilterComponents/DateFilterBase';
 import type {ReportFieldDateKey, ReportFieldTextKey} from '@components/Search/types';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {getDateModifierTitle, isSearchDatePreset} from '@libs/SearchQueryUtils';
-import {getDateDisplayValue, getDatePresets, SearchDateModifier} from '@libs/SearchUIUtils';
+import {getDateDisplayValue, getDatePresets} from '@libs/SearchUIUtils';
+import type {SearchDateModifier} from '@libs/SearchUIUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import {createAllPolicyReportFieldsSelector} from '@src/selectors/Policy';
 import type {Policy, PolicyReportField} from '@src/types/onyx';
-import DateFilterBase from '../DateFilterBase';
-import type {DateFilterBaseHandle} from '../DateFilterBase';
 import ReportFieldList from './ReportFieldList';
 import ReportFieldText from './ReportFieldText';
 
@@ -148,7 +149,7 @@ function SelectedDateReportField({ref, field, value: initialValue, selectedDateM
 
     return (
         <>
-            {selectedDateModifier && (
+            {!!selectedDateModifier && (
                 <HeaderWithBackButton
                     style={[styles.h10]}
                     subtitle={selectedDateModifier ? getDateModifierTitle(selectedDateModifier, '', translate) : ''}

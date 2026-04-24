@@ -197,7 +197,7 @@ function DateFilterBase({
             goBack,
             save,
         }),
-        [goBack],
+        [goBack, save],
     );
 
     const shouldShowActionButtons = shouldShowActionButtonsProp && (!shouldShowButtonsOnlyWithDateModifier || !!selectedDateModifier);

@@ -1,6 +1,6 @@
 import React from 'react';
+import SingleSelect from '@components/Search/FilterComponents/SingleSelect';
 import type {PolicyReportField} from '@src/types/onyx';
-import SingleSelect from '../SingleSelect';
 
 type ReportFieldListProps = {
     field: PolicyReportField;
@@ -13,7 +13,7 @@ function ReportFieldList({field, value, onChange}: ReportFieldListProps) {
         value: fieldValue,
         text: fieldValue,
     }));
-    const selectedValue = {text: value, value: value};
+    const selectedValue = {text: value, value};
 
     return (
         <SingleSelect

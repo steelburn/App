@@ -7,7 +7,6 @@ import type {SearchAdvancedFiltersForm} from '@src/types/form';
 import type {Icon} from '@src/types/onyx/OnyxCommon';
 import type {MultiSelectItem} from './MultiSelect';
 import MultiSelect from './MultiSelect';
-import type FilterComponentProps from './types';
 
 type WorkspaceSelectorProps = {
     policyIDQuery: string[] | undefined;

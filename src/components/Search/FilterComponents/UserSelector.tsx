@@ -35,7 +35,7 @@ function UserSelector({filterKey, onChange}: UserSelectorProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const {windowHeight} = useWindowDimensions();
-    // eslint-disable-next-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidthExpand commentComment on line R49Resolved
+    // eslint-disable-next-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidth
     const {isSmallScreenWidth, isInLandscapeMode} = useResponsiveLayout();
     const personalDetails = usePersonalDetails();
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
