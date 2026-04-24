@@ -69,7 +69,7 @@ const DEBOUNCE_DELAY = 150; // ms
 
 /**
  * Inner gate — all Pusher, reasoning, and label state.
- * Only mounted when reportID matches the Concierge report.
+ * Only mounted for AgentZero chats (Concierge DMs or policy #admins rooms).
  * Remounted via key prop when reportID changes, so all state resets automatically.
  */
 function AgentZeroStatusGate({reportID, children}: React.PropsWithChildren<{reportID: string}>) {
