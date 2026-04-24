@@ -462,7 +462,7 @@ function ReportActionsList({
     }, [report.reportID]);
 
     const initialScrollKey = useMemo(() => {
-        return linkedReportActionID ?? unreadMarkerReportActionID;
+        return linkedReportActionID ?? unreadMarkerReportActionID ?? undefined;
     }, [linkedReportActionID, unreadMarkerReportActionID]);
 
     const isReportUnread = useMemo(
@@ -568,7 +568,7 @@ function ReportActionsList({
     }, [handleReportChangeMarkAsRead, handleAppVisibilityMarkAsRead]);
 
     useEffect(() => {
-        if (!!linkedReportActionID || !!unreadMarkerReportActionID) {
+        if (initialScrollKey) {
             return;
         }
 
@@ -780,7 +780,7 @@ function ReportActionsList({
         const numToRender = Math.ceil(availableHeight / minimumReportActionHeight);
         return getReportActionsListInitialNumToRender({
             numToRender,
-            linkedReportActionID,
+            initialScrollKey,
             shouldScrollToEndAfterLayout,
             hasCreatedActionAdded,
             sortedVisibleReportActionsLength: sortedVisibleReportActions.length,
@@ -791,7 +791,7 @@ function ReportActionsList({
         styles.chatItem.paddingBottom,
         styles.chatItem.paddingTop,
         windowHeight,
-        linkedReportActionID,
+        initialScrollKey,
         shouldScrollToEndAfterLayout,
         hasCreatedActionAdded,
         sortedVisibleReportActions.length,
