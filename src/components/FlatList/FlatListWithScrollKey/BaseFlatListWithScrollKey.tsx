@@ -19,7 +19,6 @@ function BaseFlatListWithScrollKey<T>({ref, ...props}: BaseFlatListWithScrollKey
         onScrollBeginDrag,
         onWheel,
         onTouchStartCapture,
-        onInitiallyLoaded,
         initialNumToRender,
         ...restProps
     } = props;
@@ -28,12 +27,10 @@ function BaseFlatListWithScrollKey<T>({ref, ...props}: BaseFlatListWithScrollKey
         keyExtractor,
         initialScrollKey,
         inverted: false,
-        initialNumToRender,
         onStartReached,
         shouldEnableAutoScrollToTopThreshold,
         renderItem,
         ref,
-        onInitiallyLoaded,
     });
 
     const isLoadingData = useRef(true);
@@ -58,7 +55,6 @@ function BaseFlatListWithScrollKey<T>({ref, ...props}: BaseFlatListWithScrollKey
             // eslint-disable-next-line react/jsx-props-no-spreading
             {...restProps}
             data={displayedData}
-            initialNumToRender={initialNumToRender}
             maintainVisibleContentPosition={maintainVisibleContentPosition}
             onStartReached={handleStartReached}
             renderItem={handleRenderItem}
