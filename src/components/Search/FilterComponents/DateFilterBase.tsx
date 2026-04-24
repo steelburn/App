@@ -20,6 +20,7 @@ type DateFilterBaseHandle = {
     getDateValues: () => SearchDateValues;
     /** Handles back navigation by closing the active date modifier before leaving the screen */
     goBack: () => void;
+    save: () => void;
 };
 
 type DateFilterBaseProps = {
@@ -45,6 +46,7 @@ type DateFilterBaseProps = {
     onSelectDateModifier?: (dateModifier: SearchDateModifier | null) => void;
     /** Callback when the date modifier screen is opened or closed (on/after/before) */
     onDateModifierChange?: (isOpen: boolean) => void;
+    shouldShowActionButtons?: boolean;
     /** If true, the Reset/Save buttons are only shown when a date modifier is selected. */
     shouldShowButtonsOnlyWithDateModifier?: boolean;
     /** Whether to render the built-in HeaderWithBackButton. Defaults to true. */
@@ -64,6 +66,7 @@ function DateFilterBase({
     onReset,
     onDateValuesChange,
     onDateModifierChange,
+    shouldShowActionButtons: shouldShowActionButtonsProp = true,
     shouldShowButtonsOnlyWithDateModifier = false,
     shouldShowHeader = true,
     ref,
@@ -142,15 +145,6 @@ function DateFilterBase({
         onBackButtonPress?.();
     }, [onBackButtonPress, onDateModifierChange, selectedDateModifier, setSelectedDateModifier]);
 
-    useImperativeHandle(
-        ref,
-        () => ({
-            getDateValues: () => searchDatePresetFilterBaseRef.current?.getDateValues() ?? getEmptyDateValues(),
-            goBack,
-        }),
-        [goBack],
-    );
-
     const computedTitle = getDateModifierTitle(selectedDateModifier, title ?? '', translate);
 
     const reset = useCallback(() => {
@@ -196,7 +190,17 @@ function DateFilterBase({
         onSubmit(searchDatePresetFilterBaseRef.current.getDateValues());
     }, [onDateModifierChange, onSubmit, selectedDateModifier, setSelectedDateModifier]);
 
-    const shouldShowActionButtons = !shouldShowButtonsOnlyWithDateModifier || !!selectedDateModifier;
+    useImperativeHandle(
+        ref,
+        () => ({
+            getDateValues: () => searchDatePresetFilterBaseRef.current?.getDateValues() ?? getEmptyDateValues(),
+            goBack,
+            save,
+        }),
+        [goBack],
+    );
+
+    const shouldShowActionButtons = shouldShowActionButtonsProp && (!shouldShowButtonsOnlyWithDateModifier || !!selectedDateModifier);
     const shouldShowRangeSummary = selectedDateModifier === CONST.SEARCH.DATE_MODIFIERS.RANGE && !!rangeDisplayText;
 
     return (
