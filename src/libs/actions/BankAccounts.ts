@@ -176,7 +176,40 @@ function updateAddPersonalBankAccountDraft(bankData: Partial<PersonalBankAccount
 /**
  * Helper method to build the Onyx data required during setup of a Verified Business Bank Account
  */
-function getVBBADataForOnyx(currentStep?: BankAccountStep, shouldShowLoading = true): OnyxData<typeof ONYXKEYS.REIMBURSEMENT_ACCOUNT | typeof ONYXKEYS.NVP_LAST_PAYMENT_METHOD> {
+function getVBBADataForOnyx(currentStep?: BankAccountStep, shouldShowLoading = true): OnyxData<typeof ONYXKEYS.REIMBURSEMENT_ACCOUNT | typeof ONYXKEYS.NVP_LAST_PAYMENT_METHOD | typeof ONYXKEYS.ONFIDO_TOKEN | typeof ONYXKEYS.ONFIDO_APPLICANT_ID | typeof ONYXKEYS.PLAID_DATA | typeof ONYXKEYS.PLAID_LINK_TOKEN> {
+    let failureData: Array<OnyxUpdate<typeof ONYXKEYS.REIMBURSEMENT_ACCOUNT | typeof ONYXKEYS.NVP_LAST_PAYMENT_METHOD | typeof ONYXKEYS.ONFIDO_TOKEN | typeof ONYXKEYS.ONFIDO_APPLICANT_ID | typeof ONYXKEYS.PLAID_DATA | typeof ONYXKEYS.PLAID_LINK_TOKEN>> = [
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: ONYXKEYS.REIMBURSEMENT_ACCOUNT,
+            value: {
+                isLoading: false,
+                errors: getMicroSecondOnyxErrorWithTranslationKey('walletPage.addBankAccountFailure'),
+            },
+        },
+        {
+            onyxMethod: Onyx.METHOD.SET,
+            key: ONYXKEYS.PLAID_DATA,
+            value: null
+        },
+        {
+            onyxMethod: Onyx.METHOD.SET,
+            key: ONYXKEYS.PLAID_LINK_TOKEN,
+            value: null
+        },
+    ];
+    if (currentStep != CONST.BANK_ACCOUNT.STEP.REQUESTOR) {
+        failureData.push({
+            onyxMethod: Onyx.METHOD.SET,
+            key: ONYXKEYS.ONFIDO_TOKEN,
+            value: null
+        });
+        failureData.push({
+            onyxMethod: Onyx.METHOD.SET,
+            key: ONYXKEYS.ONFIDO_APPLICANT_ID,
+            value: null
+        });
+    }
+    
     return {
         optimisticData: [
             {
@@ -204,16 +237,7 @@ function getVBBADataForOnyx(currentStep?: BankAccountStep, shouldShowLoading = t
                 },
             },
         ],
-        failureData: [
-            {
-                onyxMethod: Onyx.METHOD.MERGE,
-                key: ONYXKEYS.REIMBURSEMENT_ACCOUNT,
-                value: {
-                    isLoading: false,
-                    errors: getMicroSecondOnyxErrorWithTranslationKey('walletPage.addBankAccountFailure'),
-                },
-            },
-        ],
+        failureData: failureData,
     };
 }
 
