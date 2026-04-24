@@ -28,6 +28,7 @@ function BaseFlatListWithScrollKey<T>({ref, ...props}: BaseFlatListWithScrollKey
         keyExtractor,
         initialScrollKey,
         inverted: false,
+        initialNumToRender,
         onStartReached,
         shouldEnableAutoScrollToTopThreshold,
         renderItem,
