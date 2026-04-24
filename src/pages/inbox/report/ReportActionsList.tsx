@@ -307,33 +307,39 @@ function ReportActionsList({
      * The reportActionID the unread marker should display above
      */
     const prevUnreadMarkerReportActionID = useRef<string | null>(null);
-    const [unreadMarkerReportActionID, unreadMarkerReportActionIndex] = useMemo(
-        () =>
-            oldestUnreadReportActionMarker ??
-            getUnreadMarkerReportAction({
-                visibleReportActions: sortedVisibleReportActions,
-                earliestReceivedOfflineMessageIndex,
-                currentUserAccountID,
-                prevSortedVisibleReportActionsObjects,
-                unreadMarkerTime,
-                scrollingVerticalOffset: scrollOffsetRef.current,
-                prevUnreadMarkerReportActionID: prevUnreadMarkerReportActionID.current,
-                isOffline,
-                isReversed: false,
-                isAnonymousUser,
-            }),
-        [
-            currentUserAccountID,
+    const [unreadMarkerReportActionID, unreadMarkerReportActionIndex] = useMemo(() => {
+        const scanned = getUnreadMarkerReportAction({
+            visibleReportActions: sortedVisibleReportActions,
             earliestReceivedOfflineMessageIndex,
-            isAnonymousUser,
-            isOffline,
-            oldestUnreadReportActionMarker,
+            currentUserAccountID,
             prevSortedVisibleReportActionsObjects,
-            scrollOffsetRef,
-            sortedVisibleReportActions,
             unreadMarkerTime,
-        ],
-    );
+            scrollingVerticalOffset: scrollOffsetRef.current,
+            prevUnreadMarkerReportActionID: prevUnreadMarkerReportActionID.current,
+            isOffline,
+            isReversed: false,
+            isAnonymousUser,
+        });
+        if (oldestUnreadReportActionMarker) {
+            const [oldestAnchorActionID] = oldestUnreadReportActionMarker;
+            // Pagination is anchored to the oldest unread on first open; that anchor does not change when the user
+            // marks read or unread, or when messages are deleted. Prefer the scan when it does not match that stale id.
+            if (scanned[0] !== null && scanned[0] !== oldestAnchorActionID) {
+                return scanned;
+            }
+        }
+        return oldestUnreadReportActionMarker ?? scanned;
+    }, [
+        currentUserAccountID,
+        earliestReceivedOfflineMessageIndex,
+        isAnonymousUser,
+        isOffline,
+        oldestUnreadReportActionMarker,
+        prevSortedVisibleReportActionsObjects,
+        scrollOffsetRef,
+        sortedVisibleReportActions,
+        unreadMarkerTime,
+    ]);
     prevUnreadMarkerReportActionID.current = unreadMarkerReportActionID;
 
     const initialScrollKey = useMemo(() => {
