@@ -1,5 +1,8 @@
 import React, {useRef, useState} from 'react';
+import useIsInLandscapeMode from '@hooks/useIsInLandscapeMode';
 import useLocalize from '@hooks/useLocalize';
+import useThemeStyles from '@hooks/useThemeStyles';
+import useWindowDimensions from '@hooks/useWindowDimensions';
 import CONST from '@src/CONST';
 import type {SearchAdvancedFiltersForm} from '@src/types/form';
 import type {PolicyReportField} from '@src/types/onyx';
@@ -13,6 +16,9 @@ type ReportFieldPopupProps = {
 
 function ReportFieldPopup({closeOverlay, updateFilterForm}: ReportFieldPopupProps) {
     const {translate} = useLocalize();
+    const {windowHeight} = useWindowDimensions();
+    const isInLandscapeMode = useIsInLandscapeMode();
+    const styles = useThemeStyles();
     const [selectedField, setSelectedField] = useState<PolicyReportField | null>(null);
     const reportFieldRef = useRef<ReportFieldHandle>(null);
 
@@ -51,6 +57,7 @@ function ReportFieldPopup({closeOverlay, updateFilterForm}: ReportFieldPopupProp
             onApply={applyChanges}
             resetSentryLabel={CONST.SENTRY_LABEL.SEARCH.FILTER_POPUP_RESET_REPORT_FIELD}
             applySentryLabel={CONST.SENTRY_LABEL.SEARCH.FILTER_POPUP_APPLY_REPORT_FIELD}
+            style={[styles.getPopoverMaxHeight(windowHeight, isInLandscapeMode)]}
         >
             <ReportFieldBase
                 ref={reportFieldRef}

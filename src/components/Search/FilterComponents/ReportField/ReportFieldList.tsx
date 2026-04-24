@@ -20,6 +20,7 @@ function ReportFieldList({field, value, onChange}: ReportFieldListProps) {
             items={items}
             value={selectedValue}
             onChange={onChange}
+            hasHeader
         />
     );
 }

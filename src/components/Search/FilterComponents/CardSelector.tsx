@@ -11,13 +11,16 @@ import useDebouncedState from '@hooks/useDebouncedState';
 import useLocalize from '@hooks/useLocalize';
 import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
+import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useTheme from '@hooks/useTheme';
 import useThemeIllustrations from '@hooks/useThemeIllustrations';
 import useThemeStyles from '@hooks/useThemeStyles';
+import useWindowDimensions from '@hooks/useWindowDimensions';
 import {openSearchCardFiltersPage} from '@libs/actions/Search';
 import {buildCardFeedsData, buildCardsData, generateSelectedCards, getDomainFeedData} from '@libs/CardFeedUtils';
 import type {CardFilterItem} from '@libs/CardFeedUtils';
 import type {SkeletonSpanReasonAttributes} from '@libs/telemetry/useSkeletonSpan';
+import variables from '@styles/variables';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import isLoadingOnyxValue from '@src/types/utils/isLoadingOnyxValue';
@@ -34,6 +37,9 @@ function CardSelector({onChange, onCountChange}: CardSelectorProps) {
     const {isOffline} = useNetwork();
     const illustrations = useThemeIllustrations();
     const companyCardFeedIcons = useCompanyCardFeedIcons();
+    const {windowHeight} = useWindowDimensions();
+    // eslint-disable-next-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidth
+    const {isSmallScreenWidth, isInLandscapeMode} = useResponsiveLayout();
 
     const [areCardsLoaded] = useOnyx(ONYXKEYS.IS_SEARCH_FILTERS_CARD_DATA_LOADED);
     const [userCardList, userCardListMetadata] = useOnyx(ONYXKEYS.CARD_LIST);
@@ -96,6 +102,7 @@ function CardSelector({onChange, onCountChange}: CardSelectorProps) {
 
     let sections: Array<Section<CardFilterItem>> = [];
     let itemCount = 0;
+    let sectionHeaderCount = 0;
 
     if (searchAdvancedFiltersForm) {
         const selectedData = [...cardFeedsSectionData.selected, ...individualCardsSectionData.selected, ...closedCardsSectionData.selected];
@@ -104,6 +111,7 @@ function CardSelector({onChange, onCountChange}: CardSelectorProps) {
         const unselectedClosedCardsData = closedCardsSectionData.unselected;
 
         itemCount = selectedData.length + unselectedCardFeedsData.length + unselectedIndividualCardsData.length + unselectedClosedCardsData.length;
+        sectionHeaderCount = [unselectedCardFeedsData.length, unselectedIndividualCardsData.length, unselectedClosedCardsData.length].filter(Boolean).length;
 
         sections = [
             {
@@ -160,26 +168,43 @@ function CardSelector({onChange, onCountChange}: CardSelectorProps) {
     const shouldShowLoadingState = isLoadingOnyxData || (!areCardsLoaded && !isOffline);
     const reasonAttributes: SkeletonSpanReasonAttributes = {context: 'SearchFiltersCardPage', isLoadingFromOnyx: isLoadingOnyxData};
 
-    return shouldShowLoadingState ? (
-        <View style={[styles.flex1, styles.flexColumn, styles.justifyContentCenter, styles.alignItemsCenter]}>
-            <ActivityIndicator
-                color={theme.spinner}
-                size={CONST.ACTIVITY_INDICATOR_SIZE.LARGE}
-                style={[styles.pl3]}
-                reasonAttributes={reasonAttributes}
-            />
+    return (
+        <View
+            style={[
+                styles.getSelectionListPopoverHeight({
+                    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- we want to fallback to 1 when it's 0
+                    itemCount: itemCount || 1,
+                    itemHeight: variables.optionRowHeight,
+                    windowHeight,
+                    isInLandscapeMode,
+                    hasTitle: isSmallScreenWidth,
+                    isSearchable: shouldShowSearchInput,
+                    extraHeight: 28 * sectionHeaderCount,
+                }),
+            ]}
+        >
+            {shouldShowLoadingState ? (
+                <View style={[styles.flex1, styles.flexColumn, styles.justifyContentCenter, styles.alignItemsCenter]}>
+                    <ActivityIndicator
+                        color={theme.spinner}
+                        size={CONST.ACTIVITY_INDICATOR_SIZE.LARGE}
+                        style={[styles.pl3]}
+                        reasonAttributes={reasonAttributes}
+                    />
+                </View>
+            ) : (
+                <SelectionListWithSections<CardFilterItem>
+                    sections={sections}
+                    ListItem={CardListItem}
+                    onSelectRow={updateNewCards}
+                    shouldPreventDefaultFocusOnSelectRow={false}
+                    shouldShowTextInput={shouldShowSearchInput}
+                    textInputOptions={textInputOptions}
+                    shouldStopPropagation
+                    canSelectMultiple
+                />
+            )}
         </View>
-    ) : (
-        <SelectionListWithSections<CardFilterItem>
-            sections={sections}
-            ListItem={CardListItem}
-            onSelectRow={updateNewCards}
-            shouldPreventDefaultFocusOnSelectRow={false}
-            shouldShowTextInput={shouldShowSearchInput}
-            textInputOptions={textInputOptions}
-            shouldStopPropagation
-            canSelectMultiple
-        />
     );
 }
 

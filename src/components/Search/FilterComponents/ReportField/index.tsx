@@ -7,7 +7,6 @@ import ScrollView from '@components/ScrollView';
 import type {ReportFieldDateKey, ReportFieldTextKey} from '@components/Search/types';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
-import useStyleUtils from '@hooks/useStyleUtils';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {getDateModifierTitle, isSearchDatePreset} from '@libs/SearchQueryUtils';
 import {getDateDisplayValue, getDatePresets, SearchDateModifier} from '@libs/SearchUIUtils';
@@ -174,7 +173,6 @@ function SelectedDateReportField({ref, field, value: initialValue, selectedDateM
 function ReportFieldBase({ref, selectedField, onFieldSelected}: ReportFieldBaseProps) {
     const {translate, localeCompare} = useLocalize();
     const styles = useThemeStyles();
-    const StyleUtils = useStyleUtils();
     const policyReportFieldsSelector = (policies: OnyxCollection<Policy>) => createAllPolicyReportFieldsSelector(policies, localeCompare);
     const [fieldList] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {
         selector: policyReportFieldsSelector,
@@ -255,7 +253,7 @@ function ReportFieldBase({ref, selectedField, onFieldSelected}: ReportFieldBaseP
 
     if (selectedField) {
         return (
-            <ScrollView style={[styles.flex1, styles.gap2, StyleUtils.getMaximumHeight(CONST.POPOVER_DROPDOWN_MAX_HEIGHT)]}>
+            <ScrollView style={[styles.flex1, styles.gap2]}>
                 {!selectedDateModifier && (
                     <HeaderWithBackButton
                         style={[styles.h10]}
@@ -291,7 +289,7 @@ function ReportFieldBase({ref, selectedField, onFieldSelected}: ReportFieldBaseP
     });
 
     return (
-        <ScrollView style={[StyleUtils.getMaximumHeight(CONST.POPOVER_DROPDOWN_MAX_HEIGHT)]}>
+        <ScrollView>
             {listItems.map((item) => (
                 <MenuItem
                     key={item.key}

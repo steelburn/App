@@ -1,4 +1,5 @@
 import React, {useEffect, useState} from 'react';
+import {View} from 'react-native';
 import {usePersonalDetails} from '@components/OnyxListItemProvider';
 import {useOptionsList} from '@components/OptionListContextProvider';
 import useFilterCountChange from '@components/Search/hooks/useFilterCountChange';
@@ -10,13 +11,17 @@ import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import usePrivateIsArchivedMap from '@hooks/usePrivateIsArchivedMap';
 import useReportAttributes from '@hooks/useReportAttributes';
+import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useSortedActions from '@hooks/useSortedActions';
+import useThemeStyles from '@hooks/useThemeStyles';
+import useWindowDimensions from '@hooks/useWindowDimensions';
 import {searchInServer} from '@libs/actions/Report';
 import {canUseTouchScreen} from '@libs/DeviceCapabilities';
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import {createOptionFromReport, filterAndOrderOptions, formatSectionsFromSearchTerm, getAlternateText, getSearchOptions} from '@libs/OptionsListUtils';
 import type {Option, OptionWithKey, SelectionListSections} from '@libs/OptionsListUtils/types';
 import type {OptionData} from '@libs/ReportUtils';
+import variables from '@styles/variables';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import passthroughPolicyTagListSelector from '@src/selectors/PolicyTagList';
@@ -45,6 +50,10 @@ function inSelector(searchAdvancedFiltersForm: SearchAdvancedFiltersForm | undef
 
 function InSelector({onChange, onCountChange}: InSelectorProps) {
     const {translate} = useLocalize();
+    const styles = useThemeStyles();
+    // eslint-disable-next-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidth
+    const {isSmallScreenWidth, isInLandscapeMode} = useResponsiveLayout();
+    const {windowHeight} = useWindowDimensions();
     const personalDetails = usePersonalDetails();
     const {options, areOptionsInitialized} = useOptionsList();
 
@@ -170,18 +179,32 @@ function InSelector({onChange, onCountChange}: InSelectorProps) {
         headerMessage,
     };
 
+    const itemCount = sections.flatMap((section) => section.data).length || 1;
     return (
-        <SelectionListWithSections
-            sections={sections}
-            onSelectRow={handleParticipantSelection}
-            ListItem={InviteMemberListItem}
-            canSelectMultiple
-            shouldPreventDefaultFocusOnSelectRow={!canUseTouchScreen()}
-            textInputOptions={textInputOptions}
-            isLoadingNewOptions={isLoadingNewOptions}
-            shouldShowLoadingPlaceholder={shouldShowLoadingPlaceholder}
-            shouldShowTextInput
-        />
+        <View
+            style={[
+                styles.getSelectionListPopoverHeight({
+                    itemCount,
+                    itemHeight: variables.optionRowHeight,
+                    windowHeight,
+                    isInLandscapeMode,
+                    hasTitle: isSmallScreenWidth,
+                    isSearchable: true,
+                }),
+            ]}
+        >
+            <SelectionListWithSections
+                sections={sections}
+                onSelectRow={handleParticipantSelection}
+                ListItem={InviteMemberListItem}
+                canSelectMultiple
+                shouldPreventDefaultFocusOnSelectRow={!canUseTouchScreen()}
+                textInputOptions={textInputOptions}
+                isLoadingNewOptions={isLoadingNewOptions}
+                shouldShowLoadingPlaceholder={shouldShowLoadingPlaceholder}
+                shouldShowTextInput
+            />
+        </View>
     );
 }
 

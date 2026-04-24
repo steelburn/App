@@ -1,5 +1,6 @@
 import isEmpty from 'lodash/isEmpty';
 import React, {useEffect, useRef, useState} from 'react';
+import {View} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';
 import {usePersonalDetails} from '@components/OnyxListItemProvider';
 import useFilterCountChange from '@components/Search/hooks/useFilterCountChange';
@@ -9,8 +10,10 @@ import type {ListItem, SelectionListHandle} from '@components/SelectionList/type
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
+import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useSearchSelector from '@hooks/useSearchSelector';
 import useThemeStyles from '@hooks/useThemeStyles';
+import useWindowDimensions from '@hooks/useWindowDimensions';
 import canFocusInputOnScreenFocus from '@libs/canFocusInputOnScreenFocus';
 import {getParticipantsOption} from '@libs/OptionsListUtils';
 import type {OptionData} from '@libs/ReportUtils';
@@ -33,6 +36,9 @@ function UserSelector({filterKey, onChange, onCountChange}: UserSelectorProps) {
     const selectionListRef = useRef<SelectionListHandle<ListItem> | null>(null);
     const styles = useThemeStyles();
     const {translate} = useLocalize();
+    const {windowHeight} = useWindowDimensions();
+    // eslint-disable-next-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidthExpand commentComment on line R49Resolved
+    const {isSmallScreenWidth, isInLandscapeMode} = useResponsiveLayout();
     const personalDetails = usePersonalDetails();
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const currentUserAccountID = currentUserPersonalDetails.accountID;
@@ -139,18 +145,30 @@ function UserSelector({filterKey, onChange, onCountChange}: UserSelectorProps) {
     useFilterCountChange(totalOptionsCount, onCountChange);
 
     return (
-        <SelectionList
-            data={listData}
-            ref={selectionListRef}
-            textInputOptions={textInputOptions}
-            canSelectMultiple
-            ListItem={UserSelectionListItem}
-            onSelectRow={selectUser}
-            isLoadingNewOptions={isLoadingNewOptions}
-            shouldShowLoadingPlaceholder={!areOptionsInitialized}
-            onEndReached={onListEndReached}
-            style={{contentContainerStyle: [styles.pb0]}}
-        />
+        <View
+            style={[
+                styles.getSelectionListPopoverHeight({
+                    itemCount: listData.length || 1,
+                    windowHeight,
+                    isInLandscapeMode,
+                    hasTitle: isSmallScreenWidth,
+                    isSearchable: shouldShowSearchInput,
+                }),
+            ]}
+        >
+            <SelectionList
+                data={listData}
+                ref={selectionListRef}
+                textInputOptions={textInputOptions}
+                canSelectMultiple
+                ListItem={UserSelectionListItem}
+                onSelectRow={selectUser}
+                isLoadingNewOptions={isLoadingNewOptions}
+                shouldShowLoadingPlaceholder={!areOptionsInitialized}
+                onEndReached={onListEndReached}
+                style={{contentContainerStyle: [styles.pb0]}}
+            />
+        </View>
     );
 }
 

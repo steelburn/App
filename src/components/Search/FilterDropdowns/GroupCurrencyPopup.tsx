@@ -4,13 +4,13 @@ import {useCurrencyListActions, useCurrencyListState} from '@components/Currency
 import type {SingleSelectItem} from '@components/Search/FilterComponents/SingleSelect';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
-import useThemeStyles from '@hooks/useThemeStyles';
 import {getCurrencyOptions} from '@libs/SearchUIUtils';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {SearchAdvancedFiltersForm} from '@src/types/form';
 import SingleSelectPopup from './SingleSelectPopup';
 
 type GroupCurrencyPopupProps = {
+    onBackButtonPress: () => void;
     closeOverlay: () => void;
     onChange: (item: SingleSelectItem<string> | null) => void;
 };
@@ -19,8 +19,7 @@ function filterGroupCurrencySelector(searchAdvancedFiltersForm: OnyxEntry<Search
     return searchAdvancedFiltersForm?.groupCurrency;
 }
 
-function GroupCurrencyPopup({onChange, closeOverlay}: GroupCurrencyPopupProps) {
-    const styles = useThemeStyles();
+function GroupCurrencyPopup({onBackButtonPress, onChange, closeOverlay}: GroupCurrencyPopupProps) {
     const {translate} = useLocalize();
     const {currencyList} = useCurrencyListState();
     const {getCurrencySymbol} = useCurrencyListActions();
@@ -31,9 +30,10 @@ function GroupCurrencyPopup({onChange, closeOverlay}: GroupCurrencyPopupProps) {
 
     return (
         <SingleSelectPopup
-            style={[styles.pv0, styles.mt2]}
             items={groupCurrencyOptions}
             value={groupCurrencyValue}
+            label={translate('common.groupCurrency')}
+            onBackButtonPress={onBackButtonPress}
             closeOverlay={closeOverlay}
             onChange={onChange}
             isSearchable
