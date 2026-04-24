@@ -22,6 +22,8 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import type {Route} from '@src/ROUTES';
 import ROUTES from '@src/ROUTES';
 
+const MIN_MEMBERS_FOR_ACCOUNTANT_INVITED = 2;
+
 type GettingStartedItem = {
     key: string;
     label: string;
@@ -97,7 +99,7 @@ function useGettingStartedItems(): UseGettingStartedItemsResult {
         items.push({
             key: 'inviteAccountant',
             label: translate('homePage.gettingStartedSection.inviteAccountant'),
-            isComplete: activeMemberCount >= 2,
+            isComplete: activeMemberCount >= MIN_MEMBERS_FOR_ACCOUNTANT_INVITED,
             route: ROUTES.WORKSPACE_MEMBERS.getRoute(activePolicyID),
         });
 
