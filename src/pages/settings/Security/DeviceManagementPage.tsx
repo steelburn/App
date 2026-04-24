@@ -21,7 +21,7 @@ function DeviceManagementPage() {
     const styles = useThemeStyles();
     const {translate, datetimeToRelative} = useLocalize();
 
-    const [logins] = useOnyx(ONYXKEYS.LOGINS);
+    const [logins] = useOnyx(ONYXKEYS.LOGINS, {selector: getRevokableLogins});
 
     const renderItem = ({item}: ListRenderItemInfo<Login>) => {
         const {deviceName, deviceVersion, os, osVersion} = item.additionalData ?? {};
@@ -59,7 +59,7 @@ function DeviceManagementPage() {
                 <RenderHTML html={translate('deviceManagementPage.description')} />
             </View>
             <FlashList
-                data={getRevokableLogins(logins)}
+                data={logins}
                 renderItem={renderItem}
                 keyExtractor={getLoginKey}
                 maintainVisibleContentPosition={{disabled: true}}
