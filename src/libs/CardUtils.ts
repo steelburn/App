@@ -1016,16 +1016,19 @@ function checkIfNewFeedConnected(prevFeedsData: CombinedCardFeeds, currentFeedsD
     };
 }
 
-function filterAllInactiveCards(cards: CardList | undefined, includeDeactivated = false) {
+function filterAllInactiveCards(cards: CardList | undefined, includeZeroLimitCards = false) {
     if (!cards) {
         return {};
     }
 
-    const closedStates = new Set<number>(includeDeactivated ? [CONST.EXPENSIFY_CARD.STATE.CLOSED] : [CONST.EXPENSIFY_CARD.STATE.CLOSED, CONST.EXPENSIFY_CARD.STATE.STATE_DEACTIVATED]);
+    const closedStates = new Set<number>([CONST.EXPENSIFY_CARD.STATE.CLOSED, CONST.EXPENSIFY_CARD.STATE.STATE_DEACTIVATED]);
     const filteredCards = filterObject(cards, (_key, card) => {
+        const isZeroLimitExpensifyCard = includeZeroLimitCards && card.bank === CONST.EXPENSIFY_CARD.BANK && (card.nameValuePairs?.unapprovedExpenseLimit ?? 0) === 0;
         if (card.state === CONST.EXPENSIFY_CARD.STATE.STATE_SUSPENDED) {
-            // Only include suspended cards that are frozen.
-            return !!card.nameValuePairs?.frozen;
+            return !!card.nameValuePairs?.frozen || isZeroLimitExpensifyCard;
+        }
+        if (card.state === CONST.EXPENSIFY_CARD.STATE.STATE_DEACTIVATED) {
+            return isZeroLimitExpensifyCard;
         }
 
         return !closedStates.has(card.state);
@@ -1059,7 +1062,7 @@ function getAllCardsForWorkspace(
     allCardList: OnyxCollection<WorkspaceCardsList>,
     cardFeeds?: CombinedCardFeeds,
     expensifyCardSettings?: OnyxCollection<ExpensifyCardSettings>,
-    includeDeactivated = false,
+    includeZeroLimitCards = false,
 ): CardList {
     const cards: CardList = {};
     const companyCardsDomainFeeds = Object.entries(cardFeeds ?? {}).map(([feedName, feedData]) => ({domainID: feedData.domainID, feedName}));
@@ -1073,7 +1076,7 @@ function getAllCardsForWorkspace(
         const isExpensifyDomainCards = expensifyCardsDomainIDs.some((domainID) => key.includes(domainID.toString()) && key.includes(CONST.EXPENSIFY_CARD.BANK));
         if ((isWorkspaceAccountCards || isCompanyDomainCards || isExpensifyDomainCards) && values) {
             const {cardList: assignableCards, ...assignedCards} = values ?? {};
-            const filteredCards = filterAllInactiveCards(assignedCards, includeDeactivated);
+            const filteredCards = filterAllInactiveCards(assignedCards, includeZeroLimitCards);
             Object.assign(cards, filteredCards);
         }
     }
