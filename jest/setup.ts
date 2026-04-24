@@ -12,7 +12,7 @@ import mockStorage from 'react-native-onyx/dist/storage/__mocks__';
 import type Animated from 'react-native-reanimated';
 import 'setimmediate';
 import {TextDecoder, TextEncoder} from 'util';
-import type {RenderInfo} from '@components/FlatList/InvertedFlatList/RenderTaskQueue';
+import type {RenderInfo} from '@components/FlatList/RenderTaskQueue';
 import '@src/polyfills/PromiseWithResolvers';
 import mockFSLibrary from './setupMockFullstoryLib';
 import setupMockImages from './setupMockImages';
