@@ -23,7 +23,6 @@ import useEndSubmitNavigationSpans from '@hooks/useEndSubmitNavigationSpans';
 import useLoadingBarVisibility from '@hooks/useLoadingBarVisibility';
 import useLocalize from '@hooks/useLocalize';
 import useNetwork from '@hooks/useNetwork';
-import useOnyx from '@hooks/useOnyx';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useScrollEventEmitter from '@hooks/useScrollEventEmitter';
 import useSearchLoadingState from '@hooks/useSearchLoadingState';
@@ -39,9 +38,7 @@ import variables from '@styles/variables';
 import {searchInServer} from '@userActions/Report';
 import {search} from '@userActions/Search';
 import CONST from '@src/CONST';
-import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
-import {hasFilterBarsSelector} from '@src/selectors/AdvancedSearchFiltersForm';
 import type {SearchResults} from '@src/types/onyx';
 import type {SearchResultsInfo} from '@src/types/onyx/SearchResults';
 import {SearchActionsBarSwitch, SearchFiltersBarSwitch, SearchPageInputSwitch, SearchTypeMenuSwitch} from './Switches';
@@ -62,8 +59,10 @@ type SearchPageNarrowProps = {
     };
     shouldShowFooter: boolean;
     onSortPressedCallback: () => void;
+    /** Overlay rendered above Search content during expense-creation flows (SearchStaticList or null). */
     searchOverlayContent: React.ReactNode;
     onSearchContentReady: () => void;
+    hasFilterBars: boolean;
 };
 
 const tabBarContent = <TabBarBottomContent selectedTab={NAVIGATION_TABS.SEARCH} />;
@@ -78,6 +77,7 @@ function SearchPageNarrow({
     onSortPressedCallback,
     searchOverlayContent,
     onSearchContentReady,
+    hasFilterBars,
 }: SearchPageNarrowProps) {
     const shouldShowLoadingSkeleton = useSearchLoadingState(queryJSON, searchResults);
     const {translate} = useLocalize();
@@ -99,7 +99,6 @@ function SearchPageNarrow({
     const receiptDropTargetRef = useRef<View>(null);
 
     const [searchRequestResponseStatusCode, setSearchRequestResponseStatusCode] = useState<number | null>(null);
-    const [hasFilterBars = false] = useOnyx(ONYXKEYS.FORMS.SEARCH_ADVANCED_FILTERS_FORM, {selector: hasFilterBarsSelector});
 
     const scrollOffset = useSharedValue(0);
     const topBarOffset = useSharedValue<number>(StyleUtils.searchHeaderDefaultOffset);
@@ -272,6 +271,10 @@ function SearchPageNarrow({
         </>
     );
 
+    // The overlay (searchOverlayContent) is intentionally omitted here.
+    // The dynamic path runs outside submit-and-navigate flows, where Search's
+    // own skeleton/loading states handle transitions. On wide layout (SearchPageWide),
+    // the overlay is always rendered because wide doesn't have this static/dynamic split.
     const renderDynamicSearchList = () => {
         if (shouldShowLoadingSkeleton) {
             return (

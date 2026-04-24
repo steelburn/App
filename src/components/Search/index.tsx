@@ -1433,6 +1433,7 @@ function Search({
         flushDeferredWrite(CONST.DEFERRED_LAYOUT_WRITE_KEYS.SEARCH);
     }, [onDestinationVisible]);
 
+    // Deferred layout only needs the base work (no scroll handling, no content-ready signal).
     const onDeferredLayout = onLayoutBase;
 
     const onLayout = useCallback(() => {
@@ -1541,6 +1542,7 @@ function Search({
     // The minimal View fires onLayout to flush the deferred API write and set
     // hasHadFirstLayout.
     if (isDeferringHeavyWork && searchResults?.data && isTransactionSearchType(type)) {
+        // Zero-sized View - onLayout still fires on RN, which is all we need here.
         return <View onLayout={onDeferredLayout} />;
     }
 

@@ -40,6 +40,7 @@ type SearchPageWideProps = {
     onSortPressedCallback: () => void;
     route: PlatformStackRouteProp<SearchFullscreenNavigatorParamList, typeof SCREENS.SEARCH.ROOT>;
     shouldShowFooter: boolean;
+    /** Overlay rendered above Search content during expense-creation flows (SearchStaticList or null). */
     searchOverlayContent: React.ReactNode;
     onSearchContentReady: () => void;
 };

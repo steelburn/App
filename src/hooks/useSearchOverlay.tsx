@@ -63,6 +63,13 @@ function useSearchOverlay({
         return () => clearTimeout(id);
     }, [isSearchReady]);
 
+    // When the overlay is dismissed, skip column computation and JSX creation.
+    // The hook subscriptions (useSession, useOnyx) must remain unconditional per
+    // rules-of-hooks, but the derived work below is the expensive part.
+    if (isSearchReady) {
+        return {searchOverlayContent: null, onSearchContentReady};
+    }
+
     const isTransaction = isTransactionSearchType(queryJSON?.type);
     const canSelectMultiple = isTransaction && (!shouldUseNarrowLayout || isMobileSelectionModeEnabled);
 
@@ -84,8 +91,10 @@ function useSearchOverlay({
         });
     })();
 
+    // Narrow layout gets the custom contentContainerStyle (accounts for filter bars);
+    // wide layout uses SearchStaticList's own internal padding (styles.pb3).
     const searchOverlayContent =
-        !isSearchReady && isTransaction && searchData && queryJSON ? (
+        isTransaction && searchData && queryJSON ? (
             <SearchStaticList
                 searchResults={searchResults}
                 queryJSON={queryJSON}

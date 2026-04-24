@@ -62,7 +62,7 @@ function canUseDismissModalFastPath(snapshot: SubmitNavigationSnapshot): boolean
  *   isReportPreInserted                    -> REPORT_PRE_INSERT
  *   canUseDismissModalFastPath()           -> DISMISS_MODAL
  *   isFromGlobalCreate && canDismissFromSearch && isSearchTopmostFullScreen -> SEARCH_DISMISS
- *   isReportInRHP && destinationReportID   -> REPORT_IN_RHP_DISMISS
+ *   isReportInRHP && destinationReportID && !isSplitRequest -> REPORT_IN_RHP_DISMISS
  *   else                                   -> DEFAULT
  */
 function getSubmitHandler(snapshot: SubmitNavigationSnapshot): SubmitHandler {

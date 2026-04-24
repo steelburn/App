@@ -398,14 +398,28 @@ function SubmitExpenseOrchestrator({
         });
     };
 
-    // Unlike handleDismissModalFastPath, this handler does NOT call reserveDeferredWriteChannel.
-    // The createTransaction call runs inside runAfterDismiss (after the transition completes),
-    // so there is no animation to protect - the write can execute immediately via deferOrExecuteWrite.
+    // The createTransaction call runs inside runAfterDismiss (after the transition completes).
+    // When the destination report is empty we reserve a DISMISS_MODAL deferred-write channel
+    // so that MoneyRequestReportActionsList can show a loading skeleton instead of the
+    // "no expenses" empty state while the dismiss animation plays.
     const handleReportInRHPDismiss = (listOfParticipants: Participant[]) => {
         setFastPath(CONST.TELEMETRY.FAST_PATH_HANDLER.REPORT_IN_RHP_DISMISS, CONST.TELEMETRY.SUBMIT_OPTIMIZATION.DISMISS_FIRST);
         const rootState = navigationRef.getRootState();
 
+        const report = destinationReportID ? getReportOrDraftReport(destinationReportID) : undefined;
+        const isDestinationEmpty = !isMoneyRequestReport(report) || report?.transactionCount === 0;
+        if (isDestinationEmpty) {
+            reserveDeferredWriteChannel(CONST.DEFERRED_LAYOUT_WRITE_KEYS.DISMISS_MODAL);
+        }
+
         const runAfterDismiss = () => {
+            // Flush signals readiness on the reserved channel. Since no real write was
+            // registered, the channel transitions to flushRequested. When createTransaction
+            // below calls deferOrExecuteWrite, it sees the flushed channel and executes
+            // the write immediately instead of deferring.
+            if (isDestinationEmpty) {
+                flushDeferredWrite(CONST.DEFERRED_LAYOUT_WRITE_KEYS.DISMISS_MODAL);
+            }
             createTransaction(listOfParticipants, false, false);
             setIsConfirming(false);
         };

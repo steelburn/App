@@ -37,7 +37,7 @@ function SearchPage({route}: SearchPageProps) {
     const {clearSelectedTransactions, setLastSearchType} = useSearchActionsContext();
 
     const isMobileSelectionModeEnabled = useMobileSelectionMode(clearSelectedTransactions);
-    const [hasFilterBars] = useOnyx(ONYXKEYS.FORMS.SEARCH_ADVANCED_FILTERS_FORM, {selector: hasFilterBarsSelector});
+    const [hasFilterBars = false] = useOnyx(ONYXKEYS.FORMS.SEARCH_ADVANCED_FILTERS_FORM, {selector: hasFilterBarsSelector});
 
     const lastNonEmptySearchResults = useRef<SearchResults | undefined>(undefined);
 
@@ -158,6 +158,7 @@ function SearchPage({route}: SearchPageProps) {
                     onSortPressedCallback={onSortPressedCallback}
                     searchOverlayContent={searchOverlayContent}
                     onSearchContentReady={onSearchContentReady}
+                    hasFilterBars={hasFilterBars}
                 />
             ) : (
                 <SearchPageWide
