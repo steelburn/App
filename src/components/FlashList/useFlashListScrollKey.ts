@@ -24,7 +24,13 @@ export default function useFlashListScrollKey<T>({data, keyExtractor, initialScr
     //        linked item through the data swap.
     // RAF 2: pinning has happened, disable MVCP so it doesn't cause later jumps.
     useEffect(() => {
-        if (!isInitialRender || !initialScrollKey) {
+        // Without an anchor on this frame, we are not doing the deep-link slice handoff; clear the flag so a key that
+        // appears later (e.g. marking a message unread) cannot reuse the "first paint" slice path.
+        if (!initialScrollKey) {
+            setIsInitialRender(false);
+            return;
+        }
+        if (!isInitialRender) {
             return;
         }
         requestAnimationFrame(() => {
