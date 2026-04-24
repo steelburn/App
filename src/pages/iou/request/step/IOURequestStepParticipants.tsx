@@ -7,6 +7,7 @@ import useLocalize from '@hooks/useLocalize';
 import useMappedPolicies from '@hooks/useMappedPolicies';
 import useOnyx from '@hooks/useOnyx';
 import useOptimisticDraftTransactions from '@hooks/useOptimisticDraftTransactions';
+import usePermissions from '@hooks/usePermissions';
 import usePolicyForMovingExpenses from '@hooks/usePolicyForMovingExpenses';
 import useThemeStyles from '@hooks/useThemeStyles';
 import useTransactionsByID from '@hooks/useTransactionsByID';
@@ -119,6 +120,8 @@ function IOURequestStepParticipants({
     const [userBillingGracePeriodEnds] = useOnyx(ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_USER_BILLING_GRACE_PERIOD_END);
     const [ownerBillingGracePeriodEnd] = useOnyx(ONYXKEYS.NVP_PRIVATE_OWNER_BILLING_GRACE_PERIOD_END);
     const [amountOwed] = useOnyx(ONYXKEYS.NVP_PRIVATE_AMOUNT_OWED);
+    const {isBetaEnabled} = usePermissions();
+    const isNewManualExpenseFlowEnabled = isBetaEnabled(CONST.BETAS.NEW_MANUAL_EXPENSE_FLOW);
 
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
 
@@ -455,8 +458,13 @@ function IOURequestStepParticipants({
             return false;
         }
 
+        // In new flow - the amount step is skipped, so we need to include the recents for all the cases.
+        if (isNewManualExpenseFlowEnabled) {
+            return false;
+        }
+
         return initialTransaction?.amount !== undefined && initialTransaction?.amount !== null && initialTransaction?.amount <= 0;
-    }, [initialTransaction, iouRequestType]);
+    }, [isNewManualExpenseFlowEnabled, initialTransaction, iouRequestType]);
 
     return (
         <StepScreenWrapper

@@ -519,6 +519,9 @@ type Transaction = OnyxCommon.OnyxValueWithOfflineFeedback<
          */
         isAmountSet?: boolean;
 
+        /** Whether the merchant has been explicitly set by the user */
+        isMerchantSet?: boolean;
+
         /** The original merchant name */
         merchant: string;
 

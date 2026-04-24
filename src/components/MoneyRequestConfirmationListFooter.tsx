@@ -26,6 +26,7 @@ import tryResolveUrlFromApiRoot from '@libs/tryResolveUrlFromApiRoot';
 import variables from '@styles/variables';
 import CONST from '@src/CONST';
 import type {IOUAction, IOUType} from '@src/CONST';
+import type {TranslationPaths} from '@src/languages/types';
 import ROUTES from '@src/ROUTES';
 import type * as OnyxTypes from '@src/types/onyx';
 import type {Participant} from '@src/types/onyx/IOU';
@@ -86,6 +87,9 @@ type MoneyRequestConfirmationListFooterProps = {
 
     /** Clears specific form errors by key */
     clearFormErrors: (errors: string[]) => void;
+
+    /** Sets a form error message */
+    setFormError: (error: TranslationPaths | '') => void;
 
     /** Flag indicating if there is a route */
     hasRoute: boolean;
@@ -270,6 +274,7 @@ function MoneyRequestConfirmationListFooter({
     transactionID,
     unit,
     clearFormErrors,
+    setFormError,
     onPDFLoadError,
     onPDFPassword,
     onToggleReimbursable,
@@ -382,9 +387,32 @@ function MoneyRequestConfirmationListFooter({
                     isEditingSplitBill={isEditingSplitBill}
                     policy={policy}
                     clearFormErrors={clearFormErrors}
+                    setFormError={setFormError}
                 />
             ),
             shouldShow: shouldShowSmartScanFields && shouldShowAmountField,
+            shouldShowAboveShowMore: false,
+        },
+        {
+            item: (
+                <MerchantField
+                    key="merchant"
+                    isMerchantRequired={isMerchantRequired}
+                    isNewManualExpenseFlowEnabled={isNewManualExpenseFlowEnabled}
+                    isReadOnly={isReadOnly}
+                    didConfirm={didConfirm}
+                    shouldDisplayFieldError={shouldDisplayFieldError}
+                    formError={formError}
+                    transactionID={transactionID}
+                    action={action}
+                    iouType={iouType}
+                    reportID={reportID}
+                    reportActionID={reportActionID}
+                    transaction={transaction}
+                    isEditingSplitBill={isEditingSplitBill}
+                />
+            ),
+            shouldShow: shouldShowMerchant && isNewManualExpenseFlowEnabled,
             shouldShowAboveShowMore: false,
         },
         {
@@ -475,7 +503,7 @@ function MoneyRequestConfirmationListFooter({
                     isEditingSplitBill={isEditingSplitBill}
                 />
             ),
-            shouldShow: shouldShowMerchant,
+            shouldShow: shouldShowMerchant && !isNewManualExpenseFlowEnabled,
             shouldShowAboveShowMore: false,
         },
         {

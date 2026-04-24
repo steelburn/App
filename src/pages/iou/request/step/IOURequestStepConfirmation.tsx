@@ -14,6 +14,7 @@ import PrevNextButtons from '@components/PrevNextButtons';
 import ScreenWrapper from '@components/ScreenWrapper';
 import useConfirmModal from '@hooks/useConfirmModal';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
+import useDefaultExpensePolicy from '@hooks/useDefaultExpensePolicy';
 import useFetchRoute from '@hooks/useFetchRoute';
 import useFilesValidation from '@hooks/useFilesValidation';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
@@ -22,9 +23,11 @@ import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
 import useOptimisticDraftTransactions from '@hooks/useOptimisticDraftTransactions';
 import usePermissions from '@hooks/usePermissions';
+import usePersonalPolicy from '@hooks/usePersonalPolicy';
 import usePolicyForTransaction from '@hooks/usePolicyForTransaction';
 import usePrivateIsArchivedMap from '@hooks/usePrivateIsArchivedMap';
 import useReportAttributes from '@hooks/useReportAttributes';
+import useSelfDMReport from '@hooks/useSelfDMReport';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {isMobileSafari} from '@libs/Browser';
@@ -41,8 +44,17 @@ import isReportTopmostSplitNavigator from '@libs/Navigation/helpers/isReportTopm
 import isSearchTopmostFullScreenRoute from '@libs/Navigation/helpers/isSearchTopmostFullScreenRoute';
 import Navigation from '@libs/Navigation/Navigation';
 import {getParticipantsOption, getReportOption} from '@libs/OptionsListUtils';
-import {getReportOrDraftReport, isMoneyRequestReport, isProcessingReport, isReportOutstanding, isSelectedManagerMcTest} from '@libs/ReportUtils';
+import {
+    getPolicyExpenseChat,
+    getReportOrDraftReport,
+    isMoneyRequestReport,
+    isPolicyExpenseChat as isPolicyExpenseChatUtils,
+    isProcessingReport,
+    isReportOutstanding,
+    isSelectedManagerMcTest,
+} from '@libs/ReportUtils';
 import {buildCannedSearchQuery} from '@libs/SearchQueryUtils';
+import shouldUseDefaultExpensePolicy from '@libs/shouldUseDefaultExpensePolicy';
 import type {SkeletonSpanReasonAttributes} from '@libs/telemetry/useSkeletonSpan';
 import {
     getRequestType,
@@ -52,7 +64,14 @@ import {
     isOdometerDistanceRequest as isOdometerDistanceRequestTransactionUtils,
     isScanRequest,
 } from '@libs/TransactionUtils';
-import {getIOURequestPolicyID, setMoneyRequestBillable, setMoneyRequestParticipantsFromReport, setMoneyRequestReimbursable} from '@userActions/IOU';
+import {
+    getIOURequestPolicyID,
+    getMoneyRequestParticipantsFromReport,
+    setMoneyRequestBillable,
+    setMoneyRequestParticipants,
+    setMoneyRequestParticipantsFromReport,
+    setMoneyRequestReimbursable,
+} from '@userActions/IOU';
 import {setMoneyRequestReceipt} from '@userActions/IOU/Receipt';
 import {removeDraftTransaction, replaceDefaultDraftTransaction} from '@userActions/TransactionEdit';
 import CONST from '@src/CONST';
@@ -92,6 +111,9 @@ function IOURequestStepConfirmation({
     shouldHideHeader = false,
 }: IOURequestStepConfirmationProps) {
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
+    const defaultExpensePolicy = useDefaultExpensePolicy();
+    const personalPolicy = usePersonalPolicy();
+    const selfDMReport = useSelfDMReport();
     const personalDetails = usePersonalDetails();
     const allPolicyCategories = usePolicyCategories();
 
@@ -122,6 +144,9 @@ function IOURequestStepConfirmation({
     const [policyDraft] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_DRAFTS}${draftPolicyID}`);
     const [policyReal] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${realPolicyID}`);
     const [conciergeReportID] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID);
+    const [amountOwed] = useOnyx(ONYXKEYS.NVP_PRIVATE_AMOUNT_OWED);
+    const [userBillingGracePeriodEnds] = useOnyx(ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_USER_BILLING_GRACE_PERIOD_END);
+    const [ownerBillingGracePeriodEnd] = useOnyx(ONYXKEYS.NVP_PRIVATE_OWNER_BILLING_GRACE_PERIOD_END);
 
     const expensifyIcons = useMemoizedLazyExpensifyIcons(['ReplaceReceipt', 'SmartScan']);
 
@@ -246,14 +271,93 @@ function IOURequestStepConfirmation({
         // connection, so we don't need to subscribe to COLLECTION.REPORT_DRAFT here.
         [transaction?.participants, iouType, personalDetails, reportAttributesDerived, privateIsArchivedMap, policy, conciergeReportID],
     );
-    const isPolicyExpenseChat = useMemo(() => participants?.some((participant) => participant.isPolicyExpenseChat), [participants]);
+
+    const defaultParticipants = useMemo(() => {
+        const hasSelectedParticipants = (transaction?.participants ?? []).some((participant) => participant?.selected);
+        if (hasSelectedParticipants) {
+            return [];
+        }
+
+        const sourceReportID = transaction?.reportID ?? reportID;
+        if (!sourceReportID) {
+            return [];
+        }
+
+        const sourceReport = getReportOrDraftReport(sourceReportID);
+        let defaultParticipants = getMoneyRequestParticipantsFromReport(sourceReport, currentUserPersonalDetails.accountID).filter((participant) => participant.selected);
+
+        const isGlobalCreateFlow = transaction?.isFromGlobalCreate ?? transaction?.isFromFloatingActionButton ?? iouType === CONST.IOU.TYPE.CREATE;
+        if (!defaultParticipants.length && isGlobalCreateFlow) {
+            const canUseDefaultPolicy = shouldUseDefaultExpensePolicy(iouType, defaultExpensePolicy, amountOwed, userBillingGracePeriodEnds, ownerBillingGracePeriodEnd);
+
+            if (canUseDefaultPolicy) {
+                const shouldAutoReport = !!defaultExpensePolicy?.autoReporting || !!personalPolicy?.autoReporting;
+                const defaultTargetReport = shouldAutoReport ? getPolicyExpenseChat(currentUserPersonalDetails.accountID, defaultExpensePolicy?.id) : selfDMReport;
+                defaultParticipants = getMoneyRequestParticipantsFromReport(defaultTargetReport, currentUserPersonalDetails.accountID).filter((participant) => participant.selected);
+            }
+        }
+
+        return defaultParticipants;
+    }, [
+        transaction?.participants,
+        transaction?.reportID,
+        transaction?.isFromGlobalCreate,
+        transaction?.isFromFloatingActionButton,
+        reportID,
+        currentUserPersonalDetails.accountID,
+        iouType,
+        defaultExpensePolicy,
+        personalPolicy,
+        selfDMReport,
+        amountOwed,
+        userBillingGracePeriodEnds,
+        ownerBillingGracePeriodEnd,
+    ]);
+
+    useEffect(() => {
+        if (!transaction?.transactionID || defaultParticipants.length === 0) {
+            return;
+        }
+
+        const transactionParticipants = transaction?.participants ?? [];
+        if (transactionParticipants.length > 0) {
+            return;
+        }
+
+        setMoneyRequestParticipants(transaction.transactionID, defaultParticipants);
+    }, [transaction?.transactionID, transaction?.participants, defaultParticipants]);
+
+    const isPolicyExpenseChat = useMemo(() => {
+        const hasPolicyExpenseChat = (participantList: typeof defaultParticipants) =>
+            participantList.some((participant) => {
+                if (isPolicyExpenseChatUtils(participant)) {
+                    return true;
+                }
+
+                return !!participant?.reportID && isPolicyExpenseChatUtils(getReportOrDraftReport(participant.reportID));
+            });
+
+        if (isPolicyExpenseChatUtils(report)) {
+            return true;
+        }
+
+        const transactionParticipants = transaction?.participants ?? [];
+        if (hasPolicyExpenseChat(transactionParticipants)) {
+            return true;
+        }
+
+        return hasPolicyExpenseChat(defaultParticipants);
+    }, [report, transaction?.participants, defaultParticipants]);
     const isFromGlobalCreate = !!(transaction?.isFromGlobalCreate ?? transaction?.isFromFloatingActionButton);
 
     useFetchRoute(transaction, transaction?.comment?.waypoints, action, shouldUseTransactionDraft(action, iouType) ? CONST.TRANSACTION.STATE.DRAFT : CONST.TRANSACTION.STATE.CURRENT);
 
-    const policyExpenseChatPolicyID = participants?.find((participant) => participant.isPolicyExpenseChat)?.policyID;
+    const policyExpenseChatPolicyID =
+        transaction?.participants?.find((participant) => participant?.isPolicyExpenseChat)?.policyID ??
+        defaultParticipants.find((participant) => participant?.isPolicyExpenseChat)?.policyID ??
+        (isPolicyExpenseChatUtils(report) ? report?.policyID : undefined);
 
-    const senderPolicyID = participants?.find((participant) => !!participant && 'isSender' in participant && participant.isSender)?.policyID;
+    const senderPolicyID = transaction?.participants?.find((participant) => !!participant && 'isSender' in participant && participant.isSender)?.policyID;
 
     const odometerStartImage = transaction?.comment?.odometerStartImage;
     const odometerEndImage = transaction?.comment?.odometerEndImage;
