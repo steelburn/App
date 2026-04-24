@@ -90,14 +90,27 @@ function usePaginatedReportActions(reportID: string | undefined, reportActionID?
         return PaginationUtils.getContinuousChain(sortedAllReportActions, reportActionPages ?? [], (reportAction) => reportAction.reportActionID, id);
     }, [id, reportActionPages, sortedAllReportActions]);
 
-    const linkedAction = useMemo(() => (reportActionID ? resourceItem?.item : undefined), [resourceItem?.item, reportActionID]);
+    // When `treatAsNoPaginationAnchor` is set, we intentionally ignore `reportActionID` for pagination
+    // (same as `id` above), so we must not surface a "linked" action from that id either.
+    const linkedAction = useMemo(() => {
+        if (treatAsNoPaginationAnchor) {
+            return undefined;
+        }
+        if (!reportActionID) {
+            return undefined;
+        }
+        return resourceItem?.item;
+    }, [resourceItem?.item, reportActionID, treatAsNoPaginationAnchor]);
 
     const oldestUnreadReportAction = useMemo(() => {
+        if (treatAsNoPaginationAnchor) {
+            return undefined;
+        }
         if (shouldLinkToOldestUnreadReportAction && resourceItem && !reportActionID) {
             return resourceItem.item;
         }
         return undefined;
-    }, [resourceItem, shouldLinkToOldestUnreadReportAction, reportActionID]);
+    }, [resourceItem, shouldLinkToOldestUnreadReportAction, reportActionID, treatAsNoPaginationAnchor]);
 
     return {
         reportActions,
