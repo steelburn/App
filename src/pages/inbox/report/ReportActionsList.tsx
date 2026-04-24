@@ -219,6 +219,7 @@ function ReportActionsList({
     const [isVisible, setIsVisible] = useState(Visibility.isVisible);
     const isFocused = useIsFocused();
 
+    const isAnonymousUser = useIsAnonymousUser();
     const isReportArchived = useReportIsArchived(report?.reportID);
     const [userWalletTierName] = useOnyx(ONYXKEYS.USER_WALLET, {
         selector: tierNameSelector,
@@ -240,14 +241,6 @@ function ReportActionsList({
 
     const backTo = route?.params?.backTo as string;
     const linkedReportActionID = route?.params?.reportActionID;
-
-    const isTransactionThreadReport = useMemo(() => isTransactionThread(parentReportAction) && !isSentMoneyReportAction(parentReportAction), [parentReportAction]);
-    const isMoneyRequestOrInvoiceReport = useMemo(() => isMoneyRequestReport(report) || isInvoiceReport(report), [report]);
-    const shouldFocusToTopOnMount = useMemo(() => isTransactionThreadReport || isMoneyRequestOrInvoiceReport, [isMoneyRequestOrInvoiceReport, isTransactionThreadReport]);
-    const topReportAction = sortedVisibleReportActions.at(-1);
-    const [shouldScrollToEndAfterLayout, setShouldScrollToEndAfterLayout] = useState(shouldFocusToTopOnMount && !linkedReportActionID);
-    const scrollEndTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-    const isAnonymousUser = useIsAnonymousUser();
 
     useEffect(() => {
         const unsubscribe = Visibility.onVisibilityChange(() => {
@@ -288,19 +281,6 @@ function ReportActionsList({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [report.reportID]);
 
-    // When lastReadTime transitions from empty to a real value (e.g., data hasn't
-    // loaded yet after sign-in), update the marker so it uses the fresh value
-    // instead of the empty string from initial mount.
-    useEffect(() => {
-        if (reportLastReadTime === '' || unreadMarkerTime !== '') {
-            return;
-        }
-        setUnreadMarkerTime(reportLastReadTime);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [reportLastReadTime]);
-
-    const prevUnreadMarkerReportActionID = useRef<string | null>(null);
-
     /**
      * The index of the earliest message that was received while offline
      */
@@ -326,6 +306,7 @@ function ReportActionsList({
     /**
      * The reportActionID the unread marker should display above
      */
+    const prevUnreadMarkerReportActionID = useRef<string | null>(null);
     const [unreadMarkerReportActionID, unreadMarkerReportActionIndex] = useMemo(
         () =>
             oldestUnreadReportActionMarker ??
@@ -354,6 +335,28 @@ function ReportActionsList({
         ],
     );
     prevUnreadMarkerReportActionID.current = unreadMarkerReportActionID;
+
+    const initialScrollKey = useMemo(() => {
+        return linkedReportActionID ?? unreadMarkerReportActionID ?? undefined;
+    }, [linkedReportActionID, unreadMarkerReportActionID]);
+
+    const isTransactionThreadReport = useMemo(() => isTransactionThread(parentReportAction) && !isSentMoneyReportAction(parentReportAction), [parentReportAction]);
+    const isMoneyRequestOrInvoiceReport = useMemo(() => isMoneyRequestReport(report) || isInvoiceReport(report), [report]);
+    const shouldFocusToTopOnMount = useMemo(() => isTransactionThreadReport || isMoneyRequestOrInvoiceReport, [isMoneyRequestOrInvoiceReport, isTransactionThreadReport]);
+    const topReportAction = sortedVisibleReportActions.at(-1);
+    const [shouldScrollToEndAfterLayout, setShouldScrollToEndAfterLayout] = useState(shouldFocusToTopOnMount && !initialScrollKey);
+    const scrollEndTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
+    // When lastReadTime transitions from empty to a real value (e.g., data hasn't
+    // loaded yet after sign-in), update the marker so it uses the fresh value
+    // instead of the empty string from initial mount.
+    useEffect(() => {
+        if (reportLastReadTime === '' || unreadMarkerTime !== '') {
+            return;
+        }
+        setUnreadMarkerTime(reportLastReadTime);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [reportLastReadTime]);
 
     /**
      * Subscribe to read/unread events and update our unreadMarkerTime
@@ -460,10 +463,6 @@ function ReportActionsList({
         userActiveSince.current = DateUtils.getDBTime();
         prevReportID = report.reportID;
     }, [report.reportID]);
-
-    const initialScrollKey = useMemo(() => {
-        return linkedReportActionID ?? unreadMarkerReportActionID ?? undefined;
-    }, [linkedReportActionID, unreadMarkerReportActionID]);
 
     const isReportUnread = useMemo(
         () => isUnread(report, transactionThreadReport, isReportArchived) || (lastAction && isCurrentActionUnread(report, lastAction)),
@@ -622,7 +621,9 @@ function ReportActionsList({
                 }
 
                 const shouldJumpToLiveTail =
-                    !isOffline && action?.actionName !== CONST.REPORT.ACTIONS.TYPE.REPORT_PREVIEW && (hasNewerActionsRef.current || !!linkedReportActionIDRef.current);
+                    !isOffline &&
+                    action?.actionName !== CONST.REPORT.ACTIONS.TYPE.REPORT_PREVIEW &&
+                    (hasNewerActionsRef.current || !!linkedReportActionIDRef.current || unreadMarkerReportActionID);
 
                 if (shouldJumpToLiveTail) {
                     if (liveTailJumpRef.current.stage === 'idle') {
@@ -660,7 +661,7 @@ function ReportActionsList({
                 setIsScrollToBottomEnabled(true);
             });
         },
-        [betas, introSelected, isOffline, report.reportID, reportScrollManager, setIsFloatingMessageCounterVisible],
+        [betas, introSelected, isOffline, report.reportID, reportScrollManager, setIsFloatingMessageCounterVisible, unreadMarkerReportActionID],
     );
 
     useEffect(() => {
