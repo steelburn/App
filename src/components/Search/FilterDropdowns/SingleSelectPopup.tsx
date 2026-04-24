@@ -10,12 +10,8 @@ import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
 import useWindowDimensions from '@hooks/useWindowDimensions';
 import CONST from '@src/CONST';
+import type {SingleSelectItem} from '../FilterComponents/SingleSelect';
 import BasePopup from './BasePopup';
-
-type SingleSelectItem<T> = {
-    text: string;
-    value: T;
-};
 
 type SingleSelectPopupProps<T> = {
     /** The label to show when in an overlay on mobile */
@@ -176,5 +172,5 @@ function SingleSelectPopup<T extends string>({
     );
 }
 
-export type {SingleSelectPopupProps, SingleSelectItem};
+export type {SingleSelectPopupProps};
 export default SingleSelectPopup;
