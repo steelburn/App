@@ -465,11 +465,6 @@ function ReportActionsList({
         return linkedReportActionID ?? unreadMarkerReportActionID;
     }, [linkedReportActionID, unreadMarkerReportActionID]);
 
-    const [isListInitiallyLoaded, setIsListInitiallyLoaded] = useState(false);
-    const handleListInitiallyLoaded = useCallback(() => {
-        setIsListInitiallyLoaded(true);
-    }, []);
-
     const isReportUnread = useMemo(
         () => isUnread(report, transactionThreadReport, isReportArchived) || (lastAction && isCurrentActionUnread(report, lastAction)),
         [report, transactionThreadReport, isReportArchived, lastAction],
@@ -478,10 +473,6 @@ function ReportActionsList({
     // Mark the report as read when the user initially opens the report and there are unread messages
     const didMarkReportAsReadInitially = useRef(false);
     useEffect(() => {
-        if (!isListInitiallyLoaded) {
-            return;
-        }
-
         if (!isReportUnread || didMarkReportAsReadInitially.current) {
             didMarkReportAsReadInitially.current = true;
             return;
@@ -489,7 +480,7 @@ function ReportActionsList({
 
         didMarkReportAsReadInitially.current = true;
         readNewestAction(report.reportID, !!reportMetadata?.hasOnceLoadedReportActions);
-    }, [isListInitiallyLoaded, isReportUnread, report.reportID, reportMetadata?.hasOnceLoadedReportActions]);
+    }, [isReportUnread, report.reportID, reportMetadata?.hasOnceLoadedReportActions]);
 
     const handleReportChangeMarkAsRead = useCallback(() => {
         if (report.reportID !== prevReportID) {
@@ -519,7 +510,7 @@ function ReportActionsList({
     }, [report.lastVisibleActionCreated, transactionThreadReport?.lastVisibleActionCreated, report.reportID, isVisible, reportMetadata?.hasOnceLoadedReportActions]);
 
     const handleAppVisibilityMarkAsRead = useCallback(() => {
-        if (report.reportID !== prevReportID || !isListInitiallyLoaded) {
+        if (report.reportID !== prevReportID) {
             return;
         }
 
@@ -557,7 +548,7 @@ function ReportActionsList({
         // We will mark the report as read in the above case which marks the LHN report item as read while showing the new message
         // marker for the chat messages received while the user wasn't focused on the report or on another browser tab for web.
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isFocused, isVisible, isListInitiallyLoaded, reportMetadata?.hasOnceLoadedReportActions]);
+    }, [isFocused, isVisible, reportMetadata?.hasOnceLoadedReportActions]);
 
     const prevHandleReportChangeMarkAsRead = useRef<() => void>(null);
     const prevHandleAppVisibilityMarkAsRead = useRef<() => void>(null);
@@ -1052,7 +1043,6 @@ function ReportActionsList({
                     ListHeaderComponent={listHeaderComponent}
                     ListFooterComponent={listFooterComponent}
                     keyboardShouldPersistTaps="handled"
-                    onInitiallyLoaded={handleListInitiallyLoaded}
                     onLayout={onLayoutInner}
                     onScroll={trackVerticalScrolling}
                     onViewableItemsChanged={onViewableItemsChanged}
