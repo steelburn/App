@@ -19,6 +19,7 @@ import Navigation from '@navigation/Navigation';
 import type {PlatformStackScreenProps} from '@navigation/PlatformStackNavigation/types';
 import type {DomainSplitNavigatorParamList} from '@navigation/types';
 import DomainNotFoundPageWrapper from '@pages/domain/DomainNotFoundPageWrapper';
+import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
@@ -42,6 +43,7 @@ function DomainGroupsPage({route}: DomainGroupsPageProps) {
     const {shouldUseNarrowLayout} = useResponsiveLayout();
 
     const [groups = getEmptyArray<DomainSecurityGroupWithID>()] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {selector: groupsSelector});
+    const [pendingActions] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`);
 
     const data = groups.map((group) => {
         return {
@@ -53,6 +55,7 @@ function DomainGroupsPage({route}: DomainGroupsPageProps) {
                     <Text numberOfLines={1}>{translate('domain.groups.memberCount', {count: Object.keys(group.details.shared).length})}</Text>
                 </View>
             ),
+            pendingAction: Object.values(pendingActions?.[`${CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX}${group.id}`] ?? {}).find(Boolean),
         };
     });
 
@@ -67,6 +70,7 @@ function DomainGroupsPage({route}: DomainGroupsPageProps) {
                 leftHeaderText={translate('common.name')}
                 rightHeaderText={translate('common.members')}
                 shouldDivideEqualWidth
+                shouldShowRightCaret
             />
         );
     };
@@ -92,6 +96,7 @@ function DomainGroupsPage({route}: DomainGroupsPageProps) {
                     onSelectRow={(item: GroupOption) => Navigation.navigate(ROUTES.DOMAIN_GROUP_DETAILS.getRoute(domainAccountID, item.groupID))}
                     customListHeader={getCustomListHeader()}
                     shouldShowRightCaret
+                    addBottomSafeAreaPadding
                 />
             </ScreenWrapper>
         </DomainNotFoundPageWrapper>

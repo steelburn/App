@@ -1,7 +1,6 @@
 import {domainSecurityGroupSettingErrorsSelector, domainSecurityGroupSettingPendingActionSelector, selectGroupByID} from '@selectors/Domain';
 import React from 'react';
 import {View} from 'react-native';
-import ErrorMessageRow from '@components/ErrorMessageRow';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import MenuItemWithTopDescription from '@components/MenuItemWithTopDescription';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
@@ -40,25 +39,24 @@ function DomainGroupDetailsPage({route}: DomainGroupDetailsPageProps) {
         <DomainNotFoundPageWrapper domainAccountID={domainAccountID}>
             <ScreenWrapper
                 shouldEnableMaxHeight
-                shouldShowOfflineIndicatorInWideScreen
                 testID="DomainGroupDetailsPage"
             >
                 <HeaderWithBackButton
-                    title={group?.name ?? translate('domain.groups.title')}
+                    title={group?.name}
                     onBackButtonPress={() => Navigation.goBack(ROUTES.DOMAIN_GROUPS.getRoute(domainAccountID))}
                 />
                 <ScrollView>
-                    <OfflineWithFeedback pendingAction={namePendingAction}>
+                    <OfflineWithFeedback
+                        pendingAction={namePendingAction}
+                        errors={nameErrors}
+                        onClose={() => clearDomainSecurityGroupSettingError(domainAccountID, groupID, 'nameErrors')}
+                        errorRowStyles={[styles.mh5]}
+                    >
                         <MenuItemWithTopDescription
                             description={translate('common.name')}
-                            title={group?.name ?? ''}
+                            title={group?.name}
                             shouldShowRightIcon
                             onPress={() => Navigation.navigate(ROUTES.DOMAIN_GROUP_EDIT_NAME.getRoute(domainAccountID, groupID))}
-                        />
-                        <ErrorMessageRow
-                            errors={nameErrors}
-                            onDismiss={() => clearDomainSecurityGroupSettingError(domainAccountID, groupID, 'nameErrors')}
-                            errorRowStyles={[styles.mh5]}
                         />
                     </OfflineWithFeedback>
                     <View style={[styles.sectionDividerLine, styles.ph5, styles.mv6]} />
