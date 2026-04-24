@@ -2,7 +2,6 @@ import React, {useEffect, useState} from 'react';
 import {View} from 'react-native';
 import ActivityIndicator from '@components/ActivityIndicator';
 import {usePersonalDetails} from '@components/OnyxListItemProvider';
-import useFilterCountChange from '@components/Search/hooks/useFilterCountChange';
 import CardListItem from '@components/SelectionList/ListItem/CardListItem';
 import SelectionListWithSections from '@components/SelectionList/SelectionListWithSections';
 import type {Section} from '@components/SelectionList/SelectionListWithSections/types';
@@ -24,13 +23,12 @@ import variables from '@styles/variables';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import isLoadingOnyxValue from '@src/types/utils/isLoadingOnyxValue';
-import type FilterComponentProps from './types';
 
-type CardSelectorProps = FilterComponentProps & {
+type CardSelectorProps = {
     onChange: (cards: string[]) => void;
 };
 
-function CardSelector({onChange, onCountChange}: CardSelectorProps) {
+function CardSelector({onChange}: CardSelectorProps) {
     const theme = useTheme();
     const styles = useThemeStyles();
     const {translate} = useLocalize();
@@ -136,8 +134,6 @@ function CardSelector({onChange, onCountChange}: CardSelectorProps) {
             },
         ];
     }
-
-    useFilterCountChange(itemCount, onCountChange);
 
     const updateNewCards = (item: CardFilterItem) => {
         if (!item.keyForList) {

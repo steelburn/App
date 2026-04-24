@@ -3,7 +3,6 @@ import React, {useEffect, useRef, useState} from 'react';
 import {View} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';
 import {usePersonalDetails} from '@components/OnyxListItemProvider';
-import useFilterCountChange from '@components/Search/hooks/useFilterCountChange';
 import SelectionList from '@components/SelectionList';
 import UserSelectionListItem from '@components/SelectionList/ListItem/UserSelectionListItem';
 import type {ListItem, SelectionListHandle} from '@components/SelectionList/types';
@@ -21,9 +20,8 @@ import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {SearchAdvancedFiltersForm} from '@src/types/form/SearchAdvancedFiltersForm';
 import getEmptyArray from '@src/types/utils/getEmptyArray';
-import type FilterComponentProps from './types';
 
-type UserSelectorProps = FilterComponentProps & {
+type UserSelectorProps = {
     filterKey:
         | typeof CONST.SEARCH.SYNTAX_FILTER_KEYS.ASSIGNEE
         | typeof CONST.SEARCH.SYNTAX_FILTER_KEYS.ATTENDEE
@@ -32,7 +30,7 @@ type UserSelectorProps = FilterComponentProps & {
     onChange: (options: string[]) => void;
 };
 
-function UserSelector({filterKey, onChange, onCountChange}: UserSelectorProps) {
+function UserSelector({filterKey, onChange}: UserSelectorProps) {
     const selectionListRef = useRef<SelectionListHandle<ListItem> | null>(null);
     const styles = useThemeStyles();
     const {translate} = useLocalize();
@@ -141,8 +139,6 @@ function UserSelector({filterKey, onChange, onCountChange}: UserSelectorProps) {
               disableAutoFocus: !shouldFocusInputOnScreenFocus,
           }
         : undefined;
-
-    useFilterCountChange(totalOptionsCount, onCountChange);
 
     return (
         <View

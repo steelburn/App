@@ -2,7 +2,6 @@ import React, {useEffect, useState} from 'react';
 import {View} from 'react-native';
 import {usePersonalDetails} from '@components/OnyxListItemProvider';
 import {useOptionsList} from '@components/OptionListContextProvider';
-import useFilterCountChange from '@components/Search/hooks/useFilterCountChange';
 import InviteMemberListItem from '@components/SelectionList/ListItem/InviteMemberListItem';
 import SelectionListWithSections from '@components/SelectionList/SelectionListWithSections';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
@@ -26,9 +25,8 @@ import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import passthroughPolicyTagListSelector from '@src/selectors/PolicyTagList';
 import type {SearchAdvancedFiltersForm} from '@src/types/form';
-import type FilterComponentProps from './types';
 
-type InSelectorProps = FilterComponentProps & {
+type InSelectorProps = {
     onChange: (ins: string[]) => void;
 };
 
@@ -48,7 +46,7 @@ function inSelector(searchAdvancedFiltersForm: SearchAdvancedFiltersForm | undef
     return searchAdvancedFiltersForm?.in;
 }
 
-function InSelector({onChange, onCountChange}: InSelectorProps) {
+function InSelector({onChange}: InSelectorProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
     // eslint-disable-next-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidth
@@ -148,8 +146,6 @@ function InSelector({onChange, onCountChange}: InSelectorProps) {
     useEffect(() => {
         searchInServer(debouncedSearchTerm.trim());
     }, [debouncedSearchTerm]);
-
-    useFilterCountChange(sections.flatMap((section) => section.data).length, onCountChange);
 
     const handleParticipantSelection = (selectedOption: OptionWithKey) => {
         const optionReportID = selectedOption.reportID;

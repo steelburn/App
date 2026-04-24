@@ -1,6 +1,5 @@
 import React from 'react';
 import type {OnyxCollection} from 'react-native-onyx';
-import useFilterCountChange from '@components/Search/hooks/useFilterCountChange';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import {getDecodedCategoryName} from '@libs/CategoryUtils';
@@ -9,13 +8,12 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import type {PolicyCategories, PolicyCategory} from '@src/types/onyx';
 import {getEmptyObject} from '@src/types/utils/EmptyObject';
 import MultiSelect from './MultiSelect';
-import type FilterComponentProps from './types';
 
-type CategorySelectorProps = FilterComponentProps & {
+type CategorySelectorProps = {
     onChange: (categories: string[]) => void;
 };
 
-function CategorySelector({onChange, onCountChange}: CategorySelectorProps) {
+function CategorySelector({onChange}: CategorySelectorProps) {
     const {translate} = useLocalize();
     const [searchAdvancedFiltersForm] = useOnyx(ONYXKEYS.FORMS.SEARCH_ADVANCED_FILTERS_FORM);
     const [personalPolicyID] = useOnyx(ONYXKEYS.PERSONAL_POLICY_ID);
@@ -65,8 +63,6 @@ function CategorySelector({onChange, onCountChange}: CategorySelectorProps) {
                 return {text: decodedCategoryName, value: categoryName};
             }),
     );
-
-    useFilterCountChange(categoryItems.length, onCountChange);
 
     return (
         <MultiSelect

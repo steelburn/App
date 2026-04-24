@@ -1,6 +1,5 @@
 import React from 'react';
 import type {OnyxCollection} from 'react-native-onyx';
-import useFilterCountChange from '@components/Search/hooks/useFilterCountChange';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import {getCleanedTagName, getTagNamesFromTagsLists} from '@libs/PolicyUtils';
@@ -10,13 +9,12 @@ import passthroughPolicyTagListSelector from '@src/selectors/PolicyTagList';
 import type {PolicyTagLists} from '@src/types/onyx';
 import {getEmptyObject} from '@src/types/utils/EmptyObject';
 import MultiSelect from './MultiSelect';
-import type FilterComponentProps from './types';
 
-type TagSelectorProps = FilterComponentProps & {
+type TagSelectorProps = {
     onChange: (tags: string[]) => void;
 };
 
-function TagSelector({onChange, onCountChange}: TagSelectorProps) {
+function TagSelector({onChange}: TagSelectorProps) {
     const {translate} = useLocalize();
     const [searchAdvancedFiltersForm] = useOnyx(ONYXKEYS.FORMS.SEARCH_ADVANCED_FILTERS_FORM);
     const policyIDs = searchAdvancedFiltersForm?.policyID ?? [];
@@ -41,8 +39,6 @@ function TagSelector({onChange, onCountChange}: TagSelectorProps) {
         }
     }
     tagItems.push(...Array.from(uniqueTagNames).map((tagName) => ({text: getCleanedTagName(tagName), value: tagName})));
-
-    useFilterCountChange(tagItems.length, onCountChange);
 
     return (
         <MultiSelect

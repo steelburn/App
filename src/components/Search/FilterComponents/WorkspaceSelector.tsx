@@ -1,6 +1,5 @@
 import React from 'react';
 import type {OnyxEntry} from 'react-native-onyx';
-import useFilterCountChange from '@components/Search/hooks/useFilterCountChange';
 import useAdvancedSearchFilters from '@hooks/useAdvancedSearchFilters';
 import useOnyx from '@hooks/useOnyx';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -10,7 +9,7 @@ import type {MultiSelectItem} from './MultiSelect';
 import MultiSelect from './MultiSelect';
 import type FilterComponentProps from './types';
 
-type WorkspaceSelectorProps = FilterComponentProps & {
+type WorkspaceSelectorProps = {
     policyIDQuery: string[] | undefined;
     onChange: (item: string[]) => void;
 };
@@ -19,7 +18,7 @@ function filterPolicyIDSelector(searchAdvancedFiltersForm: OnyxEntry<SearchAdvan
     return searchAdvancedFiltersForm?.policyID;
 }
 
-function WorkspaceSelector({policyIDQuery, onChange, onCountChange}: WorkspaceSelectorProps) {
+function WorkspaceSelector({policyIDQuery, onChange}: WorkspaceSelectorProps) {
     const {workspaces, shouldShowWorkspaceSearchInput} = useAdvancedSearchFilters();
     const [policyID] = useOnyx(ONYXKEYS.FORMS.SEARCH_ADVANCED_FILTERS_FORM, {selector: filterPolicyIDSelector});
     const workspaceOptions: Array<MultiSelectItem<string>> = workspaces
@@ -32,8 +31,6 @@ function WorkspaceSelector({policyIDQuery, onChange, onCountChange}: WorkspaceSe
         }));
 
     const policyIDs = policyID ?? policyIDQuery ?? [];
-
-    useFilterCountChange(workspaceOptions.length, onCountChange);
 
     return (
         <MultiSelect

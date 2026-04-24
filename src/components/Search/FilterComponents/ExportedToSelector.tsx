@@ -2,7 +2,6 @@ import React from 'react';
 import {View} from 'react-native';
 import type {TupleToUnion} from 'type-fest';
 import Icon from '@components/Icon';
-import useFilterCountChange from '@components/Search/hooks/useFilterCountChange';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
@@ -18,9 +17,8 @@ import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {SearchAdvancedFiltersForm} from '@src/types/form';
 import MultiSelect from './MultiSelect';
-import type FilterComponentProps from './types';
 
-type ExportedToSelectorProps = FilterComponentProps & {
+type ExportedToSelectorProps = {
     onChange: (exportedTo: string[]) => void;
 };
 
@@ -33,7 +31,7 @@ function filterExportedToSelector(searchAdvancedFiltersForm: SearchAdvancedFilte
     return searchAdvancedFiltersForm?.exportedTo;
 }
 
-function ExportedToSelector({onChange, onCountChange}: ExportedToSelectorProps) {
+function ExportedToSelector({onChange}: ExportedToSelectorProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const StyleUtils = useStyleUtils();
@@ -123,8 +121,6 @@ function ExportedToSelector({onChange, onCountChange}: ExportedToSelectorProps) 
 
         return [...connectedIntegrationPickerItems, ...standardAndIntegrationCustomTemplatePickerItems];
     })();
-
-    useFilterCountChange(exportedToPickerOptions.length, onCountChange);
 
     return (
         <MultiSelect
