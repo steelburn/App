@@ -1,9 +1,9 @@
 import {format, setYear} from 'date-fns';
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import type {GestureResponderEvent} from 'react-native';
 import {InteractionManager, View} from 'react-native';
 import TextInput from '@components/TextInput';
 import type {BaseTextInputRef} from '@components/TextInput/BaseTextInput/types';
+import useAutoFocusInput from '@hooks/useAutoFocusInput';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useThemeStyles from '@hooks/useThemeStyles';
@@ -40,19 +40,24 @@ function DatePicker({
     const {translate} = useLocalize();
 
     const [isModalVisible, setIsModalVisible] = useState(false);
-    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-    const [selectedDate, setSelectedDate] = useState(value || defaultValue || undefined);
+    const [selectedDate, setSelectedDate] = useState(() => value ?? defaultValue ?? '');
     const [popoverPosition, setPopoverPosition] = useState({horizontal: 0, vertical: 0});
-    const textInputRef = useRef<BaseTextInputRef>(null);
+    const textInputRef = useRef<BaseTextInputRef | null>(null);
     const anchorRef = useRef<View>(null);
     const [isInverted, setIsInverted] = useState(false);
-    const isAutoFocused = useRef(false);
+
+    const {inputCallbackRef: autoFocusCallbackRef} = useAutoFocusInput();
+    const autoFocusCallbackRefRef = useRef(autoFocusCallbackRef);
+    autoFocusCallbackRefRef.current = autoFocusCallbackRef;
 
     useEffect(() => {
         if (shouldSaveDraft && formID) {
             setDraftValues(formID, {[inputID]: selectedDate});
         }
-        if (selectedDate === value || !value) {
+        if (selectedDate === value) {
+            return;
+        }
+        if (value === undefined) {
             return;
         }
 
@@ -71,18 +76,14 @@ function DatePicker({
         });
     }, [windowHeight]);
 
-    const handlePress = useCallback(
-        (event?: GestureResponderEvent | KeyboardEvent) => {
-            // This makes sure that cursor does not appear in the TextInput when we open the DatePicker
-            event?.preventDefault();
-            calculatePopoverPosition();
-            setIsModalVisible(true);
-        },
-        [calculatePopoverPosition],
-    );
+    const showDatePickerModal = useCallback(() => {
+        // Blur the input before showing the modal, so the focus won't be returned after the modal is closed
+        textInputRef.current?.blur();
+        calculatePopoverPosition();
+        setIsModalVisible(true);
+    }, [calculatePopoverPosition]);
 
     const closeDatePicker = useCallback(() => {
-        textInputRef.current?.blur();
         setIsModalVisible(false);
     }, []);
 
@@ -106,16 +107,20 @@ function DatePicker({
         });
     }, [calculatePopoverPosition, windowWidth]);
 
-    useEffect(() => {
-        if (!autoFocus || isAutoFocused.current) {
-            return;
-        }
-        isAutoFocused.current = true;
-        // eslint-disable-next-line @typescript-eslint/no-deprecated
-        InteractionManager.runAfterInteractions(() => {
-            handlePress();
-        });
-    }, [handlePress, autoFocus]);
+    // Combined ref: updates textInputRef (needed for blur() in showDatePickerModal) and connects
+    // autoFocusCallbackRef only when autoFocus=true so useAutoFocusInput's useFocusEffect cleanup
+    // can cancel any pending focus task when the screen starts closing.
+    const combinedTextInputRef = useCallback(
+        (ref: BaseTextInputRef | null) => {
+            textInputRef.current = ref;
+            if (autoFocus) {
+                (autoFocusCallbackRefRef.current as unknown as (ref: BaseTextInputRef | null) => void)(ref);
+            }
+        },
+        // autoFocusCallbackRefRef is a stable ref — its identity never changes, so it's not a dep
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [autoFocus],
+    );
 
     const getValidDateForCalendar = useMemo(() => {
         if (!selectedDate) {
@@ -132,7 +137,7 @@ function DatePicker({
                 style={styles.mv2}
             >
                 <TextInput
-                    ref={textInputRef}
+                    ref={combinedTextInputRef}
                     inputID={inputID}
                     forceActiveLabel
                     icon={selectedDate ? null : icons.Calendar}
@@ -145,7 +150,7 @@ function DatePicker({
                     errorText={errorText}
                     inputStyle={styles.pointerEventsNone}
                     disabled={disabled}
-                    onPress={handlePress}
+                    onFocus={showDatePickerModal}
                     textInputContainerStyles={isModalVisible ? styles.borderColorFocus : {}}
                     shouldHideClearButton={shouldHideClearButton}
                     onClearInput={handleClear}

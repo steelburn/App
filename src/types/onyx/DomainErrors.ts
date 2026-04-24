@@ -30,6 +30,10 @@ type DomainMemberErrors = {
      * Errors related to specific domain member lock account status.
      */
     lockAccountErrors?: OnyxCommon.Errors;
+    /**
+     * Errors related to changing domain member group.
+     */
+    changeDomainSecurityGroupErrors?: OnyxCommon.Errors;
 } & GeneralDomainMemberErrors;
 
 /**
@@ -40,11 +44,6 @@ type DomainSecurityGroupErrors = {
      * Errors related to the security group name
      */
     nameErrors?: OnyxCommon.Errors;
-
-    /**
-     * Errors related to the default security group ID setting
-     */
-    defaultSecurityGroupIDErrors?: OnyxCommon.Errors;
 
     /**
      * Errors related to the restricted default login selection
