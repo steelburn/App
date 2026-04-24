@@ -1,4 +1,5 @@
 import React from 'react';
+import type {ViewProps} from 'react-native';
 import useIsScrollLikelyLayoutTriggered from '@hooks/useIsScrollLikelyLayoutTriggered';
 import useOnyx from '@hooks/useOnyx';
 import {setIsComposerFullSize} from '@userActions/Report';
@@ -6,11 +7,11 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import {useComposerSendState, useComposerState} from './ComposerContext';
 import ExpandCollapseButton from './ExpandCollapseButton';
 
-type ComposerExpandCollapseButtonProps = {
+type ComposerExpandCollapseButtonProps = ViewProps & {
     reportID: string;
 };
 
-function ComposerExpandCollapseButton({reportID}: ComposerExpandCollapseButtonProps) {
+function ComposerExpandCollapseButton({reportID, ...restProps}: ComposerExpandCollapseButtonProps) {
     const {isBlockedFromConcierge} = useComposerSendState();
     const {raiseIsScrollLayoutTriggered} = useIsScrollLikelyLayoutTriggered();
 
@@ -25,6 +26,8 @@ function ComposerExpandCollapseButton({reportID}: ComposerExpandCollapseButtonPr
             raiseIsScrollLikelyLayoutTriggered={raiseIsScrollLayoutTriggered}
             setIsComposerFullSize={setIsComposerFullSize}
             disabled={isBlockedFromConcierge}
+            // eslint-disable-next-line react/jsx-props-no-spreading
+            {...restProps}
         />
     );
 }

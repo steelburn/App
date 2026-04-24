@@ -22,12 +22,17 @@ function ComposerEditingButtons({reportID}: ComposerEditingButtonsProps) {
         styles.justifyContentCenter,
         {paddingVertical: styles.composerSizeButton.marginHorizontal},
     ];
+    const expandCollapseComposerButtonStyles = [styles.flexGrow1, styles.flexShrink0, {marginRight: styles.composerSizeButton.marginHorizontal}];
+
     return (
         <View
             testID={CONST.COMPOSER.TEST_ID.EDITING_MESSAGE_ACTION_ROW}
             style={editingButtonsContainerStyles}
         >
-            <ComposerExpandCollapseButton reportID={reportID} />
+            <ComposerExpandCollapseButton
+                reportID={reportID}
+                style={expandCollapseComposerButtonStyles}
+            />
             <MessageEditCancelButton
                 onCancel={deleteDraft}
                 testID={CONST.COMPOSER.TEST_ID.MESSAGE_EDIT_CANCEL_MAIN_COMPOSER}
