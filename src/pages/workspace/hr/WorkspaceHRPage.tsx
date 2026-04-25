@@ -1,6 +1,8 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {View} from 'react-native';
+import ActivityIndicator from '@components/ActivityIndicator';
 import Button from '@components/Button';
+import ConfirmModal from '@components/ConfirmModal';
 import ConnectToGustoFlow from '@components/ConnectToGustoFlow';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import MenuItem from '@components/MenuItem';
@@ -8,21 +10,26 @@ import ScreenWrapper from '@components/ScreenWrapper';
 import ScrollView from '@components/ScrollView';
 import Section from '@components/Section';
 import Text from '@components/Text';
+import ThreeDotsMenu from '@components/ThreeDotsMenu';
+import type ThreeDotsMenuProps from '@components/ThreeDotsMenu/types';
 import {useMemoizedLazyExpensifyIcons, useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useNetwork from '@hooks/useNetwork';
+import useOnyx from '@hooks/useOnyx';
 import usePermissions from '@hooks/usePermissions';
 import usePolicy from '@hooks/usePolicy';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
 import useWorkspaceDocumentTitle from '@hooks/useWorkspaceDocumentTitle';
+import {isConnectionInProgress, removePolicyConnection, syncConnection} from '@libs/actions/connections';
 import {openPolicyHRPage} from '@libs/actions/PolicyConnections';
 import Navigation from '@libs/Navigation/Navigation';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
 import type {WorkspaceSplitNavigatorParamList} from '@libs/Navigation/types';
-import {isGustoConnected} from '@libs/PolicyUtils';
+import {getIntegrationLastSuccessfulDate, isGustoConnected} from '@libs/PolicyUtils';
 import AccessOrNotFoundWrapper from '@pages/workspace/AccessOrNotFoundWrapper';
 import CONST from '@src/CONST';
+import ONYXKEYS from '@src/ONYXKEYS';
 import type SCREENS from '@src/SCREENS';
 
 type WorkspaceHRPageProps = PlatformStackScreenProps<WorkspaceSplitNavigatorParamList, typeof SCREENS.WORKSPACE.HR>;
@@ -32,15 +39,37 @@ function WorkspaceHRPage({
         params: {policyID},
     },
 }: WorkspaceHRPageProps) {
-    const {translate} = useLocalize();
+    const {translate, datetimeToRelative, getLocalDateFromDatetime} = useLocalize();
     const {isBetaEnabled} = usePermissions();
     const styles = useThemeStyles();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const policy = usePolicy(policyID);
     const [activeGustoFlowKey, setActiveGustoFlowKey] = useState<number>();
-    const icons = useMemoizedLazyExpensifyIcons(['GustoSquare']);
+    const [isDisconnectModalOpen, setIsDisconnectModalOpen] = useState(false);
+    const [connectionSyncProgress] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CONNECTION_SYNC_PROGRESS}${policyID}`);
+    const icons = useMemoizedLazyExpensifyIcons(['GustoSquare', 'Sync', 'Trashcan']);
     const illustrations = useMemoizedLazyIllustrations(['NewUser']);
+    const gustoConnection = policy?.connections?.gusto;
     const isConnected = isGustoConnected(policy);
+    const isGustoSyncInProgress = connectionSyncProgress?.connectionName === CONST.POLICY.CONNECTIONS.NAME.GUSTO && isConnectionInProgress(connectionSyncProgress, policy);
+    const successfulDate = getIntegrationLastSuccessfulDate(
+        getLocalDateFromDatetime,
+        gustoConnection,
+        connectionSyncProgress?.connectionName === CONST.POLICY.CONNECTIONS.NAME.GUSTO ? connectionSyncProgress : undefined,
+    );
+    const hasGustoSyncError = !isGustoSyncInProgress && gustoConnection?.lastSync?.isSuccessful === false && !!gustoConnection?.lastSync?.errorDate;
+    const lastSyncErrorMessage = hasGustoSyncError ? (gustoConnection?.lastSync?.errorMessage ?? translate('workspace.hr.gusto.syncError')) : undefined;
+    const connectionDescription = useMemo(() => {
+        if (isGustoSyncInProgress && connectionSyncProgress?.stageInProgress) {
+            return translate('workspace.hr.syncStageName', {stage: connectionSyncProgress.stageInProgress});
+        }
+
+        if (successfulDate && !lastSyncErrorMessage) {
+            return translate('workspace.hr.gusto.lastSync', datetimeToRelative(successfulDate));
+        }
+
+        return undefined;
+    }, [connectionSyncProgress?.stageInProgress, datetimeToRelative, isGustoSyncInProgress, lastSyncErrorMessage, successfulDate, translate]);
 
     useWorkspaceDocumentTitle(undefined, 'workspace.common.hr');
 
@@ -48,11 +77,29 @@ function WorkspaceHRPage({
         openPolicyHRPage(policyID);
     }, [policyID]);
 
-    useNetwork({onReconnect: fetchPolicyHRPage});
+    const {isOffline} = useNetwork({onReconnect: fetchPolicyHRPage});
 
     useEffect(() => {
         fetchPolicyHRPage();
     }, [fetchPolicyHRPage]);
+
+    const overflowMenu: ThreeDotsMenuProps['menuItems'] = useMemo(
+        () => [
+            {
+                icon: icons.Sync,
+                text: translate('workspace.hr.gusto.syncNow'),
+                onSelected: () => syncConnection(policy, CONST.POLICY.CONNECTIONS.NAME.GUSTO),
+                disabled: isOffline,
+            },
+            {
+                icon: icons.Trashcan,
+                text: translate('workspace.hr.gusto.disconnect'),
+                onSelected: () => setIsDisconnectModalOpen(true),
+                shouldCallAfterModalHide: true,
+            },
+        ],
+        [icons.Sync, icons.Trashcan, isOffline, policy, translate],
+    );
 
     return (
         <AccessOrNotFoundWrapper
@@ -92,9 +139,13 @@ function WorkspaceHRPage({
                                 title={translate('workspace.hr.gusto.title')}
                                 icon={icons.GustoSquare}
                                 iconType={CONST.ICON_TYPE_AVATAR}
-                                wrapperStyle={[styles.ph0, styles.pv2, styles.mt4]}
+                                wrapperStyle={[styles.ph0, styles.pv2, styles.mt4, !!lastSyncErrorMessage && styles.pb0]}
                                 interactive={false}
-                                shouldShowRightComponent={!isConnected}
+                                description={connectionDescription}
+                                errorText={lastSyncErrorMessage}
+                                errorTextStyle={[styles.mt5]}
+                                shouldShowRedDotIndicator
+                                shouldShowRightComponent
                                 rightComponent={
                                     !isConnected ? (
                                         <Button
@@ -102,12 +153,41 @@ function WorkspaceHRPage({
                                             text={translate('workspace.hr.gusto.connect')}
                                             onPress={() => setActiveGustoFlowKey(Math.random())}
                                         />
-                                    ) : undefined
+                                    ) : isGustoSyncInProgress ? (
+                                        <ActivityIndicator
+                                            style={[styles.popoverMenuIcon]}
+                                            reasonAttributes={{context: 'WorkspaceHRPage.gustoSync'}}
+                                        />
+                                    ) : (
+                                        <ThreeDotsMenu
+                                            shouldSelfPosition
+                                            menuItems={overflowMenu}
+                                            anchorAlignment={{
+                                                horizontal: CONST.MODAL.ANCHOR_ORIGIN_HORIZONTAL.RIGHT,
+                                                vertical: CONST.MODAL.ANCHOR_ORIGIN_VERTICAL.TOP,
+                                            }}
+                                        />
+                                    )
                                 }
                             />
                         </Section>
                     </View>
                 </ScrollView>
+                <ConfirmModal
+                    title={translate('workspace.hr.gusto.disconnectTitle')}
+                    isVisible={isDisconnectModalOpen}
+                    onConfirm={() => {
+                        if (policy) {
+                            removePolicyConnection(policy, CONST.POLICY.CONNECTIONS.NAME.GUSTO);
+                        }
+                        setIsDisconnectModalOpen(false);
+                    }}
+                    onCancel={() => setIsDisconnectModalOpen(false)}
+                    prompt={translate('workspace.hr.gusto.disconnectPrompt')}
+                    confirmText={translate('workspace.hr.gusto.disconnect')}
+                    cancelText={translate('common.cancel')}
+                    danger
+                />
             </ScreenWrapper>
         </AccessOrNotFoundWrapper>
     );

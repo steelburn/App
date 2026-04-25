@@ -6340,6 +6340,12 @@ const translations = {
             gusto: {
                 title: 'Gusto',
                 connect: 'Connect',
+                syncNow: 'Sync now',
+                disconnect: 'Disconnect',
+                lastSync: (relativeDate: string) => `Last synced ${relativeDate}`,
+                syncError: "Can't connect to Gusto",
+                disconnectTitle: 'Disconnect Gusto',
+                disconnectPrompt: 'Are you sure you want to disconnect Gusto?',
                 connectionDescription: 'Connect Gusto to keep employee approvals in sync with your workspace.',
                 approvalMode: 'Approval mode',
                 finalApprover: 'Final approver',
