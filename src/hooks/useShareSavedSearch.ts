@@ -1,0 +1,39 @@
+import {useCallback, useEffect, useRef, useState} from 'react';
+import Clipboard from '@libs/Clipboard';
+import ROUTES from '@src/ROUTES';
+import useEnvironment from './useEnvironment';
+
+const SHARE_FEEDBACK_DURATION_MS = 1800;
+
+function useShareSavedSearch() {
+    const {environmentURL} = useEnvironment();
+    const [copiedHash, setCopiedHash] = useState<number | null>(null);
+    const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    useEffect(() => {
+        return () => {
+            clearTimeout(timeoutRef.current ?? undefined);
+        };
+    }, []);
+
+    const handleShare = useCallback(
+        (itemHash: number, itemQuery: string) => {
+            const url = `${environmentURL}/${ROUTES.SEARCH_ROOT.getRoute({query: itemQuery})}`;
+            Clipboard.setString(url);
+            setCopiedHash(itemHash);
+
+            if (timeoutRef.current !== null) {
+                clearTimeout(timeoutRef.current);
+            }
+            timeoutRef.current = setTimeout(() => {
+                setCopiedHash((prev) => (prev === itemHash ? null : prev));
+                timeoutRef.current = null;
+            }, SHARE_FEEDBACK_DURATION_MS);
+        },
+        [environmentURL],
+    );
+
+    return {copiedHash, handleShare};
+}
+
+export default useShareSavedSearch;
