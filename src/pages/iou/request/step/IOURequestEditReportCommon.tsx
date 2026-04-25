@@ -228,10 +228,7 @@ function IOURequestEditReportCommon({
             return;
         }
 
-        if (
-            item?.policyID &&
-            shouldRestrictUserBillableActions(item.policyID, ownerBillingGracePeriodEnd, userBillingGracePeriodEnds, amountOwed, currentUserPersonalDetails.accountID)
-        ) {
+        if (item?.policyID && shouldRestrictUserBillableActions(item.policyID, ownerBillingGracePeriodEnd, userBillingGracePeriodEnds, amountOwed, currentUserPersonalDetails.accountID)) {
             Navigation.navigate(ROUTES.RESTRICTED_ACTION.getRoute(item.policyID));
             return;
         }
