@@ -168,7 +168,7 @@ function InSelector({onChange}: InSelectorProps) {
         headerMessage,
     };
 
-    const itemCount = sections.flatMap((section) => section.data).length || 1;
+    const itemCount = sections.flatMap((section) => section.data).length;
     return (
         <ListFilterView
             itemCount={itemCount}
