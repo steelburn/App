@@ -139,13 +139,7 @@ function SearchTransactionsChangeReport() {
         }
         if (
             policyForMovingExpensesID &&
-            shouldRestrictUserBillableActions(
-                policyForMovingExpensesID,
-                ownerBillingGracePeriodEnd,
-                userBillingGracePeriodEnds,
-                amountOwed,
-                session?.accountID,
-            )
+            shouldRestrictUserBillableActions(policyForMovingExpensesID, ownerBillingGracePeriodEnd, userBillingGracePeriodEnds, amountOwed, session?.accountID)
         ) {
             Navigation.navigate(ROUTES.RESTRICTED_ACTION.getRoute(policyForMovingExpensesID));
             return;
