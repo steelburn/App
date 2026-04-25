@@ -8580,6 +8580,16 @@ const CONST = {
             PRODUCT_TRAINING_SCAN_TEST_TOOLTIP_DISMISSED: 'training_scan_test_tooltip_dismissed',
             PRODUCT_TRAINING_SCAN_TEST_TOOLTIP_CONFIRMED: 'training_scan_test_tooltip_confirmed',
         },
+        // LinkedIn uses numeric conversion IDs instead of named events
+        LINKEDIN_SIGN_UP_CONVERSION_ID: 0,
+        LINKEDIN_WORKSPACE_CREATEd_CONVERSION_ID: 0,
+        LINKEDIN_PAID_ADOPTION_CONVERSION_ID: 0,
+        NVP: {
+            META_CLICK_ID: 'expensify_leadFbclid',
+            GOOGLE_CLICK_ID: 'expensify_leadGclid',
+            REDDIT_CLICK_ID: 'expensify_leadRdtCid',
+            LINKEDIN_CLICK_ID: 'expensify_leadLiFatId',
+        },
     },
 
     CORPAY_FIELDS: {
