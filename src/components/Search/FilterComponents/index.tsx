@@ -90,7 +90,7 @@ function SingleSelectFilterComponents({filterKey, onChange}: SingleSelectFilterC
         <SingleSelect
             items={items}
             value={items.find((option) => option.value === formValue)}
-            onChange={onChange}
+            onChange={(item) => onChange(item.value)}
         />
     );
 }

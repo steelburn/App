@@ -9,12 +9,13 @@ type ListFilterWrapperProps = {
     children: React.ReactNode;
     itemCount: number;
     itemHeight?: number;
+    hasTitle?: boolean;
     hasHeader?: boolean;
     isSearchable?: boolean;
     extraHeight?: number;
 };
 
-function ListFilterView({children, itemCount, itemHeight, hasHeader, isSearchable, extraHeight}: ListFilterWrapperProps) {
+function ListFilterView({children, itemCount, itemHeight, hasTitle = true, hasHeader, isSearchable, extraHeight}: ListFilterWrapperProps) {
     const styles = useThemeStyles();
     const {windowHeight} = useWindowDimensions();
     // eslint-disable-next-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidth
@@ -28,7 +29,7 @@ function ListFilterView({children, itemCount, itemHeight, hasHeader, isSearchabl
                     itemHeight,
                     windowHeight,
                     isInLandscapeMode,
-                    hasTitle: !hasHeader && isSmallScreenWidth,
+                    hasTitle: hasTitle && !hasHeader && isSmallScreenWidth,
                     hasHeader,
                     isSearchable,
                     extraHeight,

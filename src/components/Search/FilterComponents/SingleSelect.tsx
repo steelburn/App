@@ -20,7 +20,7 @@ type SingleSelectProps<T> = {
     value: SingleSelectItem<T> | undefined;
 
     /** Function to call when changes are applied */
-    onChange: (item: T) => void;
+    onChange: (item: SingleSelectItem<T>) => void;
 
     /** Whether the search input should be displayed */
     isSearchable?: boolean;
@@ -38,7 +38,7 @@ type SingleSelectProps<T> = {
     hasHeader?: boolean;
 };
 
-function SingleSelect<T extends string>({value, items, isSearchable, searchPlaceholder, selectionListStyle, shouldShowList = true, hasHeader, onChange}: SingleSelectProps<T>) {
+function SingleSelect<T extends string>({value, items, isSearchable, searchPlaceholder, selectionListStyle, shouldShowList = true, hasTitle, hasHeader, onChange}: SingleSelectProps<T>) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
     const [selectedItem, setSelectedItem] = useState(value);
@@ -77,8 +77,12 @@ function SingleSelect<T extends string>({value, items, isSearchable, searchPlace
 
     const updateSelectedItem = (item: ListItem<T>) => {
         const newItem = items.find((i) => i.value === item.keyForList);
+        if (!newItem) {
+            return;
+        }
+
         setSelectedItem(newItem);
-        onChange(item.keyForList);
+        onChange(newItem);
     };
 
     const textInputOptions = {
@@ -92,6 +96,7 @@ function SingleSelect<T extends string>({value, items, isSearchable, searchPlace
         <ListFilterWrapper
             itemCount={options.length}
             hasHeader={hasHeader}
+            hasTitle={hasTitle}
             isSearchable={isSearchable}
         >
             <Activity mode={shouldShowList ? 'visible' : 'hidden'}>

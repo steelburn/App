@@ -60,7 +60,7 @@ function TypeSelector({onChange}: TypeSelectorProps) {
             // text is only needed when the list is searchable
             value={{value: type, text: ''}}
             items={types}
-            onChange={onChange}
+            onChange={(item) => onChange(item.value)}
         />
     );
 }

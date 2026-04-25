@@ -12,7 +12,7 @@ import SingleSelectPopup from './SingleSelectPopup';
 type GroupCurrencyPopupProps = {
     onBackButtonPress: () => void;
     closeOverlay: () => void;
-    onChange: (item: SingleSelectItem<string> | null) => void;
+    onChange: (item: SingleSelectItem<string> | undefined) => void;
 };
 
 function filterGroupCurrencySelector(searchAdvancedFiltersForm: OnyxEntry<SearchAdvancedFiltersForm>) {
@@ -26,7 +26,7 @@ function GroupCurrencyPopup({onBackButtonPress, onChange, closeOverlay}: GroupCu
     const groupCurrencyOptions = getCurrencyOptions(currencyList, getCurrencySymbol);
     const [groupCurrency] = useOnyx(ONYXKEYS.FORMS.SEARCH_ADVANCED_FILTERS_FORM, {selector: filterGroupCurrencySelector});
 
-    const groupCurrencyValue = groupCurrencyOptions.find((option) => option.value === groupCurrency) ?? null;
+    const groupCurrencyValue = groupCurrencyOptions.find((option) => option.value === groupCurrency);
 
     return (
         <SingleSelectPopup

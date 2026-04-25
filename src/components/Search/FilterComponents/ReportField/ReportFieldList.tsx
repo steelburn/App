@@ -19,7 +19,7 @@ function ReportFieldList({field, value, onChange}: ReportFieldListProps) {
         <SingleSelect
             items={items}
             value={selectedValue}
-            onChange={onChange}
+            onChange={(item) => onChange(item.value)}
             hasHeader
         />
     );
