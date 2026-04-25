@@ -55,7 +55,13 @@ function useScanActions() {
         interceptAnonymousUser(() => {
             if (
                 policyChatPolicyID &&
-                shouldRestrictUserBillableActions(policyChatPolicyID, ownerBillingGracePeriodEnd, userBillingGracePeriodEnds, amountOwed, undefined, session?.accountID)
+                shouldRestrictUserBillableActions(
+                    policyChatPolicyID,
+                    ownerBillingGracePeriodEnd,
+                    userBillingGracePeriodEnds,
+                    amountOwed,
+                    session?.accountID,
+                )
             ) {
                 Navigation.navigate(ROUTES.RESTRICTED_ACTION.getRoute(policyChatPolicyID));
                 return;

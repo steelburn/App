@@ -260,10 +260,15 @@ function IOURequestStepReport({route, transaction}: IOURequestStepReportProps) {
 
     const createReport = () => {
         const restrictionPolicyID = isPerDiemTransaction ? perDiemOriginalPolicy?.id : policyForMovingExpensesID;
-        const restrictionPolicy = restrictionPolicyID ? allPolicies?.[`${ONYXKEYS.COLLECTION.POLICY}${restrictionPolicyID}`] : undefined;
         if (
             restrictionPolicyID &&
-            shouldRestrictUserBillableActions(restrictionPolicyID, ownerBillingGracePeriodEnd, userBillingGracePeriodEnds, amountOwed, restrictionPolicy, session?.accountID)
+            shouldRestrictUserBillableActions(
+                restrictionPolicyID,
+                ownerBillingGracePeriodEnd,
+                userBillingGracePeriodEnds,
+                amountOwed,
+                session?.accountID ?? CONST.DEFAULT_NUMBER_ID,
+            )
         ) {
             Navigation.navigate(ROUTES.RESTRICTED_ACTION.getRoute(restrictionPolicyID));
             return;
