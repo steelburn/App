@@ -108,20 +108,11 @@ function QuickActionMenuItem({reportID}: QuickActionMenuItemProps) {
     const quickActionSubtitle = !hideQABSubtitle ? getReportName(quickActionReport, reportAttributes) || translate('quickAction.updateDestination') : '';
 
     const quickActionReportPolicyID = quickActionReport?.policyID;
-    const quickActionReportWorkspacePolicy = quickActionReportPolicyID ? allPolicies?.[`${ONYXKEYS.COLLECTION.POLICY}${quickActionReportPolicyID}`] : undefined;
-    const policyChatWorkspacePolicy = policyChatForActivePolicy?.policyID ? allPolicies?.[`${ONYXKEYS.COLLECTION.POLICY}${policyChatForActivePolicy.policyID}`] : undefined;
     const selectOption = (onSelected: () => void, shouldRestrictAction: boolean) => {
         if (
             shouldRestrictAction &&
             quickActionReportPolicyID &&
-            shouldRestrictUserBillableActions(
-                quickActionReportPolicyID,
-                ownerBillingGracePeriodEnd,
-                userBillingGracePeriodEnds,
-                amountOwed,
-                quickActionReportWorkspacePolicy,
-                session?.accountID,
-            )
+            shouldRestrictUserBillableActions(quickActionReportPolicyID, ownerBillingGracePeriodEnd, userBillingGracePeriodEnds, amountOwed, session?.accountID)
         ) {
             Navigation.navigate(ROUTES.RESTRICTED_ACTION.getRoute(quickActionReportPolicyID));
             return;
@@ -199,14 +190,7 @@ function QuickActionMenuItem({reportID}: QuickActionMenuItemProps) {
                 interceptAnonymousUser(() => {
                     if (
                         policyChatForActivePolicy?.policyID &&
-                        shouldRestrictUserBillableActions(
-                            policyChatForActivePolicy.policyID,
-                            ownerBillingGracePeriodEnd,
-                            userBillingGracePeriodEnds,
-                            amountOwed,
-                            policyChatWorkspacePolicy,
-                            session?.accountID,
-                        )
+                        shouldRestrictUserBillableActions(policyChatForActivePolicy.policyID, ownerBillingGracePeriodEnd, userBillingGracePeriodEnds, amountOwed, session?.accountID)
                     ) {
                         Navigation.navigate(ROUTES.RESTRICTED_ACTION.getRoute(policyChatForActivePolicy.policyID));
                         return;

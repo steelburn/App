@@ -230,14 +230,7 @@ function IOURequestEditReportCommon({
 
         if (
             item?.policyID &&
-            shouldRestrictUserBillableActions(
-                item.policyID,
-                ownerBillingGracePeriodEnd,
-                userBillingGracePeriodEnds,
-                amountOwed,
-                allPolicies?.[`${ONYXKEYS.COLLECTION.POLICY}${item.policyID}`],
-                currentUserPersonalDetails.accountID,
-            )
+            shouldRestrictUserBillableActions(item.policyID, ownerBillingGracePeriodEnd, userBillingGracePeriodEnds, amountOwed, currentUserPersonalDetails.accountID)
         ) {
             Navigation.navigate(ROUTES.RESTRICTED_ACTION.getRoute(item.policyID));
             return;

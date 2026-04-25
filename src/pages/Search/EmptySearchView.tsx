@@ -338,8 +338,7 @@ function EmptySearchViewContent({
                                                           ownerBillingGracePeriodEnd,
                                                           userBillingGracePeriodEnds,
                                                           amountOwed,
-                                                          allPolicies?.[`${ONYXKEYS.COLLECTION.POLICY}${workspaceIDForReportCreation}`],
-                                                          accountID ?? undefined,
+                                                          accountID,
                                                       ) &&
                                                           groupPoliciesWithChatEnabled.length > 1)
                                                   ) {
@@ -354,8 +353,7 @@ function EmptySearchViewContent({
                                                           ownerBillingGracePeriodEnd,
                                                           userBillingGracePeriodEnds,
                                                           amountOwed,
-                                                          allPolicies?.[`${ONYXKEYS.COLLECTION.POLICY}${workspaceIDForReportCreation}`],
-                                                          accountID ?? undefined,
+                                                          accountID,
                                                       )
                                                   ) {
                                                       handleCreateReportClick();
