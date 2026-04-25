@@ -140,6 +140,4 @@ function CameraViewport({
     );
 }
 
-CameraViewport.displayName = 'CameraViewport';
-
 export default CameraViewport;

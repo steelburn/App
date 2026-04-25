@@ -50,6 +50,4 @@ function CameraPermissionPrompt({isInLandscapeMode, handIllustration, onPress}: 
     );
 }
 
-CameraPermissionPrompt.displayName = 'CameraPermissionPrompt';
-
 export default CameraPermissionPrompt;

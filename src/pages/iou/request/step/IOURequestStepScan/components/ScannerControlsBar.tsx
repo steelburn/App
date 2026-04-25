@@ -181,6 +181,4 @@ function ScannerControlsBar({
     );
 }
 
-ScannerControlsBar.displayName = 'ScannerControlsBar';
-
 export default ScannerControlsBar;

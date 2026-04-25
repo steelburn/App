@@ -1,5 +1,5 @@
 import type {RefObject} from 'react';
-import {useCallback, useRef} from 'react';
+import {useRef} from 'react';
 import {Alert} from 'react-native';
 import {RESULTS} from 'react-native-permissions';
 import type {Camera, PhotoFile} from 'react-native-vision-camera';
@@ -106,9 +106,9 @@ function useCapturePhoto({
     const {translate} = useLocalize();
     const isCapturingPhoto = useRef(false);
 
-    const resetCapturingState = useCallback(() => {
+    const resetCapturingState = () => {
         isCapturingPhoto.current = false;
-    }, []);
+    };
 
     const maybeCancelShutterSpan = () => {
         if (isMultiScanEnabled) {

@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useRef} from 'react';
+import {useEffect, useRef} from 'react';
 import ReactNativeBlobUtil from 'react-native-blob-util';
 import {RESULTS} from 'react-native-permissions';
 import type {CameraDevice} from 'react-native-vision-camera';
@@ -60,7 +60,7 @@ function useCameraInitTelemetry({cameraPermissionStatus, device}: UseCameraInitT
         };
     }, []);
 
-    const handleCameraInitialized = useCallback(() => {
+    const handleCameraInitialized = () => {
         // Prevent duplicate span endings if callback fires multiple times
         if (cameraInitialized.current) {
             return;
@@ -91,7 +91,7 @@ function useCameraInitTelemetry({cameraPermissionStatus, device}: UseCameraInitT
             .catch((error: string) => {
                 Log.warn('Error checking if the upload directory exists', error);
             });
-    }, []);
+    };
 
     return {handleCameraInitialized};
 }
