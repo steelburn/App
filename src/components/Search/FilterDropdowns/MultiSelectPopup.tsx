@@ -1,9 +1,9 @@
 import React, {useState} from 'react';
 import type {ReactNode} from 'react';
+import {ListFilterHeightContextProvider} from '@components/Search/FilterComponents/ListFilterHeightContext';
 import MultiSelect from '@components/Search/FilterComponents/MultiSelect';
 import CONST from '@src/CONST';
 import type {Icon} from '@src/types/onyx/OnyxCommon';
-import {ListFilterHeightContextProvider} from '../FilterComponents/ListFilterHeightContext';
 import BasePopup from './BasePopup';
 
 type MultiSelectItem<T> = {

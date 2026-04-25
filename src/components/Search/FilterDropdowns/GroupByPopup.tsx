@@ -1,5 +1,6 @@
 import React, {useCallback, useMemo, useState} from 'react';
 import {View} from 'react-native';
+import ListFilterWrapper from '@components/Search/FilterComponents/ListFilterViewWrapper';
 import type {SearchGroupBy} from '@components/Search/types';
 import SingleSelectListItem from '@components/SelectionList/ListItem/SingleSelectListItem';
 import SelectionListWithSections from '@components/SelectionList/SelectionListWithSections';
@@ -8,7 +9,6 @@ import useLocalize from '@hooks/useLocalize';
 import useThemeStyles from '@hooks/useThemeStyles';
 import type {GroupBySection} from '@libs/SearchUIUtils';
 import CONST from '@src/CONST';
-import ListFilterWrapper from '../FilterComponents/ListFilterViewWrapper';
 import BasePopup from './BasePopup';
 
 type GroupByPopupItem = {

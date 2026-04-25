@@ -10,7 +10,6 @@ import useOnyx from '@hooks/useOnyx';
 import usePrivateIsArchivedMap from '@hooks/usePrivateIsArchivedMap';
 import useReportAttributes from '@hooks/useReportAttributes';
 import useSortedActions from '@hooks/useSortedActions';
-import useThemeStyles from '@hooks/useThemeStyles';
 import {searchInServer} from '@libs/actions/Report';
 import {canUseTouchScreen} from '@libs/DeviceCapabilities';
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
@@ -46,7 +45,6 @@ function inSelector(searchAdvancedFiltersForm: SearchAdvancedFiltersForm | undef
 
 function InSelector({onChange}: InSelectorProps) {
     const {translate} = useLocalize();
-    const styles = useThemeStyles();
     const personalDetails = usePersonalDetails();
     const {options, areOptionsInitialized} = useOptionsList();
 

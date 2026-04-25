@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import {View} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';
 import MenuItemWithTopDescription from '@components/MenuItemWithTopDescription';
+import ListFilterWrapper from '@components/Search/FilterComponents/ListFilterViewWrapper';
 import type {SingleSelectItem} from '@components/Search/FilterComponents/SingleSelect';
 import {useSearchActionsContext, useSearchStateContext} from '@components/Search/SearchContext';
 import type {SearchColumnType, SearchGroupBy, SearchQueryJSON} from '@components/Search/types';
@@ -21,7 +22,6 @@ import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import {columnsSelector} from '@src/selectors/AdvancedSearchFiltersForm';
 import type {SearchResults} from '@src/types/onyx';
-import ListFilterWrapper from '../FilterComponents/ListFilterViewWrapper';
 import BasePopup from './BasePopup';
 
 const DIVIDER_HEIGHT = 25;
