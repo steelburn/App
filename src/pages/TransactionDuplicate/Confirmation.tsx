@@ -57,6 +57,7 @@ function Confirmation() {
     const [reviewDuplicatesReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reviewDuplicates?.reportID}`);
     const [policyCategories] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${getNonEmptyStringOnyxID(reviewDuplicatesReport?.policyID)}`);
     const [policy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${report?.policyID}`);
+    const [duplicatedTransactionPolicy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${getNonEmptyStringOnyxID(reviewDuplicatesReport?.policyID)}`);
     const [policyTags] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_TAGS}${getNonEmptyStringOnyxID(reviewDuplicatesReport?.policyID)}`);
     const compareResult = TransactionUtils.compareDuplicateTransactionFields(policyTags ?? {}, transaction, allDuplicates, reviewDuplicatesReport, undefined, policy, policyCategories);
     const {goBack} = useReviewDuplicatesNavigation(Object.keys(compareResult.change ?? {}), 'confirmation', route.params.threadReportID, route.params.backTo);
@@ -73,6 +74,20 @@ function Confirmation() {
         () => TransactionUtils.buildMergeDuplicatesParams(reviewDuplicates, duplicates ?? [], newTransaction),
         [duplicates, reviewDuplicates, newTransaction],
     );
+    const taxData = useMemo(() => {
+        const taxCode = reviewDuplicates?.taxCode ?? '';
+        const taxRate = taxCode ? duplicatedTransactionPolicy?.taxRates?.taxes?.[taxCode] : undefined;
+        // Preserve taxAmount and taxValue if taxCode is deleted or remains unchanged compared to duplicatedTransaction?.taxCode.
+        if (!taxRate || (taxCode && duplicatedTransaction?.taxCode === taxCode) || reviewDuplicates?.taxAmount === undefined) {
+            return;
+        }
+
+        return {
+            taxAmount: -reviewDuplicates.taxAmount,
+            taxValue: taxRate?.value,
+            taxCode,
+        };
+    }, [reviewDuplicates?.taxCode, reviewDuplicates?.taxAmount, duplicatedTransactionPolicy?.taxRates?.taxes, duplicatedTransaction?.taxCode]);
     const isReportOwner = iouReport?.ownerAccountID === currentUserPersonalDetails?.accountID;
 
     const handleMergeDuplicates = useCallback(() => {
@@ -80,18 +95,18 @@ function Confirmation() {
         if (!reportAction?.childReportID) {
             transactionsMergeParams.transactionThreadReportID = transactionThreadReportID;
         }
-        mergeDuplicates({...transactionsMergeParams, currentUserAccountID: currentUserPersonalDetails.accountID, currentUserLogin: currentUserPersonalDetails?.login ?? ''});
+        mergeDuplicates({...transactionsMergeParams, ...taxData, currentUserAccountID: currentUserPersonalDetails.accountID, currentUserLogin: currentUserPersonalDetails?.login ?? ''});
         if (isSuperWideRHPDisplayed) {
             Navigation.dismissToSuperWideRHP();
             return;
         }
         Navigation.dismissModal();
-    }, [reportAction?.childReportID, transactionsMergeParams, currentUserPersonalDetails.accountID, currentUserPersonalDetails?.login, isSuperWideRHPDisplayed]);
+    }, [reportAction?.childReportID, transactionsMergeParams, taxData, currentUserPersonalDetails.accountID, currentUserPersonalDetails?.login, isSuperWideRHPDisplayed]);
 
     const handleResolveDuplicates = useCallback(() => {
-        resolveDuplicates(transactionsMergeParams);
+        resolveDuplicates({...transactionsMergeParams, ...taxData});
         Navigation.dismissToSuperWideRHP();
-    }, [transactionsMergeParams]);
+    }, [transactionsMergeParams, taxData]);
 
     const contextMenuStateValue = useMemo(
         () => ({

@@ -76,10 +76,17 @@ function getIOUActionForTransactions(transactionIDList: Array<string | undefined
     );
 }
 
-type MergeDuplicatesFuncParams = MergeDuplicatesParams & {currentUserLogin: string; currentUserAccountID: number};
+type MergeDuplicatesFuncParams = MergeDuplicatesParams & {currentUserLogin: string; currentUserAccountID: number; taxAmount?: number; taxValue?: string};
 
 /** Merge several transactions into one by updating the fields of the one we want to keep and deleting the rest */
-function mergeDuplicates({transactionThreadReportID: optimisticTransactionThreadReportID, currentUserLogin, currentUserAccountID, ...params}: MergeDuplicatesFuncParams) {
+function mergeDuplicates({
+    transactionThreadReportID: optimisticTransactionThreadReportID,
+    currentUserLogin,
+    currentUserAccountID,
+    taxAmount,
+    taxValue,
+    ...params
+}: MergeDuplicatesFuncParams) {
     const allParams: MergeDuplicatesParams = {...params};
     const allTransactions = getAllTransactions();
     const allTransactionViolations = getAllTransactionViolations();
@@ -101,6 +108,12 @@ function mergeDuplicates({transactionThreadReportID: optimisticTransactionThread
             modifiedMerchant: params.merchant,
             reimbursable: params.reimbursable,
             tag: params.tag,
+            taxCode: params.taxCode ?? originalSelectedTransaction?.taxCode,
+            taxAmount: taxAmount ?? originalSelectedTransaction?.taxAmount,
+            taxValue: taxValue ?? originalSelectedTransaction?.taxValue,
+            // Clear `taxName` to stay consistent with the server response,
+            // and avoid retaining an outdated value that doesn't match the new `taxCode`.
+            taxName: params.taxCode ? null : originalSelectedTransaction?.taxName,
         },
     };
 
@@ -349,7 +362,7 @@ function mergeDuplicates({transactionThreadReportID: optimisticTransactionThread
 }
 
 /** Instead of merging the duplicates, it updates the transaction we want to keep and puts the others on hold without deleting them */
-function resolveDuplicates(params: MergeDuplicatesParams) {
+function resolveDuplicates({taxAmount, taxValue, ...params}: MergeDuplicatesParams & {taxAmount?: number; taxValue?: string}) {
     if (!params.transactionID) {
         return;
     }
@@ -374,6 +387,12 @@ function resolveDuplicates(params: MergeDuplicatesParams) {
             modifiedMerchant: params.merchant,
             reimbursable: params.reimbursable,
             tag: params.tag,
+            taxCode: params.taxCode ?? originalSelectedTransaction?.taxCode,
+            taxAmount: taxAmount ?? originalSelectedTransaction?.taxAmount,
+            taxValue: taxValue ?? originalSelectedTransaction?.taxValue,
+            // Clear `taxName` to stay consistent with the server response,
+            // and avoid retaining an outdated value that doesn't match the new `taxCode`.
+            taxName: params.taxCode ? null : originalSelectedTransaction?.taxName,
         },
     };
 
