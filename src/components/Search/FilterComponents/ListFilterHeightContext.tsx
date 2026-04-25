@@ -1,6 +1,6 @@
 import React, {useContext} from 'react';
 
-const ListFilterHeightContext = React.createContext<boolean>(true);
+const ListFilterHeightContext = React.createContext<boolean>(false);
 
 type ListFilterHeightContextProviderProps = {
     children: React.ReactNode;
