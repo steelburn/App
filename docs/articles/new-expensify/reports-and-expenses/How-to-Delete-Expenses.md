@@ -2,7 +2,7 @@
 title: How to Delete Expenses
 description: Learn how to delete expenses in New Expensify, including how to remove expenses from reports, when you need to retract a report, and why some expenses can’t be deleted.
 keywords: [New Expensify, delete expenses, remove expense, delete expense report, company card expense delete, retract report delete expense, cannot delete expense Expensify, undelete expense, restore deleted expense, find deleted expenses]
-internalScope: Audience includes all members. Covers deleting individual expenses, deleting expenses from reports, retracting reports to enable deletion, company card deletion rules, finding and undeleting deleted expenses. Does not cover editing expenses, reimbursement workflows, expense approvals beyond deletion requirements.
+internalScope: Audience includes all members. Covers deleting individual expenses, deleting expenses from reports, retracting reports to enable deletion, company card deletion rules, finding and un-deleting deleted expenses. Does not cover editing expenses, reimbursement workflows, expense approvals beyond deletion requirements.
 ---
 
 # How to delete expenses 
