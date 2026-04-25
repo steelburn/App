@@ -51,14 +51,16 @@ function getLoginKey(login: NewLogin) {
 
 const DEVICE_PARTNER_IDS = new Set<number>([CONST.PARTNER_ID.IPHONE, CONST.PARTNER_ID.ANDROID, CONST.PARTNER_ID.NEWDOT]);
 
+function isLoginRevokable(login: NewLogin) {
+    return DEVICE_PARTNER_IDS.has(login.partnerID) && (!login.additionalData?.infiniteLoginRoot || login.additionalData.infiniteLoginRoot === login.partnerUserID);
+}
+
 function getRevokableLogins(logins: OnyxEntry<Logins>) {
-    return Object.values(logins ?? {})?.filter(
-        (login) => DEVICE_PARTNER_IDS.has(login.partnerID) && (!login.additionalData?.infiniteLoginRoot || login.additionalData.infiniteLoginRoot === login.partnerUserID),
-    );
+    return Object.values(logins ?? {})?.filter(isLoginRevokable);
 }
 
 function hasDeviceManagementError(logins: OnyxEntry<Logins>) {
-    return Object.values(logins ?? {})?.some((login) => DEVICE_PARTNER_IDS.has(login.partnerID) && !!login.errorFields?.revoke);
+    return Object.values(logins ?? {})?.some((login) => isLoginRevokable(login) && !!login.errorFields?.revoke);
 }
 
 /**
