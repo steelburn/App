@@ -1,7 +1,6 @@
 import React from 'react';
 import type {ReactNode} from 'react';
 import type {PopoverComponentProps} from '@components/Search/FilterDropdowns/DropdownButton';
-import {ListFilterHeightContextProvider} from '@components/Search/FilterComponents/ListFilterHeightContext';
 import MultiSelectPopup from '@components/Search/FilterDropdowns/MultiSelectPopup';
 import SingleSelectPopup from '@components/Search/FilterDropdowns/SingleSelectPopup';
 import type {FilterConfig, FilterConfigEntry} from '@components/Table/middlewares/filtering';
@@ -136,18 +135,16 @@ function createMultiSelectPopover<FilterKey extends string = string>({filterKey,
         const selectedItems = filterConfig.options.filter((option) => currentValueArray.includes(option.value)).map((option) => option.value);
 
         return (
-            <ListFilterHeightContextProvider>
-                <MultiSelectPopup
-                    label={filterKey}
-                    items={filterConfig.options.map((option) => ({
-                        text: option.label,
-                        value: option.value,
-                    }))}
-                    value={selectedItems}
-                    closeOverlay={closeOverlay}
-                    onChange={(items) => setFilter(filterKey, items)}
-                />
-            </ListFilterHeightContextProvider>
+            <MultiSelectPopup
+                label={filterKey}
+                items={filterConfig.options.map((option) => ({
+                    text: option.label,
+                    value: option.value,
+                }))}
+                value={selectedItems}
+                closeOverlay={closeOverlay}
+                onChange={(items) => setFilter(filterKey, items)}
+            />
         );
     };
 }

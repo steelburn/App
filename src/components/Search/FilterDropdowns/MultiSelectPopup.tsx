@@ -3,6 +3,7 @@ import type {ReactNode} from 'react';
 import MultiSelect from '@components/Search/FilterComponents/MultiSelect';
 import CONST from '@src/CONST';
 import type {Icon} from '@src/types/onyx/OnyxCommon';
+import {ListFilterHeightContextProvider} from '../FilterComponents/ListFilterHeightContext';
 import BasePopup from './BasePopup';
 
 type MultiSelectItem<T> = {
@@ -59,14 +60,16 @@ function MultiSelectPopup<T extends string>({label, loading, value, items, close
             resetSentryLabel={CONST.SENTRY_LABEL.SEARCH.FILTER_POPUP_RESET_MULTI_SELECT}
             applySentryLabel={CONST.SENTRY_LABEL.SEARCH.FILTER_POPUP_APPLY_MULTI_SELECT}
         >
-            <MultiSelect
-                loading={loading}
-                value={value}
-                items={items}
-                isSearchable={isSearchable}
-                searchPlaceholder={searchPlaceholder}
-                onChange={setSelectedItems}
-            />
+            <ListFilterHeightContextProvider>
+                <MultiSelect
+                    loading={loading}
+                    value={value}
+                    items={items}
+                    isSearchable={isSearchable}
+                    searchPlaceholder={searchPlaceholder}
+                    onChange={setSelectedItems}
+                />
+            </ListFilterHeightContextProvider>
         </BasePopup>
     );
 }

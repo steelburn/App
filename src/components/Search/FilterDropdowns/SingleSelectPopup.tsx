@@ -4,6 +4,7 @@ import type {SingleSelectItem} from '@components/Search/FilterComponents/SingleS
 import SingleSelect from '@components/Search/FilterComponents/SingleSelect';
 import type {SelectionListStyle} from '@components/SelectionList/types';
 import CONST from '@src/CONST';
+import {ListFilterHeightContextProvider} from '../FilterComponents/ListFilterHeightContext';
 import BasePopup from './BasePopup';
 
 type SingleSelectPopupProps<T> = {
@@ -78,17 +79,19 @@ function SingleSelectPopup<T extends string>({
             applySentryLabel={CONST.SENTRY_LABEL.SEARCH.FILTER_POPUP_APPLY_SINGLE_SELECT}
             style={[style]}
         >
-            <SingleSelect
-                items={items}
-                value={value}
-                onChange={setSelectedItem}
-                hasHeader={!!onBackButtonPress}
-                hasTitle={!!label}
-                isSearchable={isSearchable}
-                searchPlaceholder={searchPlaceholder}
-                selectionListStyle={selectionListStyle}
-                shouldShowList={shouldShowList}
-            />
+            <ListFilterHeightContextProvider>
+                <SingleSelect
+                    items={items}
+                    value={value}
+                    onChange={setSelectedItem}
+                    hasHeader={!!onBackButtonPress}
+                    hasTitle={!!label}
+                    isSearchable={isSearchable}
+                    searchPlaceholder={searchPlaceholder}
+                    selectionListStyle={selectionListStyle}
+                    shouldShowList={shouldShowList}
+                />
+            </ListFilterHeightContextProvider>
         </BasePopup>
     );
 }
