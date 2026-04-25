@@ -28,7 +28,7 @@ const PIXEL_EVENTS = new Set<GoogleTagManagerEvent>([CONST.ANALYTICS.EVENT.SIGN_
 
 const LINKEDIN_CONVERSION_IDS: Partial<Record<GoogleTagManagerEvent, number>> = {
     [CONST.ANALYTICS.EVENT.SIGN_UP]: CONST.ANALYTICS.LINKEDIN_SIGN_UP_CONVERSION_ID,
-    [CONST.ANALYTICS.EVENT.WORKSPACE_CREATED]: CONST.ANALYTICS.LINKEDIN_WORKSPACE_CREATEd_CONVERSION_ID,
+    [CONST.ANALYTICS.EVENT.WORKSPACE_CREATED]: CONST.ANALYTICS.LINKEDIN_WORKSPACE_CREATED_CONVERSION_ID,
     [CONST.ANALYTICS.EVENT.PAID_ADOPTION]: CONST.ANALYTICS.LINKEDIN_PAID_ADOPTION_CONVERSION_ID,
 };
 
@@ -48,6 +48,7 @@ function publishEvent(event: GoogleTagManagerEvent, accountID: number) {
         return;
     }
 
+    // Events in Meta & Reddit are currently being set in CamelCase from OldDot
     const pixelEventName = (event as string)
         .split('_')
         .map((w) => w.charAt(0).toUpperCase() + w.slice(1))

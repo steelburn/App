@@ -8582,7 +8582,7 @@ const CONST = {
         },
         // LinkedIn uses numeric conversion IDs instead of named events
         LINKEDIN_SIGN_UP_CONVERSION_ID: 0,
-        LINKEDIN_WORKSPACE_CREATEd_CONVERSION_ID: 0,
+        LINKEDIN_WORKSPACE_CREATED_CONVERSION_ID: 0,
         LINKEDIN_PAID_ADOPTION_CONVERSION_ID: 0,
         NVP: {
             META_CLICK_ID: 'expensify_leadFbclid',
