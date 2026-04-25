@@ -32,6 +32,7 @@ type Login = OnyxValueWithOfflineFeedback<{
         /** The device version where this account is logged in */
         deviceVersion?: string;
 
+        /** The partnerID of the ancestor login associated with this one. Note: this may just be a reference to the current login */
         infiniteLoginRoot?: string;
 
         /** The device OS where this account is logged in */
