@@ -1,6 +1,7 @@
 import React from 'react';
 import type {ReactNode} from 'react';
 import type {PopoverComponentProps} from '@components/Search/FilterDropdowns/DropdownButton';
+import {ListFilterHeightContextProvider} from '@components/Search/FilterComponents/ListFilterHeightContext';
 import MultiSelectPopup from '@components/Search/FilterDropdowns/MultiSelectPopup';
 import SingleSelectPopup from '@components/Search/FilterDropdowns/SingleSelectPopup';
 import type {FilterConfig, FilterConfigEntry} from '@components/Table/middlewares/filtering';
@@ -132,27 +133,21 @@ type MultiSelectPopoverFactoryProps<FilterKey extends string = string> = {
 function createMultiSelectPopover<FilterKey extends string = string>({filterKey, filterConfig, currentFilterValue, setFilter}: MultiSelectPopoverFactoryProps<FilterKey>) {
     return ({closeOverlay}: PopoverComponentProps) => {
         const currentValueArray = Array.isArray(currentFilterValue) ? currentFilterValue : [];
-        const selectedItems = filterConfig.options
-            .filter((option) => currentValueArray.includes(option.value))
-            .map((option) => ({
-                text: option.label,
-                value: option.value,
-            }));
+        const selectedItems = filterConfig.options.filter((option) => currentValueArray.includes(option.value)).map((option) => option.value);
 
         return (
-            <MultiSelectPopup
-                label={filterKey}
-                items={filterConfig.options.map((option) => ({
-                    text: option.label,
-                    value: option.value,
-                }))}
-                value={selectedItems}
-                closeOverlay={closeOverlay}
-                onChange={(items) => {
-                    const values = items.map((item) => item.value);
-                    setFilter(filterKey, values);
-                }}
-            />
+            <ListFilterHeightContextProvider>
+                <MultiSelectPopup
+                    label={filterKey}
+                    items={filterConfig.options.map((option) => ({
+                        text: option.label,
+                        value: option.value,
+                    }))}
+                    value={selectedItems}
+                    closeOverlay={closeOverlay}
+                    onChange={(items) => setFilter(filterKey, items)}
+                />
+            </ListFilterHeightContextProvider>
         );
     };
 }
