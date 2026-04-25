@@ -1,5 +1,4 @@
 import {act, renderHook} from '@testing-library/react-native';
-import useEnvironment from '@hooks/useEnvironment';
 import useShareSavedSearch from '@hooks/useShareSavedSearch';
 import Clipboard from '@libs/Clipboard';
 import ROUTES from '@src/ROUTES';
@@ -8,26 +7,16 @@ jest.mock('@libs/Clipboard', () => ({
     setString: jest.fn(),
 }));
 
-jest.mock('@hooks/useEnvironment', () => jest.fn());
+jest.mock('@hooks/useEnvironment', () => jest.fn(() => ({environmentURL: 'https://new.expensify.com'})));
 
-const mockUseEnvironment = useEnvironment as jest.MockedFunction<typeof useEnvironment>;
 const mockClipboardSetString = Clipboard.setString as jest.MockedFunction<typeof Clipboard.setString>;
 
-const ENV_URL = 'https://dev.new.expensify.com:8082';
 const ITEM_HASH = 12345;
 const ITEM_QUERY = 'type:expense status:all';
 
 describe('useShareSavedSearch', () => {
     beforeEach(() => {
         jest.useFakeTimers();
-        mockUseEnvironment.mockReturnValue({
-            environment: 'development',
-            environmentURL: ENV_URL,
-            isProduction: false,
-            isDevelopment: true,
-            isStagingEnvironment: false,
-            isDefaultEnvironment: false,
-        });
         mockClipboardSetString.mockClear();
     });
 
@@ -42,7 +31,7 @@ describe('useShareSavedSearch', () => {
             result.current.handleShare(ITEM_HASH, ITEM_QUERY);
         });
 
-        const expectedURL = `${ENV_URL}/${ROUTES.SEARCH_ROOT.getRoute({query: ITEM_QUERY})}`;
+        const expectedURL = `https://new.expensify.com/${ROUTES.SEARCH_ROOT.getRoute({query: ITEM_QUERY})}`;
         expect(mockClipboardSetString).toHaveBeenCalledWith(expectedURL);
         expect(result.current.copiedHash).toBe(ITEM_HASH);
     });
