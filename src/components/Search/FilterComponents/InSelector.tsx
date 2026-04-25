@@ -1,5 +1,4 @@
 import React, {useEffect, useState} from 'react';
-import {View} from 'react-native';
 import {usePersonalDetails} from '@components/OnyxListItemProvider';
 import {useOptionsList} from '@components/OptionListContextProvider';
 import InviteMemberListItem from '@components/SelectionList/ListItem/InviteMemberListItem';
@@ -10,10 +9,8 @@ import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import usePrivateIsArchivedMap from '@hooks/usePrivateIsArchivedMap';
 import useReportAttributes from '@hooks/useReportAttributes';
-import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useSortedActions from '@hooks/useSortedActions';
 import useThemeStyles from '@hooks/useThemeStyles';
-import useWindowDimensions from '@hooks/useWindowDimensions';
 import {searchInServer} from '@libs/actions/Report';
 import {canUseTouchScreen} from '@libs/DeviceCapabilities';
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
@@ -25,6 +22,7 @@ import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import passthroughPolicyTagListSelector from '@src/selectors/PolicyTagList';
 import type {SearchAdvancedFiltersForm} from '@src/types/form';
+import ListFilterView from './ListFilterViewWrapper';
 
 type InSelectorProps = {
     onChange: (ins: string[]) => void;
@@ -49,9 +47,6 @@ function inSelector(searchAdvancedFiltersForm: SearchAdvancedFiltersForm | undef
 function InSelector({onChange}: InSelectorProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
-    // eslint-disable-next-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidth
-    const {isSmallScreenWidth, isInLandscapeMode} = useResponsiveLayout();
-    const {windowHeight} = useWindowDimensions();
     const personalDetails = usePersonalDetails();
     const {options, areOptionsInitialized} = useOptionsList();
 
@@ -177,17 +172,10 @@ function InSelector({onChange}: InSelectorProps) {
 
     const itemCount = sections.flatMap((section) => section.data).length || 1;
     return (
-        <View
-            style={[
-                styles.getSelectionListPopoverHeight({
-                    itemCount,
-                    itemHeight: variables.optionRowHeight,
-                    windowHeight,
-                    isInLandscapeMode,
-                    hasTitle: isSmallScreenWidth,
-                    isSearchable: true,
-                }),
-            ]}
+        <ListFilterView
+            itemCount={itemCount}
+            itemHeight={variables.optionRowHeight}
+            isSearchable
         >
             <SelectionListWithSections
                 sections={sections}
@@ -200,7 +188,7 @@ function InSelector({onChange}: InSelectorProps) {
                 shouldShowLoadingPlaceholder={shouldShowLoadingPlaceholder}
                 shouldShowTextInput
             />
-        </View>
+        </ListFilterView>
     );
 }
 

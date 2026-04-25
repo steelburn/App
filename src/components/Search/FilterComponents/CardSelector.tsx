@@ -10,11 +10,9 @@ import useDebouncedState from '@hooks/useDebouncedState';
 import useLocalize from '@hooks/useLocalize';
 import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
-import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useTheme from '@hooks/useTheme';
 import useThemeIllustrations from '@hooks/useThemeIllustrations';
 import useThemeStyles from '@hooks/useThemeStyles';
-import useWindowDimensions from '@hooks/useWindowDimensions';
 import {openSearchCardFiltersPage} from '@libs/actions/Search';
 import {buildCardsData, generateSelectedCards} from '@libs/CardFeedUtils';
 import type {CardFilterItem} from '@libs/CardFeedUtils';
@@ -23,6 +21,7 @@ import variables from '@styles/variables';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import isLoadingOnyxValue from '@src/types/utils/isLoadingOnyxValue';
+import ListFilterView from './ListFilterViewWrapper';
 
 type CardSelectorProps = {
     onChange: (cards: string[]) => void;
@@ -35,9 +34,6 @@ function CardSelector({onChange}: CardSelectorProps) {
     const {isOffline} = useNetwork();
     const illustrations = useThemeIllustrations();
     const companyCardFeedIcons = useCompanyCardFeedIcons();
-    const {windowHeight} = useWindowDimensions();
-    // eslint-disable-next-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidth
-    const {isSmallScreenWidth, isInLandscapeMode} = useResponsiveLayout();
 
     const [areCardsLoaded] = useOnyx(ONYXKEYS.IS_SEARCH_FILTERS_CARD_DATA_LOADED);
     const [userCardList, userCardListMetadata] = useOnyx(ONYXKEYS.CARD_LIST);
@@ -150,19 +146,11 @@ function CardSelector({onChange}: CardSelectorProps) {
     const reasonAttributes: SkeletonSpanReasonAttributes = {context: 'SearchFiltersCardPage', isLoadingFromOnyx: isLoadingOnyxData};
 
     return (
-        <View
-            style={[
-                styles.getSelectionListPopoverHeight({
-                    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- we want to fallback to 1 when it's 0
-                    itemCount: itemCount || 1,
-                    itemHeight: variables.optionRowHeight,
-                    windowHeight,
-                    isInLandscapeMode,
-                    hasTitle: isSmallScreenWidth,
-                    isSearchable: shouldShowSearchInput,
-                    extraHeight: 28 * sectionHeaderCount,
-                }),
-            ]}
+        <ListFilterView
+            itemCount={itemCount}
+            itemHeight={variables.optionRowHeight}
+            isSearchable={shouldShowSearchInput}
+            extraHeight={28 * sectionHeaderCount}
         >
             {shouldShowLoadingState ? (
                 <View style={[styles.flex1, styles.flexColumn, styles.justifyContentCenter, styles.alignItemsCenter]}>
@@ -185,7 +173,7 @@ function CardSelector({onChange}: CardSelectorProps) {
                     canSelectMultiple
                 />
             )}
-        </View>
+        </ListFilterView>
     );
 }
 

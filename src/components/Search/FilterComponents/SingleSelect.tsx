@@ -1,13 +1,11 @@
 import React, {Activity, useState} from 'react';
-import {View} from 'react-native';
 import SelectionList from '@components/SelectionList';
 import SingleSelectListItem from '@components/SelectionList/ListItem/SingleSelectListItem';
 import type {ListItem, SelectionListStyle} from '@components/SelectionList/types';
 import useDebouncedState from '@hooks/useDebouncedState';
 import useLocalize from '@hooks/useLocalize';
-import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
-import useWindowDimensions from '@hooks/useWindowDimensions';
+import ListFilterWrapper from './ListFilterViewWrapper';
 
 type SingleSelectItem<T> = {
     text: string;
@@ -40,12 +38,9 @@ type SingleSelectProps<T> = {
     hasHeader?: boolean;
 };
 
-function SingleSelect<T extends string>({value, items, isSearchable, searchPlaceholder, selectionListStyle, shouldShowList = true, hasTitle, hasHeader, onChange}: SingleSelectProps<T>) {
+function SingleSelect<T extends string>({value, items, isSearchable, searchPlaceholder, selectionListStyle, shouldShowList = true, hasHeader, onChange}: SingleSelectProps<T>) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
-    // eslint-disable-next-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidth
-    const {isSmallScreenWidth, isInLandscapeMode} = useResponsiveLayout();
-    const {windowHeight} = useWindowDimensions();
     const [selectedItem, setSelectedItem] = useState(value);
     const [searchTerm, debouncedSearchTerm, setSearchTerm] = useDebouncedState('');
 
@@ -94,17 +89,10 @@ function SingleSelect<T extends string>({value, items, isSearchable, searchPlace
     };
 
     return (
-        <View
-            style={[
-                styles.getSelectionListPopoverHeight({
-                    itemCount: options.length || 1,
-                    windowHeight,
-                    isInLandscapeMode,
-                    hasTitle: hasTitle && isSmallScreenWidth,
-                    hasHeader,
-                    isSearchable: isSearchable ?? false,
-                }),
-            ]}
+        <ListFilterWrapper
+            itemCount={options.length}
+            hasHeader={hasHeader}
+            isSearchable={isSearchable}
         >
             <Activity mode={shouldShowList ? 'visible' : 'hidden'}>
                 <SelectionList
@@ -119,7 +107,7 @@ function SingleSelect<T extends string>({value, items, isSearchable, searchPlace
                     shouldShowLoadingPlaceholder={!noResultsFound}
                 />
             </Activity>
-        </View>
+        </ListFilterWrapper>
     );
 }
 

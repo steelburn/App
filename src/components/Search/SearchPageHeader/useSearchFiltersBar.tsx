@@ -1,5 +1,6 @@
 import React from 'react';
 import type {ReactNode} from 'react';
+import {ListFilterHeightContextProvider} from '@components/Search/FilterComponents/ListFilterHeightContext';
 import AmountPopup from '@components/Search/FilterDropdowns/AmountPopup';
 import CommonPopup from '@components/Search/FilterDropdowns/CommonPopup';
 import type {PopoverComponentProps} from '@components/Search/FilterDropdowns/DropdownButton';
@@ -124,13 +125,15 @@ function useSearchFiltersBar(queryJSON: SearchQueryJSON): UseSearchFiltersBarRes
     const {shouldShowFiltersBarLoading, currentSearchResults} = useSearchStateContext();
     const filters = mapFiltersFormToLabelValueList<FilterItem>(searchAdvancedFiltersForm, queryJSON.policyID, SKIPPED_FILTERS, translate, localeCompare, (filterKey) => ({
         PopoverComponent: ({closeOverlay, setPopoverWidth}) => (
-            <FilterPopup
-                filterKey={filterKey}
-                searchAdvancedFiltersForm={searchAdvancedFiltersForm}
-                queryJSON={queryJSON}
-                closeOverlay={closeOverlay}
-                setPopoverWidth={setPopoverWidth}
-            />
+            <ListFilterHeightContextProvider>
+                <FilterPopup
+                    filterKey={filterKey}
+                    searchAdvancedFiltersForm={searchAdvancedFiltersForm}
+                    queryJSON={queryJSON}
+                    closeOverlay={closeOverlay}
+                    setPopoverWidth={setPopoverWidth}
+                />
+            </ListFilterHeightContextProvider>
         ),
         sentryLabel: getFilterSentryLabel(filterKey),
     }));

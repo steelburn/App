@@ -7,13 +7,12 @@ import MultiSelectListItem from '@components/SelectionList/ListItem/MultiSelectL
 import type {ListItem} from '@components/SelectionList/ListItem/types';
 import useDebouncedState from '@hooks/useDebouncedState';
 import useLocalize from '@hooks/useLocalize';
-import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
-import useWindowDimensions from '@hooks/useWindowDimensions';
 import type {SkeletonSpanReasonAttributes} from '@libs/telemetry/useSkeletonSpan';
 import CONST from '@src/CONST';
 import type {Icon} from '@src/types/onyx/OnyxCommon';
+import ListFilterView from './ListFilterViewWrapper';
 
 type MultiSelectItem<T> = {
     text: string;
@@ -46,9 +45,6 @@ function MultiSelect<T extends string>({loading, value, items, isSearchable, sea
     const theme = useTheme();
     const {translate} = useLocalize();
     const styles = useThemeStyles();
-    // eslint-disable-next-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidth
-    const {isSmallScreenWidth, isInLandscapeMode} = useResponsiveLayout();
-    const {windowHeight} = useWindowDimensions();
 
     const [selectedItems, setSelectedItems] = useState(value);
     const [searchTerm, debouncedSearchTerm, setSearchTerm] = useDebouncedState('');
@@ -91,7 +87,10 @@ function MultiSelect<T extends string>({loading, value, items, isSearchable, sea
     const reasonAttributes: SkeletonSpanReasonAttributes = {context: 'MultiSelectDataLoading'};
 
     return (
-        <View style={[styles.getSelectionListPopoverHeight({itemCount: listData.length || 1, windowHeight, isInLandscapeMode, hasTitle: isSmallScreenWidth, isSearchable})]}>
+        <ListFilterView
+            itemCount={listData.length}
+            isSearchable={isSearchable}
+        >
             {loading ? (
                 <View style={[styles.flex1, styles.justifyContentCenter, styles.alignItemsCenter]}>
                     <ActivityIndicator
@@ -110,7 +109,7 @@ function MultiSelect<T extends string>({loading, value, items, isSearchable, sea
                     style={{contentContainerStyle: [styles.pb0]}}
                 />
             )}
-        </View>
+        </ListFilterView>
     );
 }
 
