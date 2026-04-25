@@ -44,6 +44,7 @@ Report actions guide the submitter, approver, and payer regarding the report's s
 | **Change workspace** | Before report is exported | Submitter, Approver, Admin | Moves the report to a different workspace |
 | **Change approver** | On submitted reports, before the report is final-approved | Admin | "Add Approver" allows an extra approver to be inserted into the approval workflow at the current point. "Bypass Approver" allows an admin to take control of the report approval and final approve |
 | **Delete** | Only on draft/unsubmitted reports | Submitter | Permanently removes the report |
+| **Undelete** | On deleted expenses (accessible via Reports > Expenses with Status = Deleted filter) | Submitter | Restores the deleted expense back to your account |
 | **Unapprove** | After approval, before payment | Approver | Reverts the approval if the report hasn’t been re-approved or paid |
 | **Mark as exported** | On approved/paid reports when integrated to an accounting system| Admin, Exporter | Marks the report as manually exported for tracking purposes |
 | **Export to [accounting system]** | When an accounting system is connected | Admin, Exporter | Sends the report to an external system such as Xero or QuickBooks Online |
