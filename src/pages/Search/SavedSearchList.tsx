@@ -1,10 +1,11 @@
 import {useIsFocused} from '@react-navigation/native';
 import {accountIDSelector} from '@selectors/Session';
-import React from 'react';
+import React, {useCallback, useState} from 'react';
 import MenuItemList from '@components/MenuItemList';
 import {usePersonalDetails} from '@components/OnyxListItemProvider';
 import {useProductTrainingContext} from '@components/ProductTrainingContext';
 import useDeleteSavedSearch from '@hooks/useDeleteSavedSearch';
+import useEnvironment from '@hooks/useEnvironment';
 import useFeedKeysWithAssignedCards from '@hooks/useFeedKeysWithAssignedCards';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
@@ -14,6 +15,7 @@ import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {setSearchContext} from '@libs/actions/Search';
 import {mergeCardListWithWorkspaceFeeds} from '@libs/CardUtils';
+import Clipboard from '@libs/Clipboard';
 import Navigation from '@libs/Navigation/Navigation';
 import {getAllTaxRates} from '@libs/PolicyUtils';
 import type {SavedSearchMenuItem} from '@libs/SearchUIUtils';
@@ -113,7 +115,22 @@ function SavedSearchList({hash}: SavedSearchListProps) {
         hideProductTrainingTooltip: hideSavedSearchTooltip,
     } = useProductTrainingContext(CONST.PRODUCT_TRAINING_TOOLTIP_NAMES.RENAME_SAVED_SEARCH, isFocused);
 
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Bookmark', 'Pencil', 'Trashcan']);
+    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Bookmark', 'Pencil', 'Trashcan', 'LinkCopy', 'Checkmark']);
+    const {environmentURL} = useEnvironment();
+
+    const [copiedHash, setCopiedHash] = useState<number | null>(null);
+
+    const handleShare = useCallback(
+        (itemHash: number, itemQuery: string) => {
+            const url = `${environmentURL}/${ROUTES.SEARCH_ROOT.getRoute({query: itemQuery})}`;
+            Clipboard.setString(url);
+            setCopiedHash(itemHash);
+            setTimeout(() => {
+                setCopiedHash((prev) => (prev === itemHash ? null : prev));
+            }, 1800);
+        },
+        [environmentURL],
+    );
 
     const taxRates = getAllTaxRates(allPolicies);
     const cardsForSavedSearchDisplay = mergeCardListWithWorkspaceFeeds(workspaceCardList ?? CONST.EMPTY_OBJECT, cardList);
@@ -132,7 +149,11 @@ function SavedSearchList({hash}: SavedSearchListProps) {
         reportAttributes,
     });
 
-    const getOverflowMenu = (itemName: string, itemHash: number, itemQuery: string) => getOverflowMenuUtil(expensifyIcons, itemName, itemHash, itemQuery, translate, showDeleteModal);
+    const getOverflowMenu = (itemName: string, itemHash: number, itemQuery: string) =>
+        getOverflowMenuUtil(expensifyIcons, itemName, itemHash, itemQuery, translate, showDeleteModal, false, undefined, {
+            onShare: () => handleShare(itemHash, itemQuery),
+            isCopied: copiedHash === itemHash,
+        });
 
     const itemStyle = [styles.alignItemsCenter];
     const tooltipWrapperStyle = [styles.mh4, styles.pv2, styles.productTrainingTooltipWrapper];

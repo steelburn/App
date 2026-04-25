@@ -2,7 +2,7 @@
 // used for fast perceived performance. If you change the UI here, verify the
 // static version still looks visually identical.
 import {useNavigation} from '@react-navigation/native';
-import React, {useRef, useState} from 'react';
+import React, {useCallback, useRef, useState} from 'react';
 import {View} from 'react-native';
 import type BaseModalProps from '@components/Modal/types';
 import {usePersonalDetails} from '@components/OnyxListItemProvider';
@@ -13,6 +13,7 @@ import TabSelectorBase from '@components/TabSelector/TabSelectorBase';
 import TabSelectorContextProvider from '@components/TabSelector/TabSelectorContext';
 import type {TabSelectorBaseItem} from '@components/TabSelector/types';
 import useDeleteSavedSearch from '@hooks/useDeleteSavedSearch';
+import useEnvironment from '@hooks/useEnvironment';
 import useFeedKeysWithAssignedCards from '@hooks/useFeedKeysWithAssignedCards';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
@@ -23,10 +24,12 @@ import useSearchTypeMenuSections from '@hooks/useSearchTypeMenuSections';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {setSearchContext} from '@libs/actions/Search';
 import {mergeCardListWithWorkspaceFeeds} from '@libs/CardUtils';
+import Clipboard from '@libs/Clipboard';
 import {getAllTaxRates} from '@libs/PolicyUtils';
 import {getItemBadgeText, getOverflowMenu} from '@libs/SearchUIUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
+import ROUTES from '@src/ROUTES';
 import {accountIDSelector} from '@src/selectors/Session';
 import todosReportCountsSelector from '@src/selectors/Todos';
 import useSavedSearchTitles from './hooks/useSavedSearchTitles';
@@ -110,6 +113,21 @@ function SearchTypeMenuNarrow({queryJSON, onTabPress}: SearchTypeMenuNarrowProps
     const menuAnchorRef = useRef<View>(null);
     const {showDeleteModal} = useDeleteSavedSearch();
 
+    const {environmentURL} = useEnvironment();
+    const [copiedHash, setCopiedHash] = useState<number | null>(null);
+
+    const handleShare = useCallback(
+        (itemHash: number, itemQuery: string) => {
+            const url = `${environmentURL}/${ROUTES.SEARCH_ROOT.getRoute({query: itemQuery})}`;
+            Clipboard.setString(url);
+            setCopiedHash(itemHash);
+            setTimeout(() => {
+                setCopiedHash((prev) => (prev === itemHash ? null : prev));
+            }, 1800);
+        },
+        [environmentURL],
+    );
+
     const expensifyIcons = useMemoizedLazyExpensifyIcons([
         'Receipt',
         'MoneyBag',
@@ -124,6 +142,8 @@ function SearchTypeMenuNarrow({queryJSON, onTabPress}: SearchTypeMenuNarrowProps
         'Bookmark',
         'Pencil',
         'Trashcan',
+        'LinkCopy',
+        'Checkmark',
         'Document',
         'ThumbsUp',
         'CheckCircle',
@@ -144,9 +164,11 @@ function SearchTypeMenuNarrow({queryJSON, onTabPress}: SearchTypeMenuNarrowProps
                   const title = item.name === item.query ? (savedSearchTitles.get(item.query) ?? item.name) : item.name;
 
                   queryMap.set(key, {query: item.query ?? '', name: item.name});
-                  savedSearchesPopoverMenuItems[key] = getOverflowMenu(expensifyIcons, title, Number(key), item.query, translate, showDeleteModal, true, () =>
-                      setSavedSearchToModifyKey(null),
-                  );
+                  const itemHash = Number(key);
+                  savedSearchesPopoverMenuItems[key] = getOverflowMenu(expensifyIcons, title, itemHash, item.query, translate, showDeleteModal, true, () => setSavedSearchToModifyKey(null), {
+                      onShare: () => handleShare(itemHash, item.query),
+                      isCopied: copiedHash === itemHash,
+                  });
 
                   if (Number(key) === queryJSON?.hash) {
                       activeKey = key;
@@ -240,7 +262,10 @@ function SearchTypeMenuNarrow({queryJSON, onTabPress}: SearchTypeMenuNarrowProps
                     horizontal: CONST.MODAL.ANCHOR_ORIGIN_HORIZONTAL.LEFT,
                     vertical: CONST.MODAL.ANCHOR_ORIGIN_VERTICAL.BOTTOM,
                 }}
-                onItemSelected={() => {
+                onItemSelected={(item) => {
+                    if (item.shouldCloseModalOnSelect === false) {
+                        return;
+                    }
                     setRestoreFocusType(CONST.MODAL.RESTORE_FOCUS_TYPE.PRESERVE);
                     setSavedSearchToModifyKey(null);
                 }}
