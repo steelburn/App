@@ -1,27 +1,30 @@
+import {cardByIdSelector} from '@selectors/Card';
 import React from 'react';
 import {View} from 'react-native';
 import type {ActionableItem} from '@components/ReportActionItem/ActionableItemButtons';
 import ActionableItemButtons from '@components/ReportActionItem/ActionableItemButtons';
 import useLocalize from '@hooks/useLocalize';
+import useOnyx from '@hooks/useOnyx';
 import {getActionableCardFraudAlertMessage, getOriginalMessage} from '@libs/ReportActionsUtils';
 import ReportActionItemBasicMessage from '@pages/inbox/report/ReportActionItemBasicMessage';
 import {resolveFraudAlert} from '@userActions/Card';
 import CONST from '@src/CONST';
+import ONYXKEYS from '@src/ONYXKEYS';
 import type {ReportAction} from '@src/types/onyx';
-import type {PossibleFraudData} from '@src/types/onyx/Card';
 
 type FraudAlertContentProps = {
     action: ReportAction<typeof CONST.REPORT.ACTIONS.TYPE.ACTIONABLE_CARD_FRAUD_ALERT>;
     reportID: string | undefined;
-    possibleFraud: PossibleFraudData | null;
 };
 
-function FraudAlertContent({action, reportID, possibleFraud}: FraudAlertContentProps) {
+function FraudAlertContent({action, reportID}: FraudAlertContentProps) {
     const {translate, getLocalDateFromDatetime} = useLocalize();
 
     const reportActionID = action?.reportActionID;
     const originalMessage = getOriginalMessage(action);
     const cardID = originalMessage?.cardID;
+    const [card] = useOnyx(ONYXKEYS.CARD_LIST, {selector: cardByIdSelector(String(cardID))});
+    const possibleFraud = card?.nameValuePairs?.possibleFraud ?? null;
 
     const buttons: ActionableItem[] = originalMessage?.resolution
         ? []
