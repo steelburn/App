@@ -46,18 +46,18 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES, {DYNAMIC_ROUTES} from '@src/ROUTES';
 import SCREENS from '@src/SCREENS';
 
-type CategorySettingsPageProps =
+type DynamicCategorySettingsPageProps =
     | PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.WORKSPACE.DYNAMIC_CATEGORY_SETTINGS>
     | PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.SETTINGS_CATEGORIES.SETTINGS_CATEGORY_SETTINGS>;
 
-function CategorySettingsPage({
+function DynamicCategorySettingsPage({
     route: {
         params: {policyID, categoryName},
         name,
         params,
     },
     navigation,
-}: CategorySettingsPageProps) {
+}: DynamicCategorySettingsPageProps) {
     const styles = useThemeStyles();
     const {translate, formatPhoneNumber} = useLocalize();
     const {convertToDisplayString} = useCurrencyListActions();
@@ -75,6 +75,7 @@ function CategorySettingsPage({
 
     const shouldPreventDisableOrDelete = isDisablingOrDeletingLastEnabledCategory(policy, policyData.categories, [policyCategory]);
     const isQuickSettingsFlow = name === SCREENS.SETTINGS_CATEGORIES.SETTINGS_CATEGORY_SETTINGS;
+    const backTo = params.backTo;
     const backPath = useDynamicBackPath(DYNAMIC_ROUTES.WORKSPACE_CATEGORY_SETTINGS.path);
     const {
         taskReport: setupCategoryTaskReport,
@@ -260,7 +261,7 @@ function CategorySettingsPage({
             <ScreenWrapper
                 enableEdgeToEdgeBottomSafeAreaPadding
                 style={[styles.defaultModalContainer]}
-                testID="CategorySettingsPage"
+                testID="DynamicCategorySettingsPage"
             >
                 <HeaderWithBackButton
                     title={decodedCategoryName}
@@ -464,4 +465,4 @@ function CategorySettingsPage({
     );
 }
 
-export default CategorySettingsPage;
+export default DynamicCategorySettingsPage;
