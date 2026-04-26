@@ -8,6 +8,7 @@ import type {
     ChangeDomainSecurityGroupParams,
     DeleteDomainMemberParams,
     DeleteDomainParams,
+    DeleteDomainSecurityGroupParams,
     RemoveDomainAdminParams,
     ResetDomainMemberTwoFactorAuthParams,
     SetTechnicalContactEmailParams,
@@ -1934,6 +1935,105 @@ function updateDomainSecurityGroup(
 }
 
 /**
+ * Deletes a domain security group.
+ *
+ * @param domainAccountID - The account ID of the domain
+ * @param groupID - The ID of the security group to delete
+ * @param currentSecurityGroup - The current security group data
+ */
+function deleteDomainSecurityGroup(domainAccountID: number, groupID: string, currentSecurityGroup: DomainSecurityGroup) {
+    const SECURITY_GROUP_KEY = `${CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX}${groupID}`;
+
+    const optimisticData: Array<
+        OnyxUpdate<typeof ONYXKEYS.COLLECTION.DOMAIN> | OnyxUpdate<typeof ONYXKEYS.COLLECTION.DOMAIN_ERRORS> | OnyxUpdate<typeof ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS>
+    > = [
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`,
+            value: {
+                [SECURITY_GROUP_KEY]: null,
+            } as PrefixedRecord<typeof CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX, Partial<DomainSecurityGroup> | null>,
+        },
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`,
+            value: {
+                [SECURITY_GROUP_KEY]: {
+                    pendingAction: CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE,
+                },
+            },
+        },
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`,
+            value: {
+                [SECURITY_GROUP_KEY]: {
+                    deleteGroupErrors: null,
+                },
+            },
+        },
+    ];
+
+    const failureData: Array<
+        OnyxUpdate<typeof ONYXKEYS.COLLECTION.DOMAIN> | OnyxUpdate<typeof ONYXKEYS.COLLECTION.DOMAIN_ERRORS> | OnyxUpdate<typeof ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS>
+    > = [
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`,
+            value: {
+                [SECURITY_GROUP_KEY]: currentSecurityGroup,
+            } as PrefixedRecord<typeof CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX, Partial<DomainSecurityGroup>>,
+        },
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`,
+            value: {
+                [SECURITY_GROUP_KEY]: {
+                    pendingAction: null,
+                },
+            },
+        },
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`,
+            value: {
+                [SECURITY_GROUP_KEY]: {
+                    deleteGroupErrors: getMicroSecondOnyxErrorWithTranslationKey('domain.groups.deleteGroupError'),
+                },
+            },
+        },
+    ];
+
+    const successData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.DOMAIN_ERRORS> | OnyxUpdate<typeof ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS>> = [
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`,
+            value: {
+                [SECURITY_GROUP_KEY]: {
+                    pendingAction: null,
+                },
+            },
+        },
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`,
+            value: {
+                [SECURITY_GROUP_KEY]: {
+                    deleteGroupErrors: null,
+                },
+            },
+        },
+    ];
+
+    const params: DeleteDomainSecurityGroupParams = {
+        domainAccountID,
+        name: SECURITY_GROUP_KEY,
+    };
+
+    API.write(WRITE_COMMANDS.DELETE_DOMAIN_SECURITY_GROUP, params, {optimisticData, failureData, successData});
+}
+
+/**
  * Removes an error after trying to change the security group setting
  */
 function clearDomainSecurityGroupSettingError(domainAccountID: number, groupID: string, settingsName: keyof DomainSecurityGroupErrors) {
@@ -1985,5 +2085,6 @@ export {
     setDomainMembersSelectedForMove,
     clearDomainMembersSelectedForMove,
     updateDomainSecurityGroup,
+    deleteDomainSecurityGroup,
     clearDomainSecurityGroupSettingError,
 };

@@ -9179,6 +9179,7 @@ Voici un *reçu test* pour vous montrer comment ça fonctionne :`,
             deleteGroupDangerConfirmationModalDescription: (defaultGroupName: string) =>
                 `Êtes-vous sûr ? Cela réaffectera tous les membres au groupe par défaut (${defaultGroupName}) et ne pourra pas être annulé.`,
             neverMind: 'Laissez tomber',
+            deleteGroupError: 'Impossible de supprimer ce groupe. Veuillez réessayer.',
         },
     },
     proactiveAppReview: {

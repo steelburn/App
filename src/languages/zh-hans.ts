@@ -8873,6 +8873,7 @@ ${reportName}
             deleteGroupDangerConfirmationModal: '删除群组',
             deleteGroupDangerConfirmationModalDescription: (defaultGroupName: string) => `您确定吗？这将把所有成员重新分配到默认群组（${defaultGroupName}），并且无法撤销。`,
             neverMind: '算了',
+            deleteGroupError: '无法删除此群组。请重试。',
         },
     },
     proactiveAppReview: {title: '喜欢全新的 Expensify 吗？', description: '请告诉我们，这样我们就能帮助您让报销体验变得更好。', positiveButton: '太棒了！', negativeButton: '不太是'},

@@ -7,7 +7,7 @@ import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import Navigation from '@libs/Navigation/Navigation';
-import {updateDomainSecurityGroup} from '@userActions/Domain';
+import {deleteDomainSecurityGroup} from '@userActions/Domain';
 import ONYXKEYS from '@src/ONYXKEYS';
 
 type DeleteGroupRowProps = {
@@ -48,12 +48,10 @@ function DeleteGroupRow({domainAccountID, groupID}: DeleteGroupRowProps) {
             return;
         }
 
-        // placeholder
-        updateDomainSecurityGroup(domainAccountID, groupID, group, {}, 'name');
+        deleteDomainSecurityGroup(domainAccountID, groupID, group);
         Navigation.goBack();
     };
 
-    // should i move render logic to DomainGroupDetailsPage or can i leave it here?
     return groupID !== defaultSecurityGroupID ? (
         <MenuItem
             icon={icons.Trashcan}

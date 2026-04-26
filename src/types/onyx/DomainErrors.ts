@@ -44,6 +44,11 @@ type DomainSecurityGroupErrors = {
      * Errors related to the security group name
      */
     nameErrors?: OnyxCommon.Errors;
+
+    /**
+     * Errors related to deleting the security group
+     */
+    deleteGroupErrors?: OnyxCommon.Errors;
 };
 
 /**

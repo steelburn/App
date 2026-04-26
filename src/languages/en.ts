@@ -9147,6 +9147,7 @@ const translations = {
             deleteGroupDangerConfirmationModalDescription: (defaultGroupName: string) =>
                 `Are you sure? This will reassign all members to the default group (${defaultGroupName}) and can't be undone.`,
             neverMind: 'Never mind',
+            deleteGroupError: 'Unable to delete this group. Please try again.',
         },
     },
 };

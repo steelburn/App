@@ -9108,6 +9108,7 @@ Aqui está um *comprovante de teste* para mostrar como funciona:`,
             deleteGroupDangerConfirmationModalDescription: (defaultGroupName: string) =>
                 `Tem certeza? Isso reatribuirá todos os membros ao grupo padrão (${defaultGroupName}) e não poderá ser desfeito.`,
             neverMind: 'Deixa pra lá',
+            deleteGroupError: 'Não foi possível excluir este grupo. Tente novamente.',
         },
     },
     proactiveAppReview: {
