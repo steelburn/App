@@ -1,34 +1,33 @@
-import {useRoute} from '@react-navigation/native';
 import React, {useCallback, useMemo} from 'react';
 import ConnectionLayout from '@components/ConnectionLayout';
 import MenuItemWithTopDescription from '@components/MenuItemWithTopDescription';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
+import useDynamicBackPath from '@hooks/useDynamicBackPath';
 import useLocalize from '@hooks/useLocalize';
 import useThemeStyles from '@hooks/useThemeStyles';
 import createDynamicRoute from '@libs/Navigation/helpers/dynamicRoutesUtils/createDynamicRoute';
 import Navigation from '@libs/Navigation/Navigation';
 import {areSettingsInErrorFields, getCurrentXeroOrganizationName, settingsPendingAction} from '@libs/PolicyUtils';
 import goBackFromExportConnection from '@navigation/helpers/goBackFromExportConnection';
-import type {PlatformStackRouteProp} from '@navigation/PlatformStackNavigation/types';
-import type {SettingsNavigatorParamList} from '@navigation/types';
 import type {WithPolicyConnectionsProps} from '@pages/workspace/withPolicyConnections';
 import withPolicyConnections from '@pages/workspace/withPolicyConnections';
 import CONST from '@src/CONST';
 import {DYNAMIC_ROUTES} from '@src/ROUTES';
-import type SCREENS from '@src/SCREENS';
 
 function DynamicXeroExportConfigurationPage({policy}: WithPolicyConnectionsProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
     const policyID = policy?.id;
-    const route = useRoute<PlatformStackRouteProp<SettingsNavigatorParamList, typeof SCREENS.WORKSPACE.ACCOUNTING.DYNAMIC_XERO_EXPORT>>();
-    const backTo = route?.params?.backTo;
     const policyOwner = policy?.owner ?? '';
+    const dynamicBackPath = useDynamicBackPath(DYNAMIC_ROUTES.POLICY_ACCOUNTING_XERO_EXPORT.path);
 
     const {export: exportConfiguration, errorFields, pendingFields} = policy?.connections?.xero?.config ?? {};
     const shouldGoBackToSpecificRoute = !exportConfiguration?.nonReimbursableAccount;
 
-    const goBack = useCallback(() => goBackFromExportConnection(shouldGoBackToSpecificRoute, backTo), [backTo, shouldGoBackToSpecificRoute]);
+    const goBack = useCallback(
+        () => goBackFromExportConnection(shouldGoBackToSpecificRoute, undefined, dynamicBackPath),
+        [dynamicBackPath, shouldGoBackToSpecificRoute],
+    );
 
     const {bankAccounts} = policy?.connections?.xero?.data ?? {};
     const selectedBankAccountName = useMemo(() => {
