@@ -132,7 +132,7 @@ function getExportMenuItem(
                 exportType,
                 shouldShowMenuItem: !!exportConfiguration?.nonReimbursableAccount,
                 title: isDefaultTitle ? defaultCard : selectedAccount?.name,
-                exportPageLink: ROUTES.POLICY_ACCOUNTING_XERO_EXPORT.getRoute(policyID, backTo),
+                exportPageLink: createDynamicRoute(DYNAMIC_ROUTES.POLICY_ACCOUNTING_XERO_EXPORT.path),
                 data: (resultData ?? []).map((card) => {
                     return {
                         value: card.id,
