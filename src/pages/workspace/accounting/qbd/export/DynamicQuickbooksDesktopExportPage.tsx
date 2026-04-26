@@ -5,6 +5,7 @@ import ConnectionLayout from '@components/ConnectionLayout';
 import MenuItemWithTopDescription from '@components/MenuItemWithTopDescription';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
 import RenderHTML from '@components/RenderHTML';
+import useDynamicBackPath from '@hooks/useDynamicBackPath';
 import useLocalize from '@hooks/useLocalize';
 import useThemeStyles from '@hooks/useThemeStyles';
 import createDynamicRoute from '@libs/Navigation/helpers/dynamicRoutesUtils/createDynamicRoute';
@@ -28,6 +29,7 @@ function DynamicQuickbooksDesktopExportPage({policy}: WithPolicyConnectionsProps
     const errorFields = qbdConfig?.errorFields;
     const route = useRoute<PlatformStackRouteProp<SettingsNavigatorParamList, typeof SCREENS.WORKSPACE.ACCOUNTING.DYNAMIC_QUICKBOOKS_DESKTOP_EXPORT>>();
     const backTo = route?.params?.backTo;
+    const dynamicBackPath = useDynamicBackPath(DYNAMIC_ROUTES.POLICY_ACCOUNTING_QUICKBOOKS_DESKTOP_EXPORT.path);
 
     const shouldShowVendorMenuItems = useMemo(
         () => qbdConfig?.export?.nonReimbursable === CONST.QUICKBOOKS_DESKTOP_NON_REIMBURSABLE_EXPORT_ACCOUNT_TYPE.VENDOR_BILL,
@@ -40,8 +42,8 @@ function DynamicQuickbooksDesktopExportPage({policy}: WithPolicyConnectionsProps
     );
 
     const goBack = useCallback(() => {
-        return goBackFromExportConnection(shouldGoBackToSpecificRoute, backTo);
-    }, [backTo, shouldGoBackToSpecificRoute]);
+        return goBackFromExportConnection(shouldGoBackToSpecificRoute, backTo, dynamicBackPath);
+    }, [backTo, dynamicBackPath, shouldGoBackToSpecificRoute]);
 
     const menuItems = [
         {
