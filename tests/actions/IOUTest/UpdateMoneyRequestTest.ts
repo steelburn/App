@@ -13,7 +13,6 @@ import {
     updateMoneyRequestTag,
 } from '@libs/actions/IOU/UpdateMoneyRequest';
 import initOnyxDerivedValues from '@libs/actions/OnyxDerived';
-import {editTransactionDateInline} from '@libs/actions/TransactionInlineEdit';
 // eslint-disable-next-line no-restricted-syntax
 import type * as PolicyUtils from '@libs/PolicyUtils';
 import {getOriginalMessage, isActionOfType} from '@libs/ReportActionsUtils';
@@ -735,7 +734,7 @@ describe('actions/IOU/UpdateMoneyRequest', () => {
     });
 
     describe('updateMoneyRequestDate', () => {
-        it('should update the transaction created date when called with isOffline: false', async () => {
+        it('should update the transaction created date', async () => {
             // Given an expense transaction with an expense report
             const transactionID = 'txnDate1';
             const transactionThreadReportID = 'threadDate1';
@@ -770,7 +769,7 @@ describe('actions/IOU/UpdateMoneyRequest', () => {
             await Onyx.set(`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`, fakeTransaction);
             await Onyx.set(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`, fakePolicy);
 
-            // When updating the date with isOffline: false
+            // When updating the date
             updateMoneyRequestDate({
                 transactionID,
                 transactionThreadReport,
@@ -791,66 +790,6 @@ describe('actions/IOU/UpdateMoneyRequest', () => {
             await waitForBatchedUpdates();
 
             // Then the modified date on the transaction should be updated
-            const transactionAfter = await getOnyxValue(`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`);
-            expect(transactionAfter?.modifiedCreated).toBe(newDate);
-        });
-
-        it('should update the transaction created date when called with isOffline: true', async () => {
-            // Given an expense transaction that is edited while the user is offline
-            const transactionID = 'txnDate2';
-            const transactionThreadReportID = 'threadDate2';
-            const parentReportID = 'parentDate2';
-            const policyID = '11';
-            const originalDate = '2026-02-01';
-            const newDate = '2026-02-15';
-
-            const parentReport: Report = {
-                ...createRandomReport(1, undefined),
-                reportID: parentReportID,
-                type: CONST.REPORT.TYPE.EXPENSE,
-                policyID,
-                ownerAccountID: RORY_ACCOUNT_ID,
-            };
-            const transactionThreadReport: Report = {
-                ...createRandomReport(2, undefined),
-                reportID: transactionThreadReportID,
-                parentReportID,
-                type: CONST.REPORT.TYPE.CHAT,
-            };
-            const fakeTransaction: Transaction = {
-                ...createRandomTransaction(3),
-                transactionID,
-                reportID: parentReportID,
-                created: originalDate,
-            };
-            const fakePolicy: Policy = createRandomPolicy(Number(policyID));
-
-            await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT}${parentReportID}`, parentReport);
-            await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT}${transactionThreadReportID}`, transactionThreadReport);
-            await Onyx.set(`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`, fakeTransaction);
-            await Onyx.set(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`, fakePolicy);
-
-            // When updating the date with isOffline: true
-            updateMoneyRequestDate({
-                transactionID,
-                transactionThreadReport,
-                parentReport,
-                transactions: {[`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`]: fakeTransaction},
-                transactionViolations: {},
-                value: newDate,
-                policy: fakePolicy,
-                policyTags: {},
-                policyCategories: {},
-                currentUserAccountIDParam: RORY_ACCOUNT_ID,
-                currentUserEmailParam: RORY_EMAIL,
-                isASAPSubmitBetaEnabled: false,
-                parentReportNextStep: undefined,
-                isOffline: true,
-            });
-
-            await waitForBatchedUpdates();
-
-            // Then the modified date on the transaction should still be updated optimistically
             const transactionAfter = await getOnyxValue(`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`);
             expect(transactionAfter?.modifiedCreated).toBe(newDate);
         });
@@ -1000,128 +939,6 @@ describe('actions/IOU/UpdateMoneyRequest', () => {
             // Then the original transaction billable value should be unchanged
             const transactionAfter = await getOnyxValue(`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`);
             expect(transactionAfter?.billable).toBe(false);
-        });
-    });
-
-    describe('editTransactionDateInline', () => {
-        it('should update the transaction created date through the inline edit path', async () => {
-            // Given an expense transaction edited inline from the Search/Expense Report table
-            const transactionID = 'txnInlineDate1';
-            const transactionThreadReportID = 'threadInlineDate1';
-            const parentReportID = 'parentInlineDate1';
-            const policyID = '30';
-            const originalDate = '2026-03-01';
-            const newDate = '2026-03-15';
-
-            const parentReport: Report = {
-                ...createRandomReport(1, undefined),
-                reportID: parentReportID,
-                type: CONST.REPORT.TYPE.EXPENSE,
-                policyID,
-                ownerAccountID: RORY_ACCOUNT_ID,
-            };
-            const transactionThreadReport: Report = {
-                ...createRandomReport(2, undefined),
-                reportID: transactionThreadReportID,
-                parentReportID,
-                type: CONST.REPORT.TYPE.CHAT,
-            };
-            const fakeTransaction: Transaction = {
-                ...createRandomTransaction(3),
-                transactionID,
-                reportID: parentReportID,
-                created: originalDate,
-            };
-            const fakePolicy: Policy = createRandomPolicy(Number(policyID));
-
-            await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT}${parentReportID}`, parentReport);
-            await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT}${transactionThreadReportID}`, transactionThreadReport);
-            await Onyx.set(`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`, fakeTransaction);
-            await Onyx.set(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`, fakePolicy);
-
-            // When the inline edit helper is invoked with isOffline: false
-            editTransactionDateInline(
-                {
-                    hash: undefined,
-                    transactionID,
-                    parentReport,
-                    transactionThreadReport,
-                    policy: fakePolicy,
-                    policyCategories: {},
-                    policyTags: {},
-                    policyRecentlyUsedCategories: [],
-                    policyRecentlyUsedTags: {},
-                    parentReportNextStep: undefined,
-                },
-                newDate,
-                false,
-            );
-
-            await waitForBatchedUpdates();
-
-            // Then the transaction's modified created date is updated just like the non-inline action
-            const transactionAfter = await getOnyxValue(`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`);
-            expect(transactionAfter?.modifiedCreated).toBe(newDate);
-        });
-
-        it('should also update the transaction when called offline', async () => {
-            // Given an expense transaction edited inline while the user is offline
-            const transactionID = 'txnInlineDate2';
-            const transactionThreadReportID = 'threadInlineDate2';
-            const parentReportID = 'parentInlineDate2';
-            const policyID = '31';
-            const originalDate = '2026-04-01';
-            const newDate = '2026-04-15';
-
-            const parentReport: Report = {
-                ...createRandomReport(1, undefined),
-                reportID: parentReportID,
-                type: CONST.REPORT.TYPE.EXPENSE,
-                policyID,
-                ownerAccountID: RORY_ACCOUNT_ID,
-            };
-            const transactionThreadReport: Report = {
-                ...createRandomReport(2, undefined),
-                reportID: transactionThreadReportID,
-                parentReportID,
-                type: CONST.REPORT.TYPE.CHAT,
-            };
-            const fakeTransaction: Transaction = {
-                ...createRandomTransaction(3),
-                transactionID,
-                reportID: parentReportID,
-                created: originalDate,
-            };
-            const fakePolicy: Policy = createRandomPolicy(Number(policyID));
-
-            await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT}${parentReportID}`, parentReport);
-            await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT}${transactionThreadReportID}`, transactionThreadReport);
-            await Onyx.set(`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`, fakeTransaction);
-            await Onyx.set(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`, fakePolicy);
-
-            // When the inline edit helper is invoked with isOffline: true
-            editTransactionDateInline(
-                {
-                    hash: undefined,
-                    transactionID,
-                    parentReport,
-                    transactionThreadReport,
-                    policy: fakePolicy,
-                    policyCategories: {},
-                    policyTags: {},
-                    policyRecentlyUsedCategories: [],
-                    policyRecentlyUsedTags: {},
-                    parentReportNextStep: undefined,
-                },
-                newDate,
-                true,
-            );
-
-            await waitForBatchedUpdates();
-
-            // Then the transaction's modified created date still updates optimistically
-            const transactionAfter = await getOnyxValue(`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`);
-            expect(transactionAfter?.modifiedCreated).toBe(newDate);
         });
     });
 
