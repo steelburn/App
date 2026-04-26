@@ -2732,6 +2732,7 @@ describe('actions/Duplicate', () => {
             transactionViolations: {},
             translate: mockTranslate,
             recentWaypoints: [],
+            conciergeReportID: undefined,
             ...overrides,
         });
 

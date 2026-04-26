@@ -1093,6 +1093,7 @@ type BulkDuplicateReportsParams = {
     transactionViolations: OnyxCollection<OnyxTypes.TransactionViolation[]>;
     translate: LocalizedTranslate;
     recentWaypoints: OnyxEntry<OnyxTypes.RecentWaypoint[]>;
+    conciergeReportID: string | undefined;
 };
 
 function bulkDuplicateReports({
@@ -1116,6 +1117,7 @@ function bulkDuplicateReports({
     transactionViolations,
     translate,
     recentWaypoints,
+    conciergeReportID,
 }: BulkDuplicateReportsParams) {
     const allTransactionsMap = getAllTransactions();
     const transactionsByReportID = new Map<string, OnyxTypes.Transaction[]>();
@@ -1191,6 +1193,7 @@ function bulkDuplicateReports({
             shouldPlaySound: false,
             currentUserAccountID: getUserAccountID(),
             currentUserLogin: getCurrentUserEmail(),
+            conciergeReportID,
         });
     }
 
