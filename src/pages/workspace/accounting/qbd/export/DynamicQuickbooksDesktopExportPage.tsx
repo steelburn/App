@@ -1,4 +1,3 @@
-import {useRoute} from '@react-navigation/native';
 import React, {useCallback, useMemo} from 'react';
 import {View} from 'react-native';
 import ConnectionLayout from '@components/ConnectionLayout';
@@ -12,13 +11,10 @@ import createDynamicRoute from '@libs/Navigation/helpers/dynamicRoutesUtils/crea
 import {areSettingsInErrorFields, settingsPendingAction} from '@libs/PolicyUtils';
 import goBackFromExportConnection from '@navigation/helpers/goBackFromExportConnection';
 import Navigation from '@navigation/Navigation';
-import type {PlatformStackRouteProp} from '@navigation/PlatformStackNavigation/types';
-import type {SettingsNavigatorParamList} from '@navigation/types';
 import type {WithPolicyConnectionsProps} from '@pages/workspace/withPolicyConnections';
 import withPolicyConnections from '@pages/workspace/withPolicyConnections';
 import CONST from '@src/CONST';
 import ROUTES, {DYNAMIC_ROUTES} from '@src/ROUTES';
-import type SCREENS from '@src/SCREENS';
 
 function DynamicQuickbooksDesktopExportPage({policy}: WithPolicyConnectionsProps) {
     const {translate} = useLocalize();
@@ -27,8 +23,6 @@ function DynamicQuickbooksDesktopExportPage({policy}: WithPolicyConnectionsProps
     const policyOwner = policy?.owner ?? '';
     const qbdConfig = policy?.connections?.quickbooksDesktop?.config;
     const errorFields = qbdConfig?.errorFields;
-    const route = useRoute<PlatformStackRouteProp<SettingsNavigatorParamList, typeof SCREENS.WORKSPACE.ACCOUNTING.DYNAMIC_QUICKBOOKS_DESKTOP_EXPORT>>();
-    const backTo = route?.params?.backTo;
     const dynamicBackPath = useDynamicBackPath(DYNAMIC_ROUTES.POLICY_ACCOUNTING_QUICKBOOKS_DESKTOP_EXPORT.path);
 
     const shouldShowVendorMenuItems = useMemo(
@@ -42,8 +36,8 @@ function DynamicQuickbooksDesktopExportPage({policy}: WithPolicyConnectionsProps
     );
 
     const goBack = useCallback(() => {
-        return goBackFromExportConnection(shouldGoBackToSpecificRoute, backTo, dynamicBackPath);
-    }, [backTo, dynamicBackPath, shouldGoBackToSpecificRoute]);
+        return goBackFromExportConnection(shouldGoBackToSpecificRoute, undefined, dynamicBackPath);
+    }, [dynamicBackPath, shouldGoBackToSpecificRoute]);
 
     const menuItems = [
         {
