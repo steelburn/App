@@ -13,7 +13,7 @@ import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {clearRevokeError, revokeDevice} from '@libs/actions/User';
 import Navigation from '@libs/Navigation/Navigation';
-import {getLoginKey, getRevokableLogins} from '@libs/UserUtils';
+import {getLastLogin, getLoginKey, getRevokableLogins} from '@libs/UserUtils';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {Login} from '@src/types/onyx/Logins';
 
@@ -33,7 +33,7 @@ function DeviceManagementPage() {
                 contentContainerStyle={[styles.flexRow, styles.alignItemsCenter, styles.pv3, styles.gap3]}
             >
                 <View style={[styles.flex1, styles.flexColumn, styles.gap1]}>
-                    <Text style={[styles.textLabelSupporting]}>{datetimeToRelative(item.lastLogin)}</Text>
+                    <Text style={[styles.textLabelSupporting]}>{datetimeToRelative(getLastLogin(item))}</Text>
                     <Text>{item.additionalData ? `${deviceName} ${deviceVersion ? `${deviceVersion} ` : ''}(${os} ${osVersion})` : translate('deviceManagementPage.unknownDevice')}</Text>
                 </View>
                 <Button

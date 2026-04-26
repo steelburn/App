@@ -49,6 +49,10 @@ function getLoginKey(login: NewLogin) {
     return `${login.partnerID}_${login.partnerUserID}`;
 }
 
+function getLastLogin(login: NewLogin) {
+    return new Date(login.lastLogin) > new Date(login.created) ? login.lastLogin : login.created;
+}
+
 const DEVICE_PARTNER_IDS = new Set<number>([CONST.PARTNER_ID.IPHONE, CONST.PARTNER_ID.ANDROID, CONST.PARTNER_ID.NEWDOT]);
 
 function isLoginRevokable(login: NewLogin) {
@@ -194,6 +198,7 @@ export {
     isCurrentUserValidated,
     getContactMethodsOptions,
     getLoginKey,
+    getLastLogin,
     getRevokableLogins,
     hasDeviceManagementError,
 };
