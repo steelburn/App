@@ -102,11 +102,7 @@ function QuickbooksDesktopOutOfPocketExpenseConfigurationPage({policy}: WithPoli
             contentContainerStyle={styles.pb2}
             titleStyle={styles.ph5}
             connectionName={CONST.POLICY.CONNECTIONS.NAME.QBD}
-            onBackButtonPress={() =>
-                Navigation.goBack(
-                    backTo ?? `${ROUTES.POLICY_ACCOUNTING.getRoute(policyID, CONST.POLICY.CONNECTIONS.NAME.QBD)}/${DYNAMIC_ROUTES.POLICY_ACCOUNTING_QUICKBOOKS_DESKTOP_EXPORT.path}`,
-                )
-            }
+            onBackButtonPress={() => Navigation.goBack(backTo ?? `${ROUTES.POLICY_ACCOUNTING.getRoute(policyID)}/${DYNAMIC_ROUTES.POLICY_ACCOUNTING_QUICKBOOKS_DESKTOP_EXPORT.path}`)}
         >
             {sections.map((section, index) => (
                 <OfflineWithFeedback

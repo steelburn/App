@@ -71,7 +71,7 @@ function QuickbooksDesktopCompanyCardExpenseAccountSelectCardPage({policy}: With
     const goBack = useCallback(() => {
         Navigation.goBack(
             backTo ??
-                `${ROUTES.POLICY_ACCOUNTING.getRoute(policyID, CONST.POLICY.CONNECTIONS.NAME.QBD)}/${DYNAMIC_ROUTES.POLICY_ACCOUNTING_QUICKBOOKS_DESKTOP_EXPORT.path}/${DYNAMIC_ROUTES.POLICY_ACCOUNTING_QUICKBOOKS_DESKTOP_COMPANY_CARD_EXPENSE_ACCOUNT.path}`,
+                `${ROUTES.POLICY_ACCOUNTING.getRoute(policyID)}/${DYNAMIC_ROUTES.POLICY_ACCOUNTING_QUICKBOOKS_DESKTOP_EXPORT.path}/${DYNAMIC_ROUTES.POLICY_ACCOUNTING_QUICKBOOKS_DESKTOP_COMPANY_CARD_EXPENSE_ACCOUNT.path}`,
         );
     }, [backTo, policyID]);
 

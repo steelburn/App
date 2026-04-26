@@ -347,7 +347,7 @@ function getExportMenuItem(
                 shouldShowMenuItem,
                 exportPageLink: createDynamicRoute(
                     DYNAMIC_ROUTES.POLICY_ACCOUNTING_QUICKBOOKS_DESKTOP_EXPORT.path,
-                    ROUTES.POLICY_ACCOUNTING.getRoute(policyID, CONST.POLICY.CONNECTIONS.NAME.QBD),
+                    `${ROUTES.POLICY_ACCOUNTING.getRoute(policyID)}/${DYNAMIC_ROUTES.POLICY_ACCOUNTING_QUICKBOOKS_DESKTOP_EXPORT.path}`,
                 ),
                 data: resultData.map((card) => ({
                     value: card.id,

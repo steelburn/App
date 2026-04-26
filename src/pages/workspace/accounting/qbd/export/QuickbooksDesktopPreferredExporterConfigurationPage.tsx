@@ -37,7 +37,7 @@ function QuickbooksDesktopPreferredExporterConfigurationPage({policy}: WithPolic
     const policyID = policy?.id;
 
     const goBack = useCallback(() => {
-        Navigation.goBack(backTo ?? `${ROUTES.POLICY_ACCOUNTING.getRoute(policyID, CONST.POLICY.CONNECTIONS.NAME.QBD)}/${DYNAMIC_ROUTES.POLICY_ACCOUNTING_QUICKBOOKS_DESKTOP_EXPORT.path}`);
+        Navigation.goBack(backTo ?? `${ROUTES.POLICY_ACCOUNTING.getRoute(policyID)}/${DYNAMIC_ROUTES.POLICY_ACCOUNTING_QUICKBOOKS_DESKTOP_EXPORT.path}`);
     }, [policyID, backTo]);
 
     const data: CardListItem[] = useMemo(
