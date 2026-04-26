@@ -9094,6 +9094,12 @@ Oto *paragon testowy*, żeby pokazać Ci, jak to działa:`,
         groups: {
             title: 'Grupy',
             memberCount: () => ({one: '1 członek', other: (count: number) => `${count} członków`}),
+            permissions: 'Uprawnienia grupy',
+            deleteGroup: 'Usuń grupę',
+            deleteGroupDangerConfirmationModal: 'Usuń grupę',
+            deleteGroupDangerConfirmationModalDescription: (defaultGroupName: string) =>
+                `Czy na pewno? Spowoduje to ponowne przypisanie wszystkich członków do domyślnej grupy (${defaultGroupName}) i nie można tego cofnąć.`,
+            neverMind: 'Nieważne',
         },
     },
     proactiveAppReview: {

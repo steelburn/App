@@ -9173,6 +9173,12 @@ Voici un *reçu test* pour vous montrer comment ça fonctionne :`,
         groups: {
             title: 'Groupes',
             memberCount: () => ({one: '1 membre', other: (count: number) => `${count} membres`}),
+            permissions: 'Autorisations du groupe',
+            deleteGroup: 'Supprimer le groupe',
+            deleteGroupDangerConfirmationModal: 'Supprimer le groupe',
+            deleteGroupDangerConfirmationModalDescription: (defaultGroupName: string) =>
+                `Êtes-vous sûr ? Cela réaffectera tous les membres au groupe par défaut (${defaultGroupName}) et ne pourra pas être annulé.`,
+            neverMind: 'Laissez tomber',
         },
     },
     proactiveAppReview: {

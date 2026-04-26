@@ -9113,6 +9113,12 @@ Hier is een *proefbon* om je te laten zien hoe het werkt:`,
         groups: {
             title: 'Groepen',
             memberCount: () => ({one: '1 lid', other: (count: number) => `${count} leden`}),
+            permissions: 'Groepsmachtigingen',
+            deleteGroup: 'Groep verwijderen',
+            deleteGroupDangerConfirmationModal: 'Groep verwijderen',
+            deleteGroupDangerConfirmationModalDescription: (defaultGroupName: string) =>
+                `Weet je het zeker? Dit wijst alle leden opnieuw toe aan de standaardgroep (${defaultGroupName}) en kan niet ongedaan worden gemaakt.`,
+            neverMind: 'Laat maar',
         },
     },
     proactiveAppReview: {

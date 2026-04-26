@@ -27,7 +27,6 @@ function DomainGroupDetailsPage({route}: DomainGroupDetailsPageProps) {
     const {domainAccountID, groupID} = route.params;
 
     const {translate} = useLocalize();
-    const styles = useThemeStyles();
 
     const [group] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {
         selector: selectGroupByID(groupID),

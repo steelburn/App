@@ -9026,6 +9026,12 @@ ${reportName}
         groups: {
             title: 'グループ',
             memberCount: () => ({one: 'メンバー 1 人', other: (count: number) => `${count}名のメンバー`}),
+            permissions: 'グループ権限',
+            deleteGroup: 'グループを削除',
+            deleteGroupDangerConfirmationModal: 'グループを削除',
+            deleteGroupDangerConfirmationModalDescription: (defaultGroupName: string) =>
+                `本当によろしいですか？これにより、すべてのメンバーがデフォルトグループ（${defaultGroupName}）に再割り当てされ、元に戻すことはできません。`,
+            neverMind: 'やめておく',
         },
     },
     proactiveAppReview: {

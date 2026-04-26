@@ -9102,6 +9102,12 @@ Aqui está um *comprovante de teste* para mostrar como funciona:`,
         groups: {
             title: 'Grupos',
             memberCount: () => ({one: '1 membro', other: (count: number) => `${count} membros`}),
+            permissions: 'Permissões do grupo',
+            deleteGroup: 'Excluir grupo',
+            deleteGroupDangerConfirmationModal: 'Excluir grupo',
+            deleteGroupDangerConfirmationModalDescription: (defaultGroupName: string) =>
+                `Tem certeza? Isso reatribuirá todos os membros ao grupo padrão (${defaultGroupName}) e não poderá ser desfeito.`,
+            neverMind: 'Deixa pra lá',
         },
     },
     proactiveAppReview: {

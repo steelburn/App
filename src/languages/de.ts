@@ -9150,6 +9150,12 @@ Hier ist ein *Testbeleg*, um dir zu zeigen, wie es funktioniert:`,
         groups: {
             title: 'Gruppen',
             memberCount: () => ({one: '1 Mitglied', other: (count: number) => `${count} Mitglieder`}),
+            permissions: 'Gruppenberechtigungen',
+            deleteGroup: 'Gruppe löschen',
+            deleteGroupDangerConfirmationModal: 'Gruppe löschen',
+            deleteGroupDangerConfirmationModalDescription: (defaultGroupName: string) =>
+                `Bist du sicher? Dadurch werden alle Mitglieder der Standardgruppe (${defaultGroupName}) neu zugewiesen und dies kann nicht rückgängig gemacht werden.`,
+            neverMind: 'Vergiss es',
         },
     },
     proactiveAppReview: {
