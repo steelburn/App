@@ -7,6 +7,7 @@ import Onyx from 'react-native-onyx';
 import type {ValueOf} from 'type-fest';
 import ReceiptGeneric from '@assets/images/receipt-generic.png';
 import type {SearchQueryJSON} from '@components/Search/types';
+import {buildOdometerCommentFromDraft} from '@libs/actions/OdometerTransactionUtils';
 import * as API from '@libs/API';
 import type {CreateDistanceRequestParams, UpdateMoneyRequestParams} from '@libs/API/parameters';
 import {WRITE_COMMANDS} from '@libs/API/types';
@@ -151,6 +152,7 @@ type InitMoneyRequestParams = {
     isTrackDistanceExpense?: boolean;
     hasOnlyPersonalPolicies: boolean;
     draftTransactionIDs?: string[];
+    odometerDraft?: OnyxEntry<OnyxTypes.OdometerDraft>;
 };
 
 type SplitData = {
@@ -725,6 +727,7 @@ function initMoneyRequest({
     currentUserPersonalDetails,
     hasOnlyPersonalPolicies,
     draftTransactionIDs,
+    odometerDraft,
 }: InitMoneyRequestParams) {
     // Generate a brand new transactionID
     const newTransactionID = CONST.IOU.OPTIMISTIC_TRANSACTION_ID;
@@ -781,12 +784,8 @@ function initMoneyRequest({
                 waypoint1: {keyForList: 'stop_waypoint'},
             };
         }
-        // Initialize odometer readings for odometer type
         if (newIouRequestType === CONST.IOU.REQUEST_TYPE.DISTANCE_ODOMETER) {
-            comment.odometerStart = undefined;
-            comment.odometerEnd = undefined;
-            comment.odometerStartImage = undefined;
-            comment.odometerEndImage = undefined;
+            Object.assign(comment, buildOdometerCommentFromDraft(newTransactionID, odometerDraft) ?? {});
         }
     }
 

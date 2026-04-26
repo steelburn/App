@@ -32,7 +32,7 @@ import {setMoneyRequestDistance} from '@libs/actions/IOU';
 import {handleMoneyRequestStepDistanceNavigation} from '@libs/actions/IOU/MoneyRequest';
 import {setDraftSplitTransaction} from '@libs/actions/IOU/Split';
 import {updateMoneyRequestDistance} from '@libs/actions/IOU/UpdateMoneyRequest';
-import {clearOdometerDraft, hydrateOdometerDraftToTransaction, saveOdometerDraft, setMoneyRequestOdometerReading} from '@libs/actions/OdometerTransactionUtils';
+import {clearOdometerDraft, saveOdometerDraft, setMoneyRequestOdometerReading} from '@libs/actions/OdometerTransactionUtils';
 import {createBackupTransaction, removeBackupTransactionWithImageCleanup, restoreOriginalTransactionFromBackupWithImageCleanup} from '@libs/actions/TransactionEdit';
 import DistanceRequestUtils from '@libs/DistanceRequestUtils';
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
@@ -102,7 +102,6 @@ function IOURequestStepDistanceOdometer({
     const initialStartImageRef = useRef<FileObject | string | undefined>(undefined);
     const initialEndImageRef = useRef<FileObject | string | undefined>(undefined);
     const prevSelectedTabRef = useRef<string | undefined>(undefined);
-    const prevSelectedTabForHydrationRef = useRef<string | undefined>(undefined);
     const didSaveEditingConfirmationRef = useRef(false);
     const shouldBypassDiscardConfirmationRef = useRef(false);
     const backupHandledManually = useRef(false);
@@ -133,10 +132,8 @@ function IOURequestStepDistanceOdometer({
     const [isSelfTourViewed] = useOnyx(ONYXKEYS.NVP_ONBOARDING, {selector: hasSeenTourSelector});
     const [selectedTab, selectedTabResult] = useOnyx(`${ONYXKEYS.COLLECTION.SELECTED_TAB}${CONST.TAB.DISTANCE_REQUEST_TYPE}`);
     const [draftTransactionIDs] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION_DRAFT, {selector: validTransactionDraftIDsSelector});
-    const [odometerDraft, odometerDraftResult] = useOnyx(ONYXKEYS.ODOMETER_DRAFT);
     const [conciergeReportID] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID);
     const isLoadingSelectedTab = isLoadingOnyxValue(selectedTabResult);
-    const isLoadingOdometerDraft = isLoadingOnyxValue(odometerDraftResult);
 
     // isEditing: we're changing an already existing odometer expense; isEditingConfirmation: we navigated here by pressing 'Distance' field from the confirmation step during the creation of a new odometer expense to adjust the input before submitting
     const isEditing = action === CONST.IOU.ACTION.EDIT;
@@ -193,47 +190,6 @@ function IOURequestStepDistanceOdometer({
 
         prevSelectedTabRef.current = selectedTab;
     }, [selectedTab, isLoadingSelectedTab]);
-
-    useEffect(() => {
-        if (isLoadingSelectedTab || isLoadingOdometerDraft) {
-            return;
-        }
-
-        const previousSelectedTabForHydration = prevSelectedTabForHydrationRef.current;
-        const isEnteringOdometerTab = previousSelectedTabForHydration !== CONST.TAB_REQUEST.DISTANCE_ODOMETER && selectedTab === CONST.TAB_REQUEST.DISTANCE_ODOMETER;
-
-        prevSelectedTabForHydrationRef.current = selectedTab;
-
-        if (!isEnteringOdometerTab || !isCreatingNewRequest || !odometerDraft) {
-            return;
-        }
-
-        const hasStoredDraftData =
-            odometerDraft.odometerStartReading !== undefined || odometerDraft.odometerEndReading !== undefined || !!odometerDraft.odometerStartImage || !!odometerDraft.odometerEndImage;
-
-        if (!hasStoredDraftData) {
-            return;
-        }
-
-        const hydratedComment = hydrateOdometerDraftToTransaction(transactionID, isTransactionDraft, odometerDraft, transaction?.comment);
-        if (!hydratedComment) {
-            return;
-        }
-
-        const hydratedStartValue = hydratedComment.odometerStart !== undefined && hydratedComment.odometerStart !== null ? hydratedComment.odometerStart.toString() : '';
-        const hydratedEndValue = hydratedComment.odometerEnd !== undefined && hydratedComment.odometerEnd !== null ? hydratedComment.odometerEnd.toString() : '';
-
-        setStartReading(hydratedStartValue);
-        setEndReading(hydratedEndValue);
-        startReadingRef.current = hydratedStartValue;
-        endReadingRef.current = hydratedEndValue;
-        initialStartReadingRef.current = hydratedStartValue;
-        initialEndReadingRef.current = hydratedEndValue;
-        initialStartImageRef.current = hydratedComment.odometerStartImage;
-        initialEndImageRef.current = hydratedComment.odometerEndImage;
-        hasInitializedRefs.current = true;
-        setFormError('');
-    }, [isCreatingNewRequest, isLoadingSelectedTab, isLoadingOdometerDraft, selectedTab, odometerDraft, transactionID, isTransactionDraft, transaction?.comment]);
 
     // Initialize initial values refs on mount for DiscardChangesConfirmation
     // These should never be updated after mount - they represent the "baseline" state

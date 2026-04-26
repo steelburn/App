@@ -165,12 +165,7 @@ async function saveOdometerDraft({startReading, endReading, startImage, endImage
     Onyx.set(ONYXKEYS.ODOMETER_DRAFT, odometerDraft);
 }
 
-function hydrateOdometerDraftToTransaction(
-    transactionID: string,
-    isDraft: boolean,
-    odometerDraft: OnyxEntry<OdometerDraft>,
-    currentComment?: Partial<Comment>,
-): Partial<Comment> | undefined {
+function buildOdometerCommentFromDraft(transactionID: string, odometerDraft: OnyxEntry<OdometerDraft>, currentComment?: Partial<Comment>): Partial<Comment> | undefined {
     if (!odometerDraft) {
         return;
     }
@@ -201,12 +196,15 @@ function hydrateOdometerDraftToTransaction(
         return;
     }
 
-    Onyx.merge(`${isDraft ? ONYXKEYS.COLLECTION.TRANSACTION_DRAFT : ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`, {
-        comment: commentUpdate,
-    });
-
     return commentUpdate;
 }
 
-export {setMoneyRequestOdometerReading, setMoneyRequestOdometerImage, removeMoneyRequestOdometerImage, clearOdometerDraft, saveOdometerDraft, hydrateOdometerDraftToTransaction};
+export {
+    setMoneyRequestOdometerReading,
+    setMoneyRequestOdometerImage,
+    removeMoneyRequestOdometerImage,
+    clearOdometerDraft,
+    saveOdometerDraft,
+    buildOdometerCommentFromDraft,
+};
 export default clearOdometerDraftTransactionState;

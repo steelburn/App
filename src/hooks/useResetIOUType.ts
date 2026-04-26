@@ -6,7 +6,6 @@ import {Keyboard} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';
 import type {IOURequestType} from '@userActions/IOU';
 import {initMoneyRequest} from '@userActions/IOU';
-import {hydrateOdometerDraftToTransaction} from '@userActions/OdometerTransactionUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {Policy, Report, Transaction} from '@src/types/onyx';
@@ -80,8 +79,6 @@ function useResetIOUType({
 
         const isFromGlobalCreate = !report?.reportID;
 
-        // Capture before initMoneyRequest wipes the transaction via Onyx.set
-        const previousComment = transaction?.comment;
         initMoneyRequest({
             reportID,
             policy,
@@ -98,11 +95,8 @@ function useResetIOUType({
             currentUserPersonalDetails,
             hasOnlyPersonalPolicies: hasOnlyPersonalPolicies ?? true,
             draftTransactionIDs,
+            odometerDraft,
         });
-        // Re-queue hydration so it runs after initMoneyRequest's Onyx.set and restores any saved images
-        if (newIOUType === CONST.IOU.REQUEST_TYPE.DISTANCE_ODOMETER && odometerDraft) {
-            hydrateOdometerDraftToTransaction(CONST.IOU.OPTIMISTIC_TRANSACTION_ID, true, odometerDraft, previousComment);
-        }
     };
 
     const tabSelectedTypeRef = useRef<IOURequestType | null>(null);
