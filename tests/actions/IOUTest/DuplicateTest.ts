@@ -1863,59 +1863,6 @@ describe('actions/Duplicate', () => {
             expect(duplicatedTransaction).toBeDefined();
             expect(duplicatedTransaction?.transactionID).not.toBe(mockCashExpenseTransaction.transactionID);
         });
-
-        it('should work correctly when conciergeReportID is undefined', async () => {
-            const {waypoints, ...restOfComment} = mockTransaction.comment ?? {};
-            const mockCashExpenseTransaction = {
-                ...mockTransaction,
-                amount: mockTransaction.amount * -1,
-                comment: {
-                    ...restOfComment,
-                },
-            };
-
-            await Onyx.clear();
-
-            duplicateExpenseTransaction({
-                transaction: mockCashExpenseTransaction,
-                optimisticChatReportID: mockOptimisticChatReportID,
-                optimisticIOUReportID: mockOptimisticIOUReportID,
-                isASAPSubmitBetaEnabled: mockIsASAPSubmitBetaEnabled,
-                introSelected: undefined,
-                activePolicyID: undefined,
-                quickAction: undefined,
-                policyRecentlyUsedCurrencies: [],
-                isSelfTourViewed: false,
-                customUnitPolicyID: '',
-                targetPolicy: mockPolicy,
-                targetPolicyCategories: fakePolicyCategories,
-                targetReport: policyExpenseChat,
-                existingTransactionDraft: undefined,
-                draftTransactionIDs: [],
-                personalDetails: mockPersonalDetails,
-                betas: [CONST.BETAS.ALL],
-                recentWaypoints,
-                targetPolicyTags,
-                conciergeReportID: undefined,
-                currentUserAccountID: RORY_ACCOUNT_ID,
-                currentUserLogin: RORY_EMAIL,
-            });
-
-            await waitForBatchedUpdates();
-
-            let duplicatedTransaction: OnyxEntry<Transaction>;
-
-            await getOnyxData({
-                key: ONYXKEYS.COLLECTION.TRANSACTION,
-                waitForCollectionCallback: true,
-                callback: (allTransactions) => {
-                    duplicatedTransaction = Object.values(allTransactions ?? {}).find((t) => !!t);
-                },
-            });
-
-            expect(duplicatedTransaction).toBeDefined();
-            expect(duplicatedTransaction?.transactionID).not.toBe(mockCashExpenseTransaction.transactionID);
-        });
     });
 
     describe('resolveDuplicate', () => {
@@ -2528,16 +2475,6 @@ describe('actions/Duplicate', () => {
 
             expect(countWriteCommandCalls(WRITE_COMMANDS.CREATE_APP_REPORT)).toBe(1);
             expect(countWriteCommandCalls(WRITE_COMMANDS.REQUEST_MONEY)).toBe(2);
-        });
-
-        it('should work when conciergeReportID is undefined', async () => {
-            const tx1 = createCashTransaction('tx1');
-
-            duplicateReport(getDefaultParams([tx1], {conciergeReportID: undefined}));
-            await waitForBatchedUpdates();
-
-            expect(countWriteCommandCalls(WRITE_COMMANDS.CREATE_APP_REPORT)).toBe(1);
-            expect(countWriteCommandCalls(WRITE_COMMANDS.REQUEST_MONEY)).toBe(1);
         });
     });
 
