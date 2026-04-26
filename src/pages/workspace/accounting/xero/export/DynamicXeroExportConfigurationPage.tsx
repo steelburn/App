@@ -24,10 +24,7 @@ function DynamicXeroExportConfigurationPage({policy}: WithPolicyConnectionsProps
     const {export: exportConfiguration, errorFields, pendingFields} = policy?.connections?.xero?.config ?? {};
     const shouldGoBackToSpecificRoute = !exportConfiguration?.nonReimbursableAccount;
 
-    const goBack = useCallback(
-        () => goBackFromExportConnection(shouldGoBackToSpecificRoute, undefined, dynamicBackPath),
-        [dynamicBackPath, shouldGoBackToSpecificRoute],
-    );
+    const goBack = useCallback(() => goBackFromExportConnection(shouldGoBackToSpecificRoute, undefined, dynamicBackPath), [dynamicBackPath, shouldGoBackToSpecificRoute]);
 
     const {bankAccounts} = policy?.connections?.xero?.data ?? {};
     const selectedBankAccountName = useMemo(() => {
