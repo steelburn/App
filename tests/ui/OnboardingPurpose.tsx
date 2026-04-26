@@ -99,9 +99,9 @@ describe('OnboardingPurpose Page', () => {
         await waitForBatchedUpdatesWithAct();
 
         const user = userEvent.setup();
-        const chatSplitLabel = translatePurpose(CONST.ONBOARDING_CHOICES.CHAT_SPLIT);
-        const chatSplitOption = screen.getByLabelText(chatSplitLabel);
-        await user.press(chatSplitOption);
+        const employerLabel = translatePurpose(CONST.ONBOARDING_CHOICES.EMPLOYER);
+        const employerOption = screen.getByLabelText(employerLabel);
+        await user.press(employerOption);
 
         await waitFor(() => {
             expect(navigate).toHaveBeenCalledWith(ROUTES.ONBOARDING_PERSONAL_DETAILS.getRoute(''));
@@ -142,7 +142,7 @@ describe('OnboardingPurpose Page', () => {
         await TestHelper.signInWithTestUser();
 
         const introSelectedValue = {
-            choice: CONST.ONBOARDING_CHOICES.CHAT_SPLIT,
+            choice: CONST.ONBOARDING_CHOICES.EMPLOYER,
             inviteType: CONST.ONBOARDING_INVITE_TYPES.CHAT,
             companySize: CONST.ONBOARDING_COMPANY_SIZE.MICRO,
         };
@@ -164,16 +164,16 @@ describe('OnboardingPurpose Page', () => {
 
         await waitForBatchedUpdatesWithAct();
 
-        // Select CHAT_SPLIT which triggers completeOnboarding directly for private domain users
+        // Select EMPLOYER which triggers completeOnboarding directly for private domain users
         const user = userEvent.setup();
-        const chatSplitLabel = translatePurpose(CONST.ONBOARDING_CHOICES.CHAT_SPLIT);
-        const chatSplitOption = screen.getByLabelText(chatSplitLabel);
-        await user.press(chatSplitOption);
+        const employerLabel = translatePurpose(CONST.ONBOARDING_CHOICES.EMPLOYER);
+        const employerOption = screen.getByLabelText(employerLabel);
+        await user.press(employerOption);
 
         await waitFor(() => {
             expect(mockCompleteOnboarding).toHaveBeenCalledWith(
                 expect.objectContaining({
-                    engagementChoice: CONST.ONBOARDING_CHOICES.CHAT_SPLIT,
+                    engagementChoice: CONST.ONBOARDING_CHOICES.EMPLOYER,
                     firstName: 'Test',
                     lastName: 'User',
                     introSelected: introSelectedValue,

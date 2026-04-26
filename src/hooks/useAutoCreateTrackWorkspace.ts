@@ -73,13 +73,16 @@ function useAutoCreateTrackWorkspace() {
             const shouldCreateWorkspace = !isRestrictedPolicyCreation && !onboardingPolicyID && !hasPaidGroupAdminPolicy;
             const displayName = createDisplayName(session?.email ?? '', {firstName, lastName}, formatPhoneNumber);
 
+            const engagementChoice =
+                onboardingPurposeSelected === CONST.ONBOARDING_CHOICES.TRACK_PERSONAL ? CONST.ONBOARDING_CHOICES.TRACK_PERSONAL : CONST.ONBOARDING_CHOICES.TRACK_WORKSPACE;
+
             const {adminsChatReportID: newAdminsChatReportID, policyID: newPolicyID} = shouldCreateWorkspace
                 ? createWorkspace({
                       policyOwnerEmail: undefined,
                       makeMeAdmin: true,
                       policyName: generateDefaultWorkspaceName(session?.email ?? '', lastWorkspaceNumber, translate, displayName),
                       policyID: generatePolicyID(),
-                      engagementChoice: CONST.ONBOARDING_CHOICES.TRACK_WORKSPACE,
+                      engagementChoice,
                       currency: currentUserPersonalDetails.localCurrencyCode ?? CONST.CURRENCY.USD,
                       file: undefined,
                       shouldAddOnboardingTasks: false,
@@ -100,8 +103,8 @@ function useAutoCreateTrackWorkspace() {
             let rhpVariant: OnboardingRHPVariant | undefined = isSidePanelReportSupported ? undefined : CONST.ONBOARDING_RHP_VARIANT.TRACK_EXPENSES_WITH_CONCIERGE;
             try {
                 const response = await completeOnboarding({
-                    engagementChoice: CONST.ONBOARDING_CHOICES.TRACK_WORKSPACE,
-                    onboardingMessage: onboardingMessages[CONST.ONBOARDING_CHOICES.TRACK_WORKSPACE],
+                    engagementChoice,
+                    onboardingMessage: onboardingMessages[engagementChoice],
                     firstName,
                     lastName,
                     adminsChatReportID: newAdminsChatReportID,

@@ -8,7 +8,7 @@ function getTestDriveURL(shouldUseNarrowLayout: boolean, introSelected: OnyxEntr
             return shouldUseNarrowLayout ? CONST.STORYLANE.EMPLOYEE_TOUR_MOBILE : CONST.STORYLANE.EMPLOYEE_TOUR;
         }
 
-        if (introSelected?.choice === CONST.ONBOARDING_CHOICES.TRACK_WORKSPACE) {
+        if (introSelected?.choice === CONST.ONBOARDING_CHOICES.TRACK_WORKSPACE || introSelected?.choice === CONST.ONBOARDING_CHOICES.TRACK_PERSONAL) {
             return shouldUseNarrowLayout ? CONST.STORYLANE.TRACK_WORKSPACE_TOUR_MOBILE : CONST.STORYLANE.TRACK_WORKSPACE_TOUR;
         }
 

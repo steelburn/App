@@ -44,7 +44,9 @@ const currentUserLoginAndAccountIDSelector = (session: OnyxEntry<Session>) => ({
 });
 
 const isTrackIntentUserSelector = (introSelected: OnyxEntry<IntroSelected>) =>
-    introSelected?.choice === CONST.ONBOARDING_CHOICES.PERSONAL_SPEND || introSelected?.choice === CONST.ONBOARDING_CHOICES.TRACK_WORKSPACE;
+    introSelected?.choice === CONST.ONBOARDING_CHOICES.PERSONAL_SPEND ||
+    introSelected?.choice === CONST.ONBOARDING_CHOICES.TRACK_WORKSPACE ||
+    introSelected?.choice === CONST.ONBOARDING_CHOICES.TRACK_PERSONAL;
 
 type UseSearchTypeMenuSectionsParams = {
     hash?: number;

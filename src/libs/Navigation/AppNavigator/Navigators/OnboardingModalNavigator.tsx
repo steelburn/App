@@ -60,7 +60,7 @@ function OnboardingModalNavigator() {
         initialRouteName = SCREENS.ONBOARDING.WORK_EMAIL;
     }
 
-    if (onboardingPurposeSelected === CONST.ONBOARDING_CHOICES.PERSONAL_SPEND && !!onboardingPolicyID) {
+    if ((onboardingPurposeSelected === CONST.ONBOARDING_CHOICES.TRACK_BUSINESS || onboardingPurposeSelected === CONST.ONBOARDING_CHOICES.TRACK_PERSONAL) && !!onboardingPolicyID) {
         initialRouteName = SCREENS.ONBOARDING.WORKSPACE_INVITE;
     }
 

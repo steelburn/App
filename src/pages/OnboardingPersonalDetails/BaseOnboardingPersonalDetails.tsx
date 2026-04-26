@@ -137,15 +137,9 @@ function BaseOnboardingPersonalDetails({currentUserPersonalDetails, shouldUseNat
                 return;
             }
 
-            if (onboardingPurposeSelected === CONST.ONBOARDING_CHOICES.PERSONAL_SPEND) {
+            if (onboardingPurposeSelected === CONST.ONBOARDING_CHOICES.TRACK_BUSINESS || onboardingPurposeSelected === CONST.ONBOARDING_CHOICES.TRACK_PERSONAL) {
                 updateDisplayName(firstName, lastName, formatPhoneNumber, session?.accountID ?? CONST.DEFAULT_NUMBER_ID, session?.email ?? '');
                 autoCreateTrackWorkspace(firstName, lastName, onboardingPurposeSelected);
-                return;
-            }
-
-            if (onboardingPurposeSelected === CONST.ONBOARDING_CHOICES.TRACK_WORKSPACE) {
-                updateDisplayName(firstName, lastName, formatPhoneNumber, session?.accountID ?? CONST.DEFAULT_NUMBER_ID, session?.email ?? '');
-                Navigation.navigate(ROUTES.ONBOARDING_WORKSPACE.getRoute(route.params?.backTo));
                 return;
             }
 
