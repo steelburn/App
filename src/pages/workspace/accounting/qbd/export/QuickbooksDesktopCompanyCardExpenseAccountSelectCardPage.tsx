@@ -44,9 +44,9 @@ function QuickbooksDesktopCompanyCardExpenseAccountSelectCardPage({policy}: With
         [policyID],
     );
 
-    const goBack = () => {
+    const goBack = useCallback(() => {
         Navigation.goBack((backTo ?? defaultBackPath) as Route);
-    };
+    }, [backTo, defaultBackPath]);
 
     const data: MenuItem[] = useMemo(
         () => [
@@ -98,7 +98,7 @@ function QuickbooksDesktopCompanyCardExpenseAccountSelectCardPage({policy}: With
             }
             goBack();
         },
-        [nonReimbursable, nonReimbursableAccount, nonReimbursableBillDefaultVendor, policyID, backTo, defaultBackPath],
+        [nonReimbursable, nonReimbursableAccount, nonReimbursableBillDefaultVendor, policyID, goBack],
     );
     return (
         <SelectionScreen
