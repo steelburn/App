@@ -50,14 +50,9 @@ type DynamicCategorySettingsPageProps =
     | PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.WORKSPACE.DYNAMIC_CATEGORY_SETTINGS>
     | PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.SETTINGS_CATEGORIES.SETTINGS_CATEGORY_SETTINGS>;
 
-function DynamicCategorySettingsPage({
-    route: {
-        params: {policyID, categoryName},
-        name,
-        params,
-    },
-    navigation,
-}: DynamicCategorySettingsPageProps) {
+function DynamicCategorySettingsPage({route, navigation}: DynamicCategorySettingsPageProps) {
+    const {policyID, categoryName} = route.params;
+    const {name} = route;
     const styles = useThemeStyles();
     const {translate, formatPhoneNumber} = useLocalize();
     const {convertToDisplayString} = useCurrencyListActions();
@@ -75,7 +70,7 @@ function DynamicCategorySettingsPage({
 
     const shouldPreventDisableOrDelete = isDisablingOrDeletingLastEnabledCategory(policy, policyData.categories, [policyCategory]);
     const isQuickSettingsFlow = name === SCREENS.SETTINGS_CATEGORIES.SETTINGS_CATEGORY_SETTINGS;
-    const backTo = 'backTo' in params ? params.backTo : undefined;
+    const backTo = 'backTo' in route.params ? route.params.backTo : undefined;
     const backPath = useDynamicBackPath(DYNAMIC_ROUTES.WORKSPACE_CATEGORY_SETTINGS.path);
     const {
         taskReport: setupCategoryTaskReport,
@@ -98,7 +93,7 @@ function DynamicCategorySettingsPage({
     const policyHasTags = hasTags(policyTags);
 
     const navigateBack = () => {
-        Navigation.goBack(isQuickSettingsFlow ? ROUTES.SETTINGS_CATEGORIES_ROOT.getRoute(policyID, params.backTo) : backPath);
+        Navigation.goBack(isQuickSettingsFlow ? ROUTES.SETTINGS_CATEGORIES_ROOT.getRoute(policyID, backTo) : backPath);
     };
 
     const isFocused = useIsFocused();
