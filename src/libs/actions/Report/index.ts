@@ -2065,6 +2065,7 @@ function navigateToAndOpenReport(
     isSelfTourViewed: boolean | undefined,
     betas: OnyxEntry<Beta[]>,
     shouldDismissModal = true,
+    shouldRevalidateExistingChat = false,
 ) {
     const participantAccountIDs = PersonalDetailsUtils.getAccountIDsByLogins(userLogins);
     const chat = getChatByParticipants([...participantAccountIDs, currentUserAccountID]);
@@ -2092,6 +2093,11 @@ function navigateToAndOpenReport(
 
     if (isEmptyObject(chat) || isReportNotFound(chat)) {
         createAndOpenNewOptimisticChat();
+        return;
+    }
+
+    if (!shouldRevalidateExistingChat) {
+        navigateToReport(chat.reportID, shouldDismissModal);
         return;
     }
 
@@ -2156,6 +2162,7 @@ function navigateToAndOpenReportWithAccountIDs(
     betas: OnyxEntry<Beta[]>,
     // TODO: personalDetails should be a required field in follow-up PRs https://github.com/Expensify/App/issues/73656
     personalDetails?: OnyxEntry<PersonalDetailsList>,
+    shouldRevalidateExistingChat = false,
 ) {
     const participants = participantAccountIDs.map((accountID): ParticipantInfo => {
         return {
@@ -2188,6 +2195,11 @@ function navigateToAndOpenReportWithAccountIDs(
 
     if (!chat || isReportNotFound(chat)) {
         createAndOpenNewOptimisticChat();
+        return;
+    }
+
+    if (!shouldRevalidateExistingChat) {
+        navigateToReport(chat.reportID, false);
         return;
     }
 
