@@ -47,9 +47,9 @@ function DynamicQuickbooksDesktopCompanyCardExpenseAccountSelectPage({policy}: W
         }));
     }, [policy?.connections?.quickbooksDesktop, nonReimbursable, nonReimbursableAccount]);
 
-    const goBack = useCallback(() => {
+    const goBack = () => {
         Navigation.goBack(backPath);
-    }, [backPath]);
+    };
 
     const selectExportAccount = useCallback(
         (row: CardListItem) => {
@@ -58,7 +58,7 @@ function DynamicQuickbooksDesktopCompanyCardExpenseAccountSelectPage({policy}: W
             }
             goBack();
         },
-        [nonReimbursableAccount, policyID, goBack],
+        [nonReimbursableAccount, policyID, backPath],
     );
 
     const listEmptyContent = useMemo(
