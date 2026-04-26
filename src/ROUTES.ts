@@ -282,6 +282,15 @@ const DYNAMIC_ROUTES = {
         path: 'category-edit',
         entryScreens: [SCREENS.SETTINGS_CATEGORIES.SETTINGS_CATEGORY_SETTINGS],
     },
+    WORKSPACE_CATEGORY_SETTINGS: {
+        path: 'category/:categoryName',
+        entryScreens: [SCREENS.WORKSPACE.CATEGORIES],
+        getRoute: (categoryName: string) => `category/${encodeURIComponent(categoryName)}` as const,
+    },
+    WORKSPACE_CATEGORY_EDIT: {
+        path: 'edit',
+        entryScreens: [SCREENS.WORKSPACE.DYNAMIC_CATEGORY_SETTINGS],
+    },
     NOTIFICATION_PREFERENCES: {
         path: 'notification-preferences',
         entryScreens: [SCREENS.REPORT_SETTINGS.ROOT, SCREENS.PROFILE_ROOT],
@@ -2305,10 +2314,6 @@ const ROUTES = {
             return `workspaces/${policyID}/categories` as const;
         },
     },
-    WORKSPACE_CATEGORY_SETTINGS: {
-        route: 'workspaces/:policyID/category/:categoryName',
-        getRoute: (policyID: string, categoryName: string) => `workspaces/${policyID}/category/${encodeURIComponent(categoryName)}` as const,
-    },
     WORKSPACE_UPGRADE: {
         route: 'workspaces/:policyID?/upgrade/:featureName?',
         getRoute: (policyID?: string, featureName?: string, backTo?: string) =>
@@ -2334,10 +2339,6 @@ const ROUTES = {
     WORKSPACE_CATEGORY_CREATE: {
         route: 'workspaces/:policyID/categories/new',
         getRoute: (policyID: string) => `workspaces/${policyID}/categories/new` as const,
-    },
-    WORKSPACE_CATEGORY_EDIT: {
-        route: 'workspaces/:policyID/category/:categoryName/edit',
-        getRoute: (policyID: string, categoryName: string) => `workspaces/${policyID}/category/${encodeURIComponent(categoryName)}/edit` as const,
     },
     WORKSPACE_CATEGORY_PAYROLL_CODE: {
         route: 'workspaces/:policyID/category/:categoryName/payroll-code',

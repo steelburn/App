@@ -978,9 +978,7 @@ const config: LinkingOptions<RootNavigatorParamList>['config'] = {
                                 },
                             },
                         },
-                        [SCREENS.WORKSPACE.CATEGORY_SETTINGS]: {
-                            path: ROUTES.WORKSPACE_CATEGORY_SETTINGS.route,
-                        },
+                        [SCREENS.WORKSPACE.DYNAMIC_CATEGORY_SETTINGS]: DYNAMIC_ROUTES.WORKSPACE_CATEGORY_SETTINGS.path,
                         [SCREENS.WORKSPACE.UPGRADE]: {
                             path: ROUTES.WORKSPACE_UPGRADE.route,
                         },
@@ -1019,9 +1017,7 @@ const config: LinkingOptions<RootNavigatorParamList>['config'] = {
                         [SCREENS.WORKSPACE.CATEGORY_CREATE]: {
                             path: ROUTES.WORKSPACE_CATEGORY_CREATE.route,
                         },
-                        [SCREENS.WORKSPACE.CATEGORY_EDIT]: {
-                            path: ROUTES.WORKSPACE_CATEGORY_EDIT.route,
-                        },
+                        [SCREENS.WORKSPACE.DYNAMIC_CATEGORY_EDIT]: DYNAMIC_ROUTES.WORKSPACE_CATEGORY_EDIT.path,
                         [SCREENS.WORKSPACE.CATEGORY_PAYROLL_CODE]: {
                             path: ROUTES.WORKSPACE_CATEGORY_PAYROLL_CODE.route,
                         },
