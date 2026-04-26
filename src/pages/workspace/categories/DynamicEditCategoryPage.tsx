@@ -63,7 +63,7 @@ function DynamicEditCategoryPage({route}: DynamicEditCategoryPageProps) {
                 Navigation.goBack(isQuickSettingsFlow ? backPath : workspaceCategorySettingsPath, {compareParams: false});
             });
         },
-        [currentCategoryName, policyData, isQuickSettingsFlow, backPath, policyID, workspaceCategorySettingsPath],
+        [currentCategoryName, policyData, isQuickSettingsFlow, backPath, workspaceCategorySettingsPath],
     );
 
     return (

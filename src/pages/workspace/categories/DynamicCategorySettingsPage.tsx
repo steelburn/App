@@ -75,7 +75,7 @@ function DynamicCategorySettingsPage({
 
     const shouldPreventDisableOrDelete = isDisablingOrDeletingLastEnabledCategory(policy, policyData.categories, [policyCategory]);
     const isQuickSettingsFlow = name === SCREENS.SETTINGS_CATEGORIES.SETTINGS_CATEGORY_SETTINGS;
-    const backTo = params.backTo;
+    const backTo = 'backTo' in params ? params.backTo : undefined;
     const backPath = useDynamicBackPath(DYNAMIC_ROUTES.WORKSPACE_CATEGORY_SETTINGS.path);
     const {
         taskReport: setupCategoryTaskReport,
