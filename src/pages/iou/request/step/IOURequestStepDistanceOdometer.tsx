@@ -183,6 +183,7 @@ function IOURequestStepDistanceOdometer({
             initialEndReadingRef.current = '';
             initialStartImageRef.current = undefined;
             initialEndImageRef.current = undefined;
+            hasInitializedRefs.current = false;
             setFormError('');
             // Force TextInput remount to reset label position
             setInputKey((prev) => prev + 1);
@@ -197,6 +198,12 @@ function IOURequestStepDistanceOdometer({
         if (hasInitializedRefs.current) {
             return;
         }
+        // Wait for initMoneyRequest's draft hydration before snapshotting the baseline,
+        // otherwise the discard modal fires for unedited odometer drafts
+        const isOdometerTransaction = currentTransaction?.iouRequestType === CONST.IOU.REQUEST_TYPE.DISTANCE_ODOMETER;
+        if (!isEditing && !isOdometerTransaction) {
+            return;
+        }
         const currentStart = currentTransaction?.comment?.odometerStart;
         const currentEnd = currentTransaction?.comment?.odometerEnd;
         const startValue = currentStart !== null && currentStart !== undefined ? currentStart.toString() : '';
@@ -207,10 +214,12 @@ function IOURequestStepDistanceOdometer({
         initialEndImageRef.current = currentTransaction?.comment?.odometerEndImage;
         hasInitializedRefs.current = true;
     }, [
+        currentTransaction?.iouRequestType,
         currentTransaction?.comment?.odometerStart,
         currentTransaction?.comment?.odometerEnd,
         currentTransaction?.comment?.odometerStartImage,
         currentTransaction?.comment?.odometerEndImage,
+        isEditing,
     ]);
 
     // Initialize values from transaction when editing or when transaction has data (but not when switching tabs)
