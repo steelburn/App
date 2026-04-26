@@ -1145,7 +1145,8 @@ function changeTransactionsReport({
         let transactionForViolations = transaction;
         if (isPaidGroupPolicy(policy) && policy?.id && isDistanceRequest(transaction)) {
             const currentRateID = transaction.comment?.customUnit?.customUnitRateID;
-            if (!currentRateID || !getDistanceRateCustomUnitRate(policy, currentRateID)) {
+            const currentRate = currentRateID ? getDistanceRateCustomUnitRate(policy, currentRateID) : undefined;
+            if (!currentRateID || !currentRate || currentRate.enabled === false) {
                 const defaultRate = DistanceRequestUtils.getDefaultMileageRate(policy);
                 if (defaultRate?.customUnitRateID) {
                     transactionIDToUpdatedCustomUnitRateID[transaction.transactionID] = defaultRate.customUnitRateID;
