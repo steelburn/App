@@ -66,7 +66,15 @@ function DynamicQuickbooksDesktopExportPage({policy}: WithPolicyConnectionsProps
         },
         {
             description: translate('workspace.accounting.exportCompanyCard'),
-            onPress: () => Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.POLICY_ACCOUNTING_QUICKBOOKS_DESKTOP_COMPANY_CARD_EXPENSE_ACCOUNT.path)),
+            onPress: !policyID
+                ? undefined
+                : () =>
+                      Navigation.navigate(
+                          createDynamicRoute(
+                              DYNAMIC_ROUTES.POLICY_ACCOUNTING_QUICKBOOKS_DESKTOP_COMPANY_CARD_EXPENSE_ACCOUNT.path,
+                              `${ROUTES.POLICY_ACCOUNTING.getRoute(policyID)}/${DYNAMIC_ROUTES.POLICY_ACCOUNTING_QUICKBOOKS_DESKTOP_EXPORT.path}`,
+                          ),
+                      ),
             brickRoadIndicator: qbdConfig?.errorFields?.exportCompanyCard ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined,
             title: qbdConfig?.export?.nonReimbursable ? translate(`workspace.qbd.accounts.${qbdConfig?.export?.nonReimbursable}`) : undefined,
             subscribedSettings: [
