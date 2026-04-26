@@ -1,6 +1,8 @@
 import {PromotedActions} from '@components/PromotedActionsBar';
+import Navigation from '@libs/Navigation/Navigation';
 import {navigateToAndOpenReport, navigateToAndOpenReportWithAccountIDs} from '@userActions/Report';
 import CONST from '@src/CONST';
+import ROUTES from '@src/ROUTES';
 
 jest.mock('@userActions/Report', () => ({
     navigateToAndOpenReport: jest.fn(),
@@ -19,6 +21,7 @@ jest.mock('@libs/Navigation/Navigation', () => ({
 
 const mockNavigateToAndOpenReport = jest.mocked(navigateToAndOpenReport);
 const mockNavigateToAndOpenReportWithAccountIDs = jest.mocked(navigateToAndOpenReportWithAccountIDs);
+const mockNavigation = jest.mocked(Navigation);
 
 describe('PromotedActions.message', () => {
     beforeEach(() => {
@@ -86,6 +89,7 @@ describe('PromotedActions.message', () => {
 
         expect(mockNavigateToAndOpenReport).not.toHaveBeenCalled();
         expect(mockNavigateToAndOpenReportWithAccountIDs).not.toHaveBeenCalled();
+        expect(mockNavigation.navigate).toHaveBeenCalledWith(ROUTES.REPORT_WITH_ID.getRoute('report123'));
     });
 
     it('should prefer login over accountID when both are provided', () => {
