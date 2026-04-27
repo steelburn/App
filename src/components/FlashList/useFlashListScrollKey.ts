@@ -30,6 +30,9 @@ export default function useFlashListScrollKey<T>({data, keyExtractor, initialScr
         // Without an anchor on this frame, we are not doing the deep-link slice handoff; clear the flag so a key that
         // appears later (e.g. marking a message unread) cannot reuse the "first paint" slice path.
         if (!initialScrollKey) {
+            // If the initial scroll key gets unset, we need to disable the initial render flag,
+            // otherwise the list will not render..
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setIsInitialRender(false);
             return;
         }
