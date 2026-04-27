@@ -1835,7 +1835,7 @@ function clearDomainMembersSelectedForMove() {
 function updateDomainSecurityGroup(
     domainAccountID: number,
     groupID: string,
-    currentSecurityGroup: DomainSecurityGroup | null,
+    currentSecurityGroup: DomainSecurityGroup,
     newSettingValue: Partial<DomainSecurityGroup>,
     settingsName: keyof DomainSecurityGroup,
 ) {
@@ -1882,7 +1882,7 @@ function updateDomainSecurityGroup(
                 [SECURITY_GROUP_KEY]: {
                     [settingsName]: currentSecurityGroup[settingsName],
                 },
-            } as PrefixedRecord<typeof CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX, DomainSecurityGroup>,
+            } as PrefixedRecord<typeof CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX, Partial<DomainSecurityGroup>>,
         },
         {
             onyxMethod: Onyx.METHOD.MERGE,
@@ -2127,7 +2127,7 @@ function setDefaultSecurityGroup(domainAccountID: number, groupID: string, previ
             key: `${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`,
             value: {
                 [SECURITY_GROUP_KEY]: {
-                    defaultSecurityGroupIDErrors: getMicroSecondOnyxErrorWithTranslationKey('domain.groups.error.settings'),
+                    defaultSecurityGroupIDErrors: getMicroSecondOnyxErrorWithTranslationKey('domain.common.error'),
                 },
             },
         },
