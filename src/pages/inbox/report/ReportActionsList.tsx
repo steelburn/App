@@ -250,6 +250,7 @@ function ReportActionsList({
     const hasHeaderRendered = useRef(false);
 
     const lastAction = sortedVisibleReportActions.at(0);
+    const [shouldMaintainVisibleContentPosition, setShouldMaintainVisibleContentPosition] = useState(() => scrollOffsetRef.current > CONST.REPORT.ACTIONS.ACTION_VISIBLE_THRESHOLD);
     const sortedVisibleReportActionsObjects: OnyxTypes.ReportActions = useMemo(
         () =>
             sortedVisibleReportActions.reduce((actions, action) => {
@@ -433,7 +434,9 @@ function ReportActionsList({
         unreadMarkerReportActionIndex,
         isInverted: true,
         onTrackScrolling: (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-            scrollOffsetRef.current = event.nativeEvent.contentOffset.y;
+            const offset = event.nativeEvent.contentOffset.y;
+            scrollOffsetRef.current = offset;
+            setShouldMaintainVisibleContentPosition(offset > CONST.REPORT.ACTIONS.ACTION_VISIBLE_THRESHOLD);
             onScroll?.(event);
             // We use a timeout to wait for the scroll to finish before resetting the flag.
             // onMomentumScrollEnd would be ideal but it doesn't work on web.
@@ -1086,6 +1089,7 @@ function ReportActionsList({
                     extraData={extraData}
                     key={listID}
                     getItemType={(item) => item.actionName}
+                    shouldMaintainVisibleContentPosition={shouldMaintainVisibleContentPosition}
                     initialScrollKey={initialScrollKey}
                     onContentSizeChange={() => {
                         trackVerticalScrolling(undefined);

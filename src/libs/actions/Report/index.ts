@@ -77,6 +77,7 @@ import HttpUtils from '@libs/HttpUtils';
 import Log from '@libs/Log';
 import {isEmailPublicDomain} from '@libs/LoginUtils';
 import {getMovedReportID} from '@libs/ModifiedExpenseMessage';
+import createDynamicRoute from '@libs/Navigation/helpers/dynamicRoutesUtils/createDynamicRoute';
 import type {LinkToOptions} from '@libs/Navigation/helpers/linkTo/types';
 import Navigation from '@libs/Navigation/Navigation';
 import enhanceParameters from '@libs/Network/enhanceParameters';
@@ -194,7 +195,7 @@ import CONFIG from '@src/CONFIG';
 import type {OnboardingAccounting} from '@src/CONST';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
-import ROUTES from '@src/ROUTES';
+import ROUTES, {DYNAMIC_ROUTES} from '@src/ROUTES';
 import INPUT_IDS from '@src/types/form/NewRoomForm';
 import type {
     AnyRequest,
@@ -358,6 +359,7 @@ type AddCommentParams = {
     isInSidePanel?: boolean;
     pregeneratedResponseParams?: PregeneratedResponseParams;
     reportActionID?: string;
+    delegateAccountID: number | undefined;
 };
 
 type AddActionsParams = {
@@ -371,6 +373,7 @@ type AddActionsParams = {
     isInSidePanel?: boolean;
     pregeneratedResponseParams?: PregeneratedResponseParams;
     reportActionID?: string;
+    delegateAccountID: number | undefined;
 };
 
 type AddAttachmentWithCommentParams = {
@@ -383,6 +386,7 @@ type AddAttachmentWithCommentParams = {
     timezone?: Timezone;
     shouldPlaySound?: boolean;
     isInSidePanel?: boolean;
+    delegateAccountID: number | undefined;
 };
 
 const addNewMessageWithText = new Set<string>([WRITE_COMMANDS.ADD_COMMENT, WRITE_COMMANDS.ADD_TEXT_AND_ATTACHMENT]);
@@ -682,6 +686,7 @@ function addActions({
     isInSidePanel = false,
     pregeneratedResponseParams,
     reportActionID,
+    delegateAccountID,
 }: AddActionsParams) {
     if (!report?.reportID) {
         return;
@@ -694,7 +699,7 @@ function addActions({
 
     const attachmentID = rand64();
     if (text && !file) {
-        const reportComment = buildOptimisticAddCommentReportAction({text, reportID, reportActionID});
+        const reportComment = buildOptimisticAddCommentReportAction({text, reportID, reportActionID, delegateAccountIDParam: delegateAccountID});
         reportCommentAction = reportComment.reportAction;
         reportCommentText = reportComment.commentText;
     }
@@ -703,7 +708,7 @@ function addActions({
         // When we are adding an attachment we will call AddAttachment.
         // It supports sending an attachment with an optional comment and AddComment supports adding a single text comment only.
         commandName = WRITE_COMMANDS.ADD_ATTACHMENT;
-        const attachment = buildOptimisticAddCommentReportAction({text, file, reportID, attachmentID});
+        const attachment = buildOptimisticAddCommentReportAction({text, file, reportID, attachmentID, delegateAccountIDParam: delegateAccountID});
         attachmentAction = attachment.reportAction;
         cacheAttachment({attachmentID, uri: file.uri ?? '', mimeType: file.type});
     }
@@ -934,6 +939,7 @@ function addAttachmentWithComment({
     timezone = CONST.DEFAULT_TIME_ZONE,
     shouldPlaySound = false,
     isInSidePanel = false,
+    delegateAccountID,
 }: AddAttachmentWithCommentParams) {
     if (!report?.reportID) {
         return;
@@ -948,17 +954,17 @@ function addAttachmentWithComment({
 
     // Single attachment
     if (!Array.isArray(attachments)) {
-        addActions({report, notifyReportID, ancestors, timezoneParam: timezone, currentUserAccountID, text, file: attachments, isInSidePanel});
+        addActions({report, notifyReportID, ancestors, timezoneParam: timezone, currentUserAccountID, text, file: attachments, isInSidePanel, delegateAccountID});
         handlePlaySound();
         return;
     }
 
     // Multiple attachments - first: combine text + first attachment as a single action
-    addActions({report, notifyReportID, ancestors, timezoneParam: timezone, currentUserAccountID, text, file: attachments?.at(0), isInSidePanel});
+    addActions({report, notifyReportID, ancestors, timezoneParam: timezone, currentUserAccountID, text, file: attachments?.at(0), isInSidePanel, delegateAccountID});
 
     // Remaining: attachment-only actions (no text duplication)
     for (let i = 1; i < attachments?.length; i += 1) {
-        addActions({report, notifyReportID, ancestors, timezoneParam: timezone, currentUserAccountID, text: '', file: attachments?.at(i), isInSidePanel});
+        addActions({report, notifyReportID, ancestors, timezoneParam: timezone, currentUserAccountID, text: '', file: attachments?.at(i), isInSidePanel, delegateAccountID});
     }
 
     // Play sound once
@@ -977,11 +983,12 @@ function addComment({
     isInSidePanel,
     pregeneratedResponseParams,
     reportActionID,
+    delegateAccountID,
 }: AddCommentParams) {
     if (shouldPlaySound) {
         playSound(SOUNDS.DONE);
     }
-    addActions({report, notifyReportID, ancestors, timezoneParam, currentUserAccountID, text, isInSidePanel, pregeneratedResponseParams, reportActionID});
+    addActions({report, notifyReportID, ancestors, timezoneParam, currentUserAccountID, text, isInSidePanel, pregeneratedResponseParams, reportActionID, delegateAccountID});
 }
 
 function reportActionsExist(reportID: string): boolean {
@@ -2219,6 +2226,7 @@ function explain(
     currentUserAccountID: number,
     introSelected: OnyxEntry<IntroSelected>,
     betas: OnyxEntry<Beta[]>,
+    delegateAccountID: number | undefined,
     timezone: Timezone = CONST.DEFAULT_TIME_ZONE,
 ) {
     if (!originalReport?.reportID || !reportAction) {
@@ -2240,6 +2248,7 @@ function explain(
             timezoneParam: timezone,
             currentUserAccountID,
             shouldPlaySound: true,
+            delegateAccountID,
         });
     });
 }
@@ -4771,10 +4780,26 @@ function inviteToRoom(report: Report, inviteeEmailsToAccountIDs: InvitedEmailsTo
 }
 
 /** Invites people to a room via concierge whisper */
-function inviteToRoomAction(report: Report, ancestors: Ancestor[], inviteeEmailsToAccountIDs: InvitedEmailsToAccountIDs, timezoneParam: Timezone, currentUserAccountID: number) {
+function inviteToRoomAction(
+    report: Report,
+    ancestors: Ancestor[],
+    inviteeEmailsToAccountIDs: InvitedEmailsToAccountIDs,
+    timezoneParam: Timezone,
+    currentUserAccountID: number,
+    delegateAccountID: number | undefined,
+) {
     const inviteeEmails = Object.keys(inviteeEmailsToAccountIDs);
 
-    addComment({report, notifyReportID: report.reportID, ancestors, text: inviteeEmails.map((login) => `@${login}`).join(' '), timezoneParam, currentUserAccountID, shouldPlaySound: false});
+    addComment({
+        report,
+        notifyReportID: report.reportID,
+        ancestors,
+        text: inviteeEmails.map((login) => `@${login}`).join(' '),
+        timezoneParam,
+        currentUserAccountID,
+        shouldPlaySound: false,
+        delegateAccountID,
+    });
 }
 
 function clearAddRoomMemberError(reportID: string, invitedAccountID: string) {
@@ -6661,14 +6686,14 @@ function updatePolicyIdForReportAndThreads(
     }
 }
 
-function navigateToTrainingModal(isChangePolicyTrainingModalDismissed: boolean, reportID: string) {
+function navigateToTrainingModal(isChangePolicyTrainingModalDismissed: boolean) {
     if (isChangePolicyTrainingModalDismissed) {
         return;
     }
 
     // eslint-disable-next-line @typescript-eslint/no-deprecated
     InteractionManager.runAfterInteractions(() => {
-        Navigation.navigate(ROUTES.CHANGE_POLICY_EDUCATIONAL.getRoute(ROUTES.REPORT_WITH_ID.getRoute(reportID)));
+        Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.CHANGE_POLICY_EDUCATIONAL.path));
     });
 }
 
@@ -7191,8 +7216,8 @@ function changeReportPolicy(
     API.write(WRITE_COMMANDS.CHANGE_REPORT_POLICY, params, {optimisticData, successData, failureData});
 
     // If the dismissedProductTraining.changeReportModal is not set,
-    // navigate to CHANGE_POLICY_EDUCATIONAL and a backTo param for the report page.
-    navigateToTrainingModal(isChangePolicyTrainingModalDismissed, report.reportID);
+    // navigate to the change policy educational modal over the current report.
+    navigateToTrainingModal(isChangePolicyTrainingModalDismissed);
 }
 
 /**
@@ -7211,6 +7236,7 @@ function changeReportPolicyAndInviteSubmitter({
     formatPhoneNumber,
     isReportLastVisibleArchived,
     reportNextStep,
+    reportActionsList,
 }: {
     report: Report;
     parentReport: OnyxEntry<Report>;
@@ -7224,6 +7250,8 @@ function changeReportPolicyAndInviteSubmitter({
     formatPhoneNumber: LocaleContextProps['formatPhoneNumber'];
     isReportLastVisibleArchived: boolean | undefined;
     reportNextStep: OnyxEntry<ReportNextStepDeprecated>;
+    // TODO: Remove optional (?) once all callers are updated in follow-up PRs of https://github.com/Expensify/App/issues/66578
+    reportActionsList?: OnyxCollection<ReportActions>;
 }) {
     if (!report.reportID || !policy?.id || report.policyID === policy.id || !isExpenseReport(report) || !report.ownerAccountID) {
         return;
@@ -7249,6 +7277,7 @@ function changeReportPolicyAndInviteSubmitter({
         currentUserAccountID,
         undefined,
         CONST.REPORT.NOTIFICATION_PREFERENCE.ALWAYS,
+        reportActionsList,
     );
     const optimisticPolicyExpenseChatReportID = membersChats.reportCreationData[submitterEmail].reportID;
     const optimisticPolicyExpenseChatCreatedReportActionID = membersChats.reportCreationData[submitterEmail].reportActionID;
@@ -7291,8 +7320,8 @@ function changeReportPolicyAndInviteSubmitter({
     API.write(WRITE_COMMANDS.CHANGE_REPORT_POLICY_AND_INVITE_SUBMITTER, params, {optimisticData, successData, failureData});
 
     // If the dismissedProductTraining.changeReportModal is not set,
-    // navigate to CHANGE_POLICY_EDUCATIONAL and a backTo param for the report page.
-    navigateToTrainingModal(isChangePolicyTrainingModalDismissed, report.reportID);
+    // navigate to the change policy educational modal over the current report.
+    navigateToTrainingModal(isChangePolicyTrainingModalDismissed);
 }
 
 /**
@@ -7313,6 +7342,7 @@ function resolveConciergeOptions(
     timezoneParam: Timezone,
     selectedField: 'selectedCategory' | 'selectedDescription',
     currentUserAccountID: number,
+    delegateAccountID: number | undefined,
     ancestors: Ancestor[] = [],
 ) {
     if (!report?.reportID || !reportActionID) {
@@ -7320,7 +7350,7 @@ function resolveConciergeOptions(
     }
 
     const reportID = report.reportID;
-    addComment({report, notifyReportID: notifyReportID ?? reportID, ancestors, text: selectedValue, timezoneParam, currentUserAccountID});
+    addComment({report, notifyReportID: notifyReportID ?? reportID, ancestors, text: selectedValue, timezoneParam, currentUserAccountID, delegateAccountID});
 
     Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${reportID}`, {
         [reportActionID]: {
@@ -7347,9 +7377,10 @@ function resolveConciergeCategoryOptions(
     selectedCategory: string,
     timezoneParam: Timezone,
     currentUserAccountID: number,
+    delegateAccountID: number | undefined,
     ancestors: Ancestor[] = [],
 ) {
-    resolveConciergeOptions(report, notifyReportID, reportActionID, selectedCategory, timezoneParam, 'selectedCategory', currentUserAccountID, ancestors);
+    resolveConciergeOptions(report, notifyReportID, reportActionID, selectedCategory, timezoneParam, 'selectedCategory', currentUserAccountID, delegateAccountID, ancestors);
 }
 
 /**
@@ -7368,9 +7399,10 @@ function resolveConciergeDescriptionOptions(
     selectedDescription: string,
     timezoneParam: Timezone,
     currentUserAccountID: number,
+    delegateAccountID: number | undefined,
     ancestors: Ancestor[] = [],
 ) {
-    resolveConciergeOptions(report, notifyReportID, reportActionID, selectedDescription, timezoneParam, 'selectedDescription', currentUserAccountID, ancestors);
+    resolveConciergeOptions(report, notifyReportID, reportActionID, selectedDescription, timezoneParam, 'selectedDescription', currentUserAccountID, delegateAccountID, ancestors);
 }
 
 /**
