@@ -50,7 +50,7 @@ function getLoginKey(login: NewLogin) {
 }
 
 function getLastLogin(login: NewLogin) {
-    // If we have not reauthenticated, then lastLogin will still be the default 2008-01-01 value. So the created time stamp will be more accurate in that case.
+    // If we have not re-authenticated, then lastLogin will still be the default 2008-01-01 value. So the created time stamp will be more accurate in that case.
     return login.lastLogin > login.created ? login.lastLogin : login.created;
 }
 
