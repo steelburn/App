@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useRef, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import Clipboard from '@libs/Clipboard';
 import ROUTES from '@src/ROUTES';
 import useEnvironment from './useEnvironment';
@@ -16,22 +16,19 @@ function useShareSavedSearch() {
         };
     }, []);
 
-    const handleShare = useCallback(
-        (itemHash: number, itemQuery: string) => {
-            const url = `${environmentURL}/${ROUTES.SEARCH_ROOT.getRoute({query: itemQuery})}`;
-            Clipboard.setString(url);
-            setCopiedHash(itemHash);
+    const handleShare = (itemHash: number, itemQuery: string) => {
+        const url = `${environmentURL}/${ROUTES.SEARCH_ROOT.getRoute({query: itemQuery})}`;
+        Clipboard.setString(url);
+        setCopiedHash(itemHash);
 
-            if (timeoutRef.current !== null) {
-                clearTimeout(timeoutRef.current);
-            }
-            timeoutRef.current = setTimeout(() => {
-                setCopiedHash((prev) => (prev === itemHash ? null : prev));
-                timeoutRef.current = null;
-            }, SHARE_FEEDBACK_DURATION_MS);
-        },
-        [environmentURL],
-    );
+        if (timeoutRef.current !== null) {
+            clearTimeout(timeoutRef.current);
+        }
+        timeoutRef.current = setTimeout(() => {
+            setCopiedHash((prev) => (prev === itemHash ? null : prev));
+            timeoutRef.current = null;
+        }, SHARE_FEEDBACK_DURATION_MS);
+    };
 
     return {copiedHash, handleShare};
 }

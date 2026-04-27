@@ -186,9 +186,6 @@ function ThreeDotsMenu({
                 anchorPosition={position ?? anchorPosition ?? {horizontal: 0, vertical: 0}}
                 anchorAlignment={anchorAlignment}
                 onItemSelected={(item) => {
-                    if (item.shouldCloseModalOnSelect === false) {
-                        return;
-                    }
                     setRestoreFocusType(CONST.MODAL.RESTORE_FOCUS_TYPE.PRESERVE);
                     hidePopoverMenu(item);
                 }}
