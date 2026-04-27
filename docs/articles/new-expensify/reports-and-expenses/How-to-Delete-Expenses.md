@@ -42,6 +42,14 @@ Most expenses can be deleted directly. If an expense is on a submitted report or
 
 ---
 
+## What happens after you delete an expense 
+
+- If the expense was the only one on a report, the report is also deleted.
+- If the report contained multiple expenses, the remaining expenses stay on the report.
+- If you need to recover the deleted expense, it can be undeleted.
+  
+---
+
 ## Why you can’t delete an expense
 
 Expenses can only be deleted when certain conditions are met.
