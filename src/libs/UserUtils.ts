@@ -50,7 +50,8 @@ function getLoginKey(login: NewLogin) {
 }
 
 function getLastLogin(login: NewLogin) {
-    return new Date(login.lastLogin) > new Date(login.created) ? login.lastLogin : login.created;
+    // If we have not reauthenticated, then lastLogin will still be the default 2008-01-01 value. So the created time stamp will be more accurate in that case.
+    return login.lastLogin > login.created ? login.lastLogin : login.created;
 }
 
 const DEVICE_PARTNER_IDS = new Set<number>([CONST.PARTNER_ID.IPHONE, CONST.PARTNER_ID.ANDROID, CONST.PARTNER_ID.NEWDOT]);
