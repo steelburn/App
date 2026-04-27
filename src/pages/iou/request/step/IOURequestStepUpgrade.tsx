@@ -129,7 +129,10 @@ function IOURequestStepUpgrade({
                     // workspace. forceReplace removes the upgrade screen from history so back returns to
                     // the originating screen, not the upgrade step.
                     setIsCreatingReport(true);
-                    createNewReport(policyID, true);
+                    const {reportID: newReportID} = createNewReport(policyID);
+                    Navigation.setNavigationActionToMicrotaskQueue(() => {
+                        Navigation.navigate(ROUTES.REPORT_WITH_ID.getRoute(newReportID), {forceReplace: true});
+                    });
                 } else {
                     Navigation.goBack();
                     navigateWithMicrotask(ROUTES.MONEY_REQUEST_STEP_REPORT.getRoute(action, CONST.IOU.TYPE.SUBMIT, transactionID, reportID));
