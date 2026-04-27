@@ -2,7 +2,7 @@
 title: Expense and Report Actions
 description: Learn what actions (Submit, Approve, Pay, Export, Hold) are available on reports based on role and report status.
 keywords: [New Expensify, report actions Expensify, who can approve report, when can I pay report, report status actions, approver permissions]
-internalScope: Audience is all members. High level overiew of what report actions are available based on role and report status. Does not cover step-by-step instructions for performing each action.
+internalScope: Audience is all members. High level overview of what report actions are available based on role and report status. Does not cover step-by-step instructions for performing each action.
 ---
 
 # Expense and Report Actions
@@ -102,7 +102,7 @@ Use this guide to understand:
 | **Action** | **When It Appears** | **Who Can See It** | **What It Does** |
 |------------|---------------------|---------------------|------------------|
 | **Submit** | Draft reports | Submitter | Sends the report into the approval workflow |
-| **Approve** | Oustanding awaiting approval | Approver | Confirms the report is accurate and moves it forward |
+| **Approve** | Outstanding awaiting approval | Approver | Confirms the report is accurate and moves it forward |
 | **Pay** | Approved reports with reimbursable expenses | Payer | Initiates or records payment |
 | **Export** | Approved or Paid reports not yet exported | Workspace Admin | Sends report data to an accounting system |
 | **Review** | When issues are detected | All roles | Prompts required fixes before continuing |
