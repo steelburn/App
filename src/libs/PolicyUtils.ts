@@ -891,8 +891,6 @@ function isPolicyEditor(policy: OnyxEntry<Policy>): boolean {
  * Returns true if the user can edit workspace settings — admins on any workspace, or editors on Submit workspaces.
  */
 function canEditWorkspaceSettings(policy: OnyxEntry<Policy>): boolean {
-    // The EDITOR role is only assigned to Submit workspaces (see buildPolicyData), so checking
-    // isPolicyEditor implicitly scopes to Submit. No extra isSubmitPolicy guard needed.
     return isPolicyAdmin(policy) || isPolicyEditor(policy);
 }
 

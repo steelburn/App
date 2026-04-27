@@ -134,13 +134,21 @@ function navigateAfterOnboardingWithMicrotaskQueue(
 function navigateToSubmitWorkspaceAfterOnboarding(policyID?: string) {
     setDisableDismissOnEscape(false);
 
-    if (policyID) {
-        setOnboardingRHPVariant(CONST.ONBOARDING_RHP_VARIANT.RHP_ADMINS_ROOM);
+    if (!policyID) {
+        Navigation.navigate(ROUTES.HOME);
+        return;
+    }
+
+    setOnboardingRHPVariant(CONST.ONBOARDING_RHP_VARIANT.RHP_ADMINS_ROOM);
+    // Push the Workspaces list first so the native back stack lands there
+    // after the user finishes exploring their newly created/joined Submit
+    // workspace. The second navigate is queued on the microtask queue so
+    // both calls are processed sequentially rather than batched.
+    Navigation.navigate(ROUTES.WORKSPACES_LIST.route);
+    Navigation.setNavigationActionToMicrotaskQueue(() => {
         Navigation.navigate(ROUTES.WORKSPACE_CATEGORIES.getRoute(policyID));
         SidePanelActions.openSidePanel(false);
-    } else {
-        Navigation.navigate(ROUTES.HOME);
-    }
+    });
 }
 
 function navigateToSubmitWorkspaceAfterOnboardingWithMicrotaskQueue(policyID?: string) {
