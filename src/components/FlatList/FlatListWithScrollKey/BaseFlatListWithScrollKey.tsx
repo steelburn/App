@@ -19,7 +19,6 @@ function BaseFlatListWithScrollKey<T>({ref, ...props}: BaseFlatListWithScrollKey
         onScrollBeginDrag,
         onWheel,
         onTouchStartCapture,
-        initialNumToRender,
         ...restProps
     } = props;
     const {displayedData, maintainVisibleContentPosition, handleStartReached, isInitialData, handleRenderItem, listRef} = useFlatListScrollKey<T>({
