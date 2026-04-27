@@ -134,7 +134,6 @@ function WorkspaceInitialPage({policyDraft, policy: policyProp, route}: Workspac
     const policyName = policy?.name ?? '';
     const hasPolicyCreationError = policy?.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD && !isEmptyObject(policy.errors);
     const shouldShowProtectedItems = canEditWorkspaceSettings(policy);
-    const shouldDisplayLHB = !shouldUseNarrowLayout;
 
     const accountingConnectionNames = CONST.POLICY.CONNECTIONS.ACCOUNTING_CONNECTION_NAMES;
     const hasSyncError = shouldShowSyncError(policy, isConnectionInProgress(connectionSyncProgress, policy), accountingConnectionNames);
@@ -189,7 +188,6 @@ function WorkspaceInitialPage({policyDraft, policy: policyProp, route}: Workspac
     // so checkIfShouldShowPolicy returns false. Suppress NotFound during this loading window.
     // eslint-disable-next-line rulesdir/no-negated-variables
     const shouldShowNotFoundPage = !shouldShowPolicy && !policy?.isLoading && (!isPendingDelete || prevIsPendingDelete);
-    const shouldShowNavigationTabBar = !shouldShowNotFoundPage;
 
     const fetchPolicyData = () => {
         if (policyDraft?.id || !isFocused) {
