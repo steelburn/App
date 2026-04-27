@@ -30,21 +30,22 @@ function useAutoCreateSubmitWorkspace() {
     const [introSelected] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED);
     const [isSelfTourViewed] = useOnyx(ONYXKEYS.NVP_ONBOARDING, {selector: hasSeenTourSelector});
     const [betas] = useOnyx(ONYXKEYS.BETAS);
-    const [session] = useOnyx(ONYXKEYS.SESSION);
+    const currentUserPersonalDetails = useCurrentUserPersonalDetails();
+    const currentUserEmail = currentUserPersonalDetails.login ?? '';
+    const currentUserAccountID = currentUserPersonalDetails.accountID;
     const groupPolicySelector = useMemo(
         () => (policies: OnyxCollection<Policy>) => Object.values(policies ?? {}).some((policy) => isGroupPolicy(policy) && canEditWorkspaceSettings(policy)),
         [],
     );
     const lastWorkspaceNumberWithEmailSelector = useCallback(
         (policies: OnyxCollection<Policy>) => {
-            return lastWorkspaceNumberSelector(policies, session?.email ?? '');
+            return lastWorkspaceNumberSelector(policies, currentUserEmail);
         },
-        [session?.email],
+        [currentUserEmail],
     );
     const [hasEditableGroupPolicy] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {selector: groupPolicySelector});
     const [lastWorkspaceNumber] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {selector: lastWorkspaceNumberWithEmailSelector});
     const [activePolicyID] = useOnyx(ONYXKEYS.NVP_ACTIVE_POLICY_ID);
-    const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const {translate, formatPhoneNumber} = useLocalize();
     const {isRestrictedPolicyCreation} = usePreferredPolicy();
     const hasActiveAdminPolicies = useHasActiveAdminPolicies();
@@ -53,13 +54,13 @@ function useAutoCreateSubmitWorkspace() {
     const autoCreateSubmitWorkspace = useCallback(
         (firstName: string, lastName: string) => {
             const shouldCreateWorkspace = !isRestrictedPolicyCreation && !onboardingPolicyID && !hasEditableGroupPolicy;
-            const displayName = createDisplayName(session?.email ?? '', {firstName, lastName}, formatPhoneNumber);
+            const displayName = createDisplayName(currentUserEmail, {firstName, lastName}, formatPhoneNumber);
 
             const {adminsChatReportID: newAdminsChatReportID, policyID: newPolicyID} = shouldCreateWorkspace
                 ? createWorkspace({
                       policyOwnerEmail: undefined,
                       makeMeAdmin: true,
-                      policyName: generateDefaultWorkspaceName(session?.email ?? '', lastWorkspaceNumber, translate, displayName),
+                      policyName: generateDefaultWorkspaceName(currentUserEmail, lastWorkspaceNumber, translate, displayName),
                       policyID: generatePolicyID(),
                       engagementChoice: CONST.ONBOARDING_CHOICES.EMPLOYER,
                       currency: currentUserPersonalDetails.localCurrencyCode ?? CONST.CURRENCY.USD,
@@ -67,8 +68,8 @@ function useAutoCreateSubmitWorkspace() {
                       shouldAddOnboardingTasks: false,
                       introSelected,
                       activePolicyID,
-                      currentUserAccountIDParam: session?.accountID ?? CONST.DEFAULT_NUMBER_ID,
-                      currentUserEmailParam: session?.email ?? '',
+                      currentUserAccountIDParam: currentUserAccountID ?? CONST.DEFAULT_NUMBER_ID,
+                      currentUserEmailParam: currentUserEmail,
                       shouldAddGuideWelcomeMessage: false,
                       type: CONST.POLICY.TYPE.SUBMIT,
                       betas,
@@ -95,8 +96,8 @@ function useAutoCreateSubmitWorkspace() {
             navigateToSubmitWorkspaceAfterOnboardingWithMicrotaskQueue(newPolicyID);
         },
         [
-            session?.email,
-            session?.accountID,
+            currentUserEmail,
+            currentUserAccountID,
             lastWorkspaceNumber,
             translate,
             formatPhoneNumber,

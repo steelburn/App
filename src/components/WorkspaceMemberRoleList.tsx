@@ -1,3 +1,4 @@
+import {emailSelector} from '@selectors/Session';
 import React from 'react';
 import {View} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';
@@ -34,7 +35,7 @@ type WorkspaceMemberRoleListProps = {
 function WorkspaceMemberRoleList({role, policy, navigateBackTo = undefined, isLoading = false, onSelectRole = () => {}}: WorkspaceMemberRoleListProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
-    const [session] = useOnyx(ONYXKEYS.SESSION);
+    const [currentUserEmail] = useOnyx(ONYXKEYS.SESSION, {selector: emailSelector});
 
     const workspaceRoles: ListItemType[] = [
         {
@@ -63,7 +64,7 @@ function WorkspaceMemberRoleList({role, policy, navigateBackTo = undefined, isLo
     const isPolicyControl = isControlPolicy(policy);
     // Only strict admins can assign the ADMIN role. Editors (e.g. Submit workspace owners) can
     // invite/manage members but must not be able to escalate anyone to admin.
-    const canAssignAdminRole = isPolicyAdmin(policy, session?.email);
+    const canAssignAdminRole = isPolicyAdmin(policy, currentUserEmail);
     const availableRoleItems: ListItemType[] = workspaceRoles.filter((item) => {
         if (item.value === CONST.POLICY.ROLE.AUDITOR && !isPolicyControl) {
             return false;
