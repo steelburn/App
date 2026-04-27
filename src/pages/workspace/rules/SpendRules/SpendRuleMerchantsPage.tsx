@@ -1,6 +1,6 @@
 import type {NavigationProp} from '@react-navigation/native';
 import {useNavigation} from '@react-navigation/native';
-import React from 'react';
+import React, {useEffect, useRef} from 'react';
 import BlockingView from '@components/BlockingViews/BlockingView';
 import FormAlertWithSubmitButton from '@components/FormAlertWithSubmitButton';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
@@ -12,6 +12,7 @@ import {useMemoizedLazyExpensifyIcons, useMemoizedLazyIllustrations} from '@hook
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
+import {updateDraftSpendRule} from '@libs/actions/User';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
 import type {SettingsNavigatorParamList} from '@libs/Navigation/types';
 import AccessOrNotFoundWrapper from '@pages/workspace/AccessOrNotFoundWrapper';
@@ -35,6 +36,26 @@ function SpendRuleMerchantsPage({route}: SpendRuleMerchantsPageProps) {
     const merchantNames = spendRuleForm?.merchantNames ?? [];
     const merchantMatchTypes = spendRuleForm?.merchantMatchTypes ?? [];
 
+    const originalMerchantNamesRef = useRef(merchantNames);
+    const originalMerchantMatchTypesRef = useRef(merchantMatchTypes);
+    const didSaveRef = useRef(false);
+
+    useEffect(() => {
+        const originalMerchantNames = originalMerchantNamesRef.current;
+        const originalMerchantMatchTypes = originalMerchantMatchTypesRef.current;
+
+        return () => {
+            if (didSaveRef.current) {
+                return;
+            }
+            updateDraftSpendRule({
+                merchantNames: originalMerchantNames,
+                merchantMatchTypes: originalMerchantMatchTypes,
+            });
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
     const emptyStateTitle =
         restrictionAction === CONST.SPEND_RULES.ACTION.BLOCK ? translate('workspace.rules.spendRules.noBlockedMerchants') : translate('workspace.rules.spendRules.noAllowedMerchants');
 
@@ -44,6 +65,11 @@ function SpendRuleMerchantsPage({route}: SpendRuleMerchantsPageProps) {
             : translate('workspace.rules.spendRules.addMerchantToAllowSpend');
 
     const goBack = () => navigation.goBack();
+
+    const handleSave = () => {
+        didSaveRef.current = true;
+        goBack();
+    };
 
     const navigateToMerchantEdit = (merchantIndex: string) => {
         navigation.navigate(SCREENS.WORKSPACE.RULES_SPEND_MERCHANT_EDIT, {policyID, ruleID, merchantIndex});
@@ -111,7 +137,7 @@ function SpendRuleMerchantsPage({route}: SpendRuleMerchantsPageProps) {
                     buttonText={translate('common.save')}
                     containerStyles={[styles.m4, styles.mb5]}
                     isAlertVisible={false}
-                    onSubmit={goBack}
+                    onSubmit={handleSave}
                     enabledWhenOffline
                     sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.RULES.SPEND_RULE_SAVE}
                 />

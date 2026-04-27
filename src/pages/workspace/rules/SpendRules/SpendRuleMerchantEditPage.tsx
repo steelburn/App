@@ -1,5 +1,5 @@
 import {useNavigation} from '@react-navigation/native';
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useRef, useState} from 'react';
 import {View} from 'react-native';
 import type {ValueOf} from 'type-fest';
 import FormProvider from '@components/Form/FormProvider';
@@ -12,6 +12,7 @@ import type {ListItem} from '@components/SelectionList/ListItem/types';
 import Text from '@components/Text';
 import TextInput from '@components/TextInput';
 import useAutoFocusInput from '@hooks/useAutoFocusInput';
+import useDiscardChangesConfirmation from '@hooks/useDiscardChangesConfirmation';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
@@ -48,10 +49,21 @@ function SpendRuleMerchantEditPage({route}: SpendRuleMerchantEditPageProps) {
 
     const [merchantName, setMerchantName] = useState(existingMerchantName ?? '');
     const [matchType, setMatchType] = useState<ValueOf<typeof CONST.SEARCH.SYNTAX_OPERATORS>>(existingMerchantMatchType ?? CONST.SEARCH.SYNTAX_OPERATORS.CONTAINS);
+    const didSaveRef = useRef(false);
 
     const goBack = useCallback(() => navigation.goBack(), [navigation]);
 
+    useDiscardChangesConfirmation({
+        getHasUnsavedChanges: () => {
+            if (didSaveRef.current) {
+                return false;
+            }
+            return merchantName !== (existingMerchantName ?? '') || matchType !== (existingMerchantMatchType ?? CONST.SEARCH.SYNTAX_OPERATORS.CONTAINS);
+        },
+    });
+
     const submit = () => {
+        didSaveRef.current = true;
         const trimmedMerchantName = merchantName.trim();
         if (!trimmedMerchantName) {
             if (!isNew) {
