@@ -2888,6 +2888,10 @@ function buildPolicyData(options: BuildPolicyDataOptions): OnyxData<BuildPolicyD
 
     if (
         introSelected !== undefined &&
+        // The TRACK_WORKSPACE onboarding message has no CREATE_WORKSPACE task, so introSelected.createWorkspace
+        // is never set for Track users. Without this guard, the !introSelected.createWorkspace check below would
+        // re-run prepareOnboardingOnyxData on every subsequent workspace creation, overwriting NVP_INTRO_SELECTED.choice.
+        introSelected.choice !== CONST.ONBOARDING_CHOICES.TRACK_WORKSPACE &&
         (introSelected.choice === CONST.ONBOARDING_CHOICES.TEST_DRIVE_RECEIVER || !introSelected?.createWorkspace) &&
         engagementChoice &&
         shouldAddOnboardingTasks
