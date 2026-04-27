@@ -354,7 +354,7 @@ function ReportActionsView({reportID, onLayout}: ReportActionsViewProps) {
         markOpenReportEnd(report, {warm: false});
     }, [report, shouldShowSkeleton]);
 
-    const isReportUnread = isUnread(report, transactionThreadReport, isReportArchived);
+    const isReportUnread = useMemo(() => isUnread(report, transactionThreadReport, isReportArchived), [report, transactionThreadReport, isReportArchived]);
 
     // When opening an unread report, it is very likely that the message we will open to is not the latest,
     // which is the only one we will have in cache.
