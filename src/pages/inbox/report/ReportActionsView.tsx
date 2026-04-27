@@ -360,9 +360,11 @@ function ReportActionsView({reportID, onLayout}: ReportActionsViewProps) {
     // which is the only one we will have in cache.
     const isInitiallyLoadingReport = isReportUnread && !!reportMetadata?.isLoadingInitialReportActions && (isOffline || reportActions.length <= 1);
 
-    // Same for unread messages, we need to wait for the results from the OpenReport api call,
-    // if the oldest unread report action is not stored in Onyx.
-    const isUnreadMessagePageLoadingInitially = !reportActionIDFromRoute && isReportUnread && !oldestUnreadReportAction;
+    // Same for unread messages, we need to wait for the results from the OpenReport API call
+    // if the oldest unread report action is not available yet. Only applies during the *first* load
+    // for this report: after `hasOnceLoadedReportActions` is set, a later "mark as unread" must not
+    // bring back this loading gate (we are not re-opening the report from a cold cache).
+    const isUnreadMessagePageLoadingInitially = !reportActionIDFromRoute && isReportUnread && !oldestUnreadReportAction && !hasOnceLoadedReportActions;
 
     // Once all the above conditions are met, we can consider the report ready.
     const isReportReady = !isInitiallyLoadingReport && !isUnreadMessagePageLoadingInitially;
