@@ -95,9 +95,7 @@ function useGettingStartedItems(): UseGettingStartedItemsResult {
             enableFeature: () => enablePolicyCategories({policy, categories: policyCategories ?? {}, tags: {}, reports: [], transactionsAndViolations: {}}, true, false),
         });
 
-        const activeMemberCount = Object.values(policy.employeeList ?? {}).filter(
-            (member) => member?.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE && Object.keys(member?.errors ?? {}).length === 0,
-        ).length;
+        const activeMemberCount = Object.values(policy.employeeList ?? {}).filter((member) => member?.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE).length;
         items.push({
             key: 'inviteAccountant',
             label: translate('homePage.gettingStartedSection.inviteAccountant'),

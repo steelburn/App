@@ -1030,7 +1030,7 @@ describe('useGettingStartedItems', () => {
                 expect(inviteAccountantItem?.isComplete).toBe(false);
             });
 
-            it('should have inviteAccountant isComplete=false when second member has a failed invite (pendingAction=null + errors)', async () => {
+            it('should have inviteAccountant isComplete=true when second member has a failed invite (pendingAction=null + errors), matching WorkspaceMembersPage count', async () => {
                 const employeeList: PolicyEmployeeList = {
                     'owner@test.com': {email: 'owner@test.com', role: CONST.POLICY.ROLE.ADMIN},
                     'failed@test.com': {
@@ -1045,7 +1045,7 @@ describe('useGettingStartedItems', () => {
                 const {result} = renderHook(() => useGettingStartedItems());
 
                 const inviteAccountantItem = result.current.items.find((item) => item.key === 'inviteAccountant');
-                expect(inviteAccountantItem?.isComplete).toBe(false);
+                expect(inviteAccountantItem?.isComplete).toBe(true);
             });
         });
     });
