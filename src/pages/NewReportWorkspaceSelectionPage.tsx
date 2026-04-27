@@ -1,6 +1,6 @@
 import {policyIDsWithEmptyReportsSelector} from '@selectors/Report';
 import {accountIDSelector, emailSelector} from '@selectors/Session';
-import React, {useEffect, useMemo, useRef, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {View} from 'react-native';
 import ActivityIndicator from '@components/ActivityIndicator';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
@@ -50,7 +50,7 @@ type WorkspaceListItem = {
 type NewReportWorkspaceSelectionPageProps = PlatformStackScreenProps<NewReportWorkspaceSelectionNavigatorParamList, typeof SCREENS.NEW_REPORT_WORKSPACE_SELECTION.ROOT>;
 
 function NewReportWorkspaceSelectionPage({route}: NewReportWorkspaceSelectionPageProps) {
-    const {isMovingExpenses, backTo, selectedPolicyID} = route.params ?? {};
+    const {isMovingExpenses, backTo} = route.params ?? {};
     const {isOffline} = useNetwork();
     const icons = useMemoizedLazyExpensifyIcons(['FallbackWorkspaceAvatar']);
     const {selectedTransactions, selectedTransactionIDs} = useSearchStateContext();
@@ -238,27 +238,6 @@ function NewReportWorkspaceSelectionPage({route}: NewReportWorkspaceSelectionPag
         }
         usersWorkspaces = result.sort((a, b) => localeCompare(a.text, b.text));
     }
-
-    // Auto-select path: when callers pass selectedPolicyID (e.g. IOURequestStepUpgrade after creating a
-    // workspace), create the report directly without making the user pick from a list or dismiss an
-    // empty-report confirmation — they already confirmed intent on the previous screen.
-    const didAutoSelectRef = useRef(false);
-    useEffect(() => {
-        if (didAutoSelectRef.current || !selectedPolicyID || shouldShowLoadingIndicator) {
-            return;
-        }
-        const targetPolicy = usersWorkspaces.find((policy) => policy.policyID === selectedPolicyID);
-        if (!targetPolicy?.policyID) {
-            return;
-        }
-        didAutoSelectRef.current = true;
-
-        if (shouldRestrictUserBillableActions(targetPolicy.policyID, ownerBillingGracePeriodEnd, userBillingGracePeriods, amountOwed)) {
-            Navigation.navigate(ROUTES.RESTRICTED_ACTION.getRoute(targetPolicy.policyID));
-            return;
-        }
-        createReport(targetPolicy.policyID, false);
-    }, [selectedPolicyID, usersWorkspaces, shouldShowLoadingIndicator, ownerBillingGracePeriodEnd, userBillingGracePeriods, amountOwed, createReport]);
 
     const filteredAndSortedUserWorkspaces: WorkspaceListItem[] = usersWorkspaces.filter((policy) => policy.text?.toLowerCase().includes(debouncedSearchTerm?.toLowerCase() ?? ''));
 

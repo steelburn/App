@@ -917,13 +917,10 @@ const ROUTES = {
 
     NEW_REPORT_WORKSPACE_SELECTION: {
         route: 'new-report-workspace-selection',
-        getRoute: (isMovingExpenses?: boolean, backTo?: string, selectedPolicyID?: string) => {
+        getRoute: (isMovingExpenses?: boolean, backTo?: string) => {
             const params = new URLSearchParams();
             if (isMovingExpenses) {
                 params.set('isMovingExpenses', 'true');
-            }
-            if (selectedPolicyID) {
-                params.set('selectedPolicyID', selectedPolicyID);
             }
             const query = params.toString();
             const baseRoute = `new-report-workspace-selection${query ? `?${query}` : ''}` as const;

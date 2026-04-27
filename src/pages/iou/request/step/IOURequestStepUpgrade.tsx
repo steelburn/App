@@ -7,6 +7,7 @@ import ScreenWrapper from '@components/ScreenWrapper';
 import ScrollView from '@components/ScrollView';
 import WorkspaceConfirmationForm from '@components/WorkspaceConfirmationForm';
 import type {WorkspaceConfirmationSubmitFunctionParams} from '@components/WorkspaceConfirmationForm';
+import useCreateNewReport from '@hooks/useCreateNewReport';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useHasActiveAdminPolicies from '@hooks/useHasActiveAdminPolicies';
 import useLastWorkspaceNumber from '@hooks/useLastWorkspaceNumber';
@@ -56,6 +57,7 @@ function IOURequestStepUpgrade({
     const [showConfirmationForm, setShowConfirmationForm] = useState(false);
     const [createdPolicyName, setCreatedPolicyName] = useState('');
     const [isUpgradeWarningModalOpen, setIsUpgradeWarningModalOpen] = useState(false);
+    const [isCreatingReport, setIsCreatingReport] = useState(false);
     const policyDataRef = useRef<CreateWorkspaceParams | null>(null);
     const isDistanceRateUpgrade = upgradePath === CONST.UPGRADE_PATHS.DISTANCE_RATES;
     const isCategorizing = upgradePath === CONST.UPGRADE_PATHS.CATEGORIES;
@@ -67,6 +69,7 @@ function IOURequestStepUpgrade({
     const [betas] = useOnyx(ONYXKEYS.BETAS);
     const [activePolicyID] = useOnyx(ONYXKEYS.NVP_ACTIVE_POLICY_ID);
     const [isSelfTourViewed] = useOnyx(ONYXKEYS.NVP_ONBOARDING, {selector: hasSeenTourSelector});
+    const createNewReport = useCreateNewReport();
 
     const feature = Object.values(CONST.UPGRADE_FEATURE_INTRO_MAPPING)
         .filter((value) => value.id !== CONST.UPGRADE_FEATURE_INTRO_MAPPING.policyPreventMemberChangingTitle.id)
@@ -121,13 +124,14 @@ function IOURequestStepUpgrade({
                 break;
             }
             case CONST.UPGRADE_PATHS.REPORTS:
-                Navigation.goBack();
-                if (action === CONST.IOU.ACTION.CREATE) {
-                    // Coming from "Create report" button (no workspace) → workspace selection.
-                    // Pass the just-created policyID so the page auto-selects it and creates the report
-                    // without making the user pick the single workspace they just created.
-                    navigateWithMicrotask(ROUTES.NEW_REPORT_WORKSPACE_SELECTION.getRoute(undefined, undefined, policyID));
+                if (action === CONST.IOU.ACTION.CREATE && policyID) {
+                    // Coming from "Create report" (no workspace) — create directly with the just-created
+                    // workspace. forceReplace removes the upgrade screen from history so back returns to
+                    // the originating screen, not the upgrade step.
+                    setIsCreatingReport(true);
+                    createNewReport(policyID, true);
                 } else {
+                    Navigation.goBack();
                     navigateWithMicrotask(ROUTES.MONEY_REQUEST_STEP_REPORT.getRoute(action, CONST.IOU.TYPE.SUBMIT, transactionID, reportID));
                 }
 
@@ -236,6 +240,7 @@ function IOURequestStepUpgrade({
                             isCategorizing={isCategorizing}
                             isReporting={isReporting}
                             isDistanceRateUpgrade={isDistanceRateUpgrade}
+                            isButtonLoading={isCreatingReport}
                         />
                     )}
                     {!isUpgraded && (

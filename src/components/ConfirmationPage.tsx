@@ -42,6 +42,9 @@ type ConfirmationPageProps = {
     /** Whether we should show a primary confirmation button */
     shouldShowButton?: boolean;
 
+    /** Whether the primary button should show a loading indicator */
+    isButtonLoading?: boolean;
+
     /** The text for the secondary button label */
     secondaryButtonText?: string;
 
@@ -83,6 +86,7 @@ function ConfirmationPage({
     buttonText = '',
     onButtonPress = () => {},
     shouldShowButton = false,
+    isButtonLoading = false,
     secondaryButtonText = '',
     onSecondaryButtonPress = () => {},
     shouldShowSecondaryButton = false,
@@ -162,6 +166,7 @@ function ConfirmationPage({
                             testID="confirmation-primary-button"
                             style={styles.mt3}
                             pressOnEnter
+                            isLoading={isButtonLoading}
                             onPress={onButtonPress}
                         />
                     )}
