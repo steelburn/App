@@ -3,7 +3,7 @@ import dedent from '@libs/StringUtils/dedent';
 import CONST from '@src/CONST';
 import type {OriginalMessageSettlementAccountLocked, PersonalRulesModifiedFields, PolicyRulesModifiedFields} from '@src/types/onyx/OriginalMessage';
 import type en from './en';
-import type {ConciergeBrokenCardConnectionParams, PaidElsewhereParams, UnsupportedFormulaValueErrorParams, ViolationsModifiedAmountParams} from './params';
+import type {ConciergeBrokenCardConnectionParams, PaidElsewhereParams, UnsupportedFormulaValueErrorParams} from './params';
 import type {TranslationDeepObject} from './types';
 
 /* eslint-disable max-len */
@@ -8527,7 +8527,7 @@ ${amount} para ${merchant} - ${date}`,
         missingComment: 'Descripción obligatoria para la categoría seleccionada',
         missingAttendees: 'Se requieren múltiples asistentes para esta categoría',
         missingTag: (tagName) => `Falta ${tagName ?? 'etiqueta'}`,
-        modifiedAmount: ({type, displayPercentVariance}: ViolationsModifiedAmountParams) => {
+        modifiedAmount: ({type, displayPercentVariance}) => {
             switch (type) {
                 case 'distance':
                     return 'Importe difiere del calculado basado en distancia';
