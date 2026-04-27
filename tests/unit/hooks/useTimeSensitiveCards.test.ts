@@ -210,7 +210,6 @@ describe('useTimeSensitiveCards', () => {
             ...baseFraudAction,
             actionName: CONST.REPORT.ACTIONS.TYPE.ACTIONABLE_CARD_FRAUD_ALERT,
             originalMessage: {
-                ...baseFraudAction.originalMessage,
                 resolution: CONST.CARD_FRAUD_ALERT_RESOLUTION.RECOGNIZED,
             },
         };
