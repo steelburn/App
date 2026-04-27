@@ -8,7 +8,7 @@ import {useFullScreenLoaderActions} from '@components/FullScreenLoaderContext';
 import LocationPermissionModal from '@components/LocationPermissionModal';
 import withCurrentUserPersonalDetails from '@components/withCurrentUserPersonalDetails';
 import useIsInLandscapeMode from '@hooks/useIsInLandscapeMode';
-import {useMemoizedLazyExpensifyIcons, useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
+import {useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useNativeCamera from '@hooks/useNativeCamera';
 import useOnyx from '@hooks/useOnyx';
@@ -103,8 +103,7 @@ function IOURequestStepScan({
     const navigateBack = () => {
         Navigation.goBack(backTo);
     };
-    const lazyIllustrations = useMemoizedLazyIllustrations(['MultiScan', 'Hand', 'Shutter']);
-    const lazyIcons = useMemoizedLazyExpensifyIcons(['Bolt', 'Gallery', 'ReceiptMultiple', 'boltSlash']);
+    const lazyIllustrations = useMemoizedLazyIllustrations(['MultiScan', 'Hand']);
     const policy = usePolicy(report?.policyID);
 
     const [policyCategories] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${report?.policyID}`);
@@ -263,7 +262,6 @@ function IOURequestStepScan({
                                 flash={flash}
                                 hasFlash={hasFlash}
                                 setFlash={setFlash}
-                                boltIcon={lazyIcons.Bolt}
                             />
                         )}
                     </View>
@@ -282,11 +280,6 @@ function IOURequestStepScan({
                         validateFiles={validateFiles}
                         capturePhoto={capturePhoto}
                         toggleMultiScan={toggleMultiScan}
-                        shutterIllustration={lazyIllustrations.Shutter}
-                        galleryIcon={lazyIcons.Gallery}
-                        receiptMultipleIcon={lazyIcons.ReceiptMultiple}
-                        boltIcon={lazyIcons.Bolt}
-                        boltSlashIcon={lazyIcons.boltSlash}
                     />
 
                     {canUseMultiScan && isInLandscapeMode && (

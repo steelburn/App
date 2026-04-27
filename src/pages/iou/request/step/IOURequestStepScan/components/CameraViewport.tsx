@@ -9,13 +9,13 @@ import Animated from 'react-native-reanimated';
 import type {Camera, CameraDevice, CameraDeviceFormat} from 'react-native-vision-camera';
 import Icon from '@components/Icon';
 import PressableWithFeedback from '@components/Pressable/PressableWithFeedback';
+import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useStyleUtils from '@hooks/useStyleUtils';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import variables from '@styles/variables';
 import CONST from '@src/CONST';
-import type IconAsset from '@src/types/utils/IconAsset';
 import NavigationAwareCamera from './NavigationAwareCamera/Camera';
 
 type CameraViewportProps = {
@@ -66,9 +66,6 @@ type CameraViewportProps = {
 
     /** Updater function to toggle flash state */
     setFlash: (updater: (prev: boolean) => boolean) => void;
-
-    /** The bolt icon asset for the flash toggle button */
-    boltIcon: IconAsset | undefined;
 };
 
 function CameraViewport({
@@ -88,12 +85,12 @@ function CameraViewport({
     flash,
     hasFlash,
     setFlash,
-    boltIcon,
 }: CameraViewportProps) {
     const theme = useTheme();
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
     const {translate} = useLocalize();
+    const lazyIcons = useMemoizedLazyExpensifyIcons(['Bolt']);
 
     return (
         <View style={[styles.cameraView, styles.alignItemsCenter]}>
@@ -130,7 +127,7 @@ function CameraViewport({
                         <Icon
                             height={variables.iconSizeSmall}
                             width={variables.iconSizeSmall}
-                            src={boltIcon}
+                            src={lazyIcons.Bolt}
                             fill={flash ? theme.white : theme.icon}
                         />
                     </PressableWithFeedback>

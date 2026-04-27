@@ -5,13 +5,13 @@ import AttachmentPicker from '@components/AttachmentPicker';
 import Icon from '@components/Icon';
 import ImageSVG from '@components/ImageSVG';
 import PressableWithFeedback from '@components/Pressable/PressableWithFeedback';
+import {useMemoizedLazyExpensifyIcons, useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import variables from '@styles/variables';
 import CONST from '@src/CONST';
 import type {FileObject} from '@src/types/utils/Attachment';
-import type IconAsset from '@src/types/utils/IconAsset';
 
 type ScannerControlsBarProps = {
     /** Whether the device is currently in landscape orientation */
@@ -52,21 +52,6 @@ type ScannerControlsBarProps = {
 
     /** Toggles multi-scan mode on or off */
     toggleMultiScan: () => void;
-
-    /** The shutter button illustration asset */
-    shutterIllustration: IconAsset | undefined;
-
-    /** The gallery icon asset for the file picker button */
-    galleryIcon: IconAsset | undefined;
-
-    /** The multi-receipt icon asset for the multi-scan toggle */
-    receiptMultipleIcon: IconAsset | undefined;
-
-    /** The bolt icon asset (flash on) */
-    boltIcon: IconAsset | undefined;
-
-    /** The bolt-slash icon asset (flash off) */
-    boltSlashIcon: IconAsset | undefined;
 };
 
 function ScannerControlsBar({
@@ -83,15 +68,12 @@ function ScannerControlsBar({
     validateFiles,
     capturePhoto,
     toggleMultiScan,
-    shutterIllustration,
-    galleryIcon,
-    receiptMultipleIcon,
-    boltIcon,
-    boltSlashIcon,
 }: ScannerControlsBarProps) {
     const theme = useTheme();
     const styles = useThemeStyles();
     const {translate} = useLocalize();
+    const lazyIllustrations = useMemoizedLazyIllustrations(['Shutter']);
+    const lazyIcons = useMemoizedLazyExpensifyIcons(['Bolt', 'Gallery', 'ReceiptMultiple', 'boltSlash']);
 
     return (
         <View style={[styles.justifyContentAround, styles.alignItemsCenter, styles.p3, !isInLandscapeMode && styles.flexRow]}>
@@ -124,7 +106,7 @@ function ScannerControlsBar({
                         <Icon
                             height={variables.iconSizeMenuItem}
                             width={variables.iconSizeMenuItem}
-                            src={galleryIcon}
+                            src={lazyIcons.Gallery}
                             fill={theme.textSupporting}
                         />
                     </PressableWithFeedback>
@@ -139,7 +121,7 @@ function ScannerControlsBar({
             >
                 <ImageSVG
                     contentFit="contain"
-                    src={shutterIllustration}
+                    src={lazyIllustrations.Shutter}
                     width={CONST.RECEIPT.SHUTTER_SIZE}
                     height={CONST.RECEIPT.SHUTTER_SIZE}
                 />
@@ -156,7 +138,7 @@ function ScannerControlsBar({
                     <Icon
                         height={variables.iconSizeMenuItem}
                         width={variables.iconSizeMenuItem}
-                        src={receiptMultipleIcon}
+                        src={lazyIcons.ReceiptMultiple}
                         fill={isMultiScanEnabled ? theme.iconMenu : theme.textSupporting}
                     />
                 </PressableWithFeedback>
@@ -172,7 +154,7 @@ function ScannerControlsBar({
                     <Icon
                         height={variables.iconSizeMenuItem}
                         width={variables.iconSizeMenuItem}
-                        src={flash ? boltIcon : boltSlashIcon}
+                        src={flash ? lazyIcons.Bolt : lazyIcons.boltSlash}
                         fill={theme.textSupporting}
                     />
                 </PressableWithFeedback>
