@@ -46,6 +46,7 @@ function DomainGroupsPage({route}: DomainGroupsPageProps) {
     const {shouldUseNarrowLayout} = useResponsiveLayout();
 
     const [groups = getEmptyArray<DomainSecurityGroupWithID>()] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {selector: groupsSelector});
+    const [pendingActions] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`);
     const [domainErrors] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`);
 
     const data = groups.map((group) => {
@@ -59,6 +60,7 @@ function DomainGroupsPage({route}: DomainGroupsPageProps) {
                     <Text numberOfLines={1}>{translate('domain.groups.memberCount', {count: Object.keys(group.details.shared).length})}</Text>
                 </View>
             ),
+            pendingAction: pendingActions?.[`${CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX}${group.id}`]?.name ?? undefined,
         };
     });
 
@@ -73,6 +75,7 @@ function DomainGroupsPage({route}: DomainGroupsPageProps) {
                 leftHeaderText={translate('common.name')}
                 rightHeaderText={translate('common.members')}
                 shouldDivideEqualWidth
+                shouldShowRightCaret
             />
         );
     };
@@ -116,6 +119,7 @@ function DomainGroupsPage({route}: DomainGroupsPageProps) {
                     onDismissError={(item: GroupOption) => clearGroupCreateError(domainAccountID, item.groupID)}
                     customListHeader={getCustomListHeader()}
                     shouldShowRightCaret
+                    addBottomSafeAreaPadding
                 />
             </ScreenWrapper>
         </DomainNotFoundPageWrapper>
