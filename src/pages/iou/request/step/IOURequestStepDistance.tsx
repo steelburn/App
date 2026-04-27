@@ -728,8 +728,7 @@ function IOURequestStepDistance({
     );
 
     if (isEditing) {
-        // Only show not-found when the transaction has loaded but waypoints are missing.
-        const hasRequiredData = !transaction || (!!currentTransaction?.comment?.waypoints && !shouldShowNotFoundPage);
+        const hasRequiredData = !!currentTransaction?.comment?.waypoints && !shouldShowNotFoundPage;
         return (
             <ScreenWrapper
                 shouldEnableMaxHeight={canUseTouchScreen()}
