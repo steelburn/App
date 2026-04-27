@@ -638,8 +638,17 @@ function buildUpdateWorkspaceMembersRoleOnyxData(policy: OnyxEntry<Policy>, sele
             onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.POLICY}${policyID}`,
             value: {
-                employeeList: previousEmployeeList,
-                errors: ErrorUtils.getMicroSecondOnyxErrorWithTranslationKey('workspace.editor.genericFailureMessage'),
+                employeeList: {
+                    ...memberRoles.reduce((member: Record<string, PolicyEmployee>, current) => {
+                        // eslint-disable-next-line no-param-reassign
+                        member[current.email] = {
+                            ...(previousEmployeeList[current.email] ?? {}),
+                            pendingAction: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE,
+                            errors: ErrorUtils.getMicroSecondOnyxErrorWithTranslationKey('workspace.editor.genericFailureMessage'),
+                        };
+                        return member;
+                    }, {}),
+                },
             },
         },
     ];
@@ -809,8 +818,11 @@ function buildAddMembersToWorkspaceOnyxData(
     policyMemberAccountIDs: number[],
     role: string,
     formatPhoneNumber: LocaleContextProps['formatPhoneNumber'],
+    currentUserAccountID: number | undefined,
     approverEmail?: string,
     policyExpenseChatNotificationPreference?: NotificationPreference,
+    // TODO: Remove optional (?) once all callers are updated in follow-up PRs of https://github.com/Expensify/App/issues/66578
+    reportActionsList?: OnyxCollection<ReportActions>,
 ) {
     const policyID = policy.id;
     const logins = Object.keys(invitedEmailsToAccountIDs).map((memberLogin) => PhoneNumber.addSMSDomainIfPhoneNumber(memberLogin));
@@ -827,12 +839,11 @@ function buildAddMembersToWorkspaceOnyxData(
         policyID,
         role === CONST.POLICY.ROLE.ADMIN || role === CONST.POLICY.ROLE.AUDITOR ? accountIDs : [],
     );
-    const optimisticAnnounceChat = ReportUtils.buildOptimisticAnnounceChat(policyID, [...policyMemberAccountIDs, ...accountIDs]);
+    const optimisticAnnounceChat = ReportUtils.buildOptimisticAnnounceChat(policyID, [...policyMemberAccountIDs, ...accountIDs], currentUserAccountID);
     const announceRoomChat = optimisticAnnounceChat.announceChatData;
 
     // create onyx data for policy expense chats for each new member
-    // TODO: Update to include reportActionsList later (https://github.com/Expensify/App/issues/66578)
-    const membersChats = createPolicyExpenseChats(policyID, invitedEmailsToAccountIDs, undefined, undefined, policyExpenseChatNotificationPreference);
+    const membersChats = createPolicyExpenseChats(policyID, invitedEmailsToAccountIDs, reportActionsList, undefined, policyExpenseChatNotificationPreference);
 
     const optimisticMembersState: OnyxCollectionInputValue<PolicyEmployee> = {};
     const successMembersState: OnyxCollectionInputValue<PolicyEmployee> = {};
@@ -942,7 +953,10 @@ function addMembersToWorkspace(
     policyMemberAccountIDs: number[],
     role: string,
     formatPhoneNumber: LocaleContextProps['formatPhoneNumber'],
+    currentUserAccountID: number | undefined,
     approverEmail?: string,
+    // TODO: Remove optional (?) once all callers are updated in follow-up PRs of https://github.com/Expensify/App/issues/66578
+    reportActionsList?: OnyxCollection<ReportActions>,
 ) {
     if (!policy?.id) {
         Log.warn('addMembersToWorkspace: Policy ID is undefined');
@@ -954,7 +968,10 @@ function addMembersToWorkspace(
         policyMemberAccountIDs,
         role,
         formatPhoneNumber,
+        currentUserAccountID,
         approverEmail,
+        undefined,
+        reportActionsList,
     );
 
     const params: AddMembersToWorkspaceParams = {
@@ -1139,6 +1156,20 @@ function clearAddMemberError(policyID: string, login: string, accountID: number)
     });
     Onyx.merge(`${ONYXKEYS.PERSONAL_DETAILS_LIST}`, {
         [accountID]: null,
+    });
+}
+
+/**
+ * Removes an error after trying to update a member role
+ */
+function clearUpdateMemberRoleError(policyID: string, login: string) {
+    Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`, {
+        employeeList: {
+            [login]: {
+                pendingAction: null,
+                errors: null,
+            },
+        },
     });
 }
 
@@ -1353,6 +1384,7 @@ export {
     addMembersToWorkspace,
     clearDeleteMemberError,
     clearAddMemberError,
+    clearUpdateMemberRoleError,
     openWorkspaceMembersPage,
     setWorkspaceInviteMembersDraft,
     inviteMemberToWorkspace,
