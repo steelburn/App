@@ -84,7 +84,8 @@ function NewReportWorkspaceSelectionPage({route}: NewReportWorkspaceSelectionPag
 
     const [allPolicyTags] = useOnyx(ONYXKEYS.COLLECTION.POLICY_TAGS);
 
-    const [transactionsByReportID] = useOnyx(ONYXKEYS.DERIVED.TODOS, {selector: (todos) => todos?.transactionsByReportID});
+    const [todos] = useOnyx(ONYXKEYS.DERIVED.TODOS);
+    const transactionsByReportID = todos?.transactionsByReportID;
 
     const [policiesWithEmptyReports] = useOnyx(
         ONYXKEYS.COLLECTION.REPORT,
