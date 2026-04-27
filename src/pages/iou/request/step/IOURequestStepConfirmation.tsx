@@ -209,6 +209,7 @@ function IOURequestStepConfirmation({
     const [receiptFiles, setReceiptFiles] = useState<Record<string, Receipt>>({});
     const isDistanceRequest = isDistanceRequestTransactionUtils(transaction);
     const isManualDistanceRequest = isManualDistanceRequestTransactionUtils(transaction);
+    const isManualRequest = transaction?.iouRequestType === CONST.IOU.REQUEST_TYPE.MANUAL;
     const isOdometerDistanceRequest = isOdometerDistanceRequestTransactionUtils(transaction);
     const isTimeRequest = requestType === CONST.IOU.REQUEST_TYPE.TIME;
     const [lastLocationPermissionPrompt] = useOnyx(ONYXKEYS.NVP_LAST_LOCATION_PERMISSION_PROMPT);
@@ -225,6 +226,7 @@ function IOURequestStepConfirmation({
     const gpsRequired = transaction?.amount === 0 && iouType !== CONST.IOU.TYPE.SPLIT && Object.values(receiptFiles).length && !isTestTransaction && isScanRequest(transaction);
     const [isStitchingReceipt, setIsStitchingReceipt] = useState(false);
     const [stitchError, setStitchError] = useState('');
+    const [shouldOpenParticipantPicker, setShouldOpenParticipantPicker] = useState(false);
     const headerTitle = useMemo(() => {
         if (isCategorizingTrackExpense) {
             return translate('iou.categorize');
@@ -304,17 +306,23 @@ function IOURequestStepConfirmation({
     ]);
 
     useEffect(() => {
-        if (!transaction?.transactionID || defaultParticipants.length === 0) {
+        if (!transaction?.transactionID) {
             return;
         }
 
         const transactionParticipants = transaction?.participants ?? [];
-        if (transactionParticipants.length > 0) {
+        const hasTransactionParticipants = transactionParticipants.length > 0;
+        const hasDefaultParticipants = defaultParticipants.length > 0;
+        const shouldOpenPicker = !hasTransactionParticipants && !hasDefaultParticipants && isNewManualExpenseFlowEnabled && isManualRequest;
+
+        setShouldOpenParticipantPicker(shouldOpenPicker);
+
+        if (hasTransactionParticipants || !hasDefaultParticipants) {
             return;
         }
 
         setMoneyRequestParticipants(transaction.transactionID, defaultParticipants);
-    }, [transaction?.transactionID, transaction?.participants, defaultParticipants]);
+    }, [transaction?.transactionID, transaction?.participants, defaultParticipants, isNewManualExpenseFlowEnabled]);
 
     const isPolicyExpenseChat = useMemo(() => {
         const hasPolicyExpenseChat = (participantList: typeof defaultParticipants) =>
@@ -754,6 +762,7 @@ function IOURequestStepConfirmation({
                             <MoneyRequestConfirmationList
                                 transaction={transaction}
                                 selectedParticipants={participants}
+                                shouldOpenParticipantPicker={shouldOpenParticipantPicker}
                                 onToggleBillable={setBillable}
                                 onConfirm={onConfirm}
                                 onSendMoney={sendMoney}

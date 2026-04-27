@@ -2,6 +2,7 @@ import {useFocusEffect, useIsFocused} from '@react-navigation/native';
 import React, {memo, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {InteractionManager, Keyboard, View} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';
+import ParticipantPicker from '@components/ParticipantPicker';
 import {useCurrencyListActions} from '@hooks/useCurrencyList';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useDebouncedState from '@hooks/useDebouncedState';
@@ -57,6 +58,7 @@ import {
 } from '@libs/TransactionUtils';
 import {isInvalidMerchantValue, isValidInputLength} from '@libs/ValidationUtils';
 import {getIsViolationFixed} from '@libs/Violations/ViolationsUtils';
+import {setMoneyRequestParticipants} from '@userActions/IOU';
 import {hasInvoicingDetails} from '@userActions/Policy/Policy';
 import type {IOUAction, IOUType} from '@src/CONST';
 import CONST from '@src/CONST';
@@ -103,6 +105,9 @@ type MoneyRequestConfirmationListProps = {
 
     /** Selected participants from MoneyRequestModal with login / accountID */
     selectedParticipants: Participant[];
+
+    /** Trigger opening participant picker from parent flow */
+    shouldOpenParticipantPicker?: boolean;
 
     /** Payee of the expense with login */
     payeePersonalDetails?: OnyxEntry<OnyxTypes.PersonalDetails> | null;
@@ -204,7 +209,8 @@ function MoneyRequestConfirmationList({
     shouldShowSmartScanFields = true,
     isEditingSplitBill,
     isReceiptEditable,
-    selectedParticipants: selectedParticipantOptions = [],
+    selectedParticipants = [],
+    shouldOpenParticipantPicker = false,
     payeePersonalDetails,
     isReadOnly = false,
     policyID,
@@ -259,8 +265,8 @@ function MoneyRequestConfirmationList({
     }, [transaction?.receipt?.isTestDriveReceipt]);
 
     const isManagerMcTestReceipt = useMemo(() => {
-        return isBetaEnabled(CONST.BETAS.NEWDOT_MANAGER_MCTEST) && selectedParticipantOptions.some((participant) => isSelectedManagerMcTest(participant.login));
-    }, [isBetaEnabled, selectedParticipantOptions]);
+        return isBetaEnabled(CONST.BETAS.NEWDOT_MANAGER_MCTEST) && selectedParticipants.some((participant) => isSelectedManagerMcTest(participant.login));
+    }, [isBetaEnabled, selectedParticipants]);
 
     const {shouldShowProductTrainingTooltip, renderProductTrainingTooltip} = useProductTrainingContext(
         isTestDriveReceipt ? CONST.PRODUCT_TRAINING_TOOLTIP_NAMES.SCAN_TEST_DRIVE_CONFIRMATION : CONST.PRODUCT_TRAINING_TOOLTIP_NAMES.SCAN_TEST_CONFIRMATION,
@@ -382,6 +388,7 @@ function MoneyRequestConfirmationList({
     const [didConfirm, setDidConfirm] = useState(isConfirmed);
     const [didConfirmSplit, setDidConfirmSplit] = useState(false);
     const [showMoreFields, setShowMoreFields] = useState(false);
+    const [isParticipantPickerVisible, setIsParticipantPickerVisible] = useState(false);
 
     useEffect(() => {
         setShowMoreFields(false);
@@ -563,8 +570,6 @@ function MoneyRequestConfirmationList({
         [transaction?.transactionID],
     );
 
-    const selectedParticipants = useMemo(() => selectedParticipantOptions.filter((participant) => participant.selected), [selectedParticipantOptions]);
-
     const effectivePayeePersonalDetails = useMemo(() => payeePersonalDetails ?? currentUserPersonalDetails, [payeePersonalDetails, currentUserPersonalDetails]);
     const shouldShowReadOnlySplits = useMemo(() => isPolicyExpenseChat || isReadOnly || isScanRequest, [isPolicyExpenseChat, isReadOnly, isScanRequest]);
 
@@ -702,6 +707,39 @@ function MoneyRequestConfirmationList({
     );
 
     const canEditParticipant = isFromGlobalCreateAndCanEditParticipant && !isTestReceipt && (!isRestrictedToPreferredPolicy || isTypeInvoice);
+    const participantPickerIOUType = iouType === CONST.IOU.TYPE.SUBMIT || iouType === CONST.IOU.TYPE.TRACK ? CONST.IOU.TYPE.CREATE : iouType;
+    const participantRowErrors = useMemo(() => {
+        if (formError !== 'iou.error.noParticipantSelected' && formError !== 'violations.missingAttendees') {
+            return undefined;
+        }
+
+        return {participants: translate(formError)};
+    }, [formError, translate]);
+
+    const closeParticipantPicker = useCallback(() => {
+        setIsParticipantPickerVisible(false);
+    }, []);
+
+    useEffect(() => {
+        if (shouldOpenParticipantPicker) {
+            setIsParticipantPickerVisible(true);
+            return;
+        }
+        setIsParticipantPickerVisible(false);
+    }, [shouldOpenParticipantPicker]);
+
+    const handleParticipantsAdded = useCallback(
+        (participants: Participant[]) => {
+            if (!transactionID) {
+                return;
+            }
+
+            setMoneyRequestParticipants(transactionID, participants);
+            clearFormErrors(['iou.error.noParticipantSelected']);
+
+        },
+        [transactionID, clearFormErrors, closeParticipantPicker],
+    );
 
     const sections = useMemo(() => {
         const options: Array<Section<MoneyRequestConfirmationListItem>> = [];
@@ -728,18 +766,21 @@ function MoneyRequestConfirmationList({
                           keyForList: `${participant.keyForList ?? participant.accountID ?? participant.reportID}`,
                           isInteractive: canEditParticipant,
                           shouldShowRightCaret: canEditParticipant,
+                          errors: participantRowErrors,
                       }))
                     : [
                           {
                               keyForList: 'empty-participant-option',
-                              text: translate('iou.error.noParticipantSelected'),
+                              text: translate('iou.chooseRecipient'),
                               isInteractive: canEditParticipant,
                               shouldShowRightCaret: canEditParticipant,
+                              isBold: false,
+                              errors: participantRowErrors,
                           },
                       ];
 
             options.push({
-                title: translate('common.to'),
+                title: selectedParticipants.length > 0 ? translate('common.to') : undefined,
                 data: participantRows,
                 sectionIndex: 0,
             });
@@ -754,6 +795,7 @@ function MoneyRequestConfirmationList({
         splitParticipants,
         selectedParticipants,
         canEditParticipant,
+        participantRowErrors,
         shouldHideToSection,
         shouldForceTopEmptySections,
     ]);
@@ -767,8 +809,17 @@ function MoneyRequestConfirmationList({
         }
 
         const newIOUType = iouType === CONST.IOU.TYPE.SUBMIT || iouType === CONST.IOU.TYPE.TRACK ? CONST.IOU.TYPE.CREATE : iouType;
+        if (isNewManualExpenseFlowEnabled) {
+            setIsParticipantPickerVisible(true);
+            return;
+        }
+
         Navigation.navigate(ROUTES.MONEY_REQUEST_STEP_PARTICIPANTS.getRoute(newIOUType, transactionID, transaction.reportID, Navigation.getActiveRoute(), action));
     };
+
+    const dismissParticipantRowError = useCallback(() => {
+        clearFormErrors(['iou.error.noParticipantSelected', 'violations.missingAttendees']);
+    }, [clearFormErrors]);
 
     /**
      * @param {String} paymentMethod
@@ -791,7 +842,7 @@ function MoneyRequestConfirmationList({
             // In the new manual expense flow the amount field starts empty (transaction.amount defaults to 0).
             // We block submission until the user explicitly enters an amount (tracked by isAmountSet).
             // Note: a user-entered $0 is valid – this only blocks the empty field.
-            if (iouType !== CONST.IOU.TYPE.PAY && isNewManualExpenseFlowEnabled && !transaction?.isAmountSet) {
+            if (iouType !== CONST.IOU.TYPE.PAY && !isScanRequest && isNewManualExpenseFlowEnabled && !transaction?.isAmountSet) {
                 setFormError('common.error.invalidAmount');
                 return;
             }
@@ -1190,7 +1241,7 @@ function MoneyRequestConfirmationList({
                 isMovingTransactionFromTrackExpense={isMovingTransactionFromTrackExpense}
                 isTypeSplit={isTypeSplit}
                 selectedParticipants={selectedParticipants}
-                selectedParticipantsProp={selectedParticipantOptions}
+                selectedParticipantsProp={selectedParticipants}
                 defaultMileageRateCustomUnitRateID={defaultRate}
                 hasRoute={hasRoute}
                 isDistanceRequestWithPendingRoute={isDistanceRequestWithPendingRoute}
@@ -1225,6 +1276,7 @@ function MoneyRequestConfirmationList({
                     sections={sections}
                     ListItem={UserListItem}
                     onSelectRow={navigateToParticipantPage}
+                    onDismissError={dismissParticipantRowError}
                     shouldSingleExecuteRowSelect
                     shouldPreventDefaultFocusOnSelectRow
                     shouldShowListEmptyContent={false}
@@ -1234,6 +1286,18 @@ function MoneyRequestConfirmationList({
                     disableKeyboardShortcuts
                 />
             </MouseProvider>
+            {isNewManualExpenseFlowEnabled && (
+                <ParticipantPicker
+                    iouType={participantPickerIOUType}
+                    action={action}
+                    isPerDiemRequest={isPerDiemRequest}
+                    isTimeRequest={isTimeRequest}
+                    onParticipantsAdded={handleParticipantsAdded}
+                    onFinish={closeParticipantPicker}
+                    isVisible={isParticipantPickerVisible}
+                    onClose={closeParticipantPicker}
+                />
+            )}
         </>
     );
 }
