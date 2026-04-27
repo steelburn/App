@@ -53,8 +53,7 @@ function SpendRuleMerchantsPage({route}: SpendRuleMerchantsPageProps) {
                 merchantMatchTypes: originalMerchantMatchTypes,
             });
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [originalMerchantNamesRef, originalMerchantMatchTypesRef, didSaveRef]);
 
     const emptyStateTitle =
         restrictionAction === CONST.SPEND_RULES.ACTION.BLOCK ? translate('workspace.rules.spendRules.noBlockedMerchants') : translate('workspace.rules.spendRules.noAllowedMerchants');
