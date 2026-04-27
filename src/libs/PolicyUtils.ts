@@ -38,8 +38,6 @@ import type {
     PolicyConnectionSyncProgress,
     PolicyFeatureName,
     Rate,
-    SageIntacctDataElement,
-    SageIntacctDataElementWithValue,
     Tenant,
 } from '@src/types/onyx/Policy';
 import type PolicyEmployee from '@src/types/onyx/PolicyEmployee';
@@ -1037,14 +1035,6 @@ function hasAccountingFeatureConnection(policy: OnyxEntry<Policy>) {
     return hasAccountingConnections(policy) || hasUnsupportedIntegration(policy);
 }
 
-function getPolicyEmployeeListByIdWithoutCurrentUser(policies: OnyxCollection<Pick<Policy, 'employeeList'>>, currentPolicyID?: string, currentUserAccountID?: number) {
-    const policy = policies?.[`${ONYXKEYS.COLLECTION.POLICY}${currentPolicyID}`] ?? null;
-    const policyMemberEmailsToAccountIDs = getMemberAccountIDsForWorkspace(policy?.employeeList);
-    return Object.values(policyMemberEmailsToAccountIDs)
-        .map((policyMemberAccountID) => Number(policyMemberAccountID))
-        .filter((policyMemberAccountID) => policyMemberAccountID !== currentUserAccountID);
-}
-
 function getPolicyEmployeeAccountIDs(policy: OnyxEntry<Pick<Policy, 'employeeList'>>, currentUserAccountID?: number) {
     if (!policy) {
         return [];
@@ -1430,11 +1420,6 @@ function settingsPendingAction(settings?: string[], pendingFields?: PendingField
 
 function findSelectedVendorWithDefaultSelect(vendors: NetSuiteVendor[] | undefined, selectedVendorId: string | undefined) {
     const selectedVendor = (vendors ?? []).find(({id}) => id === selectedVendorId);
-    return selectedVendor ?? vendors?.[0] ?? undefined;
-}
-
-function findSelectedSageVendorWithDefaultSelect(vendors: SageIntacctDataElementWithValue[] | SageIntacctDataElement[] | undefined, selectedVendorID: string | undefined) {
-    const selectedVendor = (vendors ?? []).find(({id}) => id === selectedVendorID);
     return selectedVendor ?? vendors?.[0] ?? undefined;
 }
 
@@ -2102,17 +2087,6 @@ function isCurrentUserMemberOfAnyPolicy(): boolean {
 }
 
 /**
- * Whether the given policy member is an admin of the given policy
- */
-function isMemberPolicyAdmin(policy: OnyxEntry<Policy>, memberEmail: string | undefined): boolean {
-    if (!policy || !memberEmail) {
-        return false;
-    }
-    const admins = getAdminEmployees(policy);
-    return admins.some((admin) => admin.email === memberEmail);
-}
-
-/**
  * Determines which travel step should be shown based on policy state
  */
 function getTravelStep(
@@ -2184,7 +2158,6 @@ export {
     escapeTagName,
     getActivePolicies,
     getAdminEmployees,
-    getAccountingConnectionNames,
     getCleanedTagName,
     getCommaSeparatedTagNameWithSanitizedColons,
     getConnectedIntegration,
@@ -2194,17 +2167,14 @@ export {
     getCountOfEnabledTagsOfList,
     getIneligibleInvitees,
     getMemberAccountIDsForWorkspace,
-    getHRConnectionNames,
     getGuideAndAccountManagerInfo,
     getSoftExclusionsForGuideAndAccountManager,
     filterGuideAndAccountManager,
-    getNumericValue,
     isMultiLevelTags,
     // This will be fixed as part of https://github.com/Expensify/App/issues/66397
     // eslint-disable-next-line @typescript-eslint/no-deprecated
     getPersonalPolicy,
     getPolicyBrickRoadIndicatorStatus,
-    getPolicyEmployeeListByIdWithoutCurrentUser,
     getSortedTagKeys,
     getTagList,
     getTagListByOrderWeight,
@@ -2225,9 +2195,7 @@ export {
     hasIntegrationAutoSync,
     hasPolicyCategoriesError,
     shouldShowPolicyError,
-    shouldShowPolicyErrorFields,
     shouldShowTaxRateError,
-    isControlOnAdvancedApprovalMode,
     isExpensifyTeam,
     shouldFilterExpensifyTeam,
     isDeletedPolicyEmployee,
@@ -2270,7 +2238,6 @@ export {
     findSelectedBankAccountWithDefaultSelect,
     findSelectedInvoiceItemWithDefaultSelect,
     findSelectedTaxAccountWithDefaultSelect,
-    findSelectedSageVendorWithDefaultSelect,
     hasPolicyWithXeroConnection,
     getNetSuiteVendorOptions,
     canUseTaxNetSuite,
@@ -2308,7 +2275,6 @@ export {
     isControlPolicy,
     isAttendeeTrackingEnabled,
     isCollectPolicy,
-    isGustoConnected,
     isNetSuiteCustomSegmentRecord,
     getNameFromNetSuiteCustomField,
     isNetSuiteCustomFieldPropertyEditable,
@@ -2326,7 +2292,6 @@ export {
     getTagNamesFromTagsLists,
     getTagApproverRule,
     getDomainNameForPolicy,
-    hasUnsupportedIntegration,
     hasSupportedOnlyOnOldDotIntegration,
     getWorkflowApprovalsUnavailable,
     getNetSuiteImportCustomFieldLabel,
@@ -2354,7 +2319,6 @@ export {
     isPolicyMemberWithoutPendingDelete,
     hasDynamicExternalWorkflow,
     getPolicyEmployeeAccountIDs,
-    isMemberPolicyAdmin,
     getActivePoliciesWithExpenseChatAndPerDiemEnabled,
     getTravelStep,
     getActivePoliciesWithExpenseChatAndPerDiemEnabledAndHasRates,
@@ -2365,6 +2329,8 @@ export {
     isPolicyTaxEnabled,
     sortPoliciesByName,
     isPolicyApprover,
+    getHRConnectionNames,
+    isGustoConnected,
 };
 
 export type {MemberEmailsToAccountIDs};
