@@ -8,7 +8,7 @@ import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {clearMoneyRequestMerchant, setMoneyRequestMerchant} from '@libs/actions/IOU';
 import Navigation from '@libs/Navigation/Navigation';
-import {getMerchant, hasReceipt, isMerchantMissing} from '@libs/TransactionUtils';
+import {getMerchant, hasReceipt} from '@libs/TransactionUtils';
 import {isValidInputLength} from '@libs/ValidationUtils';
 import {setDraftSplitTransaction} from '@userActions/IOU/Split';
 import CONST from '@src/CONST';

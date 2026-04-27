@@ -3,8 +3,8 @@ import React, {useEffect, useRef} from 'react';
 import FormHelpMessage from '@components/FormHelpMessage';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
-import usePermissions from '@hooks/usePermissions';
 import useParticipantSubmission from '@hooks/useParticipantSubmission';
+import usePermissions from '@hooks/usePermissions';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {isMovingTransactionFromTrackExpense as isMovingTransactionFromTrackExpenseIOUUtils, navigateToStartMoneyRequestStep} from '@libs/IOUUtils';
 import Navigation from '@libs/Navigation/Navigation';
@@ -44,8 +44,8 @@ function IOURequestStepParticipants({
     const isTime = isTimeRequestUtil(initialTransaction);
     const isCorporateCard = isCorporateCardTransaction(initialTransaction);
     const {isBetaEnabled} = usePermissions();
-    const isNewManualExpenseFlowEnabled = isBetaEnabled(CONST.BETAS.NEW_MANUAL_EXPENSE_FLOW)
-    
+    const isNewManualExpenseFlowEnabled = isBetaEnabled(CONST.BETAS.NEW_MANUAL_EXPENSE_FLOW);
+
     let headerTitle = translate('iou.chooseRecipient');
     if (action === CONST.IOU.ACTION.CATEGORIZE) {
         headerTitle = translate('iou.categorize');
@@ -135,7 +135,7 @@ function IOURequestStepParticipants({
         }
 
         return initialTransaction?.amount !== undefined && initialTransaction?.amount !== null && initialTransaction?.amount <= 0;
-    }
+    };
 
     const isWorkspacesOnly = getIsWorkspacesOnly();
 

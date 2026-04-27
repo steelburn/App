@@ -52,7 +52,6 @@ import {
     isDistanceRequest as isDistanceRequestUtil,
     isGPSDistanceRequest as isGPSDistanceRequestUtil,
     isManualDistanceRequest as isManualDistanceRequestUtil,
-    isMerchantMissing,
     isScanning,
     isScanRequest as isScanRequestUtil,
 } from '@libs/TransactionUtils';
@@ -84,7 +83,7 @@ import {PressableWithFeedback} from './Pressable';
 import {useProductTrainingContext} from './ProductTrainingContext';
 import UserListItem from './SelectionList/ListItem/UserListItem';
 import SelectionListWithSections from './SelectionList/SelectionListWithSections';
-import type {Section, SelectionListWithSectionsHandle} from './SelectionList/SelectionListWithSections/types';
+import type {Section} from './SelectionList/SelectionListWithSections/types';
 import SettlementButton from './SettlementButton';
 import type {PaymentActionParams} from './SettlementButton/types';
 import Text from './Text';
@@ -299,7 +298,8 @@ function MoneyRequestConfirmationList({
     const iouMerchant = getMerchant(transaction);
     const iouCategory = getCategory(transaction);
     const iouAttendees = useMemo(() => getAttendees(transaction, currentUserPersonalDetails), [transaction, currentUserPersonalDetails]);
-    const isP2P = !!(transaction?.participants?.[0]?.accountID && !transaction?.participants?.[0]?.isPolicyExpenseChat);
+    const firstParticipant = transaction?.participants?.at(0);
+    const isP2P = !!(firstParticipant?.accountID && !firstParticipant?.isPolicyExpenseChat);
 
     const isTypeRequest = iouType === CONST.IOU.TYPE.SUBMIT;
     const isTypeSplit = iouType === CONST.IOU.TYPE.SPLIT;
@@ -736,7 +736,6 @@ function MoneyRequestConfirmationList({
 
             setMoneyRequestParticipants(transactionID, participants);
             clearFormErrors(['iou.error.noParticipantSelected']);
-
         },
         [transactionID, clearFormErrors, closeParticipantPicker],
     );
@@ -975,10 +974,12 @@ function MoneyRequestConfirmationList({
             policy,
             policyTagLists,
             selectedParticipants,
-            selectedParticipants,
             isEditingSplitBill,
             isMerchantRequired,
             merchantValue,
+            isMerchantFieldValid,
+            isP2P,
+            isTypeRequest,
             shouldShowMerchant,
             shouldDisplayFieldError,
             shouldShowTax,
@@ -1004,6 +1005,7 @@ function MoneyRequestConfirmationList({
             isTimeRequest,
             getCurrencyDecimals,
             isNewManualExpenseFlowEnabled,
+            isScanRequest,
         ],
     );
 

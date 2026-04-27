@@ -83,12 +83,19 @@ function AmountField({
     const [isCurrencyPickerVisible, setIsCurrencyPickerVisible] = useState(false);
 
     const isAmountFieldDisabled = didConfirm || isReadOnly || shouldShowTimeRequestFields || isDistanceRequest;
-    // In the new manual expense flow, participants are determined from the report, not stored in transaction.participants
+    const firstParticipant = transaction?.participants?.at(0);
     const isP2P = isNewManualExpenseFlowEnabled
         ? isParticipantP2P(getMoneyRequestParticipantsFromReport(report, currentUserPersonalDetails.accountID).at(0))
-        : !!(transaction?.participants?.[0]?.accountID && !transaction?.participants?.[0]?.isPolicyExpenseChat);
+        : !!(firstParticipant?.accountID && !firstParticipant?.isPolicyExpenseChat);
     const shouldShowAmountRequiredError = formError === 'common.error.fieldRequired';
     const shouldShowAmountInvalidError = formError === 'common.error.invalidAmount';
+
+    let amountFieldErrorText = '';
+    if (shouldShowAmountInvalidError) {
+        amountFieldErrorText = translate('common.error.invalidAmount');
+    } else if (shouldShowAmountRequiredError) {
+        amountFieldErrorText = translate('common.error.fieldRequired');
+    }
 
     const effectiveCurrency = isDistanceRequest ? distanceRateCurrency : (iouCurrencyCode ?? CONST.CURRENCY.USD);
     const decimals = getCurrencyDecimals(effectiveCurrency);
@@ -227,7 +234,7 @@ function AmountField({
                         currency={effectiveCurrency}
                         symbol={getLocalizedCurrencySymbol(preferredLocale, effectiveCurrency) ?? ''}
                         label={translate('iou.amount')}
-                        errorText={shouldShowAmountInvalidError ? translate('common.error.invalidAmount') : shouldShowAmountRequiredError ? translate('common.error.fieldRequired') : ''}
+                        errorText={amountFieldErrorText}
                         onInputChange={handleAmountChange}
                         allowNegativeInput={allowNegative}
                         shouldShowFlipButton
