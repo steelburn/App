@@ -9502,7 +9502,14 @@ function hasReportErrorsOtherThanFailedReceipt(
     transactions: OnyxCollection<Transaction>,
     reportAttributes?: ReportAttributesDerivedValue['reports'],
 ) {
-    const allReportErrors = reportAttributes?.[report?.reportID]?.reportErrors ?? {};
+    const childAttributes = reportAttributes?.[report?.reportID];
+    // When this report's RBR-worthy state is being propagated up to an accessible parent workspace chat,
+    // skip the child's own reportErrors so it doesn't get force-shown in the LHN with a duplicate RBR.
+    // The parent chat row carries the indicator. The per-report pass in reportAttributes.ts suppresses
+    // the child's own brickRoadStatus on the same condition; mirror that here for consumers (LHN
+    // shouldDisplayReportInLHN, OptionsListUtils brickRoadIndicator) that key off `reportErrors` directly.
+    const isPropagatingToAccessibleParent = !!childAttributes?.needsParentChatErrorPropagation && !childAttributes?.brickRoadStatus;
+    const allReportErrors = isPropagatingToAccessibleParent ? {} : (childAttributes?.reportErrors ?? {});
     const transactionReportActions = getAllReportActions(report.reportID);
     const oneTransactionThreadReportID = getOneTransactionThreadReportID(report, chatReport, transactionReportActions, undefined);
     let doesTransactionThreadReportHasViolations = false;
