@@ -334,7 +334,7 @@ function ReportActionsView({reportID, onLayout}: ReportActionsViewProps) {
     };
 
     // Show skeleton while loading initial report actions when data is incomplete/missing and online
-    const shouldShowSkeletonForInitialLoad = isLoadingInitialReportActions && (isReportDataIncomplete || isMissingReportActions) && !isOffline;
+    const shouldShowSkeletonForInitialLoad = !!isLoadingInitialReportActions && (isReportDataIncomplete || isMissingReportActions) && !isOffline;
 
     // Show skeleton while the app is loading and we're online
     const shouldShowSkeletonForAppLoad = isLoadingApp && !isOffline;
@@ -345,29 +345,7 @@ function ReportActionsView({reportID, onLayout}: ReportActionsViewProps) {
     // onboarding messages. The skeleton avoids flashing wrong content.
     const shouldShowSkeletonForConciergePanel = isConciergeSidePanel && !hasOnceLoadedReportActions && !isOffline;
 
-    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
     const shouldShowSkeleton = shouldShowSkeletonForConciergePanel || shouldShowSkeletonForInitialLoad || shouldShowSkeletonForAppLoad;
-
-    const isReportUnread = isUnread(report, transactionThreadReport, isReportArchived);
-    const isReportUnreadInitially = useRef(isReportUnread);
-
-    // Without this, navigating to another report in the same mounted view keeps the previous
-    // report’s “initially unread” value and can block the skeleton or unread-anchor logic for the new report.
-    useEffect(() => {
-        isReportUnreadInitially.current = isUnread(report, transactionThreadReport, isReportArchived);
-        // Intentionally only on navigation: do not resync when read/unread or thread data updates in place.
-    }, [isReportArchived, report, reportID, transactionThreadReport]);
-
-    // Same for unread messages, we need to wait for the results from the OpenReport api call,
-    // if the oldest unread report action is not stored in Onyx.
-    const isUnreadMessagePageLoadingInitially = !reportActionIDFromRoute && isReportUnreadInitially.current && !oldestUnreadReportAction;
-
-    // When opening an unread report, it is very likely that the message we will open to is not the latest,
-    // which is the only one we will have in cache.
-    const isInitiallyLoadingReport = isReportUnread && !!reportMetadata?.isLoadingInitialReportActions && (isOffline || reportActions.length <= 1);
-
-    // Once all the above conditions are met, we can consider the report ready.
-    const isReportReady = !isInitiallyLoadingReport && !isUnreadMessagePageLoadingInitially;
 
     useEffect(() => {
         if (!shouldShowSkeleton || !report) {
@@ -375,6 +353,19 @@ function ReportActionsView({reportID, onLayout}: ReportActionsViewProps) {
         }
         markOpenReportEnd(report, {warm: false});
     }, [report, shouldShowSkeleton]);
+
+    const isReportUnread = isUnread(report, transactionThreadReport, isReportArchived);
+
+    // When opening an unread report, it is very likely that the message we will open to is not the latest,
+    // which is the only one we will have in cache.
+    const isInitiallyLoadingReport = isReportUnread && !!reportMetadata?.isLoadingInitialReportActions && (isOffline || reportActions.length <= 1);
+
+    // Same for unread messages, we need to wait for the results from the OpenReport api call,
+    // if the oldest unread report action is not stored in Onyx.
+    const isUnreadMessagePageLoadingInitially = !reportActionIDFromRoute && isReportUnread && !oldestUnreadReportAction;
+
+    // Once all the above conditions are met, we can consider the report ready.
+    const isReportReady = !isInitiallyLoadingReport && !isUnreadMessagePageLoadingInitially;
 
     if (isLoadingOnyxValue(reportResult) || !report || !isReportReady || shouldShowSkeleton) {
         return <ReportActionsSkeletonView />;
