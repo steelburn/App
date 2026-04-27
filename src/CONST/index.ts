@@ -8482,6 +8482,8 @@ const CONST = {
         ORIGINAL_CURRENCY: 'originalCurrency',
         UNIQUE_ID: 'uniqueID',
         EXTERNAL_ID: 'externalID',
+        MAX_AMOUNT_NO_RECEIPT: 'maxAmountNoReceipt',
+        MAX_AMOUNT_NO_ITEMIZED_RECEIPT: 'maxAmountNoItemizedReceipt',
     },
 
     IMPORT_SPREADSHEET: {

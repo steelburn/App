@@ -23,6 +23,32 @@ import SCREENS from '@src/SCREENS';
 import type {Errors} from '@src/types/onyx/OnyxCommon';
 import isLoadingOnyxValue from '@src/types/utils/isLoadingOnyxValue';
 
+/**
+ * Parses a CSV cell value for receipt requirement columns.
+ * Mirrors the OD import logic: "default" → null, "required"/"always_required" → 0,
+ * "not_required" → DISABLED_MAX_EXPENSE_VALUE, numeric string → number.
+ */
+function parseCsvReceiptValue(raw: string | undefined): number | null | undefined {
+    if (raw === undefined) {
+        return undefined;
+    }
+    const trimmed = raw.trim().toLowerCase();
+    if (!trimmed || trimmed === 'default') {
+        return null;
+    }
+    if (trimmed === 'required' || trimmed === 'always_required') {
+        return 0;
+    }
+    if (trimmed === 'not_required') {
+        return CONST.DISABLED_MAX_EXPENSE_VALUE;
+    }
+    const num = Number(trimmed);
+    if (Number.isFinite(num) && num >= 0) {
+        return num;
+    }
+    return undefined;
+}
+
 type ImportedCategoriesPageProps = {
     route: RouteProp<SettingsNavigatorParamList, typeof SCREENS.WORKSPACE.DYNAMIC_CATEGORIES_IMPORTED | typeof SCREENS.SETTINGS_CATEGORIES.SETTINGS_CATEGORIES_IMPORTED>;
 };
@@ -52,7 +78,11 @@ function ImportedCategoriesPage({route}: ImportedCategoriesPageProps) {
         );
 
         if (isControlPolicy(policy)) {
-            roles.push({text: translate('workspace.categories.glCode'), value: CONST.CSV_IMPORT_COLUMNS.GL_CODE});
+            roles.push(
+                {text: translate('workspace.categories.glCode'), value: CONST.CSV_IMPORT_COLUMNS.GL_CODE},
+                {text: translate('workspace.rules.categoryRules.requireReceiptsOver'), value: CONST.CSV_IMPORT_COLUMNS.MAX_AMOUNT_NO_RECEIPT},
+                {text: translate('workspace.rules.categoryRules.requireItemizedReceiptsOver'), value: CONST.CSV_IMPORT_COLUMNS.MAX_AMOUNT_NO_ITEMIZED_RECEIPT},
+            );
         }
 
         return roles;
@@ -99,17 +129,39 @@ function ImportedCategoriesPage({route}: ImportedCategoriesPageProps) {
         const categoriesNamesColumn = columns.findIndex((column) => column === CONST.CSV_IMPORT_COLUMNS.NAME);
         const categoriesGLCodeColumn = columns.findIndex((column) => column === CONST.CSV_IMPORT_COLUMNS.GL_CODE);
         const categoriesEnabledColumn = columns.findIndex((column) => column === CONST.CSV_IMPORT_COLUMNS.ENABLED);
+        const categoriesMaxAmountNoReceiptColumn = columns.findIndex((column) => column === CONST.CSV_IMPORT_COLUMNS.MAX_AMOUNT_NO_RECEIPT);
+        const categoriesMaxAmountNoItemizedReceiptColumn = columns.findIndex((column) => column === CONST.CSV_IMPORT_COLUMNS.MAX_AMOUNT_NO_ITEMIZED_RECEIPT);
         const categoriesNames = spreadsheet?.data[categoriesNamesColumn].map((name) => name);
         const categoriesEnabled = categoriesEnabledColumn !== -1 ? spreadsheet?.data[categoriesEnabledColumn].map((enabled) => enabled) : [];
         const categoriesGLCode = categoriesGLCodeColumn !== -1 ? spreadsheet?.data[categoriesGLCodeColumn].map((glCode) => glCode) : [];
+        const categoriesMaxAmountNoReceipt = categoriesMaxAmountNoReceiptColumn !== -1 ? spreadsheet?.data[categoriesMaxAmountNoReceiptColumn] : [];
+        const categoriesMaxAmountNoItemizedReceipt = categoriesMaxAmountNoItemizedReceiptColumn !== -1 ? spreadsheet?.data[categoriesMaxAmountNoItemizedReceiptColumn] : [];
         const categories = categoriesNames?.slice(containsHeader ? 1 : 0).map((name, index) => {
             const categoryAlreadyExists = policyCategories?.[name];
             const existingGLCodeOrDefault = categoryAlreadyExists?.['GL Code'] ?? '';
+            const dataIndex = containsHeader ? index + 1 : index;
+
+            const parsedMaxAmountNoReceipt = categoriesMaxAmountNoReceiptColumn !== -1 ? parseCsvReceiptValue(categoriesMaxAmountNoReceipt?.[dataIndex]?.toString()) : undefined;
+            const parsedMaxAmountNoItemizedReceipt =
+                categoriesMaxAmountNoItemizedReceiptColumn !== -1 ? parseCsvReceiptValue(categoriesMaxAmountNoItemizedReceipt?.[dataIndex]?.toString()) : undefined;
+
+            // Apply normalization: if itemized receipts required but receipts not required, force both to required
+            let normalizedMaxAmountNoReceipt = parsedMaxAmountNoReceipt;
+            let normalizedMaxAmountNoItemizedReceipt = parsedMaxAmountNoItemizedReceipt;
+            if (normalizedMaxAmountNoReceipt === CONST.DISABLED_MAX_EXPENSE_VALUE && normalizedMaxAmountNoItemizedReceipt !== undefined) {
+                normalizedMaxAmountNoItemizedReceipt = CONST.DISABLED_MAX_EXPENSE_VALUE;
+            }
+            if (normalizedMaxAmountNoItemizedReceipt === 0 && normalizedMaxAmountNoReceipt !== undefined) {
+                normalizedMaxAmountNoReceipt = 0;
+            }
+
             return {
                 name,
-                enabled: categoriesEnabledColumn !== -1 ? ['true', 'yes'].includes(categoriesEnabled?.[containsHeader ? index + 1 : index]?.toString().toLowerCase() ?? '') : true,
+                enabled: categoriesEnabledColumn !== -1 ? ['true', 'yes'].includes(categoriesEnabled?.[dataIndex]?.toString().toLowerCase() ?? '') : true,
                 // eslint-disable-next-line @typescript-eslint/naming-convention
-                'GL Code': categoriesGLCodeColumn !== -1 ? (categoriesGLCode?.[containsHeader ? index + 1 : index] ?? '') : existingGLCodeOrDefault,
+                'GL Code': categoriesGLCodeColumn !== -1 ? (categoriesGLCode?.[dataIndex] ?? '') : existingGLCodeOrDefault,
+                ...(normalizedMaxAmountNoReceipt !== undefined && {maxAmountNoReceipt: normalizedMaxAmountNoReceipt}),
+                ...(normalizedMaxAmountNoItemizedReceipt !== undefined && {maxAmountNoItemizedReceipt: normalizedMaxAmountNoItemizedReceipt}),
             };
         });
 
