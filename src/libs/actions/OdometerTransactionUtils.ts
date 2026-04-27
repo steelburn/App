@@ -199,12 +199,5 @@ function buildOdometerCommentFromDraft(transactionID: string, odometerDraft: Ony
     return commentUpdate;
 }
 
-export {
-    setMoneyRequestOdometerReading,
-    setMoneyRequestOdometerImage,
-    removeMoneyRequestOdometerImage,
-    clearOdometerDraft,
-    saveOdometerDraft,
-    buildOdometerCommentFromDraft,
-};
+export {setMoneyRequestOdometerReading, setMoneyRequestOdometerImage, removeMoneyRequestOdometerImage, clearOdometerDraft, saveOdometerDraft, buildOdometerCommentFromDraft};
 export default clearOdometerDraftTransactionState;
