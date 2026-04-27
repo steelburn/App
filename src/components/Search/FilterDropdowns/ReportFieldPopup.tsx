@@ -9,9 +9,11 @@ import CONST from '@src/CONST';
 import type {SearchAdvancedFiltersForm} from '@src/types/form';
 import type {PolicyReportField} from '@src/types/onyx';
 import BasePopup from './BasePopup';
+import type {PopoverComponentProps} from './DropdownButton';
 
 type ReportFieldPopupProps = {
     closeOverlay: () => void;
+    setPopoverWidth: PopoverComponentProps['setPopoverWidth'];
     updateFilterForm: (value: Partial<SearchAdvancedFiltersForm>) => void;
 };
 
