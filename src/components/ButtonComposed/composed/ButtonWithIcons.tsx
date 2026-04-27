@@ -93,7 +93,7 @@ function ButtonWithIcons({
             onMouseDown={onMouseDown}
             style={style}
             disabledStyle={disabledStyle}
-            innerStyles={[buttonPaddingStyle, !!text && !!iconRight && styles.alignItemsStretch, innerStyles]}
+            innerStyles={[buttonPaddingStyle, innerStyles]}
             shouldUseDefaultHover={shouldUseDefaultHover}
             variant={variant}
             shouldRemoveBorderRadius={shouldRemoveBorderRadius}
