@@ -13,7 +13,7 @@ import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {clearRevokeError, revokeDevice} from '@libs/actions/User';
 import Navigation from '@libs/Navigation/Navigation';
-import {getLastLogin, getLoginKey, getRevokableLogins} from '@libs/UserUtils';
+import {getDeviceLogins, getLastLogin, getLoginKey} from '@libs/UserUtils';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {Login} from '@src/types/onyx/Logins';
 
@@ -21,7 +21,7 @@ function DeviceManagementPage() {
     const styles = useThemeStyles();
     const {translate, datetimeToRelative} = useLocalize();
 
-    const [logins] = useOnyx(ONYXKEYS.LOGINS, {selector: getRevokableLogins});
+    const [logins] = useOnyx(ONYXKEYS.LOGINS, {selector: getDeviceLogins});
 
     const renderItem = ({item}: ListRenderItemInfo<Login>) => {
         const {deviceName, deviceVersion, os, osVersion} = item.additionalData ?? {};

@@ -56,16 +56,16 @@ function getLastLogin(login: NewLogin) {
 
 const DEVICE_PARTNER_IDS = new Set<number>([CONST.PARTNER_ID.IPHONE, CONST.PARTNER_ID.ANDROID, CONST.PARTNER_ID.NEWDOT]);
 
-function isLoginRevokable(login: NewLogin) {
+function isDeviceLogin(login: NewLogin) {
     return DEVICE_PARTNER_IDS.has(login.partnerID) && (!login.additionalData?.infiniteLoginRoot || login.additionalData.infiniteLoginRoot === login.partnerUserID);
 }
 
-function getRevokableLogins(logins: OnyxEntry<Logins>) {
-    return Object.values(logins ?? {})?.filter(isLoginRevokable);
+function getDeviceLogins(logins: OnyxEntry<Logins>) {
+    return Object.values(logins ?? {})?.filter(isDeviceLogin);
 }
 
 function hasDeviceManagementError(logins: OnyxEntry<Logins>) {
-    return Object.values(logins ?? {})?.some((login) => isLoginRevokable(login) && !!login.errorFields?.revoke);
+    return Object.values(logins ?? {})?.some((login) => isDeviceLogin(login) && !!login.errorFields?.revoke);
 }
 
 /**
@@ -200,7 +200,7 @@ export {
     getContactMethodsOptions,
     getLoginKey,
     getLastLogin,
-    getRevokableLogins,
+    getDeviceLogins,
     hasDeviceManagementError,
 };
 export type {AvatarSource};
