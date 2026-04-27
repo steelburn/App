@@ -40,7 +40,6 @@ import {
     hasPolicyCategoriesError,
     isGroupPolicy,
     isPendingDeletePolicy,
-    isSubmitPolicy,
     isTimeTrackingEnabled,
     shouldShowEmployeeListError,
     shouldShowSyncError,
@@ -234,15 +233,13 @@ function WorkspaceInitialPage({policyDraft, policy: policyProp, route}: Workspac
     ];
 
     if (isGroupPolicy(policy) && shouldShowProtectedItems) {
-        if (!isSubmitPolicy(policy)) {
-            workspaceMenuItems.push({
-                translationKey: 'common.reports',
-                icon: expensifyIcons.Document,
-                action: singleExecution(waitForNavigate(() => Navigation.navigate(ROUTES.WORKSPACE_REPORTS.getRoute(policyID)))),
-                screenName: SCREENS.WORKSPACE.REPORTS,
-                sentryLabel: CONST.SENTRY_LABEL.WORKSPACE.INITIAL.REPORTS,
-            });
-        }
+        workspaceMenuItems.push({
+            translationKey: 'common.reports',
+            icon: expensifyIcons.Document,
+            action: singleExecution(waitForNavigate(() => Navigation.navigate(ROUTES.WORKSPACE_REPORTS.getRoute(policyID)))),
+            screenName: SCREENS.WORKSPACE.REPORTS,
+            sentryLabel: CONST.SENTRY_LABEL.WORKSPACE.INITIAL.REPORTS,
+        });
 
         if (policyFeatureStates?.[CONST.POLICY.MORE_FEATURES.ARE_CONNECTIONS_ENABLED]) {
             workspaceMenuItems.push({
