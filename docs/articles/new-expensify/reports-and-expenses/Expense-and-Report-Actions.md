@@ -31,7 +31,7 @@ Use this guide to understand:
 ## What each report action means
 
 - **Submit**: Available when a report is in Draft. Sends the report into the approval workflow.
-- **Approve**: Available when a report is Oustanding and awaiting approval. Confirms the report is ready to move forward.
+- **Approve**: Available when a report is Outstanding and awaiting approval. Confirms the report is ready to move forward.
 - **Pay**: Available after approval. Initiates payment or records a manual payment.
 - **Export**: Available when a report is Approved or Paid. 
 - **Review**: Appears when there are issues (such as missing receipts or duplicates). Prompts fixes before continuing.
