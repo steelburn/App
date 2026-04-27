@@ -198,6 +198,35 @@ describe('useTimeSensitiveCards', () => {
         expect(result.current.shouldShowReviewCardFraud).toBe(true);
     });
 
+    it('should not show fraud review when card has possibleFraud data but the fraud action is already resolved as recognized', async () => {
+        const cardWithResolvedFraudAlert = createRandomExpensifyCard(1, {
+            state: CONST.EXPENSIFY_CARD.STATE.OPEN,
+            fraud: CONST.EXPENSIFY_CARD.FRAUD_TYPES.DOMAIN,
+            possibleFraud: {triggerAmount: 5663, triggerMerchant: 'WAL-MART #2366', currency: 'USD', fraudAlertReportID: 123457},
+        });
+        const cardList: CardList = {'1': cardWithResolvedFraudAlert};
+        const baseFraudAction = createRandomReportAction(4);
+        const resolvedFraudAction = {
+            ...baseFraudAction,
+            actionName: CONST.REPORT.ACTIONS.TYPE.ACTIONABLE_CARD_FRAUD_ALERT,
+            originalMessage: {
+                ...baseFraudAction.originalMessage,
+                resolution: CONST.CARD_FRAUD_ALERT_RESOLUTION.RECOGNIZED,
+            },
+        };
+
+        await Onyx.merge(ONYXKEYS.CARD_LIST, cardList);
+        await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${cardWithResolvedFraudAlert.nameValuePairs?.possibleFraud?.fraudAlertReportID}`, {
+            [resolvedFraudAction.reportActionID]: resolvedFraudAction,
+        });
+        await waitForBatchedUpdates();
+
+        const {result} = renderHook(() => useTimeSensitiveCards());
+
+        expect(result.current.cardsWithFraud).toHaveLength(0);
+        expect(result.current.shouldShowReviewCardFraud).toBe(false);
+    });
+
     it('should not show fraud review for cards with fraud type NONE and no possibleFraud data', async () => {
         const cardWithNoFraud = createRandomExpensifyCard(1, {state: CONST.EXPENSIFY_CARD.STATE.OPEN, fraud: CONST.EXPENSIFY_CARD.FRAUD_TYPES.NONE});
         const cardList: CardList = {'1': cardWithNoFraud};
