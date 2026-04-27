@@ -878,7 +878,7 @@ function getTrackExpenseInformation(params: GetTrackExpenseInformationParams): T
     if (!chatReport) {
         const currentTime = DateUtils.getDBTime();
         const selfDMReport = buildOptimisticSelfDMReport(currentTime);
-        const selfDMCreatedReportAction = buildOptimisticCreatedReportAction(getCurrentUserEmail() ?? '', currentTime);
+        const selfDMCreatedReportAction = buildOptimisticCreatedReportAction({emailCreatingAction: getCurrentUserEmail() ?? '', created: currentTime});
         optimisticReportID = selfDMReport.reportID;
         optimisticReportActionID = selfDMCreatedReportAction.reportActionID;
         chatReport = selfDMReport;

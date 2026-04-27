@@ -602,7 +602,7 @@ function getPerDiemExpenseInformationForSelfDM(perDiemExpenseInformation: PerDie
     if (!chatReport) {
         const currentTime = DateUtils.getDBTime();
         const optimisticSelfDMReport = buildOptimisticSelfDMReport(currentTime);
-        const selfDMCreatedReportAction = buildOptimisticCreatedReportAction(currentUserEmailParam, currentTime);
+        const selfDMCreatedReportAction = buildOptimisticCreatedReportAction({emailCreatingAction: currentUserEmailParam, created: currentTime});
         optimisticSelfDMReportID = optimisticSelfDMReport.reportID;
         optimisticSelfDMCreatedReportActionID = selfDMCreatedReportAction.reportActionID;
         chatReport = optimisticSelfDMReport;

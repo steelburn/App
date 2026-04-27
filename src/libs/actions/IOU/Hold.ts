@@ -69,7 +69,7 @@ function putOnHold(transactionID: string, comment: string, initialReportID: stri
         transactionThreadReport = buildTransactionThread(iouAction, moneyRequestReport, undefined, reportID);
     }
 
-    const optimisticCreatedAction = buildOptimisticCreatedReportAction(currentUserEmail);
+    const optimisticCreatedAction = buildOptimisticCreatedReportAction({emailCreatingAction: currentUserEmail});
 
     const optimisticData: Array<
         OnyxUpdate<
