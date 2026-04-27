@@ -261,7 +261,6 @@ function getOnyxTargetTransactionData({
             targetTransactionThreadReport?.reportID,
             filteredTransactionChanges,
             policy,
-            undefined,
             shouldBuildOptimisticModifiedExpenseReportAction,
         );
     } else {
