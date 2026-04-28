@@ -67,12 +67,6 @@ type ComposerEditActions = {
     deleteDraft: () => void;
 };
 
-// Infrequent — changes only when send logic changes
-type ComposerSendActions = {
-    validateAndSubmitDraft: (draftMessage: string) => void;
-    submitDraftAndClearComposer: () => void;
-};
-
 // Frozen — stable refs, set once
 type ComposerMeta = {
     containerRef: RefObject<View | null>;
@@ -187,4 +181,4 @@ export {
     useComposerEditActions,
     useComposerMeta,
 };
-export type {SuggestionsRef, ComposerText, ComposerState, ComposerSendState, ComposerActions, ComposerSendActions, ComposerMeta};
+export type {SuggestionsRef, ComposerText, ComposerState, ComposerSendState, ComposerActions, ComposerMeta};

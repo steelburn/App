@@ -4,6 +4,7 @@ import type {OnyxEntry} from 'react-native-onyx';
 import {usePersonalDetails} from '@components/OnyxListItemProvider';
 import useAncestors from '@hooks/useAncestors';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
+import useDelegateAccountID from '@hooks/useDelegateAccountID';
 import useIsInSidePanel from '@hooks/useIsInSidePanel';
 import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
@@ -41,6 +42,7 @@ function useComposerSubmit(reportID: string): ComposerSubmitFunctions {
     const isInSidePanel = useIsInSidePanel();
     const [quickAction] = useOnyx(ONYXKEYS.NVP_QUICK_ACTION_GLOBAL_CREATE);
     const [isComposerFullSize = false] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_IS_COMPOSER_FULL_SIZE}${reportID}`);
+    const delegateAccountID = useDelegateAccountID();
 
     const {composerRef, attachmentFileRef} = useComposerMeta();
     const {didResetComposerHeight} = useComposerState();
@@ -97,6 +99,7 @@ function useComposerSubmit(reportID: string): ComposerSubmitFunctions {
                 timezone: currentUserPersonalDetails.timezone,
                 shouldPlaySound: true,
                 isInSidePanel,
+                delegateAccountID,
             });
             attachmentFileRef.current = null;
             return;
@@ -168,6 +171,7 @@ function useComposerSubmit(reportID: string): ComposerSubmitFunctions {
             shouldPlaySound: true,
             isInSidePanel,
             reportActionID: optimisticReportActionID,
+            delegateAccountID,
         });
     };
 
