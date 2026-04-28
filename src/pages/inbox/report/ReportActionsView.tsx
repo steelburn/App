@@ -45,7 +45,6 @@ import markOpenReportEnd from '@libs/telemetry/markOpenReportEnd';
 import type {ReportScreenNavigationProps} from '@pages/inbox/types';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
-import type * as OnyxTypes from '@src/types/onyx';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
 import isLoadingOnyxValue from '@src/types/utils/isLoadingOnyxValue';
 import getReportActionsToDisplay from './getReportActionsToDisplay';
@@ -108,24 +107,20 @@ function ReportActionsView({reportID, onLayout}: ReportActionsViewProps) {
 
     const [chatReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${report?.chatReportID}`);
     const allReportTransactions = useReportTransactionsCollection(reportID);
-    const reportTransactionsForThreadID = getAllNonDeletedTransactions(allReportTransactions, allReportActions ?? [], isOffline, true);
+    const reportTransactionsForThreadID = getAllNonDeletedTransactions(allReportTransactions, allReportActions, isOffline, true);
     const visibleTransactionsForThreadID = reportTransactionsForThreadID?.filter((transaction) => isOffline || transaction.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE);
     const reportTransactionIDsForThread = visibleTransactionsForThreadID?.map((t) => t.transactionID);
     const transactionThreadReportID = getOneTransactionThreadReportID(report, chatReport, allReportActions ?? [], isOffline, reportTransactionIDsForThread);
 
     const isReportArchived = useReportIsArchived(reportID);
-    const canPerformWriteAction = canUserPerformWriteAction(report, isReportArchived);
-
-    const getTransactionThreadReportActions = (reportActions: OnyxTypes.ReportActions | undefined): OnyxTypes.ReportAction[] => {
-        return getSortedReportActionsForDisplay(reportActions, canPerformWriteAction, true, undefined, transactionThreadReportID ?? undefined);
-    };
+    const canPerformWriteAction = !!canUserPerformWriteAction(report, isReportArchived);
 
     const [transactionThreadReportActions] = useOnyx(
         `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${transactionThreadReportID}`,
         {
-            selector: getTransactionThreadReportActions,
+            selector: (reportActions) => getSortedReportActionsForDisplay(reportActions, canPerformWriteAction, true, undefined, transactionThreadReportID ?? undefined),
         },
-        [getTransactionThreadReportActions],
+        [canPerformWriteAction, transactionThreadReportID],
     );
     const [transactionThreadReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${transactionThreadReportID}`);
     const [isLoadingApp] = useOnyx(ONYXKEYS.IS_LOADING_APP);
@@ -142,7 +137,7 @@ function ReportActionsView({reportID, onLayout}: ReportActionsViewProps) {
     const prevShouldUseNarrowLayoutRef = useRef(shouldUseNarrowLayout);
     const isReportFullyVisible = getIsReportFullyVisible(isFocused);
     const {transactions: reportTransactions} = useTransactionsAndViolationsForReport(reportID);
-    const reportTransactionIDs = getAllNonDeletedTransactions(reportTransactions, allReportActions ?? []).map((transaction) => transaction.transactionID);
+    const reportTransactionIDs = getAllNonDeletedTransactions(reportTransactions, allReportActions).map((transaction) => transaction.transactionID);
 
     const lastAction = allReportActions?.at(-1);
     const isInitiallyLoadingTransactionThread = isReportTransactionThread && (!!isLoadingInitialReportActions || (allReportActions ?? [])?.length <= 1);
