@@ -56,9 +56,7 @@ type ReportActionEditMessageContextProviderProps = {
 
 function ReportActionEditMessageContextProvider({reportID, children}: ReportActionEditMessageContextProviderProps) {
     const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportID}`);
-    const [reportActions] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${reportID}`, {
-        canEvict: false,
-    });
+    const [reportActions] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${reportID}`);
 
     const ancestors = useAncestors(report, shouldExcludeAncestorReportAction);
 
