@@ -583,7 +583,7 @@ function IOURequestStepDistanceOdometer({
         const hasAnyInput = startReadingValue !== undefined || endReadingValue !== undefined || !!odometerStartImage || !!odometerEndImage;
 
         if (!hasAnyInput) {
-            clearOdometerDraft();
+            await clearOdometerDraft();
             Navigation.closeRHPFlow();
             return;
         }

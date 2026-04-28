@@ -97,8 +97,8 @@ function clearOdometerDraftTransactionState(transaction: OnyxEntry<Transaction>)
     removeBackupTransaction(transaction.transactionID);
 }
 
-function clearOdometerDraft() {
-    Onyx.set(ONYXKEYS.ODOMETER_DRAFT, null);
+function clearOdometerDraft(): Promise<void> {
+    return Onyx.set(ONYXKEYS.ODOMETER_DRAFT, null);
 }
 
 async function serializeOdometerDraftImage(image: FileObject | string | null | undefined): Promise<string | undefined> {
@@ -151,7 +151,7 @@ async function saveOdometerDraft({startReading, endReading, startImage, endImage
     const hasDraftData = startReading !== undefined || endReading !== undefined || !!serializedStartImage || !!serializedEndImage;
 
     if (!hasDraftData) {
-        clearOdometerDraft();
+        await clearOdometerDraft();
         return;
     }
 
@@ -162,7 +162,7 @@ async function saveOdometerDraft({startReading, endReading, startImage, endImage
         ...(serializedEndImage && {odometerEndImage: serializedEndImage}),
     };
 
-    Onyx.set(ONYXKEYS.ODOMETER_DRAFT, odometerDraft);
+    await Onyx.set(ONYXKEYS.ODOMETER_DRAFT, odometerDraft);
 }
 
 function buildOdometerCommentFromDraft(transactionID: string, odometerDraft: OnyxEntry<OdometerDraft>, currentComment?: Partial<Comment>): Partial<Comment> | undefined {
