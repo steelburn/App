@@ -128,7 +128,7 @@ function CancelSubscriptionPage() {
                 enabledWhenOffline={false}
             />
         ),
-        [acknowledgementText, formState?.isLoading, styles.flex1, styles.mb2, styles.mt4, translate],
+        [acknowledgementText, formState?.isLoading, styles.mb2, styles.mt4, translate],
     );
 
     const contentMap: Partial<Record<CancellationType, ReactNode>> = {

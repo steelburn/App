@@ -328,7 +328,12 @@ function BasePopoverMenu({
     });
     const expensifyIcons = useMemoizedLazyExpensifyIcons(['BackArrow', 'ReceiptScan', 'MoneyCircle']);
     const prevMenuItems = usePrevious(menuItems);
+    const prevIsVisible = usePrevious(isVisible);
     const [hasKeyBeenPressed, setHasKeyBeenPressed] = useState(false);
+
+    if (shouldShowRadioButton && isVisible && !prevIsVisible) {
+        setHasKeyBeenPressed(false);
+    }
 
     // In radio-button mode, suppress the visual highlight until the user starts navigating,
     // even though the selected item is already focused (for immediate Enter/arrow support).
@@ -336,7 +341,6 @@ function BasePopoverMenu({
         if (!isVisible || !shouldShowRadioButton) {
             return;
         }
-        setHasKeyBeenPressed(false);
         const handleKeyDown = (e: KeyboardEvent) => {
             const isNavigationKey = [
                 CONST.KEYBOARD_SHORTCUTS.ARROW_UP,
@@ -598,7 +602,7 @@ function BasePopoverMenu({
         }
 
         return stylesArray;
-    }, [isSmallScreenWidth, shouldEnableMaxHeight, styles.createMenuContainer, styles.pv2, shouldUseScrollView, windowHeight, isInLandscapeMode, isInLandscapeMode]);
+    }, [isSmallScreenWidth, shouldEnableMaxHeight, styles.createMenuContainer, styles.pv2, shouldUseScrollView, windowHeight, isInLandscapeMode]);
 
     const {paddingTop, paddingBottom, paddingVertical, ...restScrollContainerStyle} =
         (StyleSheet.flatten([isSmallScreenWidth ? styles.pv4 : styles.pv2, scrollContainerStyle]) as ViewStyle) ?? {};
