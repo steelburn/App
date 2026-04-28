@@ -13,7 +13,7 @@ type WindowWithPixels = Window & {
         push: (params: DataLayerPushParams) => void;
     };
     fbq?: (method: string, eventName: string, params?: Record<string, unknown>, options?: Record<string, unknown>) => void;
-    rdt?: (method: string, eventName: string, params?: Record<string, unknown>) => void;
+    rdt?: (method: string, params: Record<string, string>) => void;
     lintrk?: (method: string, params: Record<string, unknown>) => void;
 };
 
@@ -31,6 +31,12 @@ const LINKEDIN_CONVERSION_IDS: Partial<Record<GoogleTagManagerEvent, number>> = 
     [CONST.ANALYTICS.EVENT.SIGN_UP]: CONST.ANALYTICS.LINKEDIN_SIGN_UP_CONVERSION_ID,
     [CONST.ANALYTICS.EVENT.WORKSPACE_CREATED]: CONST.ANALYTICS.LINKEDIN_WORKSPACE_CREATED_CONVERSION_ID,
     [CONST.ANALYTICS.EVENT.PAID_ADOPTION]: CONST.ANALYTICS.LINKEDIN_PAID_ADOPTION_CONVERSION_ID,
+};
+
+const REDDIT_CONVERSION_IDS: Partial<Record<GoogleTagManagerEvent, string>> = {
+    [CONST.ANALYTICS.EVENT.SIGN_UP]: CONST.ANALYTICS.REDDIT_SIGN_UP_CONVERSION_ID,
+    [CONST.ANALYTICS.EVENT.WORKSPACE_CREATED]: CONST.ANALYTICS.REDDIT_WORKSPACE_CREATED_CONVERSION_ID,
+    [CONST.ANALYTICS.EVENT.PAID_ADOPTION]: CONST.ANALYTICS.REDDIT_PAID_ADOPTION_CONVERSION_ID,
 };
 
 function publishEvent(event: GoogleTagManagerEvent, accountID: number, email: string) {
@@ -61,13 +67,18 @@ function publishEvent(event: GoogleTagManagerEvent, accountID: number, email: st
     }
 
     // Reddit
-    if (typeof window.rdt === 'function') {
-        window.rdt('track', pixelEventName);
+    const redditConversionId = REDDIT_CONVERSION_IDS[event];
+    if (typeof window.rdt === 'function' && redditConversionId) {
+        window.rdt('track', {
+            event: redditConversionId,
+            email,
+        });
     }
 
     // LinkedIn (uses numeric conversion IDs instead of named events)
     const linkedInConversionId = LINKEDIN_CONVERSION_IDS[event];
     if (typeof window.lintrk === 'function' && linkedInConversionId) {
+        window.lintrk('setUserData', {email});
         window.lintrk('track', {conversion_id: linkedInConversionId});
     }
 }
