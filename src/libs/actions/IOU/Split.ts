@@ -4004,7 +4004,7 @@ function createDistanceRequest(distanceRequestInformation: CreateDistanceRequest
         };
     }
 
-    if (odometerStart !== undefined || odometerEnd !== undefined) {
+    if (previousOdometerDraft !== undefined && (odometerStart !== undefined || odometerEnd !== undefined)) {
         onyxData?.optimisticData?.push({
             onyxMethod: Onyx.METHOD.SET,
             key: ONYXKEYS.ODOMETER_DRAFT,
@@ -4013,7 +4013,7 @@ function createDistanceRequest(distanceRequestInformation: CreateDistanceRequest
         onyxData?.failureData?.push({
             onyxMethod: Onyx.METHOD.SET,
             key: ONYXKEYS.ODOMETER_DRAFT,
-            value: previousOdometerDraft ?? null,
+            value: previousOdometerDraft,
         });
     }
 
