@@ -26,6 +26,7 @@ function IndustryCodeSelector({onInputChange, value, errorText}: IndustryCodeSel
                     value: `${item.id}`,
                     text: `${item.id} - ${item.value}`,
                     keyForList: `${item.id}`,
+                    isSelected: `${item.id}` === value,
                 };
             });
         }
@@ -36,6 +37,7 @@ function IndustryCodeSelector({onInputChange, value, errorText}: IndustryCodeSel
                     value: `${item.id}`,
                     text: `${item.id} - ${item.value}`,
                     keyForList: `${item.id}`,
+                    isSelected: `${item.id}` === value,
                 };
             });
         }
@@ -45,9 +47,10 @@ function IndustryCodeSelector({onInputChange, value, errorText}: IndustryCodeSel
                 value: `${item.id}`,
                 text: `${item.id} - ${item.value}`,
                 keyForList: `${item.id}`,
+                isSelected: `${item.id}` === value,
             };
         });
-    }, [searchValue, shouldDisplayChildItems]);
+    }, [searchValue, shouldDisplayChildItems, value]);
 
     useEffect(() => {
         setSearchValue(value);
