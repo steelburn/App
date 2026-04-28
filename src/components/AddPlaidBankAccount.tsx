@@ -275,7 +275,10 @@ function AddPlaidBankAccount({
                 defaultCheckedValue={defaultSelectedPlaidAccountID}
                 onSelect={handleSelectingPlaidAccount}
             />
-            <FormHelpMessage message={errorText} />
+            <FormHelpMessage
+                style={styles.mh5}
+                message={errorText}
+            />
         </FullPageOfflineBlockingView>
     );
 }
