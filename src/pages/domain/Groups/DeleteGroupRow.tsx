@@ -9,6 +9,7 @@ import useOnyx from '@hooks/useOnyx';
 import Navigation from '@libs/Navigation/Navigation';
 import {deleteDomainSecurityGroup} from '@userActions/Domain';
 import ONYXKEYS from '@src/ONYXKEYS';
+import ROUTES from '@src/ROUTES';
 
 type DeleteGroupRowProps = {
     domainAccountID: number;
@@ -49,7 +50,7 @@ function DeleteGroupRow({domainAccountID, groupID}: DeleteGroupRowProps) {
         }
 
         deleteDomainSecurityGroup(domainAccountID, groupID, group);
-        Navigation.goBack();
+        Navigation.goBack(ROUTES.DOMAIN_GROUPS.getRoute(domainAccountID));
     };
 
     return groupID !== defaultSecurityGroupID ? (

@@ -1968,7 +1968,7 @@ function deleteDomainSecurityGroup(domainAccountID: number, groupID: string, cur
             key: `${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`,
             value: {
                 [SECURITY_GROUP_KEY]: {
-                    deleteGroupErrors: null,
+                    errors: null,
                 },
             },
         },
@@ -1998,7 +1998,7 @@ function deleteDomainSecurityGroup(domainAccountID: number, groupID: string, cur
             key: `${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`,
             value: {
                 [SECURITY_GROUP_KEY]: {
-                    deleteGroupErrors: getMicroSecondOnyxErrorWithTranslationKey('domain.groups.deleteGroupError'),
+                    errors: getMicroSecondOnyxErrorWithTranslationKey('domain.groups.deleteGroupError'),
                 },
             },
         },
@@ -2019,7 +2019,7 @@ function deleteDomainSecurityGroup(domainAccountID: number, groupID: string, cur
             key: `${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`,
             value: {
                 [SECURITY_GROUP_KEY]: {
-                    deleteGroupErrors: null,
+                    errors: null,
                 },
             },
         },
@@ -2031,6 +2031,19 @@ function deleteDomainSecurityGroup(domainAccountID: number, groupID: string, cur
     };
 
     API.write(WRITE_COMMANDS.DELETE_DOMAIN_SECURITY_GROUP, params, {optimisticData, failureData, successData});
+}
+
+/**
+ * Clears the base error left on a security group after a failed delete attempt.
+ * The group itself is already restored by failureData, so this only clears the error.
+ */
+function clearGroupDeleteError(domainAccountID: number, groupID: string) {
+    const SECURITY_GROUP_KEY = `${CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX}${groupID}`;
+    Onyx.merge(`${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`, {
+        [SECURITY_GROUP_KEY]: {
+            errors: null,
+        },
+    });
 }
 
 /**
@@ -2086,5 +2099,6 @@ export {
     clearDomainMembersSelectedForMove,
     updateDomainSecurityGroup,
     deleteDomainSecurityGroup,
+    clearGroupDeleteError,
     clearDomainSecurityGroupSettingError,
 };

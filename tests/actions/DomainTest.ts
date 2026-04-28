@@ -7,10 +7,12 @@ import {
     clearDomainMemberError,
     clearDomainMembersSelectedForMove,
     clearDomainSecurityGroupSettingError,
+    clearGroupDeleteError,
     clearTwoFactorAuthExemptEmailsErrors,
     clearVacationDelegateError,
     closeUserAccount,
     createDomain,
+    deleteDomainSecurityGroup,
     deleteDomainVacationDelegate,
     resetCreateDomainForm,
     resetDomain,
@@ -1074,6 +1076,134 @@ describe('actions/Domain', () => {
             );
 
             apiWriteSpy.mockRestore();
+        });
+    });
+
+    describe('deleteDomainSecurityGroup', () => {
+        const domainAccountID = 123;
+        const groupID = '456';
+        const accountID = 789;
+        const SECURITY_GROUP_KEY = `${CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX}${groupID}`;
+        const currentSecurityGroup: DomainSecurityGroup = {
+            name: 'Group To Delete',
+            shared: {[accountID]: 'read'},
+            enableRestrictedPolicyCreation: false,
+            enableRestrictedPrimaryLogin: false,
+        };
+
+        let apiWriteSpy: jest.SpyInstance;
+
+        beforeEach(() => {
+            apiWriteSpy = jest.spyOn(require('@libs/API'), 'write').mockImplementation(() => Promise.resolve());
+        });
+
+        afterEach(() => {
+            apiWriteSpy.mockRestore();
+        });
+
+        it('calls API.write with DELETE_DOMAIN_SECURITY_GROUP and correct parameters', () => {
+            deleteDomainSecurityGroup(domainAccountID, groupID, currentSecurityGroup);
+
+            expect(apiWriteSpy).toHaveBeenCalledTimes(1);
+            expect(apiWriteSpy).toHaveBeenCalledWith(WRITE_COMMANDS.DELETE_DOMAIN_SECURITY_GROUP, {domainAccountID, name: SECURITY_GROUP_KEY}, expect.any(Object));
+        });
+
+        it('optimisticData clears the security group, sets DELETE pending action and clears errors', () => {
+            deleteDomainSecurityGroup(domainAccountID, groupID, currentSecurityGroup);
+
+            expect(apiWriteSpy).toHaveBeenCalledWith(
+                WRITE_COMMANDS.DELETE_DOMAIN_SECURITY_GROUP,
+                expect.any(Object),
+                expect.objectContaining({
+                    optimisticData: expect.arrayContaining([
+                        expect.objectContaining({
+                            key: `${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`,
+                            value: {[SECURITY_GROUP_KEY]: null},
+                        }),
+                        expect.objectContaining({
+                            key: `${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`,
+                            value: {[SECURITY_GROUP_KEY]: {pendingAction: CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE}},
+                        }),
+                        expect.objectContaining({
+                            key: `${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`,
+                            value: {[SECURITY_GROUP_KEY]: {errors: null}},
+                        }),
+                    ]),
+                }),
+            );
+        });
+
+        it('successData clears the pending action and errors for the security group', () => {
+            deleteDomainSecurityGroup(domainAccountID, groupID, currentSecurityGroup);
+
+            expect(apiWriteSpy).toHaveBeenCalledWith(
+                WRITE_COMMANDS.DELETE_DOMAIN_SECURITY_GROUP,
+                expect.any(Object),
+                expect.objectContaining({
+                    successData: expect.arrayContaining([
+                        expect.objectContaining({
+                            key: `${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`,
+                            value: {[SECURITY_GROUP_KEY]: {pendingAction: null}},
+                        }),
+                        expect.objectContaining({
+                            key: `${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`,
+                            value: {[SECURITY_GROUP_KEY]: {errors: null}},
+                        }),
+                    ]),
+                }),
+            );
+        });
+
+        it('failureData restores the security group, clears the pending action and sets errors', () => {
+            deleteDomainSecurityGroup(domainAccountID, groupID, currentSecurityGroup);
+
+            expect(apiWriteSpy).toHaveBeenCalledWith(
+                WRITE_COMMANDS.DELETE_DOMAIN_SECURITY_GROUP,
+                expect.any(Object),
+                expect.objectContaining({
+                    failureData: expect.arrayContaining([
+                        expect.objectContaining({
+                            key: `${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`,
+                            value: {[SECURITY_GROUP_KEY]: currentSecurityGroup},
+                        }),
+                        expect.objectContaining({
+                            key: `${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`,
+                            value: {[SECURITY_GROUP_KEY]: {pendingAction: null}},
+                        }),
+                        expect.objectContaining({
+                            key: `${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`,
+                            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                            value: {[SECURITY_GROUP_KEY]: {errors: expect.any(Object)}},
+                        }),
+                    ]),
+                }),
+            );
+        });
+    });
+
+    describe('clearGroupDeleteError', () => {
+        it('clears the base errors for the given security group', async () => {
+            const domainAccountID = 123;
+            const groupID = '456';
+            const SECURITY_GROUP_KEY = `${CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX}${groupID}`;
+            const timestamp = 789;
+
+            await Onyx.set(`${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`, {
+                [SECURITY_GROUP_KEY]: {
+                    errors: {[timestamp]: 'error'},
+                },
+            });
+
+            clearGroupDeleteError(domainAccountID, groupID);
+
+            await TestHelper.getOnyxData({
+                key: `${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`,
+                waitForCollectionCallback: false,
+                callback: (errors) => {
+                    const groupErrors = errors?.[SECURITY_GROUP_KEY as keyof typeof errors] as Record<string, Record<string, string>> | undefined;
+                    expect(groupErrors?.errors).toBeFalsy();
+                },
+            });
         });
     });
 
