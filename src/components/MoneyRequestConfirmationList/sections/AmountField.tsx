@@ -17,7 +17,7 @@ import {isAmountMissing} from '@libs/TransactionUtils';
 import {isParticipantP2P} from '@pages/iou/request/step/IOURequestStepAmount';
 import IOURequestStepCurrencyModal from '@pages/iou/request/step/IOURequestStepCurrencyModal';
 import {getMoneyRequestParticipantsFromReport} from '@userActions/IOU';
-import {resetSplitShares, setDraftSplitTransaction} from '@userActions/IOU/Split';
+import {resetSplitShares, setDraftSplitTransaction, setSplitShares} from '@userActions/IOU/Split';
 import CONST from '@src/CONST';
 import type {IOUAction, IOUType} from '@src/CONST';
 import type {TranslationPaths} from '@src/languages/types';
@@ -130,38 +130,68 @@ function AmountField({
         return isNegative ? -absoluteBackendAmount : absoluteBackendAmount;
     };
 
+    /**
+     * When the bill total or currency changes:
+     * - Editing an existing split bill: recompute shares on the split draft (`SPLIT_TRANSACTION_DRAFT`).
+     * - Creating a split (`iouType` split): `setSplitShares` on the transaction draft (or seed from `participants` if shares are missing).
+     * - Any other draft that already has `splitShares`: `resetSplitShares` so shares stay proportional to the new total.
+     */
     const buildAndSaveSplitShares = (updatedAmount: number, updatedCurrency: string) => {
-        if (!transactionID) {
+        if (isEditingSplitBill) {
+            if (!transactionID) {
+                return;
+            }
+            const splitShares = splitDraftTransaction?.splitShares ?? transaction?.splitShares;
+            const accountID = currentUserAccountID ?? CONST.DEFAULT_NUMBER_ID;
+            const newAccountIDs = Object.keys(splitShares ?? {}).map((key) => Number(key));
+            const oldAccountIDs = Object.keys(transaction?.splitShares ?? {}).map((key) => Number(key));
+            const accountIDs = [...new Set<number>([accountID, ...newAccountIDs, ...oldAccountIDs])];
+
+            const participantsLength = newAccountIDs.includes(accountID) ? newAccountIDs.length - 1 : newAccountIDs.length;
+
+            const updatedSplitShares = accountIDs.reduce<NonNullable<OnyxTypes.Transaction['splitShares']>>((acc, splitShareAccountID) => {
+                if (!newAccountIDs.includes(splitShareAccountID) && splitShareAccountID !== accountID) {
+                    acc[splitShareAccountID] = null;
+                    return acc;
+                }
+
+                const isPayer = splitShareAccountID === accountID;
+                acc[splitShareAccountID] = {
+                    amount: calculateAmount(participantsLength, updatedAmount, updatedCurrency, isPayer),
+                    isModified: false,
+                };
+                return acc;
+            }, {});
+
+            setDraftSplitTransaction(transactionID, splitDraftTransaction, {
+                amount: updatedAmount,
+                currency: updatedCurrency,
+                ...(accountIDs.length > 0 ? {splitShares: updatedSplitShares} : {}),
+            });
             return;
         }
 
-        const splitShares = splitDraftTransaction?.splitShares ?? transaction?.splitShares;
-        const accountID = currentUserAccountID ?? CONST.DEFAULT_NUMBER_ID;
-        const newAccountIDs = Object.keys(splitShares ?? {}).map((key) => Number(key));
-        const oldAccountIDs = Object.keys(transaction?.splitShares ?? {}).map((key) => Number(key));
-        const accountIDs = [...new Set<number>([accountID, ...newAccountIDs, ...oldAccountIDs])];
-
-        const participantsLength = newAccountIDs.includes(accountID) ? newAccountIDs.length - 1 : newAccountIDs.length;
-
-        const updatedSplitShares = accountIDs.reduce<NonNullable<OnyxTypes.Transaction['splitShares']>>((acc, splitShareAccountID) => {
-            if (!newAccountIDs.includes(splitShareAccountID) && splitShareAccountID !== accountID) {
-                acc[splitShareAccountID] = null;
-                return acc;
+        if (iouType === CONST.IOU.TYPE.SPLIT && transaction) {
+            const shareAccountIDs = Object.keys(transaction.splitShares ?? {}).map(Number);
+            const participantAccountIDs =
+                shareAccountIDs.length > 0 ? shareAccountIDs : (transaction.participants ?? []).map((p) => p.accountID).filter((id): id is number => id !== undefined);
+            if (participantAccountIDs.length > 0) {
+                setSplitShares(transaction, updatedAmount, updatedCurrency, participantAccountIDs);
             }
+            return;
+        }
 
-            const isPayer = splitShareAccountID === accountID;
-            acc[splitShareAccountID] = {
-                amount: calculateAmount(participantsLength, updatedAmount, updatedCurrency, isPayer),
-                isModified: false,
-            };
-            return acc;
-        }, {});
+        if (transaction?.splitShares) {
+            resetSplitShares(transaction, updatedAmount, updatedCurrency);
+        }
+    };
 
-        setDraftSplitTransaction(transactionID, splitDraftTransaction, {
-            amount: updatedAmount,
-            currency: updatedCurrency,
-            ...(accountIDs.length > 0 ? {splitShares: updatedSplitShares} : {}),
-        });
+    /** Writes `amount` / `currency` to the main transaction draft unless we only touched the split-bill draft above. */
+    const persistMainDraftTotal = (backendAmount: number, currency: string) => {
+        if (isEditingSplitBill || !transactionID) {
+            return;
+        }
+        setMoneyRequestAmount(transactionID, backendAmount, currency);
     };
 
     const updateCurrency = (value: string) => {
@@ -174,12 +204,8 @@ function AmountField({
         const parsedAmount = getBackendAmountFromInput(transactionAmount);
         const updatedAmount = parsedAmount ?? amount;
 
-        if (isEditingSplitBill) {
-            buildAndSaveSplitShares(updatedAmount, value);
-            return;
-        }
-
-        setMoneyRequestAmount(transactionID, updatedAmount, value);
+        buildAndSaveSplitShares(updatedAmount, value);
+        persistMainDraftTotal(updatedAmount, value);
     };
 
     const handleAmountChange = (newAmount: string) => {
@@ -203,17 +229,8 @@ function AmountField({
             clearFormErrors(['common.error.invalidAmount']);
         }
 
-        // Edits to the amount from the splits page should reset the split shares.
-        if (transaction?.splitShares) {
-            resetSplitShares(transaction, parsedAmount);
-        }
-
-        if (isEditingSplitBill) {
-            buildAndSaveSplitShares(parsedAmount, effectiveCurrency);
-            return;
-        }
-
-        setMoneyRequestAmount(transactionID, parsedAmount, effectiveCurrency);
+        buildAndSaveSplitShares(parsedAmount, effectiveCurrency);
+        persistMainDraftTotal(parsedAmount, effectiveCurrency);
     };
 
     return (
