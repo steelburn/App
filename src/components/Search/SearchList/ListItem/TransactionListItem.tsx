@@ -2,27 +2,17 @@
 // SearchStaticList (src/components/Search/SearchStaticList.tsx) used for fast
 // perceived performance. If you change the narrow-layout UI here, verify the
 // static version still looks visually identical.
-import React, {useRef} from 'react';
-import type {View} from 'react-native';
+import React from 'react';
 import type {OnyxEntry} from 'react-native-onyx';
 // Use the original useOnyx hook to get the real-time data from Onyx and not from the snapshot
 // eslint-disable-next-line no-restricted-imports
 import {useOnyx as originalUseOnyx} from 'react-native-onyx';
-import {getButtonRole} from '@components/Button/utils';
 import {useDelegateNoAccessActions, useDelegateNoAccessState} from '@components/DelegateNoAccessModalProvider';
-import OfflineWithFeedback from '@components/OfflineWithFeedback';
-import PressableWithFeedback from '@components/Pressable/PressableWithFeedback';
 import {useSearchStateContext} from '@components/Search/SearchContext';
 import type {ListItem} from '@components/SelectionList/types';
-import TransactionItemRow from '@components/TransactionItemRow';
-import useAnimatedHighlightStyle from '@hooks/useAnimatedHighlightStyle';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useOnyx from '@hooks/useOnyx';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
-import useStyleUtils from '@hooks/useStyleUtils';
-import useSyncFocus from '@hooks/useSyncFocus';
-import useTheme from '@hooks/useTheme';
-import useThemeStyles from '@hooks/useThemeStyles';
 import type {TransactionPreviewData} from '@libs/actions/Search';
 import {handleActionButtonPress as handleActionButtonPressUtil} from '@libs/actions/Search';
 import {syncMissingAttendeesViolation} from '@libs/AttendeeUtils';
@@ -35,8 +25,9 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import {isActionLoadingSelector} from '@src/selectors/ReportMetaData';
 import type {Policy, Report, ReportAction, ReportActions} from '@src/types/onyx';
 import type {TransactionViolation} from '@src/types/onyx/TransactionViolation';
+import TransactionListItemNarrow from './TransactionListItemNarrow';
+import TransactionListItemWide from './TransactionListItemWide';
 import type {TransactionListItemProps, TransactionListItemType} from './types';
-import UserInfoAndActionButtonRow from './UserInfoAndActionButtonRow';
 
 function TransactionListItem<TItem extends ListItem>({
     item,
@@ -64,11 +55,8 @@ function TransactionListItem<TItem extends ListItem>({
 }: TransactionListItemProps<TItem>) {
     const transactionItem = item as unknown as TransactionListItemType;
     const isDeletedTransaction = isDeletedTransactionUtil(transactionItem);
-    const styles = useThemeStyles();
-    const theme = useTheme();
-    const StyleUtils = useStyleUtils();
 
-    const {isLargeScreenWidth, shouldUseNarrowLayout} = useResponsiveLayout();
+    const {isLargeScreenWidth} = useResponsiveLayout();
     const {currentSearchHash, currentSearchKey, currentSearchResults} = useSearchStateContext();
     const snapshotReport = (currentSearchResults?.data?.[`${ONYXKEYS.COLLECTION.REPORT}${transactionItem.reportID}`] ?? {}) as Report;
 
@@ -107,37 +95,6 @@ function TransactionListItem<TItem extends ListItem>({
         hasParentReportAction: !!parentReportAction,
         hasTransactionThreadReport: !!transactionThreadReport,
     };
-
-    const pressableStyle = [
-        styles.transactionListItemStyle,
-        !isLargeScreenWidth && styles.p4,
-        !isLargeScreenWidth && styles.noBorderRadius,
-        item.isSelected && styles.activeComponentBG,
-        isLargeScreenWidth
-            ? {
-                  ...styles.flexRow,
-                  ...styles.justifyContentBetween,
-                  ...styles.alignItemsCenter,
-                  ...StyleUtils.getSearchTableRowPressableStyle(!!isLastItem, item.isSelected),
-              }
-            : {...styles.flexColumn, ...styles.alignItemsStretch},
-    ];
-
-    const animatedHighlightStyle = useAnimatedHighlightStyle({
-        borderRadius: 0,
-        shouldHighlight: item?.shouldAnimateInHighlight ?? false,
-        highlightColor: theme.messageHighlightBG,
-        backgroundColor: theme.highlightBG,
-        shouldApplyOtherStyles: !isLargeScreenWidth,
-    });
-
-    const amountColumnSize = transactionItem.isAmountColumnWide ? CONST.SEARCH.TABLE_COLUMN_SIZES.WIDE : CONST.SEARCH.TABLE_COLUMN_SIZES.NORMAL;
-    const taxAmountColumnSize = transactionItem.isTaxAmountColumnWide ? CONST.SEARCH.TABLE_COLUMN_SIZES.WIDE : CONST.SEARCH.TABLE_COLUMN_SIZES.NORMAL;
-    const dateColumnSize = transactionItem.shouldShowYear ? CONST.SEARCH.TABLE_COLUMN_SIZES.WIDE : CONST.SEARCH.TABLE_COLUMN_SIZES.NORMAL;
-    const submittedColumnSize = transactionItem.shouldShowYearSubmitted ? CONST.SEARCH.TABLE_COLUMN_SIZES.WIDE : CONST.SEARCH.TABLE_COLUMN_SIZES.NORMAL;
-    const approvedColumnSize = transactionItem.shouldShowYearApproved ? CONST.SEARCH.TABLE_COLUMN_SIZES.WIDE : CONST.SEARCH.TABLE_COLUMN_SIZES.NORMAL;
-    const postedColumnSize = transactionItem.shouldShowYearPosted ? CONST.SEARCH.TABLE_COLUMN_SIZES.WIDE : CONST.SEARCH.TABLE_COLUMN_SIZES.NORMAL;
-    const exportedColumnSize = transactionItem.shouldShowYearExported ? CONST.SEARCH.TABLE_COLUMN_SIZES.WIDE : CONST.SEARCH.TABLE_COLUMN_SIZES.NORMAL;
 
     // Prefer live Onyx policy data over snapshot to ensure fresh policy settings
     // like isAttendeeTrackingEnabled is not missing
@@ -190,87 +147,45 @@ function TransactionListItem<TItem extends ListItem>({
         });
     };
 
-    const pressableRef = useRef<View>(null);
+    const sharedProps = {
+        item,
+        transactionItem,
+        isDeletedTransaction,
+        isFocused,
+        showTooltip,
+        isDisabled,
+        canSelectMultiple,
+        onSelectRow,
+        onCheckboxPress,
+        onFocus,
+        onLongPressRow,
+        shouldSyncFocus,
+        columns,
+        isLoading,
+        isActionLoading,
+        transactionViolations,
+        handleActionButtonPress,
+        transactionPreviewData,
+        exportedReportActions: exportedReportActions as ReportAction[],
+        nonPersonalAndWorkspaceCards,
+        policyForMovingExpenses,
+    };
 
-    useSyncFocus(pressableRef, !!isFocused, shouldSyncFocus);
+    if (!isLargeScreenWidth) {
+        return (
+            <TransactionListItemNarrow
+                {...sharedProps}
+                isLastItem={isLastItem}
+                isFirstItem={isFirstItem}
+            />
+        );
+    }
 
     return (
-        <OfflineWithFeedback pendingAction={item.pendingAction}>
-            <PressableWithFeedback
-                ref={pressableRef}
-                onLongPress={() => onLongPressRow?.(item)}
-                onPress={isDeletedTransaction && !canSelectMultiple ? undefined : () => onSelectRow(item, transactionPreviewData)}
-                disabled={isDisabled && !item.isSelected}
-                accessibilityLabel={item.text ?? ''}
-                role={!isDeletedTransaction ? getButtonRole(true) : 'none'}
-                isNested
-                onMouseDown={(e) => e.preventDefault()}
-                hoverStyle={[!item.isDisabled && styles.hoveredComponentBG, item.isSelected && styles.activeComponentBG]}
-                dataSet={{[CONST.SELECTION_SCRAPER_HIDDEN_ELEMENT]: true, [CONST.INNER_BOX_SHADOW_ELEMENT]: false}}
-                id={item.keyForList ?? ''}
-                sentryLabel={CONST.SENTRY_LABEL.SEARCH.TRANSACTION_LIST_ITEM}
-                style={[
-                    pressableStyle,
-                    isFocused && StyleUtils.getItemBackgroundColorStyle(!!item.isSelected, !!isFocused, !!item.isDisabled, theme.activeComponentBG, theme.hoverComponentBG),
-                    isDeletedTransaction && styles.cursorDefault,
-                ]}
-                onFocus={onFocus}
-                wrapperStyle={[
-                    styles.mh5,
-                    styles.flex1,
-                    animatedHighlightStyle,
-                    styles.userSelectNone,
-                    isLargeScreenWidth && isLastItem && [styles.searchTableBottomRadius, styles.overflowHidden],
-                    !isLargeScreenWidth && isFirstItem && [styles.searchTableTopRadius, styles.overflowHidden],
-                    !isLargeScreenWidth && isLastItem && [styles.searchTableBottomRadius, styles.overflowHidden],
-                    !isLargeScreenWidth && !isLastItem && styles.borderBottom,
-                ]}
-            >
-                {({hovered}) => (
-                    <>
-                        {!isLargeScreenWidth && (
-                            <UserInfoAndActionButtonRow
-                                item={transactionItem}
-                                shouldShowUserInfo={!isDeletedTransaction && !!transactionItem?.from}
-                                stateNum={transactionItem.report?.stateNum}
-                                statusNum={transactionItem.report?.statusNum}
-                            />
-                        )}
-                        <TransactionItemRow
-                            transactionItem={transactionItem}
-                            report={transactionItem.report}
-                            policy={transactionItem.policy}
-                            shouldShowTooltip={showTooltip}
-                            onButtonPress={handleActionButtonPress}
-                            onCheckboxPress={() => onCheckboxPress?.(item)}
-                            shouldUseNarrowLayout={!isLargeScreenWidth}
-                            isLargeScreenWidth={isLargeScreenWidth}
-                            columns={columns}
-                            isActionLoading={isLoading ?? isActionLoading}
-                            isSelected={!!transactionItem.isSelected}
-                            isDisabled={!!isDisabled}
-                            dateColumnSize={dateColumnSize}
-                            submittedColumnSize={submittedColumnSize}
-                            approvedColumnSize={approvedColumnSize}
-                            postedColumnSize={postedColumnSize}
-                            exportedColumnSize={exportedColumnSize}
-                            amountColumnSize={amountColumnSize}
-                            taxAmountColumnSize={taxAmountColumnSize}
-                            isActionColumnWide={transactionItem.isActionColumnWide}
-                            shouldShowCheckbox={!!canSelectMultiple}
-                            checkboxSentryLabel={CONST.SENTRY_LABEL.SEARCH.TRANSACTION_LIST_ITEM_CHECKBOX}
-                            style={[styles.p3, styles.pv2, shouldUseNarrowLayout ? [styles.p0, styles.pt3] : isLargeScreenWidth && styles.noBorderRadius]}
-                            violations={transactionViolations}
-                            onArrowRightPress={isDeletedTransaction ? undefined : () => onSelectRow(item, transactionPreviewData)}
-                            isHover={hovered}
-                            nonPersonalAndWorkspaceCards={nonPersonalAndWorkspaceCards}
-                            reportActions={exportedReportActions}
-                            policyForMovingExpenses={policyForMovingExpenses}
-                        />
-                    </>
-                )}
-            </PressableWithFeedback>
-        </OfflineWithFeedback>
+        <TransactionListItemWide
+            {...sharedProps}
+            isLastItem={isLastItem}
+        />
     );
 }
 
