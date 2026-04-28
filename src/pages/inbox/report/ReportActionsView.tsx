@@ -1,4 +1,4 @@
-import {useIsFocused, useRoute} from '@react-navigation/native';
+import {useRoute} from '@react-navigation/native';
 import React, {useEffect, useRef, useState} from 'react';
 import type {LayoutChangeEvent} from 'react-native';
 import ReportActionsSkeletonView from '@components/ReportActionsSkeletonView';
@@ -15,12 +15,10 @@ import useParentReportAction from '@hooks/useParentReportAction';
 import usePendingConciergeResponse from '@hooks/usePendingConciergeResponse';
 import useReportIsArchived from '@hooks/useReportIsArchived';
 import useReportTransactionsCollection from '@hooks/useReportTransactionsCollection';
-import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useSidePanelState from '@hooks/useSidePanelState';
 import useTransactionsAndViolationsForReport from '@hooks/useTransactionsAndViolationsForReport';
 import {getReportPreviewAction} from '@libs/actions/IOU';
 import {updateLoadingInitialReportAction} from '@libs/actions/Report';
-import getIsReportFullyVisible from '@libs/getIsReportFullyVisible';
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import {getAllNonDeletedTransactions} from '@libs/MoneyRequestReportUtils';
 import {
@@ -88,9 +86,9 @@ function ReportActionsView({reportID, onLayout}: ReportActionsViewProps) {
 
     const parentReportAction = useParentReportAction(report);
 
-    const [reportMetadata] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_METADATA}${reportID}`);
-    const isLoadingInitialReportActions = reportMetadata?.isLoadingInitialReportActions;
-    const hasOnceLoadedReportActions = reportMetadata?.hasOnceLoadedReportActions;
+    const [reportLoadingState] = useOnyx(`${ONYXKEYS.COLLECTION.RAM_ONLY_REPORT_LOADING_STATE}${reportID}`);
+    const isLoadingInitialReportActions = reportLoadingState?.isLoadingInitialReportActions;
+    const hasOnceLoadedReportActions = reportLoadingState?.hasOnceLoadedReportActions;
 
     const isInSidePanel = useIsInSidePanel();
     const [conciergeReportID] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID);
@@ -132,10 +130,6 @@ function ReportActionsView({reportID, onLayout}: ReportActionsViewProps) {
         didLayout.current = false;
     }, [reportID]);
 
-    const {shouldUseNarrowLayout} = useResponsiveLayout();
-    const isFocused = useIsFocused();
-    const prevShouldUseNarrowLayoutRef = useRef(shouldUseNarrowLayout);
-    const isReportFullyVisible = getIsReportFullyVisible(isFocused);
     const {transactions: reportTransactions} = useTransactionsAndViolationsForReport(reportID);
     const reportTransactionIDs = getAllNonDeletedTransactions(reportTransactions, allReportActions).map((transaction) => transaction.transactionID);
 
@@ -193,11 +187,6 @@ function ReportActionsView({reportID, onLayout}: ReportActionsViewProps) {
     const isMissingTransactionThreadReportID = !transactionThreadReport?.reportID;
     const isReportDataIncomplete = isSingleExpenseReport && isMissingTransactionThreadReportID;
     const isMissingReportActions = visibleReportActions.length === 0;
-
-    useEffect(() => {
-        // update ref with current state
-        prevShouldUseNarrowLayoutRef.current = shouldUseNarrowLayout;
-    }, [shouldUseNarrowLayout, reportActions, isReportFullyVisible]);
 
     const allReportActionIDs = allReportActions?.map((action) => action.reportActionID) ?? [];
 
@@ -271,7 +260,7 @@ function ReportActionsView({reportID, onLayout}: ReportActionsViewProps) {
 
     // When opening an unread report, it is very likely that the message we will open to is not the latest,
     // which is the only one we will have in cache.
-    const isInitiallyLoadingReport = isReportUnread && !!reportMetadata?.isLoadingInitialReportActions && (isOffline || reportActions.length <= 1);
+    const isInitiallyLoadingReport = isReportUnread && !!reportLoadingState?.isLoadingInitialReportActions && (isOffline || reportActions.length <= 1);
 
     // Same for unread messages, we need to wait for the results from the OpenReport API call
     // if the oldest unread report action is not available yet. Only applies during the *first* load
