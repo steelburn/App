@@ -35,6 +35,9 @@ type MoneyRequestParticipantsSelectorProps = {
     /** Whether this is a corporate card transaction */
     isCorporateCardTransaction?: boolean;
 
+    /** The report ID of the currently selected participant (used for showing selection state) */
+    selectedReportID?: string | number;
+
     /** Reference to the outer element */
     ref?: Ref<InputFocusRef>;
 };
@@ -54,6 +57,7 @@ function MoneyRequestParticipantsSelector({
     isTimeRequest = false,
     isWorkspacesOnly = false,
     isCorporateCardTransaction = false,
+    selectedReportID,
     ref,
 }: MoneyRequestParticipantsSelectorProps) {
     const platform = getPlatform();
@@ -85,6 +89,7 @@ function MoneyRequestParticipantsSelector({
             setTextInputAutoFocus={setTextInputAutoFocus}
             onParticipantsAdded={onParticipantsAdded}
             onFinish={onFinish}
+            selectedReportID={selectedReportID}
         />
     );
 }

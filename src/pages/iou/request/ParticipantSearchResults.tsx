@@ -93,6 +93,9 @@ type ParticipantSearchResultsProps = {
 
     /** Callback to advance the parent flow */
     onFinish: (value?: string, participants?: Participant[]) => void;
+
+    /** The report ID of the currently selected participant (used for showing selection state) */
+    selectedReportID?: string | number;
 };
 
 function ParticipantSearchResults({
@@ -109,6 +112,7 @@ function ParticipantSearchResults({
     setTextInputAutoFocus,
     onParticipantsAdded,
     onFinish,
+    selectedReportID,
 }: ParticipantSearchResultsProps) {
     const isIOUSplit = iouType === CONST.IOU.TYPE.SPLIT;
     const isCategorizeOrShareAction = action === CONST.IOU.ACTION.CATEGORIZE || action === CONST.IOU.ACTION.SHARE;
@@ -342,6 +346,16 @@ function ParticipantSearchResults({
                 }),
                 sectionIndex: 5,
             });
+        }
+
+        if (selectedReportID !== undefined) {
+            for (const section of sections) {
+                section.data = section.data.map((item) => ({
+                    ...item,
+                    isSelected: item.reportID === selectedReportID,
+                    canShowSeveralIndicators: true,
+                }));
+            }
         }
 
         if (!showImportContacts) {
