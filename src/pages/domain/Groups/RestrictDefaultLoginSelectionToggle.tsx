@@ -39,7 +39,7 @@ function RestrictDefaultLoginSelectionToggle({domainAccountID, groupID}: Restric
                 shouldPlaceSubtitleBelowSwitch
                 isActive={isEnabled}
                 onToggle={(enabled) => {
-                    if (!group?.name) {
+                    if (!group) {
                         return;
                     }
                     updateDomainSecurityGroup(domainAccountID, groupID, group, {enableRestrictedPrimaryLogin: enabled}, 'enableRestrictedPrimaryLogin');
