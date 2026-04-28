@@ -70,9 +70,10 @@ function CollapsibleHeaderOnKeyboard({children, collapsibleHeaderOffset = 0}: Co
             const prevKeyboardProgress = previous?.keyboardProgress ?? 0;
             const naturalHeightValue = naturalHeight.get();
 
+            const isKeyboardFullyClosed = keyboardProgress < 0.01;
             // Keyboard fully closed — restore header (guard avoids redundant withTiming calls
             // during the first few frames of keyboard opening when keyboardProgress is still < 0.01).
-            if (keyboardProgress < 0.01) {
+            if (isKeyboardFullyClosed) {
                 if (animatedHeight.get() < naturalHeightValue) {
                     animatedHeight.set(withTiming(naturalHeightValue, {duration: RESTORE_DURATION}));
                 }
@@ -87,10 +88,10 @@ function CollapsibleHeaderOnKeyboard({children, collapsibleHeaderOffset = 0}: Co
             }
 
             // Only act at the two transition points described above, not on every intermediate frame.
-            const keyboardJustStartedOpening = prevKeyboardProgress < 0.01;
-            const keyboardJustFullyOpened = keyboardProgress > 0.99 && prevKeyboardProgress <= 0.99;
+            const isKeyboardStartingOpening = prevKeyboardProgress < 0.01;
+            const isKeyboardFullyOpened = keyboardProgress > 0.99 && prevKeyboardProgress <= 0.99;
 
-            if (!keyboardJustStartedOpening && !keyboardJustFullyOpened) {
+            if (!isKeyboardStartingOpening && !isKeyboardFullyOpened) {
                 return;
             }
 
