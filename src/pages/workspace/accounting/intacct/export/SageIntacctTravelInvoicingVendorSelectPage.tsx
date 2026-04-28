@@ -9,24 +9,34 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import {updateSageIntacctTravelInvoicingVendor} from '@libs/actions/connections/SageIntacct';
 import {clearSageIntacctErrorField} from '@libs/actions/Policy/Policy';
 import {getLatestErrorField} from '@libs/ErrorUtils';
+import createDynamicRoute from '@libs/Navigation/helpers/dynamicRoutesUtils/createDynamicRoute';
 import {settingsPendingAction} from '@libs/PolicyUtils';
 import Navigation from '@navigation/Navigation';
 import type {WithPolicyConnectionsProps} from '@pages/workspace/withPolicyConnections';
 import withPolicyConnections from '@pages/workspace/withPolicyConnections';
 import variables from '@styles/variables';
 import CONST from '@src/CONST';
-import ROUTES from '@src/ROUTES';
+import ROUTES, {DYNAMIC_ROUTES} from '@src/ROUTES';
+import type {Route} from '@src/ROUTES';
 
 type VendorListItem = ListItem & {
     value: string;
 };
 
-function SageIntacctTravelInvoicingVendorSelectPage({policy}: WithPolicyConnectionsProps) {
+type SageIntacctTravelInvoicingVendorSelectPageProps = WithPolicyConnectionsProps & {
+    backPath?: Route;
+};
+
+function SageIntacctTravelInvoicingVendorSelectPage({policy, backPath}: SageIntacctTravelInvoicingVendorSelectPageProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
     const illustrations = useMemoizedLazyIllustrations(['Telescope']);
 
     const policyID = policy?.id ?? String(CONST.DEFAULT_NUMBER_ID);
+    const fallbackBackPath = createDynamicRoute(
+        DYNAMIC_ROUTES.POLICY_ACCOUNTING_SAGE_INTACCT_TRAVEL_INVOICING_CONFIGURATION.path,
+        ROUTES.POLICY_ACCOUNTING_SAGE_INTACCT_EXPORT.getRoute(policyID),
+    );
     const config = policy?.connections?.intacct?.config;
     const {vendors} = policy?.connections?.intacct?.data ?? {};
     const selectedVendorID = config?.export?.travelInvoicingVendorID;
@@ -43,7 +53,7 @@ function SageIntacctTravelInvoicingVendorSelectPage({policy}: WithPolicyConnecti
         if (row.value !== selectedVendorID) {
             updateSageIntacctTravelInvoicingVendor(policyID, row.value, selectedVendorID);
         }
-        Navigation.goBack(ROUTES.POLICY_ACCOUNTING_SAGE_INTACCT_TRAVEL_INVOICING_CONFIGURATION.getRoute(policyID));
+        Navigation.goBack(backPath ?? fallbackBackPath);
     };
 
     const listEmptyContent = (
@@ -71,7 +81,7 @@ function SageIntacctTravelInvoicingVendorSelectPage({policy}: WithPolicyConnecti
             initiallyFocusedOptionKey={data.find((option) => option.isSelected)?.keyForList}
             listEmptyContent={listEmptyContent}
             connectionName={CONST.POLICY.CONNECTIONS.NAME.SAGE_INTACCT}
-            onBackButtonPress={() => Navigation.goBack(ROUTES.POLICY_ACCOUNTING_SAGE_INTACCT_TRAVEL_INVOICING_CONFIGURATION.getRoute(policyID))}
+            onBackButtonPress={() => Navigation.goBack(backPath ?? fallbackBackPath)}
             pendingAction={settingsPendingAction([CONST.SAGE_INTACCT_CONFIG.TRAVEL_INVOICING_VENDOR], config?.pendingFields)}
             errors={getLatestErrorField(config, CONST.SAGE_INTACCT_CONFIG.TRAVEL_INVOICING_VENDOR)}
             errorRowStyles={[styles.ph5, styles.pv3]}
@@ -80,4 +90,5 @@ function SageIntacctTravelInvoicingVendorSelectPage({policy}: WithPolicyConnecti
     );
 }
 
+export {SageIntacctTravelInvoicingVendorSelectPage};
 export default withPolicyConnections(SageIntacctTravelInvoicingVendorSelectPage);

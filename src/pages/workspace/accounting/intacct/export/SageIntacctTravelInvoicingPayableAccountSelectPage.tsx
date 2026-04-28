@@ -9,24 +9,34 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import {updateSageIntacctTravelInvoicingPayableAccount} from '@libs/actions/connections/SageIntacct';
 import {clearSageIntacctErrorField} from '@libs/actions/Policy/Policy';
 import {getLatestErrorField} from '@libs/ErrorUtils';
+import createDynamicRoute from '@libs/Navigation/helpers/dynamicRoutesUtils/createDynamicRoute';
 import {settingsPendingAction} from '@libs/PolicyUtils';
 import Navigation from '@navigation/Navigation';
 import type {WithPolicyConnectionsProps} from '@pages/workspace/withPolicyConnections';
 import withPolicyConnections from '@pages/workspace/withPolicyConnections';
 import variables from '@styles/variables';
 import CONST from '@src/CONST';
-import ROUTES from '@src/ROUTES';
+import ROUTES, {DYNAMIC_ROUTES} from '@src/ROUTES';
+import type {Route} from '@src/ROUTES';
 
 type PayableAccountListItem = ListItem & {
     value: string;
 };
 
-function SageIntacctTravelInvoicingPayableAccountSelectPage({policy}: WithPolicyConnectionsProps) {
+type SageIntacctTravelInvoicingPayableAccountSelectPageProps = WithPolicyConnectionsProps & {
+    backPath?: Route;
+};
+
+function SageIntacctTravelInvoicingPayableAccountSelectPage({policy, backPath}: SageIntacctTravelInvoicingPayableAccountSelectPageProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
     const illustrations = useMemoizedLazyIllustrations(['Telescope']);
 
     const policyID = policy?.id ?? String(CONST.DEFAULT_NUMBER_ID);
+    const fallbackBackPath = createDynamicRoute(
+        DYNAMIC_ROUTES.POLICY_ACCOUNTING_SAGE_INTACCT_TRAVEL_INVOICING_CONFIGURATION.path,
+        ROUTES.POLICY_ACCOUNTING_SAGE_INTACCT_EXPORT.getRoute(policyID),
+    );
     const config = policy?.connections?.intacct?.config;
     const {bankAccounts} = policy?.connections?.intacct?.data ?? {};
     const selectedAccountID = config?.export?.travelInvoicingPayableAccountID;
@@ -43,7 +53,7 @@ function SageIntacctTravelInvoicingPayableAccountSelectPage({policy}: WithPolicy
         if (row.value !== selectedAccountID) {
             updateSageIntacctTravelInvoicingPayableAccount(policyID, row.value, selectedAccountID);
         }
-        Navigation.goBack(ROUTES.POLICY_ACCOUNTING_SAGE_INTACCT_TRAVEL_INVOICING_CONFIGURATION.getRoute(policyID));
+        Navigation.goBack(backPath ?? fallbackBackPath);
     };
 
     const listEmptyContent = (
@@ -71,7 +81,7 @@ function SageIntacctTravelInvoicingPayableAccountSelectPage({policy}: WithPolicy
             initiallyFocusedOptionKey={data.find((option) => option.isSelected)?.keyForList}
             listEmptyContent={listEmptyContent}
             connectionName={CONST.POLICY.CONNECTIONS.NAME.SAGE_INTACCT}
-            onBackButtonPress={() => Navigation.goBack(ROUTES.POLICY_ACCOUNTING_SAGE_INTACCT_TRAVEL_INVOICING_CONFIGURATION.getRoute(policyID))}
+            onBackButtonPress={() => Navigation.goBack(backPath ?? fallbackBackPath)}
             pendingAction={settingsPendingAction([CONST.SAGE_INTACCT_CONFIG.TRAVEL_INVOICING_PAYABLE_ACCOUNT], config?.pendingFields)}
             errors={getLatestErrorField(config, CONST.SAGE_INTACCT_CONFIG.TRAVEL_INVOICING_PAYABLE_ACCOUNT)}
             errorRowStyles={[styles.ph5, styles.pv3]}
@@ -80,4 +90,5 @@ function SageIntacctTravelInvoicingPayableAccountSelectPage({policy}: WithPolicy
     );
 }
 
+export {SageIntacctTravelInvoicingPayableAccountSelectPage};
 export default withPolicyConnections(SageIntacctTravelInvoicingPayableAccountSelectPage);
