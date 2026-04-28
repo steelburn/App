@@ -1,5 +1,5 @@
 import {CardStyleInterpolators} from '@react-navigation/stack';
-import {accountIDSelector} from '@selectors/Session';
+import {accountIDSelector, emailSelector} from '@selectors/Session';
 import React, {useCallback, useEffect, useMemo} from 'react';
 import {View} from 'react-native';
 import type {ValueOf} from 'type-fest';
@@ -67,6 +67,9 @@ function OnboardingModalNavigator() {
     const [accountID] = useOnyx(ONYXKEYS.SESSION, {
         selector: accountIDSelector,
     });
+    const [email] = useOnyx(ONYXKEYS.SESSION, {
+        selector: emailSelector,
+    });
 
     // Publish a sign_up event when we start the onboarding flow. This should track basic sign ups
     // as well as Google and Apple SSO.
@@ -76,7 +79,7 @@ function OnboardingModalNavigator() {
         }
 
         signUpEventPublishedForAccountID = accountID;
-        GoogleTagManager.publishEvent(CONST.ANALYTICS.EVENT.SIGN_UP, accountID);
+        GoogleTagManager.publishEvent(CONST.ANALYTICS.EVENT.SIGN_UP, accountID, email ?? '');
     }, [accountID]);
 
     const handleOuterClick = useCallback(() => {
