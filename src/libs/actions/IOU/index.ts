@@ -654,15 +654,26 @@ function initMoneyRequest({
     // in case we have to re-init money request, but the IOU request type is the same with the old draft transaction,
     // we should keep most of the existing data by using the ONYX MERGE operation
     if (currentIouRequestType === newIouRequestType) {
-        // so, we just need to update the reportID, isFromGlobalCreate, created, currency
-        Onyx.merge(`${ONYXKEYS.COLLECTION.TRANSACTION_DRAFT}${newTransactionID}`, {
+        const baseUpdate: Partial<OnyxTypes.Transaction> = {
             reportID,
             isFromGlobalCreate,
             isFromFloatingActionButton,
             created,
             currency,
             transactionID: newTransactionID,
-        });
+        };
+
+        // Hydrate any saved odometer draft so a re-entry with iouRequestType already set to
+        // DISTANCE_ODOMETER (e.g. after blob-URL recovery on web refresh) restores readings and images.
+        if (newIouRequestType === CONST.IOU.REQUEST_TYPE.DISTANCE_ODOMETER) {
+            const existingDraftComment = allTransactionDrafts[`${ONYXKEYS.COLLECTION.TRANSACTION_DRAFT}${newTransactionID}`]?.comment;
+            const odometerCommentUpdate = buildOdometerCommentFromDraft(newTransactionID, odometerDraft, existingDraftComment);
+            if (odometerCommentUpdate) {
+                baseUpdate.comment = odometerCommentUpdate;
+            }
+        }
+
+        Onyx.merge(`${ONYXKEYS.COLLECTION.TRANSACTION_DRAFT}${newTransactionID}`, baseUpdate);
         return;
     }
 

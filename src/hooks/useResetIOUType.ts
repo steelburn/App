@@ -73,7 +73,9 @@ function useResetIOUType({
             Keyboard.dismiss();
         }
 
-        if (transaction?.iouRequestType === newIOUType) {
+        // For odometer, fall through to initMoneyRequest even when types match so a saved
+        // odometer draft can hydrate (e.g. after blob-URL recovery clears comment.odometer* on web refresh).
+        if (transaction?.iouRequestType === newIOUType && newIOUType !== CONST.IOU.REQUEST_TYPE.DISTANCE_ODOMETER) {
             return;
         }
 
