@@ -311,7 +311,7 @@ function ExpenseReportListItem<TItem extends ListItem>({
                                 isActionLoading={isActionLoading ?? isLoading}
                                 showTooltip={showTooltip}
                                 canSelectMultiple={canSelectMultiple}
-                                onCheckboxPress={handleCheckboxPress}
+                                onCheckboxPress={handleSelectionButtonPress}
                                 onButtonPress={handleOnButtonPress}
                                 isSelectAllChecked={!!reportItem.isSelected}
                                 isIndeterminate={false}
