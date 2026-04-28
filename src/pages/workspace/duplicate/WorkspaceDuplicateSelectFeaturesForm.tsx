@@ -225,6 +225,7 @@ function WorkspaceDuplicateSelectFeaturesForm({policyID}: WorkspaceDuplicateForm
 
         duplicateWorkspaceAction(policy, {
             currentUserAccountID: currentUserPersonalDetails.accountID,
+            currentUserEmail: currentUserPersonalDetails.email,
             policyName: duplicateWorkspace.name,
             policyID: policy.id,
             targetPolicyID: duplicateWorkspace.policyID,
@@ -260,6 +261,7 @@ function WorkspaceDuplicateSelectFeaturesForm({policyID}: WorkspaceDuplicateForm
         translate,
         duplicatedWorkspaceAvatar,
         currentUserPersonalDetails.accountID,
+        currentUserPersonalDetails.email,
         currentUserPersonalDetails?.localCurrencyCode,
     ]);
 
