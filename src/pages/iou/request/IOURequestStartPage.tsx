@@ -43,7 +43,8 @@ import type {DismissedProductTraining, SelectedTabRequest} from '@src/types/onyx
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
 import isLoadingOnyxValue from '@src/types/utils/isLoadingOnyxValue';
 import {IOURequestStepAmountWithTransactionOnly} from './step/IOURequestStepAmount';
-import IOURequestStepConfirmation, {type IOURequestStepConfirmationPublicProps} from './step/IOURequestStepConfirmation';
+import type {IOURequestStepConfirmationPublicProps} from './step/IOURequestStepConfirmation';
+import IOURequestStepConfirmation from './step/IOURequestStepConfirmation';
 import IOURequestStepDestination from './step/IOURequestStepDestination';
 import IOURequestStepDistance from './step/IOURequestStepDistance';
 import IOURequestStepHours from './step/IOURequestStepHours';

@@ -1,5 +1,6 @@
 import {validTransactionDraftIDsSelector} from '@selectors/TransactionDraft';
-import React, {type ComponentProps, useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import type {ComponentProps} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {View} from 'react-native';
 import DragAndDropConsumer from '@components/DragAndDrop/Consumer';
 import DragAndDropProvider from '@components/DragAndDrop/Provider';
@@ -218,7 +219,6 @@ function IOURequestStepConfirmation({
     const gpsRequired = transaction?.amount === 0 && iouType !== CONST.IOU.TYPE.SPLIT && Object.values(receiptFiles).length && !isTestTransaction && isScanRequest(transaction);
     const [isStitchingReceipt, setIsStitchingReceipt] = useState(false);
     const [stitchError, setStitchError] = useState('');
-    const [shouldOpenParticipantPicker, setShouldOpenParticipantPicker] = useState(false);
     const headerTitle = useMemo(() => {
         if (isCategorizingTrackExpense) {
             return translate('iou.categorize');
@@ -297,6 +297,16 @@ function IOURequestStepConfirmation({
         ownerBillingGracePeriodEnd,
     ]);
 
+    const shouldOpenParticipantPicker = useMemo(() => {
+        if (!transaction?.transactionID) {
+            return false;
+        }
+        const transactionParticipants = transaction?.participants ?? [];
+        const hasTransactionParticipants = transactionParticipants.length > 0;
+        const hasDefaultParticipants = defaultParticipants.length > 0;
+        return !hasTransactionParticipants && !hasDefaultParticipants && isNewManualExpenseFlowEnabled && isManualRequest;
+    }, [transaction?.transactionID, transaction?.participants, defaultParticipants, isNewManualExpenseFlowEnabled]);
+
     useEffect(() => {
         if (!transaction?.transactionID) {
             return;
@@ -305,9 +315,6 @@ function IOURequestStepConfirmation({
         const transactionParticipants = transaction?.participants ?? [];
         const hasTransactionParticipants = transactionParticipants.length > 0;
         const hasDefaultParticipants = defaultParticipants.length > 0;
-        const shouldOpenPicker = !hasTransactionParticipants && !hasDefaultParticipants && isNewManualExpenseFlowEnabled && isManualRequest;
-
-        setShouldOpenParticipantPicker(shouldOpenPicker);
 
         if (hasTransactionParticipants || !hasDefaultParticipants) {
             return;

@@ -2,7 +2,6 @@ import {useFocusEffect, useIsFocused} from '@react-navigation/native';
 import React, {memo, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {InteractionManager, Keyboard, View} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';
-import ParticipantPicker from '@components/ParticipantPicker';
 import {useCurrencyListActions} from '@hooks/useCurrencyList';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useDebouncedState from '@hooks/useDebouncedState';
@@ -79,6 +78,7 @@ import FieldAutoSelector from './MoneyRequestConfirmationList/FieldAutoSelector'
 import SplitBillController from './MoneyRequestConfirmationList/SplitBillController';
 import TaxController from './MoneyRequestConfirmationList/TaxController';
 import MoneyRequestConfirmationListFooter from './MoneyRequestConfirmationListFooter';
+import ParticipantPicker from './ParticipantPicker';
 import {PressableWithFeedback} from './Pressable';
 import {useProductTrainingContext} from './ProductTrainingContext';
 import UserListItem from './SelectionList/ListItem/UserListItem';
@@ -737,7 +737,7 @@ function MoneyRequestConfirmationList({
             setMoneyRequestParticipants(transactionID, participants);
             clearFormErrors(['iou.error.noParticipantSelected']);
         },
-        [transactionID, clearFormErrors, closeParticipantPicker],
+        [transactionID, clearFormErrors],
     );
 
     const sections = useMemo(() => {
@@ -985,8 +985,6 @@ function MoneyRequestConfirmationList({
             isMerchantFieldValid,
             isP2P,
             isTypeRequest,
-            shouldShowMerchant,
-            shouldDisplayFieldError,
             shouldShowTax,
             transaction,
             policyTags,
