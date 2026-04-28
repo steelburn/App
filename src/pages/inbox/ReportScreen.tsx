@@ -3,21 +3,27 @@ import {useFocusEffect} from '@react-navigation/native';
 import React, {useCallback, useState} from 'react';
 import type {ViewStyle} from 'react-native';
 import {InteractionManager, View} from 'react-native';
+import OfflineWithFeedback from '@components/OfflineWithFeedback';
 import ScreenWrapper from '@components/ScreenWrapper';
 import WideRHPOverlayWrapper from '@components/WideRHPOverlayWrapper';
 import useActionListContextValue from '@hooks/useActionListContextValue';
 import {useCurrentReportIDState} from '@hooks/useCurrentReportID';
+import useOnyx from '@hooks/useOnyx';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useSubmitToDestinationVisible from '@hooks/useSubmitToDestinationVisible';
 import useThemeStyles from '@hooks/useThemeStyles';
 import useViewportOffsetTop from '@hooks/useViewportOffsetTop';
+import {removeFailedReport} from '@libs/actions/Report';
 import {flushDeferredWrite, hasDeferredWrite} from '@libs/deferredLayoutWrite';
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
+import Navigation from '@libs/Navigation/Navigation';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
 import TransitionTracker from '@libs/Navigation/TransitionTracker';
+import {getReportOfflinePendingActionAndErrors} from '@libs/ReportUtils';
 import {getPendingSubmitFollowUpAction} from '@libs/telemetry/submitFollowUpAction';
 import type {ReportsSplitNavigatorParamList, RightModalNavigatorParamList} from '@navigation/types';
 import CONST from '@src/CONST';
+import ONYXKEYS from '@src/ONYXKEYS';
 import SCREENS from '@src/SCREENS';
 import AccountManagerBanner from './AccountManagerBanner';
 import {AgentZeroStatusProvider} from './AgentZeroStatusContext';
@@ -116,6 +122,15 @@ function ReportScreen({route, navigation}: ReportScreenProps) {
 
     const actionListValue = useActionListContextValue();
 
+    const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportIDFromRoute}`);
+    const {reportPendingAction, reportErrors} = getReportOfflinePendingActionAndErrors(report);
+
+    const dismissReportCreationError = useCallback(() => {
+        Navigation.goBack();
+        // eslint-disable-next-line @typescript-eslint/no-deprecated
+        InteractionManager.runAfterInteractions(() => removeFailedReport(reportIDFromRoute));
+    }, [reportIDFromRoute]);
+
     return (
         <WideRHPOverlayWrapper shouldWrap={route.name === SCREENS.RIGHT_MODAL.SEARCH_REPORT}>
             <ActionListContext.Provider value={actionListValue}>
@@ -140,18 +155,28 @@ function ReportScreen({route, navigation}: ReportScreenProps) {
                                     {!shouldDeferNonEssentials && <ReportLifecycleHandler reportID={reportIDFromRoute} />}
                                     <ReportHeader />
                                     {!shouldDeferNonEssentials && <AccountManagerBanner reportID={reportIDFromRoute} />}
-                                    <View style={[styles.flex1, styles.flexRow]}>
-                                        {!shouldDeferNonEssentials && <WideRHPReceiptPanel />}
-                                        <AgentZeroStatusProvider reportID={reportIDFromRoute}>
-                                            <View
-                                                style={[styles.flex1, styles.justifyContentEnd, styles.overflowHidden]}
-                                                testID="report-actions-view-wrapper"
-                                            >
-                                                <ReportActionsList />
-                                                {shouldDeferNonEssentials ? <ReportActionComposePlaceholder /> : <ReportFooter />}
-                                            </View>
-                                        </AgentZeroStatusProvider>
-                                    </View>
+                                    <OfflineWithFeedback
+                                        pendingAction={reportPendingAction}
+                                        errors={reportErrors}
+                                        onClose={dismissReportCreationError}
+                                        needsOffscreenAlphaCompositing
+                                        style={styles.flex1}
+                                        contentContainerStyle={styles.flex1}
+                                        errorRowStyles={[styles.ph5, styles.mv2]}
+                                    >
+                                        <View style={[styles.flex1, styles.flexRow]}>
+                                            {!shouldDeferNonEssentials && <WideRHPReceiptPanel />}
+                                            <AgentZeroStatusProvider reportID={reportIDFromRoute}>
+                                                <View
+                                                    style={[styles.flex1, styles.justifyContentEnd, styles.overflowHidden]}
+                                                    testID="report-actions-view-wrapper"
+                                                >
+                                                    <ReportActionsList />
+                                                    {shouldDeferNonEssentials ? <ReportActionComposePlaceholder /> : <ReportFooter />}
+                                                </View>
+                                            </AgentZeroStatusProvider>
+                                        </View>
+                                    </OfflineWithFeedback>
                                     <PortalHost name="suggestions" />
                                 </ReportDragAndDropProvider>
                             </LinkedActionNotFoundGuard>
