@@ -160,14 +160,12 @@ function ReportActionsView({reportID, onLayout}: ReportActionsViewProps) {
     // Remount the list when the deep-linked message or unread anchor changes (scroll positioning), or when the report changes.
     const listID = [reportID, reportActionIDFromRoute, oldestUnreadReportAction?.reportActionID].join(':');
 
-    const lastActionCreated = lastAction?.created;
-
     // When we are offline before opening an IOU/Expense report,
     // the total of the report and sometimes the expense aren't displayed because these actions aren't returned until `OpenReport` API is complete.
     // We generate a fake created action here if it doesn't exist to display the total whenever possible because the total just depends on report data
     // and we also generate an expense action if the number of expenses in allReportActions is less than the total number of expenses
     // to display at least one expense action to match the total data.
-    const reportActionsToDisplay = getReportActionsToDisplay(allReportActions, lastActionCreated, report, reportPreviewAction, transactionThreadReport, shouldAddCreatedAction);
+    const reportActionsToDisplay = getReportActionsToDisplay(allReportActions, lastAction?.created, report, reportPreviewAction, transactionThreadReport, shouldAddCreatedAction);
 
     // Get a sorted array of reportActions for both the current report and the transaction thread report associated with this report (if there is one)
     // so that we display transaction-level and report-level report actions in order in the one-transaction view
