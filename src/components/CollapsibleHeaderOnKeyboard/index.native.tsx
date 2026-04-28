@@ -82,7 +82,7 @@ function CollapsibleHeaderOnKeyboard({children, collapsibleHeaderOffset = 0}: Co
             // Portrait mode — no collapse needed. Snap to full height in case orientation
             // changed while the header was collapsed, then bail out.
             if (!isLandscape) {
-                animatedHeight.set(naturalHeightValue);
+                animatedHeight.set(withTiming(naturalHeightValue, {duration: RESTORE_DURATION}));
                 return;
             }
 
@@ -130,11 +130,13 @@ function CollapsibleHeaderOnKeyboard({children, collapsibleHeaderOffset = 0}: Co
     });
 
     return (
-        <Reanimated.View
-            style={outerStyle}
-            onLayout={onLayout}
-        >
-            <Reanimated.View style={innerStyle}>{children}</Reanimated.View>
+        <Reanimated.View style={outerStyle}>
+            <Reanimated.View
+                onLayout={onLayout}
+                style={innerStyle}
+            >
+                {children}
+            </Reanimated.View>
         </Reanimated.View>
     );
 }
