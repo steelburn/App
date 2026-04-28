@@ -1941,19 +1941,10 @@ function updateDomainSecurityGroup(
  * @param groupID - The ID of the security group to delete
  * @param currentSecurityGroup - The current security group data
  */
-function deleteDomainSecurityGroup(domainAccountID: number, groupID: string, currentSecurityGroup: DomainSecurityGroup) {
+function deleteDomainSecurityGroup(domainAccountID: number, groupID: string) {
     const SECURITY_GROUP_KEY = `${CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX}${groupID}`;
 
-    const optimisticData: Array<
-        OnyxUpdate<typeof ONYXKEYS.COLLECTION.DOMAIN> | OnyxUpdate<typeof ONYXKEYS.COLLECTION.DOMAIN_ERRORS> | OnyxUpdate<typeof ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS>
-    > = [
-        {
-            onyxMethod: Onyx.METHOD.MERGE,
-            key: `${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`,
-            value: {
-                [SECURITY_GROUP_KEY]: null,
-            } as PrefixedRecord<typeof CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX, Partial<DomainSecurityGroup> | null>,
-        },
+    const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.DOMAIN_ERRORS> | OnyxUpdate<typeof ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS>> = [
         {
             onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`,
@@ -1974,16 +1965,7 @@ function deleteDomainSecurityGroup(domainAccountID: number, groupID: string, cur
         },
     ];
 
-    const failureData: Array<
-        OnyxUpdate<typeof ONYXKEYS.COLLECTION.DOMAIN> | OnyxUpdate<typeof ONYXKEYS.COLLECTION.DOMAIN_ERRORS> | OnyxUpdate<typeof ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS>
-    > = [
-        {
-            onyxMethod: Onyx.METHOD.MERGE,
-            key: `${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`,
-            value: {
-                [SECURITY_GROUP_KEY]: currentSecurityGroup,
-            } as PrefixedRecord<typeof CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX, Partial<DomainSecurityGroup>>,
-        },
+    const failureData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.DOMAIN_ERRORS> | OnyxUpdate<typeof ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS>> = [
         {
             onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`,
@@ -2004,7 +1986,16 @@ function deleteDomainSecurityGroup(domainAccountID: number, groupID: string, cur
         },
     ];
 
-    const successData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.DOMAIN_ERRORS> | OnyxUpdate<typeof ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS>> = [
+    const successData: Array<
+        OnyxUpdate<typeof ONYXKEYS.COLLECTION.DOMAIN> | OnyxUpdate<typeof ONYXKEYS.COLLECTION.DOMAIN_ERRORS> | OnyxUpdate<typeof ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS>
+    > = [
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`,
+            value: {
+                [SECURITY_GROUP_KEY]: null,
+            } as PrefixedRecord<typeof CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX, Partial<DomainSecurityGroup> | null>,
+        },
         {
             onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`,

@@ -49,7 +49,7 @@ function DeleteGroupRow({domainAccountID, groupID}: DeleteGroupRowProps) {
             return;
         }
 
-        deleteDomainSecurityGroup(domainAccountID, groupID, group);
+        deleteDomainSecurityGroup(domainAccountID, groupID);
         Navigation.goBack(ROUTES.DOMAIN_GROUPS.getRoute(domainAccountID));
     };
 

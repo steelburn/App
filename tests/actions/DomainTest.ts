@@ -1082,14 +1082,7 @@ describe('actions/Domain', () => {
     describe('deleteDomainSecurityGroup', () => {
         const domainAccountID = 123;
         const groupID = '456';
-        const accountID = 789;
         const SECURITY_GROUP_KEY = `${CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX}${groupID}`;
-        const currentSecurityGroup: DomainSecurityGroup = {
-            name: 'Group To Delete',
-            shared: {[accountID]: 'read'},
-            enableRestrictedPolicyCreation: false,
-            enableRestrictedPrimaryLogin: false,
-        };
 
         let apiWriteSpy: jest.SpyInstance;
 
@@ -1102,24 +1095,20 @@ describe('actions/Domain', () => {
         });
 
         it('calls API.write with DELETE_DOMAIN_SECURITY_GROUP and correct parameters', () => {
-            deleteDomainSecurityGroup(domainAccountID, groupID, currentSecurityGroup);
+            deleteDomainSecurityGroup(domainAccountID, groupID);
 
             expect(apiWriteSpy).toHaveBeenCalledTimes(1);
             expect(apiWriteSpy).toHaveBeenCalledWith(WRITE_COMMANDS.DELETE_DOMAIN_SECURITY_GROUP, {domainAccountID, name: SECURITY_GROUP_KEY}, expect.any(Object));
         });
 
-        it('optimisticData clears the security group, sets DELETE pending action and clears errors', () => {
-            deleteDomainSecurityGroup(domainAccountID, groupID, currentSecurityGroup);
+        it('optimisticData sets DELETE pending action and clears errors without removing the group', () => {
+            deleteDomainSecurityGroup(domainAccountID, groupID);
 
             expect(apiWriteSpy).toHaveBeenCalledWith(
                 WRITE_COMMANDS.DELETE_DOMAIN_SECURITY_GROUP,
                 expect.any(Object),
                 expect.objectContaining({
                     optimisticData: expect.arrayContaining([
-                        expect.objectContaining({
-                            key: `${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`,
-                            value: {[SECURITY_GROUP_KEY]: null},
-                        }),
                         expect.objectContaining({
                             key: `${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`,
                             value: {[SECURITY_GROUP_KEY]: {pendingAction: CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE}},
@@ -1133,14 +1122,18 @@ describe('actions/Domain', () => {
             );
         });
 
-        it('successData clears the pending action and errors for the security group', () => {
-            deleteDomainSecurityGroup(domainAccountID, groupID, currentSecurityGroup);
+        it('successData removes the security group, clears the pending action and errors', () => {
+            deleteDomainSecurityGroup(domainAccountID, groupID);
 
             expect(apiWriteSpy).toHaveBeenCalledWith(
                 WRITE_COMMANDS.DELETE_DOMAIN_SECURITY_GROUP,
                 expect.any(Object),
                 expect.objectContaining({
                     successData: expect.arrayContaining([
+                        expect.objectContaining({
+                            key: `${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`,
+                            value: {[SECURITY_GROUP_KEY]: null},
+                        }),
                         expect.objectContaining({
                             key: `${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`,
                             value: {[SECURITY_GROUP_KEY]: {pendingAction: null}},
@@ -1154,18 +1147,14 @@ describe('actions/Domain', () => {
             );
         });
 
-        it('failureData restores the security group, clears the pending action and sets errors', () => {
-            deleteDomainSecurityGroup(domainAccountID, groupID, currentSecurityGroup);
+        it('failureData clears the pending action and sets errors without touching the group', () => {
+            deleteDomainSecurityGroup(domainAccountID, groupID);
 
             expect(apiWriteSpy).toHaveBeenCalledWith(
                 WRITE_COMMANDS.DELETE_DOMAIN_SECURITY_GROUP,
                 expect.any(Object),
                 expect.objectContaining({
                     failureData: expect.arrayContaining([
-                        expect.objectContaining({
-                            key: `${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`,
-                            value: {[SECURITY_GROUP_KEY]: currentSecurityGroup},
-                        }),
                         expect.objectContaining({
                             key: `${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`,
                             value: {[SECURITY_GROUP_KEY]: {pendingAction: null}},
