@@ -64,7 +64,7 @@ function BaseSelectListItem<TItem extends ListItem>({
         >
             <>
                 {!!item.leftElement && item.leftElement}
-                <View style={[styles.flex1, styles.alignItemsStart, styles.pr3]}>
+                <View style={[styles.flex1, styles.alignItemsStart, !!item.rightElement && styles.pr3]}>
                     <TextWithTooltip
                         shouldShowTooltip={showTooltip}
                         text={fullTitle ?? ''}
