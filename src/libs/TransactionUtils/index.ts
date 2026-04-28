@@ -869,7 +869,10 @@ function getUpdatedTransaction({
         const updatedMileageRate = DistanceRequestUtils.getRate({transaction: updatedTransaction, policy, useTransactionDistanceUnit: false});
         const {unit, rate} = updatedMileageRate;
 
-        const distanceInMeters = getDistanceInMeters(updatedTransaction, unit);
+        // The quantity is stored in the transaction's distanceUnit, which may differ from the policy's current unit
+        // We must use the stored distanceUnit to correctly convert quantity → meters before applying the policy rate.
+        const quantityUnit = updatedTransaction?.comment?.customUnit?.distanceUnit ?? unit;
+        const distanceInMeters = getDistanceInMeters(updatedTransaction, quantityUnit);
         let amount = DistanceRequestUtils.getDistanceRequestAmount(distanceInMeters, unit, rate ?? 0);
         amount = isFromExpenseReport || isUnReportedExpense ? -amount : amount;
         const updatedCurrency = updatedMileageRate.currency ?? CONST.CURRENCY.USD;
