@@ -14,6 +14,7 @@ import usePrevious from '@hooks/usePrevious';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import useWindowDimensions from '@hooks/useWindowDimensions';
+import {canUseTouchScreen} from '@libs/DeviceCapabilities';
 import {shouldShowReceiptEmptyState} from '@libs/IOUUtils';
 import Navigation from '@libs/Navigation/Navigation';
 import {getPerDiemCustomUnit} from '@libs/PolicyUtils';
@@ -322,6 +323,7 @@ function MoneyRequestConfirmationListFooter({
 
     const shouldNavigateToUpgradePath = !policyForMovingExpensesID && !shouldSelectPolicy;
     const shouldShowTimeRequestFields = isTimeRequest && action === CONST.IOU.ACTION.CREATE;
+    const shouldAutoFocusAmountField = !canUseTouchScreen();
     const tagVisibility = getTagVisibility({
         shouldShowTags,
         policy,
@@ -388,6 +390,7 @@ function MoneyRequestConfirmationListFooter({
                     policy={policy}
                     clearFormErrors={clearFormErrors}
                     setFormError={setFormError}
+                    autoFocus={shouldAutoFocusAmountField}
                 />
             ),
             shouldShow: shouldShowSmartScanFields && shouldShowAmountField,

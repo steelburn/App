@@ -47,6 +47,7 @@ type AmountFieldProps = {
     policy: OnyxEntry<OnyxTypes.Policy>;
     clearFormErrors: (errors: string[]) => void;
     setFormError: (error: TranslationPaths | '') => void;
+    autoFocus?: boolean;
 };
 
 function AmountField({
@@ -71,6 +72,7 @@ function AmountField({
     policy,
     clearFormErrors,
     setFormError,
+    autoFocus = false,
 }: AmountFieldProps) {
     const styles = useThemeStyles();
     const {translate, preferredLocale} = useLocalize();
@@ -246,6 +248,7 @@ function AmountField({
                 <View style={[styles.mh4, styles.mv2]}>
                     <NumberWithSymbolForm
                         displayAsTextInput
+                        autoFocus={autoFocus}
                         value={transactionAmount}
                         decimals={decimals}
                         currency={effectiveCurrency}
