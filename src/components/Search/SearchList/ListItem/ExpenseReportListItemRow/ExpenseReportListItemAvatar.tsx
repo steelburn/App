@@ -5,7 +5,7 @@ import useStyleUtils from '@hooks/useStyleUtils';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import CONST from '@src/CONST';
-import type {ExpenseReportListItemType} from './types';
+import type {ExpenseReportListItemType} from '../types';
 
 type ExpenseReportListItemAvatarProps = {
     item: ExpenseReportListItemType;

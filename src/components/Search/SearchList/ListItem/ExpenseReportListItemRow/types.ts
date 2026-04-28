@@ -12,24 +12,18 @@ type ExpenseReportListItemRowNarrowProps = {
     isDisabledCheckbox?: boolean;
 };
 
-type ExpenseReportListItemRowWideProps = {
-    item: ExpenseReportListItemType;
+type ExpenseReportListItemRowWideProps = ExpenseReportListItemRowNarrowProps & {
     reportActions?: ReportAction[];
     showTooltip: boolean;
-    canSelectMultiple?: boolean;
     isActionLoading?: boolean;
     onButtonPress?: () => void;
-    onCheckboxPress?: () => void;
     containerStyle?: StyleProp<ViewStyle>;
-    isSelectAllChecked?: boolean;
-    isIndeterminate?: boolean;
-    isDisabledCheckbox?: boolean;
     isHovered?: boolean;
     isFocused?: boolean;
     isPendingDelete?: boolean;
     columns?: SearchColumnType[];
 };
 
-type ExpenseReportListItemRowProps = (ExpenseReportListItemRowNarrowProps & {isLargeScreenWidth?: false}) | (ExpenseReportListItemRowWideProps & {isLargeScreenWidth: true});
+type ExpenseReportListItemRowProps = ExpenseReportListItemRowWideProps & {isLargeScreenWidth?: boolean};
 
 export type {ExpenseReportListItemRowProps, ExpenseReportListItemRowNarrowProps, ExpenseReportListItemRowWideProps};
