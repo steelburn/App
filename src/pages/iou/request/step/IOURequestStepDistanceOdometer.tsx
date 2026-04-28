@@ -37,6 +37,7 @@ import {createBackupTransaction, removeBackupTransactionWithImageCleanup, restor
 import DistanceRequestUtils from '@libs/DistanceRequestUtils';
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import {shouldUseTransactionDraft} from '@libs/IOUUtils';
+import Log from '@libs/Log';
 import Navigation from '@libs/Navigation/Navigation';
 import {roundToTwoDecimalPlaces} from '@libs/NumberUtils';
 import {getOdometerImageUri} from '@libs/OdometerImageUtils';
@@ -597,11 +598,14 @@ function IOURequestStepDistanceOdometer({
                 startImage: odometerStartImage,
                 endImage: odometerEndImage,
             });
-        } catch {
-            // If draft save fails, we still close to match "save for later" flow behavior.
+        } catch (error) {
+            Log.warn('Failed to persist odometer draft for "Save for later"', {error});
+            shouldBypassDiscardConfirmationRef.current = false;
+            setFormError(translate('iou.error.failedToSaveOdometerDraft'));
+            return;
         }
         Navigation.closeRHPFlow();
-    }, [fromLocaleDigit, startReading, endReading, odometerStartImage, odometerEndImage]);
+    }, [fromLocaleDigit, startReading, endReading, odometerStartImage, odometerEndImage, translate]);
 
     useDiscardChangesConfirmation({
         onCancel: () => {
