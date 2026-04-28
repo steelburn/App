@@ -304,20 +304,11 @@ function ExpenseReportListItem<TItem extends ListItem>({
                         <View style={styles.pt3}>
                             <ExpenseReportListItemRow
                                 item={reportItem}
-                                columns={columns}
-                                reportActions={reportActions}
-                                isActionLoading={isActionLoading ?? isLoading}
-                                showTooltip={showTooltip}
                                 canSelectMultiple={canSelectMultiple}
                                 onCheckboxPress={handleCheckboxPress}
-                                onButtonPress={handleOnButtonPress}
                                 isSelectAllChecked={!!reportItem.isSelected}
                                 isIndeterminate={false}
                                 isDisabledCheckbox={isDisabledCheckbox}
-                                isHovered={hovered}
-                                isFocused={isFocused}
-                                isPendingDelete={isPendingDelete}
-                                isLargeScreenWidth={isLargeScreenWidth}
                             />
                         </View>
                     )}
@@ -337,7 +328,7 @@ function ExpenseReportListItem<TItem extends ListItem>({
                             isHovered={hovered}
                             isFocused={isFocused}
                             isPendingDelete={isPendingDelete}
-                            isLargeScreenWidth={isLargeScreenWidth}
+                            isLargeScreenWidth
                         />
                     )}
                     {getDescription}

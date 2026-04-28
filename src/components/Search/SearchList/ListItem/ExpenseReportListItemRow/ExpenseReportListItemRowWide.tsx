@@ -9,16 +9,16 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import getBase62ReportID from '@libs/getBase62ReportID';
 import variables from '@styles/variables';
 import CONST from '@src/CONST';
-import DateCell from './DateCell';
-import DeferredActionCell from './DeferredActionCell';
-import ExpenseReportListItemAvatar from './ExpenseReportListItemAvatar';
-import type {ExpenseReportListItemRowProps} from './ExpenseReportListItemRow';
-import ExportedIconCell from './ExportedIconCell';
-import StatusCell from './StatusCell';
-import TextCell from './TextCell';
-import TotalCell from './TotalCell';
-import UserInfoCell from './UserInfoCell';
-import WorkspaceCell from './WorkspaceCell';
+import DateCell from '../DateCell';
+import DeferredActionCell from '../DeferredActionCell';
+import ExpenseReportListItemAvatar from '../ExpenseReportListItemAvatar';
+import ExportedIconCell from '../ExportedIconCell';
+import StatusCell from '../StatusCell';
+import TextCell from '../TextCell';
+import TotalCell from '../TotalCell';
+import UserInfoCell from '../UserInfoCell';
+import WorkspaceCell from '../WorkspaceCell';
+import type {ExpenseReportListItemRowWideProps} from './types';
 
 function ExpenseReportListItemRowWide({
     item,
@@ -36,7 +36,7 @@ function ExpenseReportListItemRowWide({
     isHovered = false,
     isFocused = false,
     isPendingDelete = false,
-}: ExpenseReportListItemRowProps) {
+}: ExpenseReportListItemRowWideProps) {
     const StyleUtils = useStyleUtils();
     const styles = useThemeStyles();
     const theme = useTheme();
