@@ -1,4 +1,4 @@
-import React, {memo} from 'react';
+import React from 'react';
 import {View} from 'react-native';
 import SearchReportAvatar from '@components/ReportActionAvatars/SearchReportAvatar';
 import useStyleUtils from '@hooks/useStyleUtils';
@@ -38,4 +38,4 @@ function ExpenseReportListItemAvatar({item, showTooltip, isHovered = false, isFo
     );
 }
 
-export default memo(ExpenseReportListItemAvatar);
+export default ExpenseReportListItemAvatar;

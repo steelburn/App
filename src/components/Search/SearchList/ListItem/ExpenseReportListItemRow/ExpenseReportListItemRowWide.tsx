@@ -10,14 +10,14 @@ import getBase62ReportID from '@libs/getBase62ReportID';
 import variables from '@styles/variables';
 import CONST from '@src/CONST';
 import DateCell from '../DateCell';
-import DeferredActionCell from '../DeferredActionCell';
-import ExpenseReportListItemAvatar from '../ExpenseReportListItemAvatar';
+import DeferredActionCell from '../ActionCell/DeferredActionCell';
 import ExportedIconCell from '../ExportedIconCell';
 import StatusCell from '../StatusCell';
 import TextCell from '../TextCell';
 import TotalCell from '../TotalCell';
 import UserInfoCell from '../UserInfoCell';
 import WorkspaceCell from '../WorkspaceCell';
+import ExpenseReportListItemAvatar from './ExpenseReportListItemAvatar';
 import type {ExpenseReportListItemRowWideProps} from './types';
 
 function ExpenseReportListItemRowWide({

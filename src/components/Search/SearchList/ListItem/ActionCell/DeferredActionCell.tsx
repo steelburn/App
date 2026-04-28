@@ -3,8 +3,8 @@ import {View} from 'react-native';
 import PulsingView from '@components/PulsingView';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
-import ActionCell from './ActionCell';
-import type {ActionCellProps} from './ActionCell';
+import ActionCell from '.';
+import type {ActionCellProps} from '.';
 
 function DeferredActionCell(actionCellProps: ActionCellProps) {
     const styles = useThemeStyles();
