@@ -843,15 +843,7 @@ function MoneyRequestConfirmationList({
             // draft already has a non-zero total (e.g. tests, restored drafts). Time expenses derive totals from
             // hours × rate, not the amount field. Scan flows use SmartScan instead of a typed amount. Distance
             // totals come from route × rate (see DistanceRequestController); do not apply the manual-amount guard.
-            if (
-                iouType !== CONST.IOU.TYPE.PAY &&
-                !isScanRequest &&
-                !isTimeRequest &&
-                !isDistanceRequest &&
-                isNewManualExpenseFlowEnabled &&
-                !transaction?.isAmountSet &&
-                iouAmount === 0
-            ) {
+            if (iouType !== CONST.IOU.TYPE.PAY && !isScanRequest && !isTimeRequest && !isDistanceRequest && isNewManualExpenseFlowEnabled && !transaction?.isAmountSet && iouAmount === 0) {
                 setFormError('common.error.invalidAmount');
                 return;
             }
