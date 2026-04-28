@@ -2278,6 +2278,7 @@ function trackExpense(params: CreateTrackExpenseParams) {
         draftTransactionIDs = [],
         isSelfTourViewed,
         defaultWorkspaceName,
+        previousOdometerDraft,
     } = params;
     const {participant, payeeAccountID, payeeEmail} = participantParams;
     const {policy, policyCategories, policyTagList} = policyData;
@@ -2445,10 +2446,15 @@ function trackExpense(params: CreateTrackExpenseParams) {
     }
 
     if (odometerStart !== undefined || odometerEnd !== undefined) {
-        onyxData?.successData?.push({
+        onyxData?.optimisticData?.push({
             onyxMethod: Onyx.METHOD.SET,
             key: ONYXKEYS.ODOMETER_DRAFT,
             value: null,
+        });
+        onyxData?.failureData?.push({
+            onyxMethod: Onyx.METHOD.SET,
+            key: ONYXKEYS.ODOMETER_DRAFT,
+            value: previousOdometerDraft ?? null,
         });
     }
 

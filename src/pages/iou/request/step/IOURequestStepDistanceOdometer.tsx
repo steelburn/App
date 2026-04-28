@@ -414,6 +414,7 @@ function IOURequestStepDistanceOdometer({
 
     const [recentWaypoints] = useOnyx(ONYXKEYS.NVP_RECENT_WAYPOINTS);
     const [betas] = useOnyx(ONYXKEYS.BETAS);
+    const [odometerDraft] = useOnyx(ONYXKEYS.ODOMETER_DRAFT);
     // Navigate to next page following Manual tab pattern
     const navigateToNextPage = () => {
         const start = parseFloat(DistanceRequestUtils.normalizeOdometerText(startReading, fromLocaleDigit));
@@ -521,6 +522,7 @@ function IOURequestStepDistanceOdometer({
             odometerStart: start,
             odometerEnd: end,
             odometerDistance: calculatedDistance,
+            previousOdometerDraft: odometerDraft,
             betas,
             recentWaypoints,
             unit,

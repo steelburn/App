@@ -192,6 +192,7 @@ type CreateDistanceRequestInformation = {
     betas: OnyxEntry<OnyxTypes.Beta[]>;
     optimisticReportPreviewActionID?: string;
     shouldDeferAutoSubmit?: boolean;
+    previousOdometerDraft?: OnyxEntry<OnyxTypes.OdometerDraft>;
 };
 
 type CreateSplitsTransactionParams = Omit<BaseTransactionParams, 'customUnitRateID'> & {
@@ -3768,6 +3769,7 @@ function createDistanceRequest(distanceRequestInformation: CreateDistanceRequest
         betas,
         optimisticReportPreviewActionID,
         shouldDeferAutoSubmit,
+        previousOdometerDraft,
     } = distanceRequestInformation;
     const {policy, policyCategories, policyRecentlyUsedCategories, policyRecentlyUsedTags} = policyParams;
     const parsedComment = getParsedComment(transactionParams.comment);
@@ -4003,10 +4005,15 @@ function createDistanceRequest(distanceRequestInformation: CreateDistanceRequest
     }
 
     if (odometerStart !== undefined || odometerEnd !== undefined) {
-        onyxData?.successData?.push({
+        onyxData?.optimisticData?.push({
             onyxMethod: Onyx.METHOD.SET,
             key: ONYXKEYS.ODOMETER_DRAFT,
             value: null,
+        });
+        onyxData?.failureData?.push({
+            onyxMethod: Onyx.METHOD.SET,
+            key: ONYXKEYS.ODOMETER_DRAFT,
+            value: previousOdometerDraft ?? null,
         });
     }
 
