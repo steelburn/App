@@ -85,7 +85,7 @@ describe('normalizeForKey', () => {
         const result = normalizeForKey(undefined);
         expect(typeof result).toBe('string');
         expect(result).not.toBeNull();
-        // Round-trip: stringifying [undefined] would normally produce [null]; the sentinel keeps them distinct.
+        // Round-trip: JSON.stringify on [undefined] would normally produce [null]; the sentinel keeps them distinct.
         expect(JSON.stringify([normalizeForKey(undefined)])).not.toBe('[null]');
     });
 
