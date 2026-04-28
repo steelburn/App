@@ -23,7 +23,7 @@ import type {PersonalDetailsList, Transaction} from '@src/types/onyx';
 import type {PureReportActionItemProps} from './PureReportActionItem';
 import PureReportActionItem from './PureReportActionItem';
 
-type ReportActionItemProps = Omit<PureReportActionItemProps, 'taskReport' | 'linkedReport' | 'iouReportOfLinkedReport' | 'personalPolicyID'> & {
+type ReportActionItemProps = Omit<PureReportActionItemProps, 'personalPolicyID'> & {
     /** Whether to show the draft message or not */
     shouldShowDraftMessage?: boolean;
 
@@ -59,20 +59,12 @@ function ReportActionItem({
     ...props
 }: ReportActionItemProps) {
     const reportID = report?.reportID;
-    const originalMessage = getOriginalMessage(action);
     const originalReportID = useOriginalReportID(reportID, action);
     const isOriginalReportArchived = useReportIsArchived(originalReportID);
     const [reportMetadata] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_METADATA}${reportID}`);
     const [originalReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${originalReportID}`);
     const [iouReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getIOUReportIDFromReportActionPreview(action)}`);
     const [parentReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(report?.parentReportID)}`);
-
-    const taskReportID = originalMessage && 'taskReportID' in originalMessage ? originalMessage.taskReportID : undefined;
-    const [taskReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${taskReportID}`);
-    const linkedReportID = originalMessage && 'linkedReportID' in originalMessage ? originalMessage.linkedReportID : undefined;
-    const [linkedReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${linkedReportID}`);
-    const iouReportOfLinkedReportID = linkedReport && 'iouReportID' in linkedReport ? linkedReport.iouReportID : undefined;
-    const [iouReportOfLinkedReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${iouReportOfLinkedReportID}`);
 
     const [policy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${report?.policyID}`);
     const [bankAccountList] = useOnyx(ONYXKEYS.BANK_ACCOUNT_LIST);
@@ -102,9 +94,6 @@ function ReportActionItem({
             policy={policy}
             draftMessage={draftMessage}
             iouReport={iouReport}
-            taskReport={taskReport}
-            linkedReport={linkedReport}
-            iouReportOfLinkedReport={iouReportOfLinkedReport}
             linkedTransactionRouteError={linkedTransactionRouteError}
             isUserValidated={isUserValidated}
             parentReport={parentReport}
