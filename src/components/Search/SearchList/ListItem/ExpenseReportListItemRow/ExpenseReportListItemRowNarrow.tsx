@@ -19,7 +19,8 @@ function ExpenseReportListItemRowNarrow({item, onCheckboxPress = () => {}, canSe
     const currency = item.currency ?? CONST.CURRENCY.USD;
     const {totalDisplaySpend = 0, isAllScanning: isScanning = false} = item;
 
-    const expenseCount = item.transactionCount ?? item.transactions?.length ?? 0;
+    const filteredTransactions = item.transactions?.filter((t) => t.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE);
+    const expenseCount = (filteredTransactions?.length ? filteredTransactions.length : undefined) ?? item.transactionCount ?? 0;
     const expenseCountText = translate('iou.expenseCount', {count: expenseCount});
     const formattedDate = DateUtils.formatWithUTCTimeZone(
         item.created ?? '',
