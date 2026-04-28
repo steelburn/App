@@ -28,9 +28,8 @@ import {
     startSplitBill,
     updateSplitExpenseAmountField,
     updateSplitExpenseField,
-    updateSplitTransactions,
-    updateSplitTransactionsFromSplitExpensesFlow,
 } from '@userActions/IOU/Split';
+import {updateSplitTransactions, updateSplitTransactionsFromSplitExpensesFlow} from '@userActions/IOU/SplitTransactionUpdate';
 import CONST from '@src/CONST';
 import IntlStore from '@src/languages/IntlStore';
 import DateUtils from '@src/libs/DateUtils';
