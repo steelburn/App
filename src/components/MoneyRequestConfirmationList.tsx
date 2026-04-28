@@ -839,14 +839,27 @@ function MoneyRequestConfirmationList({
             }
 
             // In the new manual expense flow the amount field starts empty (transaction.amount defaults to 0).
-            // We block submission until the user explicitly enters an amount (tracked by isAmountSet).
-            // Note: a user-entered $0 is valid – this only blocks the empty field.
-            if (iouType !== CONST.IOU.TYPE.PAY && !isScanRequest && isNewManualExpenseFlowEnabled && !transaction?.isAmountSet) {
+            // We block submission until the user explicitly enters an amount (tracked by isAmountSet), unless the
+            // draft already has a non-zero total (e.g. tests, restored drafts). Time expenses derive totals from
+            // hours × rate, not the amount field. Scan flows use SmartScan instead of a typed amount. Distance
+            // totals come from route × rate (see DistanceRequestController); do not apply the manual-amount guard.
+            if (
+                iouType !== CONST.IOU.TYPE.PAY &&
+                !isScanRequest &&
+                !isTimeRequest &&
+                !isDistanceRequest &&
+                isNewManualExpenseFlowEnabled &&
+                !transaction?.isAmountSet &&
+                iouAmount === 0
+            ) {
                 setFormError('common.error.invalidAmount');
                 return;
             }
 
-            const isInvalidP2PAmount = iouAmount === 0 && (isTypeRequest ? isP2P : iouType === CONST.IOU.TYPE.PAY || iouType === CONST.IOU.TYPE.INVOICE || iouType === CONST.IOU.TYPE.SPLIT);
+            const isInvalidP2PAmount =
+                !isDistanceRequest &&
+                iouAmount === 0 &&
+                (isTypeRequest ? isP2P : iouType === CONST.IOU.TYPE.PAY || iouType === CONST.IOU.TYPE.INVOICE || (iouType === CONST.IOU.TYPE.SPLIT && !isScanRequest));
             if (isInvalidP2PAmount) {
                 setFormError('common.error.invalidAmount');
                 return;
