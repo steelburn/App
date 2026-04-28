@@ -31,9 +31,12 @@ type ReviewFieldsProps<K extends keyof ReviewDuplicates> = {
 
     /* Callback to what should happen after selecting row */
     onSelectRow: (item: FieldItemType<K>) => void;
+
+    /* Currently selected value */
+    selectedValue?: ReviewDuplicates[K];
 };
 
-function ReviewFields<K extends keyof ReviewDuplicates>({stepNames, label, options, index, onSelectRow}: ReviewFieldsProps<K>) {
+function ReviewFields<K extends keyof ReviewDuplicates>({stepNames, label, options, index, onSelectRow, selectedValue}: ReviewFieldsProps<K>) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
 
@@ -52,8 +55,9 @@ function ReviewFields<K extends keyof ReviewDuplicates>({stepNames, label, optio
                 text: option.text,
                 keyForList: `${option.text}-${idx}`,
                 value: option.value,
+                isSelected: option.value === selectedValue,
             })),
-        [filteredOptions],
+        [filteredOptions, selectedValue],
     );
 
     return (
@@ -81,6 +85,8 @@ function ReviewFields<K extends keyof ReviewDuplicates>({stepNames, label, optio
                 data={optionRows ?? []}
                 ListItem={SingleSelectListItem}
                 onSelectRow={onSelectRow}
+                shouldSingleExecuteRowSelect
+                initiallyFocusedItemKey={optionRows?.find((option) => option.isSelected)?.keyForList}
             />
         </View>
     );

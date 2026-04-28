@@ -92,6 +92,7 @@ function ReviewTaxRate() {
                 options={options}
                 index={currentScreenIndex}
                 onSelectRow={setTaxCode}
+                selectedValue={reviewDuplicates?.taxCode}
             />
         </ScreenWrapper>
     );
