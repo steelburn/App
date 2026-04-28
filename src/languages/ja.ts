@@ -908,10 +908,6 @@ const translations: TranslationDeepObject<typeof en> = {
         listOfChats: 'チャット一覧',
         saveTheWorld: '世界を救う',
         tooltip: 'ここから始めましょう！',
-        redirectToExpensifyClassicModal: {
-            title: '近日公開予定',
-            description: 'お客様の環境に合わせて New Expensify の細かな部分をいくつか調整しているところです。その間は、Expensify Classic をご利用ください。',
-        },
     },
     homePage: {
         forYou: 'あなた向け',

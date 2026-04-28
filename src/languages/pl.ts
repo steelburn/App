@@ -922,10 +922,6 @@ const translations: TranslationDeepObject<typeof en> = {
         listOfChats: 'Lista czatów',
         saveTheWorld: 'Uratuj świat',
         tooltip: 'Zacznij tutaj!',
-        redirectToExpensifyClassicModal: {
-            title: 'Wkrótce dostępne',
-            description: 'Dopasowujemy jeszcze kilka elementów Nowego Expensify do Twojej specyficznej konfiguracji. Tymczasem przejdź do klasycznej wersji Expensify.',
-        },
     },
     homePage: {
         forYou: 'Dla ciebie',

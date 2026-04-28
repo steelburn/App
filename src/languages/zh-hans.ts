@@ -891,10 +891,6 @@ const translations: TranslationDeepObject<typeof en> = {
         listOfChats: '聊天列表',
         saveTheWorld: '拯救世界',
         tooltip: '从这里开始！',
-        redirectToExpensifyClassicModal: {
-            title: '即将推出',
-            description: '我们正在对新版 Expensify 做最后的一些细节调整，以适配你的特定设置。与此同时，请先前往 Expensify 经典版。',
-        },
     },
     homePage: {
         forYou: '为你',
