@@ -62,7 +62,7 @@ function PreferredWorkspaceToggle({domainAccountID, groupID}: PreferredWorkspace
                     switchAccessibilityLabel={translate('domain.groups.preferredWorkspace')}
                     shouldPlaceSubtitleBelowSwitch
                     isActive={isEnabled}
-                    disabled={!hasAdminPolicies}
+                    disabled={!hasAdminPolicies && !isEnabled}
                     disabledAction={() => setIsNoWorkspacesModalVisible(true)}
                     onToggle={(enabled) => {
                         if (!group?.name) {

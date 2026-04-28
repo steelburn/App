@@ -72,11 +72,12 @@ function DomainGroupPreferredWorkspacePage({route}: DomainGroupPreferredWorkspac
     }
 
     const handleSubmit = () => {
-        if (!selectedPolicyID) {
-            setShouldShowError(true);
+        if (!group) {
             return;
         }
-        if (!group) {
+
+        if (!selectedPolicyID) {
+            setShouldShowError(true);
             return;
         }
 
