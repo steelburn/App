@@ -8581,9 +8581,9 @@ const CONST = {
             PRODUCT_TRAINING_SCAN_TEST_TOOLTIP_CONFIRMED: 'training_scan_test_tooltip_confirmed',
         },
         // LinkedIn uses numeric conversion IDs instead of named events
-        LINKEDIN_SIGN_UP_CONVERSION_ID: 0,
-        LINKEDIN_WORKSPACE_CREATED_CONVERSION_ID: 0,
-        LINKEDIN_PAID_ADOPTION_CONVERSION_ID: 0,
+        LINKEDIN_SIGN_UP_CONVERSION_ID: 507587661,
+        LINKEDIN_WORKSPACE_CREATED_CONVERSION_ID: 25474804,
+        LINKEDIN_PAID_ADOPTION_CONVERSION_ID: 25474820,
         NVP: {
             META_CLICK_ID: 'expensify_leadFbclid',
             GOOGLE_CLICK_ID: 'expensify_leadGclid',
