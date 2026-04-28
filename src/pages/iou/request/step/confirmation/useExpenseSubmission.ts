@@ -205,6 +205,7 @@ function useExpenseSubmission(params: UseExpenseSubmissionParams) {
     const [betas] = useOnyx(ONYXKEYS.BETAS);
     const [gpsDraftDetails] = useOnyx(ONYXKEYS.GPS_DRAFT_DETAILS);
     const [recentWaypoints] = useOnyx(ONYXKEYS.NVP_RECENT_WAYPOINTS);
+    const [odometerDraft] = useOnyx(ONYXKEYS.ODOMETER_DRAFT);
     const [delegateEmail] = useOnyx(ONYXKEYS.ACCOUNT, {selector: delegateEmailSelector});
 
     // Onboarding task data
@@ -522,6 +523,7 @@ function useExpenseSubmission(params: UseExpenseSubmissionParams) {
                 draftTransactionIDs,
                 isSelfTourViewed,
                 defaultWorkspaceName: generateDefaultWorkspaceName(email, lastWorkspaceNumber, translate),
+                previousOdometerDraft: odometerDraft,
             });
         }
     }
@@ -578,6 +580,7 @@ function useExpenseSubmission(params: UseExpenseSubmissionParams) {
             recentWaypoints,
             betas,
             shouldHandleNavigation: shouldHandleNav,
+            previousOdometerDraft: odometerDraft,
         });
     }
 
