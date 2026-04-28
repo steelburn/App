@@ -1379,6 +1379,7 @@ const translations: TranslationDeepObject<typeof en> = {
             distanceAmountTooLargeReduceRate: 'El importe total es demasiado alto. Disminuye la tarifa.',
             odometerReadingTooLarge: (formattedMax: string) => `Las lecturas del odómetro no pueden superar ${formattedMax}.`,
             stitchOdometerImagesFailed: 'No se pudieron combinar las imágenes del odómetro. Por favor, inténtalo de nuevo más tarde.',
+            failedToSaveOdometerDraft: "No se pudo guardar el borrador del odómetro. Por favor, inténtalo de nuevo más tarde.",
             invalidIntegerAmount: 'Por favor, introduce una cantidad entera en dólares antes de continuar',
             invalidTaxAmount: (amount) => `El importe máximo del impuesto es ${amount}`,
             invalidSplit: 'La suma de las partes debe ser igual al importe total',
