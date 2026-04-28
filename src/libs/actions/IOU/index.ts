@@ -698,7 +698,8 @@ function initMoneyRequest({
             };
         }
         if (newIouRequestType === CONST.IOU.REQUEST_TYPE.DISTANCE_ODOMETER) {
-            Object.assign(comment, buildOdometerCommentFromDraft(newTransactionID, odometerDraft) ?? {});
+            const existingDraftComment = allTransactionDrafts[`${ONYXKEYS.COLLECTION.TRANSACTION_DRAFT}${newTransactionID}`]?.comment;
+            Object.assign(comment, buildOdometerCommentFromDraft(newTransactionID, odometerDraft, existingDraftComment) ?? {});
         }
     }
 
