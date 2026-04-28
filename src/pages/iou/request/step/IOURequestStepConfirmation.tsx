@@ -344,8 +344,9 @@ function IOURequestStepConfirmation({
 
         return hasPolicyExpenseChat(defaultParticipants);
     }, [report, transaction?.participants, defaultParticipants]);
-    const isFromGlobalCreate = !!(transaction?.isFromGlobalCreate ?? transaction?.isFromFloatingActionButton);
 
+
+    const isFromGlobalCreate = !!transaction?.isFromGlobalCreate || !!transaction?.isFromFloatingActionButton;
     useFetchRoute(transaction, transaction?.comment?.waypoints, action, shouldUseTransactionDraft(action, iouType) ? CONST.TRANSACTION.STATE.DRAFT : CONST.TRANSACTION.STATE.CURRENT);
 
     const policyExpenseChatPolicyID =
