@@ -11,6 +11,8 @@ import type {FormInputErrors, FormOnyxValues} from '@components/Form/types';
 import FullScreenLoadingIndicator from '@components/FullscreenLoadingIndicator';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import ScreenWrapper from '@components/ScreenWrapper';
+import type {State} from '@components/StateSelector';
+import StateSelector from '@components/StateSelector';
 import Text from '@components/Text';
 import TextInput from '@components/TextInput';
 import useLocalize from '@hooks/useLocalize';
@@ -120,7 +122,10 @@ function PrivatePersonalDetailsPage() {
         }
 
         const stateValue = values[INPUT_IDS.STATE] ?? '';
-        if (state && !stateValue.trim()) {
+        const countryValue = values[INPUT_IDS.COUNTRY] ?? '';
+        if (countryValue === CONST.COUNTRY.US && !stateValue) {
+            errors[INPUT_IDS.STATE] = translate('common.error.fieldRequired');
+        } else if (state && !stateValue.trim()) {
             errors[INPUT_IDS.STATE] = translate('common.error.fieldRequired');
         }
 
@@ -129,7 +134,6 @@ function PrivatePersonalDetailsPage() {
             errors[INPUT_IDS.ZIP_POST_CODE] = translate('common.error.fieldRequired');
         }
 
-        const countryValue = values[INPUT_IDS.COUNTRY] ?? '';
         if (!countryValue) {
             errors[INPUT_IDS.COUNTRY] = translate('common.error.fieldRequired');
         }
@@ -308,19 +312,29 @@ function PrivatePersonalDetailsPage() {
                             autoComplete="street-address"
                         />
                     </View>
-                    <View style={styles.mb4}>
-                        <InputWrapper
-                            InputComponent={TextInput}
-                            inputID={INPUT_IDS.STATE}
-                            label={translate('common.stateOrProvince')}
-                            aria-label={translate('common.stateOrProvince')}
-                            role={CONST.ROLE.PRESENTATION}
-                            defaultValue={state}
-                            shouldSaveDraft
-                            spellCheck={false}
-                            autoComplete="street-address"
-                        />
-                    </View>
+                    {selectedCountry === CONST.COUNTRY.US ? (
+                        <View style={styles.mhn5}>
+                            <InputWrapper
+                                InputComponent={StateSelector}
+                                inputID={INPUT_IDS.STATE}
+                                value={state as State}
+                                shouldSaveDraft
+                            />
+                        </View>
+                    ) : (
+                        <View style={styles.mb4}>
+                            <InputWrapper
+                                InputComponent={TextInput}
+                                inputID={INPUT_IDS.STATE}
+                                label={translate('common.stateOrProvince')}
+                                aria-label={translate('common.stateOrProvince')}
+                                role={CONST.ROLE.PRESENTATION}
+                                defaultValue={state}
+                                shouldSaveDraft
+                                spellCheck={false}
+                            />
+                        </View>
+                    )}
                     <View style={styles.mb4}>
                         <InputWrapper
                             InputComponent={TextInput}
