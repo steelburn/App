@@ -64,7 +64,6 @@ function IOURequestStepUpgrade({
     const [showConfirmationForm, setShowConfirmationForm] = useState(false);
     const [createdPolicyName, setCreatedPolicyName] = useState('');
     const [isUpgradeWarningModalOpen, setIsUpgradeWarningModalOpen] = useState(false);
-    const [isCreatingReport, setIsCreatingReport] = useState(false);
     const policyDataRef = useRef<CreateWorkspaceParams | null>(null);
     const isDistanceRateUpgrade = upgradePath === CONST.UPGRADE_PATHS.DISTANCE_RATES;
     const isCategorizing = upgradePath === CONST.UPGRADE_PATHS.CATEGORIES;
@@ -76,7 +75,7 @@ function IOURequestStepUpgrade({
     const [betas] = useOnyx(ONYXKEYS.BETAS);
     const [activePolicyID] = useOnyx(ONYXKEYS.NVP_ACTIVE_POLICY_ID);
     const [isSelfTourViewed] = useOnyx(ONYXKEYS.NVP_ONBOARDING, {selector: hasSeenTourSelector});
-    const createNewReport = useCreateNewReport();
+    const createReportForCurrentUser = useCreateNewReport();
 
     // Hooks for bulk move functionality
     const {selectedTransactions} = useSearchStateContext();
@@ -200,8 +199,7 @@ function IOURequestStepUpgrade({
                     // Coming from "Create report" (no workspace) — create directly with the just-created
                     // workspace. forceReplace removes the upgrade screen from history so back returns to
                     // the originating screen, not the upgrade step.
-                    setIsCreatingReport(true);
-                    const {reportID: newReportID} = createNewReport(policyID);
+                    const {reportID: newReportID} = createReportForCurrentUser(policyID);
                     Navigation.setNavigationActionToMicrotaskQueue(() => {
                         Navigation.navigate(ROUTES.REPORT_WITH_ID.getRoute(newReportID), {forceReplace: true});
                     });
@@ -242,6 +240,7 @@ function IOURequestStepUpgrade({
         iouType,
         isTrack,
         allPolicyTags,
+        createReportForCurrentUser,
     ]);
 
     const participant = transaction?.participants?.[0];
@@ -336,7 +335,6 @@ function IOURequestStepUpgrade({
                             isCategorizing={isCategorizing}
                             isReporting={isReporting}
                             isDistanceRateUpgrade={isDistanceRateUpgrade}
-                            isButtonLoading={isCreatingReport}
                         />
                     )}
                     {!isUpgraded && (

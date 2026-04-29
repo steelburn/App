@@ -18,11 +18,9 @@ type Props = {
     isReporting?: boolean;
     isTravelUpgrade?: boolean;
     isDistanceRateUpgrade?: boolean;
-    /** Whether the "Got it, thanks" button should show a loading indicator */
-    isButtonLoading?: boolean;
 };
 
-function UpgradeConfirmation({policyName, afterUpgradeAcknowledged, isReporting, isCategorizing, isTravelUpgrade, isDistanceRateUpgrade, isButtonLoading}: Props) {
+function UpgradeConfirmation({policyName, afterUpgradeAcknowledged, isReporting, isCategorizing, isTravelUpgrade, isDistanceRateUpgrade}: Props) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
     const {environmentURL} = useEnvironment();
@@ -71,7 +69,6 @@ function UpgradeConfirmation({policyName, afterUpgradeAcknowledged, isReporting,
             shouldShowButton
             onButtonPress={afterUpgradeAcknowledged}
             buttonText={translate('workspace.upgrade.completed.gotIt')}
-            isButtonLoading={isButtonLoading}
             containerStyle={styles.h100}
         />
     );
