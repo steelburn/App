@@ -1,4 +1,3 @@
-import lodashDebounce from 'lodash/debounce';
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 // eslint-disable-next-line no-restricted-imports
 import {InteractionManager, View} from 'react-native';
@@ -47,6 +46,7 @@ import useDebouncedCommentMaxLengthValidation from './ReportActionCompose/useDeb
 import useEditMessage from './ReportActionCompose/useEditMessage';
 import {useReportActionActiveEdit, useReportActionActiveEditActions} from './ReportActionEditMessageContext';
 import shouldUseEmojiPickerSelection from './shouldUseEmojiPickerSelection';
+import useDebouncedSaveDraft from './useDebouncedSaveDraft';
 import useDraftMessageVideoAttributeCache from './useDraftMessageVideoAttributeCache';
 
 type ReportActionItemMessageEditProps = {
@@ -137,15 +137,17 @@ function ReportActionItemMessageEdit({action, reportID, originalReportID, policy
     const composerRef = useRef<ComposerRef | null>(null);
     const draftRef = useRef(draft);
     const emojiPickerSelectionRef = useRef<Selection | undefined>(undefined);
-    // The ref to check whether the comment saving is in progress
-    const isCommentPendingSaved = useRef(false);
+
+    // Save the draft of the comment. This debounced so that we're not ceaselessly saving your edit. Saving the draft
+    // allows one to navigate somewhere else and come back to the comment and still have it in edit mode.
+    const {saveDraft, isSavePending: isDraftSavePending} = useDebouncedSaveDraft(saveReportActionDraft);
 
     useDraftMessageVideoAttributeCache({
         draftMessage: editingMessage ?? '',
         isEditing: true,
         editingReportAction: action,
         updateDraftMessage: setDraft,
-        isEditInProgressRef: isCommentPendingSaved,
+        isEditInProgressRef: isDraftSavePending,
     });
 
     useEffect(() => {
@@ -185,28 +187,6 @@ function ReportActionItemMessageEdit({action, reportID, originalReportID, policy
     }, [focus]);
 
     /**
-     * Save the draft of the comment. This debounced so that we're not ceaselessly saving your edit. Saving the draft
-     * allows one to navigate somewhere else and come back to the comment and still have it in edit mode.
-     * @param {String} newDraft
-     */
-    const debouncedSaveDraft = useMemo(
-        () =>
-            lodashDebounce((newDraft: string) => {
-                saveReportActionDraft(reportID, action, newDraft);
-                isCommentPendingSaved.current = false;
-            }, 1000),
-        [reportID, action],
-    );
-
-    useEffect(
-        () => () => {
-            debouncedSaveDraft.cancel();
-            isCommentPendingSaved.current = false;
-        },
-        [debouncedSaveDraft],
-    );
-
-    /**
      * Update the value of the draft in Onyx
      *
      * @param {String} newDraftInput
@@ -238,10 +218,9 @@ function ReportActionItemMessageEdit({action, reportID, originalReportID, policy
             setEditingMessage(newDraft);
 
             // We want to escape the draft message to differentiate the HTML from the report action and the HTML the user drafted.
-            debouncedSaveDraft(newDraft);
-            isCommentPendingSaved.current = true;
+            saveDraft(reportID, action, newDraft);
         },
-        [debouncedSaveDraft, preferredLocale, preferredSkinTone, raiseIsScrollLayoutTriggered, selection?.end, setEditingMessage, setSelection],
+        [action, preferredLocale, preferredSkinTone, raiseIsScrollLayoutTriggered, reportID, selection.end, setEditingMessage, setSelection, saveDraft],
     );
 
     useEffect(() => {

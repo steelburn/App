@@ -1,7 +1,7 @@
 import {useIsFocused, useNavigation, useRoute} from '@react-navigation/native';
 import lodashDebounce from 'lodash/debounce';
 import type {Ref, RefObject} from 'react';
-import React, {memo, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState} from 'react';
+import React, {memo, useCallback, useEffect, useImperativeHandle, useRef, useState} from 'react';
 import type {
     BlurEvent,
     LayoutChangeEvent,
@@ -49,6 +49,7 @@ import {isValidReportIDFromPath, shouldAutoFocusOnKeyPress} from '@libs/ReportUt
 import updateMultilineInputRange from '@libs/updateMultilineInputRange';
 import willBlurTextInputOnTapOutsideFunc from '@libs/willBlurTextInputOnTapOutside';
 import {useReportActionActiveEditActions} from '@pages/inbox/report/ReportActionEditMessageContext';
+import useDebouncedSaveDraft from '@pages/inbox/report/useDebouncedSaveDraft';
 import useDraftMessageVideoAttributeCache from '@pages/inbox/report/useDraftMessageVideoAttributeCache';
 import {isEmojiPickerVisible} from '@userActions/EmojiPickerAction';
 import type {OnEmojiSelected} from '@userActions/EmojiPickerAction';
@@ -275,15 +276,19 @@ function ComposerWithSuggestions({
         return initialValue;
     });
 
-    // The ref to check whether the comment saving is in progress
-    const isDraftPendingSaved = useRef(false);
+    // Save the draft of the report action. This debounced so that we're not ceaselessly saving your edit.
+    const {saveDraft: debouncedSaveReportActionDraft, isSavePending: isDraftSavePending} = useDebouncedSaveDraft(saveReportActionDraft);
+
+    // Save the draft of the report comment. This debounced so that we're not ceaselessly saving your edit. Saving the draft
+    // allows one to navigate somewhere else and come back to the comment and still have it in edit mode.
+    const {saveDraft: debouncedSaveComment, isSavePending: isCommentSavePending} = useDebouncedSaveDraft(saveReportDraftComment);
 
     useDraftMessageVideoAttributeCache({
         draftMessage: value,
         isEditing,
         editingReportAction,
         updateDraftMessage: setValue,
-        isEditInProgressRef: isDraftPendingSaved,
+        isEditInProgressRef: isDraftSavePending,
     });
 
     const [selection, setSelection] = useState<TextSelection>(() => currentEditMessageSelection ?? {start: value.length, end: value.length});
@@ -382,40 +387,6 @@ function ComposerWithSuggestions({
         }
         RNTextInputReset.resetKeyboardInput(CONST.COMPOSER.NATIVE_ID);
     }, []);
-
-    /**
-     * Save the draft of the comment. This debounced so that we're not ceaselessly saving your edit. Saving the draft
-     * allows one to navigate somewhere else and come back to the comment and still have it in edit mode.
-     * @param {String} newDraft
-     */
-    const debouncedSaveDraft = useMemo(
-        () =>
-            lodashDebounce((newDraft: string) => {
-                saveReportActionDraft(reportID, editingReportAction, newDraft);
-                isDraftPendingSaved.current = false;
-            }, 1000),
-        [reportID, editingReportAction],
-    );
-
-    useEffect(
-        () => () => {
-            debouncedSaveDraft.cancel();
-            isDraftPendingSaved.current = false;
-        },
-        [debouncedSaveDraft],
-    );
-
-    // The ref to check whether the comment saving is in progress
-    const isCommentPendingSaved = useRef(false);
-
-    const debouncedSaveReportComment = useMemo(
-        () =>
-            lodashDebounce((selectedReportID: string, newComment: string | null) => {
-                saveReportDraftComment(selectedReportID, newComment);
-                isCommentPendingSaved.current = false;
-            }, 1000),
-        [],
-    );
 
     useEffect(() => {
         const switchToCurrentReport = DeviceEventEmitter.addListener(`switchToPreExistingReport_${reportID}`, ({reportToCopyDraftTo, callback}: SwitchToCurrentReportProps) => {
@@ -545,8 +516,7 @@ function ComposerWithSuggestions({
             if (editingState === 'editing' && shouldUseNarrowLayout) {
                 setEditingMessage(newCommentConverted);
                 if (shouldDebounceSaveComment) {
-                    isDraftPendingSaved.current = true;
-                    debouncedSaveDraft(newCommentConverted);
+                    debouncedSaveReportActionDraft(reportID, editingReportAction, newCommentConverted);
                     return;
                 }
 
@@ -555,8 +525,7 @@ function ComposerWithSuggestions({
             }
 
             if (shouldDebounceSaveComment) {
-                isCommentPendingSaved.current = true;
-                debouncedSaveReportComment(reportID, newCommentConverted);
+                debouncedSaveComment(reportID, newCommentConverted);
             } else {
                 saveReportDraftComment(reportID, newCommentConverted);
             }
@@ -567,21 +536,22 @@ function ComposerWithSuggestions({
         },
         [
             currentUserAccountID,
-            debouncedSaveDraft,
-            debouncedSaveReportComment,
+            editingReportAction,
             editingReportActionID,
             editingState,
             findNewlyAddedChars,
             preferredLocale,
             preferredSkinTone,
-            reportID,
-            suggestionsRef,
             raiseIsScrollLikelyLayoutTriggered,
+            reportID,
             selection.end,
             selection.start,
             setCurrentEditMessageSelection,
             setEditingMessage,
             shouldUseNarrowLayout,
+            suggestionsRef,
+            debouncedSaveReportActionDraft,
+            debouncedSaveComment,
         ],
     );
 
@@ -1123,7 +1093,7 @@ function ComposerWithSuggestions({
                     value={value}
                     updateComment={updateComment}
                     commentRef={commentRef}
-                    isCommentPendingSaved={isCommentPendingSaved}
+                    isCommentPendingSaved={isCommentSavePending}
                     isTransitioningToPreExistingReport={isTransitioningToPreExistingReport}
                     onTransitionToPreExistingReportComplete={handleTransitionToPreExistingReportComplete}
                 />
