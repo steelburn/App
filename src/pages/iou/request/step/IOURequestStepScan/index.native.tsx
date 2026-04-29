@@ -48,7 +48,6 @@ function IOURequestStepScan({
     },
     transaction: initialTransaction,
     currentUserPersonalDetails,
-    onLayout,
 }: IOURequestStepScanProps) {
     const theme = useTheme();
     const styles = useThemeStyles();
@@ -147,7 +146,6 @@ function IOURequestStepScan({
         validateFiles,
         PDFValidationComponent,
         ErrorModal,
-        setTestReceiptAndNavigate,
     } = useReceiptScan({
         report,
         reportID,
@@ -215,15 +213,7 @@ function IOURequestStepScan({
             shouldShowWrapper={!!backTo || isEditing}
             testID="IOURequestStepScan"
         >
-            <View
-                style={styles.flex1}
-                onLayout={() => {
-                    if (!onLayout) {
-                        return;
-                    }
-                    onLayout(setTestReceiptAndNavigate);
-                }}
-            >
+            <View style={styles.flex1}>
                 {PDFValidationComponent}
                 <View style={[styles.flex1, isInLandscapeMode && styles.flexRow]}>
                     <View style={[styles.flex1]}>
