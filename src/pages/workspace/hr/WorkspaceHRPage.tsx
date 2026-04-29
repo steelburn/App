@@ -101,6 +101,35 @@ function WorkspaceHRPage({
         [icons.Sync, icons.Trashcan, isOffline, policy, translate],
     );
 
+    let gustoRowRightComponent;
+    if (!isConnected) {
+        gustoRowRightComponent = (
+            <Button
+                small
+                text={translate('workspace.hr.gusto.connect')}
+                onPress={() => setActiveGustoFlowKey(Math.random())}
+            />
+        );
+    } else if (isGustoSyncInProgress) {
+        gustoRowRightComponent = (
+            <ActivityIndicator
+                style={[styles.popoverMenuIcon]}
+                reasonAttributes={{context: 'WorkspaceHRPage.gustoSync'}}
+            />
+        );
+    } else {
+        gustoRowRightComponent = (
+            <ThreeDotsMenu
+                shouldSelfPosition
+                menuItems={overflowMenu}
+                anchorAlignment={{
+                    horizontal: CONST.MODAL.ANCHOR_ORIGIN_HORIZONTAL.RIGHT,
+                    vertical: CONST.MODAL.ANCHOR_ORIGIN_VERTICAL.TOP,
+                }}
+            />
+        );
+    }
+
     return (
         <AccessOrNotFoundWrapper
             accessVariants={[CONST.POLICY.ACCESS_VARIANTS.ADMIN, CONST.POLICY.ACCESS_VARIANTS.CONTROL]}
@@ -146,29 +175,7 @@ function WorkspaceHRPage({
                                 errorTextStyle={[styles.mt5]}
                                 shouldShowRedDotIndicator
                                 shouldShowRightComponent
-                                rightComponent={
-                                    !isConnected ? (
-                                        <Button
-                                            small
-                                            text={translate('workspace.hr.gusto.connect')}
-                                            onPress={() => setActiveGustoFlowKey(Math.random())}
-                                        />
-                                    ) : isGustoSyncInProgress ? (
-                                        <ActivityIndicator
-                                            style={[styles.popoverMenuIcon]}
-                                            reasonAttributes={{context: 'WorkspaceHRPage.gustoSync'}}
-                                        />
-                                    ) : (
-                                        <ThreeDotsMenu
-                                            shouldSelfPosition
-                                            menuItems={overflowMenu}
-                                            anchorAlignment={{
-                                                horizontal: CONST.MODAL.ANCHOR_ORIGIN_HORIZONTAL.RIGHT,
-                                                vertical: CONST.MODAL.ANCHOR_ORIGIN_VERTICAL.TOP,
-                                            }}
-                                        />
-                                    )
-                                }
+                                rightComponent={gustoRowRightComponent}
                             />
                         </Section>
                     </View>
