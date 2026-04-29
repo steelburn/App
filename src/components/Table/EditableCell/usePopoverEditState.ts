@@ -60,9 +60,8 @@ function usePopoverEditState({canEdit, popoverHeight = CONST.POPOVER_DATE_MAX_HE
 
     const startEditing = () => {
         setIsEditing(true);
-        // Defer opening until after interactions so the anchor is measured correctly
-        // eslint-disable-next-line @typescript-eslint/no-deprecated
-        InteractionManager.runAfterInteractions(() => {
+        // EditableCell renders conditionally based on isEditing, defer measurement until that render completes and the anchor is laid out
+        requestAnimationFrame(() => {
             openPopover();
         });
     };
