@@ -1324,8 +1324,9 @@ function changeTransactionsReport({
         const allowNegative = shouldEnableNegative(newReport);
 
         // 3. Keep track of the new report totals
+        // Use transactionForViolations which contains the updated amount/currency when a new distance rate was auto-selected
         const targetReportID = isUnreported ? selfDMReportID : reportID;
-        const {amount: transactionAmount = 0, currency: transactionCurrency} = getTransactionDetails(transaction, undefined, undefined, allowNegative) ?? {};
+        const {amount: transactionAmount = 0, currency: transactionCurrency} = getTransactionDetails(transactionForViolations, undefined, undefined, allowNegative) ?? {};
         const resolvedTransactionCurrency = transactionCurrency ?? transaction.currency;
         const oldReportTotal = oldReport?.total ?? 0;
         const updatedReportTotal = transactionAmount < 0 ? oldReportTotal - transactionAmount : oldReportTotal + transactionAmount;
