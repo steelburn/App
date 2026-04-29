@@ -9,11 +9,12 @@ import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type {CompanyCardFeed} from '@src/types/onyx';
+import isLoadingOnyxValue from '@src/types/utils/isLoadingOnyxValue';
 
 function useFixPersonalCardConnection(cardID: string) {
     const {isOffline} = useNetwork();
 
-    const [cardList] = useOnyx(ONYXKEYS.CARD_LIST);
+    const [cardList, cardListMetadata] = useOnyx(ONYXKEYS.CARD_LIST);
     const card = cardList?.[cardID];
     const bankDisplayName = card ? getBankName(card.bank as CompanyCardFeed) : '';
     const isPlaid = !!(card?.bank && getPlaidInstitutionId(card.bank as CompanyCardFeed));
@@ -22,14 +23,15 @@ function useFixPersonalCardConnection(cardID: string) {
     const isCardBroken = card ? isCardConnectionBroken(card) : false;
 
     useEffect(() => {
-        if (isCardBroken) {
+        if (isLoadingOnyxValue(cardListMetadata)) {
             return;
         }
-        if (card) {
-            updatePersonalCardConnection(card.cardID.toString(), card.lastScrapeResult);
+        if (!card || isCardBroken) {
+            return;
         }
+        updatePersonalCardConnection(card.cardID.toString(), card.lastScrapeResult);
         Navigation.goBack(ROUTES.SETTINGS_WALLET_PERSONAL_CARD_DETAILS.getRoute(cardID));
-    }, [isCardBroken, card, cardID]);
+    }, [isCardBroken, card, cardID, cardListMetadata]);
 
     return {card, bankDisplayName, url, isCardBroken, isOffline, isPlaid, country};
 }
