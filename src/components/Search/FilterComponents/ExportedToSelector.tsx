@@ -2,6 +2,7 @@ import React from 'react';
 import {View} from 'react-native';
 import type {TupleToUnion} from 'type-fest';
 import Icon from '@components/Icon';
+import {filterPolicyIDSelector} from '@components/Search/selectors/Search';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
@@ -15,10 +16,10 @@ import {getIntegrationIcon} from '@libs/ReportUtils';
 import variables from '@styles/variables';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
-import type {SearchAdvancedFiltersForm} from '@src/types/form';
 import MultiSelect from './MultiSelect';
 
 type ExportedToSelectorProps = {
+    value: string[] | undefined;
     onChange: (exportedTo: string[]) => void;
 };
 
@@ -27,21 +28,15 @@ const STANDARD_EXPORT_TEMPLATE_ID_TO_DISPLAY_LABEL: Record<string, string> = {
     [CONST.REPORT.EXPORT_OPTIONS.EXPENSE_LEVEL_EXPORT]: CONST.REPORT.EXPORT_OPTION_LABELS.EXPENSE_LEVEL_EXPORT,
 };
 
-function filterExportedToSelector(searchAdvancedFiltersForm: SearchAdvancedFiltersForm | undefined) {
-    return searchAdvancedFiltersForm?.exportedTo;
-}
-
-function ExportedToSelector({onChange}: ExportedToSelectorProps) {
+function ExportedToSelector({value = [], onChange}: ExportedToSelectorProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const StyleUtils = useStyleUtils();
     const theme = useTheme();
     const expensifyIcons = useMemoizedLazyExpensifyIcons(['XeroSquare', 'QBOSquare', 'NetSuiteSquare', 'IntacctSquare', 'QBDSquare', 'CertiniaSquare', 'GustoSquare', 'Table']);
-    const [exportedTo] = useOnyx(ONYXKEYS.FORMS.SEARCH_ADVANCED_FILTERS_FORM, {selector: filterExportedToSelector});
     const [integrationsExportTemplates] = useOnyx(ONYXKEYS.NVP_INTEGRATION_SERVER_EXPORT_TEMPLATES);
     const [csvExportLayouts] = useOnyx(ONYXKEYS.NVP_CSV_EXPORT_LAYOUTS);
-    const [searchAdvancedFiltersForm] = useOnyx(ONYXKEYS.FORMS.SEARCH_ADVANCED_FILTERS_FORM);
-    const policyIDs = searchAdvancedFiltersForm?.policyID ?? [];
+    const [policyIDs = []] = useOnyx(ONYXKEYS.FORMS.SEARCH_ADVANCED_FILTERS_FORM, {selector: filterPolicyIDSelector});
     const [policies] = useOnyx(ONYXKEYS.COLLECTION.POLICY);
 
     const connectedIntegrationNames = getConnectedIntegrationNamesForPolicies(policies, policyIDs.length > 0 ? policyIDs : undefined);
@@ -124,7 +119,7 @@ function ExportedToSelector({onChange}: ExportedToSelectorProps) {
 
     return (
         <MultiSelect
-            value={exportedTo ?? []}
+            value={value}
             items={exportedToPickerOptions}
             isSearchable={exportedToPickerOptions.length >= CONST.STANDARD_LIST_ITEM_LIMIT}
             onChange={onChange}

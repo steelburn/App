@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import {usePersonalDetails} from '@components/OnyxListItemProvider';
 import {useOptionsList} from '@components/OptionListContextProvider';
 import InviteMemberListItem from '@components/SelectionList/ListItem/InviteMemberListItem';
@@ -20,10 +20,10 @@ import variables from '@styles/variables';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import passthroughPolicyTagListSelector from '@src/selectors/PolicyTagList';
-import type {SearchAdvancedFiltersForm} from '@src/types/form';
 import ListFilterView from './ListFilterViewWrapper';
 
 type InSelectorProps = {
+    value: string[] | undefined;
     onChange: (ins: string[]) => void;
 };
 
@@ -39,11 +39,7 @@ function getSelectedOptionData(option: Option & Pick<OptionData, 'reportID'>): O
     return {...option, isSelected: true, keyForList: option.keyForList ?? option.reportID};
 }
 
-function inSelector(searchAdvancedFiltersForm: SearchAdvancedFiltersForm | undefined) {
-    return searchAdvancedFiltersForm?.in;
-}
-
-function InSelector({onChange}: InSelectorProps) {
+function InSelector({value = [], onChange}: InSelectorProps) {
     const {translate} = useLocalize();
     const personalDetails = usePersonalDetails();
     const {options, areOptionsInitialized} = useOptionsList();
@@ -52,7 +48,6 @@ function InSelector({onChange}: InSelectorProps) {
     const [countryCode = CONST.DEFAULT_COUNTRY_CODE] = useOnyx(ONYXKEYS.COUNTRY_CODE);
     const [loginList] = useOnyx(ONYXKEYS.LOGIN_LIST);
     const [allPolicies] = useOnyx(ONYXKEYS.COLLECTION.POLICY);
-    const [inReportIDs] = useOnyx(ONYXKEYS.FORMS.SEARCH_ADVANCED_FILTERS_FORM, {selector: inSelector});
     const sortedActions = useSortedActions();
 
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
@@ -61,7 +56,6 @@ function InSelector({onChange}: InSelectorProps) {
 
     const [isSearchingForReports] = useOnyx(ONYXKEYS.RAM_ONLY_IS_SEARCHING_FOR_REPORTS);
     const reportAttributesDerived = useReportAttributes();
-    const [selectedReportIDs, setSelectedReportIDs] = useState<string[]>(inReportIDs ?? []);
     const [searchTerm, debouncedSearchTerm, setSearchTerm] = useDebouncedState('');
     const cleanSearchTerm = searchTerm.trim().toLowerCase();
     const [draftComments] = useOnyx(ONYXKEYS.COLLECTION.REPORT_DRAFT_COMMENT);
@@ -70,7 +64,7 @@ function InSelector({onChange}: InSelectorProps) {
     const [policyTags] = useOnyx(ONYXKEYS.COLLECTION.POLICY_TAGS, {selector: passthroughPolicyTagListSelector});
     const [conciergeReportID] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID);
 
-    const selectedOptions: OptionData[] = selectedReportIDs.map((id) => {
+    const selectedOptions: OptionData[] = value.map((id) => {
         const privateIsArchived = privateIsArchivedMap[`${ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS}${id}`];
         const reportData = reports?.[`${ONYXKEYS.COLLECTION.REPORT}${id}`];
         const reportPolicy = allPolicies?.[`${ONYXKEYS.COLLECTION.POLICY}${reportData?.policyID}`];
@@ -124,8 +118,8 @@ function InSelector({onChange}: InSelectorProps) {
 
         sections.push(formattedResults.section);
 
-        const visibleReportsWhenSearchTermNonEmpty = chatOptions.recentReports.map((report) => (selectedReportIDs.includes(report.reportID) ? getSelectedOptionData(report) : report));
-        const visibleReportsWhenSearchTermEmpty = chatOptions.recentReports.filter((report) => !selectedReportIDs.includes(report.reportID));
+        const visibleReportsWhenSearchTermNonEmpty = chatOptions.recentReports.map((report) => (value.includes(report.reportID) ? getSelectedOptionData(report) : report));
+        const visibleReportsWhenSearchTermEmpty = chatOptions.recentReports.filter((report) => !value.includes(report.reportID));
         const reportsFiltered = cleanSearchTerm === '' ? visibleReportsWhenSearchTermEmpty : visibleReportsWhenSearchTermNonEmpty;
 
         sections.push({
@@ -145,21 +139,20 @@ function InSelector({onChange}: InSelectorProps) {
         if (!optionReportID) {
             return;
         }
-        const foundOptionIndex = selectedReportIDs.findIndex((reportID) => {
+        const foundOptionIndex = value.findIndex((reportID) => {
             return reportID && reportID !== '' && selectedOption.reportID === reportID;
         });
-        let newSelectedReportIDs;
+        let newvalue;
         if (foundOptionIndex < 0) {
-            newSelectedReportIDs = [...selectedReportIDs, optionReportID];
+            newvalue = [...value, optionReportID];
         } else {
-            newSelectedReportIDs = [...selectedReportIDs.slice(0, foundOptionIndex), ...selectedReportIDs.slice(foundOptionIndex + 1)];
+            newvalue = [...value.slice(0, foundOptionIndex), ...value.slice(foundOptionIndex + 1)];
         }
-        setSelectedReportIDs(newSelectedReportIDs);
-        onChange(newSelectedReportIDs);
+        onChange(newvalue);
     };
 
     const isLoadingNewOptions = !!isSearchingForReports;
-    const shouldShowLoadingPlaceholder = !areOptionsInitialized || !inReportIDs || !personalDetails;
+    const shouldShowLoadingPlaceholder = !areOptionsInitialized || !value || !personalDetails;
 
     const textInputOptions = {
         value: searchTerm,

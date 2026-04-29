@@ -1,5 +1,6 @@
 import React from 'react';
 import type {OnyxCollection} from 'react-native-onyx';
+import {filterPolicyIDSelector} from '@components/Search/selectors/Search';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import {getDecodedCategoryName} from '@libs/CategoryUtils';
@@ -10,15 +11,14 @@ import {getEmptyObject} from '@src/types/utils/EmptyObject';
 import MultiSelect from './MultiSelect';
 
 type CategorySelectorProps = {
+    value: string[] | undefined;
     onChange: (categories: string[]) => void;
 };
 
-function CategorySelector({onChange}: CategorySelectorProps) {
+function CategorySelector({value = [], onChange}: CategorySelectorProps) {
     const {translate} = useLocalize();
-    const [searchAdvancedFiltersForm] = useOnyx(ONYXKEYS.FORMS.SEARCH_ADVANCED_FILTERS_FORM);
+    const [policyIDs] = useOnyx(ONYXKEYS.FORMS.SEARCH_ADVANCED_FILTERS_FORM, {selector: filterPolicyIDSelector});
     const [personalPolicyID] = useOnyx(ONYXKEYS.PERSONAL_POLICY_ID);
-    const policyIDs = searchAdvancedFiltersForm?.policyID ?? [];
-    const selectedCategoriesItems = searchAdvancedFiltersForm?.category ?? [];
 
     const availableNonPersonalPolicyCategoriesSelector = (policyCategories: OnyxCollection<PolicyCategories>) =>
         Object.fromEntries(
@@ -66,7 +66,7 @@ function CategorySelector({onChange}: CategorySelectorProps) {
 
     return (
         <MultiSelect
-            value={selectedCategoriesItems}
+            value={value}
             items={categoryItems}
             isSearchable={categoryItems.length >= CONST.STANDARD_LIST_ITEM_LIMIT}
             searchPlaceholder={translate('common.category')}

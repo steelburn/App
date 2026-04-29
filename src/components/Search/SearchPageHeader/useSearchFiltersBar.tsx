@@ -100,6 +100,7 @@ function FilterPopup({filterKey, searchAdvancedFiltersForm, queryJSON, closeOver
     if (filterKey === CONST.SEARCH.REPORT_FIELD.GLOBAL_PREFIX) {
         return (
             <ReportFieldPopup
+                values={searchAdvancedFiltersForm}
                 closeOverlay={closeOverlay}
                 updateFilterForm={updateFilterForm}
             />
@@ -109,7 +110,7 @@ function FilterPopup({filterKey, searchAdvancedFiltersForm, queryJSON, closeOver
     return (
         <CommonPopup
             filterKey={filterKey}
-            searchAdvancedFiltersForm={searchAdvancedFiltersForm}
+            value={searchAdvancedFiltersForm[filterKey]}
             label={label}
             policyIDQuery={queryJSON.policyID}
             closeOverlay={closeOverlay}

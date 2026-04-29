@@ -1,6 +1,5 @@
 import isEmpty from 'lodash/isEmpty';
 import React, {useEffect, useRef, useState} from 'react';
-import type {OnyxEntry} from 'react-native-onyx';
 import {usePersonalDetails} from '@components/OnyxListItemProvider';
 import SelectionList from '@components/SelectionList';
 import UserSelectionListItem from '@components/SelectionList/ListItem/UserSelectionListItem';
@@ -15,20 +14,14 @@ import {getParticipantsOption} from '@libs/OptionsListUtils';
 import type {OptionData} from '@libs/ReportUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
-import type {SearchAdvancedFiltersForm} from '@src/types/form/SearchAdvancedFiltersForm';
-import getEmptyArray from '@src/types/utils/getEmptyArray';
 import ListFilterWrapper from './ListFilterViewWrapper';
 
 type UserSelectorProps = {
-    filterKey:
-        | typeof CONST.SEARCH.SYNTAX_FILTER_KEYS.ASSIGNEE
-        | typeof CONST.SEARCH.SYNTAX_FILTER_KEYS.ATTENDEE
-        | typeof CONST.SEARCH.SYNTAX_FILTER_KEYS.TO
-        | typeof CONST.SEARCH.SYNTAX_FILTER_KEYS.FROM;
+    value: string[] | undefined;
     onChange: (options: string[]) => void;
 };
 
-function UserSelector({filterKey, onChange}: UserSelectorProps) {
+function UserSelector({value = [], onChange}: UserSelectorProps) {
     const selectionListRef = useRef<SelectionListHandle<ListItem> | null>(null);
     const styles = useThemeStyles();
     const {translate} = useLocalize();
@@ -37,9 +30,7 @@ function UserSelector({filterKey, onChange}: UserSelectorProps) {
     const currentUserAccountID = currentUserPersonalDetails.accountID;
     const shouldFocusInputOnScreenFocus = canFocusInputOnScreenFocus();
     const [isSearchingForReports] = useOnyx(ONYXKEYS.RAM_ONLY_IS_SEARCHING_FOR_REPORTS);
-    const accountIDsSelector = (searchAdvancedFiltersForm: OnyxEntry<SearchAdvancedFiltersForm>) => searchAdvancedFiltersForm?.[filterKey];
-    const [accountIDs = getEmptyArray<string>()] = useOnyx(ONYXKEYS.FORMS.SEARCH_ADVANCED_FILTERS_FORM, {selector: accountIDsSelector});
-    const initialSelectedOptions = accountIDs.reduce<OptionData[]>((options, id) => {
+    const initialSelectedOptions = value.reduce<OptionData[]>((options, id) => {
         const participant = personalDetails?.[id];
         if (!participant) {
             return options;

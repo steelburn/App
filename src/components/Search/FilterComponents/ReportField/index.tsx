@@ -27,12 +27,13 @@ type ReportFieldHandle = {
     getValue: () => ReportFieldValues;
     getEmptyValue: () => ReportFieldValues;
     isDateModifierSelected: () => boolean;
-    applySelectedFieldAndGoBack: () => void;
+    applySelectedFieldAndGoBack: () => ReportFieldValues | void;
     resetSelectedFieldAndGoBack: () => void;
 };
 
 type ReportFieldBaseProps = {
     ref: React.Ref<ReportFieldHandle>;
+    values: ReportFieldValues | undefined;
     selectedField: PolicyReportField | null;
     onFieldSelected: (field: PolicyReportField | null) => void;
 };
@@ -173,21 +174,20 @@ function SelectedDateReportField({ref, field, value: initialValue, selectedDateM
     );
 }
 
-function ReportFieldBase({ref, selectedField, onFieldSelected}: ReportFieldBaseProps) {
+function ReportFieldBase({ref, values: initialValues = {}, selectedField, onFieldSelected}: ReportFieldBaseProps) {
     const {translate, localeCompare} = useLocalize();
     const styles = useThemeStyles();
     const policyReportFieldsSelector = (policies: OnyxCollection<Policy>) => createAllPolicyReportFieldsSelector(policies, localeCompare);
     const [fieldList] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {
         selector: policyReportFieldsSelector,
     });
-    const [searchAdvancedFiltersForm] = useOnyx(ONYXKEYS.FORMS.SEARCH_ADVANCED_FILTERS_FORM);
-    const [values, setValues] = useState<ReportFieldValues>({});
+    const [values, setValues] = useState<ReportFieldValues>(initialValues);
     const [selectedDateModifier, setSelectedDateModifier] = useState<SearchDateModifier | null>(null);
     const selectedFieldRef = useRef<ReportFieldHandle>(null);
 
     const getValue = (fieldName: string) => {
         const filterKey = getFilterKey(fieldName);
-        return values[filterKey] ?? searchAdvancedFiltersForm?.[filterKey] ?? '';
+        return values[filterKey] ?? '';
     };
 
     const getDateValue = (fieldName: string) => {
@@ -197,10 +197,10 @@ function ReportFieldBase({ref, selectedField, onFieldSelected}: ReportFieldBaseP
         const afterKey = `${CONST.SEARCH.REPORT_FIELD.AFTER_PREFIX}${suffix}` as const;
         const rangeKey = `${CONST.SEARCH.REPORT_FIELD.RANGE_PREFIX}${suffix}` as const;
         return {
-            [onKey]: values[onKey] ?? searchAdvancedFiltersForm?.[onKey],
-            [beforeKey]: values[beforeKey] ?? searchAdvancedFiltersForm?.[beforeKey],
-            [afterKey]: values[afterKey] ?? searchAdvancedFiltersForm?.[afterKey],
-            [rangeKey]: values[rangeKey] ?? searchAdvancedFiltersForm?.[rangeKey],
+            [onKey]: values[onKey],
+            [beforeKey]: values[beforeKey],
+            [afterKey]: values[afterKey],
+            [rangeKey]: values[rangeKey],
         };
     };
 
@@ -236,6 +236,7 @@ function ReportFieldBase({ref, selectedField, onFieldSelected}: ReportFieldBaseP
             const selectedValue = selectedFieldRef.current.getValue();
             setValues((prevValues) => ({...prevValues, ...selectedValue}));
             onFieldSelected(null);
+            return selectedValue;
         },
         resetSelectedFieldAndGoBack: () => {
             if (!selectedFieldRef.current || !selectedField) {

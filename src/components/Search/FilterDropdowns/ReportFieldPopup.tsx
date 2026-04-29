@@ -11,11 +11,12 @@ import type {PolicyReportField} from '@src/types/onyx';
 import BasePopup from './BasePopup';
 
 type ReportFieldPopupProps = {
+    values: Partial<SearchAdvancedFiltersForm>;
     closeOverlay: () => void;
     updateFilterForm: (value: Partial<SearchAdvancedFiltersForm>) => void;
 };
 
-function ReportFieldPopup({closeOverlay, updateFilterForm}: ReportFieldPopupProps) {
+function ReportFieldPopup({values, closeOverlay, updateFilterForm}: ReportFieldPopupProps) {
     const {translate} = useLocalize();
     const {windowHeight} = useWindowDimensions();
     const isInLandscapeMode = useIsInLandscapeMode();
@@ -62,6 +63,7 @@ function ReportFieldPopup({closeOverlay, updateFilterForm}: ReportFieldPopupProp
         >
             <ReportFieldBase
                 ref={reportFieldRef}
+                values={values}
                 selectedField={selectedField}
                 onFieldSelected={setSelectedField}
             />

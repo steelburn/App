@@ -24,10 +24,11 @@ import isLoadingOnyxValue from '@src/types/utils/isLoadingOnyxValue';
 import ListFilterView from './ListFilterViewWrapper';
 
 type CardSelectorProps = {
+    value: string[] | undefined;
     onChange: (cards: string[]) => void;
 };
 
-function CardSelector({onChange}: CardSelectorProps) {
+function CardSelector({value, onChange}: CardSelectorProps) {
     const theme = useTheme();
     const styles = useThemeStyles();
     const {translate} = useLocalize();
@@ -53,9 +54,9 @@ function CardSelector({onChange}: CardSelectorProps) {
     }, [isOffline]);
 
     useEffect(() => {
-        const generatedCards = generateSelectedCards(userCardList, workspaceCardFeeds, searchAdvancedFiltersForm?.feed, searchAdvancedFiltersForm?.cardID);
+        const generatedCards = generateSelectedCards(userCardList, workspaceCardFeeds, searchAdvancedFiltersForm?.feed, value);
         setSelectedCards(generatedCards);
-    }, [searchAdvancedFiltersForm?.feed, searchAdvancedFiltersForm?.cardID, workspaceCardFeeds, userCardList]);
+    }, [searchAdvancedFiltersForm?.feed, workspaceCardFeeds, userCardList]);
 
     const individualCardsSectionData = buildCardsData(
         workspaceCardFeeds ?? {},

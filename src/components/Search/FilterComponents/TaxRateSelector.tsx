@@ -1,4 +1,5 @@
 import React from 'react';
+import {filterPolicyIDSelector} from '@components/Search/selectors/Search';
 import useOnyx from '@hooks/useOnyx';
 import {getAllTaxRates} from '@libs/PolicyUtils';
 import CONST from '@src/CONST';
@@ -7,15 +8,14 @@ import type {Policy} from '@src/types/onyx';
 import MultiSelect from './MultiSelect';
 
 type TaxRateSelectorProps = {
+    value: string[] | undefined;
     onChange: (taxRates: string[]) => void;
 };
 
-function TaxRateSelector({onChange}: TaxRateSelectorProps) {
-    const [searchAdvancedFiltersForm] = useOnyx(ONYXKEYS.FORMS.SEARCH_ADVANCED_FILTERS_FORM);
+function TaxRateSelector({value = [], onChange}: TaxRateSelectorProps) {
+    const [policyIDs] = useOnyx(ONYXKEYS.FORMS.SEARCH_ADVANCED_FILTERS_FORM, {selector: filterPolicyIDSelector});
     const [policies] = useOnyx(ONYXKEYS.COLLECTION.POLICY);
 
-    const taxRates = searchAdvancedFiltersForm?.taxRate;
-    const policyIDs = searchAdvancedFiltersForm?.policyID;
     const allTaxRates = getAllTaxRates(policies);
     const selectedPoliciesMap = policyIDs?.reduce<Record<string, Policy>>((acc, policyID) => {
         const key = `${ONYXKEYS.COLLECTION.POLICY}${policyID}`;
@@ -33,7 +33,7 @@ function TaxRateSelector({onChange}: TaxRateSelectorProps) {
 
     return (
         <MultiSelect
-            value={taxRates ?? []}
+            value={value}
             items={taxItems}
             isSearchable={taxItems.length >= CONST.STANDARD_LIST_ITEM_LIMIT}
             onChange={onChange}

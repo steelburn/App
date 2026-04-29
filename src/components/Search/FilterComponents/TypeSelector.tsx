@@ -1,16 +1,16 @@
 import React from 'react';
-import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
+import type {OnyxCollection} from 'react-native-onyx';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import {getTypeOptions} from '@libs/SearchUIUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import {emailSelector} from '@src/selectors/Session';
-import type {SearchAdvancedFiltersForm} from '@src/types/form';
 import type {Policy} from '@src/types/onyx';
 import SingleSelect from './SingleSelect';
 
 type TypeSelectorProps = {
+    value: string | undefined;
     onChange: (item: string) => void;
 };
 
@@ -43,22 +43,17 @@ function typeOptionsPoliciesSelector(policies: OnyxCollection<Policy>): OnyxColl
     return result;
 }
 
-function typeSelector(searchAdvancedFiltersForm: OnyxEntry<SearchAdvancedFiltersForm>) {
-    return searchAdvancedFiltersForm?.type;
-}
-
-function TypeSelector({onChange}: TypeSelectorProps) {
+function TypeSelector({value = CONST.SEARCH.DATA_TYPES.EXPENSE, onChange}: TypeSelectorProps) {
     const {translate} = useLocalize();
     const [allPolicies] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {selector: typeOptionsPoliciesSelector});
     const [sessionEmail] = useOnyx(ONYXKEYS.SESSION, {selector: emailSelector});
-    const [type = CONST.SEARCH.DATA_TYPES.EXPENSE] = useOnyx(ONYXKEYS.FORMS.SEARCH_ADVANCED_FILTERS_FORM, {selector: typeSelector});
 
     const types = getTypeOptions(translate, allPolicies, sessionEmail);
 
     return (
         <SingleSelect
             // text is only needed when the list is searchable
-            value={{value: type, text: ''}}
+            value={{value, text: ''}}
             items={types}
             onChange={(item) => onChange(item.value)}
         />

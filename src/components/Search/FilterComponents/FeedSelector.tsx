@@ -5,12 +5,13 @@ import {openSearchCardFiltersPage} from '@libs/actions/Search';
 import MultiSelect from './MultiSelect';
 
 type FeedSelectorProps = {
+    value: string[] | undefined;
     onChange: (item: string[]) => void;
 };
 
-function FeedSelector({onChange}: FeedSelectorProps) {
+function FeedSelector({value, onChange}: FeedSelectorProps) {
     const {isOffline} = useNetwork();
-    const {feedOptions, feedValue} = useFilterFeedData();
+    const {feedOptions, feedValue} = useFilterFeedData(value);
 
     useEffect(() => {
         if (isOffline) {

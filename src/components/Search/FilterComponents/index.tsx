@@ -1,5 +1,6 @@
-import React, {useState} from 'react';
+import React from 'react';
 import type {OnyxEntry} from 'react-native-onyx';
+import type {SearchAmountFilterKeys, SearchDateFilterKeys} from '@components/Search/types';
 import TextInput from '@components/TextInput';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
@@ -9,8 +10,6 @@ import type {SearchFilter} from '@libs/SearchUIUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {SearchAdvancedFiltersForm} from '@src/types/form/SearchAdvancedFiltersForm';
-import type {SearchDataTypes} from '@src/types/onyx/SearchResults';
-import getEmptyArray from '@src/types/utils/getEmptyArray';
 import CardSelector from './CardSelector';
 import CategorySelector from './CategorySelector';
 import CurrencySelector from './CurrencySelector';
@@ -25,10 +24,12 @@ import TypeSelector from './TypeSelector';
 import UserSelector from './UserSelector';
 import WorkspaceSelector from './WorkspaceSelector';
 
+type FilterKeys = Exclude<SearchFilter['key'], SearchDateFilterKeys | SearchAmountFilterKeys | typeof CONST.SEARCH.SYNTAX_FILTER_KEYS.REPORT_FIELD>;
 type FilterComponentsProps = {
-    filterKey: SearchFilter['key'];
+    filterKey: FilterKeys;
+    value: SearchAdvancedFiltersForm[FilterKeys] | undefined;
     policyIDQuery: string[] | undefined;
-    onChange: (value: string | string[]) => void;
+    onChange: (value: SearchAdvancedFiltersForm[FilterKeys]) => void;
 };
 
 type TextInputFilterComponentsProps = {
@@ -39,40 +40,38 @@ type TextInputFilterComponentsProps = {
         | typeof CONST.SEARCH.SYNTAX_FILTER_KEYS.KEYWORD
         | typeof CONST.SEARCH.SYNTAX_FILTER_KEYS.TITLE
         | typeof CONST.SEARCH.SYNTAX_FILTER_KEYS.WITHDRAWAL_ID;
+    value: string | undefined;
     onChange: (value: string) => void;
 };
 
+type SingleSelectFilterKeys = typeof CONST.SEARCH.SYNTAX_FILTER_KEYS.BILLABLE | typeof CONST.SEARCH.SYNTAX_FILTER_KEYS.REIMBURSABLE | typeof CONST.SEARCH.SYNTAX_FILTER_KEYS.WITHDRAWAL_TYPE;
 type SingleSelectFilterComponentsProps = {
-    filterKey: typeof CONST.SEARCH.SYNTAX_FILTER_KEYS.BILLABLE | typeof CONST.SEARCH.SYNTAX_FILTER_KEYS.REIMBURSABLE | typeof CONST.SEARCH.SYNTAX_FILTER_KEYS.WITHDRAWAL_TYPE;
-    onChange: (value: string) => void;
+    filterKey: SingleSelectFilterKeys;
+    value: SearchAdvancedFiltersForm[SingleSelectFilterKeys] | undefined;
+    onChange: (value: SearchAdvancedFiltersForm[SingleSelectFilterKeys]) => void;
 };
 
+type MultiSelectFilterKeys =
+    | typeof CONST.SEARCH.SYNTAX_FILTER_KEYS.HAS
+    | typeof CONST.SEARCH.SYNTAX_FILTER_KEYS.IS
+    | typeof CONST.SEARCH.SYNTAX_FILTER_KEYS.EXPENSE_TYPE
+    | typeof CONST.SEARCH.SYNTAX_FILTER_KEYS.STATUS;
 type MultiSelectFilterComponentsProps = {
-    filterKey:
-        | typeof CONST.SEARCH.SYNTAX_FILTER_KEYS.HAS
-        | typeof CONST.SEARCH.SYNTAX_FILTER_KEYS.IS
-        | typeof CONST.SEARCH.SYNTAX_FILTER_KEYS.EXPENSE_TYPE
-        | typeof CONST.SEARCH.SYNTAX_FILTER_KEYS.STATUS;
-    onChange: (values: string[] | string) => void;
+    filterKey: MultiSelectFilterKeys;
+    value: SearchAdvancedFiltersForm[MultiSelectFilterKeys] | undefined;
+    onChange: (values: SearchAdvancedFiltersForm[MultiSelectFilterKeys]) => void;
 };
 
-function TextInputFilterComponents({filterKey, onChange}: TextInputFilterComponentsProps) {
+function TextInputFilterComponents({filterKey, value, onChange}: TextInputFilterComponentsProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
-    const formValueSelector = (searchAdvancedFiltersForm: OnyxEntry<SearchAdvancedFiltersForm>) => searchAdvancedFiltersForm?.[filterKey];
-    const [formValue] = useOnyx(ONYXKEYS.FORMS.SEARCH_ADVANCED_FILTERS_FORM, {selector: formValueSelector});
-
-    const [value, setValue] = useState(formValue);
 
     const label = translate(FILTER_LABEL_MAP[filterKey]);
     return (
         <TextInput
             placeholder={label}
             value={value}
-            onChangeText={(newValue) => {
-                setValue(newValue);
-                onChange(newValue);
-            }}
+            onChangeText={onChange}
             accessibilityLabel={label}
             role={CONST.ROLE.PRESENTATION}
             containerStyles={[styles.ph5]}
@@ -80,42 +79,34 @@ function TextInputFilterComponents({filterKey, onChange}: TextInputFilterCompone
     );
 }
 
-function SingleSelectFilterComponents({filterKey, onChange}: SingleSelectFilterComponentsProps) {
+function SingleSelectFilterComponents({filterKey, value, onChange}: SingleSelectFilterComponentsProps) {
     const {translate} = useLocalize();
-    const formValueSelector = (searchAdvancedFiltersForm: OnyxEntry<SearchAdvancedFiltersForm>) => searchAdvancedFiltersForm?.[filterKey];
-    const [formValue] = useOnyx(ONYXKEYS.FORMS.SEARCH_ADVANCED_FILTERS_FORM, {selector: formValueSelector});
     const items = getSingleSelectFilterOptions(filterKey, translate);
 
     return (
         <SingleSelect
             items={items}
-            value={items.find((option) => option.value === formValue)}
+            value={items.find((option) => option.value === value)}
             onChange={(item) => onChange(item.value)}
         />
     );
 }
 
-function MultiSelectFilterComponents({filterKey, onChange}: MultiSelectFilterComponentsProps) {
+function MultiSelectFilterComponents({filterKey, value = [], onChange}: MultiSelectFilterComponentsProps) {
     const {translate} = useLocalize();
-    const formValuesSelector = (searchAdvancedFiltersForm: OnyxEntry<SearchAdvancedFiltersForm>): [SearchDataTypes | undefined, string[] | undefined] => {
-        const values = searchAdvancedFiltersForm?.[filterKey];
-        const type = searchAdvancedFiltersForm?.type;
-
-        if (!values) {
-            return [type, undefined];
-        }
-
-        return [type, Array.isArray(values) ? values : values.split(',')];
+    const typeSelector = (searchAdvancedFiltersForm: OnyxEntry<SearchAdvancedFiltersForm>) => {
+        return searchAdvancedFiltersForm?.type;
     };
-    const [[type = CONST.SEARCH.DATA_TYPES.EXPENSE, formValues = []] = getEmptyArray<SearchDataTypes & string[]>()] = useOnyx(ONYXKEYS.FORMS.SEARCH_ADVANCED_FILTERS_FORM, {
-        selector: formValuesSelector,
+    const [type = CONST.SEARCH.DATA_TYPES.EXPENSE] = useOnyx(ONYXKEYS.FORMS.SEARCH_ADVANCED_FILTERS_FORM, {
+        selector: typeSelector,
     });
     const items = getMultiSelectFilterOptions(filterKey, type, translate);
+    const normalizedValue = Array.isArray(value) ? value : value.split(',');
 
     return (
         <MultiSelect
             items={items}
-            value={formValues}
+            value={normalizedValue}
             onChange={(selectedItems) => {
                 if (filterKey === CONST.SEARCH.SYNTAX_FILTER_KEYS.STATUS) {
                     onChange(selectedItems.length > 0 ? selectedItems : CONST.SEARCH.STATUS.EXPENSE.ALL);
@@ -127,9 +118,8 @@ function MultiSelectFilterComponents({filterKey, onChange}: MultiSelectFilterCom
     );
 }
 
-function FilterComponents({filterKey, policyIDQuery, onChange}: FilterComponentsProps) {
+function FilterComponents({filterKey, value, policyIDQuery, onChange}: FilterComponentsProps) {
     switch (filterKey) {
-        case CONST.SEARCH.SYNTAX_FILTER_KEYS.TYPE:
         case CONST.SEARCH.SYNTAX_FILTER_KEYS.FEED:
         case CONST.SEARCH.SYNTAX_FILTER_KEYS.CARD_ID:
         case CONST.SEARCH.SYNTAX_FILTER_KEYS.IN:
@@ -138,7 +128,6 @@ function FilterComponents({filterKey, policyIDQuery, onChange}: FilterComponents
         case CONST.SEARCH.SYNTAX_FILTER_KEYS.TAG:
         case CONST.SEARCH.SYNTAX_FILTER_KEYS.CATEGORY: {
             const Component = {
-                [CONST.SEARCH.SYNTAX_FILTER_KEYS.TYPE]: TypeSelector,
                 [CONST.SEARCH.SYNTAX_FILTER_KEYS.FEED]: FeedSelector,
                 [CONST.SEARCH.SYNTAX_FILTER_KEYS.CARD_ID]: CardSelector,
                 [CONST.SEARCH.SYNTAX_FILTER_KEYS.IN]: InSelector,
@@ -147,7 +136,20 @@ function FilterComponents({filterKey, policyIDQuery, onChange}: FilterComponents
                 [CONST.SEARCH.SYNTAX_FILTER_KEYS.TAG]: TagSelector,
                 [CONST.SEARCH.SYNTAX_FILTER_KEYS.CATEGORY]: CategorySelector,
             }[filterKey];
-            return <Component onChange={onChange} />;
+            return (
+                <Component
+                    value={value as string[] | undefined}
+                    onChange={onChange}
+                />
+            );
+        }
+        case CONST.SEARCH.SYNTAX_FILTER_KEYS.TYPE: {
+            return (
+                <TypeSelector
+                    value={value as string | undefined}
+                    onChange={onChange}
+                />
+            );
         }
         case CONST.SEARCH.SYNTAX_FILTER_KEYS.MERCHANT:
         case CONST.SEARCH.SYNTAX_FILTER_KEYS.DESCRIPTION:
@@ -159,6 +161,7 @@ function FilterComponents({filterKey, policyIDQuery, onChange}: FilterComponents
                 <TextInputFilterComponents
                     key={filterKey}
                     filterKey={filterKey}
+                    value={value as string | undefined}
                     onChange={onChange}
                 />
             );
@@ -168,7 +171,7 @@ function FilterComponents({filterKey, policyIDQuery, onChange}: FilterComponents
             return (
                 <CurrencySelector
                     key={filterKey}
-                    filterKey={filterKey}
+                    value={value as string[] | undefined}
                     onChange={onChange}
                 />
             );
@@ -180,6 +183,7 @@ function FilterComponents({filterKey, policyIDQuery, onChange}: FilterComponents
                 <SingleSelectFilterComponents
                     key={filterKey}
                     filterKey={filterKey}
+                    value={value as SingleSelectFilterComponentsProps['value'] | undefined}
                     onChange={onChange}
                 />
             );
@@ -192,6 +196,7 @@ function FilterComponents({filterKey, policyIDQuery, onChange}: FilterComponents
                 <MultiSelectFilterComponents
                     key={filterKey}
                     filterKey={filterKey}
+                    value={value as MultiSelectFilterComponentsProps['value'] | undefined}
                     onChange={onChange}
                 />
             );
@@ -202,14 +207,15 @@ function FilterComponents({filterKey, policyIDQuery, onChange}: FilterComponents
         case CONST.SEARCH.SYNTAX_FILTER_KEYS.FROM:
             return (
                 <UserSelector
+                    value={value as string[] | undefined}
                     key={filterKey}
-                    filterKey={filterKey}
                     onChange={onChange}
                 />
             );
         case CONST.SEARCH.SYNTAX_FILTER_KEYS.POLICY_ID:
             return (
                 <WorkspaceSelector
+                    value={value as string[] | undefined}
                     policyIDQuery={policyIDQuery}
                     onChange={onChange}
                 />
@@ -220,3 +226,4 @@ function FilterComponents({filterKey, policyIDQuery, onChange}: FilterComponents
 }
 
 export default FilterComponents;
+export type {FilterComponentsProps};

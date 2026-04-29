@@ -45,8 +45,8 @@ function FilterWorkspaceValue({value}: FilterValueProps) {
     return useFilterWorkspaceValue(value);
 }
 
-function FilterFeedValue() {
-    return useFilterFeedValue();
+function FilterFeedValue({value}: FilterValueProps) {
+    return useFilterFeedValue(value as string[]);
 }
 
 function FilterCardValue() {
@@ -76,7 +76,7 @@ function FilterValue({filterKey, value}: FilterValueWithKeyProps) {
     }
 
     if (filterKey === CONST.SEARCH.SYNTAX_FILTER_KEYS.FEED) {
-        return <FilterFeedValue />;
+        return <FilterFeedValue value={value} />;
     }
 
     if (filterKey === CONST.SEARCH.SYNTAX_FILTER_KEYS.CARD_ID) {
