@@ -661,7 +661,7 @@ function WorkspaceCategoriesPage({route}: WorkspaceCategoriesPageProps) {
                     sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.CATEGORIES.MORE_DROPDOWN}
                     options={secondaryActions}
                     isSplitButton={false}
-                    wrapperStyle={shouldShowAddCategory ? styles.flexGrow0 : styles.flexGrow1}
+                    wrapperStyle={shouldShowAddCategory || isInLandscapeMode ? styles.flexGrow0 : styles.flexGrow1}
                 />
             </View>
         );

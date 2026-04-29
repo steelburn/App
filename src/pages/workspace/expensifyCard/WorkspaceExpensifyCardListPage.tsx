@@ -262,8 +262,9 @@ function WorkspaceExpensifyCardListPage({route, cardsList, fundID}: WorkspaceExp
             </HeaderWithBackButton>
             {!shouldShowSelector && !shouldDisplayNarrowHeaderButton && isBankAccountVerified && <View style={styles.ph5}>{getHeaderButtons()}</View>}
             {shouldShowSelector && (
-                <View style={[styles.w100, styles.ph5, styles.pb3, !shouldChangeLayout && [styles.flexRow, styles.alignItemsCenter, styles.justifyContentBetween]]}>
+                <View style={[styles.w100, styles.ph5, styles.pb3, (!shouldChangeLayout || isInLandscapeMode) && [styles.flexRow, styles.alignItemsCenter, styles.justifyContentBetween]]}>
                     <FeedSelector
+                        wrapperStyle={isInLandscapeMode ? styles.flex1 : undefined}
                         onFeedSelect={() => Navigation.navigate(ROUTES.WORKSPACE_EXPENSIFY_CARD_SELECT_FEED.getRoute(policyID))}
                         CardFeedIcon={cardFeedIcon}
                         feedName={translate('workspace.common.expensifyCard')}
