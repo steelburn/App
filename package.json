@@ -360,6 +360,7 @@
     "webpack-merge": "^5.8.0"
   },
   "overrides": {
+    "react-native-screens": "4.25.0-beta.1",
     "braces": "3.0.3",
     "yargs": "17.7.2",
     "yargs-parser": "21.1.1",
