@@ -1,6 +1,7 @@
 /* eslint-disable max-lines */
 import {eachDayOfInterval, format, parse} from 'date-fns';
 import {fastMerge} from 'expensify-common';
+// eslint-disable-next-line no-restricted-imports
 import {InteractionManager} from 'react-native';
 import type {NullishDeep, OnyxCollection, OnyxEntry, OnyxInputValue, OnyxUpdate} from 'react-native-onyx';
 import Onyx from 'react-native-onyx';
