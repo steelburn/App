@@ -27,8 +27,10 @@ import {READ_COMMANDS, WRITE_COMMANDS} from '@libs/API/types';
 import {getMicroSecondOnyxErrorWithTranslationKey} from '@libs/ErrorUtils';
 import createDynamicRoute from '@libs/Navigation/helpers/dynamicRoutesUtils/createDynamicRoute';
 import Navigation from '@libs/Navigation/Navigation';
+import * as NetworkStore from '@libs/Network/NetworkStore';
 import type {MemberForList} from '@libs/OptionsListUtils';
 import {getFormattedStreet} from '@libs/PersonalDetailsUtils';
+import {buildOptimisticAddCommentReportAction} from '@libs/ReportUtils';
 import CONST from '@src/CONST';
 import type {Country} from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -45,8 +47,6 @@ import {setBankAccountSubStep} from './ReimbursementAccount';
 
 export {
     goToWithdrawalAccountSetupStep,
-    setBankAccountFormValidationErrors,
-    resetReimbursementAccount,
     resetUSDBankAccount,
     resetNonUSDBankAccount,
     hideBankAccountErrors,
@@ -85,7 +85,7 @@ type OpenPersonalBankAccountSetupViewProps = {
 };
 
 function clearPlaid(): Promise<void | void[]> {
-    Onyx.set(ONYXKEYS.PLAID_LINK_TOKEN, '');
+    Onyx.set(ONYXKEYS.RAM_ONLY_PLAID_LINK_TOKEN, '');
     Onyx.set(ONYXKEYS.PLAID_CURRENT_EVENT, null);
     return Onyx.set(ONYXKEYS.PLAID_DATA, CONST.PLAID.DEFAULT_DATA);
 }
@@ -315,6 +315,7 @@ function addPersonalBankAccount(
         addressState: account?.addressState,
         addressZip: account?.addressZipCode,
         addressCountry: account?.country,
+        confirmedOwnershipDetails: account?.confirmedOwnershipDetails,
     };
     if (policyID) {
         parameters.policyID = policyID;
@@ -1555,6 +1556,111 @@ function openBankAccountSharePage() {
     });
 }
 
+function initiateBankAccountUnlock(bankAccountID: number, conciergeReportID: string | undefined, optimisticReportActionID: string | null | undefined) {
+    const authToken = NetworkStore.getAuthToken();
+
+    const onyxData: OnyxData<typeof ONYXKEYS.INITIATING_BANK_ACCOUNT_UNLOCK | typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS> = {
+        optimisticData: [
+            {
+                onyxMethod: Onyx.METHOD.MERGE,
+                key: ONYXKEYS.INITIATING_BANK_ACCOUNT_UNLOCK,
+                value: {
+                    isLoading: true,
+                    isSuccess: false,
+                },
+            },
+        ],
+        successData: [
+            {
+                onyxMethod: Onyx.METHOD.MERGE,
+                key: ONYXKEYS.INITIATING_BANK_ACCOUNT_UNLOCK,
+                value: {
+                    errors: null,
+                    isLoading: false,
+                    isSuccess: null,
+                    bankAccountIDToUnlock: null,
+                    optimisticReportActionID: null,
+                },
+            },
+            ...(optimisticReportActionID && conciergeReportID
+                ? [
+                      {
+                          onyxMethod: Onyx.METHOD.MERGE,
+                          key: `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${conciergeReportID}` as const,
+                          value: {[optimisticReportActionID]: {pendingAction: null}},
+                      },
+                  ]
+                : []),
+        ],
+        failureData: [
+            {
+                onyxMethod: Onyx.METHOD.MERGE,
+                key: ONYXKEYS.INITIATING_BANK_ACCOUNT_UNLOCK,
+                value: {
+                    isLoading: false,
+                    isSuccess: false,
+                    errors: getMicroSecondOnyxErrorWithTranslationKey('common.genericErrorMessage'),
+                },
+            },
+            ...(optimisticReportActionID && conciergeReportID
+                ? [
+                      {
+                          onyxMethod: Onyx.METHOD.MERGE,
+                          key: `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${conciergeReportID}` as const,
+                          value: {[optimisticReportActionID]: {errors: getMicroSecondOnyxErrorWithTranslationKey('common.genericErrorMessage')}},
+                      },
+                  ]
+                : []),
+        ],
+    };
+
+    return API.write(WRITE_COMMANDS.INITIATE_BANK_ACCOUNT_UNLOCK, {bankAccountID, authToken, optimisticReportActionID}, onyxData);
+}
+
+function pressLockedBankAccount(bankAccountID: number, translate: LocalizedTranslate, conciergeReportID: string | undefined, delegateAccountID: number | undefined) {
+    let optimisticReportActionID: string | undefined;
+
+    if (conciergeReportID) {
+        const bankAccount = Object.values(bankAccountList ?? {}).find((account) => account?.accountData?.bankAccountID === bankAccountID);
+        const maskedAccountNumber = bankAccount?.accountData?.accountNumber ?? '';
+
+        const html = translate('bankAccount.htmlUnlockMessage', maskedAccountNumber);
+        const text = translate('bankAccount.textUnlockMessage', maskedAccountNumber);
+
+        const {reportAction} = buildOptimisticAddCommentReportAction({
+            text,
+            actorAccountID: CONST.ACCOUNT_ID.CONCIERGE,
+            reportID: conciergeReportID,
+            delegateAccountIDParam: delegateAccountID,
+        });
+        optimisticReportActionID = reportAction.reportActionID;
+
+        reportAction.message = [
+            {
+                type: CONST.REPORT.MESSAGE.TYPE.COMMENT,
+                html,
+                text,
+                isEdited: false,
+                whisperedTo: [],
+                isDeletedParentAction: false,
+                deleted: '',
+            },
+        ];
+        Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${conciergeReportID}`, {
+            [optimisticReportActionID]: reportAction,
+        });
+        Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT}${conciergeReportID}`, {
+            lastVisibleActionCreated: reportAction.created,
+            lastActorAccountID: CONST.ACCOUNT_ID.CONCIERGE,
+        });
+    }
+
+    Onyx.merge(ONYXKEYS.INITIATING_BANK_ACCOUNT_UNLOCK, {
+        bankAccountIDToUnlock: bankAccountID,
+        optimisticReportActionID: optimisticReportActionID ?? null,
+    });
+}
+
 export {
     acceptACHContractForBankAccount,
     addBusinessWebsiteForDraft,
@@ -1612,4 +1718,6 @@ export {
     getBankAccountFromID,
     openBankAccountSharePage,
     clearShareBankAccountErrors,
+    initiateBankAccountUnlock,
+    pressLockedBankAccount,
 };
