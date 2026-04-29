@@ -50,6 +50,7 @@ function DomainGroupsPage({route}: DomainGroupsPageProps) {
     const [domainErrors] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`);
 
     const data = groups.map((group) => {
+        const groupPendingActions = pendingActions?.[`${CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX}${group.id}`];
         return {
             keyForList: group.id,
             groupID: group.id,
@@ -60,7 +61,7 @@ function DomainGroupsPage({route}: DomainGroupsPageProps) {
                     <Text numberOfLines={1}>{translate('domain.groups.memberCount', {count: Object.keys(group.details.shared).length})}</Text>
                 </View>
             ),
-            pendingAction: pendingActions?.[`${CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX}${group.id}`]?.name ?? undefined,
+            pendingAction: groupPendingActions ? Object.values(groupPendingActions).find(Boolean) : undefined,
         };
     });
 

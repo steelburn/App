@@ -102,7 +102,7 @@ function DomainGroupCreatePage({route}: DomainGroupCreatePageProps) {
                             enableRestrictedPrimaryLogin: restrictDefaultLoginSelection,
                             enableStrictPolicyRules: strictlyEnforceWorkspaceRules,
                             enableRestrictedPrimaryPolicy: preferredWorkspace,
-                            restrictedPrimaryPolicyID: preferredWorkspace ? (preferredPolicyID ?? '') : '',
+                            restrictedPrimaryPolicyID: preferredWorkspace ? preferredPolicyID : undefined,
                             overridePreferredPolicyWithCardPolicy: expensifyCardPreferredWorkspace,
                         });
                         if (defaultGroupForNewMembers && domainName) {
