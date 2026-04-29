@@ -89,7 +89,7 @@ type VBBAOnyxKey =
     | typeof ONYXKEYS.NVP_LAST_PAYMENT_METHOD
     | typeof ONYXKEYS.ONFIDO_TOKEN
     | typeof ONYXKEYS.ONFIDO_APPLICANT_ID
-    | typeof ONYXKEYS.PLAID_LINK_TOKEN;
+    | typeof ONYXKEYS.RAM_ONLY_PLAID_LINK_TOKEN;
 
 function clearPlaid(): Promise<void | void[]> {
     Onyx.set(ONYXKEYS.RAM_ONLY_PLAID_LINK_TOKEN, '');
@@ -195,7 +195,7 @@ function getVBBADataForOnyx(currentStep?: BankAccountStep, shouldShowLoading = t
         },
         {
             onyxMethod: Onyx.METHOD.SET,
-            key: ONYXKEYS.PLAID_LINK_TOKEN,
+            key: ONYXKEYS.RAM_ONLY_PLAID_LINK_TOKEN,
             value: null,
         },
     ];
