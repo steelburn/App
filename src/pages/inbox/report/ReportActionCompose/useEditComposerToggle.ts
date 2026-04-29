@@ -5,7 +5,7 @@ import type {ComposerRef, TextSelection} from '@components/Composer/types';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import getPlatform from '@libs/getPlatform';
 import CONST from '@src/CONST';
-import {useComposerEditState} from './ComposerContext';
+import {useComposerActions, useComposerEditState} from './ComposerContext';
 import ReportActionComposeUtils from './ReportActionComposeUtils';
 
 const isIOSNative = getPlatform() === CONST.PLATFORM.IOS;
@@ -29,7 +29,8 @@ type UseEditComposerToggleProps = {
 function useEditComposerToggle({selection, draftComment, composerRef, onFocus, onValueChange, onSelectionChange}: UseEditComposerToggleProps) {
     const {shouldUseNarrowLayout} = useResponsiveLayout();
 
-    const {editingState, editingReportActionID, editingMessage, currentEditMessageSelection} = useComposerEditState();
+    const {isEditingInComposer, editingState, editingReportActionID, editingMessage, currentEditMessageSelection} = useComposerEditState();
+    const {setDidResetComposerHeight} = useComposerActions();
     const isEditing = editingState !== 'off';
 
     const wasEditingRef = useRef(isEditing);
@@ -82,6 +83,10 @@ function useEditComposerToggle({selection, draftComment, composerRef, onFocus, o
             if (wasEditingRef.current && wasEditingInComposerRef.current) {
                 // Editing just ended in the composer – restore the draft comment and its previous selection.
                 applyComposerValue(draftComment ?? '', {selection: previousDraftSelectionRef.current, shouldForceNativeValueUpdate: true});
+
+                if (isEditingInComposer) {
+                    setDidResetComposerHeight(true);
+                }
 
                 if (!wasComposerFocusedBeforeEditingRef.current) {
                     composerRef.current?.blur();
@@ -141,7 +146,9 @@ function useEditComposerToggle({selection, draftComment, composerRef, onFocus, o
         editingMessage,
         editingReportActionID,
         editingState,
+        isEditingInComposer,
         selection,
+        setDidResetComposerHeight,
         shouldUseNarrowLayout,
     ]);
 }

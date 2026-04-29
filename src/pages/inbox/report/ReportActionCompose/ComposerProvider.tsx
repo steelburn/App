@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useRef, useState} from 'react';
 import type {View} from 'react-native';
 import {scheduleOnUI} from 'react-native-worklets';
 import useOnyx from '@hooks/useOnyx';
@@ -64,13 +64,6 @@ function ComposerProvider({children, reportID}: ComposerProviderProps) {
     const {editingState, editingReportID, editingReportActionID, editingReportAction, editingMessage, currentEditMessageSelection} = useReportActionActiveEdit();
 
     const [didResetComposerHeight, setDidResetComposerHeight] = useState(false);
-    useEffect(() => {
-        if (editingState !== 'off' || !didResetComposerHeight) {
-            return;
-        }
-
-        setDidResetComposerHeight(false);
-    }, [didResetComposerHeight, editingState]);
 
     const isEditingInComposer = shouldUseNarrowLayout && editingState !== 'off' && !didResetComposerHeight;
     const effectiveDraft = isEditingInComposer ? editingMessage : draftComment;
@@ -124,11 +117,13 @@ function ComposerProvider({children, reportID}: ComposerProviderProps) {
     const composerEditState = {
         editingState,
         isEditingInComposer,
+        editingReportID,
         editingReportActionID,
+        editingReportAction,
         editingMessage,
-        editingState,
         draftComment,
         effectiveDraft,
+        currentEditMessageSelection,
     };
 
     const composerSendState = {
