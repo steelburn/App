@@ -45,10 +45,10 @@ function useComposerSubmit(reportID: string): ComposerSubmitFunctions {
     const delegateAccountID = useDelegateAccountID();
 
     const {composerRef, attachmentFileRef} = useComposerMeta();
-    const {didResetComposerHeight} = useComposerState();
+    const {didResetComposerHeight, draftComment} = useComposerState();
     const {setDidResetComposerHeight, clearComposer} = useComposerActions();
     const {isSendDisabled, debouncedCommentMaxLengthValidation} = useComposerSendState();
-    const {isEditingInComposer, editingMessage, draftComment, effectiveDraft} = useComposerEditState();
+    const {isEditingInComposer, editingMessage, effectiveDraft} = useComposerEditState();
     const {publishDraft} = useComposerEditActions();
     const {scrollOffsetRef} = useContext(ActionListContext);
 

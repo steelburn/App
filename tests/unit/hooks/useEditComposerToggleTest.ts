@@ -59,7 +59,6 @@ function defaultComposerEditState(overrides?: Partial<ComposerEditState>): Compo
         editingReportAction: null,
         editingMessage: null,
         currentEditMessageSelection: null,
-        draftComment: undefined,
         effectiveDraft: undefined,
         ...overrides,
     };
