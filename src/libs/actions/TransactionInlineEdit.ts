@@ -118,6 +118,9 @@ type TransactionEditPermissionsParams = {
 
     /** When true, all editing is disabled regardless of permissions. */
     disabled?: boolean;
+
+    /** When true, unreported expenses require workspace selection before category can be edited. */
+    shouldSelectPolicyForUnreported?: boolean;
 };
 
 type GetIouParamsInput = {
@@ -286,6 +289,7 @@ function getTransactionEditPermissions({
     chatReportNVP,
     originalTransaction,
     disabled,
+    shouldSelectPolicyForUnreported,
 }: TransactionEditPermissionsParams): TransactionEditPermissions {
     if (disabled || !transaction || isScanning(transaction)) {
         return NO_EDIT;
@@ -342,9 +346,9 @@ function getTransactionEditPermissions({
             if (isPolicyExpenseChat) {
                 return !!categoryForDisplay || hasEnabledOptions(policyCategories ?? {});
             }
-            // For unreported expenses, allow if no policy or if categories are enabled with options
+            // For unreported expenses, disable inline category editing while workspace selection is required.
             if (isUnreported) {
-                return !policy || hasEnabledOptions(policyCategories ?? {});
+                return !shouldSelectPolicyForUnreported && hasEnabledOptions(policyCategories ?? {});
             }
         }
 

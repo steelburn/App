@@ -24,6 +24,7 @@ import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {Report, ReportAction, ReportActions} from '@src/types/onyx';
 import useOnyx from './useOnyx';
+import usePolicyForMovingExpenses from './usePolicyForMovingExpenses';
 import usePolicyForTransaction from './usePolicyForTransaction';
 
 type UseTransactionInlineEditParams = {
@@ -146,6 +147,9 @@ function useTransactionInlineEdit({
 
     const {hasSelectedTransactions} = useSearchStateContext();
 
+    const isPerDiem = isPerDiemRequest(transaction);
+    const {shouldSelectPolicy} = usePolicyForMovingExpenses(isPerDiem);
+
     const permissions = getTransactionEditPermissions({
         transaction,
         parentReportAction,
@@ -158,6 +162,7 @@ function useTransactionInlineEdit({
         chatReportNVP,
         originalTransaction,
         disabled: hasSelectedTransactions,
+        shouldSelectPolicyForUnreported: shouldSelectPolicy,
     });
 
     const wasEditingOnMouseDownRef = useRef(false);
