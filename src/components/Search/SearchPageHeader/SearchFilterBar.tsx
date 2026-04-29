@@ -11,7 +11,7 @@ import type {SearchFilter} from '@libs/SearchUIUtils';
 import CONST from '@src/CONST';
 import type {FilterItem} from './useSearchFiltersBar';
 
-type DropdownProps = Omit<DropdownButtonProps, 'value' | 'viewportOffsetTop'> & {
+type DropdownProps = Pick<DropdownButtonProps, 'label' | 'PopoverComponent' | 'sentryLabel'> & {
     value: SearchFilter['value'];
 };
 
