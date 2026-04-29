@@ -9,13 +9,13 @@ import type {ComposerEditState} from '@pages/inbox/report/ReportActionCompose/Co
 import ReportActionComposeUtils from '@pages/inbox/report/ReportActionCompose/ReportActionComposeUtils';
 import useEditComposerToggle from '@pages/inbox/report/ReportActionCompose/useEditComposerToggle';
 
-jest.mock('@pages/inbox/report/ReportActionEditMessageContext', () => {
+jest.mock('@pages/inbox/report/ReportActionCompose/ComposerContext', () => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const actual = jest.requireActual('@pages/inbox/report/ReportActionEditMessageContext');
+    const actual = jest.requireActual('@pages/inbox/report/ReportActionCompose/ComposerContext');
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return {
         ...actual,
-        useReportActionActiveEdit: jest.fn(),
+        useComposerEditState: jest.fn(),
     };
 });
 
@@ -50,7 +50,7 @@ function makeComposerRef(overrides?: Partial<ComposerRef>): RefObject<ComposerRe
     };
 }
 
-function defaultActiveEdit(overrides?: Partial<ComposerEditState>): ComposerEditState {
+function defaultComposerEditState(overrides?: Partial<ComposerEditState>): ComposerEditState {
     return {
         editingState: 'off',
         isEditingInComposer: false,
@@ -98,19 +98,19 @@ function narrowLayoutResult(): ResponsiveLayoutResult {
 }
 
 describe('useEditComposerToggle', () => {
-    const activeEditRef = {current: defaultActiveEdit()};
+    const composerEditStateRef = {current: defaultComposerEditState()};
 
     beforeEach(() => {
         jest.clearAllMocks();
-        activeEditRef.current = defaultActiveEdit();
-        mockUseComposerEditState.mockImplementation(() => activeEditRef.current);
+        composerEditStateRef.current = defaultComposerEditState();
+        mockUseComposerEditState.mockImplementation(() => composerEditStateRef.current);
         mockUseResponsiveLayout.mockReturnValue(narrowLayoutResult());
     });
 
     it('does not run apply logic while editingState is submitted', () => {
         const onValueChange = jest.fn();
         const composerRef = makeComposerRef();
-        activeEditRef.current = defaultActiveEdit({editingState: 'submitted', editingMessage: 'hello'});
+        composerEditStateRef.current = defaultComposerEditState({editingState: 'submitted', editingMessage: 'hello'});
 
         renderHook(() =>
             useEditComposerToggle({
@@ -144,7 +144,7 @@ describe('useEditComposerToggle', () => {
             {initialProps: {selection: priorSelection, draft: 'keep my draft'}},
         );
 
-        activeEditRef.current = defaultActiveEdit({
+        composerEditStateRef.current = defaultComposerEditState({
             editingState: 'editing',
             editingMessage: 'edited body',
             editingReportActionID: '100',
@@ -173,7 +173,7 @@ describe('useEditComposerToggle', () => {
             }),
         );
 
-        activeEditRef.current = defaultActiveEdit({
+        composerEditStateRef.current = defaultComposerEditState({
             editingState: 'editing',
             editingMessage: 'from thread',
         });
@@ -191,7 +191,7 @@ describe('useEditComposerToggle', () => {
         // Start with edit off so wasEditingRef is false; then turn editing on to capture previousDraftSelectionRef.
         const {rerender} = renderHook(
             (props: {selection: TextSelection; draft: string; editing: boolean}) => {
-                activeEditRef.current = defaultActiveEdit(props.editing ? {editingState: 'editing', editingMessage: 'e', editingReportActionID: '1'} : {editingState: 'off'});
+                composerEditStateRef.current = defaultComposerEditState(props.editing ? {editingState: 'editing', editingMessage: 'e', editingReportActionID: '1'} : {editingState: 'off'});
                 return useEditComposerToggle({
                     selection: props.selection,
                     draftComment: props.draft,
@@ -220,7 +220,7 @@ describe('useEditComposerToggle', () => {
         const onFocus = jest.fn();
         const composerRef = makeComposerRef();
 
-        activeEditRef.current = defaultActiveEdit({
+        composerEditStateRef.current = defaultComposerEditState({
             editingState: 'editing',
             editingMessage: 'first',
             editingReportActionID: 'a',
@@ -228,7 +228,7 @@ describe('useEditComposerToggle', () => {
 
         const {rerender} = renderHook(
             (id: string) => {
-                activeEditRef.current = defaultActiveEdit({
+                composerEditStateRef.current = defaultComposerEditState({
                     editingState: 'editing',
                     editingMessage: id === 'a' ? 'first' : 'second',
                     editingReportActionID: id,
@@ -260,7 +260,7 @@ describe('useEditComposerToggle', () => {
         const onFocus = jest.fn();
         const composerRef = makeComposerRef();
 
-        activeEditRef.current = defaultActiveEdit({
+        composerEditStateRef.current = defaultComposerEditState({
             editingState: 'editing',
             editingMessage: 'wide first',
         });
@@ -288,7 +288,7 @@ describe('useEditComposerToggle', () => {
         const onValueChange = jest.fn();
         const composerRef = makeComposerRef();
 
-        activeEditRef.current = defaultActiveEdit({
+        composerEditStateRef.current = defaultComposerEditState({
             editingState: 'editing',
             editingMessage: 'editing in narrow',
         });
@@ -320,7 +320,7 @@ describe('useEditComposerToggle', () => {
 
         const {rerender} = renderHook(
             (editing: boolean) => {
-                activeEditRef.current = defaultActiveEdit(editing ? {editingState: 'editing', editingMessage: 'hi', editingReportActionID: '1'} : {editingState: 'off'});
+                composerEditStateRef.current = defaultComposerEditState(editing ? {editingState: 'editing', editingMessage: 'hi', editingReportActionID: '1'} : {editingState: 'off'});
                 return useEditComposerToggle({
                     selection: {start: 0, end: 0},
                     draftComment: 'd',
