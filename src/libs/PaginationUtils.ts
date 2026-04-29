@@ -241,9 +241,7 @@ function pagesShareAnyNonMarkerID(pageA: string[], pageB: string[]): boolean {
     return false;
 }
 
-function mergeTwoPagesByUnionAndSort<TResource>(sortedItems: TResource[], pageA: string[], pageB: string[], getItemID: (item: TResource) => string): string[] {
-    const idToIndex = buildIDToIndexMap(sortedItems, getItemID);
-
+function mergeTwoPagesByUnionAndSort(idToIndex: Map<string, number>, pageA: string[], pageB: string[]): string[] {
     const hasStart = pageA.at(0) === CONST.PAGINATION_START_ID || pageB.at(0) === CONST.PAGINATION_START_ID;
     const hasEnd = pageA.at(-1) === CONST.PAGINATION_END_ID || pageB.at(-1) === CONST.PAGINATION_END_ID;
 
@@ -312,7 +310,7 @@ function mergePagesByIDOverlap<TResource>(sortedItems: TResource[], pages: Pages
             continue;
         }
 
-        result[result.length - 1] = mergeTwoPagesByUnionAndSort(sortedItems, previous, current, getItemID);
+        result[result.length - 1] = mergeTwoPagesByUnionAndSort(idToIndex, previous, current);
     }
 
     return result;
