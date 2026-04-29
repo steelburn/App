@@ -4,7 +4,7 @@
  * than being duplicated across every surface that renders a transaction.
  */
 import {useCallback, useRef} from 'react';
-import type {OnyxEntry} from 'react-native-onyx';
+import {type OnyxEntry, useOnyx as originalUseOnyx} from 'react-native-onyx';
 import {useSearchStateContext} from '@components/Search/SearchContext';
 import type {SearchQueryJSON} from '@components/Search/types';
 import type {TransactionInlineEditParams} from '@libs/actions/TransactionInlineEdit';
@@ -138,6 +138,8 @@ function useTransactionInlineEdit({
     const [policyRecentlyUsedCategories] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_RECENTLY_USED_CATEGORIES}${getNonEmptyStringOnyxID(policyID)}`);
     const [policyRecentlyUsedTags] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_RECENTLY_USED_TAGS}${getNonEmptyStringOnyxID(policyID)}`);
     const [parentReportNextStep] = useOnyx(`${ONYXKEYS.COLLECTION.NEXT_STEP}${getNonEmptyStringOnyxID(reportID)}`);
+    // Use original Onyx here because the useOnyx wrapper can read partial Search snapshot policy data instead of the full policy object.
+    const [completePolicy] = originalUseOnyx(`${ONYXKEYS.COLLECTION.POLICY}${getNonEmptyStringOnyxID(policyID)}`);
 
     const originalTransactionID = transaction?.comment?.originalTransactionID;
     const [originalTransaction] = useOnyx(`${ONYXKEYS.COLLECTION.TRANSACTION}${getNonEmptyStringOnyxID(originalTransactionID)}`);
@@ -148,7 +150,7 @@ function useTransactionInlineEdit({
         transaction,
         parentReportAction,
         parentReport: parentReport ?? fallbackReport,
-        policy,
+        policy: completePolicy ?? policy,
         transactionThreadReport,
         policyCategories,
         policyTags,
