@@ -963,6 +963,8 @@ function getUpdateMoneyRequestParams(params: GetUpdateMoneyRequestParamsType): U
     // For distance requests, resolve the policyID from the rate's original policy so the
     // backend receives the correct workspace context, even when the expense is unreported
     // and the caller's `policy` is the user's default workspace.
+    // Also, don't push error to failureData when updating distance requests —
+    // the error will be handled by API response for distance requests.
     const isDistanceTransaction = transaction && isDistanceRequestTransactionUtils(transaction);
     const distancePolicyID = isDistanceTransaction ? getDistanceRateOriginalPolicyID(transaction) : undefined;
 
@@ -1048,8 +1050,6 @@ function getUpdateMoneyRequestParams(params: GetUpdateMoneyRequestParamsType): U
             },
         });
 
-        // Don't push error to failureData when updating distance requests
-        // The error will be handled by API response for distance requests
         failureData.push({
             onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${transactionThreadReport?.reportID}`,
