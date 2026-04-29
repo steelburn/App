@@ -1,0 +1,23 @@
+diff --git a/node_modules/react-native-screens/lib/module/components/safe-area/SafeAreaView.web.js b/node_modules/react-native-screens/lib/module/components/safe-area/SafeAreaView.web.js
+index 398afe2..60f14e2 100644
+--- a/node_modules/react-native-screens/lib/module/components/safe-area/SafeAreaView.web.js
++++ b/node_modules/react-native-screens/lib/module/components/safe-area/SafeAreaView.web.js
+@@ -1,4 +1,5 @@
+ import { View } from 'react-native';
+ const SafeAreaView = View;
++export { SafeAreaView };
+ export default SafeAreaView;
+ //# sourceMappingURL=SafeAreaView.web.js.map
+diff --git a/node_modules/react-native-screens/src/components/safe-area/SafeAreaView.web.tsx b/node_modules/react-native-screens/src/components/safe-area/SafeAreaView.web.tsx
+index aff03a5..3398bef 100644
+--- a/node_modules/react-native-screens/src/components/safe-area/SafeAreaView.web.tsx
++++ b/node_modules/react-native-screens/src/components/safe-area/SafeAreaView.web.tsx
+@@ -1,5 +1,8 @@
++// Implementation adapted from `react-native-safe-area-context`:
++// https://github.com/AppAndFlow/react-native-safe-area-context/blob/v5.6.1/src/SafeAreaView.tsx
+ import { View } from 'react-native';
+ 
+ const SafeAreaView = View;
+ 
++export { SafeAreaView };
+ export default SafeAreaView;
