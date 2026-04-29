@@ -66,7 +66,7 @@ type ConfirmationFieldListProps = {
     /** Whether the surface is read-only */
     isReadOnly: boolean;
 
-    /** Whether the user has confirmed (locks editable affordances) */
+    /** Whether the user has confirmed (locks editable controls) */
     didConfirm: boolean;
 
     /** Whether the new manual expense flow beta is enabled */
