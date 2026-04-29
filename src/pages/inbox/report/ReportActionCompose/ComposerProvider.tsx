@@ -112,6 +112,7 @@ function ComposerProvider({children, reportID}: ComposerProviderProps) {
         isMenuVisible,
         isFullComposerAvailable,
         didResetComposerHeight,
+        draftComment,
     };
 
     const composerEditState = {
@@ -121,7 +122,6 @@ function ComposerProvider({children, reportID}: ComposerProviderProps) {
         editingReportActionID,
         editingReportAction,
         editingMessage,
-        draftComment,
         effectiveDraft,
         currentEditMessageSelection,
     };

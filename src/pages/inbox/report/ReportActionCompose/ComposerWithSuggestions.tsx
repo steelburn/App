@@ -64,7 +64,7 @@ import type {FileObject} from '@src/types/utils/Attachment';
 import type ChildrenProps from '@src/types/utils/ChildrenProps';
 // eslint-disable-next-line no-restricted-imports
 import findNodeHandle from '@src/utils/findNodeHandle';
-import {useComposerEditState} from './ComposerContext';
+import {useComposerEditState, useComposerState} from './ComposerContext';
 import getCursorPosition from './getCursorPosition';
 import getScrollPosition from './getScrollPosition';
 import type {SuggestionsRef} from './ReportActionCompose';
@@ -257,18 +257,17 @@ function ComposerWithSuggestions({
     const cursorPositionValue = useSharedValue({x: 0, y: 0});
     const tag = useSharedValue(-1);
     const isInSidePanel = useIsInSidePanel();
-    const [draftComment = ''] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_DRAFT_COMMENT}${reportID}`);
     const {shouldUseNarrowLayout} = useResponsiveLayout();
 
     const composerRef = useRef<ComposerRef | null>(null);
 
-    const {editingState, editingReportActionID, editingReportAction, editingMessage, currentEditMessageSelection} = useComposerEditState();
+    const {draftComment = ''} = useComposerState();
+    const {editingState, editingReportActionID, editingReportAction, effectiveDraft, currentEditMessageSelection} = useComposerEditState();
     const {setEditingMessage, setCurrentEditMessageSelection} = useReportActionActiveEditActions();
 
     const isEditing = editingState !== 'off';
-    const isEditingInComposer = shouldUseNarrowLayout && isEditing;
     const [value, setValue] = useState(() => {
-        const initialValue = isEditingInComposer ? (editingMessage ?? draftComment) : draftComment;
+        const initialValue = effectiveDraft ?? draftComment;
 
         if (initialValue) {
             emojisPresentBefore.current = extractEmojis(initialValue);

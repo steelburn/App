@@ -28,6 +28,7 @@ type ComposerState = {
     isMenuVisible: boolean;
     isFullComposerAvailable: boolean;
     didResetComposerHeight: boolean;
+    draftComment: string | undefined;
 };
 
 type ComposerEditState = {
@@ -37,7 +38,6 @@ type ComposerEditState = {
     editingReportActionID: string | null;
     editingReportAction: ReportAction | null;
     editingMessage: string | null;
-    draftComment: string | null | undefined;
     effectiveDraft: string | null | undefined;
     currentEditMessageSelection: TextSelection | null;
 };
@@ -91,6 +91,7 @@ const defaultState: ComposerState = {
     isMenuVisible: false,
     isFullComposerAvailable: false,
     didResetComposerHeight: false,
+    draftComment: undefined,
 };
 const ComposerStateContext = createContext<ComposerState>(defaultState);
 
@@ -110,7 +111,6 @@ const defaultEditState: ComposerEditState = {
     editingReportActionID: null,
     editingReportAction: null,
     editingMessage: null,
-    draftComment: undefined,
     effectiveDraft: undefined,
     currentEditMessageSelection: null,
 };

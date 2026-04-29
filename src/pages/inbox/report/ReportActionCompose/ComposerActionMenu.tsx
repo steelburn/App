@@ -17,14 +17,13 @@ type ComposerActionMenuProps = {
 
 function ComposerActionMenu({reportID}: ComposerActionMenuProps) {
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
-    const {isMenuVisible, isFullComposerAvailable} = useComposerState();
+    const {isMenuVisible, isFullComposerAvailable, draftComment} = useComposerState();
     const {exceededMaxLength} = useComposerSendState();
     const {setMenuVisibility, onAddActionPressed, onItemSelected, onTriggerAttachmentPicker} = useComposerActions();
     const {actionButtonRef, composerRef} = useComposerMeta();
     const {pickAttachments, PDFValidationComponent, ErrorModal} = useAttachmentPicker(reportID);
 
     const [isComposerFullSize = false] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_IS_COMPOSER_FULL_SIZE}${reportID}`);
-    const [draftComment] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_DRAFT_COMMENT}${reportID}`);
 
     const {raiseIsScrollLayoutTriggered} = useIsScrollLikelyLayoutTriggered();
 
