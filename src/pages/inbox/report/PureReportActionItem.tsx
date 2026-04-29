@@ -260,6 +260,7 @@ type PureReportActionItemProps = {
         reportAction: OnyxEntry<OnyxTypes.ReportAction>,
         resolution: ValueOf<typeof CONST.REPORT.ACTIONABLE_MENTION_WHISPER_RESOLUTION>,
         isReportArchived: boolean,
+        parentReport?: OnyxEntry<OnyxTypes.Report>,
     ) => void;
 
     /** Whether the provided report is a closed expense report with no expenses */
