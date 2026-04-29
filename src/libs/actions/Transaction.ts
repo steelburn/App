@@ -1323,12 +1323,14 @@ function changeTransactionsReport({
         const allowNegative = shouldEnableNegative(newReport);
 
         // 3. Keep track of the new report totals
-        // Use transactionForViolations which contains the updated amount/currency when a new distance rate was auto-selected
+        // Source report uses original transaction details (expense is being removed at its original amount)
+        // Target report uses transactionForViolations (expense arrives with the updated rate/amount after auto-selecting workspace rate)
         const targetReportID = isUnreported ? selfDMReportID : reportID;
-        const {amount: transactionAmount = 0, currency: transactionCurrency} = getTransactionDetails(transactionForViolations, undefined, undefined, allowNegative) ?? {};
-        const resolvedTransactionCurrency = transactionCurrency ?? transaction.currency;
+        const {amount: sourceTransactionAmount = 0, currency: sourceTransactionCurrency} = getTransactionDetails(transaction, undefined, undefined, allowNegative) ?? {};
+        const {amount: targetTransactionAmount = 0, currency: targetTransactionCurrency} = getTransactionDetails(transactionForViolations, undefined, undefined, allowNegative) ?? {};
+        const resolvedTargetTransactionCurrency = targetTransactionCurrency ?? transaction.currency;
         const oldReportTotal = oldReport?.total ?? 0;
-        const updatedReportTotal = transactionAmount < 0 ? oldReportTotal - transactionAmount : oldReportTotal + transactionAmount;
+        const updatedReportTotal = sourceTransactionAmount < 0 ? oldReportTotal - sourceTransactionAmount : oldReportTotal + sourceTransactionAmount;
 
         if (oldReport) {
             const oldReportTransactionCount = updatedReportTransactionCounts[oldReportID] ?? oldReport.transactionCount ?? 0;
@@ -1336,14 +1338,14 @@ function changeTransactionsReport({
 
             if (staleReportIDs.has(oldReportID) || oldReport.pendingFields?.total) {
                 markReportTotalAsStale(oldReportID);
-            } else if (oldReport.currency === transactionCurrency) {
+            } else if (oldReport.currency === sourceTransactionCurrency) {
                 updatedReportTotals[oldReportID] = updatedReportTotals[oldReportID] ? updatedReportTotals[oldReportID] : updatedReportTotal;
                 updatedReportNonReimbursableTotals[oldReportID] =
                     (updatedReportNonReimbursableTotals[oldReportID] ? updatedReportNonReimbursableTotals[oldReportID] : (oldReport?.nonReimbursableTotal ?? 0)) +
-                    (transaction?.reimbursable ? 0 : transactionAmount);
+                    (transaction?.reimbursable ? 0 : sourceTransactionAmount);
                 updatedReportUnheldNonReimbursableTotals[oldReportID] =
                     (updatedReportUnheldNonReimbursableTotals[oldReportID] ? updatedReportUnheldNonReimbursableTotals[oldReportID] : (oldReport?.unheldNonReimbursableTotal ?? 0)) +
-                    (transaction?.reimbursable && !isOnHold(transaction) ? 0 : transactionAmount);
+                    (transaction?.reimbursable && !isOnHold(transaction) ? 0 : sourceTransactionAmount);
             } else {
                 markReportTotalAsStale(oldReportID);
             }
@@ -1357,20 +1359,21 @@ function changeTransactionsReport({
             const targetReportTransactionCount = updatedReportTransactionCounts[targetReportID] ?? targetReport?.transactionCount ?? 0;
             updatedReportTransactionCounts[targetReportID] = targetReportTransactionCount + 1;
 
-            if (staleReportIDs.has(targetReportID) || targetReport?.pendingFields?.total || new Set([...targetReportCurrencies, resolvedTransactionCurrency]).size > 1) {
+            if (staleReportIDs.has(targetReportID) || targetReport?.pendingFields?.total || new Set([...targetReportCurrencies, resolvedTargetTransactionCurrency]).size > 1) {
                 markReportTotalAsStale(targetReportID);
-            } else if (transactionCurrency === targetReport?.currency) {
+            } else if (targetTransactionCurrency === targetReport?.currency) {
                 const currentTotal = updatedReportTotals[targetReportID] ?? targetReport?.total ?? 0;
-                updatedReportTotals[targetReportID] = currentTotal - transactionAmount;
+                updatedReportTotals[targetReportID] = currentTotal - targetTransactionAmount;
 
                 const currentNonReimbursableTotal = updatedReportNonReimbursableTotals[targetReportID] ?? targetReport?.nonReimbursableTotal ?? 0;
-                updatedReportNonReimbursableTotals[targetReportID] = currentNonReimbursableTotal - (transactionReimbursable ? 0 : transactionAmount);
+                updatedReportNonReimbursableTotals[targetReportID] = currentNonReimbursableTotal - (transactionReimbursable ? 0 : targetTransactionAmount);
 
                 const currentUnheldNonReimbursableTotal = updatedReportUnheldNonReimbursableTotals[targetReportID] ?? targetReport?.unheldNonReimbursableTotal ?? 0;
-                updatedReportUnheldNonReimbursableTotals[targetReportID] = currentUnheldNonReimbursableTotal - (transactionReimbursable && !isOnHold(transaction) ? 0 : transactionAmount);
-            } else if (transaction.convertedAmount && oldReport?.currency === targetReport?.currency) {
+                updatedReportUnheldNonReimbursableTotals[targetReportID] =
+                    currentUnheldNonReimbursableTotal - (transactionReimbursable && !isOnHold(transaction) ? 0 : targetTransactionAmount);
+            } else if (transactionForViolations.convertedAmount && oldReport?.currency === targetReport?.currency) {
                 // Use convertedAmount when transaction currency differs but workspace currency is the same
-                const {convertedAmount} = transaction;
+                const {convertedAmount} = transactionForViolations;
                 const currentTotal = updatedReportTotals[targetReportID] ?? targetReport?.total ?? 0;
                 updatedReportTotals[targetReportID] = currentTotal + convertedAmount;
 
@@ -1383,7 +1386,7 @@ function changeTransactionsReport({
                 markReportTotalAsStale(targetReportID);
             }
 
-            targetReportCurrencies.add(resolvedTransactionCurrency);
+            targetReportCurrencies.add(resolvedTargetTransactionCurrency);
         }
 
         // 4. Optimistically update the IOU action reportID
