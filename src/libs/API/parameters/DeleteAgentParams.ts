@@ -1,5 +1,5 @@
 type DeleteAgentParams = {
-    accountID: number;
+    agentAccountID: number;
 };
 
 export default DeleteAgentParams;

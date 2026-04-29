@@ -195,7 +195,7 @@ function deleteAgent(accountID: number) {
         },
     ];
 
-    write(WRITE_COMMANDS.DELETE_AGENT, {accountID}, {optimisticData, successData, failureData});
+    write(WRITE_COMMANDS.DELETE_AGENT, {agentAccountID: accountID}, {optimisticData, successData, failureData});
     Navigation.navigate(ROUTES.SETTINGS_AGENTS);
 }
 
