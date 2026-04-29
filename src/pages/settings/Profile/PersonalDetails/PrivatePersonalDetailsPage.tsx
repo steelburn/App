@@ -90,7 +90,9 @@ function PrivatePersonalDetailsPage() {
         }
 
         const dobValue = values[INPUT_IDS.DATE_OF_BIRTH] ?? '';
-        if (dobValue) {
+        if (!dobValue) {
+            errors[INPUT_IDS.DATE_OF_BIRTH] = translate('common.error.fieldRequired');
+        } else {
             const dateError = getAgeRequirementError(translate, dobValue, CONST.DATE_BIRTH.MIN_AGE_FOR_PAYMENT, CONST.DATE_BIRTH.MAX_AGE);
             if (dateError) {
                 errors[INPUT_IDS.DATE_OF_BIRTH] = dateError;
