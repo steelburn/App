@@ -51,8 +51,8 @@ function FeedDropdown({label, value, PopoverComponent, sentryLabel}: DropdownPro
     );
 }
 
-function CardDropdown({label, PopoverComponent, sentryLabel}: DropdownProps) {
-    const cardValue = useFilterCardValue();
+function CardDropdown({label, value, PopoverComponent, sentryLabel}: DropdownProps) {
+    const cardValue = useFilterCardValue(value as string[]);
     return (
         <DropdownButton
             label={label}
@@ -63,8 +63,8 @@ function CardDropdown({label, PopoverComponent, sentryLabel}: DropdownProps) {
     );
 }
 
-function TaxRateDropdown({label, PopoverComponent, sentryLabel}: DropdownProps) {
-    const taxRateValue = useFilterTaxRateValue();
+function TaxRateDropdown({label, value, PopoverComponent, sentryLabel}: DropdownProps) {
+    const taxRateValue = useFilterTaxRateValue(value as string[]);
     return (
         <DropdownButton
             label={label}

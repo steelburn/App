@@ -49,12 +49,12 @@ function FilterFeedValue({value}: FilterValueProps) {
     return useFilterFeedValue(value as string[]);
 }
 
-function FilterCardValue() {
-    return useFilterCardValue();
+function FilterCardValue({value}: FilterValueProps) {
+    return useFilterCardValue(value as string[]);
 }
 
-function FilterTaxRateValue() {
-    return useFilterTaxRateValue();
+function FilterTaxRateValue({value}: FilterValueProps) {
+    return useFilterTaxRateValue(value as string[]);
 }
 
 function FilterReportValue({value}: FilterValueProps) {
@@ -80,11 +80,11 @@ function FilterValue({filterKey, value}: FilterValueWithKeyProps) {
     }
 
     if (filterKey === CONST.SEARCH.SYNTAX_FILTER_KEYS.CARD_ID) {
-        return <FilterCardValue />;
+        return <FilterCardValue value={value} />;
     }
 
     if (filterKey === CONST.SEARCH.SYNTAX_FILTER_KEYS.TAX_RATE) {
-        return <FilterTaxRateValue />;
+        return <FilterTaxRateValue value={value} />;
     }
 
     if (filterKey === CONST.SEARCH.SYNTAX_FILTER_KEYS.IN) {

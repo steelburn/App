@@ -1,19 +1,18 @@
+import {filterFeedSelector} from '@components/Search/selectors/Search';
 import useAdvancedSearchFilters from '@hooks/useAdvancedSearchFilters';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import {createCardFeedKey, getCardFeedKey, getCardFeedNamesWithType, getFeedCountryForDisplay, getWorkspaceCardFeedKey} from '@libs/CardFeedUtils';
 import {getCardDescription} from '@libs/CardUtils';
-import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {WorkspaceCardsList} from '@src/types/onyx';
+import getEmptyArray from '@src/types/utils/getEmptyArray';
 
-function useFilterCardValue(): string {
+function useFilterCardValue(value: string[]): string {
     const {translate} = useLocalize();
     const {policies, searchCards} = useAdvancedSearchFilters();
 
-    const [searchAdvancedFiltersForm] = useOnyx(ONYXKEYS.FORMS.SEARCH_ADVANCED_FILTERS_FORM);
-    const cardIdsFilter = searchAdvancedFiltersForm?.[CONST.SEARCH.SYNTAX_FILTER_KEYS.CARD_ID] ?? [];
-    const feedFilter = searchAdvancedFiltersForm?.[CONST.SEARCH.SYNTAX_FILTER_KEYS.FEED] ?? [];
+    const [feedFilter = getEmptyArray<string>()] = useOnyx(ONYXKEYS.FORMS.SEARCH_ADVANCED_FILTERS_FORM, {selector: filterFeedSelector});
     const workspaceCardFeeds = Object.entries(searchCards ?? {}).reduce<Record<string, WorkspaceCardsList>>((acc, [cardID, card]) => {
         const feedCountry = getFeedCountryForDisplay(card);
         const feedKey = `${createCardFeedKey(card.fundID, card.bank, feedCountry)}`;
@@ -35,7 +34,7 @@ function useFilterCardValue(): string {
     const cardNames = Object.values(searchCards ?? {})
         .filter((card) => {
             const feedCountry = getFeedCountryForDisplay(card);
-            return cardIdsFilter.includes(card.cardID.toString()) && !feedFilter.includes(createCardFeedKey(card.fundID, card.bank, feedCountry));
+            return value.includes(card.cardID.toString()) && !feedFilter.includes(createCardFeedKey(card.fundID, card.bank, feedCountry));
         })
         .map((card) => getCardDescription(card, translate));
 
