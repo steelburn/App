@@ -9,6 +9,7 @@ import type {OnyxEntry} from 'react-native-onyx';
 import {useOnyx as originalUseOnyx} from 'react-native-onyx';
 import {useDelegateNoAccessActions, useDelegateNoAccessState} from '@components/DelegateNoAccessModalProvider';
 import {useSearchStateContext} from '@components/Search/SearchContext';
+import type {TransactionListItemProps, TransactionListItemType} from '@components/Search/SearchList/ListItem/types';
 import type {ListItem} from '@components/SelectionList/types';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useOnyx from '@hooks/useOnyx';
@@ -27,7 +28,6 @@ import type {Policy, Report, ReportAction, ReportActions} from '@src/types/onyx'
 import type {TransactionViolation} from '@src/types/onyx/TransactionViolation';
 import TransactionListItemNarrow from './TransactionListItemNarrow';
 import TransactionListItemWide from './TransactionListItemWide';
-import type {TransactionListItemProps, TransactionListItemType} from './types';
 
 function TransactionListItem<TItem extends ListItem>({
     item,
@@ -95,37 +95,6 @@ function TransactionListItem<TItem extends ListItem>({
         hasParentReportAction: !!parentReportAction,
         hasTransactionThreadReport: !!transactionThreadReport,
     };
-
-    const pressableStyle = [
-        styles.transactionListItemStyle,
-        !isLargeScreenWidth && styles.p4,
-        !isLargeScreenWidth && styles.noBorderRadius,
-        item.isSelected && styles.activeComponentBG,
-        isLargeScreenWidth
-            ? {
-                  ...styles.flexRow,
-                  ...styles.justifyContentBetween,
-                  ...styles.alignItemsCenter,
-                  ...StyleUtils.getSearchTableRowPressableStyle(!!isLastItem, item.isSelected),
-              }
-            : {...styles.flexColumn, ...styles.alignItemsStretch},
-    ];
-
-    const animatedHighlightStyle = useAnimatedHighlightStyle({
-        borderRadius: 0,
-        shouldHighlight: item?.shouldAnimateInHighlight ?? false,
-        highlightColor: theme.messageHighlightBG,
-        backgroundColor: theme.highlightBG,
-        shouldApplyOtherStyles: !isLargeScreenWidth,
-    });
-
-    const amountColumnSize = transactionItem.isAmountColumnWide ? CONST.SEARCH.TABLE_COLUMN_SIZES.WIDE : CONST.SEARCH.TABLE_COLUMN_SIZES.NORMAL;
-    const taxAmountColumnSize = transactionItem.isTaxAmountColumnWide ? CONST.SEARCH.TABLE_COLUMN_SIZES.WIDE : CONST.SEARCH.TABLE_COLUMN_SIZES.NORMAL;
-    const dateColumnSize = transactionItem.shouldShowYear ? CONST.SEARCH.TABLE_COLUMN_SIZES.WIDE : CONST.SEARCH.TABLE_COLUMN_SIZES.NORMAL;
-    const submittedColumnSize = transactionItem.shouldShowYearSubmitted ? CONST.SEARCH.TABLE_COLUMN_SIZES.WIDE : CONST.SEARCH.TABLE_COLUMN_SIZES.NORMAL;
-    const approvedColumnSize = transactionItem.shouldShowYearApproved ? CONST.SEARCH.TABLE_COLUMN_SIZES.WIDE : CONST.SEARCH.TABLE_COLUMN_SIZES.NORMAL;
-    const postedColumnSize = transactionItem.shouldShowYearPosted ? CONST.SEARCH.TABLE_COLUMN_SIZES.WIDE : CONST.SEARCH.TABLE_COLUMN_SIZES.NORMAL;
-    const exportedColumnSize = transactionItem.shouldShowYearExported ? CONST.SEARCH.TABLE_COLUMN_SIZES.WIDE : CONST.SEARCH.TABLE_COLUMN_SIZES.NORMAL;
 
     // Prefer live Onyx policy data over snapshot to ensure fresh policy settings
     // like isAttendeeTrackingEnabled is not missing
@@ -197,7 +166,7 @@ function TransactionListItem<TItem extends ListItem>({
         transactionViolations,
         handleActionButtonPress,
         transactionPreviewData,
-        exportedReportActions: exportedReportActions as ReportAction[],
+        exportedReportActions,
         nonPersonalAndWorkspaceCards,
         policyForMovingExpenses,
     };
@@ -205,6 +174,7 @@ function TransactionListItem<TItem extends ListItem>({
     if (!isLargeScreenWidth) {
         return (
             <TransactionListItemNarrow
+                // eslint-disable-next-line react/jsx-props-no-spreading
                 {...sharedProps}
                 isLastItem={isLastItem}
                 isFirstItem={isFirstItem}
@@ -214,6 +184,7 @@ function TransactionListItem<TItem extends ListItem>({
 
     return (
         <TransactionListItemWide
+            // eslint-disable-next-line react/jsx-props-no-spreading
             {...sharedProps}
             isLastItem={isLastItem}
         />

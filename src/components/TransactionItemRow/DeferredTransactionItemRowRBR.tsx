@@ -1,4 +1,4 @@
-import React, {useState, useTransition} from 'react';
+import React, {useEffect, useState, useTransition} from 'react';
 import {View} from 'react-native';
 import useThemeStyles from '@hooks/useThemeStyles';
 import TransactionItemRowRBR from './TransactionItemRowRBR';
@@ -7,19 +7,18 @@ type DeferredTransactionItemRowRBRProps = React.ComponentProps<typeof Transactio
 
 function DeferredTransactionItemRowRBR(props: DeferredTransactionItemRowRBRProps) {
     const styles = useThemeStyles();
-    const [isPending, startTransition] = useTransition();
-    const [isReady, setIsReady] = useState(false);
+    const [shouldRender, setShouldRender] = useState(false);
+    const [, startTransition] = useTransition();
 
-    if (!isReady) {
-        startTransition(() => {
-            setIsReady(true);
-        });
-    }
+    useEffect(() => {
+        startTransition(() => setShouldRender(true));
+    }, []);
 
-    if (isPending || !isReady) {
+    if (!shouldRender) {
         return <View style={[styles.minHeight4]} />;
     }
 
+    // eslint-disable-next-line react/jsx-props-no-spreading
     return <TransactionItemRowRBR {...props} />;
 }
 

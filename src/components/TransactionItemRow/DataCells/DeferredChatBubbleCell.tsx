@@ -1,4 +1,4 @@
-import React, {useState, useTransition} from 'react';
+import React, {useEffect, useState, useTransition} from 'react';
 import {View} from 'react-native';
 import PulsingView from '@components/PulsingView';
 import useTheme from '@hooks/useTheme';
@@ -9,23 +9,22 @@ type DeferredChatBubbleCellProps = React.ComponentProps<typeof ChatBubbleCell>;
 
 function DeferredChatBubbleCell(props: DeferredChatBubbleCellProps) {
     const theme = useTheme();
-    const [isPending, startTransition] = useTransition();
-    const [isReady, setIsReady] = useState(false);
+    const [shouldRender, setShouldRender] = useState(false);
+    const [, startTransition] = useTransition();
 
-    if (!isReady) {
-        startTransition(() => {
-            setIsReady(true);
-        });
-    }
+    useEffect(() => {
+        startTransition(() => setShouldRender(true));
+    }, []);
 
-    if (isPending || !isReady) {
+    if (!shouldRender) {
         return (
             <PulsingView shouldPulse>
-                <View style={{height: variables.iconSizeSmall, width: variables.iconSizeSmall, borderRadius: variables.iconSizeSmall / 2, backgroundColor: theme.highlightBG}} />
+                <View style={{height: variables.iconSizeSmall, width: variables.iconSizeSmall, borderRadius: variables.iconSizeSmall / 2, backgroundColor: theme.skeletonLHNIn}} />
             </PulsingView>
         );
     }
 
+    // eslint-disable-next-line react/jsx-props-no-spreading
     return <ChatBubbleCell {...props} />;
 }
 

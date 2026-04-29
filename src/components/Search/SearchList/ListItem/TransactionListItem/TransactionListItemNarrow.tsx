@@ -3,8 +3,7 @@ import type {View} from 'react-native';
 import {getButtonRole} from '@components/Button/utils';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
 import PressableWithFeedback from '@components/Pressable/PressableWithFeedback';
-import type {SearchColumnType} from '@components/Search/types';
-import type {ListItemFocusEventHandler} from '@components/SelectionList/ListItem/types';
+import UserInfoAndActionButtonRow from '@components/Search/SearchList/ListItem/UserInfoAndActionButtonRow';
 import type {ListItem} from '@components/SelectionList/types';
 import TransactionItemRow from '@components/TransactionItemRow';
 import useAnimatedHighlightStyle from '@hooks/useAnimatedHighlightStyle';
@@ -13,37 +12,8 @@ import useStyleUtils from '@hooks/useStyleUtils';
 import useSyncFocus from '@hooks/useSyncFocus';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
-import type {TransactionPreviewData} from '@libs/actions/Search';
 import CONST from '@src/CONST';
-import type {CardList, Policy, ReportAction, TransactionViolation} from '@src/types/onyx';
-import type {TransactionListItemType} from './types';
-import UserInfoAndActionButtonRow from './UserInfoAndActionButtonRow';
-
-type TransactionListItemNarrowProps<TItem extends ListItem> = {
-    item: TItem;
-    transactionItem: TransactionListItemType;
-    isDeletedTransaction: boolean;
-    isFocused?: boolean;
-    showTooltip: boolean;
-    isDisabled?: boolean | null;
-    canSelectMultiple?: boolean;
-    onSelectRow: (item: TItem, transactionPreviewData?: TransactionPreviewData) => void;
-    onCheckboxPress?: (item: TItem) => void;
-    onFocus?: ListItemFocusEventHandler;
-    onLongPressRow?: (item: TItem) => void;
-    shouldSyncFocus?: boolean;
-    columns?: SearchColumnType[];
-    isLoading?: boolean;
-    isActionLoading?: boolean;
-    isLastItem?: boolean;
-    isFirstItem?: boolean;
-    transactionViolations: TransactionViolation[];
-    handleActionButtonPress: () => void;
-    transactionPreviewData: TransactionPreviewData;
-    exportedReportActions: ReportAction[];
-    nonPersonalAndWorkspaceCards?: CardList;
-    policyForMovingExpenses?: Policy;
-};
+import type {TransactionListItemNarrowProps} from './types';
 
 function TransactionListItemNarrow<TItem extends ListItem>({
     item,

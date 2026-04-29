@@ -3,8 +3,6 @@ import type {View} from 'react-native';
 import {getButtonRole} from '@components/Button/utils';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
 import PressableWithFeedback from '@components/Pressable/PressableWithFeedback';
-import type {SearchColumnType} from '@components/Search/types';
-import type {ListItemFocusEventHandler} from '@components/SelectionList/ListItem/types';
 import type {ListItem} from '@components/SelectionList/types';
 import TransactionItemRow from '@components/TransactionItemRow';
 import useAnimatedHighlightStyle from '@hooks/useAnimatedHighlightStyle';
@@ -12,35 +10,9 @@ import useStyleUtils from '@hooks/useStyleUtils';
 import useSyncFocus from '@hooks/useSyncFocus';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
-import type {TransactionPreviewData} from '@libs/actions/Search';
 import CONST from '@src/CONST';
-import type {CardList, Policy, ReportAction, TransactionViolation} from '@src/types/onyx';
-import type {TransactionListItemType} from './types';
-
-type TransactionListItemWideProps<TItem extends ListItem> = {
-    item: TItem;
-    transactionItem: TransactionListItemType;
-    isDeletedTransaction: boolean;
-    isFocused?: boolean;
-    showTooltip: boolean;
-    isDisabled?: boolean | null;
-    canSelectMultiple?: boolean;
-    onSelectRow: (item: TItem, transactionPreviewData?: TransactionPreviewData) => void;
-    onCheckboxPress?: (item: TItem) => void;
-    onFocus?: ListItemFocusEventHandler;
-    onLongPressRow?: (item: TItem) => void;
-    shouldSyncFocus?: boolean;
-    columns?: SearchColumnType[];
-    isLoading?: boolean;
-    isActionLoading?: boolean;
-    isLastItem?: boolean;
-    transactionViolations: TransactionViolation[];
-    handleActionButtonPress: () => void;
-    transactionPreviewData: TransactionPreviewData;
-    exportedReportActions: ReportAction[];
-    nonPersonalAndWorkspaceCards?: CardList;
-    policyForMovingExpenses?: Policy;
-};
+import type {TransactionListItemType} from '../types';
+import type {TransactionListItemWideProps} from './types';
 
 function TransactionListItemWide<TItem extends ListItem>({
     item,
@@ -72,13 +44,13 @@ function TransactionListItemWide<TItem extends ListItem>({
     const pressableRef = useRef<View>(null);
     useSyncFocus(pressableRef, !!isFocused, shouldSyncFocus);
 
-    const amountColumnSize = transactionItem.isAmountColumnWide ? CONST.SEARCH.TABLE_COLUMN_SIZES.WIDE : CONST.SEARCH.TABLE_COLUMN_SIZES.NORMAL;
-    const taxAmountColumnSize = transactionItem.isTaxAmountColumnWide ? CONST.SEARCH.TABLE_COLUMN_SIZES.WIDE : CONST.SEARCH.TABLE_COLUMN_SIZES.NORMAL;
-    const dateColumnSize = transactionItem.shouldShowYear ? CONST.SEARCH.TABLE_COLUMN_SIZES.WIDE : CONST.SEARCH.TABLE_COLUMN_SIZES.NORMAL;
-    const submittedColumnSize = transactionItem.shouldShowYearSubmitted ? CONST.SEARCH.TABLE_COLUMN_SIZES.WIDE : CONST.SEARCH.TABLE_COLUMN_SIZES.NORMAL;
-    const approvedColumnSize = transactionItem.shouldShowYearApproved ? CONST.SEARCH.TABLE_COLUMN_SIZES.WIDE : CONST.SEARCH.TABLE_COLUMN_SIZES.NORMAL;
-    const postedColumnSize = transactionItem.shouldShowYearPosted ? CONST.SEARCH.TABLE_COLUMN_SIZES.WIDE : CONST.SEARCH.TABLE_COLUMN_SIZES.NORMAL;
-    const exportedColumnSize = transactionItem.shouldShowYearExported ? CONST.SEARCH.TABLE_COLUMN_SIZES.WIDE : CONST.SEARCH.TABLE_COLUMN_SIZES.NORMAL;
+    const amountColumnSize = (transactionItem as TransactionListItemType).isAmountColumnWide ? CONST.SEARCH.TABLE_COLUMN_SIZES.WIDE : CONST.SEARCH.TABLE_COLUMN_SIZES.NORMAL;
+    const taxAmountColumnSize = (transactionItem as TransactionListItemType).isTaxAmountColumnWide ? CONST.SEARCH.TABLE_COLUMN_SIZES.WIDE : CONST.SEARCH.TABLE_COLUMN_SIZES.NORMAL;
+    const dateColumnSize = (transactionItem as TransactionListItemType).shouldShowYear ? CONST.SEARCH.TABLE_COLUMN_SIZES.WIDE : CONST.SEARCH.TABLE_COLUMN_SIZES.NORMAL;
+    const submittedColumnSize = (transactionItem as TransactionListItemType).shouldShowYearSubmitted ? CONST.SEARCH.TABLE_COLUMN_SIZES.WIDE : CONST.SEARCH.TABLE_COLUMN_SIZES.NORMAL;
+    const approvedColumnSize = (transactionItem as TransactionListItemType).shouldShowYearApproved ? CONST.SEARCH.TABLE_COLUMN_SIZES.WIDE : CONST.SEARCH.TABLE_COLUMN_SIZES.NORMAL;
+    const postedColumnSize = (transactionItem as TransactionListItemType).shouldShowYearPosted ? CONST.SEARCH.TABLE_COLUMN_SIZES.WIDE : CONST.SEARCH.TABLE_COLUMN_SIZES.NORMAL;
+    const exportedColumnSize = (transactionItem as TransactionListItemType).shouldShowYearExported ? CONST.SEARCH.TABLE_COLUMN_SIZES.WIDE : CONST.SEARCH.TABLE_COLUMN_SIZES.NORMAL;
 
     const pressableStyle = [
         styles.transactionListItemStyle,
