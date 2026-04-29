@@ -1932,6 +1932,7 @@ describe('actions/IOU/TrackExpense', () => {
                 text: 'Testing a comment',
                 timezoneParam: CONST.DEFAULT_TIME_ZONE,
                 currentUserAccountID: CARLOS_ACCOUNT_ID,
+                delegateAccountID: undefined,
             });
             await waitForBatchedUpdates();
 
