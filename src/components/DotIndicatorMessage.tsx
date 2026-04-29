@@ -4,7 +4,6 @@ import type {ReactElement} from 'react';
 import React from 'react';
 import type {StyleProp, TextStyle, ViewStyle} from 'react-native';
 import {View} from 'react-native';
-import useConfirmModal from '@hooks/useConfirmModal';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
@@ -14,7 +13,6 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import {canUseTouchScreen} from '@libs/DeviceCapabilities';
 import {isReceiptError, isTranslationKeyError} from '@libs/ErrorUtils';
 import fileDownload from '@libs/fileDownload';
-import handleRetryPress from '@libs/ReceiptUploadRetryHandler';
 import CONST from '@src/CONST';
 import type {TranslationKeyError} from '@src/types/onyx/OnyxCommon';
 import type {ReceiptError} from '@src/types/onyx/Transaction';
@@ -52,8 +50,7 @@ function DotIndicatorMessage({messages = {}, style, type, textStyles, dismissErr
     const {translate} = useLocalize();
     const expensifyIcons = useMemoizedLazyExpensifyIcons(['DotIndicator']);
     // eslint-disable-next-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidth
-    const {shouldUseNarrowLayout, isSmallScreenWidth} = useResponsiveLayout();
-    const {showConfirmModal} = useConfirmModal();
+    const {shouldUseNarrowLayout, isSmallScreenWidth, isInNarrowPaneModal} = useResponsiveLayout();
 
     if (Object.keys(messages).length === 0) {
         return null;
@@ -94,44 +91,47 @@ function DotIndicatorMessage({messages = {}, style, type, textStyles, dismissErr
     };
 
     if (receiptError) {
+        const isStackedLayout = !(isInNarrowPaneModal && !isSmallScreenWidth);
+        const messageRow = (
+            <View style={[styles.dotIndicatorMessage, isStackedLayout && styles.alignItemsStart, styles.flex1]}>
+                <View style={styles.offlineFeedbackErrorDot}>
+                    <Icon
+                        src={expensifyIcons.DotIndicator}
+                        fill={isErrorMessage ? theme.danger : theme.success}
+                    />
+                </View>
+                <Text style={[StyleUtils.getDotIndicatorTextStyles(isErrorMessage), textStyles, styles.flex1]}>{translate('iou.error.receiptUploadFailedMessage')}</Text>
+            </View>
+        );
+        const buttonsRow = (
+            <View style={[styles.flexRow, styles.gap3]}>
+                <Button
+                    small
+                    text={translate('iou.error.saveReceipt')}
+                    onPress={() => {
+                        fileDownload(translate, receiptError.source, receiptError.filename);
+                    }}
+                />
+                <Button
+                    small
+                    danger
+                    text={translate('iou.deleteExpense', {count: 1})}
+                    onPress={dismissError}
+                />
+            </View>
+        );
+        if (!isStackedLayout) {
+            return (
+                <View style={[styles.flexRow, styles.gap3, styles.alignItemsCenter, style]}>
+                    {messageRow}
+                    {buttonsRow}
+                </View>
+            );
+        }
         return (
-            <View style={[styles.mt3, styles.mb3, style]}>
-                <View style={[styles.dotIndicatorMessage]}>
-                    <View style={styles.offlineFeedbackErrorDot}>
-                        <Icon
-                            src={expensifyIcons.DotIndicator}
-                            fill={isErrorMessage ? theme.danger : theme.success}
-                        />
-                    </View>
-                    <Text style={[StyleUtils.getDotIndicatorTextStyles(isErrorMessage), textStyles]}>{translate('iou.error.receiptFailureMessageShort')}</Text>
-                </View>
-                <View style={[styles.flexRow, styles.gap3, styles.mt3]}>
-                    <View style={isSmallScreenWidth && styles.flex1}>
-                        <Button
-                            medium
-                            text={translate('iou.error.downloadReceipt')}
-                            onPress={() => {
-                                fileDownload(translate, receiptError.source, receiptError.filename);
-                            }}
-                        />
-                    </View>
-                    <View style={isSmallScreenWidth && styles.flex1}>
-                        <Button
-                            medium
-                            success
-                            text={translate('iou.error.tryAgain')}
-                            onPress={() => {
-                                handleRetryPress(receiptError, dismissError, () => {
-                                    showConfirmModal({
-                                        prompt: translate('common.genericErrorMessage'),
-                                        confirmText: translate('common.ok'),
-                                        shouldShowCancelButton: false,
-                                    });
-                                });
-                            }}
-                        />
-                    </View>
-                </View>
+            <View style={style}>
+                {messageRow}
+                <View style={styles.mt3}>{buttonsRow}</View>
             </View>
         );
     }

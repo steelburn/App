@@ -298,15 +298,6 @@ function MoneyRequestReceiptView({
     const itemizedReceiptRequiredViolation = transactionViolations?.some((violation) => violation.name === CONST.VIOLATIONS.ITEMIZED_RECEIPT_REQUIRED);
     const customRulesViolation = transactionViolations?.some((violation) => violation.name === CONST.VIOLATIONS.CUSTOM_RULES);
 
-    // Whether to show receipt audit result (e.g.`Verified`, `Issue Found`) and messages (e.g. `Receipt not verified. Please confirm accuracy.`)
-    // `!!(receiptViolations.length || didReceiptScanSucceed)` is for not showing `Verified` when `receiptViolations` is empty and `didReceiptScanSucceed` is false.
-    const shouldShowAuditMessage =
-        !isTransactionScanning &&
-        (hasReceipt || !!receiptRequiredViolation || !!itemizedReceiptRequiredViolation || !!customRulesViolation) &&
-        !!(receiptViolations.length || didReceiptScanSucceed) &&
-        isPaidGroupPolicy(report);
-    const shouldShowReceiptAudit = !isInvoice && (shouldShowReceiptEmptyState || hasReceipt);
-
     const errorsWithoutReportCreation = useMemo(
         () => ({
             ...(transaction?.errorFields?.route ?? transaction?.errorFields?.waypoints ?? transaction?.errors),
@@ -316,6 +307,15 @@ function MoneyRequestReceiptView({
     );
     const reportCreationError = useMemo(() => (getCreationReportErrors(report) ? getMicroSecondOnyxErrorWithTranslationKey('report.genericCreateReportFailureMessage') : {}), [report]);
     const hasReceiptUploadError = useMemo(() => Object.values(errorsWithoutReportCreation).some((error) => isReceiptError(error)), [errorsWithoutReportCreation]);
+
+    // Whether to show receipt audit result (e.g.`Verified`, `Issue Found`) and messages (e.g. `Receipt not verified. Please confirm accuracy.`)
+    // `!!(receiptViolations.length || didReceiptScanSucceed)` is for not showing `Verified` when `receiptViolations` is empty and `didReceiptScanSucceed` is false.
+    const shouldShowAuditMessage =
+        !isTransactionScanning &&
+        (hasReceipt || !!receiptRequiredViolation || !!itemizedReceiptRequiredViolation || !!customRulesViolation) &&
+        !!(receiptViolations.length || didReceiptScanSucceed) &&
+        isPaidGroupPolicy(report);
+    const shouldShowReceiptAudit = !isInvoice && (shouldShowReceiptEmptyState || hasReceipt || hasReceiptUploadError);
 
     const fallbackReceiptError = useMemo(() => {
         if (hasReceiptUploadError || isEmptyObject(reportCreationError) || !hasReceipt || !transaction?.receipt) {
@@ -480,6 +480,7 @@ function MoneyRequestReceiptView({
                     <ReceiptAudit
                         notes={receiptViolations}
                         shouldShowAuditResult={!!shouldShowAuditMessage}
+                        hasReceiptUploadError={hasReceiptUploadError}
                     />
                 </OfflineWithFeedback>
             )}

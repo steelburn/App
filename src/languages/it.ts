@@ -1439,7 +1439,9 @@ const translations: TranslationDeepObject<typeof en> = {
             receiptFailureMessage:
                 '<rbr>Si è verificato un errore durante il caricamento della ricevuta. <a href="download">Salva la ricevuta</a> e <a href="retry">riprova</a> più tardi.</rbr>',
             receiptFailureMessageShort: 'Si è verificato un errore durante il caricamento della ricevuta.',
+            receiptUploadFailedMessage: 'Caricamento della ricevuta non riuscito. Salva la ricevuta oppure elimina la spesa e perdila.',
             downloadReceipt: 'Scarica ricevuta',
+            saveReceipt: 'Salva ricevuta',
             tryAgain: 'Riprova',
             genericDeleteFailureMessage: 'Errore imprevisto durante l’eliminazione di questa spesa. Riprova più tardi.',
             genericEditFailureMessage: 'Errore imprevisto durante la modifica di questa spesa. Riprova più tardi.',
