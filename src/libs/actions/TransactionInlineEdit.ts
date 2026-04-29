@@ -12,7 +12,7 @@ import {hasEnabledOptions} from '@libs/OptionsListUtils';
 import Permissions from '@libs/Permissions';
 import {getTagLists, isMultiLevelTags} from '@libs/PolicyUtils';
 import {isMoneyRequestAction} from '@libs/ReportActionsUtils';
-import {canEditFieldOfMoneyRequest, canEditMoneyRequest, canUserPerformWriteAction, isArchivedReport, isReportInGroupPolicy} from '@libs/ReportUtils';
+import {canEditFieldOfMoneyRequest, canEditMoneyRequest, canUserPerformWriteAction, isArchivedReport, isIOUReport, isReportInGroupPolicy} from '@libs/ReportUtils';
 import {hasEnabledTags} from '@libs/TagsOptionsListUtils';
 import {calculateTaxAmount, getCurrency, getOriginalTransactionWithSplitInfo, getTaxValue, isDistanceRequest, isExpenseUnreported, isScanning} from '@libs/TransactionUtils';
 import {isInvalidMerchantValue} from '@libs/ValidationUtils';
@@ -232,7 +232,7 @@ function editTransactionCategoryInline(params: TransactionInlineEditParams, newC
 
 /** Updates the amount and currency of an expense from the Search results table or the Expense Report page. */
 function editTransactionAmountInline(params: TransactionInlineEditParams, newAmount: number) {
-    if (newAmount < 0) {
+    if (newAmount < 0 || (newAmount === 0 && isIOUReport(params.parentReport))) {
         return;
     }
     const iouParams = getIouParamsForTransaction(params);
