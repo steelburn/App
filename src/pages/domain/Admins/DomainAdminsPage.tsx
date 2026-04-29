@@ -9,7 +9,7 @@ import useDomainDocumentTitle from '@hooks/useDomainDocumentTitle';
 import {useMemoizedLazyExpensifyIcons, useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
-import useResponsiveLayout from '@hooks/useResponsiveLayout';
+import useShouldShowHeaderButtonsInHeaderRow from '@hooks/useShouldShowHeaderButtonsInHeaderRow';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {hasDomainAdminsSettingsErrors} from '@libs/DomainUtils';
@@ -31,7 +31,6 @@ function DomainAdminsPage({route}: DomainAdminsPageProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
     const theme = useTheme();
-    const {shouldUseNarrowLayout, isInLandscapeMode} = useResponsiveLayout();
     const illustrations = useMemoizedLazyIllustrations(['UserShield']);
     const icons = useMemoizedLazyExpensifyIcons(['Gear', 'Plus', 'DotIndicator']);
 
@@ -75,7 +74,7 @@ function DomainAdminsPage({route}: DomainAdminsPageProps) {
     );
 
     const hasSettingsErrors = hasDomainAdminsSettingsErrors(domainErrors);
-    const shouldDisplayNarrowHeaderButton = isInLandscapeMode || !shouldUseNarrowLayout;
+    const shouldShowHeaderButtonsInHeaderRow = useShouldShowHeaderButtonsInHeaderRow();
 
     const headerContent = isAdmin ? (
         <View style={[styles.flexRow, styles.gap2]}>
@@ -84,8 +83,8 @@ function DomainAdminsPage({route}: DomainAdminsPageProps) {
                 onPress={() => Navigation.navigate(ROUTES.DOMAIN_ADD_ADMIN.getRoute(domainAccountID))}
                 text={translate('domain.admins.addAdmin')}
                 icon={icons.Plus}
-                innerStyles={[!shouldDisplayNarrowHeaderButton && styles.alignItemsCenter]}
-                style={!shouldDisplayNarrowHeaderButton && [styles.flexGrow1, styles.mb3]}
+                innerStyles={[!shouldShowHeaderButtonsInHeaderRow && styles.alignItemsCenter]}
+                style={!shouldShowHeaderButtonsInHeaderRow && [styles.flexGrow1, styles.mb3]}
             />
             <Button
                 onPress={() => Navigation.navigate(ROUTES.DOMAIN_ADMINS_SETTINGS.getRoute(domainAccountID))}
@@ -93,8 +92,8 @@ function DomainAdminsPage({route}: DomainAdminsPageProps) {
                 icon={hasSettingsErrors ? icons.DotIndicator : icons.Gear}
                 iconFill={hasSettingsErrors ? theme.danger : undefined}
                 iconHoverFill={hasSettingsErrors ? theme.dangerHover : undefined}
-                innerStyles={[!shouldDisplayNarrowHeaderButton && styles.alignItemsCenter]}
-                style={!shouldDisplayNarrowHeaderButton ? [styles.flexGrow0, styles.mb3] : undefined}
+                innerStyles={[!shouldShowHeaderButtonsInHeaderRow && styles.alignItemsCenter]}
+                style={!shouldShowHeaderButtonsInHeaderRow ? [styles.flexGrow0, styles.mb3] : undefined}
             />
         </View>
     ) : null;

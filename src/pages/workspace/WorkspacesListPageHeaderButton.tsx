@@ -4,6 +4,7 @@ import ButtonWithDropdownMenu from '@components/ButtonWithDropdownMenu';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
+import useShouldShowHeaderButtonsInHeaderRow from '@hooks/useShouldShowHeaderButtonsInHeaderRow';
 import useThemeStyles from '@hooks/useThemeStyles';
 import interceptAnonymousUser from '@libs/interceptAnonymousUser';
 import Navigation from '@libs/Navigation/Navigation';
@@ -22,11 +23,11 @@ function WorkspacesListPageHeaderButton({shouldShowNewWorkspaceButton, shouldSho
     const icons = useMemoizedLazyExpensifyIcons(['Building', 'Globe', 'Plus']);
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const {shouldUseNarrowLayout, isInLandscapeMode} = useResponsiveLayout();
+    const {isInLandscapeMode} = useResponsiveLayout();
 
-    const shouldDisplayNarrowHeaderButton = isInLandscapeMode || !shouldUseNarrowLayout;
+    const shouldShowHeaderButtonsInHeaderRow = useShouldShowHeaderButtonsInHeaderRow();
 
-    const buttonStyle = !shouldDisplayNarrowHeaderButton && [styles.flexGrow1, styles.mb3];
+    const buttonStyle = !shouldShowHeaderButtonsInHeaderRow && [styles.flexGrow1, styles.mb3];
 
     if (shouldShowNewWorkspaceButton && shouldShowNewDomainButton) {
         return (

@@ -27,6 +27,7 @@ import usePolicy from '@hooks/usePolicy';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useSearchBackPress from '@hooks/useSearchBackPress';
 import useSearchResults from '@hooks/useSearchResults';
+import useShouldShowHeaderButtonsInHeaderRow from '@hooks/useShouldShowHeaderButtonsInHeaderRow';
 import useThemeStyles from '@hooks/useThemeStyles';
 import useTransactionViolation from '@hooks/useTransactionViolation';
 import useWorkspaceDocumentTitle from '@hooks/useWorkspaceDocumentTitle';
@@ -427,17 +428,17 @@ function PolicyDistanceRatesPage({
         [icons.Gear, openSettings, translate],
     );
 
-    const shouldDisplayNarrowHeaderButton = isInLandscapeMode || !shouldUseNarrowLayout;
+    const shouldShowHeaderButtonsInHeaderRow = useShouldShowHeaderButtonsInHeaderRow();
 
     const headerButtons = (
-        <View style={[!isInLandscapeMode && styles.w100, styles.flexRow, styles.gap2, !shouldDisplayNarrowHeaderButton && styles.mb3]}>
+        <View style={[!isInLandscapeMode && styles.w100, styles.flexRow, styles.gap2, !shouldShowHeaderButtonsInHeaderRow && styles.mb3]}>
             {(shouldUseNarrowLayout ? !isMobileSelectionModeEnabled : selectedDistanceRates.length === 0) ? (
                 <>
                     <Button
                         text={translate('workspace.distanceRates.addRate')}
                         onPress={addRate}
                         sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.DISTANCE_RATES.ADD_BUTTON}
-                        style={[!shouldDisplayNarrowHeaderButton && styles.flex1]}
+                        style={[!shouldShowHeaderButtonsInHeaderRow && styles.flex1]}
                         icon={icons.Plus}
                         success
                     />
@@ -460,7 +461,7 @@ function PolicyDistanceRatesPage({
                     buttonSize={CONST.DROPDOWN_BUTTON_SIZE.MEDIUM}
                     onPress={() => null}
                     options={getBulkActionsButtonOptions()}
-                    style={[!shouldDisplayNarrowHeaderButton && styles.flexGrow1]}
+                    style={[!shouldShowHeaderButtonsInHeaderRow && styles.flexGrow1]}
                     wrapperStyle={!isInLandscapeMode ? styles.w100 : undefined}
                     isSplitButton={false}
                     isDisabled={!selectedDistanceRates.length}
@@ -518,9 +519,9 @@ function PolicyDistanceRatesPage({
                         Navigation.goBack();
                     }}
                 >
-                    {shouldDisplayNarrowHeaderButton && headerButtons}
+                    {shouldShowHeaderButtonsInHeaderRow && headerButtons}
                 </HeaderWithBackButton>
-                {!shouldDisplayNarrowHeaderButton && <View style={[styles.ph5]}>{headerButtons}</View>}
+                {!shouldShowHeaderButtonsInHeaderRow && <View style={[styles.ph5]}>{headerButtons}</View>}
                 {isLoading && (
                     <ActivityIndicator
                         size={CONST.ACTIVITY_INDICATOR_SIZE.LARGE}

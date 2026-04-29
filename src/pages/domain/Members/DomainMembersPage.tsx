@@ -22,6 +22,7 @@ import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useSearchBackPress from '@hooks/useSearchBackPress';
+import useShouldShowHeaderButtonsInHeaderRow from '@hooks/useShouldShowHeaderButtonsInHeaderRow';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {clearDomainMemberError, closeUserAccount, exportMembersToCSV, setDomainMembersSelectedForMove} from '@libs/actions/Domain';
 import {turnOffMobileSelectionMode} from '@libs/actions/MobileSelectionMode';
@@ -43,7 +44,7 @@ function DomainMembersPage({route}: DomainMembersPageProps) {
     const styles = useThemeStyles();
     const illustrations = useMemoizedLazyIllustrations(['Profile']);
     const icons = useMemoizedLazyExpensifyIcons(['Plus', 'Gear', 'DotIndicator', 'RemoveMembers', 'Download', 'Transfer']);
-    const {shouldUseNarrowLayout, isInLandscapeMode} = useResponsiveLayout();
+    const {shouldUseNarrowLayout} = useResponsiveLayout();
     const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
     const clearSelectedMembers = () => setSelectedMembers([]);
     const isMobileSelectionModeEnabled = useMobileSelectionMode(clearSelectedMembers);
@@ -51,7 +52,7 @@ function DomainMembersPage({route}: DomainMembersPageProps) {
 
     const canSelectMultiple = shouldUseNarrowLayout ? isMobileSelectionModeEnabled : true;
     const selectionModeHeader = isMobileSelectionModeEnabled && shouldUseNarrowLayout;
-    const shouldDisplayNarrowHeaderButton = isInLandscapeMode || !shouldUseNarrowLayout;
+    const shouldShowHeaderButtonsInHeaderRow = useShouldShowHeaderButtonsInHeaderRow();
 
     const [domainErrors] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`);
     const [domainPendingActions] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`, {selector: memberPendingActionSelector});
@@ -229,10 +230,10 @@ function DomainMembersPage({route}: DomainMembersPageProps) {
                 onPress={() => null}
                 options={getBulkActionsButtonOptions()}
                 isSplitButton={false}
-                style={!shouldDisplayNarrowHeaderButton ? [styles.flexGrow1, styles.mb3] : undefined}
+                style={!shouldShowHeaderButtonsInHeaderRow ? [styles.flexGrow1, styles.mb3] : undefined}
                 isDisabled={!selectedMembers.length}
                 testID="DomainMembersPage-header-dropdown-menu-button"
-                wrapperStyle={!shouldDisplayNarrowHeaderButton && styles.flexGrow1}
+                wrapperStyle={!shouldShowHeaderButtonsInHeaderRow && styles.flexGrow1}
             />
         ) : (
             <View style={[styles.flexRow, styles.gap2]}>
@@ -241,8 +242,8 @@ function DomainMembersPage({route}: DomainMembersPageProps) {
                     onPress={() => Navigation.navigate(ROUTES.DOMAIN_ADD_MEMBER.getRoute(domainAccountID))}
                     text={translate('domain.members.addMember')}
                     icon={icons.Plus}
-                    innerStyles={[!shouldDisplayNarrowHeaderButton && styles.alignItemsCenter]}
-                    style={!shouldDisplayNarrowHeaderButton ? [styles.flexGrow1, styles.mb3] : undefined}
+                    innerStyles={[!shouldShowHeaderButtonsInHeaderRow && styles.alignItemsCenter]}
+                    style={!shouldShowHeaderButtonsInHeaderRow ? [styles.flexGrow1, styles.mb3] : undefined}
                 />
                 <ButtonWithDropdownMenu
                     success={false}

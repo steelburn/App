@@ -25,6 +25,7 @@ import usePolicyData from '@hooks/usePolicyData';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useSearchBackPress from '@hooks/useSearchBackPress';
 import useSearchResults from '@hooks/useSearchResults';
+import useShouldShowHeaderButtonsInHeaderRow from '@hooks/useShouldShowHeaderButtonsInHeaderRow';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {turnOffMobileSelectionMode} from '@libs/actions/MobileSelectionMode';
 import {
@@ -63,7 +64,8 @@ function WorkspaceViewTagsPage({route}: WorkspaceViewTagsProps) {
 
     // We need to use isSmallScreenWidth instead of shouldUseNarrowLayout for the small screen selection mode
     // eslint-disable-next-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidth
-    const {shouldUseNarrowLayout, isSmallScreenWidth, isInLandscapeMode} = useResponsiveLayout();
+    const {isSmallScreenWidth} = useResponsiveLayout();
+    const shouldShowHeaderButtonsInHeaderRow = useShouldShowHeaderButtonsInHeaderRow();
     const styles = useThemeStyles();
     const icons = useMemoizedLazyExpensifyIcons(['Close', 'Checkmark', 'Trashcan']);
     const {translate, localeCompare} = useLocalize();
@@ -229,8 +231,6 @@ function WorkspaceViewTagsPage({route}: WorkspaceViewTagsProps) {
             />
         ) : undefined;
 
-    const shouldDisplayNarrowHeaderButton = isInLandscapeMode || !shouldUseNarrowLayout;
-
     const getHeaderButtons = () => {
         if ((!isSmallScreenWidth && selectedTags.length === 0) || (isSmallScreenWidth && !isMobileSelectionModeEnabled)) {
             return null;
@@ -327,7 +327,7 @@ function WorkspaceViewTagsPage({route}: WorkspaceViewTagsProps) {
                 buttonSize={CONST.DROPDOWN_BUTTON_SIZE.MEDIUM}
                 customText={translate('workspace.common.selected', {count: selectedTags.length})}
                 options={options}
-                style={[!shouldDisplayNarrowHeaderButton && styles.flexGrow1, !shouldDisplayNarrowHeaderButton && styles.mb3]}
+                style={[!shouldShowHeaderButtonsInHeaderRow && styles.flexGrow1, !shouldShowHeaderButtonsInHeaderRow && styles.mb3]}
                 isDisabled={!selectedTags.length}
             />
         );
@@ -369,9 +369,9 @@ function WorkspaceViewTagsPage({route}: WorkspaceViewTagsProps) {
                         Navigation.goBack(isQuickSettingsFlow ? ROUTES.SETTINGS_TAGS_ROOT.getRoute(policyID) : undefined);
                     }}
                 >
-                    {shouldDisplayNarrowHeaderButton && getHeaderButtons()}
+                    {shouldShowHeaderButtonsInHeaderRow && getHeaderButtons()}
                 </HeaderWithBackButton>
-                {!shouldDisplayNarrowHeaderButton && <View style={[styles.pl5, styles.pr5]}>{getHeaderButtons()}</View>}
+                {!shouldShowHeaderButtonsInHeaderRow && <View style={[styles.pl5, styles.pr5]}>{getHeaderButtons()}</View>}
                 {!hasDependentTags && (
                     <View style={[styles.pv4, styles.ph5]}>
                         <ToggleSettingOptionRow

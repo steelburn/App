@@ -28,6 +28,7 @@ import usePolicy from '@hooks/usePolicy';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useSearchBackPress from '@hooks/useSearchBackPress';
 import useSearchResults from '@hooks/useSearchResults';
+import useShouldShowHeaderButtonsInHeaderRow from '@hooks/useShouldShowHeaderButtonsInHeaderRow';
 import useThemeStyles from '@hooks/useThemeStyles';
 import useWorkspaceDocumentTitle from '@hooks/useWorkspaceDocumentTitle';
 import {convertAmountToDisplayString} from '@libs/CurrencyUtils';
@@ -344,7 +345,7 @@ function WorkspacePerDiemPage({route}: WorkspacePerDiemPageProps) {
         expensifyIcons.Download,
     ]);
 
-    const shouldDisplayNarrowHeaderButton = isInLandscapeMode || !shouldUseNarrowLayout;
+    const shouldShowHeaderButtonsInHeaderRow = useShouldShowHeaderButtonsInHeaderRow();
 
     const getHeaderButtons = () => {
         const options: Array<DropdownOption<DeepValueOf<typeof CONST.POLICY.BULK_ACTION_TYPES>>> = [];
@@ -376,7 +377,7 @@ function WorkspacePerDiemPage({route}: WorkspacePerDiemPageProps) {
                     customText={translate('workspace.common.selected', {count: selectedPerDiem.length})}
                     options={options}
                     isSplitButton={false}
-                    style={[!shouldDisplayNarrowHeaderButton && styles.flexGrow1, !shouldDisplayNarrowHeaderButton && styles.mb3]}
+                    style={[!shouldShowHeaderButtonsInHeaderRow && styles.flexGrow1, !shouldShowHeaderButtonsInHeaderRow && styles.mb3]}
                     isDisabled={!selectedPerDiem.length}
                     sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.PER_DIEM.BULK_ACTIONS_DROPDOWN}
                 />
@@ -384,7 +385,7 @@ function WorkspacePerDiemPage({route}: WorkspacePerDiemPageProps) {
         }
 
         return (
-            <View style={[styles.flexRow, styles.gap2, !shouldDisplayNarrowHeaderButton && styles.mb3]}>
+            <View style={[styles.flexRow, styles.gap2, !shouldShowHeaderButtonsInHeaderRow && styles.mb3]}>
                 <ButtonWithDropdownMenu
                     success={false}
                     onPress={() => {}}
@@ -470,9 +471,9 @@ function WorkspacePerDiemPage({route}: WorkspacePerDiemPageProps) {
                         Navigation.goBack();
                     }}
                 >
-                    {shouldDisplayNarrowHeaderButton && getHeaderButtons()}
+                    {shouldShowHeaderButtonsInHeaderRow && getHeaderButtons()}
                 </HeaderWithBackButton>
-                {!shouldDisplayNarrowHeaderButton && <View style={[styles.pl5, styles.pr5]}>{getHeaderButtons()}</View>}
+                {!shouldShowHeaderButtonsInHeaderRow && <View style={[styles.pl5, styles.pr5]}>{getHeaderButtons()}</View>}
                 {(!hasVisibleSubRates || isLoading) && headerContent}
                 {isLoading && (
                     <ActivityIndicator

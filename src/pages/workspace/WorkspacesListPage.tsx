@@ -37,6 +37,7 @@ import usePreferredPolicy from '@hooks/usePreferredPolicy';
 import usePrivateSubscription from '@hooks/usePrivateSubscription';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useSearchResults from '@hooks/useSearchResults';
+import useShouldShowHeaderButtonsInHeaderRow from '@hooks/useShouldShowHeaderButtonsInHeaderRow';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import useTransactionViolationOfWorkspace from '@hooks/useTransactionViolationOfWorkspace';
@@ -139,7 +140,7 @@ function WorkspacesListPage() {
     useDocumentTitle(translate('common.workspaces'));
     const {isOffline} = useNetwork();
     const isFocused = useIsFocused();
-    const {shouldUseNarrowLayout, isMediumScreenWidth, isInLandscapeMode} = useResponsiveLayout();
+    const {shouldUseNarrowLayout, isMediumScreenWidth} = useResponsiveLayout();
     const privateSubscription = usePrivateSubscription();
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const [allConnectionSyncProgresses] = useOnyx(ONYXKEYS.COLLECTION.POLICY_CONNECTION_SYNC_PROGRESS);
@@ -740,7 +741,7 @@ function WorkspacesListPage() {
         }
     };
 
-    const shouldDisplayNarrowHeaderButton = isInLandscapeMode || !shouldUseNarrowLayout;
+    const shouldShowHeaderButtonsInHeaderRow = useShouldShowHeaderButtonsInHeaderRow();
 
     return (
         <ScreenWrapper
@@ -757,9 +758,9 @@ function WorkspacesListPage() {
                     breadcrumbLabel={translate('common.workspaces')}
                     shouldDisplayHelpButton
                 >
-                    {shouldDisplayNarrowHeaderButton && <View style={styles.pr2}>{headerButton}</View>}
+                    {shouldShowHeaderButtonsInHeaderRow && <View style={styles.pr2}>{headerButton}</View>}
                 </TopBarWithLoadingBar>
-                {!shouldDisplayNarrowHeaderButton && <View style={[styles.ph5, styles.pt2]}>{headerButton}</View>}
+                {!shouldShowHeaderButtonsInHeaderRow && <View style={[styles.ph5, styles.pt2]}>{headerButton}</View>}
                 {shouldShowLoadingIndicator ? (
                     <View style={[styles.flex1, styles.fullScreenLoading]}>
                         <ActivityIndicator

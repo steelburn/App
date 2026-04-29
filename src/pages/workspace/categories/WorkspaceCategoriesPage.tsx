@@ -36,6 +36,7 @@ import usePolicyData from '@hooks/usePolicyData';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useSearchBackPress from '@hooks/useSearchBackPress';
 import useSearchResults from '@hooks/useSearchResults';
+import useShouldShowHeaderButtonsInHeaderRow from '@hooks/useShouldShowHeaderButtonsInHeaderRow';
 import useStyleUtils from '@hooks/useStyleUtils';
 import useThemeStyles from '@hooks/useThemeStyles';
 import useWorkspaceDocumentTitle from '@hooks/useWorkspaceDocumentTitle';
@@ -70,7 +71,7 @@ type WorkspaceCategoriesPageProps =
 function WorkspaceCategoriesPage({route}: WorkspaceCategoriesPageProps) {
     // We need to use isSmallScreenWidth instead of shouldUseNarrowLayout to apply the correct modal type for the decision modal
     // eslint-disable-next-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidth
-    const {shouldUseNarrowLayout, isSmallScreenWidth, isInLandscapeMode} = useResponsiveLayout();
+    const {shouldUseNarrowLayout, isSmallScreenWidth} = useResponsiveLayout();
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
     const {translate, localeCompare} = useLocalize();
@@ -514,7 +515,7 @@ function WorkspaceCategoriesPage({route}: WorkspaceCategoriesPageProps) {
         policyId,
     ]);
 
-    const shouldDisplayNarrowHeaderButton = isInLandscapeMode || !shouldUseNarrowLayout;
+    const shouldShowHeaderButtonsInHeaderRow = useShouldShowHeaderButtonsInHeaderRow();
 
     const getHeaderButtons = () => {
         const options: Array<DropdownOption<DeepValueOf<typeof CONST.POLICY.BULK_ACTION_TYPES>>> = [];
@@ -633,7 +634,7 @@ function WorkspaceCategoriesPage({route}: WorkspaceCategoriesPageProps) {
                     customText={translate('workspace.common.selected', {count: selectedCategories.length})}
                     options={options}
                     isSplitButton={false}
-                    style={[!shouldDisplayNarrowHeaderButton && styles.flexGrow1, !shouldDisplayNarrowHeaderButton && styles.mb3]}
+                    style={[!shouldShowHeaderButtonsInHeaderRow && styles.flexGrow1, !shouldShowHeaderButtonsInHeaderRow && styles.mb3]}
                     isDisabled={!selectedCategories.length}
                     sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.CATEGORIES.BULK_ACTIONS_DROPDOWN}
                     testID="WorkspaceCategoriesPage-header-dropdown-menu-button"
@@ -642,7 +643,7 @@ function WorkspaceCategoriesPage({route}: WorkspaceCategoriesPageProps) {
         }
         const shouldShowAddCategory = !policyHasAccountingConnections && hasVisibleCategories;
         return (
-            <View style={[styles.flexRow, styles.gap2, !shouldDisplayNarrowHeaderButton && styles.mb3]}>
+            <View style={[styles.flexRow, styles.gap2, !shouldShowHeaderButtonsInHeaderRow && styles.mb3]}>
                 {shouldShowAddCategory && (
                     <Button
                         success
@@ -650,7 +651,7 @@ function WorkspaceCategoriesPage({route}: WorkspaceCategoriesPageProps) {
                         sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.CATEGORIES.ADD_BUTTON}
                         icon={icons.Plus}
                         text={translate('workspace.categories.addCategory')}
-                        style={[!shouldDisplayNarrowHeaderButton && styles.flex1]}
+                        style={[!shouldShowHeaderButtonsInHeaderRow && styles.flex1]}
                     />
                 )}
                 <ButtonWithDropdownMenu
@@ -661,7 +662,7 @@ function WorkspaceCategoriesPage({route}: WorkspaceCategoriesPageProps) {
                     sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.CATEGORIES.MORE_DROPDOWN}
                     options={secondaryActions}
                     isSplitButton={false}
-                    wrapperStyle={shouldShowAddCategory || isInLandscapeMode ? styles.flexGrow0 : styles.flexGrow1}
+                    wrapperStyle={shouldShowAddCategory || shouldShowHeaderButtonsInHeaderRow ? styles.flexGrow0 : styles.flexGrow1}
                 />
             </View>
         );
@@ -749,9 +750,9 @@ function WorkspaceCategoriesPage({route}: WorkspaceCategoriesPageProps) {
                         Navigation.goBack();
                     }}
                 >
-                    {shouldDisplayNarrowHeaderButton && getHeaderButtons()}
+                    {shouldShowHeaderButtonsInHeaderRow && getHeaderButtons()}
                 </HeaderWithBackButton>
-                {!shouldDisplayNarrowHeaderButton && <View style={[styles.pl5, styles.pr5]}>{getHeaderButtons()}</View>}
+                {!shouldShowHeaderButtonsInHeaderRow && <View style={[styles.pl5, styles.pr5]}>{getHeaderButtons()}</View>}
                 {(!hasVisibleCategories || isLoading) && headerContent}
                 {isLoading && (
                     <ActivityIndicator

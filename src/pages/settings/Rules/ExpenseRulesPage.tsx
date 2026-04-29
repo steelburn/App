@@ -25,6 +25,7 @@ import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useSearchResults from '@hooks/useSearchResults';
+import useShouldShowHeaderButtonsInHeaderRow from '@hooks/useShouldShowHeaderButtonsInHeaderRow';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {turnOffMobileSelectionMode} from '@libs/actions/MobileSelectionMode';
 import {clearDraftRule, deleteExpenseRules, setDraftRule} from '@libs/actions/User';
@@ -52,7 +53,7 @@ function ExpenseRulesPage() {
     const genericIllustration = useGenericEmptyStateIllustration();
     const isMobileSelectionModeEnabled = useMobileSelectionMode();
     const [expenseRules = getEmptyArray<ExpenseRule>(), expenseRulesResult] = useOnyx(ONYXKEYS.NVP_EXPENSE_RULES);
-    const {shouldUseNarrowLayout, isInLandscapeMode} = useResponsiveLayout();
+    const {shouldUseNarrowLayout} = useResponsiveLayout();
     useDocumentTitle(translate('expenseRulesPage.title'));
     const [selectedRules, setSelectedRules] = useState<string[]>([]);
     const [deleteConfirmModalVisible, setDeleteConfirmModalVisible] = useState(false);
@@ -178,7 +179,7 @@ function ExpenseRulesPage() {
         });
     }
 
-    const shouldDisplayNarrowHeaderButton = isInLandscapeMode || !shouldUseNarrowLayout;
+    const shouldShowHeaderButtonsInHeaderRow = useShouldShowHeaderButtonsInHeaderRow();
 
     const headerButton = isInSelectionMode ? (
         <ButtonWithDropdownMenu
@@ -189,17 +190,17 @@ function ExpenseRulesPage() {
             onPress={() => null}
             options={headerDropdownOptions}
             shouldAlwaysShowDropdownMenu
-            style={[!shouldDisplayNarrowHeaderButton && styles.flexGrow1, !shouldDisplayNarrowHeaderButton && styles.mb3]}
+            style={[!shouldShowHeaderButtonsInHeaderRow && styles.flexGrow1, !shouldShowHeaderButtonsInHeaderRow && styles.mb3]}
             testID="ExpenseRulesPage-header-dropdown-menu-button"
         />
     ) : (
-        <View style={[styles.flexRow, styles.gap2, !shouldDisplayNarrowHeaderButton && styles.mb3]}>
+        <View style={[styles.flexRow, styles.gap2, !shouldShowHeaderButtonsInHeaderRow && styles.mb3]}>
             <Button
                 success
                 onPress={navigateToNewRulePage}
                 icon={icons.Plus}
                 text={translate('expenseRulesPage.newRule')}
-                style={[!shouldDisplayNarrowHeaderButton && styles.flex1]}
+                style={[!shouldShowHeaderButtonsInHeaderRow && styles.flex1]}
                 sentryLabel={CONST.SENTRY_LABEL.SETTINGS_RULES.NEW_RULE}
             />
         </View>
@@ -262,9 +263,9 @@ function ExpenseRulesPage() {
                 shouldDisplayHelpButton
                 title={selectionModeHeader ? translate('common.selectMultiple') : translate('expenseRulesPage.title')}
             >
-                {shouldDisplayNarrowHeaderButton && hasRules && headerButton}
+                {shouldShowHeaderButtonsInHeaderRow && hasRules && headerButton}
             </HeaderWithBackButton>
-            {!shouldDisplayNarrowHeaderButton && hasRules && <View style={[styles.pl5, styles.pr5]}>{headerButton}</View>}
+            {!shouldShowHeaderButtonsInHeaderRow && hasRules && <View style={[styles.pl5, styles.pr5]}>{headerButton}</View>}
             {!hasRules && !isLoading && headerContent}
             {!hasRules && !isLoading && (
                 <ScrollView contentContainerStyle={[styles.flexGrow1, styles.flexShrink0]}>

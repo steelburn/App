@@ -29,6 +29,7 @@ import usePrevious from '@hooks/usePrevious';
 import usePrivateSubscription from '@hooks/usePrivateSubscription';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useShouldBlockCurrencyChange from '@hooks/useShouldBlockCurrencyChange';
+import useShouldShowHeaderButtonsInHeaderRow from '@hooks/useShouldShowHeaderButtonsInHeaderRow';
 import useThemeStyles from '@hooks/useThemeStyles';
 import useTransactionViolationOfWorkspace from '@hooks/useTransactionViolationOfWorkspace';
 import useWorkspaceDocumentTitle from '@hooks/useWorkspaceDocumentTitle';
@@ -85,7 +86,8 @@ type WorkspaceOverviewPageProps = WithPolicyProps & PlatformStackScreenProps<Wor
 function WorkspaceOverviewPage({policyDraft, policy: policyProp, route}: WorkspaceOverviewPageProps) {
     const styles = useThemeStyles();
     const {translate, localeCompare} = useLocalize();
-    const {shouldUseNarrowLayout, isInLandscapeMode} = useResponsiveLayout();
+    const {shouldUseNarrowLayout} = useResponsiveLayout();
+    const shouldShowHeaderButtonsInHeaderRow = useShouldShowHeaderButtonsInHeaderRow();
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const {getCurrencySymbol} = useCurrencyListActions();
     const illustrationIcons = useMemoizedLazyIllustrations(['Building']);
@@ -501,8 +503,6 @@ function WorkspaceOverviewPage({policyDraft, policy: policyProp, route}: Workspa
         />
     );
 
-    const shouldDisplayNarrowHeaderButton = isInLandscapeMode || !shouldUseNarrowLayout;
-
     const headerButtons = readOnly ? (
         dropdownMenu || null
     ) : (
@@ -515,8 +515,8 @@ function WorkspaceOverviewPage({policyDraft, policy: policyProp, route}: Workspa
                     icon={expensifyIcons.UserPlus}
                     onPress={handleInvitePress}
                     medium
-                    innerStyles={[!shouldDisplayNarrowHeaderButton && styles.alignItemsCenter]}
-                    style={[!shouldDisplayNarrowHeaderButton && styles.flexGrow1, !shouldDisplayNarrowHeaderButton && styles.mb3]}
+                    innerStyles={[!shouldShowHeaderButtonsInHeaderRow && styles.alignItemsCenter]}
+                    style={[!shouldShowHeaderButtonsInHeaderRow && styles.flexGrow1, !shouldShowHeaderButtonsInHeaderRow && styles.mb3]}
                 />
             )}
             {dropdownMenu}
@@ -583,11 +583,11 @@ function WorkspaceOverviewPage({policyDraft, policy: policyProp, route}: Workspa
             shouldShowNotFoundPage={policy === undefined}
             onBackButtonPress={handleBackButtonPress}
             addBottomSafeAreaPadding
-            headerContent={shouldDisplayNarrowHeaderButton && headerButtons}
+            headerContent={shouldShowHeaderButtonsInHeaderRow && headerButtons}
             modals={modals}
         >
             <View style={[styles.flex1, styles.mt3, shouldUseNarrowLayout ? styles.workspaceSectionMobile : styles.workspaceSection]}>
-                {!shouldDisplayNarrowHeaderButton && <View style={[styles.pl5, styles.pr5, styles.pb5]}>{headerButtons}</View>}
+                {!shouldShowHeaderButtonsInHeaderRow && <View style={[styles.pl5, styles.pr5, styles.pb5]}>{headerButtons}</View>}
                 <Section
                     isCentralPane
                     title=""

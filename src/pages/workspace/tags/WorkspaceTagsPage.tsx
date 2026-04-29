@@ -34,6 +34,7 @@ import usePolicyData from '@hooks/usePolicyData';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useSearchBackPress from '@hooks/useSearchBackPress';
 import useSearchResults from '@hooks/useSearchResults';
+import useShouldShowHeaderButtonsInHeaderRow from '@hooks/useShouldShowHeaderButtonsInHeaderRow';
 import useStyleUtils from '@hooks/useStyleUtils';
 import useThemeStyles from '@hooks/useThemeStyles';
 import useWorkspaceDocumentTitle from '@hooks/useWorkspaceDocumentTitle';
@@ -600,7 +601,7 @@ function WorkspaceTagsPage({route}: WorkspaceTagsPageProps) {
         showConfirmModal,
     ]);
 
-    const shouldDisplayNarrowHeaderButton = isInLandscapeMode || !shouldUseNarrowLayout;
+    const shouldShowHeaderButtonsInHeaderRow = useShouldShowHeaderButtonsInHeaderRow();
 
     const getHeaderButtons = () => {
         const selectedTagsObject = selectedTags.map((key) => policyTagLists.at(0)?.tags?.[key]);
@@ -609,7 +610,7 @@ function WorkspaceTagsPage({route}: WorkspaceTagsPageProps) {
         if (shouldUseNarrowLayout ? !isMobileSelectionModeEnabled : selectedTags.length === 0) {
             const hasPrimaryActions = !hasAccountingConnections && !isMultiLevelTags && hasVisibleTags;
             return (
-                <View style={[styles.flexRow, styles.gap2, !shouldDisplayNarrowHeaderButton && styles.mb3]}>
+                <View style={[styles.flexRow, styles.gap2, !shouldShowHeaderButtonsInHeaderRow && styles.mb3]}>
                     {hasPrimaryActions && (
                         <Button
                             success
@@ -617,7 +618,7 @@ function WorkspaceTagsPage({route}: WorkspaceTagsPageProps) {
                             sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.TAGS.ADD_BUTTON}
                             icon={expensifyIcons.Plus}
                             text={translate('workspace.tags.addTag')}
-                            style={[!shouldDisplayNarrowHeaderButton && styles.flex1]}
+                            style={[!shouldShowHeaderButtonsInHeaderRow && styles.flex1]}
                         />
                     )}
                     <ButtonWithDropdownMenu
@@ -778,7 +779,7 @@ function WorkspaceTagsPage({route}: WorkspaceTagsPageProps) {
                 buttonSize={CONST.DROPDOWN_BUTTON_SIZE.MEDIUM}
                 customText={translate('workspace.common.selected', {count: selectedTags.length})}
                 options={options}
-                style={[!shouldDisplayNarrowHeaderButton && styles.flexGrow1, !shouldDisplayNarrowHeaderButton && styles.mb3]}
+                style={[!shouldShowHeaderButtonsInHeaderRow && styles.flexGrow1, !shouldShowHeaderButtonsInHeaderRow && styles.mb3]}
                 isDisabled={!selectedTags.length}
                 sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.TAGS.BULK_ACTIONS_DROPDOWN}
                 testID="WorkspaceTagsPage-header-dropdown-menu-button"
@@ -889,9 +890,9 @@ function WorkspaceTagsPage({route}: WorkspaceTagsPageProps) {
                             Navigation.goBack();
                         }}
                     >
-                        {shouldDisplayNarrowHeaderButton && getHeaderButtons()}
+                        {shouldShowHeaderButtonsInHeaderRow && getHeaderButtons()}
                     </HeaderWithBackButton>
-                    {!shouldDisplayNarrowHeaderButton && <View style={[styles.pl5, styles.pr5]}>{getHeaderButtons()}</View>}
+                    {!shouldShowHeaderButtonsInHeaderRow && <View style={[styles.pl5, styles.pr5]}>{getHeaderButtons()}</View>}
                     {(!hasVisibleTags || isLoading) && headerContent}
                     {isLoading && (
                         <ActivityIndicator
