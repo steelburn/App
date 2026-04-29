@@ -34,12 +34,12 @@ type ReportActionEditMessageContextActions = {
 };
 
 const ReportActionEditMessageContext = createContext<ReportActionEditMessageContextValue>({
+    editingState: 'off',
     editingReportID: null,
     editingReportActionID: null,
     editingReportAction: null,
     editingMessage: null,
     currentEditMessageSelection: null,
-    editingState: 'off',
 });
 
 const ReportActionEditMessageActionsContext = createContext<ReportActionEditMessageContextActions>({

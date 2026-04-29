@@ -4,10 +4,10 @@ import type {RefObject} from 'react';
 import type {ComposerRef, TextSelection} from '@components/Composer/types';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import type ResponsiveLayoutResult from '@hooks/useResponsiveLayout/types';
+import * as ComposerContext from '@pages/inbox/report/ReportActionCompose/ComposerContext';
+import type {ComposerEditState} from '@pages/inbox/report/ReportActionCompose/ComposerContext';
 import ReportActionComposeUtils from '@pages/inbox/report/ReportActionCompose/ReportActionComposeUtils';
 import useEditComposerToggle from '@pages/inbox/report/ReportActionCompose/useEditComposerToggle';
-import type {ReportActionEditMessageContextValue} from '@pages/inbox/report/ReportActionEditMessageContext';
-import * as ReportActionEditMessageContext from '@pages/inbox/report/ReportActionEditMessageContext';
 
 jest.mock('@pages/inbox/report/ReportActionEditMessageContext', () => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -33,11 +33,9 @@ jest.mock('@libs/getPlatform', () => ({
     default: () => 'web',
 }));
 
-const mockUseReportActionActiveEdit = jest.mocked(ReportActionEditMessageContext.useReportActionActiveEdit);
+const mockUseComposerEditState = jest.mocked(ComposerContext.useComposerEditState);
 const mockUseResponsiveLayout = useResponsiveLayout as jest.MockedFunction<typeof useResponsiveLayout>;
 const mockUpdateNativeSelectionValue = jest.mocked(ReportActionComposeUtils.updateNativeSelectionValue);
-
-type ActiveEdit = ReportActionEditMessageContextValue & {editingState: 'off' | 'editing' | 'submitted'};
 
 function makeComposerRef(overrides?: Partial<ComposerRef>): RefObject<ComposerRef | null> {
     return {
@@ -52,14 +50,17 @@ function makeComposerRef(overrides?: Partial<ComposerRef>): RefObject<ComposerRe
     };
 }
 
-function defaultActiveEdit(overrides?: Partial<ActiveEdit>): ActiveEdit {
+function defaultActiveEdit(overrides?: Partial<ComposerEditState>): ComposerEditState {
     return {
+        editingState: 'off',
+        isEditingInComposer: false,
         editingReportID: null,
         editingReportActionID: null,
         editingReportAction: null,
         editingMessage: null,
         currentEditMessageSelection: null,
-        editingState: 'off',
+        draftComment: undefined,
+        effectiveDraft: undefined,
         ...overrides,
     };
 }
@@ -102,7 +103,7 @@ describe('useEditComposerToggle', () => {
     beforeEach(() => {
         jest.clearAllMocks();
         activeEditRef.current = defaultActiveEdit();
-        mockUseReportActionActiveEdit.mockImplementation(() => activeEditRef.current);
+        mockUseComposerEditState.mockImplementation(() => activeEditRef.current);
         mockUseResponsiveLayout.mockReturnValue(narrowLayoutResult());
     });
 

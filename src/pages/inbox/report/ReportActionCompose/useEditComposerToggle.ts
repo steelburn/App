@@ -4,8 +4,8 @@ import type {RefObject} from 'react';
 import type {ComposerRef, TextSelection} from '@components/Composer/types';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import getPlatform from '@libs/getPlatform';
-import {useReportActionActiveEdit} from '@pages/inbox/report/ReportActionEditMessageContext';
 import CONST from '@src/CONST';
+import {useComposerEditState} from './ComposerContext';
 import ReportActionComposeUtils from './ReportActionComposeUtils';
 
 const isIOSNative = getPlatform() === CONST.PLATFORM.IOS;
@@ -29,7 +29,7 @@ type UseEditComposerToggleProps = {
 function useEditComposerToggle({selection, draftComment, composerRef, onFocus, onValueChange, onSelectionChange}: UseEditComposerToggleProps) {
     const {shouldUseNarrowLayout} = useResponsiveLayout();
 
-    const {editingState, editingReportActionID, editingMessage, currentEditMessageSelection} = useReportActionActiveEdit();
+    const {editingState, editingReportActionID, editingMessage, currentEditMessageSelection} = useComposerEditState();
     const isEditing = editingState !== 'off';
 
     const wasEditingRef = useRef(isEditing);
@@ -134,7 +134,16 @@ function useEditComposerToggle({selection, draftComment, composerRef, onFocus, o
         }
 
         previousEditingReportActionIDRef.current = editingReportActionID;
-    }, [applyComposerValue, composerRef, draftComment, editingMessage, editingReportActionID, editingState, selection, shouldUseNarrowLayout]);
+    }, [
+        applyComposerValue,
+        composerRef,
+        draftComment,
+        editingMessage,
+        editingReportActionID,
+        editingState,
+        selection,
+        shouldUseNarrowLayout,
+    ]);
 }
 
 export default useEditComposerToggle;

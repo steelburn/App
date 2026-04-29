@@ -2,7 +2,9 @@ import type {RefObject} from 'react';
 import {createContext, useContext} from 'react';
 import type {BlurEvent, TextInputSelectionChangeEvent, View} from 'react-native';
 import type {Emoji} from '@assets/emojis/types';
+import type {TextSelection} from '@components/Composer/types';
 import type {Mention} from '@components/MentionSuggestions';
+import type {ReportAction} from '@src/types/onyx';
 import type {FileObject} from '@src/types/utils/Attachment';
 import type {ComposerWithSuggestionsRef} from './ComposerWithSuggestions';
 import type useDebouncedCommentMaxLengthValidation from './useDebouncedCommentMaxLengthValidation';
@@ -29,12 +31,15 @@ type ComposerState = {
 };
 
 type ComposerEditState = {
-    isEditingInComposer: boolean;
-    editingReportActionID: string | null;
-    editingMessage: string | null;
     editingState: 'off' | 'editing' | 'submitted';
+    isEditingInComposer: boolean;
+    editingReportID: string | null;
+    editingReportActionID: string | null;
+    editingReportAction: ReportAction | null;
+    editingMessage: string | null;
     draftComment: string | null | undefined;
     effectiveDraft: string | null | undefined;
+    currentEditMessageSelection: TextSelection | null;
 };
 
 // Warm — changes based on content + policy
@@ -99,12 +104,15 @@ const defaultSendState: ComposerSendState = {
 };
 
 const defaultEditState: ComposerEditState = {
-    isEditingInComposer: false,
-    editingReportActionID: null,
-    editingMessage: null,
     editingState: 'off',
+    isEditingInComposer: false,
+    editingReportID: null,
+    editingReportActionID: null,
+    editingReportAction: null,
+    editingMessage: null,
     draftComment: undefined,
     effectiveDraft: undefined,
+    currentEditMessageSelection: null,
 };
 const ComposerEditStateContext = createContext<ComposerEditState>(defaultEditState);
 
@@ -181,4 +189,4 @@ export {
     useComposerEditActions,
     useComposerMeta,
 };
-export type {SuggestionsRef, ComposerText, ComposerState, ComposerSendState, ComposerActions, ComposerMeta};
+export type {SuggestionsRef, ComposerText, ComposerState, ComposerEditState, ComposerSendState, ComposerActions, ComposerMeta};
