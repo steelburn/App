@@ -894,6 +894,7 @@ const translations = {
         },
     },
     adminOnlyCanPost: 'Only admins can send messages in this room.',
+    readOnlyConversation: 'This conversation is read-only.',
     reportAction: {
         asCopilot: 'as copilot for',
         assistedBy: (agentName: string) => `assisted by ${agentName}`,
