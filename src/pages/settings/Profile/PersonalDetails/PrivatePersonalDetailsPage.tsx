@@ -55,12 +55,7 @@ function PrivatePersonalDetailsPage() {
     const zip = address?.zip ?? '';
     const country = address?.country ?? '';
 
-    // Track country locally so selections from the CountrySelector picker stick
-    // instead of being overwritten by the controlled `value` prop on every render.
     const [selectedCountry, setSelectedCountry] = useState<Country | ''>(country);
-    useEffect(() => {
-        setSelectedCountry(country);
-    }, [country]);
 
     useEffect(
         () => () => {
@@ -72,79 +67,68 @@ function PrivatePersonalDetailsPage() {
     const validate = (values: FormOnyxValues<typeof ONYXKEYS.FORMS.PERSONAL_DETAILS_FORM>): FormInputErrors<typeof ONYXKEYS.FORMS.PERSONAL_DETAILS_FORM> => {
         const errors: FormInputErrors<typeof ONYXKEYS.FORMS.PERSONAL_DETAILS_FORM> = {};
 
-        // Legal first name: required if previously set
         const firstNameValue = values[INPUT_IDS.LEGAL_FIRST_NAME] ?? '';
-        if (legalFirstName && !firstNameValue.trim()) {
+        if (!firstNameValue.trim()) {
             errors[INPUT_IDS.LEGAL_FIRST_NAME] = translate('common.error.fieldRequired');
-        } else if (firstNameValue && !isValidDisplayName(firstNameValue)) {
+        } else if (!isValidDisplayName(firstNameValue)) {
             errors[INPUT_IDS.LEGAL_FIRST_NAME] = translate('privatePersonalDetails.error.cannotIncludeCommaOrSemicolon');
-        } else if (firstNameValue && firstNameValue.length > CONST.LEGAL_NAME.MAX_LENGTH) {
+        } else if (firstNameValue.length > CONST.LEGAL_NAME.MAX_LENGTH) {
             errors[INPUT_IDS.LEGAL_FIRST_NAME] = translate('common.error.characterLimitExceedCounter', firstNameValue.length, CONST.LEGAL_NAME.MAX_LENGTH);
-        } else if (firstNameValue && doesContainReservedWord(firstNameValue, CONST.DISPLAY_NAME.RESERVED_NAMES)) {
+        } else if (doesContainReservedWord(firstNameValue, CONST.DISPLAY_NAME.RESERVED_NAMES)) {
             errors[INPUT_IDS.LEGAL_FIRST_NAME] = translate('personalDetails.error.containsReservedWord');
         }
 
-        // Legal last name: required if previously set
         const lastNameValue = values[INPUT_IDS.LEGAL_LAST_NAME] ?? '';
-        if (legalLastName && !lastNameValue.trim()) {
+        if (!lastNameValue.trim()) {
             errors[INPUT_IDS.LEGAL_LAST_NAME] = translate('common.error.fieldRequired');
-        } else if (lastNameValue && !isValidDisplayName(lastNameValue)) {
+        } else if (!isValidDisplayName(lastNameValue)) {
             errors[INPUT_IDS.LEGAL_LAST_NAME] = translate('privatePersonalDetails.error.cannotIncludeCommaOrSemicolon');
-        } else if (lastNameValue && lastNameValue.length > CONST.LEGAL_NAME.MAX_LENGTH) {
+        } else if (lastNameValue.length > CONST.LEGAL_NAME.MAX_LENGTH) {
             errors[INPUT_IDS.LEGAL_LAST_NAME] = translate('common.error.characterLimitExceedCounter', lastNameValue.length, CONST.LEGAL_NAME.MAX_LENGTH);
-        } else if (lastNameValue && doesContainReservedWord(lastNameValue, CONST.DISPLAY_NAME.RESERVED_NAMES)) {
+        } else if (doesContainReservedWord(lastNameValue, CONST.DISPLAY_NAME.RESERVED_NAMES)) {
             errors[INPUT_IDS.LEGAL_LAST_NAME] = translate('personalDetails.error.containsReservedWord');
         }
 
-        // DOB: required if previously set
         const dobValue = values[INPUT_IDS.DATE_OF_BIRTH] ?? '';
-        if (dob && !dobValue) {
-            errors[INPUT_IDS.DATE_OF_BIRTH] = translate('common.error.fieldRequired');
-        } else if (dobValue) {
+        if (dobValue) {
             const dateError = getAgeRequirementError(translate, dobValue, CONST.DATE_BIRTH.MIN_AGE_FOR_PAYMENT, CONST.DATE_BIRTH.MAX_AGE);
             if (dateError) {
                 errors[INPUT_IDS.DATE_OF_BIRTH] = dateError;
             }
         }
 
-        // Phone: required if previously set
         const phoneValue = values[INPUT_IDS.PHONE_NUMBER] ?? '';
-        if (phoneNumber && !isRequiredFulfilled(phoneValue)) {
+        if (!isRequiredFulfilled(phoneValue)) {
             errors[INPUT_IDS.PHONE_NUMBER] = translate('common.error.fieldRequired');
-        } else if (phoneValue) {
+        } else {
             const phoneWithCountryCode = appendCountryCode(phoneValue, countryCode);
             if (!isValidPhoneNumber(phoneWithCountryCode)) {
                 errors[INPUT_IDS.PHONE_NUMBER] = translate('common.error.phoneNumber');
             }
         }
 
-        // Address street: required if previously set
         const streetValue = values[INPUT_IDS.ADDRESS_LINE_1] ?? '';
-        if (initialStreet1 && !streetValue.trim()) {
+        if (!streetValue.trim()) {
             errors[INPUT_IDS.ADDRESS_LINE_1] = translate('common.error.fieldRequired');
         }
 
-        // City: required if previously set
         const cityValue = values[INPUT_IDS.CITY] ?? '';
-        if (city && !cityValue.trim()) {
+        if (!cityValue.trim()) {
             errors[INPUT_IDS.CITY] = translate('common.error.fieldRequired');
         }
 
-        // State: required if previously set
         const stateValue = values[INPUT_IDS.STATE] ?? '';
         if (state && !stateValue.trim()) {
             errors[INPUT_IDS.STATE] = translate('common.error.fieldRequired');
         }
 
-        // ZIP: required if previously set
         const zipValue = values[INPUT_IDS.ZIP_POST_CODE] ?? '';
-        if (zip && !zipValue.trim()) {
+        if (!zipValue.trim()) {
             errors[INPUT_IDS.ZIP_POST_CODE] = translate('common.error.fieldRequired');
         }
 
-        // Country: required if previously set
         const countryValue = values[INPUT_IDS.COUNTRY] ?? '';
-        if (country && !countryValue) {
+        if (!countryValue) {
             errors[INPUT_IDS.COUNTRY] = translate('common.error.fieldRequired');
         }
 
