@@ -214,23 +214,24 @@ function BaseDomainMembersPage({
     const shouldShowEmptySearchMessage = !!shouldShowSearchBar && inputValue.length !== 0 && filteredData.length === 0;
     // Show empty pre filter state only if we have data, filtered data is empty, but the search have not been used.
     const shouldShowEmptyPreFilterState = filteredData.length === 0 && data.length !== 0 && !!emptyStateTitle && inputValue.length === 0;
+    const shouldUseMobileListHeaderContentLayout = shouldUseNarrowLayout && !isInLandscapeMode;
     const listHeaderContent =
         searchBarAccessory || shouldShowSearchBar ? (
             <View style={styles.flexColumn}>
-                <View style={[styles.mh5, styles.gap3, styles.mb5, shouldUseNarrowLayout ? styles.flexColumn : styles.flexRow]}>
+                <View style={[styles.mh5, styles.gap3, styles.mb5, shouldUseMobileListHeaderContentLayout ? styles.flexColumn : styles.flexRow]}>
                     {!!searchBarAccessory && (
                         <View
                             style={[
-                                shouldUseNarrowLayout && styles.w100,
-                                shouldShowSearchBar && !shouldUseNarrowLayout && styles.h13,
-                                shouldShowSearchBar && !shouldUseNarrowLayout && styles.justifyContentCenter,
+                                shouldUseMobileListHeaderContentLayout && styles.w100,
+                                shouldShowSearchBar && !shouldUseMobileListHeaderContentLayout && styles.h13,
+                                shouldShowSearchBar && !shouldUseMobileListHeaderContentLayout && styles.justifyContentCenter,
                             ]}
                         >
                             {searchBarAccessory}
                         </View>
                     )}
                     {shouldShowSearchBar && (
-                        <View style={[shouldUseNarrowLayout && styles.w100]}>
+                        <View style={[shouldUseMobileListHeaderContentLayout ? styles.w100 : styles.flex1]}>
                             <SearchBar
                                 inputValue={inputValue}
                                 onChangeText={setInputValue}
