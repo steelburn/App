@@ -1,7 +1,7 @@
 import type {StyleProp, ViewStyle} from 'react-native';
+import type {ExpenseReportListItemType} from '@components/Search/SearchList/ListItem/types';
 import type {SearchColumnType} from '@components/Search/types';
 import type {ReportAction} from '@src/types/onyx';
-import type {ExpenseReportListItemType} from '../types';
 
 type ExpenseReportListItemRowNarrowProps = {
     item: ExpenseReportListItemType;

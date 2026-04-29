@@ -1,11 +1,11 @@
 import React from 'react';
 import {View} from 'react-native';
 import SearchReportAvatar from '@components/ReportActionAvatars/SearchReportAvatar';
+import type {ExpenseReportListItemType} from '@components/Search/SearchList/ListItem/types';
 import useStyleUtils from '@hooks/useStyleUtils';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import CONST from '@src/CONST';
-import type {ExpenseReportListItemType} from '../types';
 
 type ExpenseReportListItemAvatarProps = {
     item: ExpenseReportListItemType;
