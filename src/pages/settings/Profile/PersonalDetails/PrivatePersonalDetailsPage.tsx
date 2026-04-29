@@ -58,6 +58,7 @@ function PrivatePersonalDetailsPage() {
     const country = address?.country ?? '';
 
     const [selectedCountry, setSelectedCountry] = useState<Country | ''>(country);
+    const [selectedState, setSelectedState] = useState(state);
 
     useEffect(
         () => () => {
@@ -317,7 +318,8 @@ function PrivatePersonalDetailsPage() {
                             <InputWrapper
                                 InputComponent={StateSelector}
                                 inputID={INPUT_IDS.STATE}
-                                value={state as State}
+                                value={selectedState as State}
+                                onValueChange={(value: unknown) => setSelectedState((value ?? '') as string)}
                                 shouldSaveDraft
                             />
                         </View>
