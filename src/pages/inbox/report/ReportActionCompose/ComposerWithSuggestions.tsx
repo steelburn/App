@@ -277,11 +277,25 @@ function ComposerWithSuggestions({
     });
 
     // Save the draft of the report action. This debounced so that we're not ceaselessly saving your edit.
-    const {saveDraft: debouncedSaveReportActionDraft, isSavePending: isDraftSavePending} = useDebouncedSaveDraft(saveReportActionDraft);
+    const {saveDraft: debouncedSaveReportActionDraft, isSavePending: isDraftSavePending} = useDebouncedSaveDraft(
+        useCallback(
+            (comment: string) => {
+                saveReportActionDraft(reportID, editingReportAction, comment);
+            },
+            [reportID, editingReportAction],
+        ),
+    );
 
     // Save the draft of the report comment. This debounced so that we're not ceaselessly saving your edit. Saving the draft
     // allows one to navigate somewhere else and come back to the comment and still have it in edit mode.
-    const {saveDraft: debouncedSaveComment, isSavePending: isCommentSavePending} = useDebouncedSaveDraft(saveReportDraftComment);
+    const {saveDraft: debouncedSaveComment, isSavePending: isCommentSavePending} = useDebouncedSaveDraft(
+        useCallback(
+            (comment: string) => {
+                saveReportDraftComment(reportID, comment);
+            },
+            [reportID],
+        ),
+    );
 
     useDraftMessageVideoAttributeCache({
         draftMessage: value,
@@ -516,7 +530,7 @@ function ComposerWithSuggestions({
             if (editingState === 'editing' && shouldUseNarrowLayout) {
                 setEditingMessage(newCommentConverted);
                 if (shouldDebounceSaveComment) {
-                    debouncedSaveReportActionDraft(reportID, editingReportAction, newCommentConverted);
+                    debouncedSaveReportActionDraft(newCommentConverted);
                     return;
                 }
 
@@ -525,7 +539,7 @@ function ComposerWithSuggestions({
             }
 
             if (shouldDebounceSaveComment) {
-                debouncedSaveComment(reportID, newCommentConverted);
+                debouncedSaveComment(newCommentConverted);
             } else {
                 saveReportDraftComment(reportID, newCommentConverted);
             }
@@ -536,7 +550,6 @@ function ComposerWithSuggestions({
         },
         [
             currentUserAccountID,
-            editingReportAction,
             editingReportActionID,
             editingState,
             findNewlyAddedChars,
