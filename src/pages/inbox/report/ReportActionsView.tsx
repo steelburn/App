@@ -147,7 +147,7 @@ function ReportActionsView({reportID, onLayout}: ReportActionsViewProps) {
     }, [isOffline, report?.reportID, reportID, reportActionIDFromRoute]);
 
     // Remount the list when the deep-linked message or unread anchor changes (scroll positioning), or when the report changes.
-    const listID = [reportID, reportActionIDFromRoute, oldestUnreadReportAction?.reportActionID].join(':');
+    const listID = [reportID, reportActionIDFromRoute, hasOnceLoadedReportActions ? undefined : oldestUnreadReportAction?.reportActionID].join(':');
 
     // When we are offline before opening an IOU/Expense report,
     // the total of the report and sometimes the expense aren't displayed because these actions aren't returned until `OpenReport` API is complete.
