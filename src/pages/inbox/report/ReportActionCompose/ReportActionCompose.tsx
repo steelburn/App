@@ -1,9 +1,11 @@
 import React from 'react';
 import {View} from 'react-native';
 import OfflineIndicator from '@components/OfflineIndicator';
+import OfflineWithFeedback from '@components/OfflineWithFeedback';
 import useOnyx from '@hooks/useOnyx';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
+import {getReportOfflinePendingActionAndErrors} from '@libs/ReportUtils';
 import ONYXKEYS from '@src/ONYXKEYS';
 import AgentZeroAwareTypingIndicator from './AgentZeroAwareTypingIndicator';
 import ComposerActionMenu from './ComposerActionMenu';
@@ -29,6 +31,7 @@ function ComposerInner({reportID}: ReportActionComposeProps) {
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportID}`);
     const [isComposerFullSize = false] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_IS_COMPOSER_FULL_SIZE}${reportID}`);
+    const {reportPendingAction: pendingAction} = getReportOfflinePendingActionAndErrors(report);
 
     if (!report) {
         return null;
@@ -38,19 +41,26 @@ function ComposerInner({reportID}: ReportActionComposeProps) {
         <View style={[isComposerFullSize && styles.chatItemFullComposeRow]}>
             <Composer.LocalTime reportID={reportID} />
             <View style={isComposerFullSize ? styles.flex1 : {}}>
-                <Composer.DropZone reportID={reportID}>
-                    <Composer.Box reportID={reportID}>
-                        <Composer.ActionMenu reportID={reportID} />
-                        <Composer.Input reportID={reportID} />
-                        <Composer.EmojiPicker reportID={reportID} />
-                        <Composer.SendButton />
-                    </Composer.Box>
-                </Composer.DropZone>
-                <Composer.Footer>
-                    {!shouldUseNarrowLayout && <OfflineIndicator containerStyles={[styles.chatItemComposeSecondaryRow]} />}
-                    <Composer.TypingIndicator reportID={reportID} />
-                    <Composer.ExceededLength />
-                </Composer.Footer>
+                <OfflineWithFeedback
+                    shouldDisableOpacity
+                    pendingAction={pendingAction}
+                    style={isComposerFullSize ? styles.chatItemFullComposeRow : {}}
+                    contentContainerStyle={isComposerFullSize ? styles.flex1 : {}}
+                >
+                    <Composer.DropZone reportID={reportID}>
+                        <Composer.Box reportID={reportID}>
+                            <Composer.ActionMenu reportID={reportID} />
+                            <Composer.Input reportID={reportID} />
+                            <Composer.EmojiPicker reportID={reportID} />
+                            <Composer.SendButton />
+                        </Composer.Box>
+                    </Composer.DropZone>
+                    <Composer.Footer>
+                        {!shouldUseNarrowLayout && <OfflineIndicator containerStyles={[styles.chatItemComposeSecondaryRow]} />}
+                        <Composer.TypingIndicator reportID={reportID} />
+                        <Composer.ExceededLength />
+                    </Composer.Footer>
+                </OfflineWithFeedback>
                 <Composer.ImportedState />
             </View>
         </View>
