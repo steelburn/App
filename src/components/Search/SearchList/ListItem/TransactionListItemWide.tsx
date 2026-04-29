@@ -120,7 +120,13 @@ function TransactionListItemWide<TItem extends ListItem>({
                     isDeletedTransaction && styles.cursorDefault,
                 ]}
                 onFocus={onFocus}
-                wrapperStyle={[styles.mh5, styles.flex1, animatedHighlightStyle, styles.userSelectNone, isLastItem && [styles.searchTableBottomRadius, styles.overflowHidden]]}
+                wrapperStyle={[
+                    styles.mh5,
+                    styles.flex1,
+                    animatedHighlightStyle,
+                    styles.userSelectNone,
+                    isLastItem && [styles.searchTableBottomRadius, styles.overflowHidden, styles.searchTableBottomRadius],
+                ]}
             >
                 {({hovered}) => (
                     <TransactionItemRow

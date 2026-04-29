@@ -60,7 +60,7 @@ function TransactionListItem<TItem extends ListItem>({
     const {currentSearchHash, currentSearchKey, currentSearchResults} = useSearchStateContext();
     const snapshotReport = (currentSearchResults?.data?.[`${ONYXKEYS.COLLECTION.REPORT}${transactionItem.reportID}`] ?? {}) as Report;
 
-    const [isActionLoading] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_METADATA}${transactionItem.reportID}`, {selector: isActionLoadingSelector});
+    const [isActionLoading] = useOnyx(`${ONYXKEYS.COLLECTION.RAM_ONLY_REPORT_LOADING_STATE}${transactionItem.reportID}`, {selector: isActionLoadingSelector});
 
     // Use active policy (user's current workspace) as fallback for self DM tracking expenses
     // This matches MoneyRequestView's approach via usePolicyForMovingExpenses()
@@ -95,6 +95,37 @@ function TransactionListItem<TItem extends ListItem>({
         hasParentReportAction: !!parentReportAction,
         hasTransactionThreadReport: !!transactionThreadReport,
     };
+
+    const pressableStyle = [
+        styles.transactionListItemStyle,
+        !isLargeScreenWidth && styles.p4,
+        !isLargeScreenWidth && styles.noBorderRadius,
+        item.isSelected && styles.activeComponentBG,
+        isLargeScreenWidth
+            ? {
+                  ...styles.flexRow,
+                  ...styles.justifyContentBetween,
+                  ...styles.alignItemsCenter,
+                  ...StyleUtils.getSearchTableRowPressableStyle(!!isLastItem, item.isSelected),
+              }
+            : {...styles.flexColumn, ...styles.alignItemsStretch},
+    ];
+
+    const animatedHighlightStyle = useAnimatedHighlightStyle({
+        borderRadius: 0,
+        shouldHighlight: item?.shouldAnimateInHighlight ?? false,
+        highlightColor: theme.messageHighlightBG,
+        backgroundColor: theme.highlightBG,
+        shouldApplyOtherStyles: !isLargeScreenWidth,
+    });
+
+    const amountColumnSize = transactionItem.isAmountColumnWide ? CONST.SEARCH.TABLE_COLUMN_SIZES.WIDE : CONST.SEARCH.TABLE_COLUMN_SIZES.NORMAL;
+    const taxAmountColumnSize = transactionItem.isTaxAmountColumnWide ? CONST.SEARCH.TABLE_COLUMN_SIZES.WIDE : CONST.SEARCH.TABLE_COLUMN_SIZES.NORMAL;
+    const dateColumnSize = transactionItem.shouldShowYear ? CONST.SEARCH.TABLE_COLUMN_SIZES.WIDE : CONST.SEARCH.TABLE_COLUMN_SIZES.NORMAL;
+    const submittedColumnSize = transactionItem.shouldShowYearSubmitted ? CONST.SEARCH.TABLE_COLUMN_SIZES.WIDE : CONST.SEARCH.TABLE_COLUMN_SIZES.NORMAL;
+    const approvedColumnSize = transactionItem.shouldShowYearApproved ? CONST.SEARCH.TABLE_COLUMN_SIZES.WIDE : CONST.SEARCH.TABLE_COLUMN_SIZES.NORMAL;
+    const postedColumnSize = transactionItem.shouldShowYearPosted ? CONST.SEARCH.TABLE_COLUMN_SIZES.WIDE : CONST.SEARCH.TABLE_COLUMN_SIZES.NORMAL;
+    const exportedColumnSize = transactionItem.shouldShowYearExported ? CONST.SEARCH.TABLE_COLUMN_SIZES.WIDE : CONST.SEARCH.TABLE_COLUMN_SIZES.NORMAL;
 
     // Prefer live Onyx policy data over snapshot to ensure fresh policy settings
     // like isAttendeeTrackingEnabled is not missing
