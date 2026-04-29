@@ -1,15 +1,23 @@
+import {useIsFocused} from '@react-navigation/native';
 import React, {useEffect, useRef} from 'react';
 import type {LayoutChangeEvent} from 'react-native';
 import {useReanimatedKeyboardAnimation} from 'react-native-keyboard-controller';
-import Reanimated, {useAnimatedReaction, useAnimatedStyle, useSharedValue, withTiming} from 'react-native-reanimated';
+import Reanimated, {Easing, useAnimatedReaction, useAnimatedStyle, useSharedValue, withTiming} from 'react-native-reanimated';
 import useWindowDimensions from '@hooks/useWindowDimensions';
-import isInLandscapeMode from '@libs/isInLandscapeMode';
+import isInLandscapeModeUtil from '@libs/isInLandscapeMode';
 import type {CollapsibleHeaderOnKeyboardProps} from './types';
 
-const COLLAPSE_DURATION = 200;
+const COLLAPSE_DURATION = 100;
 const RESTORE_DURATION = 300;
 // Assumed vertical space for the focused input field — used to reserve space above the keyboard.
 const VERTICAL_SPACE_FOR_FOCUSED_INPUT = 120;
+const KEYBOARD_OPENING_PROGRESS_THRESHOLDS = [0.5, 0.7, 0.8, 0.85, 0.9, 0.95, 0.99];
+
+function isKeyboardOpeningAtGivenProgress(keyboardProgress: number, prevKeyboardProgress: number, requiredProgress: number[]): boolean {
+    'worklet';
+
+    return requiredProgress.some((progress) => keyboardProgress > progress && prevKeyboardProgress <= progress);
+}
 
 /**
  * Wraps a header and collapses it upward when the keyboard is open and there is not enough
@@ -20,6 +28,7 @@ const VERTICAL_SPACE_FOR_FOCUSED_INPUT = 120;
  * Uses height animation (not translateY) so the freed space is reclaimed by the layout below.
  */
 function CollapsibleHeaderOnKeyboard({children, collapsibleHeaderOffset = 0}: CollapsibleHeaderOnKeyboardProps) {
+    const isFocused = useIsFocused();
     // JS ref guards against re-measurement when the Reanimated.View fires onLayout with height=0
     const naturalHeightRef = useRef(-1);
     // Worklet-accessible mirror of naturalHeightRef. -1 signals "not yet measured".
@@ -30,17 +39,24 @@ function CollapsibleHeaderOnKeyboard({children, collapsibleHeaderOffset = 0}: Co
     const {height: keyboardHeightSV, progress: keyboardProgressSV} = useReanimatedKeyboardAnimation();
 
     const {windowWidth, windowHeight} = useWindowDimensions();
+    const isInLandscapeMode = isInLandscapeModeUtil(windowWidth, windowHeight);
     // Keep window dimensions and offset accessible on the UI thread. Stable refs, excluded from deps.
     const windowHeightSV = useSharedValue(windowHeight);
-    const isLandscapeSV = useSharedValue(isInLandscapeMode(windowWidth, windowHeight));
     const collapsibleHeaderOffsetSV = useSharedValue(collapsibleHeaderOffset);
+    const isFocusedSV = useSharedValue(isFocused);
+    const isInLandscapeModeSV = useSharedValue(isInLandscapeMode);
     useEffect(() => {
         windowHeightSV.set(windowHeight);
-        isLandscapeSV.set(isInLandscapeMode(windowWidth, windowHeight));
-    }, [windowWidth, windowHeight, isLandscapeSV, windowHeightSV]);
+    }, [windowHeight, windowHeightSV]);
     useEffect(() => {
         collapsibleHeaderOffsetSV.set(collapsibleHeaderOffset);
     }, [collapsibleHeaderOffset, collapsibleHeaderOffsetSV]);
+    useEffect(() => {
+        isFocusedSV.set(isFocused);
+    }, [isFocused, isFocusedSV]);
+    useEffect(() => {
+        isInLandscapeModeSV.set(isInLandscapeMode);
+    }, [isInLandscapeMode, isInLandscapeModeSV]);
 
     const onLayout = (e: LayoutChangeEvent) => {
         const height = e.nativeEvent.layout.height;
@@ -57,41 +73,52 @@ function CollapsibleHeaderOnKeyboard({children, collapsibleHeaderOffset = 0}: Co
         }
     };
 
+    // Restores the header when the screen goes from landscape to portrait mode.
+    useEffect(() => {
+        const naturalHeightValue = naturalHeightRef.current;
+        if (!isInLandscapeMode && isFocused && naturalHeightValue !== -1) {
+            animatedHeight.set(withTiming(naturalHeightValue, {duration: RESTORE_DURATION}));
+        }
+    }, [isInLandscapeMode, isFocused, animatedHeight]);
+
     // Runs on the UI thread whenever keyboard state changes.
     // Fires at two key moments:
     // 1. When keyboard just starts opening: on iOS keyboardHeight is already at its final value
     //    (set by onKeyboardMoveStart), so the collapse begins before the list scrolls the
     //    input into place — preventing the input from ending up behind the collapsed header.
-    // 2. When keyboard is fully open: on Android keyboardHeight only reaches its final value at
-    //    this point (set by onKeyboardMoveEnd), so this is the earliest we can act correctly.
+    // 2. When keyboard is reaching a threshold while opening: on Android keyboardHeight
+    //    reaches its final value when fully open (set by onKeyboardMoveEnd), so we check at thresholds
+    //    to smoothly collapse the header.
     useAnimatedReaction(
-        () => ({keyboardHeight: keyboardHeightSV.get(), keyboardProgress: keyboardProgressSV.get(), isLandscape: isLandscapeSV.get(), windowHeightValue: windowHeightSV.get()}),
-        ({keyboardHeight, keyboardProgress, isLandscape, windowHeightValue}, previous) => {
+        () => ({
+            keyboardHeight: keyboardHeightSV.get(),
+            keyboardProgress: keyboardProgressSV.get(),
+            windowHeightValue: windowHeightSV.get(),
+        }),
+        ({keyboardHeight, keyboardProgress, windowHeightValue}, previous) => {
+            // If the screen is not focused, bail out
+            if (!isFocusedSV.get() || !isInLandscapeModeSV.get()) {
+                return;
+            }
+
+            // If the keyboard is closed, restore the header
+            const isKeyboardClosed = keyboardProgress === 0 && keyboardHeight === 0;
+            if (isKeyboardClosed) {
+                animatedHeight.set(withTiming(naturalHeight.get(), {duration: RESTORE_DURATION}));
+                return;
+            }
+
+            // If the keyboard is closing, bail out
             const prevKeyboardProgress = previous?.keyboardProgress ?? 0;
-            const naturalHeightValue = naturalHeight.get();
-
-            const isKeyboardFullyClosed = keyboardProgress < 0.01;
-            // Keyboard fully closed — restore header (guard avoids redundant withTiming calls
-            // during the first few frames of keyboard opening when keyboardProgress is still < 0.01).
-            if (isKeyboardFullyClosed) {
-                if (animatedHeight.get() < naturalHeightValue) {
-                    animatedHeight.set(withTiming(naturalHeightValue, {duration: RESTORE_DURATION}));
-                }
+            if (prevKeyboardProgress >= keyboardProgress) {
                 return;
             }
 
-            // Portrait mode — no collapse needed. Snap to full height in case orientation
-            // changed while the header was collapsed, then bail out.
-            if (!isLandscape) {
-                animatedHeight.set(withTiming(naturalHeightValue, {duration: RESTORE_DURATION}));
-                return;
-            }
+            // Only act when the keyboard is starting to open or reaching a threshold, not on every intermediate frame.
+            const isKeyboardStartingOpening = prevKeyboardProgress === 0 && keyboardProgress > 0;
+            const isKeyboardOpeningAndReachingThreshold = isKeyboardOpeningAtGivenProgress(keyboardProgress, prevKeyboardProgress, KEYBOARD_OPENING_PROGRESS_THRESHOLDS);
 
-            // Only act at the two transition points described above, not on every intermediate frame.
-            const isKeyboardStartingOpening = prevKeyboardProgress < 0.01;
-            const isKeyboardFullyOpened = keyboardProgress > 0.99 && prevKeyboardProgress <= 0.99;
-
-            if (!isKeyboardStartingOpening && !isKeyboardFullyOpened) {
+            if (!isKeyboardStartingOpening && !isKeyboardOpeningAndReachingThreshold) {
                 return;
             }
 
@@ -100,12 +127,13 @@ function CollapsibleHeaderOnKeyboard({children, collapsibleHeaderOffset = 0}: Co
             // the header gets what remains. Clamped to [0, naturalHeight].
             const keyboardTop = windowHeightValue + keyboardHeight;
             const targetHeight = Math.max(0, keyboardTop - VERTICAL_SPACE_FOR_FOCUSED_INPUT - collapsibleHeaderOffsetSV.get());
+            const naturalHeightValue = naturalHeight.get();
 
             if (targetHeight >= naturalHeightValue) {
                 // Enough space for the full header plus the input — restore or keep.
                 animatedHeight.set(withTiming(naturalHeightValue, {duration: RESTORE_DURATION}));
             } else {
-                animatedHeight.set(withTiming(targetHeight, {duration: COLLAPSE_DURATION}));
+                animatedHeight.set(withTiming(targetHeight, {duration: COLLAPSE_DURATION, easing: Easing.out(Easing.cubic)}));
             }
         },
     );

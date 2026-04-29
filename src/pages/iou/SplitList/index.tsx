@@ -1,4 +1,4 @@
-import React, {useCallback, useMemo, useRef} from 'react';
+import React, {useMemo, useRef} from 'react';
 import type {ValueOf} from 'type-fest';
 import SelectionList from '@components/SelectionList';
 import SplitListItem from '@components/SelectionList/ListItem/SplitListItem';
@@ -6,6 +6,7 @@ import type {ListItem, SplitListItemType} from '@components/SelectionList/ListIt
 import type {SelectionListHandle} from '@components/SelectionList/types';
 import useThemeStyles from '@hooks/useThemeStyles';
 import type CONST from '@src/CONST';
+import useHandleInputFocus from './useHandleInputFocus';
 
 type SplitListProps = {
     /** The split expense sections data. */
@@ -38,12 +39,7 @@ function SplitList({data, initiallyFocusedOptionKey, onSelectRow, listFooterCont
     const styles = useThemeStyles();
     const listRef = useRef<SelectionListHandle<SplitListItemType>>(null);
 
-    const handleInputFocus = useCallback((item: SplitListItemType) => {
-        if (!listRef.current) {
-            return;
-        }
-        listRef.current?.scrollToFocusedInput(item);
-    }, []);
+    const handleInputFocus = useHandleInputFocus({listRef});
 
     // Create a wrapper component that adds the onInputFocus handler
     const SplitListItemWithInputFocus = useMemo(
