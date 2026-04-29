@@ -66,7 +66,12 @@ describe('compoundParamsKey', () => {
 
         it('preserves array structure (does not collapse to object keys)', () => {
             const asArray = compoundParamsKey('r', {ids: [1, 2]});
-            const asObject = compoundParamsKey('r', {ids: {0: 1, 1: 2}});
+            const asObject = compoundParamsKey('r', {
+                ids: Object.fromEntries([
+                    [0, 1],
+                    [1, 2],
+                ]),
+            });
             expect(asArray).not.toBe(asObject);
         });
 
