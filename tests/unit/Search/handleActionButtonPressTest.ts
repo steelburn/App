@@ -343,7 +343,9 @@ describe('handleActionButtonPress', () => {
             snapshotPolicy: snapshotPolicy as Policy,
             lastPaymentMethod: mockLastPaymentMethod,
             personalPolicyID: undefined,
-            userBillingGraceEndPeriods: undefined,
+            userBillingGracePeriodEnds: undefined,
+            ownerBillingGracePeriodEnd: undefined,
+            amountOwed: undefined,
             onHoldMenuOpen,
         });
 
