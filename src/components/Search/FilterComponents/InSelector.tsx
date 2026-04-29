@@ -60,7 +60,6 @@ function InSelector({value = [], onChange}: InSelectorProps) {
     const cleanSearchTerm = searchTerm.trim().toLowerCase();
     const [draftComments] = useOnyx(ONYXKEYS.COLLECTION.REPORT_DRAFT_COMMENT);
     const privateIsArchivedMap = usePrivateIsArchivedMap();
-    const [nvpDismissedProductTraining] = useOnyx(ONYXKEYS.NVP_DISMISSED_PRODUCT_TRAINING);
     const [policyTags] = useOnyx(ONYXKEYS.COLLECTION.POLICY_TAGS, {selector: passthroughPolicyTagListSelector});
     const [conciergeReportID] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID);
 
@@ -81,7 +80,6 @@ function InSelector({value = [], onChange}: InSelectorProps) {
         : getSearchOptions({
               options,
               draftComments,
-              nvpDismissedProductTraining,
               betas: undefined,
               isUsedInChatFinder: false,
               countryCode,
