@@ -120,6 +120,7 @@ function TableListItem<TItem extends ListItem>({
                 onFocus={onFocus}
                 shouldSyncFocus={shouldSyncFocus}
                 hoverStyle={item.isSelected && styles.activeComponentBG}
+                shouldHighlightSelectedItem
                 shouldShowRightCaret={shouldShowRightCaret}
                 selectionButtonPosition={selectionButtonPosition}
             >
@@ -157,6 +158,7 @@ function TableListItem<TItem extends ListItem>({
             onFocus={onFocus}
             shouldSyncFocus={shouldSyncFocus}
             hoverStyle={item.isSelected && styles.activeComponentBG}
+            shouldHighlightSelectedItem
             shouldShowRightCaret={shouldShowRightCaret}
         >
             {rowContent}

@@ -233,17 +233,7 @@ function BaseListItem<TItem extends ListItem>({
                 wrapperStyle={pressableWrapperStyle}
             >
                 <View
-                    style={[
-                        isFocusVisible &&
-                            StyleUtils.getItemBackgroundColorStyle(
-                                shouldHighlightSelectedItem && !!item.isSelected,
-                                !!isFocusVisible,
-                                !!item.isDisabled,
-                                theme.activeComponentBG,
-                                theme.hoverComponentBG,
-                            ),
-                        wrapperStyle,
-                    ]}
+                    style={wrapperStyle}
                     fsClass={forwardedFSClass}
                 >
                     {typeof children === 'function' ? children(hovered) : children}
