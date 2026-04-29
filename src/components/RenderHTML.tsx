@@ -42,8 +42,8 @@ function RenderHTML({html: htmlParam, onLinkPress, isSelectable}: RenderHTMLProp
                 .replaceAll(/(<emoji[^>]*>)(?:<emoji[^>]*>)+/g, '$1')
                 .replaceAll(/(<\/emoji[^>]*>)(?:<\/emoji[^>]*>)+/g, '$1')
                 // Strip orphaned <br/> tags inside <ul> that would render as extra empty bullets
-                .replace(/<br\s*\/?>\s*(<\/ul>)/gi, '$1')
-                .replace(/(<\/li>)\s*<br\s*\/?>\s*(?=<(?:li|\/ul)>)/gi, '$1')
+                .replaceAll(/<br\s*\/?>\s*(<\/ul>)/gi, '$1')
+                .replaceAll(/(<\/li>)\s*<br\s*\/?>\s*(?=<(?:li|\/ul)>)/gi, '$1')
         );
     }, [htmlParam]);
 
