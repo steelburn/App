@@ -90,21 +90,13 @@ type TransactionItemRowProps = {
 };
 
 /**
- * Shared data computed by the TransactionItemRow dispatcher and passed to the
- * Wide / Narrow variants so each variant doesn't need to duplicate the derivation.
+ * Data computed by the dispatcher and consumed by the Narrow variant.
  */
-type TransactionItemRowComputedData = {
+type TransactionItemRowNarrowComputedData = {
     bgActiveStyles: StyleProp<ViewStyle>;
     merchant: string;
     merchantOrDescription: string;
-    description: string;
-    missingFieldError: string | undefined;
-    exchangeRateMessage: string | undefined;
-    cardName: string | undefined;
-    transactionAttendees: Attendee[];
-    isUnreported: boolean;
-    shouldShowAttendees: boolean;
-    totalPerAttendee: number | undefined;
+    missingFieldError: string;
     categoryForDisplay: string;
     createdAt: string;
     isDeletedTransaction: boolean;
@@ -112,4 +104,17 @@ type TransactionItemRowComputedData = {
     shouldRenderChatBubbleCell: boolean;
 };
 
-export type {TransactionWithOptionalSearchFields, TransactionItemRowProps, TransactionItemRowComputedData};
+/**
+ * Data computed by the dispatcher and consumed by the Wide variant.
+ * Extends the shared base with fields only the wide layout needs.
+ */
+type TransactionItemRowWideComputedData = Omit<TransactionItemRowNarrowComputedData, 'merchantOrDescription' | 'shouldRenderChatBubbleCell' | 'categoryForDisplay'> & {
+    description: string;
+    exchangeRateMessage: string | undefined;
+    cardName: string | undefined;
+    transactionAttendees: Attendee[];
+    shouldShowAttendees: boolean;
+    totalPerAttendee: number | undefined;
+};
+
+export type {TransactionWithOptionalSearchFields, TransactionItemRowProps, TransactionItemRowNarrowComputedData, TransactionItemRowWideComputedData};

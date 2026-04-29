@@ -35,9 +35,9 @@ import TaxCell from './DataCells/TaxCell';
 import TotalCell from './DataCells/TotalCell';
 import TypeCell from './DataCells/TypeCell';
 import DeferredTransactionItemRowRBR from './DeferredTransactionItemRowRBR';
-import type {TransactionItemRowComputedData, TransactionItemRowProps} from './types';
+import type {TransactionItemRowProps, TransactionItemRowWideComputedData} from './types';
 
-type TransactionItemRowWideProps = Omit<TransactionItemRowProps, 'shouldUseNarrowLayout'> & TransactionItemRowComputedData;
+type TransactionItemRowWideProps = Omit<TransactionItemRowProps, 'shouldUseNarrowLayout' | 'policyForMovingExpenses' | 'isLargeScreenWidth'> & TransactionItemRowWideComputedData;
 
 function TransactionItemRowWide({
     transactionItem,
@@ -69,13 +69,9 @@ function TransactionItemRowWide({
     isHover = false,
     reportActions,
     checkboxSentryLabel,
-    nonPersonalAndWorkspaceCards = {},
-    isLargeScreenWidth: isLargeScreenWidthProp,
-    policyForMovingExpenses,
     isActionColumnWide: isActionColumnWideProp,
     bgActiveStyles,
     merchant,
-    merchantOrDescription: _merchantOrDescription,
     description,
     missingFieldError,
     exchangeRateMessage,
@@ -85,7 +81,6 @@ function TransactionItemRowWide({
     totalPerAttendee,
     isDeletedTransaction,
     transactionThreadReportID,
-    shouldRenderChatBubbleCell: _shouldRenderChatBubbleCell,
     createdAt,
 }: TransactionItemRowWideProps) {
     const styles = useThemeStyles();
@@ -93,7 +88,6 @@ function TransactionItemRowWide({
     const StyleUtils = useStyleUtils();
     const theme = useTheme();
     const expensicons = useMemoizedLazyExpensifyIcons(['ArrowRight']);
-    const isLargeScreenWidth = isLargeScreenWidthProp ?? true;
 
     const isDateColumnWide = dateColumnSize === CONST.SEARCH.TABLE_COLUMN_SIZES.WIDE;
     const isSubmittedColumnWide = submittedColumnSize === CONST.SEARCH.TABLE_COLUMN_SIZES.WIDE;
@@ -304,7 +298,7 @@ function TransactionItemRowWide({
                                 accountID={transactionItem.to.accountID}
                                 avatar={transactionItem.to.avatar}
                                 displayName={transactionItem.formattedTo ?? transactionItem.to.displayName ?? ''}
-                                isLargeScreenWidth={isLargeScreenWidth}
+                                isLargeScreenWidth
                             />
                         )}
                     </View>
@@ -320,7 +314,7 @@ function TransactionItemRowWide({
                                 accountID={transactionItem.from.accountID}
                                 avatar={transactionItem.from.avatar}
                                 displayName={transactionItem.formattedFrom ?? transactionItem.from.displayName ?? ''}
-                                isLargeScreenWidth={isLargeScreenWidth}
+                                isLargeScreenWidth
                             />
                         )}
                     </View>
@@ -471,7 +465,7 @@ function TransactionItemRowWide({
                     >
                         <TextCell
                             text={getReportName(transactionItem.report) || (transactionItem.report?.reportName ?? '')}
-                            isLargeScreenWidth={isLargeScreenWidth}
+                            isLargeScreenWidth
                         />
                     </View>
                 );
@@ -534,27 +528,26 @@ function TransactionItemRowWide({
                             />
                         </View>
                     )}
-                    {!!isLargeScreenWidth &&
-                        (onArrowRightPress ? (
-                            <PressableWithFeedback
-                                disabled={!!isDisabled}
-                                onPress={() => onArrowRightPress?.()}
-                                style={[styles.pv2, styles.justifyContentCenter, styles.alignItemsEnd]}
-                                accessibilityRole={CONST.ROLE.BUTTON}
-                                accessibilityLabel={CONST.ROLE.BUTTON}
-                                sentryLabel={CONST.SENTRY_LABEL.TRANSACTION_ITEM_ROW.ARROW_RIGHT}
-                            >
-                                <Icon
-                                    src={expensicons.ArrowRight}
-                                    fill={theme.icon}
-                                    additionalStyles={!isHover && styles.opacitySemiTransparent}
-                                    width={variables.iconSizeNormal}
-                                    height={variables.iconSizeNormal}
-                                />
-                            </PressableWithFeedback>
-                        ) : (
-                            <View style={[styles.p3Half, styles.pl0half, styles.pr0half, {width: variables.iconSizeNormal}]} />
-                        ))}
+                    {onArrowRightPress ? (
+                        <PressableWithFeedback
+                            disabled={!!isDisabled}
+                            onPress={() => onArrowRightPress?.()}
+                            style={[styles.pv2, styles.justifyContentCenter, styles.alignItemsEnd]}
+                            accessibilityRole={CONST.ROLE.BUTTON}
+                            accessibilityLabel={CONST.ROLE.BUTTON}
+                            sentryLabel={CONST.SENTRY_LABEL.TRANSACTION_ITEM_ROW.ARROW_RIGHT}
+                        >
+                            <Icon
+                                src={expensicons.ArrowRight}
+                                fill={theme.icon}
+                                additionalStyles={!isHover && styles.opacitySemiTransparent}
+                                width={variables.iconSizeNormal}
+                                height={variables.iconSizeNormal}
+                            />
+                        </PressableWithFeedback>
+                    ) : (
+                        <View style={[styles.p3Half, styles.pl0half, styles.pr0half, {width: variables.iconSizeNormal}]} />
+                    )}
                 </View>
                 {shouldShowErrors && (
                     <DeferredTransactionItemRowRBR

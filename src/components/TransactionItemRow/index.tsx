@@ -1,8 +1,7 @@
-import React, {useMemo} from 'react';
+import React from 'react';
 import type {StyleProp, ViewStyle} from 'react-native';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useLocalize from '@hooks/useLocalize';
-import useStyleUtils from '@hooks/useStyleUtils';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {getCompanyCardDescription} from '@libs/CardUtils';
 import {getDecodedCategoryName, isCategoryMissing} from '@libs/CategoryUtils';
@@ -31,7 +30,7 @@ import type {TransactionItemRowProps, TransactionWithOptionalSearchFields} from 
 
 const EMPTY_ACTIVE_STYLE: StyleProp<ViewStyle> = [];
 
-function getMerchantName(transactionItem: TransactionWithOptionalSearchFields, translate: (key: TranslationPaths) => string) {
+function getMerchantName(transactionItem: TransactionWithOptionalSearchFields, translate: (key: TranslationPaths) => string): string {
     const shouldShowMerchant = transactionItem.shouldShowMerchant ?? true;
 
     let merchant = transactionItem?.formattedMerchant ?? getMerchant(transactionItem);
@@ -41,7 +40,7 @@ function getMerchantName(transactionItem: TransactionWithOptionalSearchFields, t
     }
 
     const merchantName = StringUtils.getFirstLine(merchant);
-    return merchantName !== CONST.TRANSACTION.PARTIAL_TRANSACTION_MERCHANT && merchantName !== CONST.TRANSACTION.DEFAULT_MERCHANT ? merchantName : '';
+    return merchantName !== CONST.TRANSACTION.PARTIAL_TRANSACTION_MERCHANT && merchantName !== CONST.TRANSACTION.DEFAULT_MERCHANT ? (merchantName ?? '') : '';
 }
 
 function TransactionItemRow({
@@ -79,33 +78,20 @@ function TransactionItemRow({
     reportActions,
     checkboxSentryLabel,
     nonPersonalAndWorkspaceCards = {},
-    isLargeScreenWidth: isLargeScreenWidthProp,
     policyForMovingExpenses,
     isActionColumnWide: isActionColumnWideProp,
 }: TransactionItemRowProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const StyleUtils = useStyleUtils();
-    const isLargeScreenWidth = isLargeScreenWidthProp ?? !shouldUseNarrowLayout;
     const createdAt = getTransactionCreated(transactionItem);
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const transactionThreadReportID = reportActions ? getIOUActionForTransactionID(reportActions, transactionItem.transactionID)?.childReportID : undefined;
     const isDeletedTransaction = isDeletedTransactionUtil(transactionItem);
 
-    const bgActiveStyles = useMemo(() => {
-        if (!isSelected || !shouldHighlightItemWhenSelected) {
-            return EMPTY_ACTIVE_STYLE;
-        }
-        return styles.activeComponentBG;
-    }, [isSelected, styles.activeComponentBG, shouldHighlightItemWhenSelected]);
+    const bgActiveStyles = isSelected && shouldHighlightItemWhenSelected ? styles.activeComponentBG : EMPTY_ACTIVE_STYLE;
+    const merchant = getMerchantName(transactionItem, translate);
 
-    const merchant = useMemo(() => getMerchantName(transactionItem, translate) ?? '', [transactionItem, translate]);
-    const description = getDescription(transactionItem);
-
-    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-    const merchantOrDescription = merchant || description;
-
-    const missingFieldError = useMemo(() => {
+    const getMissingFieldError = () => {
         if (isSettled(report)) {
             return '';
         }
@@ -114,62 +100,21 @@ function TransactionItemRow({
         if (hasFieldErrors) {
             const amountMissing = isAmountMissing(transactionItem);
             const merchantMissing = isMerchantMissing(transactionItem);
-            let error = '';
 
             if (amountMissing && merchantMissing) {
-                error = translate('violations.reviewRequired');
-            } else if (amountMissing) {
-                error = translate('iou.missingAmount');
-            } else if (merchantMissing && !isSettled(report)) {
-                error = translate('iou.missingMerchant');
+                return translate('violations.reviewRequired');
             }
-
-            return error;
-        }
-    }, [transactionItem, translate, report]);
-
-    const exchangeRateMessage = getExchangeRate(transactionItem, report?.currency);
-    const cardName = getCompanyCardDescription(translate, transactionItem?.cardName, transactionItem?.cardID, nonPersonalAndWorkspaceCards);
-    const transactionAttendees = useMemo(() => getAttendees(transactionItem, currentUserPersonalDetails), [transactionItem, currentUserPersonalDetails]);
-
-    const isUnreported = transactionItem.reportID === CONST.REPORT.UNREPORTED_REPORT_ID;
-    const shouldShowAttendees = shouldShowAttendeesUtils(CONST.IOU.TYPE.SUBMIT, isUnreported ? policyForMovingExpenses : policy) && transactionAttendees.length > 0;
-
-    const totalPerAttendee = useMemo(() => {
-        const attendeesCount = transactionAttendees.length ?? 0;
-        const totalAmount = getAmount(transactionItem, isExpenseReport(report));
-
-        if (!attendeesCount || totalAmount === undefined) {
-            return undefined;
+            if (amountMissing) {
+                return translate('iou.missingAmount');
+            }
+            if (merchantMissing) {
+                return translate('iou.missingMerchant');
+            }
         }
 
-        return totalAmount / attendeesCount;
-    }, [report, transactionAttendees.length, transactionItem]);
-
-    const shouldRenderChatBubbleCell = useMemo(() => {
-        return columns?.includes(CONST.SEARCH.TABLE_COLUMNS.COMMENTS) ?? false;
-    }, [columns]);
-
-    const categoryForDisplay = isCategoryMissing(transactionItem?.category) ? '' : getDecodedCategoryName(transactionItem?.category ?? '');
-
-    const computedData = {
-        bgActiveStyles,
-        merchant,
-        merchantOrDescription,
-        description,
-        missingFieldError,
-        exchangeRateMessage,
-        cardName,
-        transactionAttendees,
-        isUnreported,
-        shouldShowAttendees,
-        totalPerAttendee,
-        categoryForDisplay,
-        createdAt,
-        isDeletedTransaction,
-        transactionThreadReportID,
-        shouldRenderChatBubbleCell,
+        return '';
     };
+    const missingFieldError = getMissingFieldError();
 
     const sharedProps = {
         transactionItem,
@@ -205,24 +150,59 @@ function TransactionItemRow({
         reportActions,
         checkboxSentryLabel,
         nonPersonalAndWorkspaceCards,
-        isLargeScreenWidth,
-        policyForMovingExpenses,
         isActionColumnWide: isActionColumnWideProp,
     };
 
     if (shouldUseNarrowLayout) {
+        const description = getDescription(transactionItem);
+        // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+        const merchantOrDescription = merchant || description;
+        const categoryForDisplay = isCategoryMissing(transactionItem?.category) ? '' : getDecodedCategoryName(transactionItem?.category ?? '');
+        const shouldRenderChatBubbleCell = columns?.includes(CONST.SEARCH.TABLE_COLUMNS.COMMENTS) ?? false;
+
         return (
             <TransactionItemRowNarrow
+                // eslint-disable-next-line react/jsx-props-no-spreading
                 {...sharedProps}
-                {...computedData}
+                bgActiveStyles={bgActiveStyles}
+                merchant={merchant}
+                merchantOrDescription={merchantOrDescription}
+                missingFieldError={missingFieldError}
+                categoryForDisplay={categoryForDisplay}
+                createdAt={createdAt}
+                isDeletedTransaction={isDeletedTransaction}
+                transactionThreadReportID={transactionThreadReportID}
+                shouldRenderChatBubbleCell={shouldRenderChatBubbleCell}
             />
         );
     }
 
+    const description = getDescription(transactionItem);
+    const exchangeRateMessage = getExchangeRate(transactionItem, report?.currency);
+    const cardName = getCompanyCardDescription(translate, transactionItem?.cardName, transactionItem?.cardID, nonPersonalAndWorkspaceCards);
+    const transactionAttendees = getAttendees(transactionItem, currentUserPersonalDetails);
+    const isUnreported = transactionItem.reportID === CONST.REPORT.UNREPORTED_REPORT_ID;
+    const shouldShowAttendees = shouldShowAttendeesUtils(CONST.IOU.TYPE.SUBMIT, isUnreported ? policyForMovingExpenses : policy) && transactionAttendees.length > 0;
+
+    const attendeesCount = transactionAttendees.length ?? 0;
+    const totalAmount = getAmount(transactionItem, isExpenseReport(report));
+
     return (
         <TransactionItemRowWide
+            // eslint-disable-next-line react/jsx-props-no-spreading
             {...sharedProps}
-            {...computedData}
+            bgActiveStyles={bgActiveStyles}
+            merchant={merchant}
+            description={description}
+            missingFieldError={missingFieldError}
+            exchangeRateMessage={exchangeRateMessage}
+            cardName={cardName}
+            transactionAttendees={transactionAttendees}
+            shouldShowAttendees={shouldShowAttendees}
+            totalPerAttendee={!attendeesCount || totalAmount === undefined ? undefined : totalAmount / attendeesCount}
+            createdAt={createdAt}
+            isDeletedTransaction={isDeletedTransaction}
+            transactionThreadReportID={transactionThreadReportID}
         />
     );
 }

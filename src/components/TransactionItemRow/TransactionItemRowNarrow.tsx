@@ -15,9 +15,9 @@ import ReceiptCell from './DataCells/ReceiptCell';
 import TotalCell from './DataCells/TotalCell';
 import TypeCell from './DataCells/TypeCell';
 import DeferredTransactionItemRowRBR from './DeferredTransactionItemRowRBR';
-import type {TransactionItemRowComputedData, TransactionItemRowProps} from './types';
+import type {TransactionItemRowNarrowComputedData, TransactionItemRowProps} from './types';
 
-type TransactionItemRowNarrowProps = Omit<TransactionItemRowProps, 'shouldUseNarrowLayout'> & TransactionItemRowComputedData;
+type TransactionItemRowNarrowProps = Omit<TransactionItemRowProps, 'shouldUseNarrowLayout' | 'policyForMovingExpenses'> & TransactionItemRowNarrowComputedData;
 
 function TransactionItemRowNarrow({
     transactionItem,
