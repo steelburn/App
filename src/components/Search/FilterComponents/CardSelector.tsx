@@ -56,7 +56,7 @@ function CardSelector({value, onChange}: CardSelectorProps) {
     useEffect(() => {
         const generatedCards = generateSelectedCards(userCardList, workspaceCardFeeds, searchAdvancedFiltersForm?.feed, value);
         setSelectedCards(generatedCards);
-    }, [searchAdvancedFiltersForm?.feed, workspaceCardFeeds, userCardList]);
+    }, [searchAdvancedFiltersForm?.feed, value, workspaceCardFeeds, userCardList]);
 
     const individualCardsSectionData = buildCardsData(
         workspaceCardFeeds ?? {},

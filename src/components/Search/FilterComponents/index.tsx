@@ -196,7 +196,7 @@ function FilterComponents({filterKey, value, policyIDQuery, onChange}: FilterCom
                 <MultiSelectFilterComponents
                     key={filterKey}
                     filterKey={filterKey}
-                    value={value as MultiSelectFilterComponentsProps['value'] | undefined}
+                    value={value}
                     onChange={onChange}
                 />
             );

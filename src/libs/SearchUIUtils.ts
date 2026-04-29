@@ -4940,7 +4940,7 @@ const isDateFilterKey = (key: SearchFilter['key']): key is Exclude<SearchDateFil
 type SearchFilter = {
     key: keyof typeof FILTER_LABEL_MAP;
     label: string;
-    value: string | string[] | null;
+    value: string | string[];
 };
 
 function mapFiltersFormToLabelValueList<T extends Record<string, unknown>>(
