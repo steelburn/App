@@ -35,8 +35,8 @@ type MoneyRequestParticipantsSelectorProps = {
     /** Whether this is a corporate card transaction */
     isCorporateCardTransaction?: boolean;
 
-    /** The report ID of the currently selected participant (used for showing selection state) */
-    selectedReportID?: string | number;
+    /** Report ID of a pre-selected participant whose selection state can't be derived from the participants array (e.g. self DM with accountID 0) */
+    initiallySelectedReportID?: string | number;
 
     /** Reference to the outer element */
     ref?: Ref<InputFocusRef>;
@@ -57,7 +57,7 @@ function MoneyRequestParticipantsSelector({
     isTimeRequest = false,
     isWorkspacesOnly = false,
     isCorporateCardTransaction = false,
-    selectedReportID,
+    initiallySelectedReportID,
     ref,
 }: MoneyRequestParticipantsSelectorProps) {
     const platform = getPlatform();
@@ -89,7 +89,7 @@ function MoneyRequestParticipantsSelector({
             setTextInputAutoFocus={setTextInputAutoFocus}
             onParticipantsAdded={onParticipantsAdded}
             onFinish={onFinish}
-            selectedReportID={selectedReportID}
+            initiallySelectedReportID={initiallySelectedReportID}
         />
     );
 }

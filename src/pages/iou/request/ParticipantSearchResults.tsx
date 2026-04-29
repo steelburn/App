@@ -95,8 +95,8 @@ type ParticipantSearchResultsProps = {
     /** Callback to advance the parent flow */
     onFinish: (value?: string, participants?: Participant[]) => void;
 
-    /** The report ID of the currently selected participant (used for showing selection state) */
-    selectedReportID?: string | number;
+    /** Report ID of a pre-selected participant whose selection state can't be derived from the participants array (e.g. self DM with accountID 0) */
+    initiallySelectedReportID?: string | number;
 };
 
 function ParticipantSearchResults({
@@ -113,7 +113,7 @@ function ParticipantSearchResults({
     setTextInputAutoFocus,
     onParticipantsAdded,
     onFinish,
-    selectedReportID,
+    initiallySelectedReportID,
 }: ParticipantSearchResultsProps) {
     const isIOUSplit = iouType === CONST.IOU.TYPE.SPLIT;
     const isCategorizeOrShareAction = action === CONST.IOU.ACTION.CATEGORIZE || action === CONST.IOU.ACTION.SHARE;
@@ -349,11 +349,11 @@ function ParticipantSearchResults({
             });
         }
 
-        if (selectedReportID !== undefined) {
+        if (initiallySelectedReportID !== undefined) {
             for (const section of sections) {
                 section.data = section.data.map((item) => ({
                     ...item,
-                    isSelected: item.reportID === selectedReportID,
+                    isSelected: item.reportID === initiallySelectedReportID,
                     canShowSeveralIndicators: true,
                 }));
             }
