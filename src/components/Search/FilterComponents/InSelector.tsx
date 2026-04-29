@@ -142,13 +142,13 @@ function InSelector({value = [], onChange}: InSelectorProps) {
         const foundOptionIndex = value.findIndex((reportID) => {
             return reportID && reportID !== '' && selectedOption.reportID === reportID;
         });
-        let newvalue;
+        let newValue;
         if (foundOptionIndex < 0) {
-            newvalue = [...value, optionReportID];
+            newValue = [...value, optionReportID];
         } else {
-            newvalue = [...value.slice(0, foundOptionIndex), ...value.slice(foundOptionIndex + 1)];
+            newValue = [...value.slice(0, foundOptionIndex), ...value.slice(foundOptionIndex + 1)];
         }
-        onChange(newvalue);
+        onChange(newValue);
     };
 
     const isLoadingNewOptions = !!isSearchingForReports;
