@@ -2092,8 +2092,8 @@ const translations: TranslationDeepObject<typeof en> = {
         account: 'Account',
         general: 'Algemeen',
         helpPage: {
-            title: 'Hulp en ondersteuning',
-            description: 'We zijn er om je 24/7 te helpen',
+            title: 'Vragen?',
+            description: 'We zijn er 24/7 om je te helpen.',
             helpSite: 'Helppagina',
             conciergeChat: 'Concierge',
             conciergeChatDescription: 'Je persoonlijke AI-agent',
@@ -9112,6 +9112,11 @@ Hier is een *proefbon* om je te laten zien hoe het werkt:`,
         groups: {
             title: 'Groepen',
             memberCount: () => ({one: '1 lid', other: (count: number) => `${count} leden`}),
+            defaultGroup: 'Standaardgroep voor nieuwe leden',
+            defaultGroupPrompt: (currentName: string, newName: string) =>
+                `Weet je zeker dat je ${newName} de standaardgroep wilt maken? Nieuwe leden worden uitgenodigd voor deze groep in plaats van de vorige standaardgroep (${currentName}). `,
+            makeDefault: 'Standaard maken',
+            neverMind: 'Laat maar',
         },
     },
     proactiveAppReview: {

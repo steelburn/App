@@ -2088,8 +2088,8 @@ const translations: TranslationDeepObject<typeof en> = {
         account: 'Conta',
         general: 'Geral',
         helpPage: {
-            title: 'Ajuda e suporte',
-            description: 'Estamos aqui para ajudar você 24 horas por dia, 7 dias por semana',
+            title: 'Tem dúvidas?',
+            description: 'Estamos aqui para ajudar, 24 horas por dia.',
             helpSite: 'Site de ajuda',
             conciergeChat: 'Concierge',
             conciergeChatDescription: 'Seu agente de IA pessoal',
@@ -9102,6 +9102,11 @@ Aqui está um *comprovante de teste* para mostrar como funciona:`,
         groups: {
             title: 'Grupos',
             memberCount: () => ({one: '1 membro', other: (count: number) => `${count} membros`}),
+            defaultGroup: 'Grupo padrão para novos membros',
+            defaultGroupPrompt: (currentName: string, newName: string) =>
+                `Tem certeza de que deseja tornar ${newName} o grupo padrão? Novos membros serão convidados para este grupo em vez do grupo padrão anterior (${currentName}). `,
+            makeDefault: 'Tornar padrão',
+            neverMind: 'Deixa pra lá',
         },
     },
     proactiveAppReview: {
