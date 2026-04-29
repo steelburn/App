@@ -379,8 +379,8 @@
 "../../src/pages/inbox/report/PureReportActionItem.tsx"	"react-hooks/refs"	2
 "../../src/pages/inbox/report/PureReportActionItem.tsx"	"react-hooks/set-state-in-effect"	1
 "../../src/pages/inbox/report/ReactionList/HeaderReactionList.tsx"	"no-restricted-syntax"	1
-"../../src/pages/inbox/report/ReportActionCompose/ComposerWithSuggestions/ComposerWithSuggestions.tsx"	"react-hooks/preserve-manual-memoization"	2
-"../../src/pages/inbox/report/ReportActionCompose/ComposerWithSuggestions/ComposerWithSuggestions.tsx"	"react-hooks/refs"	8
+"../../src/pages/inbox/report/ReportActionCompose/ComposerWithSuggestions.tsx"	"react-hooks/preserve-manual-memoization"	2
+"../../src/pages/inbox/report/ReportActionCompose/ComposerWithSuggestions.tsx"	"react-hooks/refs"	8
 "../../src/pages/inbox/report/ReportActionCompose/SuggestionEmoji.tsx"	"react-hooks/refs"	1
 "../../src/pages/inbox/report/ReportActionCompose/SuggestionMention.tsx"	"react-hooks/refs"	3
 "../../src/pages/inbox/report/ReportActionItemMessageEdit.tsx"	"no-restricted-syntax"	1
