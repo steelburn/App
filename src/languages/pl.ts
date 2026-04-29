@@ -2091,8 +2091,8 @@ const translations: TranslationDeepObject<typeof en> = {
         account: 'Konto',
         general: 'Ogólne',
         helpPage: {
-            title: 'Pomoc i wsparcie',
-            description: 'Jesteśmy tu, żeby pomagać ci 24/7',
+            title: 'Masz pytania?',
+            description: 'Jesteśmy tutaj, aby pomagać przez całą dobę.',
             helpSite: 'Centrum pomocy',
             conciergeChat: 'Concierge',
             conciergeChatDescription: 'Twój osobisty agent AI',
@@ -9094,6 +9094,11 @@ Oto *paragon testowy*, żeby pokazać Ci, jak to działa:`,
         groups: {
             title: 'Grupy',
             memberCount: () => ({one: '1 członek', other: (count: number) => `${count} członków`}),
+            defaultGroup: 'Domyślna grupa dla nowych członków',
+            defaultGroupPrompt: (currentName: string, newName: string) =>
+                `Czy na pewno chcesz ustawić ${newName} jako grupę domyślną? Nowi członkowie będą zapraszani do tej grupy zamiast do poprzedniej grupy domyślnej (${currentName}). `,
+            makeDefault: 'Ustaw jako domyślną',
+            neverMind: 'Nieważne',
         },
     },
     proactiveAppReview: {

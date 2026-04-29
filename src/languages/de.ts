@@ -2099,8 +2099,8 @@ const translations: TranslationDeepObject<typeof en> = {
         account: 'Konto',
         general: 'Allgemein',
         helpPage: {
-            title: 'Hilfe und Support',
-            description: 'Wir sind rund um die Uhr für Sie da',
+            title: 'Fragen?',
+            description: 'Wir sind rund um die Uhr für Sie da.',
             helpSite: 'Hilfeseite',
             conciergeChat: 'Concierge',
             conciergeChatDescription: 'Ihr persönlicher KI-Agent',
@@ -9150,6 +9150,11 @@ Hier ist ein *Testbeleg*, um dir zu zeigen, wie es funktioniert:`,
         groups: {
             title: 'Gruppen',
             memberCount: () => ({one: '1 Mitglied', other: (count: number) => `${count} Mitglieder`}),
+            defaultGroup: 'Standardgruppe für neue Mitglieder',
+            defaultGroupPrompt: (currentName: string, newName: string) =>
+                `Möchtest du ${newName} wirklich zur Standardgruppe machen? Neue Mitglieder werden zu dieser Gruppe anstelle der bisherigen Standardgruppe (${currentName}) eingeladen. `,
+            makeDefault: 'Als Standard festlegen',
+            neverMind: 'Vergiss es',
         },
     },
     proactiveAppReview: {

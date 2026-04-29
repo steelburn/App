@@ -50,12 +50,6 @@ type ReportActionsListItemRendererProps = {
     /** Animate highlight action in few seconds */
     shouldHighlight?: boolean;
 
-    /** User wallet tierName */
-    userWalletTierName: string | undefined;
-
-    /** Whether the user is validated */
-    isUserValidated: boolean | undefined;
-
     /** Personal details list */
     personalDetails: OnyxEntry<PersonalDetailsList>;
 
@@ -89,8 +83,6 @@ function ReportActionsListItemRenderer({
     shouldUseThreadDividerLine = false,
     shouldHighlight = false,
     parentReportActionForTransactionThread,
-    userWalletTierName,
-    isUserValidated,
     userBillingFundID,
     personalDetails,
     isTryNewDotNVPDismissed = false,
@@ -186,8 +178,6 @@ function ReportActionsListItemRenderer({
                 index={index}
                 isFirstVisibleReportAction={isFirstVisibleReportAction}
                 shouldUseThreadDividerLine={shouldUseThreadDividerLine}
-                userWalletTierName={userWalletTierName}
-                isUserValidated={isUserValidated}
                 personalDetails={personalDetails}
                 userBillingFundID={userBillingFundID}
                 isTryNewDotNVPDismissed={isTryNewDotNVPDismissed}
@@ -211,8 +201,6 @@ function ReportActionsListItemRenderer({
             isFirstVisibleReportAction={isFirstVisibleReportAction}
             shouldUseThreadDividerLine={shouldUseThreadDividerLine}
             shouldHighlight={shouldHighlight}
-            userWalletTierName={userWalletTierName}
-            isUserValidated={isUserValidated}
             personalDetails={personalDetails}
             userBillingFundID={userBillingFundID}
             isTryNewDotNVPDismissed={isTryNewDotNVPDismissed}
