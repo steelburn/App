@@ -65,14 +65,7 @@ function usePaginatedReportActions(reportID: string | undefined, reportActionID?
             return undefined;
         }
 
-        for (let i = sortedAllReportActions.length - 1; i >= 0; i -= 1) {
-            const reportAction = sortedAllReportActions.at(i);
-            if (reportAction && reportAction.created > initialLastReadTime) {
-                return reportAction.reportActionID;
-            }
-        }
-
-        return undefined;
+        return sortedAllReportActions.findLast((reportAction) => reportAction.created > initialLastReadTime)?.reportActionID;
         /* eslint-enable react-hooks/refs */
     }, [treatAsNoPaginationAnchor, reportActionID, shouldLinkToOldestUnreadReportAction, sortedAllReportActions]);
 
