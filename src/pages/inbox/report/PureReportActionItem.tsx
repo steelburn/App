@@ -972,7 +972,13 @@ function PureReportActionItem({
         } else if (isCardBrokenConnectionAction(action)) {
             children = <CardBrokenConnectionContent action={action} />;
         } else if (isActionOfType(action, CONST.REPORT.ACTIONS.TYPE.EXPORTED_TO_INTEGRATION)) {
-            children = <ExportIntegration action={action} />;
+            children = (
+                <ExportIntegration
+                    action={action}
+                    childReport={childReport}
+                    originalReport={originalReport}
+                />
+            );
         } else if (isRenamedAction(action)) {
             const message = getRenamedAction(translate, action, isExpenseReport(report));
             children = <ReportActionItemBasicMessage message={message} />;
