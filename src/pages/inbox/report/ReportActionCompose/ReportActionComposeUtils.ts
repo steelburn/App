@@ -1,4 +1,3 @@
-import {InteractionManager} from 'react-native';
 import type {ComposerRef} from '@components/Composer/types';
 import getPlatform from '@libs/getPlatform';
 import CONST from '@src/CONST';
@@ -11,8 +10,7 @@ const updateNativeSelectionValue = (composerRef: React.RefObject<ComposerRef | n
     }
 
     // Ensure that native selection value is set imperatively after all state changes are effective
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
-    InteractionManager.runAfterInteractions(() => {
+    requestIdleCallback(() => {
         // note: this implementation is only available on non-web RN, thus the wrapping
         // 'if' block contains a redundant (since the ref is only used on iOS) platform check
         composerRef.current?.setSelection(start, end);
