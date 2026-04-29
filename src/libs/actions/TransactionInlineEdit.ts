@@ -191,13 +191,18 @@ function editTransactionDateInline(params: TransactionInlineEditParams, newDate:
 
 /** Updates the merchant of an expense from the Search results table or the Expense Report page. */
 function editTransactionMerchantInline(params: TransactionInlineEditParams, newMerchant: string) {
-    if (isInvalidMerchantValue(newMerchant)) {
+    const transaction = allTransactions[`${ONYXKEYS.COLLECTION.TRANSACTION}${params.transactionID}`];
+    const isUnreportedTransaction = isExpenseUnreported(transaction);
+    const isClearingMerchant = newMerchant === '';
+    const isInvalidMerchantForUpdate = isInvalidMerchantValue(newMerchant) && !(isUnreportedTransaction && isClearingMerchant);
+
+    if (isInvalidMerchantForUpdate) {
         return;
     }
     const iouParams = getIouParamsForTransaction(params);
     updateMoneyRequestMerchant({
         ...iouParams,
-        value: newMerchant,
+        value: newMerchant || CONST.TRANSACTION.PARTIAL_TRANSACTION_MERCHANT,
         hash: params.hash,
     });
 }
