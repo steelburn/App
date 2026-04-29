@@ -313,7 +313,7 @@ function PrivatePersonalDetailsPage() {
                         />
                     </View>
                     {selectedCountry === CONST.COUNTRY.US ? (
-                        <View style={styles.mhn5}>
+                        <View style={[styles.mhn5, styles.mb4]}>
                             <InputWrapper
                                 InputComponent={StateSelector}
                                 inputID={INPUT_IDS.STATE}
