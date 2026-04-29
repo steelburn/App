@@ -87,7 +87,7 @@ function Confirmation() {
             taxValue: taxRate?.value,
             taxCode,
         };
-    }, [reviewDuplicates?.taxCode, reviewDuplicates?.taxAmount, duplicatedTransactionPolicy?.taxRates?.taxes, duplicatedTransaction?.taxCode]);
+    }, [reviewDuplicates, duplicatedTransactionPolicy?.taxRates?.taxes, duplicatedTransaction?.taxCode]);
     const isReportOwner = iouReport?.ownerAccountID === currentUserPersonalDetails?.accountID;
 
     const handleMergeDuplicates = useCallback(() => {
