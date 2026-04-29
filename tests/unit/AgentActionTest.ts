@@ -280,7 +280,7 @@ describe('deleteAgent', () => {
     it('calls write with DELETE_AGENT command and correct params', () => {
         deleteAgent(TEST_ACCOUNT_ID);
 
-        expect(mockWrite).toHaveBeenCalledWith(WRITE_COMMANDS.DELETE_AGENT, {accountID: TEST_ACCOUNT_ID}, expect.any(Object));
+        expect(mockWrite).toHaveBeenCalledWith(WRITE_COMMANDS.DELETE_AGENT, {agentAccountID: TEST_ACCOUNT_ID}, expect.any(Object));
     });
 
     it('optimistic data merges pendingAction DELETE on the prompt key', () => {
