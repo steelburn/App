@@ -56,7 +56,6 @@ import {
     isManualDistanceRequest,
     isOdometerDistanceRequest,
     isOnHold,
-    recalculateUnreportedTransactionDetails,
     shouldClearConvertedAmount,
     waypointHasValidAddress,
 } from '@libs/TransactionUtils';
