@@ -1,5 +1,6 @@
 import {deepEqual} from 'fast-equals';
 import React, {useEffect, useMemo} from 'react';
+// eslint-disable-next-line no-restricted-imports
 import {InteractionManager, Keyboard, View} from 'react-native';
 import type {ValueOf} from 'type-fest';
 import FullPageNotFoundView from '@components/BlockingViews/FullPageNotFoundView';
@@ -20,6 +21,7 @@ import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails'
 import useGetIOUReportFromReportAction from '@hooks/useGetIOUReportFromReportAction';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
+import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
 import usePermissions from '@hooks/usePermissions';
 import usePolicy from '@hooks/usePolicy';
@@ -74,6 +76,7 @@ function SplitExpensePage({route}: SplitExpensePageProps) {
 
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const {showConfirmModal} = useConfirmModal();
+    const {isOffline} = useNetwork();
 
     const [errorMessage, setErrorMessage] = React.useState<string>('');
     const {currentSearchResults, currentSearchHash, currentSearchQueryJSON} = useSearchStateContext();
@@ -306,6 +309,7 @@ function SplitExpensePage({route}: SplitExpensePageProps) {
             personalDetails,
             transactionReport: draftTransactionReport,
             expenseReport,
+            isOffline,
         });
     };
 
