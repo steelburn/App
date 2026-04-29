@@ -7,7 +7,7 @@ import {getCompanyCardFeed} from '@libs/CardUtils';
 import getPlaidLinkTokenParameters from '@libs/getPlaidLinkTokenParameters';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
-import type {CardFeedWithDomainID, CardFeedWithNumber, CompanyCardFeedWithDomainID, StatementPeriodEnd, StatementPeriodEndDay} from '@src/types/onyx/CardFeeds';
+import type {CardFeedWithDomainID, CardFeedWithNumber, CompanyCardFeedWithDomainID} from '@src/types/onyx/CardFeeds';
 
 /**
  * Gets the Plaid Link token used to initialize the Plaid SDK
@@ -146,8 +146,6 @@ function importPlaidAccounts(
     country: string,
     domainName: string,
     plaidAccounts: string,
-    statementPeriodEnd: StatementPeriodEnd | undefined,
-    statementPeriodEndDay: StatementPeriodEndDay | undefined,
     plaidAccessToken: string | undefined,
 ) {
     const parameters: ImportPlaidAccountsParams = {
@@ -157,8 +155,6 @@ function importPlaidAccounts(
         country,
         domainName,
         plaidAccounts,
-        statementPeriodEnd,
-        statementPeriodEndDay,
         plaidAccessToken,
     };
 
