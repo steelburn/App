@@ -1,8 +1,9 @@
+// eslint-disable-next-line no-restricted-imports
 import {InteractionManager} from 'react-native';
 import type {NullishDeep, OnyxCollection, OnyxEntry, OnyxUpdate} from 'react-native-onyx';
 import Onyx from 'react-native-onyx';
 import type {SearchActionsContextValue, SearchStateContextValue} from '@components/Search/types';
-import * as API from '@libs/API';
+import {write as apiWrite} from '@libs/API';
 import type {RevertSplitTransactionParams, SplitTransactionParams, SplitTransactionSplitsParam} from '@libs/API/parameters';
 import {WRITE_COMMANDS} from '@libs/API/types';
 import DateUtils from '@libs/DateUtils';
@@ -11,7 +12,7 @@ import {calculateAmount as calculateIOUAmount} from '@libs/IOUUtils';
 import Log from '@libs/Log';
 import isSearchTopmostFullScreenRoute from '@libs/Navigation/helpers/isSearchTopmostFullScreenRoute';
 import Navigation, {navigationRef} from '@libs/Navigation/Navigation';
-import * as NumberUtils from '@libs/NumberUtils';
+import {rand64} from '@libs/NumberUtils';
 import Parser from '@libs/Parser';
 import {getDistanceRateCustomUnitRate} from '@libs/PolicyUtils';
 import {
@@ -549,7 +550,7 @@ function updateSplitTransactions({
         const successDataComments: Array<OnyxUpdate<BuildOnyxDataForMoneyRequestKeys>> = [];
         const failureDataComments: Array<OnyxUpdate<BuildOnyxDataForMoneyRequestKeys>> = [];
         const addCommentToSplitTransactionThread = (commentAction: OnyxTypes.ReportAction) => {
-            const newReportActionID = NumberUtils.rand64();
+            const newReportActionID = rand64();
             // delegateAccountIDParam: will be threaded in PR 11; buildOptimisticAddCommentReportAction falls back to module-level Onyx.connect value (https://github.com/Expensify/App/issues/66425)
             const reportComment = buildOptimisticAddCommentReportAction({
                 text: '',
@@ -620,7 +621,7 @@ function updateSplitTransactions({
                 return;
             }
             // Generate new IDs and timestamps for each split
-            const newHoldReportActionID = NumberUtils.rand64();
+            const newHoldReportActionID = rand64();
             const timestamp = DateUtils.getDBTime();
 
             // Create new optimistic hold report action with new ID and timestamp, keeping other information
@@ -632,7 +633,7 @@ function updateSplitTransactions({
                 timestamp: undefined,
             };
 
-            const newHoldReportActionCommentID = commentAction ? NumberUtils.rand64() : undefined;
+            const newHoldReportActionCommentID = commentAction ? rand64() : undefined;
             const newHoldReportActionComment =
                 commentAction && newHoldReportActionCommentID
                     ? {
@@ -1259,7 +1260,7 @@ function updateSplitTransactions({
             comment: splits.at(0)?.comment?.comment,
             waypoints: splits.at(0)?.waypoints ? JSON.stringify(splits.at(0)?.waypoints) : undefined,
         } as RevertSplitTransactionParams;
-        API.write(WRITE_COMMANDS.REVERT_SPLIT_TRANSACTION, parameters, onyxData);
+        apiWrite(WRITE_COMMANDS.REVERT_SPLIT_TRANSACTION, parameters, onyxData);
     } else {
         // Prepare splitApiParams for the Transaction_Split API call which requires a specific format for the splits
         // The format is: splits[0][amount], splits[0][category], splits[0][tag] etc.
@@ -1277,10 +1278,10 @@ function updateSplitTransactions({
 
         if (isCreationOfSplits) {
             // eslint-disable-next-line rulesdir/no-multiple-api-calls
-            API.write(WRITE_COMMANDS.SPLIT_TRANSACTION, splitParameters, onyxData);
+            apiWrite(WRITE_COMMANDS.SPLIT_TRANSACTION, splitParameters, onyxData);
         } else {
             // eslint-disable-next-line rulesdir/no-multiple-api-calls
-            API.write(WRITE_COMMANDS.UPDATE_SPLIT_TRANSACTION, splitParameters, onyxData);
+            apiWrite(WRITE_COMMANDS.UPDATE_SPLIT_TRANSACTION, splitParameters, onyxData);
         }
     }
     // eslint-disable-next-line @typescript-eslint/no-deprecated
