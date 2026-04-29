@@ -27,13 +27,12 @@ import useScrollToEndOnNewMessageReceived from '@hooks/useScrollToEndOnNewMessag
 import useStyleUtils from '@hooks/useStyleUtils';
 import useThemeStyles from '@hooks/useThemeStyles';
 import useWindowDimensions from '@hooks/useWindowDimensions';
-import {openReport, pruneReportActionPagesToNewestWindow, readNewestAction, subscribeToNewActionEvent} from '@libs/actions/Report';
+import {openReport, readNewestAction} from '@libs/actions/Report';
 import {isSafari} from '@libs/Browser';
 import {isConsecutiveChronosAutomaticTimerAction} from '@libs/ChronosUtils';
 import DateUtils from '@libs/DateUtils';
 import FS from '@libs/Fullstory';
 import durationHighlightItem from '@libs/Navigation/helpers/getDurationHighlightItem';
-import isReportTopmostSplitNavigator from '@libs/Navigation/helpers/isReportTopmostSplitNavigator';
 import isSearchTopmostFullScreenRoute from '@libs/Navigation/helpers/isSearchTopmostFullScreenRoute';
 import Navigation from '@libs/Navigation/Navigation';
 import type {PlatformStackRouteProp} from '@libs/Navigation/PlatformStackNavigation/types';
@@ -80,6 +79,7 @@ import ListBoundaryLoader from './ListBoundaryLoader';
 import ReportActionsListItemRenderer from './ReportActionsListItemRenderer';
 import {getUnreadMarkerReportAction} from './shouldDisplayNewMarkerOnReportAction';
 import StaticReportActionsPreview from './StaticReportActionsPreview';
+import useReportActionsNewActionLiveTail from './useReportActionsNewActionLiveTail';
 import useReportUnreadMessageScrollTracking from './useReportUnreadMessageScrollTracking';
 
 type ReportActionsListProps = {
@@ -151,12 +151,6 @@ type ReportActionsListProps = {
     /** Callback to show previous messages */
     onShowPreviousMessages?: () => void;
 };
-
-// In the component we are subscribing to the arrival of new actions.
-// As there is the possibility that there are multiple instances of a ReportScreen
-// for the same report, we only ever want one subscription to be active, as
-// the subscriptions could otherwise be conflicting.
-const newActionUnsubscribeMap: Record<string, () => void> = {};
 
 // Seems that there is an architecture issue that prevents us from using the reportID with useRef
 // the useRef value gets reset when the reportID changes, so we use a global variable to keep track
@@ -230,7 +224,6 @@ function ReportActionsList({
     const isTryNewDotNVPDismissed = !!tryNewDot?.classicRedirect?.dismissed;
     const [introSelected] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED);
     const [betas] = useOnyx(ONYXKEYS.BETAS);
-    const [isScrollToBottomEnabled, setIsScrollToBottomEnabled] = useState(false);
     const [actionIdToHighlight, setActionIdToHighlight] = useState('');
     const [reportLoadingState] = useOnyx(`${ONYXKEYS.COLLECTION.RAM_ONLY_REPORT_LOADING_STATE}${report.reportID}`);
     const prevIsLoadingInitialReportActions = usePrevious(reportLoadingState?.isLoadingInitialReportActions);
@@ -313,6 +306,7 @@ function ReportActionsList({
      */
     const prevUnreadMarkerReportActionID = useRef<string | null>(null);
     const [unreadMarkerReportActionID, unreadMarkerReportActionIndex] = useMemo(() => {
+        // eslint-disable-next-line react-hooks/refs
         const scanned = getUnreadMarkerReportAction({
             visibleReportActions: sortedVisibleReportActions,
             earliestReceivedOfflineMessageIndex,
@@ -414,18 +408,6 @@ function ReportActionsList({
 
     const lastVisibleActionCreated = getReportLastVisibleActionCreated(report, transactionThreadReport);
     const hasNewestReportAction = lastAction?.created === lastVisibleActionCreated || isReportPreviewAction(lastAction);
-    const hasNewestReportActionRef = useRef(hasNewestReportAction);
-    hasNewestReportActionRef.current = hasNewestReportAction;
-    const hasNewerActionsRef = useRef(hasNewerActions);
-    hasNewerActionsRef.current = hasNewerActions;
-    const linkedReportActionIDRef = useRef(linkedReportActionID);
-    linkedReportActionIDRef.current = linkedReportActionID;
-    const sortedAllReportActionsForPaginationRef = useRef(sortedAllReportActionsForPagination);
-    const reportActionPagesRef = useRef(reportActionPages);
-    sortedAllReportActionsForPaginationRef.current = sortedAllReportActionsForPagination;
-    reportActionPagesRef.current = reportActionPages;
-    const liveTailJumpRef = useRef<{stage: 'idle' | 'open_report' | 'await_scroll' | 'await_prune'}>({stage: 'idle'});
-    const sortedVisibleReportActionsRef = useRef(sortedVisibleReportActions);
 
     const {isFloatingMessageCounterVisible, setIsFloatingMessageCounterVisible, trackVerticalScrolling, onViewableItemsChanged} = useReportUnreadMessageScrollTracking({
         reportID: report.reportID,
@@ -449,6 +431,27 @@ function ReportActionsList({
             }
         },
         hasOnceLoadedReportActions: !!reportLoadingState?.hasOnceLoadedReportActions,
+    });
+
+    const {isScrollToBottomEnabled, setIsScrollToBottomEnabled, completeLiveTailPruneAfterScrollToBottom} = useReportActionsNewActionLiveTail({
+        reportID: report.reportID,
+        introSelected,
+        betas,
+        isOffline,
+        reportScrollManager,
+        setIsFloatingMessageCounterVisible,
+        setActionIdToHighlight,
+        unreadMarkerReportActionID,
+        hasNewerActions,
+        linkedReportActionID,
+        hasNewestReportAction,
+        sortedVisibleReportActions,
+        sortedAllReportActionsForPagination,
+        reportActionPages,
+        setTreatAsNoPaginationAnchor,
+        treatAsNoPaginationAnchor,
+        prevIsLoadingInitialReportActions,
+        reportLoadingState,
     });
 
     useEffect(() => () => clearTimeout(scrollEndTimerRef.current), []);
@@ -621,106 +624,6 @@ function ReportActionsList({
         }
     }, [lastAction?.reportActionID, lastAction?.actionName, prevSortedVisibleReportActionsObjects, reportScrollManager]);
 
-    useEffect(() => {
-        sortedVisibleReportActionsRef.current = sortedVisibleReportActions;
-    }, [sortedVisibleReportActions]);
-
-    const scrollToBottomForCurrentUserAction = useCallback(
-        (isFromCurrentUser: boolean, action?: OnyxTypes.ReportAction) => {
-            // eslint-disable-next-line @typescript-eslint/no-deprecated
-            InteractionManager.runAfterInteractions(() => {
-                // If a new comment is added and it's from the current user scroll to the bottom otherwise leave the user positioned where
-                // they are now in the list.
-                if (!isFromCurrentUser || (!isReportTopmostSplitNavigator() && !Navigation.getReportRHPActiveRoute())) {
-                    return;
-                }
-                if (!hasNewestReportActionRef.current && !isFromCurrentUser) {
-                    if (Navigation.getReportRHPActiveRoute()) {
-                        return;
-                    }
-                    Navigation.setNavigationActionToMicrotaskQueue(() => {
-                        Navigation.navigate(ROUTES.REPORT_WITH_ID.getRoute(report.reportID));
-                    });
-                    return;
-                }
-
-                const shouldJumpToLiveTail =
-                    !isOffline &&
-                    action?.actionName !== CONST.REPORT.ACTIONS.TYPE.REPORT_PREVIEW &&
-                    (hasNewerActionsRef.current || !!linkedReportActionIDRef.current || unreadMarkerReportActionID);
-
-                if (shouldJumpToLiveTail) {
-                    if (liveTailJumpRef.current.stage === 'idle') {
-                        liveTailJumpRef.current = {stage: 'open_report'};
-                        openReport({
-                            reportID: report.reportID,
-                            introSelected,
-                            betas,
-                        });
-                    }
-                    return;
-                }
-
-                const index = sortedVisibleReportActionsRef.current.findIndex((item) => keyExtractor(item) === action?.reportActionID);
-                if (action?.actionName === CONST.REPORT.ACTIONS.TYPE.REPORT_PREVIEW) {
-                    if (index > 0) {
-                        setTimeout(() => {
-                            reportScrollManager.scrollToIndex(index);
-                        }, 100);
-                    } else {
-                        setIsFloatingMessageCounterVisible(false);
-                        reportScrollManager.scrollToBottom();
-                    }
-                    if (action?.reportActionID) {
-                        setActionIdToHighlight(action.reportActionID);
-                    }
-                } else {
-                    setIsFloatingMessageCounterVisible(false);
-                    // Wait for the next frame so the list has laid out new items before scrolling
-                    requestAnimationFrame(() => {
-                        reportScrollManager.scrollToBottom();
-                    });
-                }
-
-                setIsScrollToBottomEnabled(true);
-            });
-        },
-        [betas, introSelected, isOffline, report.reportID, reportScrollManager, setIsFloatingMessageCounterVisible, unreadMarkerReportActionID],
-    );
-
-    useEffect(() => {
-        liveTailJumpRef.current = {stage: 'idle'};
-    }, [report.reportID]);
-
-    useEffect(() => {
-        if (liveTailJumpRef.current.stage !== 'open_report') {
-            return;
-        }
-
-        const finishedInitialLoad = prevIsLoadingInitialReportActions === true && reportLoadingState?.isLoadingInitialReportActions === false;
-
-        if (!finishedInitialLoad) {
-            return;
-        }
-
-        setTreatAsNoPaginationAnchor(true);
-        Navigation.setParams({reportActionID: ''});
-        liveTailJumpRef.current = {stage: 'await_scroll'};
-    }, [prevIsLoadingInitialReportActions, reportLoadingState?.isLoadingInitialReportActions, setTreatAsNoPaginationAnchor]);
-
-    useEffect(() => {
-        if (liveTailJumpRef.current.stage !== 'await_scroll') {
-            return;
-        }
-        if (!hasNewestReportAction) {
-            return;
-        }
-
-        liveTailJumpRef.current = {stage: 'await_prune'};
-        setIsFloatingMessageCounterVisible(false);
-        setIsScrollToBottomEnabled(true);
-    }, [hasNewestReportAction, treatAsNoPaginationAnchor, setIsFloatingMessageCounterVisible]);
-
     // Clear the highlighted report action after scrolling and highlighting
     useEffect(() => {
         if (actionIdToHighlight === '') {
@@ -732,37 +635,6 @@ function ReportActionsList({
         }, durationHighlightItem);
         return () => clearTimeout(timer);
     }, [actionIdToHighlight]);
-
-    useEffect(() => {
-        // Why are we doing this, when in the cleanup of the useEffect we are already calling the unsubscribe function?
-        // Answer: On web, when navigating to another report screen, the previous report screen doesn't get unmounted,
-        //         meaning that the cleanup might not get called. When we then open a report we had open already previously, a new
-        //         ReportScreen will get created. Thus, we have to cancel the earlier subscription of the previous screen,
-        //         because the two subscriptions could conflict!
-        //         In case we return to the previous screen (e.g. by web back navigation) the useEffect for that screen would
-        //         fire again, as the focus has changed and will set up the subscription correctly again.
-        const previousSubUnsubscribe = newActionUnsubscribeMap[report.reportID];
-        if (previousSubUnsubscribe) {
-            previousSubUnsubscribe();
-        }
-
-        // This callback is triggered when a new action arrives via Pusher and the event is emitted from Report.js. This allows us to maintain
-        // a single source of truth for the "new action" event instead of trying to derive that a new action has appeared from looking at props.
-        const unsubscribe = subscribeToNewActionEvent(report.reportID, scrollToBottomForCurrentUserAction);
-
-        const cleanup = () => {
-            if (!unsubscribe) {
-                return;
-            }
-            unsubscribe();
-        };
-
-        newActionUnsubscribeMap[report.reportID] = cleanup;
-
-        return cleanup;
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [report.reportID]);
 
     const reportActionsListFSClass = FS.getChatFSClass(report);
     const lastIOUActionWithError = sortedVisibleReportActions.find((action) => action.errors);
@@ -967,12 +839,7 @@ function ReportActionsList({
             if (isScrollToBottomEnabled) {
                 reportScrollManager.scrollToBottom();
                 setIsScrollToBottomEnabled(false);
-                if (liveTailJumpRef.current.stage === 'await_prune') {
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- pruneReportActionPagesToNewestWindow is typed; rule loses inference via Report actions barrel
-                    pruneReportActionPagesToNewestWindow(report.reportID, sortedAllReportActionsForPaginationRef.current, reportActionPagesRef.current);
-                    setTreatAsNoPaginationAnchor(false);
-                    liveTailJumpRef.current = {stage: 'idle'};
-                }
+                completeLiveTailPruneAfterScrollToBottom();
             }
             if (shouldScrollToEndAfterLayout && (!hasCreatedActionAdded || isOffline)) {
                 requestAnimationFrame(() => {
@@ -980,7 +847,16 @@ function ReportActionsList({
                 });
             }
         },
-        [isOffline, isScrollToBottomEnabled, onLayout, report.reportID, reportScrollManager, hasCreatedActionAdded, shouldScrollToEndAfterLayout, setTreatAsNoPaginationAnchor],
+        [
+            isOffline,
+            isScrollToBottomEnabled,
+            onLayout,
+            reportScrollManager,
+            hasCreatedActionAdded,
+            shouldScrollToEndAfterLayout,
+            completeLiveTailPruneAfterScrollToBottom,
+            setIsScrollToBottomEnabled,
+        ],
     );
 
     const retryLoadNewerChatsError = useCallback(() => {
