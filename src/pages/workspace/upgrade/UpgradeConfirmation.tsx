@@ -38,7 +38,7 @@ function UpgradeConfirmation({policyName, afterUpgradeAcknowledged, isReporting,
     }, [updateSubscriptionLink]);
 
     const description = useMemo(() => {
-        if (isCategorizing ?? isReporting) {
+        if (isCategorizing || isReporting) {
             return <Text style={[styles.textAlignCenter, styles.w100]}>{translate('workspace.upgrade.completed.categorizeMessage')}</Text>;
         }
 
@@ -58,7 +58,7 @@ function UpgradeConfirmation({policyName, afterUpgradeAcknowledged, isReporting,
     }, [isDistanceRateUpgrade, isCategorizing, isReporting, isTravelUpgrade, policyName, styles.renderHTML, styles.textAlignCenter, styles.w100, translate, subscriptionLink]);
 
     const heading = useMemo(() => {
-        if (isCategorizing ?? isReporting) {
+        if (isCategorizing || isReporting) {
             return translate('workspace.upgrade.completed.createdWorkspace');
         }
         return translate('workspace.upgrade.completed.headline');
