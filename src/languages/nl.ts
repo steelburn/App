@@ -311,6 +311,7 @@ const translations: TranslationDeepObject<typeof en> = {
         letsStart: `Laten we beginnen`,
         showMore: 'Meer weergeven',
         showLess: 'Toon minder',
+        plusMore: ({count}: {count: number}) => `+${count} meer`,
         merchant: 'Handelaar',
         change: 'Wijzigen',
         category: 'Categorie',
@@ -2513,6 +2514,8 @@ ${amount} voor ${merchant} - ${date}`,
         frozenByAdminNeedsUnfreezePrefix: 'Deze kaart is bevroren door ',
         frozenByAdminNeedsUnfreezeSuffix: '. Neem contact op met een beheerder om deze te deblokkeren.',
         frozenByAdminNeedsUnfreeze: ({person}: {person: string}) => `Deze kaart is bevroren door ${person}. Neem contact op met een beheerder om deze te deblokkeren.`,
+        spendRules: 'Bestedingsregels',
+        editSpendRules: 'Uitgavenregels bewerken',
     },
     workflowsPage: {
         workflowTitle: 'Uitgaven',
@@ -6803,6 +6806,8 @@ Vereis onkostendetails zoals bonnen en beschrijvingen, stel limieten en standaar
             customRules: {
                 title: 'Declaratiebeleid',
                 cardSubtitle: 'Hier staat het declaratiebeleid van je team, zodat iedereen hetzelfde beeld heeft van wat er wordt vergoed.',
+                policyDocument: 'Beleidsdocument',
+                policyText: 'Beleidstekst',
             },
             spendRules: {
                 title: 'Uitgaven',
@@ -6818,8 +6823,7 @@ Vereis onkostendetails zoals bonnen en beschrijvingen, stel limieten en standaar
   • Geldautomaten (ATM's)  
   • Gokken  
   • Geldoverschrijvingen  
-
-Voeg meer bestedingsregels toe om de kasstroom van het bedrijf te beschermen.`,
+er bestedingsregels toe om de kasstroom van het bedrijf te beschermen.`,
                 },
                 addSpendRule: 'Uitgaveregel toevoegen',
                 cardPageTitle: 'Kaart',
@@ -6847,7 +6851,7 @@ Voeg meer bestedingsregels toe om de kasstroom van het bedrijf te beschermen.`,
                 currencyMismatchTitle: 'Valutamismatch',
                 currencyMismatchPrompt: 'Om een maximumbedrag in te stellen, selecteer je kaarten die in dezelfde valuta worden vereffend.',
                 reviewSelectedCards: 'Geselecteerde kaarten bekijken',
-                summaryMoreCount: ({summary, count}: {summary: string; count: number}) => `${summary}, +${count} meer`,
+                summaryMoreCount: ({summary, count}: {summary: string; count: number}) => (count > 0 ? `${summary}, +${count} meer` : summary),
                 confirmErrorApplyAtLeastOneSpendRuleToOneCard: 'Pas minstens één bestedingsregel toe op één kaart',
                 confirmErrorCardRequired: 'Kaart is een verplicht veld',
                 confirmErrorApplyAtLeastOneSpendRule: 'Pas minstens één bestedingsregel toe',
@@ -6855,6 +6859,8 @@ Voeg meer bestedingsregels toe om de kasstroom van het bedrijf te beschermen.`,
                 merchants: 'Handelaars',
                 noAvailableCards: 'Alle kaarten hebben al een regel',
                 noAvailableCardsSubtitle: 'Bewerk een bestaande kaartregel om wijzigingen aan te brengen',
+                noCardsIssuedTitle: 'Geen Expensify Kaarten uitgegeven',
+                noCardsIssuedSubtitle: 'Geef Expensify Kaarten uit om bestedingsregels te maken',
                 max: 'Max',
                 categoryOptions: {
                     [CONST.SPEND_RULES.CATEGORIES.AIRLINES]: 'Luchtvaartmaatschappijen',
@@ -6882,6 +6888,30 @@ Voeg meer bestedingsregels toe om de kasstroom van het bedrijf te beschermen.`,
                 editRuleTitle: 'Regel bewerken',
                 deleteRule: 'Regel verwijderen',
                 deleteRuleConfirmation: 'Weet je zeker dat je deze regel wilt verwijderen?',
+                summaryMerchants: ({
+                    merchants,
+                    hiddenCount,
+                    shownCount,
+                    action,
+                }: {
+                    merchants: string;
+                    hiddenCount: number;
+                    shownCount: number;
+                    action: ValueOf<typeof CONST.SPEND_RULES.ACTION>;
+                }) =>
+                    `${action === CONST.SPEND_RULES.ACTION.BLOCK ? 'Geblokkeerd' : 'Toegestaan'} ${shownCount > 1 ? 'handelaars' : 'handelaar'}: ${merchants}${hiddenCount > 0 ? `, +${hiddenCount} meer` : ''}`,
+                summaryCategories: ({
+                    categories,
+                    hiddenCount,
+                    shownCount,
+                    action,
+                }: {
+                    categories: string;
+                    hiddenCount: number;
+                    shownCount: number;
+                    action: ValueOf<typeof CONST.SPEND_RULES.ACTION>;
+                }) =>
+                    `${action === CONST.SPEND_RULES.ACTION.BLOCK ? 'Geblokkeerd' : 'Toegestaan'} ${shownCount > 1 ? 'categorieën' : 'categorie'}: ${categories}${hiddenCount > 0 ? `, +${hiddenCount} meer` : ''}`,
             },
         },
         planTypePage: {
@@ -6926,7 +6956,13 @@ Voeg meer bestedingsregels toe om de kasstroom van het bedrijf te beschermen.`,
                     }
                 }
             },
-            gusto: {title: 'Gusto', approvalMode: 'Goedkeuringsmodus', finalApprover: 'Laatste fiatteur'},
+            gusto: {
+                title: 'Gusto',
+                approvalMode: 'Goedkeuringsmodus',
+                finalApprover: 'Laatste fiatteur',
+                connect: 'Verbinden',
+                connectionDescription: 'Verbind Gusto om goedkeuringen van werknemers gesynchroniseerd te houden met je workspace.',
+            },
         },
     },
     getAssistancePage: {
@@ -7630,6 +7666,7 @@ Voeg meer bestedingsregels toe om de kasstroom van het bedrijf te beschermen.`,
                 cardFeedName: ({cardFeedBankName, cardFeedLabel}: {cardFeedBankName: string; cardFeedLabel?: string}) =>
                     `Alle ${cardFeedBankName}${cardFeedLabel ? ` - ${cardFeedLabel}` : ''}`,
                 cardFeedNameCSV: ({cardFeedLabel}: {cardFeedLabel?: string}) => `Alle geïmporteerde CSV-kaarten${cardFeedLabel ? ` - ${cardFeedLabel}` : ''}`,
+                centralInvoicing: 'Gecentraliseerde facturatie',
             },
             reportField: (name: string, value: string) => `${name} is ${value}`,
             current: 'Huidig',
@@ -7739,8 +7776,8 @@ Voeg meer bestedingsregels toe om de kasstroom van het bedrijf te beschermen.`,
         spendOverTime: 'Uitgaven in de tijd',
         tabs: {
             expenseReports: 'Declaraties',
-            reports: 'Alle rapporten',
-            expenses: 'Alle uitgaven',
+            reports: 'Rapporten',
+            expenses: 'Declaraties',
             submit: 'Concepten',
             approve: 'Moet worden goedgekeurd',
             pay: 'Klaar om te betalen',
@@ -8667,9 +8704,9 @@ Voeg meer bestedingsregels toe om de kasstroom van het bedrijf te beschermen.`,
             collectBillingDescription: 'Collect-werkruimtes worden maandelijks per lid gefactureerd, zonder jaarlijkse verplichting.',
             pricing: 'Prijzen',
         },
-        requestEarlyCancellation: {
-            title: 'Vroegtijdige annulering aanvragen',
-            subtitle: 'Wat is de belangrijkste reden dat je om vervroegde annulering vraagt?',
+        cancelSubscription: {
+            title: 'Abonnement opzeggen',
+            subtitle: 'Wat is de belangrijkste reden dat je je abonnement opzegt?',
             subscriptionCanceled: {
                 title: 'Abonnement geannuleerd',
                 subtitle: 'Je jaarlijkse abonnement is opgezegd.',
@@ -8682,7 +8719,7 @@ Voeg meer bestedingsregels toe om de kasstroom van het bedrijf te beschermen.`,
                 subtitle:
                     'Bedankt dat je ons laat weten dat je je abonnement wilt opzeggen. We bekijken je verzoek en nemen binnenkort contact met je op via je chat met <concierge-link>Concierge</concierge-link>.',
             },
-            acknowledgement: `Door het verzoek om vroegtijdige opzegging erken en ga ik ermee akkoord dat Expensify volgens de Expensify <a href=${CONST.OLD_DOT_PUBLIC_URLS.TERMS_URL}>Servicevoorwaarden</a> of een andere toepasselijke dienstverleningsovereenkomst tussen mij en Expensify niet verplicht is om een dergelijk verzoek te honoreren en dat Expensify de volledige beslissingsbevoegdheid behoudt met betrekking tot het al dan niet inwilligen van een dergelijk verzoek.`,
+            acknowledgement: `Door het verzoek om opzegging erken en ga ik ermee akkoord dat Expensify volgens de Expensify <a href=${CONST.OLD_DOT_PUBLIC_URLS.TERMS_URL}>Servicevoorwaarden</a> of een andere toepasselijke dienstverleningsovereenkomst tussen mij en Expensify niet verplicht is om een dergelijk verzoek te honoreren en dat Expensify de volledige beslissingsbevoegdheid behoudt met betrekking tot het al dan niet inwilligen van een dergelijk verzoek.`,
         },
     },
     feedbackSurvey: {
@@ -9076,8 +9113,12 @@ Hier is een *proefbon* om je te laten zien hoe het werkt:`,
             forceTwoFactorAuthDescription: `<muted-text>Tweeledige verificatie vereisen voor alle leden van dit domein. Domeinleden worden gevraagd om tweefactorauthenticatie voor hun account in te stellen wanneer ze zich aanmelden.</muted-text>`,
             forceTwoFactorAuthError: 'Verplichte twee-factor-authenticatie kon niet worden gewijzigd. Probeer het later opnieuw.',
             resetTwoFactorAuth: 'Tweeledige verificatie opnieuw instellen',
+            error: 'Kon deze wijziging niet opslaan. Probeer het opnieuw.',
         },
-        groups: {title: 'Groepen', memberCount: () => ({one: '1 lid', other: (count: number) => `${count} leden`})},
+        groups: {
+            title: 'Groepen',
+            memberCount: () => ({one: '1 lid', other: (count: number) => `${count} leden`}),
+        },
     },
     proactiveAppReview: {
         title: 'Geniet je van de nieuwe Expensify?',

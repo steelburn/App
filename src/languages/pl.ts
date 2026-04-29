@@ -311,6 +311,7 @@ const translations: TranslationDeepObject<typeof en> = {
         letsStart: `Zacznijmy`,
         showMore: 'Pokaż więcej',
         showLess: 'Pokaż mniej',
+        plusMore: ({count}: {count: number}) => `+${count} więcej`,
         merchant: 'Sprzedawca',
         change: 'Zmień',
         category: 'Kategoria',
@@ -2508,6 +2509,8 @@ ${amount} dla ${merchant} - ${date}`,
         frozenByAdminNeedsUnfreezePrefix: 'Ta karta została zamrożona przez ',
         frozenByAdminNeedsUnfreezeSuffix: '. Skontaktuj się z administratorem, aby ją odmrozić.',
         frozenByAdminNeedsUnfreeze: ({person}: {person: string}) => `Ta karta została zamrożona przez ${person}. Skontaktuj się z administratorem, aby ją odmrozić.`,
+        spendRules: 'Zasady wydatków',
+        editSpendRules: 'Edytuj zasady wydatków',
     },
     workflowsPage: {
         workflowTitle: 'Wydatki',
@@ -6795,6 +6798,8 @@ Wymagaj szczegółów wydatków, takich jak paragony i opisy, ustawiaj limity i 
             customRules: {
                 title: 'Polityka wydatków',
                 cardSubtitle: 'To tutaj znajduje się polityka wydatków Twojego zespołu, aby wszyscy mieli jasność co do tego, co jest objęte.',
+                policyDocument: 'Dokument polityki',
+                policyText: 'Tekst polityki',
             },
             spendRules: {
                 title: 'Wydatki',
@@ -6839,7 +6844,7 @@ Dodaj więcej zasad wydatków, żeby chronić płynność finansową firmy.`,
                 currencyMismatchTitle: 'Niezgodność waluty',
                 currencyMismatchPrompt: 'Aby ustawić maksymalną kwotę, wybierz karty rozliczane w tej samej walucie.',
                 reviewSelectedCards: 'Przejrzyj wybrane karty',
-                summaryMoreCount: ({summary, count}: {summary: string; count: number}) => `${summary}, +${count} więcej`,
+                summaryMoreCount: ({summary, count}: {summary: string; count: number}) => (count > 0 ? `${summary}, +${count} więcej` : summary),
                 confirmErrorApplyAtLeastOneSpendRuleToOneCard: 'Zastosuj co najmniej jedną regułę wydatków do jednej karty',
                 confirmErrorCardRequired: 'Pole „Karta” jest wymagane',
                 confirmErrorApplyAtLeastOneSpendRule: 'Zastosuj co najmniej jedną regułę wydatków',
@@ -6847,6 +6852,8 @@ Dodaj więcej zasad wydatków, żeby chronić płynność finansową firmy.`,
                 merchants: 'Sprzedawcy',
                 noAvailableCards: 'Wszystkie karty mają już regułę',
                 noAvailableCardsSubtitle: 'Edytuj istniejącą regułę karty, aby wprowadzić zmiany',
+                noCardsIssuedTitle: 'Nie wydano żadnych Kart Expensify',
+                noCardsIssuedSubtitle: 'Wydaj karty Expensify, aby utworzyć zasady wydatków',
                 max: 'Maks',
                 categoryOptions: {
                     [CONST.SPEND_RULES.CATEGORIES.AIRLINES]: 'Linie lotnicze',
@@ -6874,6 +6881,30 @@ Dodaj więcej zasad wydatków, żeby chronić płynność finansową firmy.`,
                 editRuleTitle: 'Edytuj regułę',
                 deleteRule: 'Usuń regułę',
                 deleteRuleConfirmation: 'Na pewno chcesz usunąć tę regułę?',
+                summaryMerchants: ({
+                    merchants,
+                    hiddenCount,
+                    shownCount,
+                    action,
+                }: {
+                    merchants: string;
+                    hiddenCount: number;
+                    shownCount: number;
+                    action: ValueOf<typeof CONST.SPEND_RULES.ACTION>;
+                }) =>
+                    `${action === CONST.SPEND_RULES.ACTION.BLOCK ? 'Zablokowane' : 'Dozwolone'} ${shownCount > 1 ? 'sprzedawcy' : 'sprzedawca'}: ${merchants}${hiddenCount > 0 ? `, +${hiddenCount} więcej` : ''}`,
+                summaryCategories: ({
+                    categories,
+                    hiddenCount,
+                    shownCount,
+                    action,
+                }: {
+                    categories: string;
+                    hiddenCount: number;
+                    shownCount: number;
+                    action: ValueOf<typeof CONST.SPEND_RULES.ACTION>;
+                }) =>
+                    `${action === CONST.SPEND_RULES.ACTION.BLOCK ? 'Zablokowane' : 'Dozwolone'} ${shownCount > 1 ? 'kategorie' : 'kategoria'}: ${categories}${hiddenCount > 0 ? `, +${hiddenCount} więcej` : ''}`,
             },
         },
         planTypePage: {
@@ -6918,7 +6949,13 @@ Dodaj więcej zasad wydatków, żeby chronić płynność finansową firmy.`,
                     }
                 }
             },
-            gusto: {title: 'Gusto', approvalMode: 'Tryb zatwierdzania', finalApprover: 'Ostateczny zatwierdzający'},
+            gusto: {
+                title: 'Gusto',
+                approvalMode: 'Tryb zatwierdzania',
+                finalApprover: 'Ostateczny zatwierdzający',
+                connect: 'Połącz',
+                connectionDescription: 'Połącz Gusto, aby synchronizować akceptacje pracowników z Twoim miejscem pracy.',
+            },
         },
     },
     getAssistancePage: {
@@ -7620,6 +7657,7 @@ Dodaj więcej zasad wydatków, żeby chronić płynność finansową firmy.`,
                 cardFeedName: ({cardFeedBankName, cardFeedLabel}: {cardFeedBankName: string; cardFeedLabel?: string}) =>
                     `Wszystkie ${cardFeedBankName}${cardFeedLabel ? ` - ${cardFeedLabel}` : ''}`,
                 cardFeedNameCSV: ({cardFeedLabel}: {cardFeedLabel?: string}) => `Wszystkie zaimportowane karty CSV${cardFeedLabel ? ` - ${cardFeedLabel}` : ''}`,
+                centralInvoicing: 'Centralne fakturowanie',
             },
             reportField: (name: string, value: string) => `${name} to ${value}`,
             current: 'Bieżące',
@@ -7729,8 +7767,8 @@ Dodaj więcej zasad wydatków, żeby chronić płynność finansową firmy.`,
         spendOverTime: 'Wydatki w czasie',
         tabs: {
             expenseReports: 'Raporty wydatków',
-            reports: 'Wszystkie raporty',
-            expenses: 'Wszystkie wydatki',
+            reports: 'Raporty',
+            expenses: 'Wydatki',
             submit: 'Szkice',
             approve: 'Wymaga zatwierdzenia',
             pay: 'Gotowe do zapłaty',
@@ -8652,9 +8690,9 @@ Dodaj więcej zasad wydatków, żeby chronić płynność finansową firmy.`,
             collectBillingDescription: 'Przestrzenie robocze Collect są rozliczane miesięcznie za każdego członka, bez rocznego zobowiązania.',
             pricing: 'Cennik',
         },
-        requestEarlyCancellation: {
-            title: 'Poproś o wcześniejsze anulowanie',
-            subtitle: 'Jaki jest główny powód, dla którego prosisz o wcześniejsze anulowanie?',
+        cancelSubscription: {
+            title: 'Anuluj subskrypcję',
+            subtitle: 'Jaki jest główny powód, dla którego prosisz o anulowanie subskrypcji?',
             subscriptionCanceled: {
                 title: 'Subskrypcja anulowana',
                 subtitle: 'Twoja subskrypcja roczna została anulowana.',
@@ -8667,7 +8705,7 @@ Dodaj więcej zasad wydatków, żeby chronić płynność finansową firmy.`,
                 subtitle:
                     'Dziękujemy za informację, że jesteś zainteresowany(-a) anulowaniem swojej subskrypcji. Rozpatrujemy Twoją prośbę i wkrótce skontaktujemy się z Tobą na czacie z <concierge-link>Concierge</concierge-link>.',
             },
-            acknowledgement: `Składając prośbę o wcześniejsze rozwiązanie, potwierdzam i zgadzam się, że Expensify nie ma obowiązku uwzględnienia takiej prośby na mocy <a href=${CONST.OLD_DOT_PUBLIC_URLS.TERMS_URL}>Regulaminu świadczenia usług</a> Expensify ani innej obowiązującej umowy o świadczenie usług zawartej pomiędzy mną a Expensify oraz że Expensify zachowuje wyłączną dowolność w zakresie rozpatrzenia takiej prośby.`,
+            acknowledgement: `Składając prośbę o rozwiązanie, potwierdzam i zgadzam się, że Expensify nie ma obowiązku uwzględnienia takiej prośby na mocy <a href=${CONST.OLD_DOT_PUBLIC_URLS.TERMS_URL}>Regulaminu świadczenia usług</a> Expensify ani innej obowiązującej umowy o świadczenie usług zawartej pomiędzy mną a Expensify oraz że Expensify zachowuje wyłączną dowolność w zakresie rozpatrzenia takiej prośby.`,
         },
     },
     feedbackSurvey: {
@@ -9057,8 +9095,12 @@ Oto *paragon testowy*, żeby pokazać Ci, jak to działa:`,
             forceTwoFactorAuthDescription: `<muted-text>Wymagaj uwierzytelniania dwuskładnikowego od wszystkich członków tej domeny. Członkowie domeny zostaną poproszeni o skonfigurowanie uwierzytelniania dwuskładnikowego na swoim koncie po zalogowaniu.</muted-text>`,
             forceTwoFactorAuthError: 'Nie udało się zmienić wymuszania uwierzytelniania dwuskładnikowego. Spróbuj ponownie później.',
             resetTwoFactorAuth: 'Zresetuj uwierzytelnianie dwuskładnikowe',
+            error: 'Nie udało się zapisać tej zmiany. Spróbuj ponownie.',
         },
-        groups: {title: 'Grupy', memberCount: () => ({one: '1 członek', other: (count: number) => `${count} członków`})},
+        groups: {
+            title: 'Grupy',
+            memberCount: () => ({one: '1 członek', other: (count: number) => `${count} członków`}),
+        },
     },
     proactiveAppReview: {
         title: 'Podoba Ci się nowy Expensify?',
