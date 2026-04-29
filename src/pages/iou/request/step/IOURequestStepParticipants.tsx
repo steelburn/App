@@ -145,7 +145,7 @@ function IOURequestStepParticipants({
                 />
             )}
             <MoneyRequestParticipantsSelector
-                participants={participants}
+                participants={isSplitRequest ? participants : participants?.filter((participant) => !participant.isSender)}
                 onParticipantsAdded={addParticipant}
                 onFinish={goToNextStep}
                 iouType={iouType}
