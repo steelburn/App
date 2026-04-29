@@ -3970,7 +3970,7 @@ PODS:
     - RNWorklets
     - SocketRocket
     - Yoga
-  - RNScreens (4.15.4):
+  - RNScreens (4.25.0-beta.1):
     - boost
     - DoubleConversion
     - fast_float
@@ -3997,10 +3997,10 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - RNScreens/common (= 4.15.4)
+    - RNScreens/common (= 4.25.0-beta.1)
     - SocketRocket
     - Yoga
-  - RNScreens/common (4.15.4):
+  - RNScreens/common (4.25.0-beta.1):
     - boost
     - DoubleConversion
     - fast_float
@@ -4807,7 +4807,7 @@ SPEC CHECKSUMS:
   GTMAppAuth: f69bd07d68cd3b766125f7e072c45d7340dea0de
   GTMSessionFetcher: 5aea5ba6bd522a239e236100971f10cb71b96ab6
   GzipSwift: 893f3e48e597a1a4f62fafcb6514220fcf8287fa
-  hermes-engine: b39ec807040f5a775de027a4a9647c0f4222c6ef
+  hermes-engine: 164a2a741070fc695f1930a2d7a5b885a98c32ce
   libavif: 84bbb62fb232c3018d6f1bab79beea87e35de7b7
   libdav1d: 23581a4d8ec811ff171ed5e2e05cd27bad64c39f
   libwebp: 02b23773aedb6ff1fd38cec7a77b81414c6842a8
@@ -4934,7 +4934,7 @@ SPEC CHECKSUMS:
   RNPermissions: 518f0a0c439acc74e2b9937e0e7d29e5031ae949
   RNReactNativeHapticFeedback: 5f1542065f0b24c9252bd8cf3e83bc9c548182e4
   RNReanimated: fbcb7fd8da5b0b088401542c58fb5d266388f1cf
-  RNScreens: 4f2aed147a2775017923789d8a0a2d377712ec2e
+  RNScreens: f157fcda842dd004cbb55e536d592f20e805fb0b
   RNSentry: f73f4da92e4c20841ab16e1fa22fc289bc2f9f4e
   RNShare: 1c1fde2c4134b9cf220ffebbd6df9c414036d382
   RNSVG: 74eb75bd44d62ba9969941e80d8f9832971c681f
