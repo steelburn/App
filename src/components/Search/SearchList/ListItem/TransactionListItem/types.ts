@@ -1,9 +1,9 @@
+import type {TransactionListItemType} from '@components/Search/SearchList/ListItem/types';
 import type {SearchColumnType} from '@components/Search/types';
 import type {ListItemFocusEventHandler} from '@components/SelectionList/ListItem/types';
 import type {ListItem} from '@components/SelectionList/types';
 import type {TransactionPreviewData} from '@libs/actions/Search';
 import type {CardList, Policy, ReportAction, TransactionViolation} from '@src/types/onyx';
-import type {TransactionListItemType} from '../types';
 
 type TransactionListItemWideProps<TItem extends ListItem> = {
     item: TItem;
