@@ -6,6 +6,7 @@ import useWindowDimensions from '@hooks/useWindowDimensions';
 import Parser from '@libs/Parser';
 import BulletItemRenderer from './HTMLEngineProvider/HTMLRenderers/BulletItemRenderer';
 import SparklesIconRenderer from './HTMLEngineProvider/HTMLRenderers/SparklesIconRenderer';
+import ULRenderer from './HTMLEngineProvider/HTMLRenderers/ULRenderer';
 
 type LinkPressHandler = NonNullable<RenderersProps['a']>['onPress'];
 
@@ -55,6 +56,8 @@ function RenderHTML({html: htmlParam, onLinkPress, isSelectable}: RenderHTMLProp
         /* eslint-disable @typescript-eslint/naming-convention */
         'bullet-item': BulletItemRenderer,
         'sparkles-icon': SparklesIconRenderer,
+        li: BulletItemRenderer,
+        ul: ULRenderer,
     };
 
     const htmlSource = (
