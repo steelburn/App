@@ -55,13 +55,13 @@ type ContinuousPageChainResult<TResource> = {
 /**
  * Finds the id and index in sortedItems of the first item in the given page that's present in sortedItems.
  */
-function findFirstItem<TResource>(sortedItems: TResource[], page: string[], getID: (item: TResource) => string): ItemWithIndex | null {
+function findFirstItem(page: string[], idToIndex: Map<string, number>): ItemWithIndex | null {
     for (const id of page) {
         if (id === CONST.PAGINATION_START_ID) {
             return {id, index: 0};
         }
-        const index = sortedItems.findIndex((item) => getID(item) === id);
-        if (index !== -1) {
+        const index = idToIndex.get(id);
+        if (index !== undefined) {
             return {id, index};
         }
     }
@@ -71,14 +71,17 @@ function findFirstItem<TResource>(sortedItems: TResource[], page: string[], getI
 /**
  * Finds the id and index in sortedItems of the last item in the given page that's present in sortedItems.
  */
-function findLastItem<TResource>(sortedItems: TResource[], page: string[], getID: (item: TResource) => string): ItemWithIndex | null {
+function findLastItem(page: string[], idToIndex: Map<string, number>, lastSortedItemIndex: number): ItemWithIndex | null {
     for (let i = page.length - 1; i >= 0; i--) {
         const id = page.at(i);
         if (id === CONST.PAGINATION_END_ID) {
-            return {id, index: sortedItems.length - 1};
+            return {id, index: lastSortedItemIndex};
         }
-        const index = sortedItems.findIndex((item) => getID(item) === id);
-        if (index !== -1 && id) {
+        if (!id) {
+            continue;
+        }
+        const index = idToIndex.get(id);
+        if (index !== undefined) {
             return {id, index};
         }
     }
@@ -88,11 +91,14 @@ function findLastItem<TResource>(sortedItems: TResource[], page: string[], getID
 /**
  * Finds the index and id of the first and last items of each page in `sortedItems`.
  */
-function getPagesWithIndexes<TResource>(sortedItems: TResource[], pages: Pages, getID: (item: TResource) => string): PageWithIndex[] {
+function getPagesWithIndexes<TResource>(sortedItems: TResource[], pages: Pages, getID: (item: TResource) => string, idToIndex?: Map<string, number>): PageWithIndex[] {
+    const idToIndexMap = idToIndex ?? buildIDToIndexMap(sortedItems, getID);
+    const lastSortedItemIndex = sortedItems.length - 1;
+
     return pages
         .map((page) => {
-            let firstItem = findFirstItem(sortedItems, page, getID);
-            let lastItem = findLastItem(sortedItems, page, getID);
+            let firstItem = findFirstItem(page, idToIndexMap);
+            let lastItem = findLastItem(page, idToIndexMap, lastSortedItemIndex);
 
             // If all actions in the page are not found it will be removed.
             if (firstItem === null || lastItem === null) {
@@ -358,11 +364,14 @@ function prunePagesToNewestWindow<TResource>(sortedItems: TResource[], pages: Pa
  * Note: sortedItems should be sorted in descending order.
  */
 function getContinuousChain<TResource>(sortedItems: TResource[], pages: Pages, getID: (item: TResource) => string, id?: string): ContinuousPageChainResult<TResource> {
+    const shouldBuildIdToIndex = !!id || pages.length > 0;
+    const idToIndex = shouldBuildIdToIndex ? buildIDToIndexMap(sortedItems, getID) : new Map<string, number>();
+
     // If an id is provided, find the index of the item with that id
     let index = -1;
 
     if (id) {
-        index = sortedItems.findIndex((item) => getID(item) === id);
+        index = idToIndex.get(id) ?? -1;
     }
     const didFindItem = index !== -1;
 
@@ -383,7 +392,7 @@ function getContinuousChain<TResource>(sortedItems: TResource[], pages: Pages, g
         return {data: !!id && !didFindItem ? [] : sortedItems, hasNextPage: false, hasPreviousPage: false, resourceItem};
     }
 
-    const pagesWithIndexes = getPagesWithIndexes(sortedItems, pages, getID);
+    const pagesWithIndexes = getPagesWithIndexes(sortedItems, pages, getID, idToIndex);
 
     let page: PageWithIndex = {
         ids: [],
