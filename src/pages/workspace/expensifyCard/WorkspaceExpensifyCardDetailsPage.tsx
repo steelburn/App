@@ -319,18 +319,6 @@ function WorkspaceExpensifyCardDetailsPage({route}: WorkspaceExpensifyCardDetail
                         style={styles.mb1}
                         onPress={() => (isOffline ? setIsOfflineModalVisible(true) : deactivateCard())}
                     />
-                    {/* <ConfirmModal
-                        title={translate('workspace.card.deactivateCardModal.deactivateCard')}
-                        isVisible={isDeactivateModalVisible}
-                        onConfirm={deactivateCard}
-                        onCancel={() => setIsDeactivateModalVisible(false)}
-                        shouldSetModalVisibility={false}
-                        prompt={translate('workspace.card.deactivateCardModal.deactivateConfirmation')}
-                        confirmText={translate('workspace.card.deactivateCardModal.deactivate')}
-                        cancelText={translate('common.cancel')}
-                        danger
-                        onModalHide={() => shouldGoBack.current && Navigation.goBack()}
-                    /> */}
                     <DecisionModal
                         title={translate('common.youAppearToBeOffline')}
                         prompt={translate('common.offlinePrompt')}
