@@ -6,7 +6,7 @@ import Text from '@components/Text';
 import TextLink from '@components/TextLink';
 import useLocalize from '@hooks/useLocalize';
 import useThemeStyles from '@hooks/useThemeStyles';
-import {getExportIntegrationActionFragments, getExportIntegrationLastMessageText, hasReasoning} from '@libs/ReportActionsUtils';
+import {getExportIntegrationActionFragments, getExportIntegrationMessageHTML, hasReasoning} from '@libs/ReportActionsUtils';
 import ReportActionItemMessageWithExplain from '@pages/inbox/report/ReportActionItemMessageWithExplain';
 import type {Report, ReportAction} from '@src/types/onyx';
 
@@ -25,7 +25,7 @@ function ExportIntegration({action, childReport, originalReport}: ExportIntegrat
     const {translate} = useLocalize();
 
     if (hasReasoning(action)) {
-        const message = getExportIntegrationLastMessageText(translate, action);
+        const message = getExportIntegrationMessageHTML(translate, action);
         return (
             <ReportActionItemMessageWithExplain
                 message={message}

@@ -1573,6 +1573,29 @@ describe('PureReportActionItem', () => {
 
             expect(screen.getByText(/exported to/i)).toBeOnTheScreen();
         });
+
+        it('EXPORTED_TO_INTEGRATION with reasoning shows Explain link', async () => {
+            const action = createReportAction(CONST.REPORT.ACTIONS.TYPE.EXPORTED_TO_INTEGRATION, {
+                label: 'NetSuite',
+                automaticAction: true,
+                reasoning: 'Test reasoning',
+            });
+            renderItemWithAction(action);
+            await waitForBatchedUpdatesWithAct();
+
+            expect(screen.getByText('Explain')).toBeOnTheScreen();
+        });
+
+        it('EXPORTED_TO_INTEGRATION without reasoning does not show Explain link', async () => {
+            const action = createReportAction(CONST.REPORT.ACTIONS.TYPE.EXPORTED_TO_INTEGRATION, {
+                label: 'NetSuite',
+                automaticAction: true,
+            });
+            renderItemWithAction(action);
+            await waitForBatchedUpdatesWithAct();
+
+            expect(screen.queryByText('Explain')).not.toBeOnTheScreen();
+        });
     });
 
     describe('Card freeze/unfreeze actions', () => {
