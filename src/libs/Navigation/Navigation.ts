@@ -43,6 +43,7 @@ import setNavigationActionToMicrotaskQueue from './helpers/setNavigationActionTo
 import {linkingConfig} from './linkingConfig';
 import {SPLIT_TO_SIDEBAR} from './linkingConfig/RELATIONS';
 import navigationRef from './navigationRef';
+// eslint-disable-next-line no-restricted-imports
 import TransitionTracker from './TransitionTracker';
 import type {
     NavigationPartialRoute,
@@ -480,6 +481,14 @@ function goUp(backToRoute: Route, options?: GoBackOptions) {
      */
     if (!compareParams) {
         navigationRef.current.dispatch({...minimalAction, type: CONST.NAVIGATION.ACTION_TYPE.POP_TO});
+        return;
+    }
+
+    // For TAB_NAVIGATOR targets, use POP_TO so the underlying tab's nested state is restored from the
+    // payload — plain pop can leave the active tab pointing at Home instead of the intended target.
+    // Issue: https://github.com/Expensify/App/issues/89006
+    if ((minimalAction.payload as {name?: string} | undefined)?.name === NAVIGATORS.TAB_NAVIGATOR) {
+        navigationRef.current.dispatch({...minimalAction, type: CONST.NAVIGATION.ACTION_TYPE.POP_TO, target: targetState.key});
         return;
     }
 
