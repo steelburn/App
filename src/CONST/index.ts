@@ -3833,6 +3833,7 @@ const CONST = {
             gambling: true,
             tobacco: false,
             adultEntertainment: true,
+            handwrittenReceipt: false,
         },
         DEFAULT_BILLABLE: false,
         DEFAULT_REIMBURSABLE: true,
