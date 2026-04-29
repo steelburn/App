@@ -123,8 +123,8 @@ function PrivatePersonalDetailsPage() {
         }
 
         const stateValue = values[INPUT_IDS.STATE] ?? '';
-        const countryValue = values[INPUT_IDS.COUNTRY] ?? '';
-        if (countryValue === CONST.COUNTRY.US && !stateValue) {
+        const effectiveCountry = (values[INPUT_IDS.COUNTRY] || selectedCountry) ?? '';
+        if (effectiveCountry === CONST.COUNTRY.US && !stateValue) {
             errors[INPUT_IDS.STATE] = translate('common.error.fieldRequired');
         } else if (state && !stateValue.trim()) {
             errors[INPUT_IDS.STATE] = translate('common.error.fieldRequired');
@@ -135,7 +135,7 @@ function PrivatePersonalDetailsPage() {
             errors[INPUT_IDS.ZIP_POST_CODE] = translate('common.error.fieldRequired');
         }
 
-        if (!countryValue) {
+        if (!effectiveCountry) {
             errors[INPUT_IDS.COUNTRY] = translate('common.error.fieldRequired');
         }
 
