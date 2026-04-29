@@ -691,7 +691,10 @@ function toggleCashbackToBill(workspaceAccountID: number, programKey: CardProgra
         [programKey]: {shouldApplyCashbackToBill, pendingFields: {shouldApplyCashbackToBill: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE}},
     };
     const successValue = {[programKey]: {shouldApplyCashbackToBill, pendingFields: {shouldApplyCashbackToBill: null}}};
-    const failureValue = {[programKey]: {shouldApplyCashbackToBill: currentValue ?? true, pendingFields: {shouldApplyCashbackToBill: null}}};
+    const failureValue = {
+        [programKey]: {shouldApplyCashbackToBill: currentValue ?? true, pendingFields: {shouldApplyCashbackToBill: null}},
+        errors: ErrorUtils.getMicroSecondOnyxErrorWithTranslationKey('common.genericErrorMessage'),
+    };
 
     const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.PRIVATE_EXPENSIFY_CARD_SETTINGS>> = [
         {
