@@ -1,23 +1,14 @@
 import {Str} from 'expensify-common';
 import React from 'react';
 import {View} from 'react-native';
-import {useProductTrainingContext} from '@components/ProductTrainingContext';
 import ReportActionAvatars from '@components/ReportActionAvatars';
 import {ListItemFocusContext} from '@components/SelectionList/ListItemFocusContext';
 import Text from '@components/Text';
 import TextWithTooltip from '@components/TextWithTooltip';
-import EducationalTooltip from '@components/Tooltip/EducationalTooltip';
 import useLocalize from '@hooks/useLocalize';
-import useOnyx from '@hooks/useOnyx';
-import usePermissions from '@hooks/usePermissions';
 import useStyleUtils from '@hooks/useStyleUtils';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
-import {getIsUserSubmittedExpenseOrScannedReceipt} from '@libs/OptionsListUtils';
-import {isSelectedManagerMcTest} from '@libs/ReportUtils';
-import variables from '@styles/variables';
-import CONST from '@src/CONST';
-import ONYXKEYS from '@src/ONYXKEYS';
 import BaseListItem from './BaseListItem';
 import SelectableListItem from './SelectableListItem';
 import type {InviteMemberListItemProps, ListItem} from './types';
@@ -41,25 +32,11 @@ function InviteMemberListItem<TItem extends ListItem>({
     shouldSyncFocus,
     wrapperStyle,
     isMultilineSupported,
-    canShowProductTrainingTooltip = true,
-    index = 0,
-    sectionIndex = 0,
 }: InviteMemberListItemProps<TItem>) {
     const styles = useThemeStyles();
     const theme = useTheme();
     const StyleUtils = useStyleUtils();
     const {translate} = useLocalize();
-    const {isBetaEnabled} = usePermissions();
-    const [nvpDismissedProductTraining] = useOnyx(ONYXKEYS.NVP_DISMISSED_PRODUCT_TRAINING);
-
-    const {renderProductTrainingTooltip, shouldShowProductTrainingTooltip} = useProductTrainingContext(
-        CONST.PRODUCT_TRAINING_TOOLTIP_NAMES.SCAN_TEST_TOOLTIP_MANAGER,
-        canShowProductTrainingTooltip &&
-            !getIsUserSubmittedExpenseOrScannedReceipt(nvpDismissedProductTraining) &&
-            isBetaEnabled(CONST.BETAS.NEWDOT_MANAGER_MCTEST) &&
-            isSelectedManagerMcTest(item.login) &&
-            !item.isSelected,
-    );
 
     const focusedBackgroundColor = styles.sidebarLinkActive.backgroundColor;
     const subscriptAvatarBorderColor = isFocusVisible ? focusedBackgroundColor : theme.sidebar;
@@ -99,62 +76,47 @@ function InviteMemberListItem<TItem extends ListItem>({
             testID={item.text}
         >
             {(hovered?: boolean) => (
-                <EducationalTooltip
-                    shouldRender={shouldShowProductTrainingTooltip}
-                    renderTooltipContent={renderProductTrainingTooltip}
-                    anchorAlignment={{
-                        horizontal: CONST.MODAL.ANCHOR_ORIGIN_HORIZONTAL.LEFT,
-                        vertical: CONST.MODAL.ANCHOR_ORIGIN_VERTICAL.TOP,
-                    }}
-                    shiftVertical={variables.inviteMemberListItemTooltipShiftVertical}
-                    shiftHorizontal={variables.inviteMemberListItemTooltipShiftHorizontal}
-                    shouldHideOnNavigate
-                    shouldHideOnScroll
-                    wrapperStyle={styles.productTrainingTooltipWrapper}
-                    uniqueID={`${sectionIndex}-${index}`}
-                >
-                    <View style={[styles.flexRow, styles.alignItemsCenter, styles.flex1]}>
-                        {(!!item.reportID || !!accountID || !!item.text || !!item.alternateText) && (
-                            <ReportActionAvatars
-                                subscriptAvatarBorderColor={hovered && !isFocusVisible ? hoveredBackgroundColor : subscriptAvatarBorderColor}
+                <View style={[styles.flexRow, styles.alignItemsCenter, styles.flex1]}>
+                    {(!!item.reportID || !!accountID || !!item.text || !!item.alternateText) && (
+                        <ReportActionAvatars
+                            subscriptAvatarBorderColor={hovered && !isFocusVisible ? hoveredBackgroundColor : subscriptAvatarBorderColor}
+                            shouldShowTooltip={showTooltip}
+                            secondaryAvatarContainerStyle={[
+                                StyleUtils.getBackgroundAndBorderStyle(theme.sidebar),
+                                isFocusVisible ? StyleUtils.getBackgroundAndBorderStyle(focusedBackgroundColor) : undefined,
+                                hovered && !isFocusVisible ? StyleUtils.getBackgroundAndBorderStyle(hoveredBackgroundColor) : undefined,
+                            ]}
+                            fallbackDisplayName={item.text ?? item.alternateText ?? undefined}
+                            singleAvatarContainerStyle={[styles.actionAvatar, styles.mr3]}
+                            reportID={item.reportID}
+                            accountIDs={accountID ? [accountID] : undefined}
+                        />
+                    )}
+                    <View style={[styles.flex1, styles.flexColumn, styles.justifyContentCenter, styles.alignItemsStretch, styles.optionRow]}>
+                        <View style={[styles.flexRow, styles.alignItemsCenter]}>
+                            <TextWithTooltip
                                 shouldShowTooltip={showTooltip}
-                                secondaryAvatarContainerStyle={[
-                                    StyleUtils.getBackgroundAndBorderStyle(theme.sidebar),
-                                    isFocusVisible ? StyleUtils.getBackgroundAndBorderStyle(focusedBackgroundColor) : undefined,
-                                    hovered && !isFocusVisible ? StyleUtils.getBackgroundAndBorderStyle(hoveredBackgroundColor) : undefined,
+                                text={Str.removeSMSDomain(item.text ?? '')}
+                                numberOfLines={isMultilineSupported ? 2 : 1}
+                                style={[
+                                    styles.optionDisplayName,
+                                    isFocusVisible ? styles.sidebarLinkActiveText : styles.sidebarLinkText,
+                                    item.isBold !== false && styles.sidebarLinkTextBold,
+                                    isMultilineSupported ? styles.preWrap : styles.pre,
+                                    item.alternateText ? styles.mb1 : null,
                                 ]}
-                                fallbackDisplayName={item.text ?? item.alternateText ?? undefined}
-                                singleAvatarContainerStyle={[styles.actionAvatar, styles.mr3]}
-                                reportID={item.reportID}
-                                accountIDs={accountID ? [accountID] : undefined}
+                            />
+                        </View>
+                        {!!item.alternateText && (
+                            <TextWithTooltip
+                                shouldShowTooltip={showTooltip}
+                                text={Str.removeSMSDomain(item.alternateText ?? '')}
+                                style={[styles.textLabelSupporting, styles.lh16, styles.pre]}
                             />
                         )}
-                        <View style={[styles.flex1, styles.flexColumn, styles.justifyContentCenter, styles.alignItemsStretch, styles.optionRow]}>
-                            <View style={[styles.flexRow, styles.alignItemsCenter]}>
-                                <TextWithTooltip
-                                    shouldShowTooltip={showTooltip}
-                                    text={Str.removeSMSDomain(item.text ?? '')}
-                                    numberOfLines={isMultilineSupported ? 2 : 1}
-                                    style={[
-                                        styles.optionDisplayName,
-                                        isFocusVisible ? styles.sidebarLinkActiveText : styles.sidebarLinkText,
-                                        item.isBold !== false && styles.sidebarLinkTextBold,
-                                        isMultilineSupported ? styles.preWrap : styles.pre,
-                                        item.alternateText ? styles.mb1 : null,
-                                    ]}
-                                />
-                            </View>
-                            {!!item.alternateText && (
-                                <TextWithTooltip
-                                    shouldShowTooltip={showTooltip}
-                                    text={Str.removeSMSDomain(item.alternateText ?? '')}
-                                    style={[styles.textLabelSupporting, styles.lh16, styles.pre]}
-                                />
-                            )}
-                        </View>
-                        {!!item.rightElement && <ListItemFocusContext.Provider value={{isFocused}}>{item.rightElement}</ListItemFocusContext.Provider>}
                     </View>
-                </EducationalTooltip>
+                    {!!item.rightElement && <ListItemFocusContext.Provider value={{isFocused}}>{item.rightElement}</ListItemFocusContext.Provider>}
+                </View>
             )}
         </ListItemWrapper>
     );
