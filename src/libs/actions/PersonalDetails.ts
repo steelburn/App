@@ -527,7 +527,7 @@ function updatePrivatePersonalDetails(values: FormOnyxValues<typeof ONYXKEYS.FOR
         addressZip: values.zipPostCode?.trim().toUpperCase() ?? '',
         addressCountry: values.country ?? '',
         addressState: stateValue,
-        addressStateLong: values.country !== CONST.COUNTRY.US ? stateValue : '',
+        addressProvince: values.country !== CONST.COUNTRY.US ? stateValue : '',
         dob: values.dob ?? '',
         validateCode,
     };

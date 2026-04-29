@@ -23,6 +23,7 @@ function PrivatePersonalDetailsConfirmMagicCodePage() {
     const primaryLogin = usePrimaryContactMethod();
 
     const [validateCodeAction] = useOnyx(ONYXKEYS.VALIDATE_ACTION_CODE);
+
     // Errors may be written to either errorFields (preferred) or errors depending on
     // how the backend reports the failure, so check both.
     const personalDetailsErrorField = getLatestErrorField(privatePersonalDetails, 'personalDetails');

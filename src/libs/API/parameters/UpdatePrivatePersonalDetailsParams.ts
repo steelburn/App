@@ -10,7 +10,7 @@ type UpdatePrivatePersonalDetailsParams = {
     dob: string;
     validateCode: string;
     addressState: string;
-    addressStateLong: string;
+    addressProvince: string;
 };
 
 export default UpdatePrivatePersonalDetailsParams;
