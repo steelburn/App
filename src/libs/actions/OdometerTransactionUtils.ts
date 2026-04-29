@@ -199,5 +199,44 @@ function buildOdometerCommentFromDraft(transactionID: string, odometerDraft: Ony
     return commentUpdate;
 }
 
-export {setMoneyRequestOdometerReading, setMoneyRequestOdometerImage, removeMoneyRequestOdometerImage, clearOdometerDraft, saveOdometerDraft, buildOdometerCommentFromDraft};
+/**
+ * Idempotent hydration of a saved-for-later odometer draft into a transaction's comment.
+ * Called when the user lands on the DISTANCE_ODOMETER flow (tab change or initial mount on the
+ * odometer tab) so blob URLs can be re-minted from the persisted base64 after a page refresh.
+ * Returns silently when the draft is empty or the comment already reflects it.
+ */
+function hydrateOdometerDraftIntoTransaction(transactionID: string, odometerDraft: OnyxEntry<OdometerDraft>, currentComment?: Partial<Comment>): void {
+    const update = buildOdometerCommentFromDraft(transactionID, odometerDraft, currentComment);
+    if (!update) {
+        return;
+    }
+    Onyx.merge(`${ONYXKEYS.COLLECTION.TRANSACTION_DRAFT}${transactionID}`, {comment: update});
+}
+
+/**
+ * True when an ODOMETER_DRAFT exists but the active transaction comment hasn't yet been hydrated
+ * from it. Used to defer baseline snapshots that would otherwise treat post-hydration values as
+ * unsaved changes.
+ */
+function isOdometerDraftPendingHydration(odometerDraft: OnyxEntry<OdometerDraft>, comment: Partial<Comment> | undefined): boolean {
+    if (!odometerDraft) {
+        return false;
+    }
+    return (
+        (odometerDraft.odometerStartReading !== undefined && comment?.odometerStart == null) ||
+        (odometerDraft.odometerEndReading !== undefined && comment?.odometerEnd == null) ||
+        (!!odometerDraft.odometerStartImage && !comment?.odometerStartImage) ||
+        (!!odometerDraft.odometerEndImage && !comment?.odometerEndImage)
+    );
+}
+
+export {
+    setMoneyRequestOdometerReading,
+    setMoneyRequestOdometerImage,
+    removeMoneyRequestOdometerImage,
+    clearOdometerDraft,
+    saveOdometerDraft,
+    hydrateOdometerDraftIntoTransaction,
+    isOdometerDraftPendingHydration,
+};
 export default clearOdometerDraftTransactionState;

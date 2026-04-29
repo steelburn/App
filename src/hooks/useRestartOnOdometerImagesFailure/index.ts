@@ -16,7 +16,8 @@ import isLoadingOnyxValue from '@src/types/utils/isLoadingOnyxValue';
 // If not, redirect the user to the starting step of the flow.
 // This is because until the request is saved, the image files are only stored in the browser's memory as blob:// URLs
 // and if the browser is refreshed, then the images cease to exist.
-// The best way for the user to recover from this is to start over from the start of the request process.
+// The best way for the user to recover from this is to start over from the start of the request process — the start page's
+// useOdometerDraftHydrator rehydrates from ODOMETER_DRAFT when one exists, so save-for-later content is restored there.
 // Returns `hasVerifiedBlobs` so callers can gate dependent side-effects (e.g. odometer image stitching)
 // until this check has confirmed the blobs are still readable. When there are no blob URLs to verify
 // (e.g. native file:// paths or remote URLs), `hasVerifiedBlobs` is `true` as soon as Onyx has loaded.
@@ -30,6 +31,12 @@ const useRestartOnOdometerImagesFailure = (
     const [, draftTransactionsMetadata] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION_DRAFT, {selector: validTransactionDraftIDsSelector});
     const hasCheckedRef = useRef(false);
     const [asyncVerificationPassed, setAsyncVerificationPassed] = useState(false);
+
+    // Track the latest transaction so the async blob check's .then can compare snapshot URIs
+    // against live state — if they differ, another flow already updated the images and recovery
+    // would clobber that work.
+    const transactionRef = useRef(transaction);
+    transactionRef.current = transaction;
 
     const hasBlobUrls = (() => {
         if (!transaction) {
@@ -94,6 +101,15 @@ const useRestartOnOdometerImagesFailure = (
         ).then((results) => {
             const canBeRead = results.every(Boolean);
             if (canBeRead) {
+                setAsyncVerificationPassed(true);
+                return;
+            }
+
+            // Images replaced since this check was queued (e.g. ODOMETER_DRAFT rehydration or a fresh
+            // capture) — bail rather than clobber the live state with destructive recovery.
+            const liveStartUri = getOdometerImageUri(transactionRef.current?.comment?.odometerStartImage);
+            const liveEndUri = getOdometerImageUri(transactionRef.current?.comment?.odometerEndImage);
+            if (liveStartUri !== getOdometerImageUri(startImage) || liveEndUri !== getOdometerImageUri(endImage)) {
                 setAsyncVerificationPassed(true);
                 return;
             }

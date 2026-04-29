@@ -32,7 +32,7 @@ import {setMoneyRequestDistance} from '@libs/actions/IOU';
 import {handleMoneyRequestStepDistanceNavigation} from '@libs/actions/IOU/MoneyRequest';
 import {setDraftSplitTransaction} from '@libs/actions/IOU/Split';
 import {updateMoneyRequestDistance} from '@libs/actions/IOU/UpdateMoneyRequest';
-import {clearOdometerDraft, saveOdometerDraft, setMoneyRequestOdometerReading} from '@libs/actions/OdometerTransactionUtils';
+import {clearOdometerDraft, isOdometerDraftPendingHydration, saveOdometerDraft, setMoneyRequestOdometerReading} from '@libs/actions/OdometerTransactionUtils';
 import {createBackupTransaction, removeBackupTransactionWithImageCleanup, restoreOriginalTransactionFromBackupWithImageCleanup} from '@libs/actions/TransactionEdit';
 import DistanceRequestUtils from '@libs/DistanceRequestUtils';
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
@@ -160,9 +160,11 @@ function IOURequestStepDistanceOdometer({
 
     const confirmationRoute = ROUTES.MONEY_REQUEST_STEP_CONFIRMATION.getRoute(action, iouType, transactionID, reportID, backToReport);
 
-    useRestartOnOdometerImagesFailure(transaction, reportID, iouType, backToReport, () => {
+    const {hasVerifiedBlobs} = useRestartOnOdometerImagesFailure(transaction, reportID, iouType, backToReport, () => {
         backupHandledManually.current = true;
     });
+
+    const [odometerDraft] = useOnyx(ONYXKEYS.ODOMETER_DRAFT);
 
     // Get odometer images from transaction (only for display, not for initialization)
     const odometerStartImage = transaction?.comment?.odometerStartImage;
@@ -199,10 +201,19 @@ function IOURequestStepDistanceOdometer({
         if (hasInitializedRefs.current) {
             return;
         }
-        // Wait for initMoneyRequest's draft hydration before snapshotting the baseline,
-        // otherwise the discard modal fires for unedited odometer drafts
+        // Skip until we have meaningful odometer data to snapshot.
         const isOdometerTransaction = currentTransaction?.iouRequestType === CONST.IOU.REQUEST_TYPE.DISTANCE_ODOMETER;
         if (!isEditing && !isOdometerTransaction) {
+            return;
+        }
+        // Wait for blob verification — otherwise Cmd+R would snapshot a stale blob URI before
+        // useRestartOnOdometerImagesFailure swaps in a fresh one, and the diff would look like an edit.
+        if (!hasVerifiedBlobs) {
+            return;
+        }
+        // Wait for the save-for-later draft to land in the transaction; otherwise post-hydration
+        // values would later look like unsaved changes against this baseline.
+        if (isOdometerDraftPendingHydration(odometerDraft, currentTransaction?.comment)) {
             return;
         }
         const currentStart = currentTransaction?.comment?.odometerStart;
@@ -221,6 +232,8 @@ function IOURequestStepDistanceOdometer({
         currentTransaction?.comment?.odometerStartImage,
         currentTransaction?.comment?.odometerEndImage,
         isEditing,
+        hasVerifiedBlobs,
+        odometerDraft,
     ]);
 
     // Initialize values from transaction when editing or when transaction has data (but not when switching tabs)
@@ -415,7 +428,6 @@ function IOURequestStepDistanceOdometer({
 
     const [recentWaypoints] = useOnyx(ONYXKEYS.NVP_RECENT_WAYPOINTS);
     const [betas] = useOnyx(ONYXKEYS.BETAS);
-    const [odometerDraft] = useOnyx(ONYXKEYS.ODOMETER_DRAFT);
     // Navigate to next page following Manual tab pattern
     const navigateToNextPage = () => {
         const start = parseFloat(DistanceRequestUtils.normalizeOdometerText(startReading, fromLocaleDigit));
@@ -615,7 +627,7 @@ function IOURequestStepDistanceOdometer({
             });
         },
         getHasUnsavedChanges: () => {
-            if (!isFocused || isEditing || shouldBypassDiscardConfirmationRef.current || didSaveEditingConfirmationRef.current) {
+            if (!isFocused || isEditing || shouldBypassDiscardConfirmationRef.current || didSaveEditingConfirmationRef.current || !hasInitializedRefs.current) {
                 return false;
             }
             const hasReadingChanges = startReadingRef.current !== initialStartReadingRef.current || endReadingRef.current !== initialEndReadingRef.current;

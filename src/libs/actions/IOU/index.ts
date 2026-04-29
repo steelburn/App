@@ -5,7 +5,6 @@ import type {NullishDeep, OnyxCollection, OnyxEntry, OnyxInputValue, OnyxKey, On
 import Onyx from 'react-native-onyx';
 import type {ValueOf} from 'type-fest';
 import type {SearchQueryJSON} from '@components/Search/types';
-import {buildOdometerCommentFromDraft} from '@libs/actions/OdometerTransactionUtils';
 import type {UpdateMoneyRequestParams} from '@libs/API/parameters';
 import DateUtils from '@libs/DateUtils';
 import DistanceRequestUtils from '@libs/DistanceRequestUtils';
@@ -138,7 +137,6 @@ type InitMoneyRequestParams = {
     isTrackDistanceExpense?: boolean;
     hasOnlyPersonalPolicies: boolean;
     draftTransactionIDs?: string[];
-    odometerDraft?: OnyxEntry<OnyxTypes.OdometerDraft>;
 };
 
 type UpdateMoneyRequestData<TKey extends OnyxKey> = {
@@ -640,7 +638,6 @@ function initMoneyRequest({
     currentUserPersonalDetails,
     hasOnlyPersonalPolicies,
     draftTransactionIDs,
-    odometerDraft,
 }: InitMoneyRequestParams) {
     // Generate a brand new transactionID
     const newTransactionID = CONST.IOU.OPTIMISTIC_TRANSACTION_ID;
@@ -654,26 +651,15 @@ function initMoneyRequest({
     // in case we have to re-init money request, but the IOU request type is the same with the old draft transaction,
     // we should keep most of the existing data by using the ONYX MERGE operation
     if (currentIouRequestType === newIouRequestType) {
-        const baseUpdate: Partial<OnyxTypes.Transaction> = {
+        // so, we just need to update the reportID, isFromGlobalCreate, created, currency
+        Onyx.merge(`${ONYXKEYS.COLLECTION.TRANSACTION_DRAFT}${newTransactionID}`, {
             reportID,
             isFromGlobalCreate,
             isFromFloatingActionButton,
             created,
             currency,
             transactionID: newTransactionID,
-        };
-
-        // Hydrate any saved odometer draft so a re-entry with iouRequestType already set to
-        // DISTANCE_ODOMETER (e.g. after blob-URL recovery on web refresh) restores readings and images.
-        if (newIouRequestType === CONST.IOU.REQUEST_TYPE.DISTANCE_ODOMETER) {
-            const existingDraftComment = allTransactionDrafts[`${ONYXKEYS.COLLECTION.TRANSACTION_DRAFT}${newTransactionID}`]?.comment;
-            const odometerCommentUpdate = buildOdometerCommentFromDraft(newTransactionID, odometerDraft, existingDraftComment);
-            if (odometerCommentUpdate) {
-                baseUpdate.comment = odometerCommentUpdate;
-            }
-        }
-
-        Onyx.merge(`${ONYXKEYS.COLLECTION.TRANSACTION_DRAFT}${newTransactionID}`, baseUpdate);
+        });
         return;
     }
 
@@ -707,10 +693,6 @@ function initMoneyRequest({
                 waypoint0: {keyForList: 'start_waypoint'},
                 waypoint1: {keyForList: 'stop_waypoint'},
             };
-        }
-        if (newIouRequestType === CONST.IOU.REQUEST_TYPE.DISTANCE_ODOMETER) {
-            const existingDraftComment = allTransactionDrafts[`${ONYXKEYS.COLLECTION.TRANSACTION_DRAFT}${newTransactionID}`]?.comment;
-            Object.assign(comment, buildOdometerCommentFromDraft(newTransactionID, odometerDraft, existingDraftComment) ?? {});
         }
     }
 

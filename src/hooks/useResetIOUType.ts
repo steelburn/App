@@ -10,6 +10,7 @@ import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {Policy, Report, Transaction} from '@src/types/onyx';
 import useCurrentUserPersonalDetails from './useCurrentUserPersonalDetails';
+import useOdometerDraftHydrator from './useOdometerDraftHydrator';
 import useOnyx from './useOnyx';
 import usePersonalPolicy from './usePersonalPolicy';
 import usePrevious from './usePrevious';
@@ -63,19 +64,23 @@ function useResetIOUType({
     const [lastSelectedDistanceRates] = useOnyx(ONYXKEYS.NVP_LAST_SELECTED_DISTANCE_RATES);
     const [currentDate] = useOnyx(ONYXKEYS.CURRENT_DATE);
     const [draftTransactionIDs] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION_DRAFT, {selector: validTransactionDraftIDsSelector});
-    const [odometerDraft] = useOnyx(ONYXKEYS.ODOMETER_DRAFT);
 
     const personalPolicy = usePersonalPolicy();
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
+
+    const hydrateOdometerOnLanding = useOdometerDraftHydrator({
+        transaction,
+        transactionRequestType,
+        isLoadingTransaction,
+        isLoadingSelectedTab,
+    });
 
     const resetIOUTypeIfChanged = (newIOUType: IOURequestType) => {
         if (!(skipKeyboardDismissForPerDiem && newIOUType === CONST.IOU.REQUEST_TYPE.PER_DIEM)) {
             Keyboard.dismiss();
         }
 
-        // For odometer, fall through to initMoneyRequest even when types match so a saved
-        // odometer draft can hydrate (e.g. after blob-URL recovery clears comment.odometer* on web refresh).
-        if (transaction?.iouRequestType === newIOUType && newIOUType !== CONST.IOU.REQUEST_TYPE.DISTANCE_ODOMETER) {
+        if (transaction?.iouRequestType === newIOUType) {
             return;
         }
 
@@ -97,8 +102,11 @@ function useResetIOUType({
             currentUserPersonalDetails,
             hasOnlyPersonalPolicies: hasOnlyPersonalPolicies ?? true,
             draftTransactionIDs,
-            odometerDraft,
         });
+
+        // Layer odometer draft fields onto the freshly-rebuilt transaction. The merge queues after
+        // initMoneyRequest's Onyx.set, so the odometer fields land on top.
+        hydrateOdometerOnLanding(newIOUType);
     };
 
     const tabSelectedTypeRef = useRef<IOURequestType | null>(null);
