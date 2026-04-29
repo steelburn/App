@@ -3609,6 +3609,7 @@ function createSplitsAndOnyxData({
                 payeeEmail: currentUserEmailForIOUSplit,
                 participants: [participant],
                 transactionID: oneOnOneTransaction.transactionID,
+                currentUserAccountID,
             });
 
         // Add optimistic personal details for new participants
