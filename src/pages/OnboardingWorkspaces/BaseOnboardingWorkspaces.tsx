@@ -86,7 +86,7 @@ function BaseOnboardingWorkspaces({route, shouldUseNativeStyles}: BaseOnboarding
         const shouldUseSubmitFlow = canUseSubmit2026 && (!onboardingPurposeSelected || onboardingPurposeSelected === CONST.ONBOARDING_CHOICES.EMPLOYER);
 
         if (policy.automaticJoiningEnabled) {
-            joinAccessiblePolicy(policy.policyID, shouldUseSubmitFlow);
+            joinAccessiblePolicy(policy.policyID);
         } else {
             askToJoinPolicy(policy.policyID);
         }
