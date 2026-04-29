@@ -485,7 +485,7 @@ function ComposerWithSuggestions({
             // previous text before change
             const prevText = lastTextRef.current;
             // snapshot selection (should be the selection that was active just before the paste/change)
-            const prevSelectionStart = selection?.start ?? 0;
+            const prevSelectionStart = selection.start ?? 0;
             const prevSelectionEnd = selection?.end ?? 0;
 
             // detect newly added text (existing helper)
@@ -578,7 +578,7 @@ function ComposerWithSuggestions({
             suggestionsRef,
             raiseIsScrollLikelyLayoutTriggered,
             selection.end,
-            selection?.start,
+            selection.start,
             setCurrentEditMessageSelection,
             setEditingMessage,
             shouldUseNarrowLayout,
