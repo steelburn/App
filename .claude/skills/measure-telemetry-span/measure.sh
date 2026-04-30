@@ -105,8 +105,8 @@ reset_if_needed() {
 
 # After --relaunch on Android, UIAutomator often returns Snapshot: 0 nodes briefly; warmup replay then fails @pre.
 wait_until_android_ui_ready() {
-  local attempt snapshot
-  for attempt in $(seq 1 60); do
+  local snapshot
+  for _ in $(seq 1 60); do
     snapshot="$(agent-device snapshot 2>/dev/null || true)"
     if [[ "$snapshot" == *'"Home"'* && "$snapshot" == *'"Inbox'* ]]; then
       return
