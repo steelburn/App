@@ -21,7 +21,6 @@ import Navigation from '@libs/Navigation/Navigation';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
 // eslint-disable-next-line no-restricted-imports
 import TransitionTracker from '@libs/Navigation/TransitionTracker';
-import {getReportOfflinePendingActionAndErrors} from '@libs/ReportUtils';
 import {getPendingSubmitFollowUpAction} from '@libs/telemetry/submitFollowUpAction';
 import type {ReportsSplitNavigatorParamList, RightModalNavigatorParamList} from '@navigation/types';
 import CONST from '@src/CONST';
@@ -124,14 +123,22 @@ function ReportScreen({route, navigation}: ReportScreenProps) {
 
     const actionListValue = useActionListContextValue();
 
-    const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportIDFromRoute}`);
-    const {reportPendingAction, reportErrors} = getReportOfflinePendingActionAndErrors(report);
+    const [reportPendingActionAndErrors] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportIDFromRoute}`, {
+        selector: (r) => ({
+            reportPendingAction: r?.pendingFields?.addWorkspaceRoom ?? r?.pendingFields?.createChat ?? r?.pendingFields?.createReport ?? r?.pendingFields?.reportName,
+            reportErrors: r?.errorFields?.addWorkspaceRoom ?? r?.errorFields?.createChat ?? r?.errorFields?.createReport,
+        }),
+    });
+    const {reportPendingAction, reportErrors} = reportPendingActionAndErrors ?? {};
 
-    const dismissReportCreationError = useCallback(() => {
+    const dismissReportCreationError = () => {
         Navigation.goBack();
+        // Defer the Onyx wipe until after the back-navigation animation completes so the user
+        // doesn't see the report disappear from underneath them mid-transition. InteractionManager
+        // is the cross-platform primitive for this; the Promise-based replacement isn't available yet.
         // eslint-disable-next-line @typescript-eslint/no-deprecated
         InteractionManager.runAfterInteractions(() => removeFailedReport(reportIDFromRoute));
-    }, [reportIDFromRoute]);
+    };
 
     return (
         <WideRHPOverlayWrapper shouldWrap={route.name === SCREENS.RIGHT_MODAL.SEARCH_REPORT}>
