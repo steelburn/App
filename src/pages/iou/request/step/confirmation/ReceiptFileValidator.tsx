@@ -62,7 +62,7 @@ function ReceiptFileValidator({
                 const isLocalFile = isLocalFileFileUtils(itemReceiptPath);
 
                 if (!isLocalFile) {
-                    if (item.receipt) {
+                    if (item.receipt && itemReceiptPath) {
                         newReceiptFiles = {...newReceiptFiles, [item.transactionID]: item.receipt};
                     }
                     return Promise.resolve();
