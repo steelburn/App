@@ -1,7 +1,6 @@
 import React, {useMemo, useRef} from 'react';
 import type {GestureResponderEvent, ViewStyle} from 'react-native';
 import {StyleSheet, View} from 'react-native';
-import Badge from '@components/Badge';
 import DisplayNames from '@components/DisplayNames';
 import Icon from '@components/Icon';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
@@ -18,20 +17,20 @@ import useStyleUtils from '@hooks/useStyleUtils';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import DateUtils from '@libs/DateUtils';
-import {containsCustomEmoji as containsCustomEmojiUtils, containsOnlyCustomEmoji} from '@libs/EmojiUtils';
 import FS from '@libs/Fullstory';
 import {shouldOptionShowTooltip, shouldUseBoldText} from '@libs/OptionsListUtils';
 import ReportActionComposeFocusManager from '@libs/ReportActionComposeFocusManager';
 import {getDelegateAccountIDFromReportAction} from '@libs/ReportActionsUtils';
 import {isAdminRoom, isChatUsedForOnboarding as isChatUsedForOnboardingReportUtils, isConciergeChatReport, isGroupChat, isOneOnOneChat, isSystemChat} from '@libs/ReportUtils';
 import {startSpan} from '@libs/telemetry/activeSpans';
-import TextWithEmojiFragment from '@pages/inbox/report/comment/TextWithEmojiFragment';
 import FreeTrial from '@pages/settings/Subscription/FreeTrial';
 import variables from '@styles/variables';
 import CONST from '@src/CONST';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
 import LHNAvatar from './LHNAvatar';
 import {useLHNTooltipContext} from './LHNTooltipContext';
+import OptionRowActionBadge from './OptionRowActionBadge';
+import OptionRowAlternateText from './OptionRowAlternateText';
 import OptionRowPressable from './OptionRowPressable';
 import OptionRowTooltipLayer from './OptionRowTooltipLayer';
 import type {OptionRowLHNProps} from './types';
@@ -54,7 +53,7 @@ function OptionRowLHN({
     const styles = useThemeStyles();
     const popoverAnchor = useRef<View>(null);
     const StyleUtils = useStyleUtils();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Pencil', 'DotIndicator', 'Pin']);
+    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Pencil', 'Pin']);
 
     const {onboardingPurpose, onboarding, firstReportIDWithGBRorRBR, isScreenFocused} = useLHNTooltipContext();
     const shouldShowRBRorGBRTooltip = firstReportIDWithGBRorRBR === reportID;
@@ -76,11 +75,6 @@ function OptionRowLHN({
         isInFocusMode
             ? [styles.chatLinkRowPressable, styles.flexGrow1, styles.optionItemAvatarNameWrapper, styles.optionRowCompact, styles.justifyContentCenter]
             : [styles.chatLinkRowPressable, styles.flexGrow1, styles.optionItemAvatarNameWrapper, styles.optionRow, styles.justifyContentCenter],
-    );
-
-    const alternateTextContainsCustomEmojiWithText = useMemo(
-        () => containsCustomEmojiUtils(optionItem?.alternateText) && !containsOnlyCustomEmoji(optionItem?.alternateText),
-        [optionItem?.alternateText],
     );
 
     const delegateAccountID = useMemo(
@@ -275,22 +269,11 @@ function OptionRowLHN({
                                         )}
                                     </View>
                                     {!!optionItem.alternateText && (
-                                        <Text
+                                        <OptionRowAlternateText
+                                            alternateText={optionItem.alternateText}
                                             style={alternateTextStyle}
-                                            numberOfLines={1}
-                                            accessibilityLabel={translate('accessibilityHints.lastChatMessagePreview')}
-                                            fsClass={alternateTextFSClass}
-                                        >
-                                            {alternateTextContainsCustomEmojiWithText ? (
-                                                <TextWithEmojiFragment
-                                                    message={optionItem.alternateText}
-                                                    style={[alternateTextStyle, styles.mh0]}
-                                                    alignCustomEmoji
-                                                />
-                                            ) : (
-                                                optionItem.alternateText
-                                            )}
-                                        </Text>
+                                            forwardedFSClass={alternateTextFSClass}
+                                        />
                                     )}
                                 </View>
                                 {optionItem?.descriptiveText ? (
@@ -302,41 +285,20 @@ function OptionRowLHN({
                                     </View>
                                 ) : null}
                                 {brickRoadIndicator === CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR && (
-                                    <View style={[styles.alignItemsCenter, styles.justifyContentCenter]}>
-                                        {actionBadgeText ? (
-                                            <Badge
-                                                text={actionBadgeText}
-                                                error
-                                                isStrong
-                                            />
-                                        ) : (
-                                            <Icon
-                                                testID="RBR Icon"
-                                                src={expensifyIcons.DotIndicator}
-                                                fill={theme.danger}
-                                            />
-                                        )}
-                                    </View>
+                                    <OptionRowActionBadge
+                                        severity="error"
+                                        actionBadgeText={actionBadgeText}
+                                    />
                                 )}
                             </View>
                         </View>
                         <View style={[styles.flexRow, styles.alignItemsCenter]}>
-                            {brickRoadIndicator === CONST.BRICK_ROAD_INDICATOR_STATUS.INFO &&
-                                (actionBadgeText ? (
-                                    <Badge
-                                        text={actionBadgeText}
-                                        success
-                                        isStrong
-                                    />
-                                ) : (
-                                    <View style={styles.ml2}>
-                                        <Icon
-                                            testID="GBR Icon"
-                                            src={expensifyIcons.DotIndicator}
-                                            fill={theme.success}
-                                        />
-                                    </View>
-                                ))}
+                            {brickRoadIndicator === CONST.BRICK_ROAD_INDICATOR_STATUS.INFO && (
+                                <OptionRowActionBadge
+                                    severity="info"
+                                    actionBadgeText={actionBadgeText}
+                                />
+                            )}
                             {hasDraftComment && !!optionItem.isAllowedToComment && (
                                 <View
                                     style={styles.ml2}
