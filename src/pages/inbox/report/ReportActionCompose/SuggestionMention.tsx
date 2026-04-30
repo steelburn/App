@@ -127,33 +127,42 @@ function SuggestionMention({
      *
      * The function is debounced to not perform requests on every keystroke.
      */
-    const debouncedSearchInServer = useDebounce(() => {
-        const foundSuggestionsCount = suggestionValues.suggestedMentions.length;
-        if (suggestionValues.prefixType === '#' && foundSuggestionsCount < 5 && isGroupPolicyReport) {
-            searchInServer(suggestionValues.mentionPrefix, policyID);
-        }
-    }, CONST.TIMING.SEARCH_OPTION_LIST_DEBOUNCE_TIME);
+    const debouncedSearchInServer = useDebounce(
+        useCallback(() => {
+            const foundSuggestionsCount = suggestionValues.suggestedMentions.length;
+            if (suggestionValues.prefixType === '#' && foundSuggestionsCount < 5 && isGroupPolicyReport) {
+                searchInServer(suggestionValues.mentionPrefix, policyID);
+            }
+        }, [suggestionValues.suggestedMentions.length, suggestionValues.prefixType, suggestionValues.mentionPrefix, policyID, isGroupPolicyReport]),
+        CONST.TIMING.SEARCH_OPTION_LIST_DEBOUNCE_TIME,
+    );
 
-    const formatLoginPrivateDomain = (displayText = '', userLogin = '') => {
-        if (userLogin !== displayText) {
-            return displayText;
-        }
-        // If the emails are not in the same private domain, we also return the displayText
-        if (!areEmailsFromSamePrivateDomain(displayText, currentUserPersonalDetails.login ?? '')) {
-            return Str.removeSMSDomain(displayText);
-        }
+    const formatLoginPrivateDomain = useCallback(
+        (displayText = '', userLogin = '') => {
+            if (userLogin !== displayText) {
+                return displayText;
+            }
+            // If the emails are not in the same private domain, we also return the displayText
+            if (!areEmailsFromSamePrivateDomain(displayText, currentUserPersonalDetails.login ?? '')) {
+                return Str.removeSMSDomain(displayText);
+            }
 
-        // Otherwise, the emails must be of the same private domain, so we should remove the domain part
-        return displayText.split('@').at(0);
-    };
+            // Otherwise, the emails must be of the same private domain, so we should remove the domain part
+            return displayText.split('@').at(0);
+        },
+        [currentUserPersonalDetails.login],
+    );
 
-    const getMentionCode = (mention: Mention, mentionType: string): string => {
-        if (mentionType === '#') {
-            // room mention case
-            return mention.handle ?? '';
-        }
-        return mention.text === CONST.AUTO_COMPLETE_SUGGESTER.HERE_TEXT ? CONST.AUTO_COMPLETE_SUGGESTER.HERE_TEXT : `@${formatLoginPrivateDomain(mention.handle, mention.handle)}`;
-    };
+    const getMentionCode = useCallback(
+        (mention: Mention, mentionType: string): string => {
+            if (mentionType === '#') {
+                // room mention case
+                return mention.handle ?? '';
+            }
+            return mention.text === CONST.AUTO_COMPLETE_SUGGESTER.HERE_TEXT ? CONST.AUTO_COMPLETE_SUGGESTER.HERE_TEXT : `@${formatLoginPrivateDomain(mention.handle, mention.handle)}`;
+        },
+        [formatLoginPrivateDomain],
+    );
 
     function getOriginalMentionText(inputValue: string, atSignIndex: number, whiteSpacesLength = 0) {
         const rest = inputValue.slice(atSignIndex);
@@ -175,269 +184,305 @@ function SuggestionMention({
     /**
      * Replace the code of mention and update selection
      */
-    const insertSelectedMention = (highlightedMentionIndexInner: number) => {
-        const commentBeforeAtSign = value.slice(0, suggestionValues.atSignIndex);
-        const mentionObject = suggestionValues.suggestedMentions.at(highlightedMentionIndexInner);
-        if (!mentionObject || highlightedMentionIndexInner === -1) {
-            return;
-        }
+    const insertSelectedMention = useCallback(
+        (highlightedMentionIndexInner: number) => {
+            const commentBeforeAtSign = value.slice(0, suggestionValues.atSignIndex);
+            const mentionObject = suggestionValues.suggestedMentions.at(highlightedMentionIndexInner);
+            if (!mentionObject || highlightedMentionIndexInner === -1) {
+                return;
+            }
 
-        const mentionCode = getMentionCode(mentionObject, suggestionValues.prefixType);
-        const originalMention = getOriginalMentionText(value, suggestionValues.atSignIndex, StringUtils.countWhiteSpaces(suggestionValues.mentionPrefix));
+            const mentionCode = getMentionCode(mentionObject, suggestionValues.prefixType);
+            const originalMention = getOriginalMentionText(value, suggestionValues.atSignIndex, StringUtils.countWhiteSpaces(suggestionValues.mentionPrefix));
 
-        // We split trailing dot from the mention token so selecting `@a.` can become `@adam.`
-        // (preserve sentence punctuation) instead of consuming the `.` into the replacement.
-        let trailingDot = '';
-        let mentionToReplace = originalMention;
-        if (suggestionValues.prefixType === '@' && suggestionValues.mentionPrefix.endsWith('.')) {
-            trailingDot = originalMention.match(CONST.REGEX.TRAILING_DOTS)?.[0] ?? '';
-            mentionToReplace = originalMention.slice(0, originalMention.length - trailingDot.length);
-        }
+            // We split trailing dot from the mention token so selecting `@a.` can become `@adam.`
+            // (preserve sentence punctuation) instead of consuming the `.` into the replacement.
+            let trailingDot = '';
+            let mentionToReplace = originalMention;
+            if (suggestionValues.prefixType === '@' && suggestionValues.mentionPrefix.endsWith('.')) {
+                trailingDot = originalMention.match(CONST.REGEX.TRAILING_DOTS)?.[0] ?? '';
+                mentionToReplace = originalMention.slice(0, originalMention.length - trailingDot.length);
+            }
 
-        // Append a preserved trailing dot only when it is sentence punctuation, not part of the selected mention match.
-        const dotToAppend =
-            trailingDot && ![mentionObject.text, mentionObject.alternateText].some((mentionText) => mentionText.toLowerCase().includes(suggestionValues.mentionPrefix.toLowerCase()))
-                ? trailingDot
-                : '';
+            // Append a preserved trailing dot only when it is sentence punctuation, not part of the selected mention match.
+            const dotToAppend =
+                trailingDot && ![mentionObject.text, mentionObject.alternateText].some((mentionText) => mentionText.toLowerCase().includes(suggestionValues.mentionPrefix.toLowerCase()))
+                    ? trailingDot
+                    : '';
 
-        const commentAfterMention = value.slice(suggestionValues.atSignIndex + Math.max(mentionToReplace.length, suggestionValues.mentionPrefix.length + suggestionValues.prefixType.length));
+            const commentAfterMention = value.slice(
+                suggestionValues.atSignIndex + Math.max(mentionToReplace.length, suggestionValues.mentionPrefix.length + suggestionValues.prefixType.length),
+            );
 
-        const trimmedCommentAfterMention = trimLeadingSpace(commentAfterMention);
-        const spacer = !trimmedCommentAfterMention || !CONST.REGEX.STARTS_WITH_PUNCTUATION.test(trimmedCommentAfterMention) ? ' ' : '';
+            const trimmedCommentAfterMention = trimLeadingSpace(commentAfterMention);
+            const spacer = !trimmedCommentAfterMention || !CONST.REGEX.STARTS_WITH_PUNCTUATION.test(trimmedCommentAfterMention) ? ' ' : '';
 
-        updateComment(`${commentBeforeAtSign}${mentionCode}${dotToAppend}${spacer}${trimmedCommentAfterMention}`, true);
-        const selectionPosition = suggestionValues.atSignIndex + mentionCode.length + dotToAppend.length + spacer.length;
-        setSelection({
-            start: selectionPosition,
-            end: selectionPosition,
-        });
-        suggestionInsertionIndexRef.current = selectionPosition;
-        setSuggestionValues((prevState) => ({
-            ...prevState,
-            suggestedMentions: [],
-            shouldShowSuggestionMenu: false,
-        }));
-    };
+            updateComment(`${commentBeforeAtSign}${mentionCode}${dotToAppend}${spacer}${trimmedCommentAfterMention}`, true);
+            const selectionPosition = suggestionValues.atSignIndex + mentionCode.length + dotToAppend.length + spacer.length;
+            setSelection({
+                start: selectionPosition,
+                end: selectionPosition,
+            });
+            suggestionInsertionIndexRef.current = selectionPosition;
+            setSuggestionValues((prevState) => ({
+                ...prevState,
+                suggestedMentions: [],
+                shouldShowSuggestionMenu: false,
+            }));
+        },
+        [value, suggestionValues.atSignIndex, suggestionValues.suggestedMentions, suggestionValues.prefixType, getMentionCode, updateComment, setSelection, suggestionValues.mentionPrefix],
+    );
 
     /**
      * Clean data related to suggestions
      */
-    const resetSuggestions = () => {
+    const resetSuggestions = useCallback(() => {
         setSuggestionValues(defaultSuggestionsValues);
-    };
+    }, []);
 
     /**
      * Listens for keyboard shortcuts and applies the action
      */
-    const triggerHotkeyActions = (event: KeyboardEvent) => {
-        const suggestionsExist = suggestionValues.suggestedMentions.length > 0;
+    const triggerHotkeyActions = useCallback(
+        (event: KeyboardEvent) => {
+            const suggestionsExist = suggestionValues.suggestedMentions.length > 0;
 
-        if (((!event.shiftKey && event.key === CONST.KEYBOARD_SHORTCUTS.ENTER.shortcutKey) || event.key === CONST.KEYBOARD_SHORTCUTS.TAB.shortcutKey) && suggestionsExist) {
-            event.preventDefault();
-            if (suggestionValues.suggestedMentions.length > 0) {
-                insertSelectedMention(highlightedMentionIndex);
+            if (((!event.shiftKey && event.key === CONST.KEYBOARD_SHORTCUTS.ENTER.shortcutKey) || event.key === CONST.KEYBOARD_SHORTCUTS.TAB.shortcutKey) && suggestionsExist) {
+                event.preventDefault();
+                if (suggestionValues.suggestedMentions.length > 0) {
+                    insertSelectedMention(highlightedMentionIndex);
+                    return true;
+                }
+            }
+
+            if (event.key === CONST.KEYBOARD_SHORTCUTS.ESCAPE.shortcutKey) {
+                event.preventDefault();
+
+                if (suggestionsExist) {
+                    resetSuggestions();
+                }
+
                 return true;
             }
-        }
+        },
+        [highlightedMentionIndex, insertSelectedMention, resetSuggestions, suggestionValues.suggestedMentions.length],
+    );
 
-        if (event.key === CONST.KEYBOARD_SHORTCUTS.ESCAPE.shortcutKey) {
-            event.preventDefault();
+    const getUserMentionOptions = useCallback(
+        (searchValue = ''): Mention[] => {
+            const policyEmployeeAccountIDs = getPolicyEmployeeAccountIDs(policy, currentUserPersonalDetails.accountID);
+            const shouldWeightDetails = isGroupChat(currentReport) || doesReportBelongToWorkspace(currentReport, policyEmployeeAccountIDs, policyID, conciergeReportID);
 
-            if (suggestionsExist) {
-                resetSuggestions();
+            let personalDetailsParam: PersonalDetailsList | SuggestionPersonalDetailsList | undefined;
+
+            if (!shouldWeightDetails) {
+                personalDetailsParam = personalDetails;
+            } else {
+                // Smaller weight means higher order in suggestion list
+                const getPersonalDetailsWeight = (detail: PersonalDetails): number => {
+                    if (isReportParticipant(detail.accountID, currentReport)) {
+                        return 0;
+                    }
+                    if (policyEmployeeAccountIDs.includes(detail.accountID)) {
+                        return 1;
+                    }
+                    return 2;
+                };
+                personalDetailsParam = lodashMapValues(personalDetails, (detail) => (detail ? {...detail, weight: getPersonalDetailsWeight(detail)} : null));
             }
 
-            return true;
-        }
-    };
+            const suggestions: Mention[] = [];
 
-    const getUserMentionOptions = (searchValue = ''): Mention[] => {
-        const policyEmployeeAccountIDs = getPolicyEmployeeAccountIDs(policy, currentUserPersonalDetails.accountID);
-        const shouldWeightDetails = isGroupChat(currentReport) || doesReportBelongToWorkspace(currentReport, policyEmployeeAccountIDs, policyID, conciergeReportID);
-
-        let personalDetailsParam: PersonalDetailsList | SuggestionPersonalDetailsList | undefined;
-
-        if (!shouldWeightDetails) {
-            personalDetailsParam = personalDetails;
-        } else {
-            // Smaller weight means higher order in suggestion list
-            const getPersonalDetailsWeight = (detail: PersonalDetails): number => {
-                if (isReportParticipant(detail.accountID, currentReport)) {
-                    return 0;
-                }
-                if (policyEmployeeAccountIDs.includes(detail.accountID)) {
-                    return 1;
-                }
-                return 2;
-            };
-            personalDetailsParam = lodashMapValues(personalDetails, (detail) => (detail ? {...detail, weight: getPersonalDetailsWeight(detail)} : null));
-        }
-
-        const suggestions: Mention[] = [];
-
-        if (CONST.AUTO_COMPLETE_SUGGESTER.HERE_TEXT.includes(searchValue.toLowerCase())) {
-            suggestions.push({
-                text: CONST.AUTO_COMPLETE_SUGGESTER.HERE_TEXT,
-                alternateText: translate('mentionSuggestions.hereAlternateText'),
-                icons: [
-                    {
-                        source: expensifyIcons.Megaphone,
-                        type: CONST.ICON_TYPE_AVATAR,
-                    },
-                ],
-            });
-        }
-
-        // Create a set to track logins that have already been seen
-        const seenLogins = new Set<string>();
-        const filteredPersonalDetails = Object.values(personalDetailsParam ?? {}).filter((detail) => {
-            // If we don't have user's primary login, that member is not known to the current user and hence we do not allow them to be mentioned
-            if (!detail?.login || detail.isOptimisticPersonalDetail) {
-                return false;
-            }
-            // We don't want to mention system emails like notifications@expensify.com
-            if (CONST.RESTRICTED_EMAILS.includes(detail.login) || CONST.RESTRICTED_ACCOUNT_IDS.includes(detail.accountID)) {
-                return false;
-            }
-            const displayName = getDisplayNameOrDefault(detail);
-            const displayText = displayName === formatPhoneNumber(detail.login) ? displayName : `${displayName} ${detail.login}`;
-            if (searchValue && !displayText.toLowerCase().includes(searchValue.toLowerCase())) {
-                return false;
-            }
-
-            // Given the mention is inserted by user, we don't want to show the mention options unless the
-            // selection index changes. In that case, suggestionInsertionIndexRef.current will be null.
-            // See https://github.com/Expensify/App/issues/38358 for more context
-            if (suggestionInsertionIndexRef.current) {
-                return false;
-            }
-
-            // on staging server, in specific cases (see issue) BE returns duplicated personalDetails
-            // entries with the same `login` which we need to filter out
-            if (seenLogins.has(detail.login)) {
-                return false;
-            }
-            seenLogins.add(detail.login);
-            return true;
-        }) as Array<PersonalDetails & {weight: number}>;
-
-        // At this point we are sure that the details are not null, since empty user details have been filtered in the previous step
-        const sortedPersonalDetails = getSortedPersonalDetails(filteredPersonalDetails, localeCompare);
-
-        for (const detail of sortedPersonalDetails.slice(0, CONST.AUTO_COMPLETE_SUGGESTER.MAX_AMOUNT_OF_SUGGESTIONS - suggestions.length)) {
-            suggestions.push({
-                text: `${formatLoginPrivateDomain(getDisplayNameOrDefault(detail), detail?.login)}`,
-                alternateText: `@${formatLoginPrivateDomain(detail?.login, detail?.login)}`,
-                handle: detail?.login,
-                icons: [
-                    {
-                        name: detail?.login,
-                        source: detail?.avatar ?? expensifyIcons.FallbackAvatar,
-                        type: CONST.ICON_TYPE_AVATAR,
-                        fallbackIcon: detail?.fallbackIcon,
-                        id: detail?.accountID,
-                    },
-                ],
-            });
-        }
-
-        return suggestions;
-    };
-
-    const getRoomMentionOptions = (searchTerm: string): Mention[] => {
-        const filteredRoomMentions: Mention[] = [];
-        for (const report of Object.values(mentionableReports ?? {})) {
-            if (report?.reportName?.toLowerCase().includes(searchTerm.toLowerCase())) {
-                filteredRoomMentions.push({
-                    text: report.reportName,
-                    handle: report.reportName,
-                    alternateText: report.reportName,
+            if (CONST.AUTO_COMPLETE_SUGGESTER.HERE_TEXT.includes(searchValue.toLowerCase())) {
+                suggestions.push({
+                    text: CONST.AUTO_COMPLETE_SUGGESTER.HERE_TEXT,
+                    alternateText: translate('mentionSuggestions.hereAlternateText'),
+                    icons: [
+                        {
+                            source: expensifyIcons.Megaphone,
+                            type: CONST.ICON_TYPE_AVATAR,
+                        },
+                    ],
                 });
             }
-        }
 
-        return lodashSortBy(filteredRoomMentions, 'handle').slice(0, CONST.AUTO_COMPLETE_SUGGESTER.MAX_AMOUNT_OF_SUGGESTIONS);
-    };
+            // Create a set to track logins that have already been seen
+            const seenLogins = new Set<string>();
+            const filteredPersonalDetails = Object.values(personalDetailsParam ?? {}).filter((detail) => {
+                // If we don't have user's primary login, that member is not known to the current user and hence we do not allow them to be mentioned
+                if (!detail?.login || detail.isOptimisticPersonalDetail) {
+                    return false;
+                }
+                // We don't want to mention system emails like notifications@expensify.com
+                if (CONST.RESTRICTED_EMAILS.includes(detail.login) || CONST.RESTRICTED_ACCOUNT_IDS.includes(detail.accountID)) {
+                    return false;
+                }
+                const displayName = getDisplayNameOrDefault(detail);
+                const displayText = displayName === formatPhoneNumber(detail.login) ? displayName : `${displayName} ${detail.login}`;
+                if (searchValue && !displayText.toLowerCase().includes(searchValue.toLowerCase())) {
+                    return false;
+                }
 
-    const calculateMentionSuggestion = (newValue: string, selectionStart?: number, selectionEnd?: number) => {
-        if (selectionEnd !== selectionStart || !selectionEnd || shouldBlockCalc.current || selectionEnd < 1 || !isComposerFocused) {
-            shouldBlockCalc.current = false;
-            resetSuggestions();
-            return;
-        }
+                // Given the mention is inserted by user, we don't want to show the mention options unless the
+                // selection index changes. In that case, suggestionInsertionIndexRef.current will be null.
+                // See https://github.com/Expensify/App/issues/38358 for more context
+                if (suggestionInsertionIndexRef.current) {
+                    return false;
+                }
 
-        const afterLastBreakLineIndex = newValue.lastIndexOf('\n', selectionEnd - 1) + 1;
-        const leftString = newValue.substring(afterLastBreakLineIndex, selectionEnd);
-        const words = leftString.split(CONST.REGEX.SPACE_OR_EMOJI);
-        const lastWord: string = words.at(-1) ?? '';
-        const secondToLastWord = words.at(-3);
+                // on staging server, in specific cases (see issue) BE returns duplicated personalDetails
+                // entries with the same `login` which we need to filter out
+                if (seenLogins.has(detail.login)) {
+                    return false;
+                }
+                seenLogins.add(detail.login);
+                return true;
+            }) as Array<PersonalDetails & {weight: number}>;
 
-        let atSignIndex: number | undefined;
-        let suggestionWord = '';
-        let prefix: string;
-        let prefixType = '';
+            // At this point we are sure that the details are not null, since empty user details have been filtered in the previous step
+            const sortedPersonalDetails = getSortedPersonalDetails(filteredPersonalDetails, localeCompare);
 
-        // Detect if the last two words contain a mention (two words are needed to detect a mention with a space in it)
-        if (lastWord.startsWith('@') || lastWord.startsWith('#')) {
-            atSignIndex = leftString.lastIndexOf(lastWord) + afterLastBreakLineIndex;
-            suggestionWord = lastWord;
+            for (const detail of sortedPersonalDetails.slice(0, CONST.AUTO_COMPLETE_SUGGESTER.MAX_AMOUNT_OF_SUGGESTIONS - suggestions.length)) {
+                suggestions.push({
+                    text: `${formatLoginPrivateDomain(getDisplayNameOrDefault(detail), detail?.login)}`,
+                    alternateText: `@${formatLoginPrivateDomain(detail?.login, detail?.login)}`,
+                    handle: detail?.login,
+                    icons: [
+                        {
+                            name: detail?.login,
+                            source: detail?.avatar ?? expensifyIcons.FallbackAvatar,
+                            type: CONST.ICON_TYPE_AVATAR,
+                            fallbackIcon: detail?.fallbackIcon,
+                            id: detail?.accountID,
+                        },
+                    ],
+                });
+            }
 
-            prefix = suggestionWord.substring(1);
-            prefixType = suggestionWord.substring(0, 1);
-        } else if (secondToLastWord && secondToLastWord.startsWith('@') && secondToLastWord.length > 1) {
-            atSignIndex = leftString.lastIndexOf(secondToLastWord) + afterLastBreakLineIndex;
-            suggestionWord = `${secondToLastWord} ${lastWord}`;
+            return suggestions;
+        },
+        [
+            localeCompare,
+            translate,
+            expensifyIcons.Megaphone,
+            expensifyIcons.FallbackAvatar,
+            formatPhoneNumber,
+            formatLoginPrivateDomain,
+            personalDetails,
+            policy,
+            currentReport,
+            policyID,
+            conciergeReportID,
+            currentUserPersonalDetails.accountID,
+        ],
+    );
 
-            prefix = suggestionWord.substring(1);
-            prefixType = suggestionWord.substring(0, 1);
-        } else {
-            prefix = lastWord.substring(1);
-        }
+    const getRoomMentionOptions = useCallback(
+        (searchTerm: string): Mention[] => {
+            const filteredRoomMentions: Mention[] = [];
+            for (const report of Object.values(mentionableReports ?? {})) {
+                if (report?.reportName?.toLowerCase().includes(searchTerm.toLowerCase())) {
+                    filteredRoomMentions.push({
+                        text: report.reportName,
+                        handle: report.reportName,
+                        alternateText: report.reportName,
+                    });
+                }
+            }
 
-        // Treat a trailing dot as punctuation so short mentions like "@a." still match "@a".
-        const hasTrailingDot = prefixType === '@' && prefix.length > 1 && prefix.endsWith('.');
-        const normalizedPrefix = hasTrailingDot ? prefix.slice(0, -1) : prefix;
-        // Keep the raw prefix for highlight so dots are preserved in the UI.
-        const mentionPrefix = prefix;
+            return lodashSortBy(filteredRoomMentions, 'handle').slice(0, CONST.AUTO_COMPLETE_SUGGESTER.MAX_AMOUNT_OF_SUGGESTIONS);
+        },
+        [mentionableReports],
+    );
 
-        const nextState: Partial<SuggestionValues> = {
-            suggestedMentions: [],
-            atSignIndex,
-            mentionPrefix,
-            prefixType,
-        };
+    const calculateMentionSuggestion = useCallback(
+        (newValue: string, selectionStart?: number, selectionEnd?: number) => {
+            if (selectionEnd !== selectionStart || !selectionEnd || shouldBlockCalc.current || selectionEnd < 1 || !isComposerFocused) {
+                shouldBlockCalc.current = false;
+                resetSuggestions();
+                return;
+            }
 
-        if (isMentionCode(suggestionWord) && prefixType === '@') {
-            const suggestions = getUserMentionOptions(normalizedPrefix);
-            nextState.suggestedMentions = suggestions;
-            nextState.shouldShowSuggestionMenu = !!suggestions.length;
-        }
+            const afterLastBreakLineIndex = newValue.lastIndexOf('\n', selectionEnd - 1) + 1;
+            const leftString = newValue.substring(afterLastBreakLineIndex, selectionEnd);
+            const words = leftString.split(CONST.REGEX.SPACE_OR_EMOJI);
+            const lastWord: string = words.at(-1) ?? '';
+            const secondToLastWord = words.at(-3);
 
-        const shouldDisplayRoomMentionsSuggestions = isGroupPolicyReport && (isValidRoomName(suggestionWord.toLowerCase()) || normalizedPrefix === '');
-        if (prefixType === '#' && shouldDisplayRoomMentionsSuggestions) {
-            // Filter reports by room name and current policy
-            nextState.suggestedMentions = getRoomMentionOptions(normalizedPrefix);
+            let atSignIndex: number | undefined;
+            let suggestionWord = '';
+            let prefix: string;
+            let prefixType = '';
 
-            // Even if there are no reports, we should show the suggestion menu - to perform live search
-            nextState.shouldShowSuggestionMenu = true;
-        }
+            // Detect if the last two words contain a mention (two words are needed to detect a mention with a space in it)
+            if (lastWord.startsWith('@') || lastWord.startsWith('#')) {
+                atSignIndex = leftString.lastIndexOf(lastWord) + afterLastBreakLineIndex;
+                suggestionWord = lastWord;
 
-        // Early return if there is no update
-        const currentState = suggestionValuesRef.current;
-        if (currentState.suggestedMentions.length === 0 && nextState.suggestedMentions?.length === 0) {
-            return;
-        }
+                prefix = suggestionWord.substring(1);
+                prefixType = suggestionWord.substring(0, 1);
+            } else if (secondToLastWord && secondToLastWord.startsWith('@') && secondToLastWord.length > 1) {
+                atSignIndex = leftString.lastIndexOf(secondToLastWord) + afterLastBreakLineIndex;
+                suggestionWord = `${secondToLastWord} ${lastWord}`;
 
-        setSuggestionValues((prevState) => ({
-            ...prevState,
-            ...nextState,
-        }));
-        setHighlightedMentionIndex(0);
-    };
+                prefix = suggestionWord.substring(1);
+                prefixType = suggestionWord.substring(0, 1);
+            } else {
+                prefix = lastWord.substring(1);
+            }
 
-    const debouncedCalculateMentionSuggestion = useDebounce((newValue: string, selectionStart?: number, selectionEnd?: number) => {
-        calculateMentionSuggestion(newValue, selectionStart, selectionEnd);
-    }, CONST.TIMING.SUGGESTION_DEBOUNCE_TIME);
+            // Treat a trailing dot as punctuation so short mentions like "@a." still match "@a".
+            const hasTrailingDot = prefixType === '@' && prefix.length > 1 && prefix.endsWith('.');
+            const normalizedPrefix = hasTrailingDot ? prefix.slice(0, -1) : prefix;
+            // Keep the raw prefix for highlight so dots are preserved in the UI.
+            const mentionPrefix = prefix;
+
+            const nextState: Partial<SuggestionValues> = {
+                suggestedMentions: [],
+                atSignIndex,
+                mentionPrefix,
+                prefixType,
+            };
+
+            if (isMentionCode(suggestionWord) && prefixType === '@') {
+                const suggestions = getUserMentionOptions(normalizedPrefix);
+                nextState.suggestedMentions = suggestions;
+                nextState.shouldShowSuggestionMenu = !!suggestions.length;
+            }
+
+            const shouldDisplayRoomMentionsSuggestions = isGroupPolicyReport && (isValidRoomName(suggestionWord.toLowerCase()) || normalizedPrefix === '');
+            if (prefixType === '#' && shouldDisplayRoomMentionsSuggestions) {
+                // Filter reports by room name and current policy
+                nextState.suggestedMentions = getRoomMentionOptions(normalizedPrefix);
+
+                // Even if there are no reports, we should show the suggestion menu - to perform live search
+                nextState.shouldShowSuggestionMenu = true;
+            }
+
+            // Early return if there is no update
+            const currentState = suggestionValuesRef.current;
+            if (currentState.suggestedMentions.length === 0 && nextState.suggestedMentions?.length === 0) {
+                return;
+            }
+
+            setSuggestionValues((prevState) => ({
+                ...prevState,
+                ...nextState,
+            }));
+            setHighlightedMentionIndex(0);
+        },
+        [isComposerFocused, isGroupPolicyReport, setHighlightedMentionIndex, resetSuggestions, getUserMentionOptions, getRoomMentionOptions],
+    );
+
+    const debouncedCalculateMentionSuggestion = useDebounce(
+        useCallback(
+            (newValue: string, selectionStart?: number, selectionEnd?: number) => {
+                calculateMentionSuggestion(newValue, selectionStart, selectionEnd);
+            },
+            [calculateMentionSuggestion],
+        ),
+        CONST.TIMING.SUGGESTION_DEBOUNCE_TIME,
+    );
 
     useEffect(() => {
         debouncedCalculateMentionSuggestion(value, selection.start, selection.end);
@@ -447,30 +492,37 @@ function SuggestionMention({
         debouncedSearchInServer();
     }, [suggestionValues.suggestedMentions.length, suggestionValues.prefixType, policyID, value, debouncedSearchInServer]);
 
-    const updateShouldShowSuggestionMenuToFalse = () => {
+    const updateShouldShowSuggestionMenuToFalse = useCallback(() => {
         setSuggestionValues((prevState) => {
             if (prevState.shouldShowSuggestionMenu) {
                 return {...prevState, shouldShowSuggestionMenu: false};
             }
             return prevState;
         });
-    };
+    }, []);
 
-    const setShouldBlockSuggestionCalc = (shouldBlockSuggestionCalc: boolean) => {
-        shouldBlockCalc.current = shouldBlockSuggestionCalc;
-    };
+    const setShouldBlockSuggestionCalc = useCallback(
+        (shouldBlockSuggestionCalc: boolean) => {
+            shouldBlockCalc.current = shouldBlockSuggestionCalc;
+        },
+        [shouldBlockCalc],
+    );
 
-    const getSuggestions = () => suggestionValues.suggestedMentions;
-    const getIsSuggestionsMenuVisible = () => isMentionSuggestionsMenuVisible;
+    const getSuggestions = useCallback(() => suggestionValues.suggestedMentions, [suggestionValues.suggestedMentions]);
+    const getIsSuggestionsMenuVisible = useCallback(() => isMentionSuggestionsMenuVisible, [isMentionSuggestionsMenuVisible]);
 
-    useImperativeHandle(ref, () => ({
-        resetSuggestions,
-        triggerHotkeyActions,
-        setShouldBlockSuggestionCalc,
-        updateShouldShowSuggestionMenuToFalse,
-        getSuggestions,
-        getIsSuggestionsMenuVisible,
-    }));
+    useImperativeHandle(
+        ref,
+        () => ({
+            resetSuggestions,
+            triggerHotkeyActions,
+            setShouldBlockSuggestionCalc,
+            updateShouldShowSuggestionMenuToFalse,
+            getSuggestions,
+            getIsSuggestionsMenuVisible,
+        }),
+        [resetSuggestions, setShouldBlockSuggestionCalc, triggerHotkeyActions, updateShouldShowSuggestionMenuToFalse, getSuggestions, getIsSuggestionsMenuVisible],
+    );
 
     if (!isMentionSuggestionsMenuVisible) {
         return null;

@@ -1,7 +1,7 @@
 import {useIsFocused, useNavigation, useRoute} from '@react-navigation/native';
 import lodashDebounce from 'lodash/debounce';
 import type {Ref, RefObject} from 'react';
-import React, {useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState} from 'react';
+import React, {memo, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState} from 'react';
 import type {
     BlurEvent,
     LayoutChangeEvent,
@@ -72,6 +72,8 @@ type SyncSelection = {
     position: number;
     value: string;
 };
+
+type NewlyAddedChars = {startIndex: number; endIndex: number; diff: string};
 
 type ComposerWithSuggestionsProps = Partial<ChildrenProps> &
     ForwardedFSClassProps & {
@@ -359,6 +361,46 @@ function ComposerWithSuggestions({
     }, [reportID]);
 
     /**
+     * Find the newly added characters between the previous text and the new text based on the selection.
+     *
+     * @param prevText - The previous text.
+     * @param newText - The new text.
+     * @returns An object containing information about the newly added characters.
+     * @property startIndex - The start index of the newly added characters in the new text.
+     * @property endIndex - The end index of the newly added characters in the new text.
+     * @property diff - The newly added characters.
+     */
+    const findNewlyAddedChars = useCallback(
+        (prevText: string, newText: string): NewlyAddedChars => {
+            let startIndex = -1;
+            let endIndex = -1;
+            let currentIndex = 0;
+
+            // Find the first character mismatch with newText
+            while (currentIndex < newText.length && prevText.charAt(currentIndex) === newText.charAt(currentIndex) && selection.start > currentIndex) {
+                currentIndex++;
+            }
+
+            if (currentIndex < newText.length) {
+                startIndex = currentIndex;
+                const commonSuffixLength = findCommonSuffixLength(prevText, newText, selection?.end ?? 0);
+                // if text is getting pasted over find length of common suffix and subtract it from new text length
+                if (commonSuffixLength > 0 || (selection?.end ?? 0) - selection.start > 0) {
+                    endIndex = newText.length - commonSuffixLength;
+                } else {
+                    endIndex = currentIndex + newText.length;
+                }
+            }
+            return {
+                startIndex,
+                endIndex,
+                diff: newText.substring(startIndex, endIndex),
+            };
+        },
+        [selection.start, selection.end],
+    );
+
+    /**
      * Update the value of the comment in Onyx
      */
     const updateComment = useCallback(
@@ -371,23 +413,8 @@ function ComposerWithSuggestions({
             const prevSelectionStart = selection?.start ?? 0;
             const prevSelectionEnd = selection?.end ?? 0;
 
-            // detect newly added text (inlined from findNewlyAddedChars)
-            let startIndex = -1;
-            let endIndex = -1;
-            let currentIndex = 0;
-            while (currentIndex < commentValue.length && prevText.charAt(currentIndex) === commentValue.charAt(currentIndex) && selection.start > currentIndex) {
-                currentIndex++;
-            }
-            if (currentIndex < commentValue.length) {
-                startIndex = currentIndex;
-                const commonSuffixLength = findCommonSuffixLength(prevText, commentValue, selection?.end ?? 0);
-                if (commonSuffixLength > 0 || (selection?.end ?? 0) - selection.start > 0) {
-                    endIndex = commentValue.length - commonSuffixLength;
-                } else {
-                    endIndex = currentIndex + commentValue.length;
-                }
-            }
-            const diff = commentValue.substring(startIndex, endIndex);
+            // detect newly added text (existing helper)
+            const {startIndex, endIndex, diff} = findNewlyAddedChars(prevText, commentValue);
 
             // Try to rewrite if this looks like "selected text replaced with a single URL"
             const {text: rewritten, didReplace} = detectAndRewritePaste(prevText, prevSelectionStart, prevSelectionEnd, diff);
@@ -449,16 +476,16 @@ function ComposerWithSuggestions({
             }
         },
         [
-            raiseIsScrollLikelyLayoutTriggered,
-            selection?.start,
-            selection?.end,
-            preferredSkinTone,
+            findNewlyAddedChars,
             preferredLocale,
-            debouncedSaveReportComment,
+            preferredSkinTone,
             reportID,
-            currentUserAccountID,
             suggestionsRef,
-            setValue,
+            raiseIsScrollLikelyLayoutTriggered,
+            debouncedSaveReportComment,
+            selection?.end,
+            selection?.start,
+            currentUserAccountID,
         ],
     );
 
@@ -641,18 +668,24 @@ function ComposerWithSuggestions({
     }, [focus, route.key, shouldAutoFocus, shouldDelayAutoFocus]);
 
     /**
+     * Tracks whether there is a composer input inside the side panel on the screen.
+     */
+    const handleSidePanelFocus = useCallback(() => {
+        if (!isInSidePanel) {
+            ReportActionComposeFocusManager.sidePanelComposerRef.current = null;
+        } else {
+            ReportActionComposeFocusManager.sidePanelComposerRef.current = textInputRef.current;
+        }
+    }, [isInSidePanel]);
+
+    /**
      * Set focus callback
      * @param shouldTakeOverFocus - Whether this composer should gain focus priority
      */
     const setUpComposeFocusManager = useCallback(
         (shouldTakeOverFocus = false) => {
             ReportActionComposeFocusManager.onComposerFocus((shouldFocusForNonBlurInputOnTapOutside = false) => {
-                // Tracks whether there is a composer input inside the side panel on the screen.
-                if (!isInSidePanel) {
-                    ReportActionComposeFocusManager.sidePanelComposerRef.current = null;
-                } else {
-                    ReportActionComposeFocusManager.sidePanelComposerRef.current = textInputRef.current;
-                }
+                handleSidePanelFocus();
                 if ((!willBlurTextInputOnTapOutside && !shouldFocusForNonBlurInputOnTapOutside) || !isFocused || !isSidePanelHiddenOrLargeScreen) {
                     return;
                 }
@@ -660,11 +693,12 @@ function ComposerWithSuggestions({
                 focus(true);
             }, shouldTakeOverFocus);
         },
-        [focus, isInSidePanel, isFocused, isSidePanelHiddenOrLargeScreen],
+        [focus, isFocused, isSidePanelHiddenOrLargeScreen, handleSidePanelFocus],
     );
 
     /**
      * Check if the composer is visible. Returns true if the composer is not covered up by emoji picker or menu. False otherwise.
+     * @returns {Boolean}
      */
     const checkComposerVisibility = useCallback(() => {
         // Checking whether the screen is focused or not, helps avoid `modal.isVisible` false when popups are closed, even if the modal is opened.
@@ -880,15 +914,10 @@ function ComposerWithSuggestions({
     );
 
     const handleFocus = useCallback(() => {
-        // Tracks whether there is a composer input inside the side panel on the screen.
-        if (!isInSidePanel) {
-            ReportActionComposeFocusManager.sidePanelComposerRef.current = null;
-        } else {
-            ReportActionComposeFocusManager.sidePanelComposerRef.current = textInputRef.current;
-        }
+        handleSidePanelFocus();
         setUpComposeFocusManager(!isInSidePanel);
         onFocus();
-    }, [setUpComposeFocusManager, isInSidePanel, onFocus]);
+    }, [onFocus, setUpComposeFocusManager, handleSidePanelFocus, isInSidePanel]);
 
     // When using the suggestions box (Suggestions) we need to imperatively
     // set the cursor to the end of the suggestion/mention after it's selected.
@@ -987,6 +1016,6 @@ function ComposerWithSuggestions({
     );
 }
 
-export default ComposerWithSuggestions;
+export default memo(ComposerWithSuggestions);
 
 export type {ComposerWithSuggestionsProps, ComposerRef};
