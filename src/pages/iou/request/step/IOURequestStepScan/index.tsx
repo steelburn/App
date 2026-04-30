@@ -13,7 +13,7 @@ import {endSpan} from '@libs/telemetry/activeSpans';
 import withFullTransactionOrNotFound from '@pages/iou/request/step/withFullTransactionOrNotFound';
 import withWritableReportOrNotFound from '@pages/iou/request/step/withWritableReportOrNotFound';
 import {updateLastLocationPermissionPrompt} from '@userActions/IOU';
-import {checkIfScanFileCanBeRead, replaceReceipt} from '@userActions/IOU/Receipt';
+import {checkIfLocalFileIsAccessible, replaceReceipt} from '@userActions/IOU/Receipt';
 import {removeDraftTransactionsByIDs, removeTransactionReceipt} from '@userActions/TransactionEdit';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -33,7 +33,6 @@ function IOURequestStepScan({
     },
     transaction: initialTransaction,
     currentUserPersonalDetails,
-    onLayout,
 }: Omit<IOURequestStepScanProps, 'user'>) {
     const isMobileWeb = isMobile();
     const policy = usePolicy(report?.policyID);
@@ -85,7 +84,6 @@ function IOURequestStepScan({
         validateFiles,
         PDFValidationComponent,
         ErrorModal,
-        setTestReceiptAndNavigate,
     } = useReceiptScan({
         report,
         reportID,
@@ -100,10 +98,6 @@ function IOURequestStepScan({
         updateScanAndNavigate,
         getSource,
     });
-
-    const handleOnLayout = useCallback(() => {
-        onLayout?.(setTestReceiptAndNavigate);
-    }, [onLayout, setTestReceiptAndNavigate]);
 
     const hasValidatedInitialScanFiles = useRef(false);
 
@@ -131,7 +125,7 @@ function IOURequestStepScan({
                     isAllScanFilesCanBeRead = false;
                 };
 
-                return checkIfScanFileCanBeRead(item.receipt?.filename, itemReceiptPath, item.receipt?.type, () => {}, onFailure);
+                return checkIfLocalFileIsAccessible(item.receipt?.filename, itemReceiptPath, item.receipt?.type, () => {}, onFailure);
             }),
         ).then(() => {
             if (isAllScanFilesCanBeRead) {
@@ -187,7 +181,6 @@ function IOURequestStepScan({
                     navigateToConfirmationStep={navigateToConfirmationStep}
                     shouldSkipConfirmation={shouldSkipConfirmation}
                     setStartLocationPermissionFlow={setStartLocationPermissionFlow}
-                    onLayout={handleOnLayout}
                     onBackButtonPress={navigateBack}
                     shouldShowWrapper={!!backTo || isEditing}
                 />
@@ -196,7 +189,6 @@ function IOURequestStepScan({
                     PDFValidationComponent={PDFValidationComponent}
                     shouldAcceptMultipleFiles={shouldAcceptMultipleFiles}
                     isReplacingReceipt={isReplacingReceipt}
-                    onLayout={handleOnLayout}
                     validateFiles={validateFiles}
                     onBackButtonPress={navigateBack}
                     shouldShowWrapper={!!backTo || isEditing}
