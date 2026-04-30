@@ -275,7 +275,6 @@ export type {default as UpdatePolicyTaxValueParams} from './UpdatePolicyTaxValue
 export type {default as RenamePolicyTagsParams} from './RenamePolicyTagsParams';
 export type {default as DeletePolicyTagsParams} from './DeletePolicyTagsParams';
 export type {default as UpdatePolicyTagGLCodeParams} from './UpdatePolicyTagGLCodeParams';
-export type {default as AddSubscriptionPaymentCardParams} from './AddSubscriptionPaymentCardParams';
 export type {default as SetPolicyCustomTaxNameParams} from './SetPolicyCustomTaxNameParams';
 export type {default as SetPolicyForeignCurrencyDefaultParams} from './SetPolicyForeignCurrencyDefaultParams';
 export type {default as SetPolicyCurrencyDefaultParams} from './SetPolicyCurrencyDefaultParams';
@@ -461,7 +460,6 @@ export type {default as MoveIOUReportToExistingPolicyParams} from './MoveIOURepo
 export type {default as ChangeReportPolicyParams} from './ChangeReportPolicyParams';
 export type {default as ChangeReportPolicyAndInviteSubmitterParams} from './ChangeReportPolicyAndInviteSubmitterParams';
 export type {ChangeTransactionsReportParams, TransactionThreadInfo} from './ChangeTransactionsReportParams';
-export type {default as ResetBankAccountSetupParams} from './ResetBankAccountSetupParams';
 export type {default as SetPolicyProhibitedExpensesParams} from './SetPolicyProhibitedExpensesParams';
 export type {default as CreateDigitalWalletParams} from './CreateDigitalWalletParams';
 export type {default as GetGuideCallAvailabilityScheduleParams} from './GetGuideCallAvailabilitySchedule';
