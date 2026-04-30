@@ -157,7 +157,7 @@ function ImportedCategoriesPage({route}: ImportedCategoriesPageProps) {
 
             return {
                 name,
-                enabled: categoriesEnabledColumn !== -1 ? ['true', 'yes'].includes(categoriesEnabled?.[dataIndex]?.toString().toLowerCase() ?? '') : true,
+                enabled: categoriesEnabledColumn !== -1 ? ['true', 'yes'].includes(categoriesEnabled?.[dataIndex]?.toString().trim().toLowerCase() ?? '') : true,
                 // eslint-disable-next-line @typescript-eslint/naming-convention
                 'GL Code': categoriesGLCodeColumn !== -1 ? (categoriesGLCode?.[dataIndex] ?? '') : existingGLCodeOrDefault,
                 ...(normalizedMaxAmountNoReceipt !== undefined && {maxAmountNoReceipt: normalizedMaxAmountNoReceipt}),

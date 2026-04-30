@@ -142,6 +142,19 @@ function findColumnName(header: string, columnRoles?: ColumnRole[]): string {
             attribute = CONST.CSV_IMPORT_COLUMNS.ENABLED;
             break;
 
+        case 'receiptsrequired':
+        case 'requirereceiptsover':
+        case 'maxamountnoreceipt':
+            attribute = CONST.CSV_IMPORT_COLUMNS.MAX_AMOUNT_NO_RECEIPT;
+            break;
+
+        case 'itemisedreceiptrequirement':
+        case 'itemizedreceiptrequirement':
+        case 'requireitemizedreceiptsover':
+        case 'maxamountnoitemizedreceipt':
+            attribute = CONST.CSV_IMPORT_COLUMNS.MAX_AMOUNT_NO_ITEMIZED_RECEIPT;
+            break;
+
         default:
             break;
     }
