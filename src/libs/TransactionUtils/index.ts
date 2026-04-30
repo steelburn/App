@@ -1173,13 +1173,28 @@ function getReportOwnerAsAttendee(transaction: OnyxInputOrEntry<Transaction>, cu
 }
 
 /**
+ * Converts raw attendees value to an array.
+ * Onyx may deserialize arrays as plain objects, so both shapes are handled.
+ * @param rawAttendees - attendees value as stored in Onyx, may be an array or a plain object
+ */
+function convertAttendeesToArray(rawAttendees: Attendee[] | undefined): Attendee[] {
+    if (Array.isArray(rawAttendees)) {
+        return rawAttendees;
+    }
+    if (rawAttendees && typeof rawAttendees === 'object') {
+        return Object.values(rawAttendees as Record<string, Attendee>);
+    }
+    return [];
+}
+
+/**
  * Return the list of attendees present on the transaction, if it's empty return report owner as default attendee
  * @param transaction
  * @param currentUserPersonalDetails - personal details of current user
  */
 function getOriginalAttendees(transaction: OnyxInputOrEntry<Transaction>, currentUserPersonalDetails: CurrentUserPersonalDetails | undefined): Attendee[] {
     const rawAttendees = transaction?.comment?.attendees;
-    const attendees = normalizeAttendees(Array.isArray(rawAttendees) ? rawAttendees : []);
+    const attendees = normalizeAttendees(convertAttendeesToArray(rawAttendees));
     const reportOwnerAsAttendee = getReportOwnerAsAttendee(transaction, currentUserPersonalDetails);
     if (attendees.length === 0 && reportOwnerAsAttendee !== undefined) {
         attendees.push(reportOwnerAsAttendee);
@@ -1194,7 +1209,7 @@ function getOriginalAttendees(transaction: OnyxInputOrEntry<Transaction>, curren
  */
 function getAttendees(transaction: OnyxInputOrEntry<Transaction>, currentUserPersonalDetails: CurrentUserPersonalDetails | undefined): Attendee[] {
     const rawAttendees = transaction?.modifiedAttendees ?? transaction?.comment?.attendees;
-    const attendees = normalizeAttendees(Array.isArray(rawAttendees) ? rawAttendees : []);
+    const attendees = normalizeAttendees(convertAttendeesToArray(rawAttendees));
     const reportOwnerAsAttendee = getReportOwnerAsAttendee(transaction, currentUserPersonalDetails);
 
     if (attendees.length === 0 && reportOwnerAsAttendee !== undefined) {
