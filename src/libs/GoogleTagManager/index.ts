@@ -44,17 +44,11 @@ function publishEvent(event: GoogleTagManagerEvent, accountID: number, email: st
         return;
     }
 
-    // Events in Meta & Reddit are currently being set in CamelCase from OldDot
-    const pixelEventName = event
-        .split('_')
-        .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-        .join('');
-
     const eventID = `${accountID}-${event}`;
 
     // Meta
     if (typeof window.fbq === 'function') {
-        window.fbq('trackCustom', pixelEventName, undefined, {eventID});
+        window.fbq('trackCustom', pixelEvent.META, {em: email}, {eventID});
     }
 
     // Reddit
