@@ -5,7 +5,6 @@ import Onyx from 'react-native-onyx';
 import type {OnyxEntry} from 'react-native-onyx';
 import useParentReport from '@hooks/useParentReport';
 import useReportIsArchived from '@hooks/useReportIsArchived';
-// eslint-disable-next-line no-restricted-syntax -- this is required to allow mocking
 import * as ReportModule from '@libs/actions/Report';
 import {
     canActionTask,
@@ -19,14 +18,10 @@ import {
     getFinishOnboardingTaskOnyxData,
     getNavigationUrlOnTaskDelete,
 } from '@libs/actions/Task';
-// eslint-disable-next-line no-restricted-syntax -- this is required to allow mocking
 import * as API from '@libs/API';
-// eslint-disable-next-line no-restricted-syntax -- this is required to allow mocking
 import DateUtils from '@libs/DateUtils';
 import Navigation from '@libs/Navigation/Navigation';
-// eslint-disable-next-line no-restricted-syntax -- this is required to allow mocking
 import * as ReportActionsUtils from '@libs/ReportActionsUtils';
-// eslint-disable-next-line no-restricted-syntax -- this is required to allow mocking
 import * as ReportUtils from '@libs/ReportUtils';
 import initOnyxDerivedValues from '@userActions/OnyxDerived';
 import CONST from '@src/CONST';
@@ -53,14 +48,12 @@ const mockBuildOptimisticTaskReport = jest.fn();
 const mockBuildOptimisticCreatedReportAction = jest.fn();
 const mockBuildOptimisticTaskCommentReportAction = jest.fn();
 const mockGetTaskAssigneeChatOnyxData = jest.fn();
-const mockGetOptimisticDataForParentReportAction = jest.fn();
 const mockIsHiddenForCurrentUser = jest.fn();
 const mockFormatReportLastMessageText = jest.fn();
 jest.spyOn(ReportUtils, 'buildOptimisticTaskReport').mockImplementation(mockBuildOptimisticTaskReport);
 jest.spyOn(ReportUtils, 'buildOptimisticCreatedReportAction').mockImplementation(mockBuildOptimisticCreatedReportAction);
 jest.spyOn(ReportUtils, 'buildOptimisticTaskCommentReportAction').mockImplementation(mockBuildOptimisticTaskCommentReportAction);
 jest.spyOn(ReportUtils, 'getTaskAssigneeChatOnyxData').mockImplementation(mockGetTaskAssigneeChatOnyxData);
-jest.spyOn(ReportUtils, 'getOptimisticDataForParentReportAction').mockImplementation(mockGetOptimisticDataForParentReportAction);
 jest.spyOn(ReportUtils, 'isHiddenForCurrentUser').mockImplementation(mockIsHiddenForCurrentUser);
 jest.spyOn(ReportUtils, 'formatReportLastMessageText').mockImplementation(mockFormatReportLastMessageText);
 
@@ -271,24 +264,43 @@ describe('actions/Task', () => {
         const conciergeChatReport: Report = getFakeReport([accountID, CONST.ACCOUNT_ID.CONCIERGE]);
         const testDriveTaskReport: Report = {...getFakeReport(), ownerAccountID: accountID};
         it('Completes test drive task', () => {
-            completeTestDriveTask(testDriveTaskReport, conciergeChatReport, false, accountID, false, undefined);
-            expect(Object.values(getFinishOnboardingTaskOnyxData(testDriveTaskReport, conciergeChatReport, false, 0, false, undefined)).length).toBe(0);
+            completeTestDriveTask(testDriveTaskReport, conciergeChatReport, false, accountID, false, undefined, undefined);
+            expect(Object.values(getFinishOnboardingTaskOnyxData(testDriveTaskReport, conciergeChatReport, false, 0, false, undefined, undefined)).length).toBe(0);
         });
     });
 
     describe('getFinishOnboardingTaskOnyxData', () => {
+        const DELEGATE_EMAIL = 'delegate@example.com';
+        const DELEGATE_ACCOUNT_ID = 999;
         const parentReport: Report = getFakeReport();
         const taskReport: Report = {...getFakeReport(), type: CONST.REPORT.TYPE.TASK, ownerAccountID: 1, managerID: 2, parentReportID: parentReport.reportID};
         beforeEach(async () => {
             await Onyx.clear();
             await Onyx.set(ONYXKEYS.SESSION, {email: 'user1@gmail.com', accountID: 2});
+            await Onyx.set(ONYXKEYS.PERSONAL_DETAILS_LIST, {
+                [DELEGATE_ACCOUNT_ID]: {accountID: DELEGATE_ACCOUNT_ID, login: DELEGATE_EMAIL},
+            });
             await waitForBatchedUpdates();
         });
         it('Return not empty object', () => {
-            expect(Object.values(getFinishOnboardingTaskOnyxData(taskReport, parentReport, false, 2, false, undefined)).length).toBeGreaterThan(0);
+            expect(Object.values(getFinishOnboardingTaskOnyxData(taskReport, parentReport, false, 2, false, undefined, undefined)).length).toBeGreaterThan(0);
         });
         it('Return empty object', () => {
-            expect(Object.values(getFinishOnboardingTaskOnyxData(taskReport, parentReport, true, 2, false, undefined)).length).toBe(0);
+            expect(Object.values(getFinishOnboardingTaskOnyxData(taskReport, parentReport, true, 2, false, undefined, undefined)).length).toBe(0);
+        });
+        it('forwards delegateAccountID when delegateEmail is provided', () => {
+            const onyxData = getFinishOnboardingTaskOnyxData(taskReport, parentReport, false, 2, false, undefined, DELEGATE_EMAIL);
+            const reportActionsData = onyxData.optimisticData?.find((entry) => (entry.key as string).startsWith(ONYXKEYS.COLLECTION.REPORT_ACTIONS));
+            const reportActions = reportActionsData?.value as Record<string, ReportAction> | undefined;
+            const completedAction = reportActions ? Object.values(reportActions).find((action) => action.actionName === CONST.REPORT.ACTIONS.TYPE.TASK_COMPLETED) : undefined;
+            expect(completedAction?.delegateAccountID).toBe(DELEGATE_ACCOUNT_ID);
+        });
+        it('does not set delegateAccountID when delegateEmail is undefined', () => {
+            const onyxData = getFinishOnboardingTaskOnyxData(taskReport, parentReport, false, 2, false, undefined, undefined);
+            const reportActionsData = onyxData.optimisticData?.find((entry) => (entry.key as string).startsWith(ONYXKEYS.COLLECTION.REPORT_ACTIONS));
+            const reportActions = reportActionsData?.value as Record<string, ReportAction> | undefined;
+            const completedAction = reportActions ? Object.values(reportActions).find((action) => action.actionName === CONST.REPORT.ACTIONS.TYPE.TASK_COMPLETED) : undefined;
+            expect(completedAction?.delegateAccountID).toBeUndefined();
         });
     });
 
@@ -355,7 +367,6 @@ describe('actions/Task', () => {
                 },
             });
 
-            mockGetOptimisticDataForParentReportAction.mockReturnValue([]);
             mockIsHiddenForCurrentUser.mockReturnValue(false);
             mockFormatReportLastMessageText.mockReturnValue('Last message text');
 
