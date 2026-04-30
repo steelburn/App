@@ -84,7 +84,6 @@ import * as ErrorUtils from '@libs/ErrorUtils';
 import {createFile, splitExtensionFromFileName} from '@libs/fileDownload/FileUtils';
 import getIsNarrowLayout from '@libs/getIsNarrowLayout';
 import GoogleTagManager from '@libs/GoogleTagManager';
-// eslint-disable-next-line @typescript-eslint/no-deprecated
 import {translateLocal} from '@libs/Localize';
 import Log from '@libs/Log';
 import {buildNextStepNew} from '@libs/NextStepUtils';
@@ -1526,7 +1525,7 @@ function addBillingCardAndRequestPolicyOwnerChange(
             addressZip,
             currency: currency as ValueOf<typeof CONST.PAYMENT_CARD_CURRENCY>,
         };
-        // eslint-disable-next-line rulesdir/no-multiple-api-calls
+
         API.write(WRITE_COMMANDS.ADD_BILLING_CARD_AND_REQUEST_WORKSPACE_OWNER_CHANGE, params, {optimisticData, successData, failureData});
     }
 }
@@ -1585,6 +1584,7 @@ function verifySetupIntentAndRequestPolicyOwnerChange(policyID: string, currentU
 function createPolicyExpenseChats(
     policyID: string,
     invitedEmailsToAccountIDs: InvitedEmailsToAccountIDs,
+    currentUserAccountID: number,
     // TODO: Remove optional (?) once all is updated (https://github.com/Expensify/App/issues/66578)
     reportActionsList?: OnyxCollection<ReportActions>,
     hasOutstandingChildRequest = false,
@@ -1648,12 +1648,12 @@ function createPolicyExpenseChats(
             continue;
         }
         const optimisticReport = ReportUtils.buildOptimisticChatReport({
-            participantList: [deprecatedSessionAccountID, cleanAccountID],
+            participantList: [currentUserAccountID, cleanAccountID],
             chatType: CONST.REPORT.CHAT_TYPE.POLICY_EXPENSE_CHAT,
             policyID,
             ownerAccountID: cleanAccountID,
             notificationPreference,
-            currentUserAccountID: deprecatedSessionAccountID,
+            currentUserAccountID,
         });
 
         // Set correct notification preferences: visible for the submitter, hidden for others until there's activity
@@ -2973,12 +2973,7 @@ function buildPolicyData(options: BuildPolicyDataOptions): OnyxData<BuildPolicyD
         areDistanceRatesEnabled,
     };
 
-    if (
-        introSelected !== undefined &&
-        (introSelected.choice === CONST.ONBOARDING_CHOICES.TEST_DRIVE_RECEIVER || !introSelected?.createWorkspace) &&
-        engagementChoice &&
-        shouldAddOnboardingTasks
-    ) {
+    if (introSelected !== undefined && (introSelected.choice === CONST.ONBOARDING_CHOICES.TEST_DRIVE_RECEIVER || !introSelected?.choice) && engagementChoice && shouldAddOnboardingTasks) {
         const {onboardingMessages} = getOnboardingMessages();
         const onboardingData = ReportUtils.prepareOnboardingOnyxData({
             introSelected,
@@ -3031,6 +3026,7 @@ function buildPolicyData(options: BuildPolicyDataOptions): OnyxData<BuildPolicyD
         const employeeWorkspaceChat = createPolicyExpenseChats(
             policyID,
             {[adminParticipant.login]: adminParticipant.accountID ?? CONST.DEFAULT_NUMBER_ID},
+            currentUserAccountIDParam,
             undefined,
             hasOutstandingChildRequest,
         );
@@ -3253,7 +3249,7 @@ function buildDuplicatePolicyData(policy: Policy, options: DuplicatePolicyDataOp
         policyCategories && isCategoriesOptionSelected ? buildOptimisticPolicyWithExistingCategories(targetPolicyID, policyCategories) : defaultOptimisticCategoriesData;
 
     // WARNING: The data below should be kept in sync with the API so we create the policy with the correct configuration.
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+
     const optimisticData: Array<
         OnyxUpdate<
             | typeof ONYXKEYS.COLLECTION.POLICY
@@ -4043,7 +4039,7 @@ function dismissAddedWithPrimaryLoginMessages(policyID: string) {
  *
  * @returns policyID of the workspace we have created
  */
-// eslint-disable-next-line rulesdir/no-call-actions-from-actions
+
 function createWorkspaceFromIOUPayment(
     iouReport: OnyxEntry<Report>,
     reportPreviewAction: ReportAction | undefined,
@@ -4086,7 +4082,7 @@ function createWorkspaceFromIOUPayment(
     }
 
     // Create the expense chat for the employee whose IOU is being paid
-    const employeeWorkspaceChat = createPolicyExpenseChats(policyID, {[iouReportOwnerEmail]: employeeAccountID}, reportActionsList, true);
+    const employeeWorkspaceChat = createPolicyExpenseChats(policyID, {[iouReportOwnerEmail]: employeeAccountID}, currentUserAccountID, reportActionsList, true);
     const newWorkspace = {
         id: policyID,
 
@@ -4641,7 +4637,6 @@ function enablePolicyReceiptPartners(policyID: string, enabled: boolean) {
                 onyxMethod: Onyx.METHOD.MERGE,
                 key: `${ONYXKEYS.COLLECTION.POLICY}${policyID}`,
                 value: {
-                    // @ts-expect-error - will be solved in https://github.com/Expensify/App/issues/73830
                     receiptPartners: {enabled},
                     pendingFields: {
                         receiptPartners: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE,
@@ -4665,7 +4660,6 @@ function enablePolicyReceiptPartners(policyID: string, enabled: boolean) {
                 onyxMethod: Onyx.METHOD.MERGE,
                 key: `${ONYXKEYS.COLLECTION.POLICY}${policyID}`,
                 value: {
-                    // @ts-expect-error - will be solved in https://github.com/Expensify/App/issues/73830
                     receiptPartners: {enabled: !enabled},
                     pendingFields: {
                         receiptPartners: null,
