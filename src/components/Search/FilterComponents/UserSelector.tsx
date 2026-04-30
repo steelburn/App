@@ -1,5 +1,5 @@
 import isEmpty from 'lodash/isEmpty';
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useRef, useState} from 'react';
 import {usePersonalDetails} from '@components/OnyxListItemProvider';
 import SelectionList from '@components/SelectionList';
 import UserSelectionListItem from '@components/SelectionList/ListItem/UserSelectionListItem';
@@ -130,14 +130,12 @@ function UserSelector({value = [], onChange}: UserSelectorProps) {
     };
 
     const isLoadingNewOptions = !!isSearchingForReports;
-    const [totalOptionsCount, setTotalOptionsCount] = useState(() => selectedOptionsForDisplay.length + availableOptions.personalDetails.length + availableOptions.recentReports.length);
+    const totalOptions = selectedOptionsForDisplay.length + availableOptions.personalDetails.length + availableOptions.recentReports.length;
+    const [totalOptionsCount, setTotalOptionsCount] = useState(totalOptions);
 
-    useEffect(() => {
-        if (debouncedSearchTerm) {
-            return;
-        }
+    if (totalOptions !== totalOptionsCount && !debouncedSearchTerm) {
         setTotalOptionsCount(selectedOptionsForDisplay.length + availableOptions.personalDetails.length + availableOptions.recentReports.length);
-    }, [debouncedSearchTerm, selectedOptionsForDisplay.length, availableOptions.personalDetails.length, availableOptions.recentReports.length]);
+    }
 
     const shouldShowSearchInput = totalOptionsCount >= CONST.STANDARD_LIST_ITEM_LIMIT;
 

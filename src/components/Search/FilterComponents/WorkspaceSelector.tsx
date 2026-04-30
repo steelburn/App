@@ -28,7 +28,7 @@ function WorkspaceSelector({policyIDQuery, value, onChange}: WorkspaceSelectorPr
         <MultiSelect
             items={workspaceOptions}
             value={selectedWorkspaceOptions}
-            onChange={(policyIDs) => onChange(policyIDs.map((policyID) => policyID.value))}
+            onChange={(policyIDs) => onChange(policyIDs.map((id) => id.value))}
             isSearchable={shouldShowWorkspaceSearchInput}
         />
     );
