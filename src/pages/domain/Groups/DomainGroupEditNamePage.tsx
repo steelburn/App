@@ -34,7 +34,6 @@ function DomainGroupEditNamePage({route}: DomainGroupEditNamePageProps) {
     const [group] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {
         selector: selectGroupByID(groupID),
     });
-    const [isPendingDelete] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`, {selector: isSecurityGroupPendingDeleteSelector(groupID)});
 
     const inputRef = useRef<AnimatedTextInputRef>(null);
 
@@ -51,10 +50,7 @@ function DomainGroupEditNamePage({route}: DomainGroupEditNamePageProps) {
     };
 
     return (
-        <DomainNotFoundPageWrapper
-            domainAccountID={domainAccountID}
-            shouldBeBlocked={isPendingDelete}
-        >
+        <DomainNotFoundPageWrapper domainAccountID={domainAccountID}>
             <ScreenWrapper
                 onEntryTransitionEnd={() => inputRef.current?.focus()}
                 shouldEnableMaxHeight
