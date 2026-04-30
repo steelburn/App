@@ -1,3 +1,4 @@
+import {deepEqual} from 'fast-equals';
 // eslint-disable-next-line you-dont-need-lodash-underscore/union-by
 import lodashUnionBy from 'lodash/unionBy';
 import type {NullishDeep, OnyxCollection, OnyxEntry, OnyxUpdate} from 'react-native-onyx';
@@ -970,6 +971,12 @@ function getUpdateMoneyRequestParams(params: GetUpdateMoneyRequestParamsType): U
 
     const dataToIncludeInParams: Partial<TransactionDetails> = Object.fromEntries(Object.entries(transactionDetails ?? {}).filter(([key]) => key in transactionChanges));
 
+    // Preserve the caller's full-precision distance so the server doesn't fire `increasedDistance`
+    // when the rounded display value drifts above the exact route distance.
+    if ('distance' in transactionChanges && typeof transactionChanges.distance === 'number') {
+        dataToIncludeInParams.distance = transactionChanges.distance;
+    }
+
     const apiParams: UpdateMoneyRequestParams = {
         ...dataToIncludeInParams,
         reportID: iouReport?.reportID,
@@ -977,6 +984,18 @@ function getUpdateMoneyRequestParams(params: GetUpdateMoneyRequestParamsType): U
     };
 
     const hasPendingWaypoints = 'waypoints' in transactionChanges;
+    // The manual-distance submit path always passes the current waypoints to keep the merge consistent,
+    // even when the user only edited the distance number. Compare against the existing transaction so we
+    // can tell apart a real waypoint edit (route invalidated) from a pure distance edit (route still valid).
+    const haveWaypointsActuallyChanged =
+        hasPendingWaypoints &&
+        (() => {
+            const oldWaypoints = transaction?.comment?.waypoints ?? {};
+            const newWaypoints = transactionChanges.waypoints ?? {};
+            const getAddresses = (collection: WaypointCollection) =>
+                Object.fromEntries(Object.entries(collection).map(([key, waypoint]) => [key, waypoint && 'address' in waypoint ? waypoint.address : undefined]));
+            return !deepEqual(getAddresses(oldWaypoints), getAddresses(newWaypoints));
+        })();
     const hasModifiedDistanceRate = 'customUnitRateID' in transactionChanges;
     const hasModifiedCreated = 'created' in transactionChanges;
     const hasModifiedAmount = 'amount' in transactionChanges;
@@ -1240,7 +1259,10 @@ function getUpdateMoneyRequestParams(params: GetUpdateMoneyRequestParamsType): U
         apiParams.attendees = JSON.stringify(apiParams?.attendees);
     }
 
-    // Clear out the error fields and loading states on success
+    // Clear out the error fields and loading states on success.
+    // Only clear `routes` when waypoints/rate changed (the server will push a fresh route via Pusher).
+    // For pure distance edits the route is unchanged, and clearing it would make the map briefly disappear.
+    const shouldClearRoutes = haveWaypointsActuallyChanged || hasModifiedDistanceRate;
     successData.push({
         onyxMethod: Onyx.METHOD.MERGE,
         key: `${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`,
@@ -1248,7 +1270,7 @@ function getUpdateMoneyRequestParams(params: GetUpdateMoneyRequestParamsType): U
             pendingFields: clearedPendingFields,
             isLoading: false,
             errorFields: null,
-            routes: null,
+            ...(shouldClearRoutes && {routes: null}),
         },
     });
 
@@ -1317,9 +1339,13 @@ function getUpdateMoneyRequestParams(params: GetUpdateMoneyRequestParamsType): U
         if (hasPendingWaypoints) {
             optimisticViolations = optimisticViolations.filter((violation) => violation.name !== CONST.VIOLATIONS.NO_ROUTE);
         }
-        if (hasModifiedDistanceRate || hasModifiedDistance) {
+        if (hasModifiedDistanceRate || hasModifiedDistance || hasPendingWaypoints) {
+            // Clear stale distance-related violations while the server reprocesses.
+            // The server will re-evaluate and re-add any that legitimately apply.
             optimisticViolations = optimisticViolations.filter(
-                (violation) => !(violation.name === CONST.VIOLATIONS.MODIFIED_AMOUNT && violation.data?.type === CONST.MODIFIED_AMOUNT_VIOLATION_DATA.DISTANCE),
+                (violation) =>
+                    !(violation.name === CONST.VIOLATIONS.MODIFIED_AMOUNT && violation.data?.type === CONST.MODIFIED_AMOUNT_VIOLATION_DATA.DISTANCE) &&
+                    violation.name !== CONST.VIOLATIONS.INCREASED_DISTANCE,
             );
         }
 

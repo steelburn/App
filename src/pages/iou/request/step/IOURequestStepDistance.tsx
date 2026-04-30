@@ -512,11 +512,11 @@ function IOURequestStepDistance({
                 return;
             }
             if (transaction?.transactionID && report?.reportID) {
-                // When waypoints change, include the route-calculated distance so the server
-                // updates quantity to match the new route instead of keeping the old value.
+                // Send the new route distance so the server replaces any stale manual quantity.
+                // Use full precision (no rounding) to avoid triggering the `increasedDistance`
+                // violation when the rounded display value drifts above the exact route distance.
                 const routeDistanceInMeters = transaction?.routes?.route0?.distance;
-                const routeDistanceInUnit =
-                    routeDistanceInMeters != null ? roundToTwoDecimalPlaces(DistanceRequestUtils.convertDistanceUnit(routeDistanceInMeters, distanceUnit)) : undefined;
+                const routeDistanceInUnit = routeDistanceInMeters != null ? DistanceRequestUtils.convertDistanceUnit(routeDistanceInMeters, distanceUnit) : undefined;
 
                 updateMoneyRequestDistance({
                     transaction,
@@ -537,6 +537,9 @@ function IOURequestStepDistance({
                 });
             }
             transactionWasSaved.current = true;
+            // Remove the backup eagerly so the parent report view reads the optimistic transaction
+            // immediately, instead of the stale backup, while the API request is still in flight.
+            removeBackupTransaction(transaction?.transactionID);
             navigateBack();
             return;
         }
