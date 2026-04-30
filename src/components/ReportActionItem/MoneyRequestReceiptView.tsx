@@ -31,7 +31,6 @@ import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
 import useOriginalReportID from '@hooks/useOriginalReportID';
 import usePrevious from '@hooks/usePrevious';
-import useReceiptRetryParams from '@hooks/useReceiptRetryParams';
 import useReportIsArchived from '@hooks/useReportIsArchived';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useTheme from '@hooks/useTheme';
@@ -157,7 +156,6 @@ function MoneyRequestReceiptView({
     const [transaction] = useOnyx(`${ONYXKEYS.COLLECTION.TRANSACTION}${getNonEmptyStringOnyxID(linkedTransactionID)}`);
     const [policy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${moneyRequestReport?.policyID}`);
     const [cardList] = useOnyx(ONYXKEYS.CARD_LIST);
-    const retryAction = useReceiptRetryParams(transaction, iouReport, chatReport, policy, isTrackExpense);
     const transactionViolations = useTransactionViolations(transaction?.transactionID);
     const [policyCategories] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${moneyRequestReport?.policyID}`);
 
@@ -329,10 +327,8 @@ function MoneyRequestReceiptView({
             error: CONST.IOU.RECEIPT_ERROR,
             source: transaction.receipt.source?.toString() ?? '',
             filename: transaction.receipt.filename ?? '',
-            action: retryAction?.action ?? '',
-            retryParams: retryAction?.retryParams ?? '',
         });
-    }, [hasReceiptUploadError, reportCreationError, hasReceipt, transaction, retryAction?.action, retryAction?.retryParams]);
+    }, [hasReceiptUploadError, reportCreationError, hasReceipt, transaction]);
 
     const errors = useMemo(() => {
         if (hasReceiptUploadError) {
