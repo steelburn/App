@@ -1,5 +1,6 @@
 import React, {memo, useCallback, useContext, useEffect} from 'react';
 import ScreenWrapper from '@components/ScreenWrapper';
+import attachmentModalHandler from '@libs/AttachmentModalHandler';
 import Navigation from '@libs/Navigation/Navigation';
 import AttachmentModalBaseContent from '@pages/media/AttachmentModalScreen/AttachmentModalBaseContent';
 import AttachmentStateContextProvider from '@pages/media/AttachmentModalScreen/AttachmentModalBaseContent/AttachmentStateContextProvider';
@@ -20,14 +21,23 @@ function AttachmentModalContainer<Screen extends AttachmentModalScreenType>({con
 
     /**
      * Closes the modal.
-     * @param {boolean} [shouldCallDirectly] If true, navigates back immediately.
+     * @param {boolean} [shouldCallDirectly] If true, directly calls `onModalClose`.
      * This is useful when you plan to continue navigating to another page after closing the modal, to avoid freezing the app due to navigating to another page first and dismissing the modal later.
-     * Otherwise, `Navigation.goBack` waits for ongoing transitions to finish so the `AttachmentCarousel` can unmount before the modal close animation starts.
+     * If `shouldCallDirectly` is false or undefined, it calls `attachmentModalHandler.handleModalClose` to close the modal.
+     * This ensures smooth modal closing behavior without causing delays in closing.
      */
     const closeScreen = useCallback(
         (options?: AttachmentModalOnCloseOptions) => {
-            resetAttachmentModalAndClose();
-            Navigation.goBack(undefined, {waitForTransition: !options?.shouldCallDirectly});
+            const close = () => {
+                resetAttachmentModalAndClose();
+                Navigation.goBack();
+            };
+
+            if (options?.shouldCallDirectly) {
+                close();
+            } else {
+                attachmentModalHandler.handleModalClose(close);
+            }
         },
         [resetAttachmentModalAndClose],
     );
