@@ -42,7 +42,7 @@ function ExpensifyCardPreferredWorkspaceToggle({domainAccountID, groupID}: Expen
     const hasWorkspaceCard = !!preferredPolicy?.areExpensifyCardsEnabled && !isEmptyObject(cardsList);
 
     const isDisabled = !isPreferredPolicyEnabled || !hasWorkspaceCard;
-    const isEnabled = !isDisabled && !!group?.overridePreferredPolicyWithCardPolicy;
+    const isActive = !!group?.overridePreferredPolicyWithCardPolicy;
 
     return (
         <View style={styles.mv3}>
@@ -52,7 +52,7 @@ function ExpensifyCardPreferredWorkspaceToggle({domainAccountID, groupID}: Expen
                 switchAccessibilityLabel={translate('domain.groups.ExpensifyCardPreferredWorkspace')}
                 shouldPlaceSubtitleBelowSwitch
                 disabled={isDisabled}
-                isActive={isEnabled}
+                isActive={isActive}
                 onToggle={(enabled) => {
                     if (!group) {
                         return;
