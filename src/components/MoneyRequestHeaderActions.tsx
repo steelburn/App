@@ -29,13 +29,14 @@ function MoneyRequestHeaderActions({reportID, onBackButtonPress}: MoneyRequestHe
         | PlatformStackRouteProp<RightModalNavigatorParamList, typeof SCREENS.RIGHT_MODAL.SEARCH_MONEY_REQUEST_REPORT>
     >();
 
-    const isNarrow = isInLandscapeMode || !shouldUseNarrowLayout || (wideRHPRouteKeys.length > 0 && !isSmallScreenWidth);
+    const shouldUseDesktopLayout = !shouldUseNarrowLayout || isInLandscapeMode;
+    const shouldDisplayNarrowButtons = shouldUseDesktopLayout || (wideRHPRouteKeys.length > 0 && !isSmallScreenWidth);
     const shouldDisplayTransactionNavigation = !!(reportID && route.name === SCREENS.RIGHT_MODAL.SEARCH_REPORT);
 
     return (
         <View
             style={
-                isNarrow
+                shouldDisplayNarrowButtons
                     ? [styles.flexRow, styles.gap2, shouldDisplayTransactionNavigation && styles.mr3]
                     : [styles.flexRow, styles.gap2, styles.pb3, styles.ph5, styles.w100, styles.alignItemsCenter, styles.justifyContentCenter]
             }

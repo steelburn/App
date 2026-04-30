@@ -80,17 +80,18 @@ function EarlyDiscountBanner({isSubscriptionPage, onboardingHelpDropdownButton, 
     );
 
     const rightComponent = useMemo(() => {
-        const smallScreenStyle = shouldUseNarrowLayout && !isInLandscapeMode ? [styles.flex0, styles.flexBasis100, styles.justifyContentCenter] : [];
+        const shouldUseMobileLayout = shouldUseNarrowLayout && !isInLandscapeMode;
+        const smallScreenStyle = shouldUseMobileLayout ? [styles.flex0, styles.flexBasis100, styles.justifyContentCenter] : [];
         return (
             <View style={[styles.flexRow, styles.gap2, smallScreenStyle, styles.alignItemsCenter]}>
                 {onboardingHelpDropdownButton}
                 <Button
                     success={!hasActiveScheduledCall}
-                    style={shouldUseNarrowLayout && !isInLandscapeMode ? [styles.earlyDiscountButton, styles.flexGrow2] : styles.mr2}
+                    style={shouldUseMobileLayout ? [styles.earlyDiscountButton, styles.flexGrow2] : styles.mr2}
                     text={translate('subscription.billingBanner.earlyDiscount.claimOffer')}
                     onPress={() => Navigation.navigate(ROUTES.SETTINGS_SUBSCRIPTION.getRoute(Navigation.getActiveRoute()))}
                 />
-                {(!shouldUseNarrowLayout || isInLandscapeMode) && dismissButton}
+                {!shouldUseMobileLayout && dismissButton}
             </View>
         );
     }, [

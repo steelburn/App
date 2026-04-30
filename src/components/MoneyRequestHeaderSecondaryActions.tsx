@@ -109,7 +109,8 @@ function MoneyRequestHeaderSecondaryActions({reportID, onBackButtonPress}: Money
     ] as const);
 
     const {wideRHPRouteKeys} = useWideRHPState();
-    const isNarrow = isInLandscapeMode || !shouldUseNarrowLayout || (wideRHPRouteKeys.length > 0 && !isSmallScreenWidth);
+    const shouldUseDesktopLayout = !shouldUseNarrowLayout || isInLandscapeMode;
+    const isNarrowButton = shouldUseDesktopLayout || (wideRHPRouteKeys.length > 0 && !isSmallScreenWidth);
     const {isOffline} = useNetwork();
 
     // Per-key Onyx subscriptions
@@ -517,7 +518,7 @@ function MoneyRequestHeaderSecondaryActions({reportID, onBackButtonPress}: Money
                 customText={translate('common.more')}
                 options={applicableSecondaryActions}
                 isSplitButton={false}
-                wrapperStyle={!isNarrow && !hasPrimaryAction ? [styles.flexGrow4] : undefined}
+                wrapperStyle={!isNarrowButton && !hasPrimaryAction ? [styles.flexGrow4] : undefined}
             />
             {!!rejectModalAction && (
                 <HoldOrRejectEducationalModal
