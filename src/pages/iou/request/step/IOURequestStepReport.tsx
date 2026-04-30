@@ -169,10 +169,21 @@ function IOURequestStepReport({route, transaction}: IOURequestStepReportProps) {
         // eslint-disable-next-line @typescript-eslint/no-deprecated
         InteractionManager.runAfterInteractions(() => {
             Navigation.setNavigationActionToMicrotaskQueue(() => {
+                const participants = [
+                    {
+                        selected: true,
+                        accountID: 0,
+                        isPolicyExpenseChat: true,
+                        reportID: report?.chatReportID,
+                        policyID: report?.policyID,
+                    },
+                ];
+
                 setTransactionReport(
                     transaction.transactionID,
                     {
                         reportID: item.value,
+                        participants,
                     },
                     !isEditing,
                 );
