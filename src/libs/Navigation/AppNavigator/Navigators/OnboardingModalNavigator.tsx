@@ -79,7 +79,7 @@ function OnboardingModalNavigator() {
         }
 
         signUpEventPublishedForAccountID = accountID;
-        GoogleTagManager.publishEvent(CONST.ANALYTICS.EVENT.SIGN_UP, accountID, email ?? '');
+        GoogleTagManager.publishEvent(CONST.ANALYTICS.EVENT.SIGN_UP.NAME, accountID, email ?? '');
     }, [accountID]);
 
     const handleOuterClick = useCallback(() => {

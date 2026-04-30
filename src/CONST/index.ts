@@ -8573,20 +8573,25 @@ const CONST = {
 
     ANALYTICS: {
         EVENT: {
-            SIGN_UP: 'sign_up',
-            WORKSPACE_CREATED: 'workspace_created',
-            PAID_ADOPTION: 'paid_adoption',
+            SIGN_UP: {
+                NAME: 'sign_up',
+                REDDIT: 'SignUp',
+                LINKEDIN: 507587661,
+            },
+            WORKSPACE_CREATED: {
+                NAME: 'workspace_created',
+                REDDIT: 'Lead',
+                LINKEDIN: 25474804,
+            },
+            PAID_ADOPTION: {
+                NAME: 'paid_adoption',
+                REDDIT: 'Purchase',
+                LINKEDIN: 25474820,
+            },
             PRODUCT_TRAINING_SCAN_TEST_TOOLTIP_SHOWN: 'training_scan_test_tooltip_shown',
             PRODUCT_TRAINING_SCAN_TEST_TOOLTIP_DISMISSED: 'training_scan_test_tooltip_dismissed',
             PRODUCT_TRAINING_SCAN_TEST_TOOLTIP_CONFIRMED: 'training_scan_test_tooltip_confirmed',
         },
-        // LinkedIn uses numeric conversion IDs instead of named events
-        LINKEDIN_SIGN_UP_CONVERSION_ID: 507587661,
-        LINKEDIN_WORKSPACE_CREATED_CONVERSION_ID: 25474804,
-        LINKEDIN_PAID_ADOPTION_CONVERSION_ID: 25474820,
-        REDDIT_SIGN_UP_CONVERSION_ID: 'SignUp',
-        REDDIT_WORKSPACE_CREATED_CONVERSION_ID: 'Lead',
-        REDDIT_PAID_ADOPTION_CONVERSION_ID: 'Purchase',
         NVP: {
             META_CLICK_ID: 'expensify_leadFbclid',
             GOOGLE_CLICK_ID: 'expensify_leadGclid',

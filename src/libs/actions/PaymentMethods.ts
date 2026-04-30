@@ -207,7 +207,7 @@ function addPaymentCard(accountID: number, params: PaymentCardParams) {
         failureData,
     });
 
-    GoogleTagManager.publishEvent(CONST.ANALYTICS.EVENT.PAID_ADOPTION, accountID, getCurrentUserEmail() ?? '');
+    GoogleTagManager.publishEvent(CONST.ANALYTICS.EVENT.PAID_ADOPTION.NAME, accountID, getCurrentUserEmail() ?? '');
 }
 
 /**
@@ -276,9 +276,9 @@ function addSubscriptionPaymentCard(
         });
     }
     if (getCardForSubscriptionBilling(fundList)) {
-        Log.info(`[GTM] Not logging ${CONST.ANALYTICS.EVENT.PAID_ADOPTION} because a card was already added`);
+        Log.info(`[GTM] Not logging ${CONST.ANALYTICS.EVENT.PAID_ADOPTION.NAME} because a card was already added`);
     } else {
-        GoogleTagManager.publishEvent(CONST.ANALYTICS.EVENT.PAID_ADOPTION, accountID, getCurrentUserEmail() ?? '');
+        GoogleTagManager.publishEvent(CONST.ANALYTICS.EVENT.PAID_ADOPTION.NAME, accountID, getCurrentUserEmail() ?? '');
     }
 }
 
