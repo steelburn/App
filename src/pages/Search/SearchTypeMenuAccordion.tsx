@@ -14,6 +14,7 @@ import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import CONST from '@src/CONST';
 import type ChildrenProps from '@src/types/utils/ChildrenProps';
+import variables from '@styles/variables';
 
 type SearchTypeMenuAccordionProps = ChildrenProps & {
     title: string;
@@ -96,6 +97,8 @@ function SearchTypeMenuAccordion({title, defaultExpanded = true, badgeText, chil
                     <Icon
                         fill={theme.icon}
                         src={icons.UpArrow}
+                        width={variables.iconSizeSemiSmall}
+                        height={variables.iconSizeSemiSmall}
                     />
                 </Animated.View>
             </PressableWithFeedback>
