@@ -1,10 +1,10 @@
-import {filterFeedSelector} from '@components/Search/selectors/Search';
 import useAdvancedSearchFilters from '@hooks/useAdvancedSearchFilters';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import {createCardFeedKey, getCardFeedKey, getCardFeedNamesWithType, getFeedCountryForDisplay, getWorkspaceCardFeedKey} from '@libs/CardFeedUtils';
 import {getCardDescription} from '@libs/CardUtils';
 import ONYXKEYS from '@src/ONYXKEYS';
+import {filterFeedSelector} from '@src/selectors/Search';
 import type {WorkspaceCardsList} from '@src/types/onyx';
 import getEmptyArray from '@src/types/utils/getEmptyArray';
 
