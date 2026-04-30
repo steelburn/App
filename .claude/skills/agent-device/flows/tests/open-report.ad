@@ -6,7 +6,7 @@
 # @tag    navigation
 # @tag    perf
 # @tag    sentry-ManualOpenReport
-env TARGET_CHAT="Navigates to a chat"
+# @param  TARGET_CHAT Visible report/chat title to open from Inbox LHN.
 
 find "Inbox" "click"
 find "${TARGET_CHAT}" "click"
