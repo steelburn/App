@@ -3,6 +3,7 @@ import {fireEvent, render, screen, userEvent, within} from '@testing-library/rea
 import {addMonths, addYears, subMonths, subYears} from 'date-fns';
 import CalendarPicker from '@components/DatePicker/CalendarPicker';
 import DateUtils from '@libs/DateUtils';
+import CONST from '@src/CONST';
 
 const monthNames = DateUtils.getMonthNames();
 
@@ -419,6 +420,72 @@ describe('CalendarPicker', () => {
 
         expect(within(screen.getByTestId('currentYearText')).getByText('2024')).toBeTruthy();
         expect(screen.getByText(monthNames.at(11) ?? '')).toBeTruthy();
+    });
+
+    test('next year arrow should not navigate above CONST.CALENDAR_PICKER.MAX_YEAR', () => {
+        const value = new Date(CONST.CALENDAR_PICKER.MAX_YEAR, 5, 15);
+        const maxDate = new Date(CONST.CALENDAR_PICKER.MAX_YEAR, 11, 31);
+        render(
+            <CalendarPicker
+                value={value}
+                maxDate={maxDate}
+            />,
+        );
+
+        fireEvent.press(screen.getByTestId('next-year-arrow'));
+
+        // Year should be clamped at MAX_YEAR
+        expect(within(screen.getByTestId('currentYearText')).getByText(CONST.CALENDAR_PICKER.MAX_YEAR.toString())).toBeTruthy();
+    });
+
+    test('prev year arrow should not navigate below CONST.CALENDAR_PICKER.MIN_YEAR', () => {
+        const value = new Date(CONST.CALENDAR_PICKER.MIN_YEAR, 5, 15);
+        const minDate = new Date(CONST.CALENDAR_PICKER.MIN_YEAR, 0, 1);
+        render(
+            <CalendarPicker
+                value={value}
+                minDate={minDate}
+            />,
+        );
+
+        fireEvent.press(screen.getByTestId('prev-year-arrow'));
+
+        // Year should be clamped at MIN_YEAR
+        expect(within(screen.getByTestId('currentYearText')).getByText(CONST.CALENDAR_PICKER.MIN_YEAR.toString())).toBeTruthy();
+    });
+
+    test('next month arrow should not navigate above December of CONST.CALENDAR_PICKER.MAX_YEAR', () => {
+        const value = new Date(CONST.CALENDAR_PICKER.MAX_YEAR, 11, 15);
+        const maxDate = new Date(CONST.CALENDAR_PICKER.MAX_YEAR, 11, 31);
+        render(
+            <CalendarPicker
+                value={value}
+                maxDate={maxDate}
+            />,
+        );
+
+        fireEvent.press(screen.getByTestId('next-month-arrow'));
+
+        // Should remain on December of MAX_YEAR
+        expect(within(screen.getByTestId('currentYearText')).getByText(CONST.CALENDAR_PICKER.MAX_YEAR.toString())).toBeTruthy();
+        expect(within(screen.getByTestId('currentMonthText')).getByText(monthNames.at(11) ?? '')).toBeTruthy();
+    });
+
+    test('prev month arrow should not navigate below January of CONST.CALENDAR_PICKER.MIN_YEAR', () => {
+        const value = new Date(CONST.CALENDAR_PICKER.MIN_YEAR, 0, 15);
+        const minDate = new Date(CONST.CALENDAR_PICKER.MIN_YEAR, 0, 1);
+        render(
+            <CalendarPicker
+                value={value}
+                minDate={minDate}
+            />,
+        );
+
+        fireEvent.press(screen.getByTestId('prev-month-arrow'));
+
+        // Should remain on January of MIN_YEAR
+        expect(within(screen.getByTestId('currentYearText')).getByText(CONST.CALENDAR_PICKER.MIN_YEAR.toString())).toBeTruthy();
+        expect(within(screen.getByTestId('currentMonthText')).getByText(monthNames.at(0) ?? '')).toBeTruthy();
     });
 
     test('month picker should always return all 12 months', () => {
