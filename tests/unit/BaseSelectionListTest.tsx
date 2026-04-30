@@ -183,6 +183,33 @@ describe('BaseSelectionList', () => {
             />,
         );
 
+        expect(screen.getByTestId(`${CONST.BASE_LIST_ITEM_TEST_ID}0`)).toHaveStyle({backgroundColor: colors.productDark400});
+
+        act(() => {
+            arrowDownCallback();
+        });
+
+        // The item that gets focused will be the one following the currently focused item
+        await waitFor(() => {
+            expect(screen.getByTestId(`${CONST.BASE_LIST_ITEM_TEST_ID}1`)).toHaveStyle({backgroundColor: colors.productDark300});
+        });
+
+        act(() => {
+            arrowUpCallback();
+            arrowUpCallback();
+        });
+
+        await waitFor(() => {
+            expect(screen.getByTestId(`${CONST.BASE_LIST_ITEM_TEST_ID}9`)).toHaveStyle({backgroundColor: colors.productDark300});
+        });
+
+        act(() => {
+            arrowDownCallback();
+        });
+
+        await waitFor(() => {
+            expect(screen.getByTestId(`${CONST.BASE_LIST_ITEM_TEST_ID}0`)).toHaveStyle({backgroundColor: colors.productDark400});
+        });
         expect(screen.getByTestId(`${CONST.BASE_LIST_ITEM_TEST_ID}0`)).toBeTruthy();
         expect(screen.getByTestId(`${CONST.BASE_LIST_ITEM_TEST_ID}99`)).toBeTruthy();
     });

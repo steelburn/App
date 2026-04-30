@@ -25,8 +25,6 @@ function ChatListItem<TItem extends ListItem>({
     onFocus,
     onLongPressRow,
     shouldSyncFocus,
-    userWalletTierName,
-    isUserValidated,
     personalDetails,
     userBillingFundID,
 }: ChatListItemProps<TItem>) {
@@ -87,8 +85,6 @@ function ChatListItem<TItem extends ListItem>({
                 shouldDisplayContextMenu={false}
                 shouldShowDraftMessage={false}
                 shouldShowBorder
-                userWalletTierName={userWalletTierName}
-                isUserValidated={isUserValidated}
                 personalDetails={personalDetails}
                 userBillingFundID={userBillingFundID}
             />

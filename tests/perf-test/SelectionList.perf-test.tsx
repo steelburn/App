@@ -129,7 +129,6 @@ test('[SelectionList] should render 1 section and a thousand items', async () =>
 });
 
 test('[SelectionList] should press a list item', async () => {
-    // eslint-disable-next-line @typescript-eslint/require-await
     const scenario = async (screen: RenderResult) => {
         fireEvent.press(screen.getByText('Item 5'));
     };
@@ -138,7 +137,6 @@ test('[SelectionList] should press a list item', async () => {
 });
 
 test('[SelectionList] should render multiple selection and select 3 items', async () => {
-    // eslint-disable-next-line @typescript-eslint/require-await
     const scenario = async (screen: RenderResult) => {
         fireEvent.press(screen.getByText('Item 1'));
         fireEvent.press(screen.getByText('Item 2'));
@@ -167,7 +165,6 @@ test('[SelectionList] should scroll and select a few items', async () => {
         },
     };
 
-    // eslint-disable-next-line @typescript-eslint/require-await
     const scenario = async (screen: RenderResult) => {
         fireEvent.press(screen.getByText('Item 1'));
         // see https://github.com/callstack/react-native-testing-library/issues/1540

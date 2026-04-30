@@ -194,7 +194,7 @@ const renderWithConditionalWrapper = (shouldUseScrollView: boolean, contentConta
     if (shouldUseScrollView) {
         return <ScrollView contentContainerStyle={contentContainerStyle}>{children}</ScrollView>;
     }
-    // eslint-disable-next-line react/jsx-no-useless-fragment
+
     return <View style={contentContainerStyle}>{children}</View>;
 };
 
@@ -444,7 +444,7 @@ function BasePopoverMenu({
             ...menuItemProps
         } = item;
         const icon = typeof item.icon === 'string' ? expensifyIcons[item.icon as keyof typeof expensifyIcons] : item.icon;
-        // eslint-disable-next-line react/no-array-index-key
+
         const reactKey = shouldIgnoreKeyForRendering ? `${item.text}_${menuIndex}` : (key ?? `${item.text}_${menuIndex}`);
         // In radio-button mode, suppress visual focus highlight until the user starts keyboard navigation.
         const isVisuallyFocused = focusedIndex === menuIndex && (!shouldShowRadioButton || hasKeyBeenPressed);

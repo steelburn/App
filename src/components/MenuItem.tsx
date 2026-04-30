@@ -455,6 +455,9 @@ type MenuItemBaseProps = ForwardedFSClassProps &
 
         /** Additional styles for the right icon wrapper */
         rightIconWrapperStyle?: StyleProp<ViewStyle>;
+
+        /** Whether to ignore compact popover menu styling for this item */
+        shouldIgnoreCompactStyle?: boolean;
     };
 
 type MenuItemProps = (IconProps | AvatarProps | NoIcon) & MenuItemBaseProps;
@@ -602,6 +605,7 @@ function MenuItem({
     tabIndex = 0,
     rightIconWrapperStyle,
     titleAccessibilityRole,
+    shouldIgnoreCompactStyle = false,
 }: MenuItemProps) {
     const icons = useMemoizedLazyExpensifyIcons(['ArrowRight', 'FallbackAvatar', 'DotIndicator', 'Checkmark', 'NewWindow']);
     const {translate} = useLocalize();
@@ -616,11 +620,16 @@ function MenuItem({
     const popoverAnchor = useRef<View>(null);
     const deviceHasHoverSupport = hasHoverSupport();
     const isCompactMenu = useIsCompactMenu();
-    const isCompactPopoverItem = isCompactMenu && !isSmallScreenWidth;
+    const isCompactPopoverItem = isCompactMenu && !isSmallScreenWidth && !shouldIgnoreCompactStyle;
     const compactIconStyle = isCompactPopoverItem && iconType === CONST.ICON_TYPE_ICON && {width: variables.iconSizeNormal};
     const isCompact = viewMode === CONST.OPTION_MODE.COMPACT;
     const isDeleted = style && Array.isArray(style) ? style.includes(styles.offlineFeedbackDeleted) : false;
-    const descriptionVerticalMargin = shouldShowDescriptionOnTop ? styles.mb1 : styles.mt1;
+    let descriptionVerticalMargin: ViewStyle = styles.mt1;
+    if (shouldShowDescriptionOnTop) {
+        descriptionVerticalMargin = styles.mb1;
+    } else if (isCompactPopoverItem) {
+        descriptionVerticalMargin = styles.mt0Half;
+    }
     const menuItemLoadingReasonAttributes: SkeletonSpanReasonAttributes = {
         context: 'MenuItem',
     };
@@ -867,7 +876,6 @@ function MenuItem({
                                         <View style={[styles.flexRow]}>
                                             <View style={[styles.flexColumn, styles.flex1]}>
                                                 {!!label && isLabelHoverable && (
-                                                    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
                                                     <View style={[isIDPassed ? styles.mb2 : null, labelStyle]}>
                                                         <Text style={StyleUtils.combineStyles([styles.sidebarLinkText, styles.optionAlternateText, styles.textLabelSupporting, styles.pre])}>
                                                             {label}
@@ -884,7 +892,7 @@ function MenuItem({
                                                     ]}
                                                 >
                                                     {!!leftComponent && <View style={[styles.mr3]}>{leftComponent}</View>}
-                                                    {/* eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing */}
+                                                    {}
                                                     {isIDPassed && (
                                                         <ReportActionAvatars
                                                             subscriptAvatarBorderColor={getSubscriptAvatarBackgroundColor(isHovered, pressed, theme.hoverComponentBG, theme.buttonHoveredBG)}
