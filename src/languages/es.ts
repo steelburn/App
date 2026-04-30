@@ -9454,6 +9454,8 @@ ${amount} para ${merchant} - ${date}`,
         liveActivity: {
             subtitle: 'Seguimiento de distancia',
             button: 'Ver progreso',
+            lockScreenBadgeText: 'Distancia',
+            lockScreenTrackingText: 'Seguimiento...',
         },
     },
 };

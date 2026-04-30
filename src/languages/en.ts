@@ -8239,6 +8239,8 @@ const translations = {
         gpsFloatingPillText: 'GPS tracking in progress...',
         liveActivity: {
             subtitle: 'Tracking distance',
+            lockScreenBadgeText: 'Distance',
+            lockScreenTrackingText: 'Tracking...',
             button: 'View progress',
         },
     },

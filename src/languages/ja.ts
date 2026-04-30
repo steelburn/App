@@ -8145,7 +8145,7 @@ ${reportName}
             prompt: 'GPSで距離の追跡を開始するには、端末の設定で位置情報へのアクセスを許可してください。',
         },
         gpsFloatingPillText: 'GPS 追跡を実行中です…',
-        liveActivity: {subtitle: '距離の記録', button: '進捗を表示'},
+        liveActivity: {subtitle: '距離の記録', button: '進捗を表示', lockScreenBadgeText: '距離', lockScreenTrackingText: '追跡中...'},
     },
     reportCardLostOrDamaged: {
         screenTitle: '成績表の紛失または破損',

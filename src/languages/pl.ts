@@ -8208,7 +8208,7 @@ Dodaj więcej zasad wydatków, żeby chronić płynność finansową firmy.`,
             prompt: 'Zezwól na dostęp do lokalizacji w ustawieniach urządzenia, aby rozpocząć śledzenie dystansu GPS.',
         },
         gpsFloatingPillText: 'Trwa śledzenie GPS...',
-        liveActivity: {subtitle: 'Śledzenie dystansu', button: 'Zobacz postęp'},
+        liveActivity: {subtitle: 'Śledzenie dystansu', button: 'Zobacz postęp', lockScreenBadgeText: 'Dystans', lockScreenTrackingText: 'Śledzenie...'},
     },
     reportCardLostOrDamaged: {
         screenTitle: 'Świadectwo zgubione lub uszkodzone',

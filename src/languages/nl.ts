@@ -8222,7 +8222,7 @@ er bestedingsregels toe om de kasstroom van het bedrijf te beschermen.`,
             prompt: 'Sta locatiestoegang toe in de instellingen van je apparaat om GPS-afstandsregistratie te starten.',
         },
         gpsFloatingPillText: 'GPS-tracking bezig...',
-        liveActivity: {subtitle: 'Afstand bijhouden', button: 'Voortgang bekijken'},
+        liveActivity: {subtitle: 'Afstand bijhouden', button: 'Voortgang bekijken', lockScreenBadgeText: 'Afstand', lockScreenTrackingText: 'Tracking...'},
     },
     reportCardLostOrDamaged: {
         screenTitle: 'Rapportkaart kwijt of beschadigd',

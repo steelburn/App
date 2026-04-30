@@ -8248,7 +8248,7 @@ Aggiungi altre regole di spesa per proteggere il flusso di cassa aziendale.`,
             prompt: 'Consenti l’accesso alla posizione nelle impostazioni del dispositivo per iniziare il tracciamento della distanza GPS.',
         },
         gpsFloatingPillText: 'Tracciamento GPS in corso...',
-        liveActivity: {subtitle: 'Rilevamento distanza', button: 'Visualizza avanzamento'},
+        liveActivity: {subtitle: 'Rilevamento distanza', button: 'Visualizza avanzamento', lockScreenBadgeText: 'Distanza', lockScreenTrackingText: 'Tracciamento...'},
     },
     reportCardLostOrDamaged: {
         screenTitle: 'Pagella smarrita o danneggiata',
