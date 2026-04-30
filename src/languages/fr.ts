@@ -8282,7 +8282,7 @@ Ajoutez davantage de règles de dépenses pour protéger la trésorerie de l’e
             prompt: 'Veuillez autoriser l’accès à la localisation dans les réglages de votre appareil pour commencer le suivi de distance GPS.',
         },
         gpsFloatingPillText: 'Suivi GPS en cours...',
-        liveActivity: {subtitle: 'Suivi de la distance', button: 'Voir la progression'},
+        liveActivity: {subtitle: 'Suivi de la distance', button: 'Voir la progression', lockScreenBadgeText: 'Distance', lockScreenTrackingText: 'Tracking...'},
     },
     reportCardLostOrDamaged: {
         screenTitle: 'relevé de notes perdu ou endommagé',
