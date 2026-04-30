@@ -60,8 +60,7 @@ import {
     navigateToDetailsPage,
 } from '@libs/ReportUtils';
 import {isExpensifyCardTransaction, isPending} from '@libs/TransactionUtils';
-import {markReportPaymentReceived} from '@userActions/IOU/PayMoneyRequest';
-import {payInvoice, payMoneyRequest} from '@userActions/IOU/PayMoneyRequest';
+import {markReportPaymentReceived, payInvoice, payMoneyRequest} from '@userActions/IOU/PayMoneyRequest';
 import {canApproveIOU, canIOUBePaid as canIOUBePaidAction} from '@userActions/IOU/ReportWorkflow';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
