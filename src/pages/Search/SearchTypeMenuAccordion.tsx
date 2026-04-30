@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {View} from 'react-native';
-import Animated, {useAnimatedReaction, useAnimatedStyle, useSharedValue, withTiming} from 'react-native-reanimated';
+import Animated, {SharedValue, useAnimatedReaction, useAnimatedStyle, useSharedValue, withTiming} from 'react-native-reanimated';
 import Accordion from '@components/Accordion';
 import Badge from '@components/Badge';
 import Icon from '@components/Icon';
@@ -20,6 +20,11 @@ type SearchTypeMenuAccordionProps = ChildrenProps & {
     badgeText?: string;
 };
 
+type AnimatedBadgeProps = {
+    text: string;
+    isExpanded: SharedValue<boolean>;
+};
+
 function getBadgeOpacity(isExpanded: boolean) {
     return Number(!isExpanded);
 }
@@ -30,6 +35,36 @@ function getBadgeOffsetY(isExpanded: boolean): `${number}%` | number {
 
 function getArrowRotation(isExpanded: boolean) {
     return isExpanded ? 0 : 180;
+}
+
+function AnimatedBadge({text, isExpanded}: AnimatedBadgeProps) {
+    const styles = useThemeStyles();
+
+    const badgeOpacity = useSharedValue(getBadgeOpacity(isExpanded.get()));
+    const badgeOffsetY = useSharedValue(getBadgeOffsetY(isExpanded.get()));
+
+    useAnimatedReaction(
+        () => isExpanded.get(),
+        (isExpandedValue) => {
+            badgeOpacity.set(withTiming(getBadgeOpacity(isExpandedValue), {duration: CONST.ANIMATED_TRANSITION}));
+            badgeOffsetY.set(withTiming(getBadgeOffsetY(isExpandedValue), {duration: CONST.ANIMATED_TRANSITION}));
+        },
+    );
+
+    const badgeAnimatedStyle = useAnimatedStyle(() => ({
+        opacity: badgeOpacity.get(),
+        transform: [{translateY: badgeOffsetY.get()}],
+    }));
+
+    return (
+        <Animated.View style={[badgeAnimatedStyle]}>
+            <Badge
+                text={text}
+                badgeStyles={styles.todoBadge}
+                success
+            />
+        </Animated.View>
+    );
 }
 
 function SearchTypeMenuAccordion({title, defaultExpanded = true, badgeText, children}: SearchTypeMenuAccordionProps) {
@@ -43,27 +78,16 @@ function SearchTypeMenuAccordion({title, defaultExpanded = true, badgeText, chil
         setIsExpanded((prevIsExpanded) => !prevIsExpanded);
     };
 
-    const badgeOpacity = useSharedValue(badgeText ? getBadgeOpacity(defaultExpanded) : 0);
-    const badgeOffsetY = useSharedValue(badgeText ? getBadgeOffsetY(defaultExpanded) : 0);
     const arrowRotation = useSharedValue(getArrowRotation(defaultExpanded));
 
     useAnimatedReaction(
         () => isAccordionExpanded.get(),
         (isExpandedValue) => {
-            if (badgeText) {
-                badgeOpacity.set(withTiming(getBadgeOpacity(isExpandedValue), {duration: CONST.ANIMATED_TRANSITION}));
-                badgeOffsetY.set(withTiming(getBadgeOffsetY(isExpandedValue), {duration: CONST.ANIMATED_TRANSITION}));
-            }
-
             const rotateDegree = getArrowRotation(isExpandedValue);
             arrowRotation.set(withTiming(rotateDegree, {duration: CONST.ANIMATED_TRANSITION}));
         },
     );
 
-    const badgeAnimatedStyle = useAnimatedStyle(() => ({
-        opacity: badgeOpacity.get(),
-        transform: [{translateY: badgeOffsetY.get()}],
-    }));
     const arrowAnimatedStyle = useAnimatedStyle(() => ({transform: [{rotate: `${arrowRotation.get()}deg`}]}));
 
     return (
@@ -83,13 +107,10 @@ function SearchTypeMenuAccordion({title, defaultExpanded = true, badgeText, chil
                     {title}
                 </Text>
                 {!!badgeText && (
-                    <Animated.View style={[badgeAnimatedStyle]}>
-                        <Badge
-                            text={badgeText}
-                            badgeStyles={styles.todoBadge}
-                            success
-                        />
-                    </Animated.View>
+                    <AnimatedBadge
+                        text={badgeText}
+                        isExpanded={isAccordionExpanded}
+                    />
                 )}
                 <Animated.View style={[arrowAnimatedStyle]}>
                     <Icon
