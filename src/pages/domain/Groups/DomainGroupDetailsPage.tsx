@@ -1,4 +1,4 @@
-import {domainSecurityGroupSettingErrorsSelector, domainSecurityGroupSettingPendingActionSelector, isSecurityGroupPendingDeleteSelector, selectGroupByID} from '@selectors/Domain';
+import {domainSecurityGroupSettingErrorsSelector, domainSecurityGroupSettingPendingActionSelector, selectGroupByID} from '@selectors/Domain';
 import React from 'react';
 import {View} from 'react-native';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';

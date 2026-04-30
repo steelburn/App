@@ -1,4 +1,4 @@
-import {isSecurityGroupPendingDeleteSelector, selectGroupByID} from '@selectors/Domain';
+import {selectGroupByID} from '@selectors/Domain';
 import React, {useRef} from 'react';
 import FormProvider from '@components/Form/FormProvider';
 import InputWrapper from '@components/Form/InputWrapper';
