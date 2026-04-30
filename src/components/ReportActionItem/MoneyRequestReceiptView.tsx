@@ -1,3 +1,4 @@
+import {useRoute} from '@react-navigation/native';
 import {hasSeenTourSelector} from '@selectors/Onboarding';
 import mapValues from 'lodash/mapValues';
 import React, {useEffect, useMemo, useRef, useState} from 'react';
@@ -66,7 +67,7 @@ import variables from '@styles/variables';
 import {clearAllRelatedReportActionErrors} from '@userActions/ClearReportActionErrors';
 import {cleanUpMoneyRequest} from '@userActions/IOU/DeleteMoneyRequest';
 import {replaceReceipt} from '@userActions/IOU/Receipt';
-import {addAttachmentWithComment, navigateToConciergeChatAndDeleteReport} from '@userActions/Report';
+import {addAttachmentWithComment, navigateToConciergeChatAndDeleteReport, setDeleteTransactionNavigateBackUrl} from '@userActions/Report';
 import {clearError, getLastModifiedExpense, revert} from '@userActions/Transaction';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -127,6 +128,8 @@ function MoneyRequestReceiptView({
     const {environmentURL} = useEnvironment();
     const {shouldUseNarrowLayout, isInNarrowPaneModal} = useResponsiveLayout();
     const {getReportRHPActiveRoute} = useActiveRoute();
+    const route = useRoute();
+    const routeBackTo = (route.params as {backTo?: string} | undefined)?.backTo;
     const parentReportID = report?.parentReportID;
     const [parentReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(parentReportID)}`);
     const [chatReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(parentReport?.parentReportID)}`);
@@ -306,7 +309,7 @@ function MoneyRequestReceiptView({
         [transaction?.errorFields?.route, transaction?.errorFields?.waypoints, transaction?.errors, parentReportAction?.errors],
     );
     const reportCreationError = useMemo(() => (getCreationReportErrors(report) ? getMicroSecondOnyxErrorWithTranslationKey('report.genericCreateReportFailureMessage') : {}), [report]);
-    const hasReceiptUploadError = useMemo(() => Object.values(errorsWithoutReportCreation).some((error) => isReceiptError(error)), [errorsWithoutReportCreation]);
+    const hasReceiptUploadError = Object.values(errorsWithoutReportCreation).some((error) => isReceiptError(error));
 
     // Whether to show receipt audit result (e.g.`Verified`, `Issue Found`) and messages (e.g. `Receipt not verified. Please confirm accuracy.`)
     // `!!(receiptViolations.length || didReceiptScanSucceed)` is for not showing `Verified` when `receiptViolations` is empty and `didReceiptScanSucceed` is false.
@@ -397,6 +400,8 @@ function MoneyRequestReceiptView({
                 return;
             }
             if (parentReportAction) {
+                const backToRoute = routeBackTo ?? Navigation.getActiveRoute();
+                setDeleteTransactionNavigateBackUrl(backToRoute);
                 cleanUpMoneyRequest(
                     transaction?.transactionID ?? linkedTransactionID,
                     parentReportAction,
@@ -639,11 +644,11 @@ function MoneyRequestReceiptView({
                     )}
                     {/* For WideRHP (fillSpace is true), we need to wait for the image to load to get the correct size, then display the violation message to avoid the jumping issue.
                         Otherwise (when fillSpace is false), we use a fixed size, so there's no need to wait for the image to load. */}
-                    {!!shouldShowAuditMessage && hasReceipt && (!isLoading || !fillSpace) && receiptAuditMessagesRow}
+                    {!hasReceiptUploadError && !!shouldShowAuditMessage && hasReceipt && (!isLoading || !fillSpace) && receiptAuditMessagesRow}
                 </OfflineWithFeedback>
             )}
             {!shouldShowReceiptEmptyState && !hasReceipt && <View style={{marginVertical: 6}} />}
-            {!!shouldShowAuditMessage && !hasReceipt && receiptAuditMessagesRow}
+            {!hasReceiptUploadError && !!shouldShowAuditMessage && !hasReceipt && receiptAuditMessagesRow}
             {AttachmentErrorModal}
             {PDFValidationComponent}
         </View>

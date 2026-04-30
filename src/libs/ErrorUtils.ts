@@ -218,7 +218,7 @@ function addErrorMessage(errors: Errors, inputID?: string | null, message?: stri
  * Check if the error includes a receipt.
  */
 function isReceiptError(message: unknown): message is ReceiptError {
-    if (message === null || message === undefined) {
+    if (message == null) {
         return false;
     }
     if (typeof message === 'string') {
