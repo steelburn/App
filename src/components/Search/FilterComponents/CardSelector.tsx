@@ -62,16 +62,7 @@ function CardSelector({value = [], onChange}: CardSelectorProps) {
         customCardNames,
     );
 
-    const closedCardsSectionData = buildCardsData(
-        workspaceCardFeeds ?? {},
-        userCardList ?? {},
-        personalDetails ?? {},
-        value,
-        illustrations,
-        companyCardFeedIcons,
-        true,
-        customCardNames,
-    );
+    const closedCardsSectionData = buildCardsData(workspaceCardFeeds ?? {}, userCardList ?? {}, personalDetails ?? {}, value, illustrations, companyCardFeedIcons, true, customCardNames);
 
     const shouldShowSearchInput = individualCardsSectionData.selected.length + individualCardsSectionData.unselected.length >= CONST.STANDARD_LIST_ITEM_LIMIT;
 
