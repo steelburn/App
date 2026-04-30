@@ -75,6 +75,7 @@ function AttachmentCamera({isVisible, onCapture, onClose}: AttachmentCameraProps
     const [flash, setFlash] = useState(false);
     const [cameraPermissionStatus, setCameraPermissionStatus] = useState<string | null>(null);
     const isCapturing = useRef(false);
+    const isActiveRef = useRef(false);
     const cameraRef = useRef<Camera>(null);
 
     const device = useCameraDevice(cameraPosition, {
@@ -135,6 +136,11 @@ function AttachmentCamera({isVisible, onCapture, onClose}: AttachmentCameraProps
             });
     }, [translate]);
 
+    // Track visibility in a ref so async takePhoto callbacks can detect stale sessions
+    useEffect(() => {
+        isActiveRef.current = isVisible;
+    }, [isVisible]);
+
     // Refresh permissions when modal becomes visible and auto-request if denied
     useEffect(() => {
         if (!isVisible) {
@@ -182,6 +188,10 @@ function AttachmentCamera({isVisible, onCapture, onClose}: AttachmentCameraProps
                 path,
             })
             .then((photo: PhotoFile) => {
+                // Discard capture if the camera was closed while takePhoto was in-flight
+                if (!isActiveRef.current) {
+                    return;
+                }
                 const uri = getPhotoSource(photo.path);
                 const fileName = photo.path.substring(photo.path.lastIndexOf('/') + 1) || `photo_${Date.now()}.jpg`;
 
