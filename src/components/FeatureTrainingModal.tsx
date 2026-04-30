@@ -19,6 +19,8 @@ import Accessibility from '@libs/Accessibility';
 import isInLandscapeModeUtil from '@libs/isInLandscapeMode';
 import Log from '@libs/Log';
 import Navigation from '@libs/Navigation/Navigation';
+// eslint-disable-next-line no-restricted-imports
+import TransitionTracker from '@libs/Navigation/TransitionTracker';
 import variables from '@styles/variables';
 import {setNameValuePair} from '@userActions/User';
 import CONST from '@src/CONST';
@@ -234,7 +236,18 @@ function FeatureTrainingModal({
     const shouldUseScrollView = shouldUseScrollViewProp || isInLandscapeMode;
 
     useEffect(() => {
-        setIsModalVisible(isModalDisabled);
+        // Transition tracker is used directly as we defer the opening of the modal until other animations are finished,
+        // for which there is no higher-level API.
+        const handle = TransitionTracker.runAfterTransitions({
+            callback: () => {
+                if (!isModalDisabled) {
+                    setIsModalVisible(false);
+                    return;
+                }
+                setIsModalVisible(true);
+            },
+        });
+        return () => handle.cancel();
     }, [isModalDisabled]);
 
     useEffect(() => {
