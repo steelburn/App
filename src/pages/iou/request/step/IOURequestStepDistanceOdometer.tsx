@@ -173,8 +173,10 @@ function IOURequestStepDistanceOdometer({
         hasInitializedRefs.current = false;
     };
 
-    const {hasVerifiedBlobs} = useRestartOnOdometerImagesFailure(transaction, reportID, iouType, backToReport, () => {
-        resetOdometerLocalState();
+    const {hasVerifiedBlobs} = useRestartOnOdometerImagesFailure(transaction, reportID, iouType, backToReport, ({shouldResetLocalState}) => {
+        if (shouldResetLocalState) {
+            resetOdometerLocalState();
+        }
         backupHandledManually.current = true;
     });
 
