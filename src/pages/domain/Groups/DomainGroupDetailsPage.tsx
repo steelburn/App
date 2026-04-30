@@ -18,6 +18,7 @@ import {clearDomainSecurityGroupSettingError} from '@userActions/Domain';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
+import DefaultGroupToggle from './DefaultGroupToggle';
 import ExpensifyCardPreferredWorkspaceToggle from './ExpensifyCardPreferredWorkspaceToggle';
 
 type DomainGroupDetailsPageProps = PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.DOMAIN.GROUP_DETAILS>;
@@ -59,6 +60,11 @@ function DomainGroupDetailsPage({route}: DomainGroupDetailsPageProps) {
                             onPress={() => Navigation.navigate(ROUTES.DOMAIN_GROUP_EDIT_NAME.getRoute(domainAccountID, groupID))}
                         />
                     </OfflineWithFeedback>
+                    <DefaultGroupToggle
+                        domainAccountID={domainAccountID}
+                        groupID={groupID}
+                        groupName={group?.name}
+                    />
                     <View style={[styles.sectionDividerLine, styles.mh5, styles.mv6]} />
                     <Text style={[styles.textNormal, styles.textStrong, styles.ph5]}>{translate('domain.groups.permissions')}</Text>
                     <ExpensifyCardPreferredWorkspaceToggle

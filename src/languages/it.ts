@@ -866,6 +866,7 @@ const translations: TranslationDeepObject<typeof en> = {
         },
     },
     adminOnlyCanPost: 'Solo gli amministratori possono inviare messaggi in questa stanza.',
+    readOnlyConversation: 'Questa conversazione è di sola lettura.',
     reportAction: {
         asCopilot: 'come copilota per',
         assistedBy: (agentName: string) => `assistito da ${agentName}`,
@@ -1472,11 +1473,11 @@ const translations: TranslationDeepObject<typeof en> = {
         heldExpense: 'ha messo in sospeso questa spesa',
         unheldExpense: 'ha sbloccato questa spesa',
         moveUnreportedExpense: 'Sposta spesa non rendicontata',
-        addUnreportedExpense: 'Aggiungi spesa non rendicontata',
-        selectUnreportedExpense: 'Seleziona almeno una spesa da aggiungere al rapporto.',
-        emptyStateUnreportedExpenseTitle: 'Nessuna spesa non dichiarata',
-        emptyStateUnreportedExpenseSubtitle: 'Sembra che tu non abbia alcuna spesa non rendicontata. Prova a crearne una qui sotto.',
-        addUnreportedExpenseConfirm: 'Aggiungi al report',
+        addExistingExpense: 'Aggiungi spesa esistente',
+        selectExistingExpense: 'Seleziona almeno una spesa da aggiungere al rapporto.',
+        emptyStateExistingExpenseTitle: 'Nessuna spesa esistente',
+        emptyStateExistingExpenseSubtitle: 'Sembra che tu non abbia alcuna spesa esistente. Prova a crearne una qui sotto.',
+        addExistingExpenseConfirm: 'Aggiungi al report',
         newReport: 'Nuovo report',
         explainHold: () => ({
             one: 'Spiega perché stai trattenendo questa spesa.',
@@ -2096,8 +2097,8 @@ const translations: TranslationDeepObject<typeof en> = {
         account: 'Account',
         general: 'Generale',
         helpPage: {
-            title: 'Aiuto e supporto',
-            description: 'Siamo qui per aiutarti 24 ore su 24, 7 giorni su 7',
+            title: 'Domande?',
+            description: 'Siamo qui per aiutarti, a qualsiasi ora.',
             helpSite: 'Sito di assistenza',
             conciergeChat: 'Concierge',
             conciergeChatDescription: 'Il tuo assistente IA personale',
@@ -9140,6 +9141,11 @@ Ecco una *ricevuta di prova* per mostrarti come funziona:`,
         groups: {
             title: 'Gruppi',
             memberCount: () => ({one: '1 membro', other: (count: number) => `${count} membri`}),
+            defaultGroup: 'Gruppo predefinito per i nuovi membri',
+            defaultGroupPrompt: (currentName: string, newName: string) =>
+                `Sei sicuro di voler impostare ${newName} come gruppo predefinito? I nuovi membri verranno invitati a questo gruppo invece del precedente gruppo predefinito (${currentName}). `,
+            makeDefault: 'Imposta come predefinito',
+            neverMind: 'Lascia perdere',
             permissions: 'Autorizzazioni del gruppo',
             ExpensifyCardPreferredWorkspace: 'Area di lavoro preferita per Expensify Card',
             ExpensifyCardPreferredWorkspaceDescription:

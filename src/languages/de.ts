@@ -865,6 +865,7 @@ const translations: TranslationDeepObject<typeof en> = {
         },
     },
     adminOnlyCanPost: 'Nur Admins können Nachrichten in diesem Raum senden.',
+    readOnlyConversation: 'Diese Konversation ist schreibgeschützt.',
     reportAction: {
         asCopilot: 'als Copilot für',
         assistedBy: (agentName: string) => `unterstützt von ${agentName}`,
@@ -1474,11 +1475,11 @@ const translations: TranslationDeepObject<typeof en> = {
         heldExpense: 'hat diese Ausgabe zurückgehalten',
         unheldExpense: 'Zurückgehaltene Ausgabe freigegeben',
         moveUnreportedExpense: 'Nicht gemeldete Ausgabe verschieben',
-        addUnreportedExpense: 'Nicht gemeldete Ausgabe hinzufügen',
-        selectUnreportedExpense: 'Wähle mindestens eine Ausgabe aus, um sie dem Bericht hinzuzufügen.',
-        emptyStateUnreportedExpenseTitle: 'Keine nicht gemeldeten Ausgaben',
-        emptyStateUnreportedExpenseSubtitle: 'Sie scheinen keine nicht eingereichten Ausgaben zu haben. Erstellen Sie unten eine.',
-        addUnreportedExpenseConfirm: 'Zu Bericht hinzufügen',
+        addExistingExpense: 'Vorhandene Ausgabe hinzufügen',
+        selectExistingExpense: 'Wähle mindestens eine Ausgabe aus, um sie dem Bericht hinzuzufügen.',
+        emptyStateExistingExpenseTitle: 'Keine vorhandenen Ausgaben',
+        emptyStateExistingExpenseSubtitle: 'Es scheint, dass du keine vorhandenen Ausgaben hast. Erstelle unten eine neue.',
+        addExistingExpenseConfirm: 'Zu Bericht hinzufügen',
         newReport: 'Neuer Bericht',
         explainHold: () => ({
             one: 'Erkläre, warum du diese Ausgabe zurückhältst.',
@@ -2099,8 +2100,8 @@ const translations: TranslationDeepObject<typeof en> = {
         account: 'Konto',
         general: 'Allgemein',
         helpPage: {
-            title: 'Hilfe und Support',
-            description: 'Wir sind rund um die Uhr für Sie da',
+            title: 'Fragen?',
+            description: 'Wir sind rund um die Uhr für Sie da.',
             helpSite: 'Hilfeseite',
             conciergeChat: 'Concierge',
             conciergeChatDescription: 'Ihr persönlicher KI-Agent',
@@ -9150,6 +9151,11 @@ Hier ist ein *Testbeleg*, um dir zu zeigen, wie es funktioniert:`,
         groups: {
             title: 'Gruppen',
             memberCount: () => ({one: '1 Mitglied', other: (count: number) => `${count} Mitglieder`}),
+            defaultGroup: 'Standardgruppe für neue Mitglieder',
+            defaultGroupPrompt: (currentName: string, newName: string) =>
+                `Möchtest du ${newName} wirklich zur Standardgruppe machen? Neue Mitglieder werden zu dieser Gruppe anstelle der bisherigen Standardgruppe (${currentName}) eingeladen. `,
+            makeDefault: 'Als Standard festlegen',
+            neverMind: 'Vergiss es',
             permissions: 'Gruppenberechtigungen',
             ExpensifyCardPreferredWorkspace: 'Bevorzugter Workspace für die Expensify Card',
             ExpensifyCardPreferredWorkspaceDescription:
