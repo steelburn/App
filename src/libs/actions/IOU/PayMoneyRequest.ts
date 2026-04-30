@@ -8,7 +8,6 @@ import {WRITE_COMMANDS} from '@libs/API/types';
 import DateUtils from '@libs/DateUtils';
 import {getMicroSecondOnyxErrorWithTranslationKey} from '@libs/ErrorUtils';
 import Navigation from '@libs/Navigation/Navigation';
-// eslint-disable-next-line @typescript-eslint/no-deprecated
 import {buildNextStepNew, buildOptimisticNextStep} from '@libs/NextStepUtils';
 import {getPersonalDetailsForAccountIDs} from '@libs/OptionsListUtils';
 import {isPaidGroupPolicy, isPolicyAdmin} from '@libs/PolicyUtils';
@@ -39,7 +38,8 @@ import type {Participant} from '@src/types/onyx/IOU';
 import type {PaymentMethodType} from '@src/types/onyx/OriginalMessage';
 import type {OnyxData} from '@src/types/onyx/Request';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
-import {getAllPersonalDetails, getAllTransactionViolations, getCurrentUserEmail, getReportFromHoldRequestsOnyxData, getReportPreviewAction, getUserAccountID} from '.';
+import {getAllPersonalDetails, getAllTransactionViolations, getCurrentUserEmail, getReportPreviewAction, getUserAccountID} from '.';
+import {getReportFromHoldRequestsOnyxData} from './Hold';
 
 type PayInvoiceArgs = {
     paymentMethodType: PaymentMethodType;
@@ -56,6 +56,7 @@ type PayInvoiceArgs = {
     activePolicy?: OnyxTypes.Policy;
     betas: OnyxEntry<OnyxTypes.Beta[]>;
     isSelfTourViewed: boolean | undefined;
+    defaultWorkspaceName: string;
 };
 
 type PayMoneyRequestData = {
@@ -111,6 +112,7 @@ function getPayMoneyRequestParams({
     iouReportCurrentNextStepDeprecated,
     betas,
     isSelfTourViewed,
+    defaultWorkspaceName,
 }: {
     initialChatReport: OnyxTypes.Report;
     iouReport: OnyxEntry<OnyxTypes.Report>;
@@ -130,6 +132,7 @@ function getPayMoneyRequestParams({
     iouReportCurrentNextStepDeprecated: OnyxEntry<OnyxTypes.ReportNextStepDeprecated>;
     betas: OnyxEntry<OnyxTypes.Beta[]>;
     isSelfTourViewed: boolean | undefined;
+    defaultWorkspaceName?: string;
 }): PayMoneyRequestData {
     const deprecatedCurrentUserEmail = getCurrentUserEmail();
     const allTransactionViolations = getAllTransactionViolations();
@@ -152,7 +155,7 @@ function getPayMoneyRequestParams({
         successData: [],
         failureData: [],
     };
-    const shouldCreatePolicy = !activePolicy || !isPolicyAdmin(activePolicy) || !isPaidGroupPolicy(activePolicy);
+    const shouldCreatePolicy = (!activePolicy || !isPolicyAdmin(activePolicy) || !isPaidGroupPolicy(activePolicy)) && defaultWorkspaceName;
 
     if (isIndividualInvoiceRoom(chatReport) && payAsBusiness && shouldCreatePolicy) {
         payerPolicyID = generatePolicyID();
@@ -163,6 +166,7 @@ function getPayMoneyRequestParams({
             params,
         } = buildPolicyData({
             policyOwnerEmail: deprecatedCurrentUserEmail,
+            policyName: defaultWorkspaceName,
             makeMeAdmin: true,
             policyID: payerPolicyID,
             currentUserAccountIDParam: currentUserAccountIDParam ?? CONST.DEFAULT_NUMBER_ID,
@@ -792,6 +796,7 @@ function payInvoice({
     invoiceReportCurrentNextStepDeprecated,
     betas,
     isSelfTourViewed,
+    defaultWorkspaceName,
 }: PayInvoiceArgs) {
     const recipient = {accountID: invoiceReport?.ownerAccountID ?? CONST.DEFAULT_NUMBER_ID};
     const {
@@ -824,6 +829,7 @@ function payInvoice({
         introSelected,
         betas,
         isSelfTourViewed,
+        defaultWorkspaceName,
     });
 
     const paymentSelected = paymentMethodType === CONST.IOU.PAYMENT_TYPE.VBBA ? CONST.IOU.PAYMENT_SELECTED.BBA : CONST.IOU.PAYMENT_SELECTED.PBA;
@@ -885,5 +891,5 @@ function savePreferredPaymentMethod(
     });
 }
 
-export {cancelPayment, completePaymentOnboarding, getPayMoneyRequestParams, payInvoice, payMoneyRequest, savePreferredPaymentMethod};
+export {cancelPayment, completePaymentOnboarding, payInvoice, payMoneyRequest, savePreferredPaymentMethod};
 export type {PayInvoiceArgs, PayMoneyRequestData, PayMoneyRequestFunctionParams};
