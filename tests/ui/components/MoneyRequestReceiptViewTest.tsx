@@ -15,11 +15,10 @@ import waitForBatchedUpdatesWithAct from '../../utils/waitForBatchedUpdatesWithA
 const mockOpenPicker = jest.fn();
 
 jest.mock('@react-navigation/native', () => {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-unsafe-assignment
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const actual = jest.requireActual('@react-navigation/native');
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
         ...actual,
         useRoute: () => ({key: 'test', name: 'test', params: {}}),
     };
