@@ -2,7 +2,7 @@
 import {useNavigation} from '@react-navigation/native';
 import {deepEqual} from 'fast-equals';
 import mapValues from 'lodash/mapValues';
-import React, {memo, use, useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react';
+import React, {memo, useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react';
 import type {GestureResponderEvent, TextInput} from 'react-native';
 import {Keyboard, View} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';
@@ -27,7 +27,6 @@ import TaskAction from '@components/ReportActionItem/TaskAction';
 import TaskPreview from '@components/ReportActionItem/TaskPreview';
 import TripRoomPreview from '@components/ReportActionItem/TripRoomPreview';
 import UnreportedTransactionAction from '@components/ReportActionItem/UnreportedTransactionAction';
-import {SearchStateContext} from '@components/Search/SearchContext';
 import {useIsOnSearch} from '@components/Search/SearchScopeProvider';
 import {ShowContextMenuActionsContext, ShowContextMenuStateContext} from '@components/ShowContextMenuContext';
 import UnreadActionIndicator from '@components/UnreadActionIndicator';
@@ -371,11 +370,6 @@ function PureReportActionItem({
     );
 
     const isOnSearch = useIsOnSearch();
-    let currentSearchHash: number | undefined;
-    if (isOnSearch) {
-        const {currentSearchHash: searchContextCurrentSearchHash} = use(SearchStateContext);
-        currentSearchHash = searchContextCurrentSearchHash;
-    }
 
     const navigation = useNavigation<PlatformStackNavigationProp<ReportsSplitNavigatorParamList, typeof SCREENS.REPORT>>();
     const dismissError = useCallback(() => {
@@ -932,7 +926,6 @@ function PureReportActionItem({
                     isArchivedRoom={isArchivedRoom}
                     composerTextInputRef={composerTextInputRef}
                     isOnSearch={isOnSearch}
-                    currentSearchHash={currentSearchHash}
                     contextMenuStateValue={contextMenuStateValue}
                     contextMenuActionsValue={contextMenuActionsValue}
                     userBillingFundID={userBillingFundID}

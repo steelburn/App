@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {use} from 'react';
 import type {TextInput} from 'react-native';
 import {View} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';
@@ -6,6 +6,7 @@ import {AttachmentContext} from '@components/AttachmentContext';
 import Button from '@components/Button';
 import MentionReportContext from '@components/HTMLEngineProvider/HTMLRenderers/MentionReportRenderer/MentionReportContext';
 import {useBlockedFromConcierge} from '@components/OnyxListItemProvider';
+import {SearchStateContext} from '@components/Search/SearchContext';
 import {ShowContextMenuActionsContext, ShowContextMenuStateContext} from '@components/ShowContextMenuContext';
 import Text from '@components/Text';
 import useLocalize from '@hooks/useLocalize';
@@ -42,7 +43,6 @@ type ChatMessageContentProps = {
     isArchivedRoom?: boolean;
     composerTextInputRef: React.RefObject<TextInput | HTMLTextAreaElement | null>;
     isOnSearch: boolean;
-    currentSearchHash: number | undefined;
     contextMenuStateValue: {
         anchor: ContextMenuAnchor | null;
         report: OnyxEntry<OnyxTypes.Report>;
@@ -74,7 +74,6 @@ function ChatMessageContent({
     isArchivedRoom,
     composerTextInputRef,
     isOnSearch,
-    currentSearchHash,
     contextMenuStateValue,
     contextMenuActionsValue,
     userBillingFundID,
@@ -86,6 +85,11 @@ function ChatMessageContent({
 
     const mentionReportContextValue = {currentReportID: report?.reportID, exactlyMatch: true};
 
+    let currentSearchHash: number | undefined;
+    if (isOnSearch) {
+        const {currentSearchHash: searchContextCurrentSearchHash} = use(SearchStateContext);
+        currentSearchHash = searchContextCurrentSearchHash;
+    }
     const attachmentContextValue = isOnSearch ? {type: CONST.ATTACHMENT_TYPE.SEARCH, currentSearchHash} : {reportID, type: CONST.ATTACHMENT_TYPE.REPORT};
 
     const {hasBeenFlagged} = getModerationFlagState(action);
