@@ -38,9 +38,6 @@ type OptionRowProps = {
     /** A function that is called when an option is selected. Selected option is passed as a param */
     onSelectRow?: (option: OptionDataWithOptionalReportID, refElement: View | HTMLDivElement | null) => void | Promise<void>;
 
-    /** Whether we highlight selected option */
-    highlightSelected?: boolean;
-
     /** Whether this item is selected */
     isSelected?: boolean;
 
@@ -83,7 +80,6 @@ function OptionRow({
     keyForList,
     isDisabled: isOptionDisabled = false,
     isMultilineSupported = false,
-    highlightSelected = false,
     shouldHaveOptionSeparator = false,
     showTitleTooltip = false,
     optionIsFocused = false,
@@ -290,14 +286,6 @@ function OptionRow({
                                         />
                                     </View>
                                 )}
-                                {isSelected && highlightSelected && (
-                                    <View style={styles.defaultCheckmarkWrapper}>
-                                        <Icon
-                                            src={icons.Checkmark}
-                                            fill={theme.iconSuccessFill}
-                                        />
-                                    </View>
-                                )}
                             </View>
                         </View>
                         {!!option.customIcon && (
@@ -329,7 +317,6 @@ export default React.memo(
         prevProps.isMultilineSupported === nextProps.isMultilineSupported &&
         prevProps.isSelected === nextProps.isSelected &&
         prevProps.shouldHaveOptionSeparator === nextProps.shouldHaveOptionSeparator &&
-        prevProps.highlightSelected === nextProps.highlightSelected &&
         prevProps.showTitleTooltip === nextProps.showTitleTooltip &&
         // eslint-disable-next-line rulesdir/no-deep-equal-in-memo -- icons array is created inline in some usages (e.g., BaseReactionList) with unstable references
         deepEqual(prevProps.option.icons, nextProps.option.icons) &&
