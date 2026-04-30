@@ -274,7 +274,7 @@ function MoneyRequestReceiptView({
                 const violationMessage = ViolationsUtils.getViolationTranslation({
                     violation,
                     translate,
-                    canEdit: isActionTakenByCurrentUser,
+                    canEdit: isActionTakenByCurrentUser && isEditable,
                     companyCardPageURL,
                     connectionLink,
                     card,
