@@ -2504,6 +2504,7 @@ function trackExpense(params: CreateTrackExpenseParams) {
                 policyParams,
                 createdWorkspaceParams,
                 currentUserAccountID: currentUserAccountIDParam,
+                currentUserEmail: currentUserEmailParam,
             };
 
             categorizeTrackedExpense(trackedExpenseParams);

@@ -203,6 +203,10 @@ describe('GoogleTagManagerTest', () => {
     });
 
     test('workspace_created - categorizeTrackedExpense', async () => {
+        await act(async () => {
+            await Onyx.set(ONYXKEYS.SESSION, {accountID, email});
+        });
+
         const recentWaypoints = (await getOnyxValue(ONYXKEYS.NVP_RECENT_WAYPOINTS)) ?? [];
 
         trackExpense({
