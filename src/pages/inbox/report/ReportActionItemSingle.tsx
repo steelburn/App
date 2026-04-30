@@ -81,7 +81,8 @@ function ReportActionItemSingle({
     isHovered = false,
     isActive = false,
 }: ReportActionItemSingleProps) {
-    const {latestDecision, hasBeenFlagged} = getModerationFlagState(action);
+    const {latestDecision, hasBeenFlagged} =
+        action?.actionName === CONST.REPORT.ACTIONS.TYPE.ADD_COMMENT ? getModerationFlagState(action) : {latestDecision: undefined, hasBeenFlagged: false};
     const theme = useTheme();
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
