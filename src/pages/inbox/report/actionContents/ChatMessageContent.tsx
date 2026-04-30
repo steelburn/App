@@ -12,12 +12,12 @@ import useLocalize from '@hooks/useLocalize';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {parseFollowupsFromHtml} from '@libs/ReportActionFollowupUtils';
 import {
+    getModerationFlagState,
     getReportActionMessage,
     isActionableAddPaymentCard,
     isActionableTrackExpense,
     isConciergeCategoryOptions,
     isConciergeDescriptionOptions,
-    isPendingRemove,
 } from '@libs/ReportActionsUtils';
 import {chatIncludesConcierge, isArchivedNonExpenseReport} from '@libs/ReportUtils';
 import type {ContextMenuAnchor} from '@pages/inbox/report/ContextMenu/ReportActionContextMenu';
@@ -38,7 +38,6 @@ type ChatMessageContentProps = {
     draftMessage: string | undefined;
     index: number;
     isHidden: boolean;
-    moderationDecision: OnyxTypes.DecisionName;
     updateHiddenState: (isHiddenValue: boolean) => void;
     isArchivedRoom?: boolean;
     composerTextInputRef: React.RefObject<TextInput | HTMLTextAreaElement | null>;
@@ -71,7 +70,6 @@ function ChatMessageContent({
     draftMessage,
     index,
     isHidden,
-    moderationDecision,
     updateHiddenState,
     isArchivedRoom,
     composerTextInputRef,
@@ -90,8 +88,7 @@ function ChatMessageContent({
 
     const attachmentContextValue = isOnSearch ? {type: CONST.ATTACHMENT_TYPE.SEARCH, currentSearchHash} : {reportID, type: CONST.ATTACHMENT_TYPE.REPORT};
 
-    const hasBeenFlagged =
-        ![CONST.MODERATION.MODERATOR_DECISION_APPROVED, CONST.MODERATION.MODERATOR_DECISION_PENDING].some((item) => item === moderationDecision) && !isPendingRemove(action);
+    const {hasBeenFlagged} = getModerationFlagState(action);
 
     const messageHtml = getReportActionMessage(action)?.html;
     const mayHaveActionableButtons =

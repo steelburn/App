@@ -931,7 +931,6 @@ function PureReportActionItem({
                     draftMessage={draftMessage}
                     index={index}
                     isHidden={isHidden}
-                    moderationDecision={moderationDecision}
                     updateHiddenState={updateHiddenState}
                     isArchivedRoom={isArchivedRoom}
                     composerTextInputRef={composerTextInputRef}
@@ -1024,9 +1023,6 @@ function PureReportActionItem({
                     iouReport={iouReport}
                     isHovered={hovered || isContextMenuActive}
                     isActive={isReportActionActive && !isContextMenuActive}
-                    hasBeenFlagged={
-                        ![CONST.MODERATION.MODERATOR_DECISION_APPROVED, CONST.MODERATION.MODERATOR_DECISION_PENDING].some((item) => item === moderationDecision) && !isPendingRemove(action)
-                    }
                 >
                     {content}
                 </ReportActionItemSingle>

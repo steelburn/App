@@ -23,8 +23,8 @@ import {
     getHumanAgentAccountIDFromReportAction,
     getHumanAgentFirstName,
     getManagerOnVacation,
+    getModerationFlagState,
     getOriginalMessage,
-    getReportActionMessage,
     getSubmittedTo,
     getVacationer,
 } from '@libs/ReportActionsUtils';
@@ -53,9 +53,6 @@ type ReportActionItemSingleProps = Partial<ChildrenProps> & {
     /** Show header for action */
     showHeader?: boolean;
 
-    /** If the message has been flagged for moderation */
-    hasBeenFlagged?: boolean;
-
     /** If the action is being hovered */
     isHovered?: boolean;
 
@@ -79,12 +76,12 @@ function ReportActionItemSingle({
     children,
     wrapperStyle,
     showHeader = true,
-    hasBeenFlagged = false,
     report,
     iouReport: potentialIOUReport,
     isHovered = false,
     isActive = false,
 }: ReportActionItemSingleProps) {
+    const {latestDecision, hasBeenFlagged} = getModerationFlagState(action);
     const theme = useTheme();
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
@@ -218,7 +215,7 @@ function ReportActionItemSingle({
                                     delegateAccountID={action?.delegateAccountID}
                                     isSingleLine
                                     actorIcon={primaryAvatar}
-                                    moderationDecision={getReportActionMessage(action)?.moderationDecision?.decision}
+                                    moderationDecision={latestDecision}
                                     shouldShowTooltip={avatarType !== CONST.REPORT_ACTION_AVATARS.TYPE.MULTIPLE}
                                 />
                             ))}

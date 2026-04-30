@@ -337,7 +337,6 @@ function MockedReportActionItemSingle({report, reportAction}: MockedReportAction
                 action={reportAction}
                 report={report}
                 showHeader
-                hasBeenFlagged={false}
                 iouReport={undefined}
                 isHovered={false}
             />
