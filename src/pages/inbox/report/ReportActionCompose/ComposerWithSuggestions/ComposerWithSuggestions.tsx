@@ -1,7 +1,7 @@
 import {useIsFocused, useNavigation, useRoute} from '@react-navigation/native';
 import lodashDebounce from 'lodash/debounce';
 import type {Ref, RefObject} from 'react';
-import React, {useEffect, useImperativeHandle, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useImperativeHandle, useRef, useState} from 'react';
 import type {
     BlurEvent,
     LayoutChangeEvent,
@@ -363,116 +363,137 @@ function ComposerWithSuggestions({
      * @property endIndex - The end index of the newly added characters in the new text.
      * @property diff - The newly added characters.
      */
-    const findNewlyAddedChars = (prevText: string, newText: string): NewlyAddedChars => {
-        let startIndex = -1;
-        let endIndex = -1;
-        let currentIndex = 0;
+    const findNewlyAddedChars = useCallback(
+        (prevText: string, newText: string): NewlyAddedChars => {
+            let startIndex = -1;
+            let endIndex = -1;
+            let currentIndex = 0;
 
-        // Find the first character mismatch with newText
-        while (currentIndex < newText.length && prevText.charAt(currentIndex) === newText.charAt(currentIndex) && selection.start > currentIndex) {
-            currentIndex++;
-        }
-
-        if (currentIndex < newText.length) {
-            startIndex = currentIndex;
-            const commonSuffixLength = findCommonSuffixLength(prevText, newText, selection?.end ?? 0);
-            // if text is getting pasted over find length of common suffix and subtract it from new text length
-            if (commonSuffixLength > 0 || (selection?.end ?? 0) - selection.start > 0) {
-                endIndex = newText.length - commonSuffixLength;
-            } else {
-                endIndex = currentIndex + newText.length;
+            // Find the first character mismatch with newText
+            while (currentIndex < newText.length && prevText.charAt(currentIndex) === newText.charAt(currentIndex) && selection.start > currentIndex) {
+                currentIndex++;
             }
-        }
-        return {
-            startIndex,
-            endIndex,
-            diff: newText.substring(startIndex, endIndex),
-        };
-    };
+
+            if (currentIndex < newText.length) {
+                startIndex = currentIndex;
+                const commonSuffixLength = findCommonSuffixLength(prevText, newText, selection?.end ?? 0);
+                // if text is getting pasted over find length of common suffix and subtract it from new text length
+                if (commonSuffixLength > 0 || (selection?.end ?? 0) - selection.start > 0) {
+                    endIndex = newText.length - commonSuffixLength;
+                } else {
+                    endIndex = currentIndex + newText.length;
+                }
+            }
+            return {
+                startIndex,
+                endIndex,
+                diff: newText.substring(startIndex, endIndex),
+            };
+        },
+        [selection.start, selection?.end],
+    );
 
     /**
      * Update the value of the comment in Onyx
      */
-    const updateComment = (commentValue: string, shouldDebounceSaveComment?: boolean) => {
-        raiseIsScrollLikelyLayoutTriggered();
+    const updateComment = useCallback(
+        (commentValue: string, shouldDebounceSaveComment?: boolean) => {
+            raiseIsScrollLikelyLayoutTriggered();
 
-        // previous text before change
-        const prevText = lastTextRef.current;
-        // snapshot selection (should be the selection that was active just before the paste/change)
-        const prevSelectionStart = selection?.start ?? 0;
-        const prevSelectionEnd = selection?.end ?? 0;
+            // previous text before change
+            const prevText = lastTextRef.current;
+            // snapshot selection (should be the selection that was active just before the paste/change)
+            const prevSelectionStart = selection?.start ?? 0;
+            const prevSelectionEnd = selection?.end ?? 0;
 
-        // detect newly added text (existing helper)
-        const {startIndex, endIndex, diff} = findNewlyAddedChars(prevText, commentValue);
+            // detect newly added text (existing helper)
+            const {startIndex, endIndex, diff} = findNewlyAddedChars(prevText, commentValue);
 
-        // Try to rewrite if this looks like "selected text replaced with a single URL"
-        const {text: rewritten, didReplace} = detectAndRewritePaste(prevText, prevSelectionStart, prevSelectionEnd, diff);
+            // Try to rewrite if this looks like "selected text replaced with a single URL"
+            const {text: rewritten, didReplace} = detectAndRewritePaste(prevText, prevSelectionStart, prevSelectionEnd, diff);
 
-        // Use the rewritten text when we replaced; otherwise fall back to the original commentValue pipeline
-        const effectiveCommentValue = didReplace ? (rewritten ?? commentValue) : commentValue;
+            // Use the rewritten text when we replaced; otherwise fall back to the original commentValue pipeline
+            const effectiveCommentValue = didReplace ? (rewritten ?? commentValue) : commentValue;
 
-        // Emoji handling: skip the "emoji inserted" special-case when we performed the markdown rewrite.
-        const isEmojiInserted =
-            !didReplace && // <-- use the didReplace flag instead of searching for '['
-            diff.length &&
-            endIndex > startIndex &&
-            diff.trim() === diff &&
-            containsOnlyEmojis(diff);
-        const commentWithSpaceInserted = isEmojiInserted ? insertWhiteSpaceAtIndex(effectiveCommentValue, endIndex) : effectiveCommentValue;
-        const {text: emojiConvertedText, emojis, cursorPosition} = replaceAndExtractEmojis(commentWithSpaceInserted, preferredSkinTone, preferredLocale);
+            // Emoji handling: skip the "emoji inserted" special-case when we performed the markdown rewrite.
+            const isEmojiInserted =
+                !didReplace && // <-- use the didReplace flag instead of searching for '['
+                diff.length &&
+                endIndex > startIndex &&
+                diff.trim() === diff &&
+                containsOnlyEmojis(diff);
+            const commentWithSpaceInserted = isEmojiInserted ? insertWhiteSpaceAtIndex(effectiveCommentValue, endIndex) : effectiveCommentValue;
+            const {text: emojiConvertedText, emojis, cursorPosition} = replaceAndExtractEmojis(commentWithSpaceInserted, preferredSkinTone, preferredLocale);
 
-        const newComment = insertTextVSBetweenDigitAndEmoji(emojiConvertedText);
-        const textVSOffset = getTextVSCursorOffset(emojiConvertedText, cursorPosition);
+            const newComment = insertTextVSBetweenDigitAndEmoji(emojiConvertedText);
+            const textVSOffset = getTextVSCursorOffset(emojiConvertedText, cursorPosition);
 
-        if (emojis.length) {
-            const newEmojis = getAddedEmojis(emojis, emojisPresentBefore.current);
-            if (newEmojis.length) {
-                // Ensure emoji suggestions are hidden after inserting emoji even when the selection is not changed
-                if (suggestionsRef.current) {
-                    suggestionsRef.current.resetSuggestions();
+            if (emojis.length) {
+                const newEmojis = getAddedEmojis(emojis, emojisPresentBefore.current);
+                if (newEmojis.length) {
+                    // Ensure emoji suggestions are hidden after inserting emoji even when the selection is not changed
+                    if (suggestionsRef.current) {
+                        suggestionsRef.current.resetSuggestions();
+                    }
                 }
             }
-        }
-        const newCommentConverted = convertToLTRForComposer(newComment);
-        emojisPresentBefore.current = emojis;
+            const newCommentConverted = convertToLTRForComposer(newComment);
+            emojisPresentBefore.current = emojis;
 
-        setValue(newCommentConverted);
-        if (commentValue !== newComment) {
-            const adjustedCursorPosition = cursorPosition !== undefined && cursorPosition !== null ? cursorPosition + textVSOffset : undefined;
-            const position = Math.max((selection.end ?? 0) + (newComment.length - commentRef.current.length), adjustedCursorPosition ?? 0);
+            setValue(newCommentConverted);
+            if (commentValue !== newComment) {
+                const adjustedCursorPosition = cursorPosition !== undefined && cursorPosition !== null ? cursorPosition + textVSOffset : undefined;
+                const position = Math.max((selection.end ?? 0) + (newComment.length - commentRef.current.length), adjustedCursorPosition ?? 0);
 
-            if (commentWithSpaceInserted !== newComment && isIOSNative) {
-                syncSelectionWithOnChangeTextRef.current = {position, value: newComment};
+                if (commentWithSpaceInserted !== newComment && isIOSNative) {
+                    syncSelectionWithOnChangeTextRef.current = {position, value: newComment};
+                }
+
+                setSelection((prevSelection) => ({
+                    start: position,
+                    end: position,
+                    positionX: prevSelection.positionX,
+                    positionY: prevSelection.positionY,
+                }));
             }
 
-            setSelection((prevSelection) => ({
-                start: position,
-                end: position,
-                positionX: prevSelection.positionX,
-                positionY: prevSelection.positionY,
-            }));
-        }
-
-        commentRef.current = newCommentConverted;
-        if (shouldDebounceSaveComment) {
-            isCommentPendingSaved.current = true;
-            debouncedSaveReportComment(reportID, newCommentConverted);
-        } else {
-            saveReportDraftComment(reportID, newCommentConverted);
-        }
-        if (newCommentConverted) {
-            debouncedBroadcastUserIsTyping(reportID, currentUserAccountID);
-        }
-    };
+            commentRef.current = newCommentConverted;
+            if (shouldDebounceSaveComment) {
+                isCommentPendingSaved.current = true;
+                debouncedSaveReportComment(reportID, newCommentConverted);
+            } else {
+                saveReportDraftComment(reportID, newCommentConverted);
+            }
+            if (newCommentConverted) {
+                debouncedBroadcastUserIsTyping(reportID, currentUserAccountID);
+            }
+        },
+        [
+            raiseIsScrollLikelyLayoutTriggered,
+            selection?.start,
+            selection?.end,
+            findNewlyAddedChars,
+            preferredSkinTone,
+            preferredLocale,
+            debouncedSaveReportComment,
+            reportID,
+            currentUserAccountID,
+            suggestionsRef,
+            setValue,
+        ],
+    );
 
     /**
      * Callback to add whatever text is chosen into the main input (used f.e as callback for the emoji picker)
      */
-    const replaceSelectionWithText = (text: string) => {
-        // selection replacement should be debounced to avoid conflicts with text typing
-        // (f.e. when emoji is being picked and 1 second still did not pass after user finished typing)
-        updateComment(insertText(commentRef.current, selection, text), true);
-    };
+    const replaceSelectionWithText = useCallback(
+        (text: string) => {
+            // selection replacement should be debounced to avoid conflicts with text typing
+            // (f.e. when emoji is being picked and 1 second still did not pass after user finished typing)
+            updateComment(insertText(commentRef.current, selection, text), true);
+        },
+        [selection, updateComment],
+    );
 
     const handleKeyPress = (event: TextInputKeyPressEvent) => {
         const webEvent = event as unknown as KeyboardEvent;
@@ -592,11 +613,11 @@ function ComposerWithSuggestions({
      * Focus the composer text input
      * @param [shouldDelay=false] Impose delay before focusing the composer
      */
-    const focus = (shouldDelay = false) => {
+    const focus = useCallback((shouldDelay = false) => {
         // If we're stacked above another RHP, wait for the transition to complete before focusing.
         const delay = shouldDelayAutoFocusRef.current ? CONST.ANIMATED_TRANSITION : CONST.COMPOSER_FOCUS_DELAY;
         focusComposerWithDelay(textInputRef.current, delay)(shouldDelay);
-    };
+    }, []);
 
     /**
      * In the stacked-RHP SearchReport case we disable the TextInput's immediate `autoFocus` to avoid jank.
@@ -631,85 +652,90 @@ function ComposerWithSuggestions({
     /**
      * Tracks whether there is a composer input inside the side panel on the screen.
      */
-    const handleSidePanelFocus = () => {
+    const handleSidePanelFocus = useCallback(() => {
         if (!isInSidePanel) {
             ReportActionComposeFocusManager.sidePanelComposerRef.current = null;
         } else {
             ReportActionComposeFocusManager.sidePanelComposerRef.current = textInputRef.current;
         }
-    };
+    }, [isInSidePanel]);
 
     /**
      * Set focus callback
      * @param shouldTakeOverFocus - Whether this composer should gain focus priority
      */
-    const setUpComposeFocusManager = (shouldTakeOverFocus = false) => {
-        ReportActionComposeFocusManager.onComposerFocus((shouldFocusForNonBlurInputOnTapOutside = false) => {
-            handleSidePanelFocus();
-            if ((!willBlurTextInputOnTapOutside && !shouldFocusForNonBlurInputOnTapOutside) || !isFocused || !isSidePanelHiddenOrLargeScreen) {
-                return;
-            }
+    const setUpComposeFocusManager = useCallback(
+        (shouldTakeOverFocus = false) => {
+            ReportActionComposeFocusManager.onComposerFocus((shouldFocusForNonBlurInputOnTapOutside = false) => {
+                handleSidePanelFocus();
+                if ((!willBlurTextInputOnTapOutside && !shouldFocusForNonBlurInputOnTapOutside) || !isFocused || !isSidePanelHiddenOrLargeScreen) {
+                    return;
+                }
 
-            focus(true);
-        }, shouldTakeOverFocus);
-    };
+                focus(true);
+            }, shouldTakeOverFocus);
+        },
+        [focus, handleSidePanelFocus, isFocused, isSidePanelHiddenOrLargeScreen],
+    );
 
     /**
      * Check if the composer is visible. Returns true if the composer is not covered up by emoji picker or menu. False otherwise.
-     * @returns {Boolean}
      */
-    const checkComposerVisibility = () => {
+    const checkComposerVisibility = useCallback(() => {
         // Checking whether the screen is focused or not, helps avoid `modal.isVisible` false when popups are closed, even if the modal is opened.
         const isComposerCoveredUp = !isFocused || isEmojiPickerVisible() || isMenuVisible || !!modal?.isVisible || modal?.willAlertModalBecomeVisible;
         return !isComposerCoveredUp;
-    };
+    }, [isMenuVisible, modal?.isVisible, modal?.willAlertModalBecomeVisible, isFocused]);
 
-    const focusComposerOnKeyPress = (e: KeyboardEvent) => {
-        const isComposerVisible = checkComposerVisibility();
-        if (!isComposerVisible) {
-            return;
-        }
+    const focusComposerOnKeyPress = useCallback(
+        (e: KeyboardEvent) => {
+            const isComposerVisible = checkComposerVisibility();
+            if (!isComposerVisible) {
+                return;
+            }
 
-        // Do not focus the composer if the Side Panel is visible
-        if (!isSidePanelHiddenOrLargeScreen) {
-            return;
-        }
+            // Do not focus the composer if the Side Panel is visible
+            if (!isSidePanelHiddenOrLargeScreen) {
+                return;
+            }
 
-        if (!shouldAutoFocusOnKeyPress(e)) {
-            return;
-        }
+            if (!shouldAutoFocusOnKeyPress(e)) {
+                return;
+            }
 
-        // if we're typing on another input/text area, do not focus
-        if (([CONST.ELEMENT_NAME.INPUT, CONST.ELEMENT_NAME.TEXTAREA] as string[]).includes((e.target as Element | null)?.nodeName ?? '')) {
-            return;
-        }
+            // if we're typing on another input/text area, do not focus
+            if (([CONST.ELEMENT_NAME.INPUT, CONST.ELEMENT_NAME.TEXTAREA] as string[]).includes((e.target as Element | null)?.nodeName ?? '')) {
+                return;
+            }
 
-        focus();
-    };
+            focus();
+        },
+        [checkComposerVisibility, focus, isSidePanelHiddenOrLargeScreen],
+    );
 
-    const blur = () => {
+    const blur = useCallback(() => {
         if (!textInputRef.current) {
             return;
         }
         textInputRef.current.blur();
-    };
+    }, []);
 
-    const clearWorklet = () => {
+    const clearWorklet = useCallback(() => {
         'worklet';
 
         forceClearInput(animatedRef);
-    };
+    }, [animatedRef]);
 
-    const resetHeight = () => {
+    const resetHeight = useCallback(() => {
         if (!emptyComposerHeightRef.current) {
             return;
         }
         setDefaultComposerHeight(emptyComposerHeightRef.current);
-    };
+    }, []);
 
-    const getCurrentText = () => {
+    const getCurrentText = useCallback(() => {
         return commentRef.current;
-    };
+    }, []);
 
     useEffect(() => {
         const unsubscribeNavigationBlur = navigation.addListener('blur', () => removeKeyDownPressListener(focusComposerOnKeyPress));

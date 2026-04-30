@@ -463,18 +463,14 @@ function SuggestionMention({
     const getSuggestions = () => suggestionValues.suggestedMentions;
     const getIsSuggestionsMenuVisible = () => isMentionSuggestionsMenuVisible;
 
-    useImperativeHandle(
-        ref,
-        () => ({
-            resetSuggestions,
-            triggerHotkeyActions,
-            setShouldBlockSuggestionCalc,
-            updateShouldShowSuggestionMenuToFalse,
-            getSuggestions,
-            getIsSuggestionsMenuVisible,
-        }),
-        [resetSuggestions, setShouldBlockSuggestionCalc, triggerHotkeyActions, updateShouldShowSuggestionMenuToFalse, getSuggestions, getIsSuggestionsMenuVisible],
-    );
+    useImperativeHandle(ref, () => ({
+        resetSuggestions,
+        triggerHotkeyActions,
+        setShouldBlockSuggestionCalc,
+        updateShouldShowSuggestionMenuToFalse,
+        getSuggestions,
+        getIsSuggestionsMenuVisible,
+    }));
 
     if (!isMentionSuggestionsMenuVisible) {
         return null;

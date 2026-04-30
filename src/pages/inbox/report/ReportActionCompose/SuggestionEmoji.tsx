@@ -68,7 +68,6 @@ function SuggestionEmoji({
 
     /**
      * Replace the code of emoji and update selection
-     * @param {Number} selectedEmoji
      */
     const insertSelectedEmoji = (highlightedEmojiIndexInner: number) => {
         const emojiObject = highlightedEmojiIndexInner !== -1 ? suggestionValues.suggestedEmojis.at(highlightedEmojiIndexInner) : undefined;
@@ -198,18 +197,14 @@ function SuggestionEmoji({
 
     const getIsSuggestionsMenuVisible = () => isEmojiSuggestionsMenuVisible;
 
-    useImperativeHandle(
-        ref,
-        () => ({
-            resetSuggestions,
-            triggerHotkeyActions,
-            setShouldBlockSuggestionCalc,
-            updateShouldShowSuggestionMenuToFalse,
-            getSuggestions,
-            getIsSuggestionsMenuVisible,
-        }),
-        [resetSuggestions, setShouldBlockSuggestionCalc, triggerHotkeyActions, updateShouldShowSuggestionMenuToFalse, getSuggestions, getIsSuggestionsMenuVisible],
-    );
+    useImperativeHandle(ref, () => ({
+        resetSuggestions,
+        triggerHotkeyActions,
+        setShouldBlockSuggestionCalc,
+        updateShouldShowSuggestionMenuToFalse,
+        getSuggestions,
+        getIsSuggestionsMenuVisible,
+    }));
 
     if (!isEmojiSuggestionsMenuVisible) {
         return null;
