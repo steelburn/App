@@ -40,7 +40,7 @@ function useOdometerDraftHydrator({
         }
         hydrateOdometerDraftIntoTransaction(transaction?.transactionID ?? CONST.IOU.OPTIMISTIC_TRANSACTION_ID, odometerDraft, transaction?.comment);
         // Narrow deps: only react to landing-on-odometer signals — transaction.comment changes would re-fire after our own merge.
-        // eslint-disable-next-line react-compiler/react-compiler, react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [transactionRequestType, odometerDraft, isLoadingTransaction, isLoadingSelectedTab]);
 
     return (newIOUType: IOURequestType) => {

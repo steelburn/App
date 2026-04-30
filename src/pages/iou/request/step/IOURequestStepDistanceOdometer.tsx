@@ -235,6 +235,7 @@ function IOURequestStepDistanceOdometer({
         hasInitializedRefs.current = true;
     }, [
         currentTransaction?.iouRequestType,
+        currentTransaction?.comment,
         currentTransaction?.comment?.odometerStart,
         currentTransaction?.comment?.odometerEnd,
         currentTransaction?.comment?.odometerStartImage,
