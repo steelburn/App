@@ -1246,14 +1246,14 @@ describe('TransactionUtils', () => {
         });
 
         it('should handle attendees stored as a plain object', () => {
-            const attendeesAsObject = {
-                0: {email: 'attendee1@example.com', login: 'attendee1@example.com', displayName: 'Attendee One', avatarUrl: '', accountID: 3, selected: true},
-                1: {email: 'attendee2@example.com', login: 'attendee2@example.com', displayName: 'Attendee Two', avatarUrl: '', accountID: 4, selected: false},
-            };
+            const attendeesArray: Attendee[] = [
+                {email: 'attendee1@example.com', login: 'attendee1@example.com', displayName: 'Attendee One', avatarUrl: '', accountID: 3, selected: true},
+                {email: 'attendee2@example.com', login: 'attendee2@example.com', displayName: 'Attendee Two', avatarUrl: '', accountID: 4, selected: false},
+            ];
             const transaction = generateTransaction({
                 reportID: FAKE_OPEN_REPORT_ID,
                 comment: {
-                    attendees: attendeesAsObject as unknown as Attendee[],
+                    attendees: Object.fromEntries(attendeesArray.entries()) as unknown as Attendee[],
                 },
             });
 
@@ -1410,13 +1410,11 @@ describe('TransactionUtils', () => {
         });
 
         it('should handle comment attendees stored as a plain object', () => {
-            const attendeesAsObject = {
-                0: {email: 'attendee@example.com', login: 'attendee@example.com', displayName: 'Attendee', avatarUrl: '', accountID: 7, selected: true},
-            };
+            const attendeesArray: Attendee[] = [{email: 'attendee@example.com', login: 'attendee@example.com', displayName: 'Attendee', avatarUrl: '', accountID: 7, selected: true}];
             const transaction = generateTransaction({
                 reportID: FAKE_OPEN_REPORT_ID,
                 comment: {
-                    attendees: attendeesAsObject as unknown as Attendee[],
+                    attendees: Object.fromEntries(attendeesArray.entries()) as unknown as Attendee[],
                 },
             });
 
@@ -1427,15 +1425,15 @@ describe('TransactionUtils', () => {
         });
 
         it('should handle modifiedAttendees stored as a plain object', () => {
-            const modifiedAttendeesAsObject = {
-                0: {email: 'modified@example.com', login: 'modified@example.com', displayName: 'Modified Attendee', avatarUrl: '', accountID: 6, selected: true},
-            };
+            const modifiedAttendeesArray: Attendee[] = [
+                {email: 'modified@example.com', login: 'modified@example.com', displayName: 'Modified Attendee', avatarUrl: '', accountID: 6, selected: true},
+            ];
             const transaction = generateTransaction({
                 reportID: FAKE_OPEN_REPORT_ID,
                 comment: {
                     attendees: [],
                 },
-                modifiedAttendees: modifiedAttendeesAsObject as unknown as Attendee[],
+                modifiedAttendees: Object.fromEntries(modifiedAttendeesArray.entries()) as unknown as Attendee[],
             });
 
             const result = TransactionUtils.getAttendees(transaction, currentUserPersonalDetails);
