@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/naming-convention */
+import Onyx from 'react-native-onyx';
 import Log from '@libs/Log';
 import CONST from '@src/CONST';
+import ONYXKEYS from '@src/ONYXKEYS';
 import type {GoogleTagManagerEvent} from './types';
 import type GoogleTagManagerModule from './types';
 
@@ -13,7 +15,7 @@ type WindowWithPixels = Window & {
         push: (params: DataLayerPushParams) => void;
     };
     fbq?: (method: string, eventName: string, params?: Record<string, unknown>, options?: Record<string, unknown>) => void;
-    rdt?: (method: string, params: Record<string, string>) => void;
+    rdt?: (method: string, eventType: string, params?: Record<string, string>) => void;
     lintrk?: (method: string, params: Record<string, unknown>) => void;
 };
 
@@ -21,6 +23,7 @@ type DataLayerPushParams = {
     event: GoogleTagManagerEvent;
     user_id: number;
     user_data: {email: string};
+    gclid?: string;
 };
 
 declare const window: WindowWithPixels;
@@ -39,12 +42,20 @@ const REDDIT_CONVERSION_IDS: Partial<Record<GoogleTagManagerEvent, string>> = {
     [CONST.ANALYTICS.EVENT.PAID_ADOPTION]: CONST.ANALYTICS.REDDIT_PAID_ADOPTION_CONVERSION_ID,
 };
 
+let googleClickId: string | null | undefined;
+Onyx.connectWithoutView({
+    key: ONYXKEYS.NVP_GOOGLE_CLICK_ID,
+    callback: (value) => {
+        googleClickId = value;
+    },
+});
+
 function publishEvent(event: GoogleTagManagerEvent, accountID: number, email: string) {
     if (!window.dataLayer) {
         return;
     }
 
-    const params = {event, user_id: accountID, user_data: {email}};
+    const params = {event, user_id: accountID, user_data: {email}, gclid: googleClickId ?? undefined};
 
     // Pass a copy of params here since the dataLayer modifies the object
     window.dataLayer.push({...params});
@@ -61,16 +72,18 @@ function publishEvent(event: GoogleTagManagerEvent, accountID: number, email: st
         .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
         .join('');
 
+    const eventID = `${accountID}-${event}`;
+
     // Meta
     if (typeof window.fbq === 'function') {
-        window.fbq('trackCustom', pixelEventName);
+        window.fbq('trackCustom', pixelEventName, undefined, {eventID});
     }
 
     // Reddit
     const redditConversionId = REDDIT_CONVERSION_IDS[event];
     if (typeof window.rdt === 'function' && redditConversionId) {
-        window.rdt('track', {
-            event: redditConversionId,
+        window.rdt('track', redditConversionId, {
+            conversionId: eventID,
             email,
         });
     }
