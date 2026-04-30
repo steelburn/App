@@ -66,7 +66,7 @@ function DomainGroupDetailsPage({route}: DomainGroupDetailsPageProps) {
                         groupName={group?.name}
                     />
                     <View style={[styles.sectionDividerLine, styles.mh5, styles.mv6]} />
-                    <Text style={[styles.textNormal, styles.textStrong, styles.ph5]}>{translate('domain.groups.permissions')}</Text>
+                    <Text style={[styles.textNormal, styles.textStrong, styles.ph5, styles.pb3]}>{translate('domain.groups.permissions')}</Text>
                     <DeleteGroupRow
                         domainAccountID={domainAccountID}
                         groupID={groupID}
