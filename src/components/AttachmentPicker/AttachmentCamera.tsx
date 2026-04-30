@@ -159,9 +159,10 @@ function AttachmentCamera({isVisible, onCapture, onClose}: AttachmentCameraProps
                 }
             })
             .catch(() => {
-                if (!ignore) {
-                    setCameraPermissionStatus(RESULTS.UNAVAILABLE);
+                if (ignore) {
+                    return;
                 }
+                setCameraPermissionStatus(RESULTS.UNAVAILABLE);
             });
         return () => {
             ignore = true;
