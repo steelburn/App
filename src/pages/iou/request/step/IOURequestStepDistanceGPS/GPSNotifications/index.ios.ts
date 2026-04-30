@@ -38,6 +38,8 @@ function getLiveActivityUpdateState(distance: number, state: GpsLiveActivityStat
         distanceUnitLong: state.distanceUnitFull,
         subtitle: state.subtitle,
         buttonText: state.buttonText,
+        lockScreenBadgeText: state.lockScreenBadgeText,
+        lockScreenTrackingText: state.lockScreenTrackingText,
     };
 }
 
