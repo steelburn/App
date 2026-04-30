@@ -11,9 +11,7 @@ import Button from '@components/Button';
 import Icon from '@components/Icon';
 import ImageSVG from '@components/ImageSVG';
 import PressableWithFeedback from '@components/Pressable/PressableWithFeedback';
-import ScrollView from '@components/ScrollView';
 import Text from '@components/Text';
-import useIsInLandscapeMode from '@hooks/useIsInLandscapeMode';
 import {useMemoizedLazyExpensifyIcons, useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useSafeAreaInsets from '@hooks/useSafeAreaInsets';
@@ -51,7 +49,6 @@ function AttachmentCamera({isVisible, onCapture, onClose}: AttachmentCameraProps
     const theme = useTheme();
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const isInLandscapeMode = useIsInLandscapeMode();
     const insets = useSafeAreaInsets();
     const StyleUtils = useStyleUtils();
     const lazyIcons = useMemoizedLazyExpensifyIcons(['Bolt', 'boltSlash', 'CameraFlip', 'Close']);
@@ -204,7 +201,7 @@ function AttachmentCamera({isVisible, onCapture, onClose}: AttachmentCameraProps
             animationType="slide"
             transparent={false}
             onRequestClose={handleClose}
-            supportedOrientations={['portrait', 'landscape']}
+            supportedOrientations={['portrait']}
             statusBarTranslucent
         >
             <View style={[styles.flex1, {backgroundColor: theme.appBG, paddingTop: insets.top, paddingBottom: insets.bottom, paddingLeft: insets.left, paddingRight: insets.right}]}>
@@ -228,26 +225,24 @@ function AttachmentCamera({isVisible, onCapture, onClose}: AttachmentCameraProps
                 {/* Camera area */}
                 <View style={[styles.flex1]}>
                     {cameraPermissionStatus !== RESULTS.GRANTED && (
-                        <ScrollView contentContainerStyle={styles.flexGrow1}>
-                            <View style={[styles.cameraView, isInLandscapeMode ? styles.permissionViewLandscape : styles.permissionView, styles.userSelectNone]}>
-                                <ImageSVG
-                                    contentFit="contain"
-                                    src={lazyIllustrations.Hand}
-                                    width={CONST.RECEIPT.HAND_ICON_WIDTH}
-                                    height={CONST.RECEIPT.HAND_ICON_HEIGHT}
-                                    style={styles.pb5}
-                                />
-                                <Text style={[styles.textFileUpload]}>{translate('receipt.takePhoto')}</Text>
-                                <Text style={[styles.subTextFileUpload]}>{translate('receipt.cameraAccess')}</Text>
-                                <Button
-                                    success
-                                    text={translate('common.continue')}
-                                    accessibilityLabel={translate('common.continue')}
-                                    style={[styles.p9, styles.pt5]}
-                                    onPress={askForPermissions}
-                                />
-                            </View>
-                        </ScrollView>
+                        <View style={[styles.cameraView, styles.permissionView, styles.userSelectNone]}>
+                            <ImageSVG
+                                contentFit="contain"
+                                src={lazyIllustrations.Hand}
+                                width={CONST.RECEIPT.HAND_ICON_WIDTH}
+                                height={CONST.RECEIPT.HAND_ICON_HEIGHT}
+                                style={styles.pb5}
+                            />
+                            <Text style={[styles.textFileUpload]}>{translate('receipt.takePhoto')}</Text>
+                            <Text style={[styles.subTextFileUpload]}>{translate('receipt.cameraAccess')}</Text>
+                            <Button
+                                success
+                                text={translate('common.continue')}
+                                accessibilityLabel={translate('common.continue')}
+                                style={[styles.p9, styles.pt5]}
+                                onPress={askForPermissions}
+                            />
+                        </View>
                     )}
                     {cameraPermissionStatus === RESULTS.GRANTED && device == null && (
                         <View style={[styles.cameraView, styles.justifyContentCenter, styles.alignItemsCenter]}>
@@ -260,9 +255,9 @@ function AttachmentCamera({isVisible, onCapture, onClose}: AttachmentCameraProps
                         </View>
                     )}
                     {cameraPermissionStatus === RESULTS.GRANTED && device != null && (
-                        <View style={[styles.cameraView, styles.alignItemsCenter, isInLandscapeMode && styles.justifyContentCenter]}>
+                        <View style={[styles.cameraView, styles.alignItemsCenter]}>
                             <GestureDetector gesture={tapGesture}>
-                                <View style={isInLandscapeMode ? {aspectRatio: cameraAspectRatio, height: '100%'} : StyleUtils.getCameraViewfinderStyle(cameraAspectRatio)}>
+                                <View style={StyleUtils.getCameraViewfinderStyle(cameraAspectRatio)}>
                                     <VisionCamera
                                         ref={camera}
                                         device={device}
