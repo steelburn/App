@@ -8595,12 +8595,6 @@ const CONST = {
             PRODUCT_TRAINING_SCAN_TEST_TOOLTIP_DISMISSED: 'training_scan_test_tooltip_dismissed',
             PRODUCT_TRAINING_SCAN_TEST_TOOLTIP_CONFIRMED: 'training_scan_test_tooltip_confirmed',
         },
-        NVP: {
-            META_CLICK_ID: 'expensify_leadFbclid',
-            GOOGLE_CLICK_ID: 'expensify_leadGclid',
-            REDDIT_CLICK_ID: 'expensify_leadRdtCid',
-            LINKEDIN_CLICK_ID: 'expensify_leadLiFatId',
-        },
     },
 
     CORPAY_FIELDS: {

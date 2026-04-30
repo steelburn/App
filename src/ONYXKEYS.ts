@@ -248,18 +248,6 @@ const ONYXKEYS = {
     /** Store the billing status */
     NVP_PRIVATE_BILLING_STATUS: 'nvp_private_billingStatus',
 
-    /** Store the Meta (Facebook) ad click ID */
-    NVP_META_CLICK_ID: 'nvp_expensify_leadFbclid',
-
-    /** Store the Google ad click ID */
-    NVP_GOOGLE_CLICK_ID: 'nvp_expensify_leadGclid',
-
-    /** Store the Reddit ad click ID */
-    NVP_REDDIT_CLICK_ID: 'nvp_expensify_leadRdtCid',
-
-    /** Store the LinkedIn ad click ID */
-    NVP_LINKEDIN_CLICK_ID: 'nvp_expensify_leadLiFatId',
-
     /** Store preferred skin tone for emoji */
     PREFERRED_EMOJI_SKIN_TONE: 'nvp_expensify_preferredEmojiSkinTone',
 
@@ -1428,10 +1416,6 @@ type OnyxValuesMapping = {
     [ONYXKEYS.NVP_PRIVATE_STRIPE_CUSTOMER_ID]: OnyxTypes.StripeCustomerID;
     [ONYXKEYS.NVP_PRIVATE_BILLING_DISPUTE_PENDING]: number;
     [ONYXKEYS.NVP_PRIVATE_BILLING_STATUS]: OnyxTypes.BillingStatus;
-    [ONYXKEYS.NVP_META_CLICK_ID]: string | null;
-    [ONYXKEYS.NVP_GOOGLE_CLICK_ID]: string | null;
-    [ONYXKEYS.NVP_REDDIT_CLICK_ID]: string | null;
-    [ONYXKEYS.NVP_LINKEDIN_CLICK_ID]: string | null;
     [ONYXKEYS.USER_WALLET]: OnyxTypes.UserWallet;
     [ONYXKEYS.RAM_ONLY_WALLET_ONFIDO]: OnyxTypes.WalletOnfido;
     [ONYXKEYS.WALLET_ADDITIONAL_DETAILS]: OnyxTypes.WalletAdditionalDetails;
