@@ -1,8 +1,6 @@
 import React, {useState} from 'react';
 import {View} from 'react-native';
-import Animated, {useAnimatedReaction, withTiming} from 'react-native-reanimated';
-import {useAnimatedStyle} from 'react-native-reanimated';
-import {useSharedValue} from 'react-native-reanimated';
+import Animated, {useAnimatedReaction, useAnimatedStyle, useSharedValue, withTiming} from 'react-native-reanimated';
 import Accordion from '@components/Accordion';
 import Badge from '@components/Badge';
 import Icon from '@components/Icon';
@@ -12,9 +10,9 @@ import useAccordionAnimation from '@hooks/useAccordionAnimation';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
+import variables from '@styles/variables';
 import CONST from '@src/CONST';
 import type ChildrenProps from '@src/types/utils/ChildrenProps';
-import variables from '@styles/variables';
 
 type SearchTypeMenuAccordionProps = ChildrenProps & {
     title: string;
@@ -45,19 +43,19 @@ function SearchTypeMenuAccordion({title, defaultExpanded = true, badgeText, chil
         setIsExpanded((prevIsExpanded) => !prevIsExpanded);
     };
 
-    const badgeOpacity = useSharedValue(!!badgeText ? getBadgeOpacity(defaultExpanded) : 0);
-    const badgeOffsetY = useSharedValue(!!badgeText ? getBadgeOffsetY(defaultExpanded) : 0);
+    const badgeOpacity = useSharedValue(badgeText ? getBadgeOpacity(defaultExpanded) : 0);
+    const badgeOffsetY = useSharedValue(badgeText ? getBadgeOffsetY(defaultExpanded) : 0);
     const arrowRotation = useSharedValue(getArrowRotation(defaultExpanded));
 
     useAnimatedReaction(
         () => isAccordionExpanded.get(),
-        (isExpanded) => {
+        (isExpandedValue) => {
             if (badgeText) {
-                badgeOpacity.set(withTiming(getBadgeOpacity(isExpanded), {duration: CONST.ANIMATED_TRANSITION}));
-                badgeOffsetY.set(withTiming(getBadgeOffsetY(isExpanded), {duration: CONST.ANIMATED_TRANSITION}));
+                badgeOpacity.set(withTiming(getBadgeOpacity(isExpandedValue), {duration: CONST.ANIMATED_TRANSITION}));
+                badgeOffsetY.set(withTiming(getBadgeOffsetY(isExpandedValue), {duration: CONST.ANIMATED_TRANSITION}));
             }
 
-            const rotateDegree = getArrowRotation(isExpanded);
+            const rotateDegree = getArrowRotation(isExpandedValue);
             arrowRotation.set(withTiming(rotateDegree, {duration: CONST.ANIMATED_TRANSITION}));
         },
     );
