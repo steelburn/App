@@ -282,7 +282,7 @@ function AttachmentCamera({isVisible, onCapture, onClose}: AttachmentCameraProps
                     {cameraPermissionStatus === RESULTS.GRANTED && device != null && (
                         <View style={[styles.cameraView, styles.alignItemsCenter]}>
                             <GestureDetector gesture={tapGesture}>
-                                <View style={StyleUtils.getCameraViewfinderStyle(cameraAspectRatio)}>
+                                <View style={StyleUtils.getCameraViewfinderStyle(cameraAspectRatio, false)}>
                                     <VisionCamera
                                         ref={cameraRef}
                                         device={device}
