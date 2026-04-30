@@ -1,4 +1,4 @@
-import {selectGroupByID} from '@selectors/Domain';
+import {isSecurityGroupPendingDeleteSelector, selectGroupByID} from '@selectors/Domain';
 import React, {useRef} from 'react';
 import FormProvider from '@components/Form/FormProvider';
 import InputWrapper from '@components/Form/InputWrapper';
@@ -34,6 +34,7 @@ function DomainGroupEditNamePage({route}: DomainGroupEditNamePageProps) {
     const [group] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {
         selector: selectGroupByID(groupID),
     });
+    const [isPendingDelete] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`, {selector: isSecurityGroupPendingDeleteSelector(groupID)});
 
     const inputRef = useRef<AnimatedTextInputRef>(null);
 
@@ -50,7 +51,10 @@ function DomainGroupEditNamePage({route}: DomainGroupEditNamePageProps) {
     };
 
     return (
-        <DomainNotFoundPageWrapper domainAccountID={domainAccountID}>
+        <DomainNotFoundPageWrapper
+            domainAccountID={domainAccountID}
+            shouldBeBlocked={isPendingDelete}
+        >
             <ScreenWrapper
                 onEntryTransitionEnd={() => inputRef.current?.focus()}
                 shouldEnableMaxHeight

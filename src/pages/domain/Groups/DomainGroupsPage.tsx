@@ -1,5 +1,5 @@
 import type {DomainSecurityGroupWithID} from '@selectors/Domain';
-import {defaultSecurityGroupIDSelector, domainNameSelector, groupsSelector} from '@selectors/Domain';
+import {defaultSecurityGroupIDSelector, domainNameSelector, groupsSelector, isSecurityGroupPendingDeleteSelector} from '@selectors/Domain';
 import React from 'react';
 import {View} from 'react-native';
 import Badge from '@components/Badge';
@@ -64,6 +64,7 @@ function DomainGroupsPage({route}: DomainGroupsPageProps) {
                 </View>
             ),
             pendingAction: Object.values(pendingActions?.[`${CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX}${group.id}`] ?? {}).find(Boolean),
+            isDisabled: isSecurityGroupPendingDeleteSelector(group.id)(pendingActions),
         };
     });
 
