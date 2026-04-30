@@ -363,7 +363,7 @@ function PureReportActionItem({
     const shouldRenderViewBasedOnAction = useTableReportViewActionRenderConditionals(action);
     const [isHidden, setIsHidden] = useState(false);
     const [moderationDecision, setModerationDecision] = useState<OnyxTypes.DecisionName>(CONST.MODERATION.MODERATOR_DECISION_APPROVED);
-    const reactionListRef = useContext(ReactionListContext);
+    const {isActiveReportAction: isActiveReactionListReportAction, hideReactionList} = useContext(ReactionListContext);
     const {updateHiddenAttachments} = useContext(AttachmentModalContext);
     const composerTextInputRef = useRef<TextInput | HTMLTextAreaElement>(null);
     const popoverAnchorRef = useRef<Exclude<ContextMenuAnchor, TextInput>>(null);
@@ -380,7 +380,6 @@ function PureReportActionItem({
     const [chatReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(report?.chatReportID)}`);
 
     const highlightedBackgroundColorIfNeeded = useMemo(
-        // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
         () => (isReportActionLinked || shouldHighlight ? StyleUtils.getBackgroundColorStyle(theme.messageHighlightBG) : {}),
         [StyleUtils, isReportActionLinked, theme.messageHighlightBG, shouldHighlight],
     );
@@ -464,11 +463,11 @@ function PureReportActionItem({
             if (isActive(action.reportActionID)) {
                 hideEmojiPicker(true);
             }
-            if (reactionListRef?.current?.isActiveReportAction(action.reportActionID)) {
-                reactionListRef?.current?.hideReactionList();
+            if (isActiveReactionListReportAction(action.reportActionID)) {
+                hideReactionList();
             }
         },
-        [action.reportActionID, reactionListRef],
+        [action.reportActionID, isActiveReactionListReportAction, hideReactionList],
     );
 
     useEffect(() => {
@@ -542,7 +541,6 @@ function PureReportActionItem({
                 return;
             }
 
-            // eslint-disable-next-line @typescript-eslint/naming-convention
             popoverAnchorRef.current?.measureInWindow((_fx, frameY, _width, height) => {
                 transitionActionSheetState({
                     type: ActionSheetAwareScrollView.Actions.OPEN_POPOVER,
@@ -797,7 +795,12 @@ function PureReportActionItem({
                 />
             );
         } else if (isSimpleMessageAction(action)) {
-            children = <SimpleMessageContent action={action} />;
+            children = (
+                <SimpleMessageContent
+                    action={action}
+                    report={report}
+                />
+            );
         } else if (isActionOfType(action, CONST.REPORT.ACTIONS.TYPE.FORWARDED)) {
             const wasAutoForwarded = getOriginalMessage(action)?.automaticAction ?? false;
             if (wasAutoForwarded) {
@@ -1229,7 +1232,6 @@ function PureReportActionItem({
                                 <OfflineWithFeedback
                                     onClose={onClose}
                                     dismissError={dismissError}
-                                    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
                                     pendingAction={
                                         draftMessage !== undefined ? undefined : (action.pendingAction ?? (action.isOptimisticAction ? CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD : undefined))
                                     }
