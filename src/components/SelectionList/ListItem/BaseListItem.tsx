@@ -102,6 +102,7 @@ function BaseListItem<TItem extends ListItem>({
     accessible,
     accessibilityRole = getButtonRole(true),
     forwardedFSClass,
+    testID,
 }: BaseListItemProps<TItem>) {
     const theme = useTheme();
     const styles = useThemeStyles();
@@ -233,6 +234,7 @@ function BaseListItem<TItem extends ListItem>({
                 wrapperStyle={pressableWrapperStyle}
             >
                 <View
+                    testID={testID}
                     style={wrapperStyle}
                     fsClass={forwardedFSClass}
                 >
