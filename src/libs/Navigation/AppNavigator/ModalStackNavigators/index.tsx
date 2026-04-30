@@ -131,15 +131,31 @@ function createModalStackNavigator<ParamList extends ParamListBase>(screens: Scr
         // eslint-disable-next-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidth
         const {isSmallScreenWidth} = useResponsiveLayout();
 
+        // Screens that stack multiple instances (wizard flows) need opaque card backgrounds
+        // to prevent transparent layers from causing GPU compositing flicker on weak devices.
+        const OPAQUE_CARD_SCREENS = new Set<string>([SCREENS.REIMBURSEMENT_ACCOUNT_USD, SCREENS.REIMBURSEMENT_ACCOUNT_NON_USD]);
+
         const getScreenOptions = useCallback<typeof screenOptions>(
             ({route: optionRoute}) => {
+                const baseOptions = screenOptions({route: optionRoute});
+
                 // Extend common options if they are defined for the screen.
-                if (OPTIONS_PER_SCREEN[optionRoute.name as Screen]) {
-                    return {...screenOptions({route: optionRoute}), ...OPTIONS_PER_SCREEN[optionRoute.name as Screen]};
+                const perScreen = OPTIONS_PER_SCREEN[optionRoute.name as Screen];
+                const merged = perScreen ? {...baseOptions, ...perScreen} : baseOptions;
+
+                if (OPAQUE_CARD_SCREENS.has(optionRoute.name)) {
+                    return {
+                        ...merged,
+                        web: {
+                            ...merged.web,
+                            cardStyle: [merged.web?.cardStyle, styles.appBG],
+                        },
+                    };
                 }
-                return screenOptions({route: optionRoute});
+
+                return merged;
             },
-            [screenOptions],
+            [screenOptions, styles.appBG],
         );
 
         return (
