@@ -100,6 +100,7 @@ function SearchTypeMenuWide({queryJSON}: SearchTypeMenuProps) {
 
     const renderSection = (section: SearchTypeMenuSection, sectionIndex: number) => (
         <SearchTypeMenuAccordion
+            key={section.translationPath}
             title={translate(section.translationPath)}
             badgeText={getSectionBadgeText(section.translationPath, reportCounts)}
         >
