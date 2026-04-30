@@ -59,7 +59,7 @@ yarn-error.log
 dist/
 
 # Generated eslint-report HTML (npm run eslint-report)
-reports/
+/reports/
 
 # BUCK
 buck-out/
