@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import {View} from 'react-native';
 import ActivityIndicator from '@components/ActivityIndicator';
 import {usePersonalDetails} from '@components/OnyxListItemProvider';
@@ -14,7 +14,7 @@ import useTheme from '@hooks/useTheme';
 import useThemeIllustrations from '@hooks/useThemeIllustrations';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {openSearchCardFiltersPage} from '@libs/actions/Search';
-import {buildCardsData, generateSelectedCards} from '@libs/CardFeedUtils';
+import {buildCardsData} from '@libs/CardFeedUtils';
 import type {CardFilterItem} from '@libs/CardFeedUtils';
 import type {SkeletonSpanReasonAttributes} from '@libs/telemetry/useSkeletonSpan';
 import variables from '@styles/variables';
@@ -28,7 +28,7 @@ type CardSelectorProps = {
     onChange: (cards: string[]) => void;
 };
 
-function CardSelector({value, onChange}: CardSelectorProps) {
+function CardSelector({value = [], onChange}: CardSelectorProps) {
     const theme = useTheme();
     const styles = useThemeStyles();
     const {translate} = useLocalize();
@@ -44,8 +44,6 @@ function CardSelector({value, onChange}: CardSelectorProps) {
     const [searchAdvancedFiltersForm, searchAdvancedFiltersFormMetadata] = useOnyx(ONYXKEYS.FORMS.SEARCH_ADVANCED_FILTERS_FORM);
     const personalDetails = usePersonalDetails();
 
-    const [selectedCards, setSelectedCards] = useState<string[]>([]);
-
     useEffect(() => {
         if (isOffline) {
             return;
@@ -53,16 +51,11 @@ function CardSelector({value, onChange}: CardSelectorProps) {
         openSearchCardFiltersPage();
     }, [isOffline]);
 
-    useEffect(() => {
-        const generatedCards = generateSelectedCards(userCardList, workspaceCardFeeds, searchAdvancedFiltersForm?.feed, value);
-        setSelectedCards(generatedCards);
-    }, [searchAdvancedFiltersForm?.feed, value, workspaceCardFeeds, userCardList]);
-
     const individualCardsSectionData = buildCardsData(
         workspaceCardFeeds ?? {},
         userCardList ?? {},
         personalDetails ?? {},
-        selectedCards,
+        value,
         illustrations,
         companyCardFeedIcons,
         false,
@@ -73,7 +66,7 @@ function CardSelector({value, onChange}: CardSelectorProps) {
         workspaceCardFeeds ?? {},
         userCardList ?? {},
         personalDetails ?? {},
-        selectedCards,
+        value,
         illustrations,
         companyCardFeedIcons,
         true,
@@ -125,12 +118,10 @@ function CardSelector({value, onChange}: CardSelectorProps) {
         }
 
         if (item.isSelected) {
-            const newCardsObject = selectedCards.filter((card) => card !== item.keyForList);
-            setSelectedCards(newCardsObject);
+            const newCardsObject = value.filter((card) => card !== item.keyForList);
             onChange(newCardsObject);
         } else {
-            const newCardsObject = [...selectedCards, item.keyForList];
-            setSelectedCards(newCardsObject);
+            const newCardsObject = [...value, item.keyForList];
             onChange(newCardsObject);
         }
     };
