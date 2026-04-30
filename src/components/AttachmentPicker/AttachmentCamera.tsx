@@ -141,14 +141,25 @@ function AttachmentCamera({isVisible, onCapture, onClose}: AttachmentCameraProps
             return;
         }
 
+        let ignore = false;
         CameraPermission?.getCameraPermissionStatus?.()
             .then((status: string) => {
+                if (ignore) {
+                    return;
+                }
                 setCameraPermissionStatus(status);
                 if (status === RESULTS.DENIED) {
                     askForPermissions();
                 }
             })
-            .catch(() => setCameraPermissionStatus(RESULTS.UNAVAILABLE));
+            .catch(() => {
+                if (!ignore) {
+                    setCameraPermissionStatus(RESULTS.UNAVAILABLE);
+                }
+            });
+        return () => {
+            ignore = true;
+        };
     }, [isVisible, askForPermissions]);
 
     const capturePhoto = useCallback(() => {
