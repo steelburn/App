@@ -67,12 +67,19 @@ function Accordion({isExpanded, children, duration = 300, isToggleTriggered, sty
             };
         }
 
+        let display;
+        if (isExpanded.get()) {
+            display = 'inline';
+        } else if (!isAnimating.get()) {
+            display = 'none';
+        }
+
         return {
             height: !isToggleTriggered.get() ? undefined : derivedHeight.get(),
             maxHeight: !isToggleTriggered.get() ? undefined : derivedHeight.get(),
             opacity: derivedOpacity.get(),
             overflow: isAnimating.get() ? 'hidden' : 'visible',
-            display: isExpanded.get() ? 'inline' : 'none',
+            display,
         };
     });
 
