@@ -53,7 +53,6 @@ import type {CurrentUserPersonalDetails} from '@src/types/onyx/PersonalDetails';
 import type {OnyxData} from '@src/types/onyx/Request';
 import type {TransactionChanges} from '@src/types/onyx/Transaction';
 import {getCleanUpTransactionThreadReportOnyxData} from './DeleteMoneyRequest';
-// eslint-disable-next-line @typescript-eslint/no-deprecated
 import {getAllReports, getMoneyRequestInformation, getMoneyRequestParticipantsFromReport, getMoneyRequestPolicyTags, getReportPreviewAction} from './index';
 import type {BuildOnyxDataForMoneyRequestKeys, MoneyRequestInformationParams} from './index';
 import {getDeleteTrackExpenseInformation} from './TrackExpense';
@@ -1277,10 +1276,8 @@ function updateSplitTransactions({
         };
 
         if (isCreationOfSplits) {
-            // eslint-disable-next-line rulesdir/no-multiple-api-calls
             apiWrite(WRITE_COMMANDS.SPLIT_TRANSACTION, splitParameters, onyxData);
         } else {
-            // eslint-disable-next-line rulesdir/no-multiple-api-calls
             apiWrite(WRITE_COMMANDS.UPDATE_SPLIT_TRANSACTION, splitParameters, onyxData);
         }
     }
