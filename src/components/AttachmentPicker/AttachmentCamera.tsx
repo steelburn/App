@@ -122,12 +122,6 @@ function AttachmentCamera({isVisible, onCapture, onClose}: AttachmentCameraProps
         });
 
     // Permission management
-    const refreshCameraPermissionStatus = useCallback(() => {
-        CameraPermission?.getCameraPermissionStatus?.()
-            .then(setCameraPermissionStatus)
-            .catch(() => setCameraPermissionStatus(RESULTS.UNAVAILABLE));
-    }, []);
-
     const askForPermissions = useCallback(() => {
         CameraPermission.requestCameraPermission?.()
             .then((status: string) => {
@@ -141,24 +135,21 @@ function AttachmentCamera({isVisible, onCapture, onClose}: AttachmentCameraProps
             });
     }, [translate]);
 
-    // Refresh permissions when modal becomes visible
+    // Refresh permissions when modal becomes visible and auto-request if denied
     useEffect(() => {
         if (!isVisible) {
             return;
         }
 
-        refreshCameraPermissionStatus();
-    }, [isVisible, refreshCameraPermissionStatus]);
-
-    // Auto-request permission if denied when modal first opens
-    useEffect(() => {
-        if (!isVisible || cameraPermissionStatus === null) {
-            return;
-        }
-        if (cameraPermissionStatus === RESULTS.DENIED) {
-            askForPermissions();
-        }
-    }, [isVisible, cameraPermissionStatus, askForPermissions]);
+        CameraPermission?.getCameraPermissionStatus?.()
+            .then((status: string) => {
+                setCameraPermissionStatus(status);
+                if (status === RESULTS.DENIED) {
+                    askForPermissions();
+                }
+            })
+            .catch(() => setCameraPermissionStatus(RESULTS.UNAVAILABLE));
+    }, [isVisible, askForPermissions]);
 
     const capturePhoto = useCallback(() => {
         if (cameraPermissionStatus !== RESULTS.GRANTED) {
