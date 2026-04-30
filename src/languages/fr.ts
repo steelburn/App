@@ -9122,7 +9122,7 @@ Voici un *reçu test* pour vous montrer comment ça fonctionne :`,
             resetDomain: 'Réinitialiser le domaine',
             resetDomainExplanation: ({domainName}: {domainName?: string}) => `Veuillez saisir <strong>${domainName}</strong> pour confirmer la réinitialisation du domaine.`,
             enterDomainName: 'Saisissez votre nom de domaine ici',
-            resetDomainInfo: `Cette action est <strong>définitive</strong> et les données suivantes seront supprimées : <br/> <bullet-list><bullet-item>Connexions de cartes d’entreprise et toutes les dépenses non déclarées associées à ces cartes</bullet-item><bullet-item>Paramètres SAML et de groupe</bullet-item></bullet-list> Tous les comptes, espaces de travail, notes de frais, dépenses et autres données seront conservés. <br/><br/>Remarque : vous pouvez supprimer ce domaine de votre liste de domaines en retirant l’adresse e-mail associée de vos <a href="#">méthodes de contact</a>.`,
+            resetDomainInfo: `Cette action est <strong>définitive</strong> et les données suivantes seront supprimées : <br/> <bullet-list><bullet-item>Connexions aux cartes d’entreprise et toutes les dépenses non encore déclarées associées à ces cartes</bullet-item><bullet-item>Paramètres SAML et de groupe</bullet-item><bullet-item>Données de voyage et accès à Expensify Travel</bullet-item></bullet-list> Tous les comptes, espaces de travail, rapports, dépenses et autres données resteront. <br/><br/>Remarque : Vous pouvez supprimer ce domaine de votre liste de domaines en retirant l’adresse e-mail associée de vos <a href="#">moyens de contact</a>.`,
         },
         domainMembers: 'Membres du domaine',
         members: {

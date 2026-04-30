@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention  */
 import type {
     CommonActions,
     NavigationContainerRefWithCurrent,
@@ -1903,7 +1902,7 @@ type MoneyRequestNavigatorParamList = {
     [SCREENS.MONEY_REQUEST.STEP_WAYPOINT]: {
         iouType: IOUType;
         reportID: string;
-        // eslint-disable-next-line no-restricted-syntax -- `backTo` usages in this file are legacy. Do not add new `backTo` params to screens. See contributingGuides/NAVIGATION.md
+
         // eslint-disable-next-line no-restricted-syntax -- `backTo` usages in this file are legacy. Do not add new `backTo` params to screens. See contributingGuides/NAVIGATION.md
         backTo: Routes | undefined;
         action: IOUAction;
@@ -2670,7 +2669,7 @@ type WorkspaceSplitNavigatorParamList = {
     };
     [SCREENS.WORKSPACE.RECEIPT_PARTNERS_CHANGE_BILLING_ACCOUNT]: {
         policyID: string;
-        integration: string;
+        integration: ValueOf<typeof CONST.POLICY.RECEIPT_PARTNERS.NAME>;
     };
 
     [SCREENS.WORKSPACE.RECEIPT_PARTNERS_INVITE_EDIT]: {
@@ -2930,7 +2929,7 @@ type SharedScreensParamList = {
         shortLivedAuthToken?: string;
         shortLivedToken?: string;
         authTokenType?: ValueOf<typeof CONST.AUTH_TOKEN_TYPES>;
-        // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
+
         exitTo?: Routes;
         shouldForceLogin: string;
         domain?: Routes;
@@ -2940,7 +2939,7 @@ type SharedScreensParamList = {
     [SCREENS.VALIDATE_LOGIN]: {
         accountID: string;
         validateCode: string;
-        // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
+
         exitTo?: Routes;
     };
 };

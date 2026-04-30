@@ -9088,7 +9088,7 @@ Ecco una *ricevuta di prova* per mostrarti come funziona:`,
             resetDomain: 'Reimposta dominio',
             resetDomainExplanation: ({domainName}: {domainName?: string}) => `Digita <strong>${domainName}</strong> per confermare il ripristino del dominio.`,
             enterDomainName: 'Inserisci qui il tuo nome di dominio',
-            resetDomainInfo: `Questa azione è <strong>definitiva</strong> e i seguenti dati verranno eliminati: <br/> <bullet-list><bullet-item>Connessioni alle carte aziendali e tutte le spese non rendicontate di tali carte</bullet-item><bullet-item>Impostazioni SAML e di gruppo</bullet-item></bullet-list> Tutti gli account, gli spazi di lavoro, i report, le spese e gli altri dati rimarranno. <br/><br/>Nota: puoi rimuovere questo dominio dall’elenco dei tuoi domini eliminando l’email associata dalle tue <a href="#">modalità di contatto</a>.`,
+            resetDomainInfo: `Questa azione è <strong>definitiva</strong> e i seguenti dati verranno eliminati: <br/> <bullet-list><bullet-item>Connessioni alle carte aziendali e tutte le spese non rendicontate da tali carte</bullet-item><bullet-item>Impostazioni SAML e dei gruppi</bullet-item><bullet-item>Dati di viaggio e accesso a Expensify Travel</bullet-item></bullet-list> Tutti gli account, gli spazi di lavoro, i report, le spese e gli altri dati rimarranno. <br/><br/>Nota: puoi rimuovere questo dominio dall’elenco dei tuoi domini eliminando l’email associata dalle tue <a href="#">modalità di contatto</a>.`,
         },
         domainMembers: 'Membri del dominio',
         members: {

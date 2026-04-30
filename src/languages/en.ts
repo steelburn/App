@@ -62,7 +62,6 @@ type States = Record<keyof typeof COMMON_CONST.STATES, StateValue>;
 
 type AllCountries = Record<Country, string>;
 
-/* eslint-disable max-len */
 const translations = {
     common: {
         // @context Used as a noun meaning a numerical total or quantity, not the verb “to count.”
@@ -6283,7 +6282,6 @@ const translations = {
                         case 'intacctImportTitle':
                             return 'Importing Sage Intacct data';
                         default: {
-                            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
                             return `Translation missing for stage: ${stage}`;
                         }
                     }
@@ -6333,7 +6331,6 @@ const translations = {
                     case 'jobDone':
                         return 'Waiting for imported data to load';
                     default: {
-                        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
                         return `Translation missing for stage: ${stage}`;
                     }
                 }
@@ -9080,7 +9077,7 @@ const translations = {
             resetDomain: 'Reset domain',
             resetDomainExplanation: ({domainName}: {domainName?: string}) => `Please type <strong>${domainName}</strong> to confirm the domain reset.`,
             enterDomainName: 'Enter your domain name here',
-            resetDomainInfo: `This action is <strong>permanent</strong> and the following data will be deleted: <br/> <bullet-list><bullet-item>Company card connections and any unreported expenses from those cards</bullet-item><bullet-item>SAML and group settings</bullet-item></bullet-list> All accounts, workspaces, reports, expenses, and other data will remain. <br/><br/>Note: You can clear this domain from your domains list by removing the associated email from your <a href="#">contact methods</a>.`,
+            resetDomainInfo: `This action is <strong>permanent</strong> and the following data will be deleted: <br/> <bullet-list><bullet-item>Company card connections and any unreported expenses from those cards</bullet-item><bullet-item>SAML and group settings</bullet-item><bullet-item>Travel data and access to Expensify Travel</bullet-item></bullet-list> All accounts, workspaces, reports, expenses, and other data will remain. <br/><br/>Note: You can clear this domain from your domains list by removing the associated email from your <a href="#">contact methods</a>.`,
         },
         domainMembers: 'Domain members',
         members: {

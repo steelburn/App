@@ -9045,7 +9045,7 @@ Oto *paragon testowy*, żeby pokazać Ci, jak to działa:`,
             resetDomain: 'Resetuj domenę',
             resetDomainExplanation: ({domainName}: {domainName?: string}) => `Wpisz proszę <strong>${domainName}</strong>, aby potwierdzić reset domeny.`,
             enterDomainName: 'Wprowadź tutaj swoją nazwę domeny',
-            resetDomainInfo: `Ta czynność jest <strong>trwała</strong> i spowoduje usunięcie następujących danych: <br/> <bullet-list><bullet-item>Połączeń z kartami firmowymi oraz wszystkich nierozliczonych wydatków z tych kart</bullet-item><bullet-item>Ustawień SAML i grup</bullet-item></bullet-list> Wszystkie konta, przestrzenie robocze, raporty, wydatki i inne dane pozostaną bez zmian. <br/><br/>Uwaga: Możesz usunąć tę domenę z listy swoich domen, usuwając powiązany adres e-mail z <a href="#">metod kontaktu</a>.`,
+            resetDomainInfo: `Ta operacja jest <strong>trwała</strong> i spowoduje usunięcie następujących danych: <br/> <bullet-list><bullet-item>Połączenia z firmowymi kartami oraz wszystkie nierozliczone wydatki z tych kart</bullet-item><bullet-item>Ustawienia SAML i ustawienia grup</bullet-item><bullet-item>Dane podróży oraz dostęp do Expensify Travel</bullet-item></bullet-list> Wszystkie konta, przestrzenie robocze, raporty, wydatki i inne dane pozostaną bez zmian. <br/><br/>Uwaga: Możesz usunąć tę domenę ze swojej listy domen, usuwając powiązany adres e-mail z sekcji <a href="#">metody kontaktu</a>.`,
         },
         domainMembers: 'Członkowie domeny',
         members: {

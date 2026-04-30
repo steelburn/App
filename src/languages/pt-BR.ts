@@ -9053,7 +9053,7 @@ Aqui está um *comprovante de teste* para mostrar como funciona:`,
             resetDomain: 'Redefinir domínio',
             resetDomainExplanation: ({domainName}: {domainName?: string}) => `Digite <strong>${domainName}</strong> para confirmar a redefinição do domínio.`,
             enterDomainName: 'Insira seu nome de domínio aqui',
-            resetDomainInfo: `Esta ação é <strong>permanente</strong> e os seguintes dados serão excluídos: <br/> <bullet-list><bullet-item>Conexões de cartões corporativos e quaisquer despesas não informadas desses cartões</bullet-item><bullet-item>Configurações de SAML e de grupo</bullet-item></bullet-list> Todas as contas, workspaces, relatórios, despesas e outros dados serão mantidos. <br/><br/>Observação: você pode remover este domínio da sua lista de domínios removendo o e-mail associado dos seus <a href="#">métodos de contato</a>.`,
+            resetDomainInfo: `Esta ação é <strong>permanente</strong> e os seguintes dados serão excluídos: <br/> <bullet-list><bullet-item>Conexões de cartões corporativos e quaisquer despesas não lançadas desses cartões</bullet-item><bullet-item>Configurações de SAML e de grupos</bullet-item><bullet-item>Dados de viagem e acesso ao Expensify Travel</bullet-item></bullet-list> Todas as contas, workspaces, relatórios, despesas e outros dados serão mantidos. <br/><br/>Observação: você pode remover este domínio da sua lista de domínios excluindo o e-mail associado em seus <a href="#">métodos de contato</a>.`,
         },
         domainMembers: 'Membros do domínio',
         members: {

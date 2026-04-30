@@ -9061,7 +9061,7 @@ Hier is een *proefbon* om je te laten zien hoe het werkt:`,
             resetDomain: 'Domein resetten',
             resetDomainExplanation: ({domainName}: {domainName?: string}) => `Typ <strong>${domainName}</strong> om het resetten van het domein te bevestigen.`,
             enterDomainName: 'Voer hier je domeinnaam in',
-            resetDomainInfo: `Deze actie is <strong>definitief</strong> en de volgende gegevens worden verwijderd: <br/> <bullet-list><bullet-item>Bedrijfskaartverbindingen en alle niet-gerapporteerde uitgaven van die kaarten</bullet-item><bullet-item>SAML- en groepsinstellingen</bullet-item></bullet-list> Alle accounts, werkruimten, rapporten, uitgaven en andere gegevens blijven behouden. <br/><br/>Opmerking: je kunt dit domein uit je domeinlijst verwijderen door het bijbehorende e-mailadres te verwijderen uit je <a href="#">contactmethoden</a>.`,
+            resetDomainInfo: `Deze actie is <strong>definitief</strong> en de volgende gegevens worden verwijderd: <br/> <bullet-list><bullet-item>Bedrijfskaartverbindingen en alle niet-ingediende uitgaven van die kaarten</bullet-item><bullet-item>SAML- en groepsinstellingen</bullet-item><bullet-item>Reisgegevens en toegang tot Expensify Travel</bullet-item></bullet-list> Alle accounts, werkruimtes, rapporten, uitgaven en andere gegevens blijven behouden. <br/><br/>Opmerking: je kunt dit domein uit je domeinlijst verwijderen door het bijbehorende e-mailadres uit je <a href="#">contactmethoden</a> te verwijderen.`,
         },
         domainMembers: 'Domeinleden',
         members: {

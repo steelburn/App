@@ -8977,7 +8977,7 @@ ${reportName}
             resetDomain: 'ドメインをリセット',
             resetDomainExplanation: ({domainName}: {domainName?: string}) => `ドメインのリセットを確認するため、<strong>${domainName}</strong> と入力してください。`,
             enterDomainName: 'ここにドメイン名を入力してください',
-            resetDomainInfo: `この操作は<strong>元に戻せません</strong>。次のデータが削除されます：<br/> <bullet-list><bullet-item>会社カードの接続と、そのカードの未報告精算</bullet-item><bullet-item>SAML およびグループ設定</bullet-item></bullet-list> すべてのアカウント、ワークスペース、レポート、経費、およびその他のデータは保持されます。<br/><br/>注：<a href="#">連絡方法</a>から関連付けられているメールアドレスを削除すると、このドメインをドメイン一覧から消去できます。`,
+            resetDomainInfo: `この操作は<strong>完全に削除</strong>され、次のデータが消去されます。<br/> <bullet-list><bullet-item>会社カードの接続およびそれらのカードに紐づく未申報経費</bullet-item><bullet-item>SAML とグループ設定</bullet-item><bullet-item>旅行データおよび Expensify Travel へのアクセス</bullet-item></bullet-list> すべてのアカウント、ワークスペース、レポート、経費、およびその他のデータはそのまま残ります。<br/><br/>注：<a href="#">連絡方法</a>から関連付けられたメールアドレスを削除すると、このドメインをドメイン一覧から消去できます。`,
         },
         domainMembers: 'ドメインメンバー',
         members: {
