@@ -10,7 +10,6 @@ import Text from '@components/Text';
 import Tooltip from '@components/Tooltip';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useLocalize from '@hooks/useLocalize';
-import useOnyx from '@hooks/useOnyx';
 import useStyleUtils from '@hooks/useStyleUtils';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
@@ -21,7 +20,6 @@ import {getPersonalDetailByEmail} from '@libs/PersonalDetailsUtils';
 import {
     getDelegateAccountIDFromReportAction,
     getHumanAgentAccountIDFromReportAction,
-    getHumanAgentFirstName,
     getManagerOnVacation,
     getModerationFlagState,
     getOriginalMessage,
@@ -30,10 +28,11 @@ import {
 } from '@libs/ReportActionsUtils';
 import {isOptimisticPersonalDetail} from '@libs/ReportUtils';
 import CONST from '@src/CONST';
-import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type {Report, ReportAction} from '@src/types/onyx';
 import type ChildrenProps from '@src/types/utils/ChildrenProps';
+import DelegateOnBehalfOfText from './DelegateOnBehalfOfText';
+import HumanAgentAssistedByText from './HumanAgentAssistedByText';
 import ReportActionItemDate from './ReportActionItemDate';
 import ReportActionItemFragment from './ReportActionItemFragment';
 
@@ -88,8 +87,6 @@ function ReportActionItemSingle({
     const StyleUtils = useStyleUtils();
     const {translate} = useLocalize();
 
-    const [personalDetails] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST);
-
     const {avatarType, avatars, details, source, reportPreviewSenderID} = useReportActionAvatars({report: potentialIOUReport ?? report, action});
 
     const reportID = source.chatReport?.reportID;
@@ -98,10 +95,7 @@ function ReportActionItemSingle({
     const [primaryAvatar, secondaryAvatar] = avatars;
     const delegateAccountID = getDelegateAccountIDFromReportAction(action);
     const humanAgentAccountID = getHumanAgentAccountIDFromReportAction(action);
-    const humanAgentName = getHumanAgentFirstName(action, personalDetails);
-    const mainAccountID = delegateAccountID ? (reportPreviewSenderID ?? potentialIOUReport?.ownerAccountID ?? action?.childOwnerAccountID) : (details.accountID ?? CONST.DEFAULT_NUMBER_ID);
-    const mainAccountLogin = mainAccountID ? (personalDetails?.[mainAccountID]?.login ?? details.login) : details.login;
-    const accountOwnerDetails = getPersonalDetailByEmail(String(mainAccountLogin ?? ''));
+    const mainAccountID = delegateAccountID ? (reportPreviewSenderID ?? potentialIOUReport?.ownerAccountID ?? action?.childOwnerAccountID) : undefined;
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
 
     // Vacation delegate details for submitted action
@@ -232,10 +226,13 @@ function ReportActionItemSingle({
                         <ReportActionItemDate created={action?.created ?? ''} />
                     </View>
                 ) : null}
-                {!!delegateAccountID && <Text style={[styles.chatDelegateMessage]}>{translate('delegate.onBehalfOfMessage', accountOwnerDetails?.displayName ?? '')}</Text>}
-                {!!humanAgentAccountID && (
-                    <Text style={[styles.chatDelegateMessage]}>{translate('reportAction.assistedBy', humanAgentName ?? translate('reportAction.humanSupportAgent'))}</Text>
+                {!!delegateAccountID && (
+                    <DelegateOnBehalfOfText
+                        mainAccountID={mainAccountID}
+                        fallbackLogin={details.login}
+                    />
                 )}
+                {!!humanAgentAccountID && <HumanAgentAssistedByText action={action} />}
                 {!!vacationer && !!submittedTo && (
                     <Text style={[styles.chatDelegateMessage]}>
                         {translate(
