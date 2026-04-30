@@ -158,7 +158,6 @@ function AttachmentPicker({
     const onCanceled = useRef<() => void>(() => {});
     const onClosed = useRef<() => void>(() => {});
     const popoverRef = useRef(null);
-    const cameraResolveRef = useRef<((value: Asset[] | void) => void) | null>(null);
 
     const {translate} = useLocalize();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
@@ -175,34 +174,13 @@ function AttachmentPicker({
 
     /**
      * Launch the in-app VisionCamera instead of the external system camera.
-     * Returns a promise that resolves with the captured photo assets.
+     * Shows the camera modal and returns a never-resolving promise so the
+     * selectItem flow stays suspended. handleCameraCapture / handleCameraClose
+     * (defined after pickAttachment) take over from here.
      */
-    const launchInAppCamera = useCallback(
-        (): Promise<Asset[] | void> =>
-            new Promise((resolve) => {
-                cameraResolveRef.current = resolve;
-                setShowAttachmentCamera(true);
-            }),
-        [],
-    );
-
-    const handleCameraCapture = useCallback((photos: CapturedPhoto[]) => {
-        setShowAttachmentCamera(false);
-        const assets: Asset[] = photos.map((photo) => ({
-            uri: photo.uri,
-            fileName: photo.fileName,
-            type: photo.type,
-            width: photo.width,
-            height: photo.height,
-        }));
-        cameraResolveRef.current?.(assets);
-        cameraResolveRef.current = null;
-    }, []);
-
-    const handleCameraClose = useCallback(() => {
-        setShowAttachmentCamera(false);
-        cameraResolveRef.current?.();
-        cameraResolveRef.current = null;
+    const launchInAppCamera = useCallback((): Promise<Asset[] | void> => {
+        setShowAttachmentCamera(true);
+        return new Promise<Asset[] | void>(() => {});
     }, []);
 
     /**
@@ -498,6 +476,31 @@ function AttachmentPicker({
         },
         [handleImageProcessingError, shouldValidateImage, showGeneralAlert, showImageCorruptionAlert],
     );
+
+    const handleCameraCapture = useCallback(
+        (photos: CapturedPhoto[]) => {
+            setShowAttachmentCamera(false);
+            const assets: Asset[] = photos.map((photo) => ({
+                uri: photo.uri,
+                fileName: photo.fileName,
+                type: photo.type,
+                width: photo.width,
+                height: photo.height,
+            }));
+            Promise.resolve(pickAttachment(assets)).finally(() => {
+                onClosed.current();
+                delete onModalHide.current;
+            });
+        },
+        [pickAttachment],
+    );
+
+    const handleCameraClose = useCallback(() => {
+        setShowAttachmentCamera(false);
+        onCanceled.current();
+        onClosed.current();
+        delete onModalHide.current;
+    }, []);
 
     /**
      * Opens the attachment modal, or directly launches the document picker when shouldSkipAttachmentTypeModal is true.
