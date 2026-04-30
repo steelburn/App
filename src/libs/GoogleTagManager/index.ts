@@ -80,19 +80,19 @@ function publishEvent(event: GoogleTagManagerEvent, accountID: number, email: st
     }
 
     // Reddit
-    const redditConversionId = REDDIT_CONVERSION_IDS[event];
-    if (typeof window.rdt === 'function' && redditConversionId) {
-        window.rdt('track', redditConversionId, {
+    const redditConversionID = REDDIT_CONVERSION_IDS[event];
+    if (typeof window.rdt === 'function' && redditConversionID) {
+        window.rdt('track', redditConversionID, {
             conversionId: eventID,
             email,
         });
     }
 
     // LinkedIn (uses numeric conversion IDs instead of named events)
-    const linkedInConversionId = LINKEDIN_CONVERSION_IDS[event];
-    if (typeof window.lintrk === 'function' && linkedInConversionId) {
+    const linkedInConversionID = LINKEDIN_CONVERSION_IDS[event];
+    if (typeof window.lintrk === 'function' && linkedInConversionID) {
         window.lintrk('setUserData', {email});
-        window.lintrk('track', {conversion_id: linkedInConversionId});
+        window.lintrk('track', {conversion_id: linkedInConversionID});
     }
 }
 
