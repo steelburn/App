@@ -80,7 +80,7 @@ function OnboardingModalNavigator() {
 
         signUpEventPublishedForAccountID = accountID;
         GoogleTagManager.publishEvent(CONST.ANALYTICS.EVENT.SIGN_UP.NAME, accountID, email ?? '');
-    }, [accountID]);
+    }, [accountID, email]);
 
     const handleOuterClick = useCallback(() => {
         OnboardingRefManager.handleOuterClick();

@@ -920,7 +920,10 @@
         "CARDFROZEN",
         "CARDUNFROZEN",
         "backgrounded",
-        "Kolkata"
+        "Kolkata",
+        "lintrk",
+        "Fbclid",
+        "Gclid"
     ],
     "ignorePaths": [
         ".gitignore",

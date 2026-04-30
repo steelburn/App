@@ -160,7 +160,7 @@ describe('GoogleTagManagerTest', () => {
 
         // Then we publish the sign_up event only once
         expect(GoogleTagManager.publishEvent).toHaveBeenCalledTimes(1);
-        expect(GoogleTagManager.publishEvent).toHaveBeenCalledWith(CONST.ANALYTICS.EVENT.SIGN_UP, accountID, email);
+        expect(GoogleTagManager.publishEvent).toHaveBeenCalledWith(CONST.ANALYTICS.EVENT.SIGN_UP.NAME, accountID, email);
     });
 
     test('workspace_created', async () => {
@@ -201,7 +201,7 @@ describe('GoogleTagManagerTest', () => {
 
         // Then we publish a workspace_created event only once
         expect(GoogleTagManager.publishEvent).toHaveBeenCalledTimes(1);
-        expect(GoogleTagManager.publishEvent).toHaveBeenCalledWith(CONST.ANALYTICS.EVENT.WORKSPACE_CREATED, 123456, email);
+        expect(GoogleTagManager.publishEvent).toHaveBeenCalledWith(CONST.ANALYTICS.EVENT.WORKSPACE_CREATED.NAME, 123456, email);
     });
 
     test('workspace_created - categorizeTrackedExpense', async () => {
@@ -245,7 +245,7 @@ describe('GoogleTagManagerTest', () => {
 
         // Then we publish a workspace_created event only once
         expect(GoogleTagManager.publishEvent).toHaveBeenCalledTimes(1);
-        expect(GoogleTagManager.publishEvent).toHaveBeenCalledWith('workspace_created', accountID, email);
+        expect(GoogleTagManager.publishEvent).toHaveBeenCalledWith(CONST.ANALYTICS.EVENT.WORKSPACE_CREATED.NAME, accountID, email);
     });
 
     test('paid_adoption - addPaymentCard', async () => {
@@ -262,7 +262,7 @@ describe('GoogleTagManagerTest', () => {
 
         // Then we publish a paid_adoption event only once
         expect(GoogleTagManager.publishEvent).toHaveBeenCalledTimes(1);
-        expect(GoogleTagManager.publishEvent).toHaveBeenCalledWith(CONST.ANALYTICS.EVENT.PAID_ADOPTION, accountID, email);
+        expect(GoogleTagManager.publishEvent).toHaveBeenCalledWith(CONST.ANALYTICS.EVENT.PAID_ADOPTION.NAME, accountID, email);
     });
 
     test('paid_adoption - addSubscriptionPaymentCard', async () => {
@@ -285,7 +285,7 @@ describe('GoogleTagManagerTest', () => {
 
         // Then we publish a paid_adoption event only once
         expect(GoogleTagManager.publishEvent).toHaveBeenCalledTimes(1);
-        expect(GoogleTagManager.publishEvent).toHaveBeenCalledWith(CONST.ANALYTICS.EVENT.PAID_ADOPTION, accountID, email);
+        expect(GoogleTagManager.publishEvent).toHaveBeenCalledWith(CONST.ANALYTICS.EVENT.PAID_ADOPTION.NAME, accountID, email);
     });
 
     it('addSubscriptionPaymentCard when changing payment card, will not publish event paid_adoption', async () => {
