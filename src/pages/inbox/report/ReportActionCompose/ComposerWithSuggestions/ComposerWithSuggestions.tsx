@@ -1,7 +1,7 @@
 import {useIsFocused, useNavigation, useRoute} from '@react-navigation/native';
 import lodashDebounce from 'lodash/debounce';
 import type {Ref, RefObject} from 'react';
-import React, {useCallback, useEffect, useImperativeHandle, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState} from 'react';
 import type {
     BlurEvent,
     LayoutChangeEvent,
@@ -72,8 +72,6 @@ type SyncSelection = {
     position: number;
     value: string;
 };
-
-type NewlyAddedChars = {startIndex: number; endIndex: number; diff: string};
 
 type ComposerWithSuggestionsProps = Partial<ChildrenProps> &
     ForwardedFSClassProps & {
@@ -305,35 +303,42 @@ function ComposerWithSuggestions({
     const isTransitioningToPreExistingReport = useRef(false);
 
     // Callback to clear the transitioning flag - passed to SilentCommentUpdater to avoid prop mutation
-    const handleTransitionToPreExistingReportComplete = () => {
+    const handleTransitionToPreExistingReportComplete = useCallback(() => {
         isTransitioningToPreExistingReport.current = false;
-    };
+    }, []);
 
     const animatedRef = useAnimatedRef<NativeMethods>();
     /**
      * Set the TextInput Ref
      */
-    const setTextInputRef = (el: TextInput) => {
-        if (isFocused) {
-            ReportActionComposeFocusManager.composerRef.current = el;
-        }
-        textInputRef.current = el;
-        if (typeof animatedRef === 'function') {
-            animatedRef(el);
-        }
-    };
+    const setTextInputRef = useCallback(
+        (el: TextInput) => {
+            if (isFocused) {
+                ReportActionComposeFocusManager.composerRef.current = el;
+            }
+            textInputRef.current = el;
+            if (typeof animatedRef === 'function') {
+                animatedRef(el);
+            }
+        },
+        [animatedRef, isFocused],
+    );
 
-    const resetKeyboardInput = () => {
+    const resetKeyboardInput = useCallback(() => {
         if (!RNTextInputReset) {
             return;
         }
         RNTextInputReset.resetKeyboardInput(CONST.COMPOSER.NATIVE_ID);
-    };
+    }, []);
 
-    const debouncedSaveReportComment = lodashDebounce((selectedReportID: string, newComment: string | null) => {
-        saveReportDraftComment(selectedReportID, newComment);
-        isCommentPendingSaved.current = false;
-    }, 1000);
+    const debouncedSaveReportComment = useMemo(
+        () =>
+            lodashDebounce((selectedReportID: string, newComment: string | null) => {
+                saveReportDraftComment(selectedReportID, newComment);
+                isCommentPendingSaved.current = false;
+            }, 1000),
+        [],
+    );
 
     useEffect(() => {
         const switchToCurrentReport = DeviceEventEmitter.addListener(`switchToPreExistingReport_${reportID}`, ({reportToCopyDraftTo, callback}: SwitchToCurrentReportProps) => {
@@ -354,46 +359,6 @@ function ComposerWithSuggestions({
     }, [reportID]);
 
     /**
-     * Find the newly added characters between the previous text and the new text based on the selection.
-     *
-     * @param prevText - The previous text.
-     * @param newText - The new text.
-     * @returns An object containing information about the newly added characters.
-     * @property startIndex - The start index of the newly added characters in the new text.
-     * @property endIndex - The end index of the newly added characters in the new text.
-     * @property diff - The newly added characters.
-     */
-    const findNewlyAddedChars = useCallback(
-        (prevText: string, newText: string): NewlyAddedChars => {
-            let startIndex = -1;
-            let endIndex = -1;
-            let currentIndex = 0;
-
-            // Find the first character mismatch with newText
-            while (currentIndex < newText.length && prevText.charAt(currentIndex) === newText.charAt(currentIndex) && selection.start > currentIndex) {
-                currentIndex++;
-            }
-
-            if (currentIndex < newText.length) {
-                startIndex = currentIndex;
-                const commonSuffixLength = findCommonSuffixLength(prevText, newText, selection?.end ?? 0);
-                // if text is getting pasted over find length of common suffix and subtract it from new text length
-                if (commonSuffixLength > 0 || (selection?.end ?? 0) - selection.start > 0) {
-                    endIndex = newText.length - commonSuffixLength;
-                } else {
-                    endIndex = currentIndex + newText.length;
-                }
-            }
-            return {
-                startIndex,
-                endIndex,
-                diff: newText.substring(startIndex, endIndex),
-            };
-        },
-        [selection.start, selection?.end],
-    );
-
-    /**
      * Update the value of the comment in Onyx
      */
     const updateComment = useCallback(
@@ -406,8 +371,23 @@ function ComposerWithSuggestions({
             const prevSelectionStart = selection?.start ?? 0;
             const prevSelectionEnd = selection?.end ?? 0;
 
-            // detect newly added text (existing helper)
-            const {startIndex, endIndex, diff} = findNewlyAddedChars(prevText, commentValue);
+            // detect newly added text (inlined from findNewlyAddedChars)
+            let startIndex = -1;
+            let endIndex = -1;
+            let currentIndex = 0;
+            while (currentIndex < commentValue.length && prevText.charAt(currentIndex) === commentValue.charAt(currentIndex) && selection.start > currentIndex) {
+                currentIndex++;
+            }
+            if (currentIndex < commentValue.length) {
+                startIndex = currentIndex;
+                const commonSuffixLength = findCommonSuffixLength(prevText, commentValue, selection?.end ?? 0);
+                if (commonSuffixLength > 0 || (selection?.end ?? 0) - selection.start > 0) {
+                    endIndex = commentValue.length - commonSuffixLength;
+                } else {
+                    endIndex = currentIndex + commentValue.length;
+                }
+            }
+            const diff = commentValue.substring(startIndex, endIndex);
 
             // Try to rewrite if this looks like "selected text replaced with a single URL"
             const {text: rewritten, didReplace} = detectAndRewritePaste(prevText, prevSelectionStart, prevSelectionEnd, diff);
@@ -472,7 +452,6 @@ function ComposerWithSuggestions({
             raiseIsScrollLikelyLayoutTriggered,
             selection?.start,
             selection?.end,
-            findNewlyAddedChars,
             preferredSkinTone,
             preferredLocale,
             debouncedSaveReportComment,
@@ -495,119 +474,131 @@ function ComposerWithSuggestions({
         [selection, updateComment],
     );
 
-    const handleKeyPress = (event: TextInputKeyPressEvent) => {
-        const webEvent = event as unknown as KeyboardEvent;
-        if (!webEvent || canSkipTriggerHotkeys(shouldUseNarrowLayout, isKeyboardShown)) {
-            return;
-        }
-
-        if (suggestionsRef.current?.triggerHotkeyActions(webEvent)) {
-            return;
-        }
-
-        // Submit the form when Enter is pressed
-        if (webEvent.key === CONST.KEYBOARD_SHORTCUTS.ENTER.shortcutKey && !webEvent.shiftKey) {
-            webEvent.preventDefault();
-            onEnterKeyPress();
-        }
-
-        // Trigger the edit box for last sent message if ArrowUp is pressed and the comment is empty and Chronos is not in the participants
-        const isEmptyComment = !valueRef.current || !!valueRef.current.match(CONST.REGEX.EMPTY_COMMENT);
-        if (webEvent.key === CONST.KEYBOARD_SHORTCUTS.ARROW_UP.shortcutKey && selection.start <= 0 && isEmptyComment && !includeChronos) {
-            webEvent.preventDefault();
-            if (lastReportAction) {
-                const message = Array.isArray(lastReportAction?.message) ? (lastReportAction?.message?.at(-1) ?? null) : (lastReportAction?.message ?? null);
-                saveReportActionDraft(reportID, lastReportAction, Parser.htmlToMarkdown(message?.html ?? ''));
-            }
-        }
-        // Flag emojis like "Wales" have several code points. Default backspace key action does not remove such flag emojis completely.
-        // so we need to handle backspace key action differently with grapheme segmentation.
-        if (webEvent.key === CONST.KEYBOARD_SHORTCUTS.BACKSPACE.shortcutKey) {
-            if (selection.start === 0) {
-                return;
-            }
-            if (selection.start !== selection.end) {
+    const handleKeyPress = useCallback(
+        (event: TextInputKeyPressEvent) => {
+            const webEvent = event as unknown as KeyboardEvent;
+            if (!webEvent || canSkipTriggerHotkeys(shouldUseNarrowLayout, isKeyboardShown)) {
                 return;
             }
 
-            // Grapheme segmentation is same for English and Spanish.
-            const splitter = new Intl.Segmenter(CONST.LOCALES.EN, {granularity: 'grapheme'});
-
-            // Wales flag has 14 UTF-16 code units. This is the emoji with the largest number of UTF-16 code units we use.
-            const start = Math.max(0, selection.start - 14);
-            const graphemes = Array.from(splitter.segment(lastTextRef.current.substring(start, selection.start)));
-            const lastGrapheme = graphemes.at(graphemes.length - 1);
-            const lastGraphemeLength = lastGrapheme?.segment.length ?? 0;
-            if (lastGraphemeLength > 1) {
-                event.preventDefault();
-                const newText = lastTextRef.current.slice(0, selection.start - lastGraphemeLength) + lastTextRef.current.slice(selection.start);
-                setSelection((prevSelection) => ({
-                    start: selection.start - lastGraphemeLength,
-                    end: selection.start - lastGraphemeLength,
-                    positionX: prevSelection.positionX,
-                    positionY: prevSelection.positionY,
-                }));
-                updateComment(newText, true);
+            if (suggestionsRef.current?.triggerHotkeyActions(webEvent)) {
+                return;
             }
-        }
-    };
+
+            // Submit the form when Enter is pressed
+            if (webEvent.key === CONST.KEYBOARD_SHORTCUTS.ENTER.shortcutKey && !webEvent.shiftKey) {
+                webEvent.preventDefault();
+                onEnterKeyPress();
+            }
+
+            // Trigger the edit box for last sent message if ArrowUp is pressed and the comment is empty and Chronos is not in the participants
+            const isEmptyComment = !valueRef.current || !!valueRef.current.match(CONST.REGEX.EMPTY_COMMENT);
+            if (webEvent.key === CONST.KEYBOARD_SHORTCUTS.ARROW_UP.shortcutKey && selection.start <= 0 && isEmptyComment && !includeChronos) {
+                webEvent.preventDefault();
+                if (lastReportAction) {
+                    const message = Array.isArray(lastReportAction?.message) ? (lastReportAction?.message?.at(-1) ?? null) : (lastReportAction?.message ?? null);
+                    saveReportActionDraft(reportID, lastReportAction, Parser.htmlToMarkdown(message?.html ?? ''));
+                }
+            }
+            // Flag emojis like "Wales" have several code points. Default backspace key action does not remove such flag emojis completely.
+            // so we need to handle backspace key action differently with grapheme segmentation.
+            if (webEvent.key === CONST.KEYBOARD_SHORTCUTS.BACKSPACE.shortcutKey) {
+                if (selection.start === 0) {
+                    return;
+                }
+                if (selection.start !== selection.end) {
+                    return;
+                }
+
+                // Grapheme segmentation is same for English and Spanish.
+                const splitter = new Intl.Segmenter(CONST.LOCALES.EN, {granularity: 'grapheme'});
+
+                // Wales flag has 14 UTF-16 code units. This is the emoji with the largest number of UTF-16 code units we use.
+                const start = Math.max(0, selection.start - 14);
+                const graphemes = Array.from(splitter.segment(lastTextRef.current.substring(start, selection.start)));
+                const lastGrapheme = graphemes.at(graphemes.length - 1);
+                const lastGraphemeLength = lastGrapheme?.segment.length ?? 0;
+                if (lastGraphemeLength > 1) {
+                    event.preventDefault();
+                    const newText = lastTextRef.current.slice(0, selection.start - lastGraphemeLength) + lastTextRef.current.slice(selection.start);
+                    setSelection((prevSelection) => ({
+                        start: selection.start - lastGraphemeLength,
+                        end: selection.start - lastGraphemeLength,
+                        positionX: prevSelection.positionX,
+                        positionY: prevSelection.positionY,
+                    }));
+                    updateComment(newText, true);
+                }
+            }
+        },
+        [shouldUseNarrowLayout, isKeyboardShown, suggestionsRef, selection.start, includeChronos, onEnterKeyPress, lastReportAction, reportID, updateComment, selection.end],
+    );
 
     /**
      * Once we cleared the input and the composer finished rendering, we need to reset the manual height value.
      * After that, the composer will adjust it's height based on it's parent flex layout.
      */
-    const clearComposerHeight = () => {
+    const clearComposerHeight = useCallback(() => {
         if (composerHeightAfterClear == null) {
             return;
         }
         setDefaultComposerHeight(null);
-    };
+    }, [composerHeightAfterClear]);
 
-    const onChangeText = (commentValue: string) => {
-        // When we clear the input, we set the composer height to a specific value.
-        // Upon text change, we can reset the height to allow flex layout to adjust the height.
-        clearComposerHeight();
+    const onChangeText = useCallback(
+        (commentValue: string) => {
+            // When we clear the input, we set the composer height to a specific value.
+            // Upon text change, we can reset the height to allow flex layout to adjust the height.
+            clearComposerHeight();
 
-        updateComment(commentValue, true);
+            updateComment(commentValue, true);
 
-        if (isIOSNative && syncSelectionWithOnChangeTextRef.current) {
-            const positionSnapshot = syncSelectionWithOnChangeTextRef.current.position;
-            syncSelectionWithOnChangeTextRef.current = null;
+            if (isIOSNative && syncSelectionWithOnChangeTextRef.current) {
+                const positionSnapshot = syncSelectionWithOnChangeTextRef.current.position;
+                syncSelectionWithOnChangeTextRef.current = null;
 
-            // ensure that selection is set imperatively after all state changes are effective
-            // eslint-disable-next-line @typescript-eslint/no-deprecated
-            InteractionManager.runAfterInteractions(() => {
-                // note: this implementation is only available on non-web RN, thus the wrapping
-                // 'if' block contains a redundant (since the ref is only used on iOS) platform check
-                textInputRef.current?.setSelection(positionSnapshot, positionSnapshot);
-            });
-        }
-    };
+                // ensure that selection is set imperatively after all state changes are effective
+                // eslint-disable-next-line @typescript-eslint/no-deprecated
+                InteractionManager.runAfterInteractions(() => {
+                    // note: this implementation is only available on non-web RN, thus the wrapping
+                    // 'if' block contains a redundant (since the ref is only used on iOS) platform check
+                    textInputRef.current?.setSelection(positionSnapshot, positionSnapshot);
+                });
+            }
+        },
+        [clearComposerHeight, updateComment],
+    );
 
-    const onSelectionChange = (e: CustomSelectionChangeEvent) => {
-        setSelection(e.nativeEvent.selection);
+    const onSelectionChange = useCallback(
+        (e: CustomSelectionChangeEvent) => {
+            setSelection(e.nativeEvent.selection);
 
-        if (!textInputRef.current?.isFocused()) {
-            return;
-        }
-        suggestionsRef.current?.onSelectionChange?.(e);
-    };
+            if (!textInputRef.current?.isFocused()) {
+                return;
+            }
+            suggestionsRef.current?.onSelectionChange?.(e);
+        },
+        [suggestionsRef],
+    );
 
-    const hideSuggestionMenu = (e: TextInputScrollEvent) => {
-        mobileInputScrollPosition.current = e?.nativeEvent?.contentOffset?.y ?? 0;
-        if (!suggestionsRef.current || isScrollLikelyLayoutTriggered.current) {
-            return;
-        }
-        suggestionsRef.current.updateShouldShowSuggestionMenuToFalse(false);
-    };
+    const hideSuggestionMenu = useCallback(
+        (e: TextInputScrollEvent) => {
+            mobileInputScrollPosition.current = e?.nativeEvent?.contentOffset?.y ?? 0;
+            if (!suggestionsRef.current || isScrollLikelyLayoutTriggered.current) {
+                return;
+            }
+            suggestionsRef.current.updateShouldShowSuggestionMenuToFalse(false);
+        },
+        [suggestionsRef, isScrollLikelyLayoutTriggered],
+    );
 
-    const setShouldBlockSuggestionCalcToFalse = () => {
+    const setShouldBlockSuggestionCalcToFalse = useCallback(() => {
         if (!suggestionsRef.current) {
             return false;
         }
         inputFocusChange(false);
         return suggestionsRef.current.setShouldBlockSuggestionCalc(false);
-    };
+    }, [suggestionsRef]);
 
     /**
      * Focus the composer text input
@@ -650,24 +641,18 @@ function ComposerWithSuggestions({
     }, [focus, route.key, shouldAutoFocus, shouldDelayAutoFocus]);
 
     /**
-     * Tracks whether there is a composer input inside the side panel on the screen.
-     */
-    const handleSidePanelFocus = useCallback(() => {
-        if (!isInSidePanel) {
-            ReportActionComposeFocusManager.sidePanelComposerRef.current = null;
-        } else {
-            ReportActionComposeFocusManager.sidePanelComposerRef.current = textInputRef.current;
-        }
-    }, [isInSidePanel]);
-
-    /**
      * Set focus callback
      * @param shouldTakeOverFocus - Whether this composer should gain focus priority
      */
     const setUpComposeFocusManager = useCallback(
         (shouldTakeOverFocus = false) => {
             ReportActionComposeFocusManager.onComposerFocus((shouldFocusForNonBlurInputOnTapOutside = false) => {
-                handleSidePanelFocus();
+                // Tracks whether there is a composer input inside the side panel on the screen.
+                if (!isInSidePanel) {
+                    ReportActionComposeFocusManager.sidePanelComposerRef.current = null;
+                } else {
+                    ReportActionComposeFocusManager.sidePanelComposerRef.current = textInputRef.current;
+                }
                 if ((!willBlurTextInputOnTapOutside && !shouldFocusForNonBlurInputOnTapOutside) || !isFocused || !isSidePanelHiddenOrLargeScreen) {
                     return;
                 }
@@ -675,7 +660,7 @@ function ComposerWithSuggestions({
                 focus(true);
             }, shouldTakeOverFocus);
         },
-        [focus, handleSidePanelFocus, isFocused, isSidePanelHiddenOrLargeScreen],
+        [focus, isInSidePanel, isFocused, isSidePanelHiddenOrLargeScreen],
     );
 
     /**
@@ -822,12 +807,15 @@ function ComposerWithSuggestions({
         onValueChange(value);
     }, [onValueChange, value]);
 
-    const onClear = (text: string) => {
-        mobileInputScrollPosition.current = 0;
-        // Note: use the value when the clear happened, not the current value which might have changed already
-        onClearProp(text);
-        updateComment('', true);
-    };
+    const onClear = useCallback(
+        (text: string) => {
+            mobileInputScrollPosition.current = 0;
+            // Note: use the value when the clear happened, not the current value which might have changed already
+            onClearProp(text);
+            updateComment('', true);
+        },
+        [onClearProp, updateComment],
+    );
 
     useEffect(() => {
         // We use the tag to store the native ID of the text input. Later, we use it in onSelectionChange to pick up the proper text input data.
@@ -849,51 +837,62 @@ function ComposerWithSuggestions({
         },
         [],
     );
-    const measureParentContainerAndReportCursor = (callback: MeasureParentContainerAndCursorCallback) => {
-        const {scrollValue} = getScrollPosition({mobileInputScrollPosition, textInputRef});
-        const {x: xPosition, y: yPosition} = getCursorPosition({positionOnMobile: cursorPositionValue.get(), positionOnWeb: selection});
-        measureParentContainer((x, y, width, height) => {
-            callback({
-                x,
-                y,
-                width,
-                height,
-                scrollValue,
-                cursorCoordinates: {x: xPosition, y: yPosition},
+    const measureParentContainerAndReportCursor = useCallback(
+        (callback: MeasureParentContainerAndCursorCallback) => {
+            const {scrollValue} = getScrollPosition({mobileInputScrollPosition, textInputRef});
+            const {x: xPosition, y: yPosition} = getCursorPosition({positionOnMobile: cursorPositionValue.get(), positionOnWeb: selection});
+            measureParentContainer((x, y, width, height) => {
+                callback({
+                    x,
+                    y,
+                    width,
+                    height,
+                    scrollValue,
+                    cursorCoordinates: {x: xPosition, y: yPosition},
+                });
             });
-        });
-    };
+        },
+        [measureParentContainer, cursorPositionValue, selection],
+    );
 
     const isTouchEndedRef = useRef(false);
     const containerComposeStyles = StyleSheet.flatten(StyleUtils.getContainerComposeStyles());
 
-    const handleContentSizeChange = (e: TextInputContentSizeChangeEvent) => {
-        const paddingTopAndBottom = (containerComposeStyles.paddingVertical as number) * 2;
-        const inputHeight = e.nativeEvent.contentSize.height;
-        const totalHeight = inputHeight + paddingTopAndBottom;
+    const handleContentSizeChange = useCallback(
+        (e: TextInputContentSizeChangeEvent) => {
+            const paddingTopAndBottom = (containerComposeStyles.paddingVertical as number) * 2;
+            const inputHeight = e.nativeEvent.contentSize.height;
+            const totalHeight = inputHeight + paddingTopAndBottom;
 
-        // When we clear the input, we set the composer height to a specific value.
-        // Upon any content size change, we can reset the height to allow flex layout to adjust the height.
-        clearComposerHeight();
+            // When we clear the input, we set the composer height to a specific value.
+            // Upon any content size change, we can reset the height to allow flex layout to adjust the height.
+            clearComposerHeight();
 
-        // Store the default collapsed composer height, so we can later reset the height when we clear the input.
-        if (emptyComposerHeightRef.current === null && inputHeight > 0 && !valueRef.current.includes('\n')) {
-            emptyComposerHeightRef.current = inputHeight;
+            // Store the default collapsed composer height, so we can later reset the height when we clear the input.
+            if (emptyComposerHeightRef.current === null && inputHeight > 0 && !valueRef.current.includes('\n')) {
+                emptyComposerHeightRef.current = inputHeight;
+            }
+
+            const isFullComposerAvailable = totalHeight >= CONST.COMPOSER.FULL_COMPOSER_MIN_HEIGHT;
+            setIsFullComposerAvailable?.(isFullComposerAvailable);
+        },
+        [containerComposeStyles.paddingVertical, clearComposerHeight, setIsFullComposerAvailable],
+    );
+
+    const handleFocus = useCallback(() => {
+        // Tracks whether there is a composer input inside the side panel on the screen.
+        if (!isInSidePanel) {
+            ReportActionComposeFocusManager.sidePanelComposerRef.current = null;
+        } else {
+            ReportActionComposeFocusManager.sidePanelComposerRef.current = textInputRef.current;
         }
-
-        const isFullComposerAvailable = totalHeight >= CONST.COMPOSER.FULL_COMPOSER_MIN_HEIGHT;
-        setIsFullComposerAvailable?.(isFullComposerAvailable);
-    };
-
-    const handleFocus = () => {
-        handleSidePanelFocus();
         setUpComposeFocusManager(!isInSidePanel);
         onFocus();
-    };
+    }, [setUpComposeFocusManager, isInSidePanel, onFocus]);
 
     // When using the suggestions box (Suggestions) we need to imperatively
     // set the cursor to the end of the suggestion/mention after it's selected.
-    const onSuggestionSelected = (suggestionSelection: TextSelection) => {
+    const onSuggestionSelected = useCallback((suggestionSelection: TextSelection) => {
         const endOfSuggestionSelection = suggestionSelection.end;
         setSelection(suggestionSelection);
 
@@ -904,7 +903,7 @@ function ComposerWithSuggestions({
         queueMicrotask(() => {
             textInputRef.current?.setSelection?.(endOfSuggestionSelection, endOfSuggestionSelection);
         });
-    };
+    }, []);
 
     return (
         <>
