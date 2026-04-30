@@ -782,7 +782,6 @@ function payMoneyRequest(params: PayMoneyRequestFunctionParams) {
     return payMoneyRequestParams.optimisticHoldReportID;
 }
 
-
 function markReportPaymentReceived(
     chatReport: OnyxEntry<OnyxTypes.Report>,
     iouReport: OnyxEntry<OnyxTypes.Report>,
