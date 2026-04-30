@@ -154,6 +154,8 @@ const WRITE_COMMANDS = {
     ADD_MEMBERS_TO_WORKSPACE: 'AddMembersToWorkspace',
     UPDATE_WORKSPACE_AVATAR: 'UpdateWorkspaceAvatar',
     DELETE_WORKSPACE_AVATAR: 'DeleteWorkspaceAvatar',
+    UPDATE_POLICY_RULES_DOCUMENT: 'UpdatePolicyRulesDocument',
+    DELETE_POLICY_RULES_DOCUMENT: 'DeletePolicyRulesDocument',
     UPDATE_WORKSPACE_GENERAL_SETTINGS: 'UpdateWorkspaceGeneralSettings',
     UPDATE_WORKSPACE_DESCRIPTION: 'UpdateWorkspaceDescription',
     UPDATE_WORKSPACE_CLIENT_ID: 'UpdateWorkspaceClientID',
@@ -582,6 +584,7 @@ const WRITE_COMMANDS = {
     INITIATE_BANK_ACCOUNT_UNLOCK: 'InitiateBankAccountUnlock',
     CHANGE_DOMAIN_SECURITY_GROUP: 'ChangeDomainSecurityGroup',
     UPDATE_DOMAIN_SECURITY_GROUP: 'UpdateDomainSecurityGroupForNewDot',
+    SET_DEFAULT_DOMAIN_SECURITY_GROUP: 'SetDefaultDomainSecurityGroup',
 } as const;
 
 type WriteCommand = ValueOf<typeof WRITE_COMMANDS>;
@@ -728,6 +731,8 @@ type WriteCommandParameters = {
     [WRITE_COMMANDS.ADD_MEMBERS_TO_WORKSPACE]: Parameters.AddMembersToWorkspaceParams;
     [WRITE_COMMANDS.UPDATE_WORKSPACE_AVATAR]: Parameters.UpdateWorkspaceAvatarParams;
     [WRITE_COMMANDS.DELETE_WORKSPACE_AVATAR]: Parameters.DeleteWorkspaceAvatarParams;
+    [WRITE_COMMANDS.UPDATE_POLICY_RULES_DOCUMENT]: Parameters.UpdatePolicyRulesDocumentParams;
+    [WRITE_COMMANDS.DELETE_POLICY_RULES_DOCUMENT]: Parameters.DeletePolicyRulesDocumentParams;
     [WRITE_COMMANDS.UPDATE_WORKSPACE_GENERAL_SETTINGS]: Parameters.UpdateWorkspaceGeneralSettingsParams;
     [WRITE_COMMANDS.UPDATE_WORKSPACE_DESCRIPTION]: Parameters.UpdateWorkspaceDescriptionParams;
     [WRITE_COMMANDS.UPDATE_WORKSPACE_CLIENT_ID]: Parameters.UpdateWorkspaceClientIDParams;
@@ -1181,6 +1186,7 @@ type WriteCommandParameters = {
     [WRITE_COMMANDS.EXPORT_DOMAIN_MEMBERS_CSV]: Parameters.ExportDomainMembersCSVParams;
     [WRITE_COMMANDS.CHANGE_DOMAIN_SECURITY_GROUP]: Parameters.ChangeDomainSecurityGroupParams;
     [WRITE_COMMANDS.UPDATE_DOMAIN_SECURITY_GROUP]: Parameters.UpdateDomainSecurityGroupParams;
+    [WRITE_COMMANDS.SET_DEFAULT_DOMAIN_SECURITY_GROUP]: Parameters.SetDefaultDomainSecurityGroupParams;
 };
 
 const READ_COMMANDS = {

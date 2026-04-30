@@ -110,7 +110,6 @@ import type {FormulaContext} from './Formula';
 import getBase62ReportID from './getBase62ReportID';
 import {isReportMessageAttachment} from './isReportMessageAttachment';
 import {formatPhoneNumber as formatPhoneNumberPhoneUtils} from './LocalePhoneNumber';
-// eslint-disable-next-line @typescript-eslint/no-deprecated
 import {translateLocal} from './Localize';
 import Log from './Log';
 import {isEmailPublicDomain} from './LoginUtils';
@@ -919,11 +918,6 @@ type Ancestor = {
     shouldDisplayNewMarker: boolean;
 };
 
-type AncestorIDs = {
-    reportIDs: string[];
-    reportActionsIDs: string[];
-};
-
 type MissingPaymentMethod = 'bankAccount' | 'wallet';
 
 type OutstandingChildRequest = {
@@ -1201,6 +1195,15 @@ Onyx.connect({
             const [, id] = reportID.split('_');
             allReportMetadataKeyValue[id] = reportMetadata;
         }
+    },
+});
+
+// See findLastAccessedReport — non-UI, module-scoped intentionally.
+let allReportLastVisitTimes: Record<string, string> = {};
+Onyx.connectWithoutView({
+    key: ONYXKEYS.REPORT_LAST_VISIT_TIMES,
+    callback: (value) => {
+        allReportLastVisitTimes = value ?? {};
     },
 });
 
@@ -2231,14 +2234,14 @@ function hasExpensifyGuidesEmails(accountIDs: number[]): boolean {
     return accountIDs.some((accountID) => Str.extractEmailDomain(allPersonalDetails?.[accountID]?.login ?? '') === CONST.EMAIL.GUIDES_DOMAIN);
 }
 
-function getMostRecentlyVisitedReport(reports: Array<OnyxEntry<Report>>, reportMetadata: OnyxCollection<ReportMetadata>): OnyxEntry<Report> {
+function getMostRecentlyVisitedReport(reports: Array<OnyxEntry<Report>>, lastVisitTimes: Record<string, string>): OnyxEntry<Report> {
     const filteredReports = reports.filter((report) => {
         if (!report?.isPinned && isHiddenForCurrentUser(report)) {
             return false;
         }
-        return !!report?.reportID && !!(reportMetadata?.[`${ONYXKEYS.COLLECTION.REPORT_METADATA}${report.reportID}`]?.lastVisitTime ?? report?.lastReadTime);
+        return !!report?.reportID && !!(lastVisitTimes?.[report.reportID] ?? report?.lastReadTime);
     });
-    return lodashMaxBy(filteredReports, (a) => [reportMetadata?.[`${ONYXKEYS.COLLECTION.REPORT_METADATA}${a?.reportID}`]?.lastVisitTime ?? '', a?.lastReadTime ?? '']);
+    return lodashMaxBy(filteredReports, (a) => [(a?.reportID && lastVisitTimes?.[a.reportID]) ?? '', a?.lastReadTime ?? '']);
 }
 
 /**
@@ -2287,9 +2290,9 @@ function findLastAccessedReport(ignoreDomainRooms: boolean, openOnAdminRoom = fa
         }) ?? [];
 
     // At least two reports remain: self DM and Concierge chat.
-    // Return the most recently visited report. Get the last read report from the report metadata.
-    // If allReportMetadata is empty we'll return most recent report owned by user
-    if (isEmptyObject(allReportMetadata)) {
+    // Return the most recently visited report. Get the last read report from the last-visit-times map.
+    // If we have no visit data we'll return most recent report owned by user.
+    if (isEmptyObject(allReportLastVisitTimes)) {
         const visibleReports = reportsValues.filter((report) => !!report?.isPinned || !isHiddenForCurrentUser(report));
         const ownedReports = visibleReports.filter((report) => report?.ownerAccountID === deprecatedCurrentUserAccountID);
         if (ownedReports.length > 0) {
@@ -2297,7 +2300,7 @@ function findLastAccessedReport(ignoreDomainRooms: boolean, openOnAdminRoom = fa
         }
         return lodashMaxBy(reportsValues, (a) => a?.lastReadTime ?? '');
     }
-    return getMostRecentlyVisitedReport(reportsValues, allReportMetadata);
+    return getMostRecentlyVisitedReport(reportsValues, allReportLastVisitTimes);
 }
 
 /**
@@ -2346,7 +2349,7 @@ function isArchivedNonExpenseReport(report: OnyxInputOrEntry<Report>, isReportAr
 /**
  * Whether the provided report is an archived report
  */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+
 function isArchivedReport(reportNameValuePairs?: OnyxInputOrEntry<ReportNameValuePairs>): boolean {
     return !!reportNameValuePairs?.private_isArchived;
 }
@@ -2603,7 +2606,6 @@ function isOneTransactionThread(report: OnyxEntry<Report>, parentReport: OnyxEnt
  * Checks if given report is a transaction thread
  */
 function isReportTransactionThread(report: OnyxEntry<Report>) {
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
     return isMoneyRequest(report) || isTrackExpenseReport(report);
 }
 
@@ -2985,10 +2987,10 @@ function getAddExpenseDropdownOptions({
             },
         },
         {
-            value: CONST.REPORT.ADD_EXPENSE_OPTIONS.ADD_UNREPORTED_EXPENSE,
-            text: translate('iou.addUnreportedExpense'),
+            value: CONST.REPORT.ADD_EXPENSE_OPTIONS.ADD_EXISTING_EXPENSE,
+            text: translate('iou.addExistingExpense'),
             icon: icons.ReceiptPlus,
-            sentryLabel: CONST.SENTRY_LABEL.MORE_MENU.ADD_EXPENSE_UNREPORTED,
+            sentryLabel: CONST.SENTRY_LABEL.MORE_MENU.ADD_EXPENSE_EXISTING,
             onSelected: () => {
                 if (policy && shouldRestrictUserBillableActions(policy, ownerBillingGracePeriodEnd, userBillingGracePeriodEnds, amountOwed)) {
                     Navigation.navigate(ROUTES.RESTRICTED_ACTION.getRoute(policy.id));
@@ -3894,7 +3896,7 @@ function getDisplayNamesWithTooltips(
     return personalDetailsListArray
         .map((user) => {
             const accountID = Number(user?.accountID);
-            // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+
             const displayName =
                 getDisplayNameForParticipant({accountID, shouldUseShortForm, shouldFallbackToHidden, shouldAddCurrentUserPostfix, formatPhoneNumber}) ||
                 // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
@@ -5062,7 +5064,6 @@ function canEditReportAction(reportAction: OnyxInputOrEntry<ReportAction>, linke
 }
 
 function canModifyHoldStatus(report: Report, reportAction: ReportAction, currentUserAccountID: number | undefined): boolean {
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
     if (!isMoneyRequestReport(report) || isTrackExpenseReport(report)) {
         return false;
     }
@@ -5101,7 +5102,7 @@ function canHoldUnholdReportAction(
     const isApproved = isReportApproved({report});
     const isRequestIOU = isIOUReport(report);
     const isHoldActionCreator = isActionCreator(holdReportAction);
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
+
     const isTrackExpenseMoneyReport = isTrackExpenseReport(report);
     const isActionOwner = isActionCreator(reportAction);
     const isApprover = isMoneyRequestReport(report) && report.managerID !== null && currentUserAccountID === report?.managerID;
@@ -5631,7 +5632,6 @@ function getModifiedExpenseOriginalMessage(
     }
 
     if (
-        // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
         ('customUnitRateID' in transactionChanges && updatedTransaction?.comment?.customUnit?.customUnitRateID) ||
         ('distance' in transactionChanges && updatedTransaction?.comment?.customUnit?.quantity)
     ) {
@@ -5728,7 +5728,7 @@ function parseReportActionHtmlToText(reportAction: OnyxEntry<ReportAction>, repo
     for (const match of matches) {
         if (match[1] !== childReportID) {
             // This will be fixed as follow up https://github.com/Expensify/App/pull/75357
-            // eslint-disable-next-line @typescript-eslint/no-use-before-define, @typescript-eslint/no-deprecated
+            // eslint-disable-next-line @typescript-eslint/no-deprecated
             reportIDToName[match[1]] = getReportName({report: getReportOrDraftReport(match[1]), conciergeReportID}) ?? '';
         }
     }
@@ -6103,7 +6103,7 @@ function getParentNavigationSubtitle(
         const ownerAccountID = report?.ownerAccountID;
         const personalDetails = ownerAccountID ? allPersonalDetails?.[ownerAccountID] : undefined;
         const login = personalDetails ? personalDetails.login : null;
-        // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+
         const reportOwnerDisplayName = getDisplayNameForParticipant({accountID: ownerAccountID, shouldRemoveDomain: true, formatPhoneNumber: formatPhoneNumberPhoneUtils}) || login;
 
         if (isExpenseReport(report)) {
@@ -6728,7 +6728,7 @@ function computeOptimisticReportName(report: Report, policy: OnyxEntry<Policy>, 
     };
 
     // We use dynamic require here to avoid a circular dependency between ReportUtils and Formula
-    // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
+
     const Formula = require('./Formula') as {compute: (formula?: string, context?: FormulaContext) => string};
 
     // If there is no title field, use "New Report" as default (matches OldDot behavior)
@@ -9082,7 +9082,6 @@ function canAccessReport(report: OnyxEntry<Report>, betas: OnyxEntry<Beta[]>, is
     return true;
 }
 
-// eslint-disable-next-line rulesdir/no-negated-variables
 function isReportNotFound(report: OnyxEntry<Report>): boolean {
     return !!report?.errorFields?.notFound;
 }
@@ -9349,6 +9348,17 @@ function shouldBlockSubmitDueToStrictPolicyRules(
     return hasAnyViolations(reportID, transactionViolations, currentUserAccountIDParam, currentUserEmailParam, reportTransactions);
 }
 
+function shouldBlockSubmitDueToPreventSelfApproval(report: OnyxEntry<Report>, policy: OnyxEntry<Policy>): boolean {
+    if (!policy?.preventSelfApproval) {
+        return false;
+    }
+
+    const nextApproverAccountID = getNextApproverAccountID(report);
+    const isSubmitterSameAsNextApprover = isReportOwner(report) && nextApproverAccountID === report?.ownerAccountID;
+    const isSubmitterSameAsApprover = isReportOwner(report) && (report?.managerID === report?.ownerAccountID || nextApproverAccountID === report?.ownerAccountID);
+    return (isSubmitterSameAsNextApprover && isOpenExpenseReport(report)) || (isSubmitterSameAsApprover && isProcessingReport(report));
+}
+
 type ReportErrorsAndReportActionThatRequiresAttention = {
     errors: ErrorFields;
     reportAction?: OnyxEntry<ReportAction>;
@@ -9590,7 +9600,7 @@ function reasonForReportToBeInOptionList({
     }
 
     // Include reports that are relevant to the user in any view mode. Criteria include having a draft or having a GBR showing.
-    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+
     if (draftComment) {
         return CONST.REPORT_IN_LHN_REASONS.HAS_DRAFT_COMMENT;
     }
@@ -10970,48 +10980,6 @@ function shouldExcludeAncestorReportAction(ancestorReportAction: ReportAction, i
     return isReportPreviewAction(ancestorReportAction);
 }
 
-function getAllAncestorReportActionIDs(report: Report | null | undefined, includeTransactionThread = false): AncestorIDs {
-    if (!report) {
-        return {
-            reportIDs: [],
-            reportActionsIDs: [],
-        };
-    }
-
-    const allAncestorIDs: AncestorIDs = {
-        reportIDs: [],
-        reportActionsIDs: [],
-    };
-    let parentReportID = report.parentReportID;
-    let parentReportActionID = report.parentReportActionID;
-
-    while (parentReportID) {
-        const parentReport = getReportOrDraftReport(parentReportID);
-        const parentReportAction = getReportAction(parentReportID, parentReportActionID);
-
-        if (
-            !parentReportAction ||
-            (!includeTransactionThread && ((isTransactionThread(parentReportAction) && !isSentMoneyReportAction(parentReportAction)) || isReportPreviewAction(parentReportAction)))
-        ) {
-            break;
-        }
-
-        allAncestorIDs.reportIDs.push(parentReportID);
-        if (parentReportActionID) {
-            allAncestorIDs.reportActionsIDs.push(parentReportActionID);
-        }
-
-        if (!parentReport) {
-            break;
-        }
-
-        parentReportID = parentReport?.parentReportID;
-        parentReportActionID = parentReport?.parentReportActionID;
-    }
-
-    return allAncestorIDs;
-}
-
 /**
  * Traverses up the report hierarchy with the `parentReportID` until the root report,
  * then returns the ancestor reports and their associated actions based on `parentReportActionID`.
@@ -11057,51 +11025,6 @@ function getAncestors(
     }
 
     return ancestors;
-}
-
-/**
- * Get optimistic data of the parent report action
- * @param report The report that is updated
- * @param lastVisibleActionCreated Last visible action created of the child report
- * @param type The type of action in the child report
- */
-function getOptimisticDataForParentReportAction(
-    report: Report | undefined,
-    lastVisibleActionCreated: string,
-    type: string,
-): Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS> | null> {
-    if (!report || isEmptyObject(report)) {
-        return [];
-    }
-
-    const ancestors = getAllAncestorReportActionIDs(report, true);
-    const totalAncestor = ancestors.reportIDs.length;
-
-    let previousActionDeleted = false;
-    return Array.from(Array(totalAncestor), (_, index) => {
-        const ancestorReport = getReportOrDraftReport(ancestors.reportIDs.at(index));
-
-        if (!ancestorReport || isEmptyObject(ancestorReport)) {
-            return null;
-        }
-
-        const ancestorReportAction = getReportAction(ancestorReport.reportID, ancestors.reportActionsIDs.at(index) ?? '');
-
-        if (!ancestorReportAction?.reportActionID || isEmptyObject(ancestorReportAction)) {
-            return null;
-        }
-        const updatedReportAction = updateOptimisticParentReportAction(ancestorReportAction, lastVisibleActionCreated, type, previousActionDeleted ? index + 1 : undefined);
-
-        previousActionDeleted = isDeletedAction(ancestorReportAction) && updatedReportAction.childVisibleActionCount === 0;
-
-        return {
-            onyxMethod: Onyx.METHOD.MERGE,
-            key: `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${ancestorReport.reportID}`,
-            value: {
-                [ancestorReportAction.reportActionID]: updatedReportAction,
-            },
-        };
-    });
 }
 
 /**
@@ -11736,15 +11659,17 @@ function prepareOnboardingOnyxData({
         onboardingMessage = getOnboardingMessages().onboardingMessages[CONST.ONBOARDING_CHOICES.SUBMIT];
     }
 
-    // Only the MANAGE_TEAM onboarding action uses the #admins room (with a guide); TRACK_WORKSPACE uses Concierge. Excludes emails that have a '+'.
-    const shouldPostTasksInAdminsRoom = isPostingTasksInAdminsRoom(engagementChoice);
     // Phase 1 cohort (MANAGE_TEAM + micro company size) bypasses the beta gate — the backend
     // handles gating via NVP, so all micro users get followups without needing the beta flag.
     // Includes MICRO_SMALL, MICRO_MEDIUM, and the deprecated MICRO for backwards compatibility.
     const isPhase1Cohort =
         companySize === CONST.ONBOARDING_COMPANY_SIZE.MICRO_SMALL || companySize === CONST.ONBOARDING_COMPANY_SIZE.MICRO_MEDIUM || companySize === CONST.ONBOARDING_COMPANY_SIZE.MICRO;
-    // When posting to admins room and the user is in the suggestedFollowups beta (or Phase 1 cohort), we skip tasks in favor of backend-generated followups.
-    const shouldUseFollowupsInsteadOfTasks = shouldPostTasksInAdminsRoom && (Permissions.isBetaEnabled(CONST.BETAS.SUGGESTED_FOLLOWUPS, betas, betaConfiguration) || isPhase1Cohort);
+    // Followups path: MANAGE_TEAM + (Phase 1 cohort OR suggestedFollowups beta). Reaches every
+    // MANAGE_TEAM cohort user, including `+` aliases and phone-primary sign-ups.
+    const shouldUseFollowupsInsteadOfTasks =
+        engagementChoice === CONST.ONBOARDING_CHOICES.MANAGE_TEAM && (isPhase1Cohort || Permissions.isBetaEnabled(CONST.BETAS.SUGGESTED_FOLLOWUPS, betas, betaConfiguration));
+    // Post to #admins room when followups fire OR the existing tasks-in-admins predicate approves.
+    const shouldPostTasksInAdminsRoom = shouldUseFollowupsInsteadOfTasks || isPostingTasksInAdminsRoom(engagementChoice);
     const adminsChatReport = deprecatedAllReports?.[`${ONYXKEYS.COLLECTION.REPORT}${adminsChatReportID}`];
     const conciergeChat =
         getChatByParticipants([CONST.ACCOUNT_ID.CONCIERGE, deprecatedCurrentUserAccountID ?? CONST.DEFAULT_NUMBER_ID], deprecatedAllReports, false) ??
@@ -12697,7 +12622,7 @@ function doesReportContainRequestsFromMultipleUsers(iouReport: OnyxEntry<Report>
     const transactions = getReportTransactions(iouReport?.reportID).filter(
         (transaction) => !shouldExcludeDeletedTransactions || transaction.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE,
     );
-    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+
     return isIOUReport(iouReport) && transactions.some((transaction) => (Number(transaction?.modifiedAmount) || transaction?.amount) <= 0);
 }
 
@@ -13325,6 +13250,7 @@ const sortableColumnNames = [
     CONST.SEARCH.TABLE_COLUMNS.CATEGORY,
     CONST.SEARCH.TABLE_COLUMNS.TAG,
     CONST.SEARCH.TABLE_COLUMNS.TOTAL_AMOUNT,
+    CONST.SEARCH.TABLE_COLUMNS.TOTAL,
     CONST.SEARCH.TABLE_COLUMNS.REIMBURSABLE,
     CONST.SEARCH.TABLE_COLUMNS.BILLABLE,
     CONST.SEARCH.TABLE_COLUMNS.EXCHANGE_RATE,
@@ -13359,6 +13285,8 @@ function getTransactionSortValue(transaction: Transaction, key: SortableColumnNa
             return getTag(transaction);
         case CONST.SEARCH.TABLE_COLUMNS.TOTAL_AMOUNT:
             return getTransactionAmount(transaction, isExpenseReport(report), transaction.reportID === CONST.REPORT.UNREPORTED_REPORT_ID);
+        case CONST.SEARCH.TABLE_COLUMNS.TOTAL:
+            return Math.abs(transaction.convertedAmount ?? 0);
         case CONST.SEARCH.TABLE_COLUMNS.DESCRIPTION:
             return Parser.htmlToText(transaction.comment?.comment ?? '');
         case CONST.SEARCH.TABLE_COLUMNS.REIMBURSABLE:
@@ -13500,7 +13428,6 @@ export {
     getMoneyRequestSpendBreakdown,
     getNonHeldAndFullAmount,
     getOptimisticDataForAncestors,
-    getOptimisticDataForParentReportAction,
     getOriginalReportID,
     getOutstandingChildRequest,
     getParentNavigationSubtitle,
@@ -13639,15 +13566,12 @@ export {
     isSystemChat,
     isTaskReport,
     isThread,
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
     isTrackExpenseReport,
     isUnread,
     isUnreadWithMention,
     isUserCreatedPolicyRoom,
     isValidReport,
     isValidReportIDFromPath,
-    getActionTypeForAssigneeToComplete,
-    isWaitingForSubmissionFromCurrentUser,
     isWorkspaceMemberLeavingWorkspaceRoom,
     isInvoiceRoom,
     isInvoiceRoomWithID,
@@ -13771,6 +13695,7 @@ export {
     getReportForHeader,
     isReportOpenOrUnsubmitted,
     getIconsForExpenseReport,
+    shouldBlockSubmitDueToPreventSelfApproval,
     getTransactionSortValue,
     isSortableColumnName,
     getLinkedIOUTransaction,
