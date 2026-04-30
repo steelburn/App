@@ -894,6 +894,7 @@ const translations = {
         },
     },
     adminOnlyCanPost: 'Only admins can send messages in this room.',
+    readOnlyConversation: 'This conversation is read-only.',
     reportAction: {
         asCopilot: 'as copilot for',
         assistedBy: (agentName: string) => `assisted by ${agentName}`,
@@ -1526,11 +1527,11 @@ const translations = {
         heldExpense: 'held this expense',
         unheldExpense: 'unheld this expense',
         moveUnreportedExpense: 'Move unreported expense',
-        addUnreportedExpense: 'Add unreported expense',
-        selectUnreportedExpense: 'Select at least one expense to add to the report.',
-        emptyStateUnreportedExpenseTitle: 'No unreported expenses',
-        emptyStateUnreportedExpenseSubtitle: 'Looks like you don’t have any unreported expenses. Try creating one below.',
-        addUnreportedExpenseConfirm: 'Add to report',
+        addExistingExpense: 'Add existing expense',
+        selectExistingExpense: 'Select at least one expense to add to the report.',
+        emptyStateExistingExpenseTitle: 'No existing expenses',
+        emptyStateExistingExpenseSubtitle: 'Looks like you don’t have any existing expenses. Try creating one below.',
+        addExistingExpenseConfirm: 'Add to report',
         newReport: 'New report',
         explainHold: () => ({
             one: "Explain why you're holding this expense.",
@@ -2165,8 +2166,8 @@ const translations = {
         readTheTermsAndPrivacy: `Read the <a href="${CONST.OLD_DOT_PUBLIC_URLS.TERMS_URL}">Terms of Service</a> and <a href="${CONST.OLD_DOT_PUBLIC_URLS.PRIVACY_URL}">Privacy</a>.`,
         help: 'Help',
         helpPage: {
-            title: 'Help and support',
-            description: 'We are here to help you 24/7',
+            title: 'Got questions?',
+            description: "We're here to help, around the clock.",
             helpSite: 'Help site',
             conciergeChat: 'Concierge',
             conciergeChatDescription: 'Your personal AI agent',
@@ -9141,12 +9142,16 @@ const translations = {
                     other: (count: number) => `${count} members`,
                 };
             },
+            defaultGroup: 'Default group for new members',
+            defaultGroupPrompt: (currentName: string, newName: string) =>
+                `Are you sure you want to make ${newName} the default group? New members will be invited to this group instead of the previous default group (${currentName}). `,
+            makeDefault: 'Make default',
+            neverMind: 'Never mind',
             permissions: 'Group permissions',
             deleteGroup: 'Delete Group',
             deleteGroupDangerConfirmationModal: 'Delete Group',
             deleteGroupDangerConfirmationModalDescription: (defaultGroupName: string) =>
                 `Are you sure? This will reassign all members to the default group (${defaultGroupName}) and can't be undone.`,
-            neverMind: 'Never mind',
             deleteGroupError: 'Unable to delete this group. Please try again.',
         },
     },

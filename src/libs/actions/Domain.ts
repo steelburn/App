@@ -11,6 +11,7 @@ import type {
     DeleteDomainSecurityGroupParams,
     RemoveDomainAdminParams,
     ResetDomainMemberTwoFactorAuthParams,
+    SetDefaultDomainSecurityGroupParams,
     SetTechnicalContactEmailParams,
     SetTwoFactorAuthExemptEmailForDomainParams,
     SetVacationDelegateParams,
@@ -2049,6 +2050,98 @@ function clearDomainSecurityGroupSettingError(domainAccountID: number, groupID: 
     });
 }
 
+/**
+ * Sets the default security group for a domain
+ * @param domainAccountID - The account ID of the domain
+ * @param groupID - The ID of the security group to set as default
+ * @param previousGroupID - The ID of the previously default security group
+ */
+function setDefaultSecurityGroup(domainAccountID: number, groupID: string, previousGroupID?: string) {
+    const SECURITY_GROUP_KEY = `${CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX}${groupID}`;
+
+    const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.DOMAIN | typeof ONYXKEYS.COLLECTION.DOMAIN_ERRORS | typeof ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS>> = [
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`,
+            // eslint-disable-next-line @typescript-eslint/naming-convention
+            value: {domain_defaultSecurityGroupID: groupID},
+        },
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`,
+            value: {
+                [SECURITY_GROUP_KEY]: {
+                    defaultSecurityGroupID: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE,
+                },
+            },
+        },
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`,
+            value: {
+                [SECURITY_GROUP_KEY]: {
+                    defaultSecurityGroupIDErrors: null,
+                },
+            },
+        },
+    ];
+
+    const failureData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.DOMAIN | typeof ONYXKEYS.COLLECTION.DOMAIN_ERRORS | typeof ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS>> = [
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`,
+            // eslint-disable-next-line @typescript-eslint/naming-convention
+            value: {domain_defaultSecurityGroupID: previousGroupID},
+        },
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`,
+            value: {
+                [SECURITY_GROUP_KEY]: {
+                    defaultSecurityGroupID: null,
+                },
+            },
+        },
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`,
+            value: {
+                [SECURITY_GROUP_KEY]: {
+                    defaultSecurityGroupIDErrors: getMicroSecondOnyxErrorWithTranslationKey('domain.common.error'),
+                },
+            },
+        },
+    ];
+
+    const successData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.DOMAIN_ERRORS | typeof ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS>> = [
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`,
+            value: {
+                [SECURITY_GROUP_KEY]: {
+                    defaultSecurityGroupID: null,
+                },
+            },
+        },
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`,
+            value: {
+                [SECURITY_GROUP_KEY]: {
+                    defaultSecurityGroupIDErrors: null,
+                },
+            },
+        },
+    ];
+
+    const params: SetDefaultDomainSecurityGroupParams = {
+        domainAccountID,
+        groupID,
+    };
+
+    API.write(WRITE_COMMANDS.SET_DEFAULT_DOMAIN_SECURITY_GROUP, params, {optimisticData, failureData, successData});
+}
+
 export {
     getDomainValidationCode,
     validateDomain,
@@ -2092,4 +2185,5 @@ export {
     deleteDomainSecurityGroup,
     clearGroupDeleteError,
     clearDomainSecurityGroupSettingError,
+    setDefaultSecurityGroup,
 };

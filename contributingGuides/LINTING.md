@@ -71,17 +71,30 @@ No TSV commit required on your end.
 
 ### "I added a new error and can't easily fix it right now"
 
-The default assumption is that you fix it. If you genuinely need to land code that trips a baselined rule and the fix is out of scope, you have two options, in order of preference:
+The default assumption is that you fix it. If you genuinely need to land code that trips a baselined rule and the fix is out of scope, you have two options:
 
-1. **Suppress the specific occurrence** with an `eslint-disable-next-line <rule>` comment and a justification. See [`CONSISTENCY-5`](../.claude/skills/coding-standards/rules/consistency-5-justify-eslint-disable.md).
-2. **Widen the seatbelt baseline** for that file/rule with `SEATBELT_INCREASE`:
+1. **Widen the seatbelt baseline** for that file/rule with `SEATBELT_INCREASE` — preferred for **temporary** suppressions (e.g. the fix requires a large refactor that is out of scope for the current PR, or you're intentionally deferring cleanup):
 
     ```bash
     # Allow the new count for one rule:
     SEATBELT_INCREASE=@typescript-eslint/no-deprecated npm run lint
     ```
 
-   That will modify `config/eslint/eslint.seatbelt.tsv`. **Always commit the diff alongside your code**, and expect a reviewer to ask you why a fix wasn't feasible.
+   That will modify `config/eslint/eslint.seatbelt.tsv`. **Always commit the diff alongside your code**, and expect a reviewer to ask you why a fix wasn't feasible. Because the violation stays visible in the baseline, it can still be fixed later.
+
+2. **Suppress the specific occurrence** with an `eslint-disable-next-line <rule>` comment and a justification — preferred for **permanent** suppressions, where you genuinely believe the lint rule is wrong for that specific case and you don't expect the violation to ever be fixed. See [`CONSISTENCY-5`](../.claude/skills/coding-standards/rules/consistency-5-justify-eslint-disable.md).
+
+> **Which should I use?** Reach for `SEATBELT_INCREASE` when the error is merely inconvenient to fix right now. Reach for `eslint-disable-next-line` only when you are making a deliberate, permanent exception — i.e. you're certain the rule simply doesn't apply to this particular case. `eslint-disable` comments hide violations from the baseline entirely, so they should only be used when the suppression is intentional and indefinite.
+
+### "I moved or renamed a file without fixing its existing errors"
+
+When you move or rename a file, seatbelt's baseline entry for the old path is no longer matched. Even though you made no logical change to the code, the violations now appear under a path the baseline doesn't know about, so CI will fail. Use `SEATBELT_INCREASE` to re-baseline the file under its new name:
+
+```bash
+SEATBELT_INCREASE=<rule-id> npm run lint
+```
+
+Commit the updated `config/eslint/eslint.seatbelt.tsv` alongside the rename. The old path will be removed from the TSV automatically by the lint job on `main` after your PR merges.
 
 ### "I'm enabling a new rule repo-wide"
 

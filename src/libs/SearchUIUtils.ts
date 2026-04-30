@@ -5791,7 +5791,6 @@ export {
     getSingleSelectFilterOptions,
     getMultiSelectFilterOptions,
     applySelectionToItem,
-    GENERIC_SEARCH_KEYS,
     TODO_SEARCH_KEYS,
     MONTHLY_ACCRUAL_SEARCH_KEYS,
     RECONCILIATION_SEARCH_KEYS,
