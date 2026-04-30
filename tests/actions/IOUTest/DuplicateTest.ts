@@ -499,6 +499,7 @@ describe('actions/Duplicate', () => {
                     text: message,
                     timezoneParam: CONST.DEFAULT_TIME_ZONE,
                     currentUserAccountID: RORY_ACCOUNT_ID,
+                    delegateAccountID: undefined,
                 });
                 await waitForBatchedUpdates();
             };
@@ -2485,6 +2486,8 @@ describe('actions/Duplicate', () => {
                 draftTransactionIDs: [],
                 betas: [CONST.BETAS.ALL],
                 recentWaypoints: [],
+                currentUserAccountID: RORY_ACCOUNT_ID,
+                currentUserLogin: RORY_EMAIL,
             });
 
             await waitForBatchedUpdates();
@@ -2587,6 +2590,7 @@ describe('actions/Duplicate', () => {
             activePolicyExpenseChat,
             ownerPersonalDetails: {accountID: RORY_ACCOUNT_ID, login: RORY_EMAIL, displayName: 'Rory'},
             currentUserLogin: RORY_EMAIL,
+            currentUserAccountID: RORY_ACCOUNT_ID,
             isASAPSubmitBetaEnabled: false,
             betas: [CONST.BETAS.ALL],
             personalDetails: {[RORY_ACCOUNT_ID]: {accountID: RORY_ACCOUNT_ID, login: RORY_EMAIL, displayName: 'Rory'}},
