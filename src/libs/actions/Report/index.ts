@@ -880,7 +880,6 @@ function addActions({
 
     for (const [actionKey, action] of Object.entries(optimisticReportActions)) {
         failureReportActions[actionKey] = {
-            // eslint-disable-next-line @typescript-eslint/non-nullable-type-assertion-style
             ...(action as OptimisticAddCommentReportAction),
             errors: getMicroSecondOnyxErrorWithTranslationKey('report.genericAddCommentFailureMessage'),
         };
@@ -5257,6 +5256,7 @@ async function completeOnboarding({
         selfDMCreatedReportActionID: selfDMParameters.createdReportActionID,
         bespokeWelcomeMessage,
         optimisticConciergeReportActionID,
+        selectedInterestedFeatures: selectedInterestedFeatures && selectedInterestedFeatures.length > 0 ? JSON.stringify(selectedInterestedFeatures) : undefined,
     };
 
     if (shouldWaitForRHPVariantInitialization) {
@@ -5423,7 +5423,7 @@ function buildParticipantsInviteData(
             if (accountID in (targetReport.participants ?? {})) {
                 return acc;
             }
-            // eslint-disable-next-line no-param-reassign -- Mutating the reduce accumulator is intentional
+
             acc[accountID] = {
                 notificationPreference: defaultPref,
                 role: CONST.REPORT.ROLE.MEMBER,
