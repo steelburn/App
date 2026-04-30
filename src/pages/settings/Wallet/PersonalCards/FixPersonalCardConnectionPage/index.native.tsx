@@ -45,7 +45,7 @@ function FixPersonalCardConnectionPage({route}: FixPersonalCardConnectionPagePro
     const hasRequestedPlaidToken = useRef(false);
 
     const [session] = useOnyx(ONYXKEYS.SESSION);
-    const [plaidLinkToken] = useOnyx(ONYXKEYS.PLAID_LINK_TOKEN);
+    const [plaidLinkToken] = useOnyx(ONYXKEYS.RAM_ONLY_PLAID_LINK_TOKEN);
     const [plaidData] = useOnyx(ONYXKEYS.PLAID_DATA);
     const [isPlaidDisabled] = useOnyx(ONYXKEYS.IS_PLAID_DISABLED);
     const authToken = session?.authToken ?? null;
