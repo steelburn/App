@@ -117,13 +117,14 @@ function ExportedToSelector({value = [], onChange}: ExportedToSelectorProps) {
 
         return [...connectedIntegrationPickerItems, ...standardAndIntegrationCustomTemplatePickerItems];
     })();
+    const selectedExportedTo = exportedToPickerOptions.filter((option) => value.includes(option.value));
 
     return (
         <MultiSelect
-            value={value}
+            value={selectedExportedTo}
             items={exportedToPickerOptions}
             isSearchable={exportedToPickerOptions.length >= CONST.STANDARD_LIST_ITEM_LIMIT}
-            onChange={onChange}
+            onChange={(exportedTo) => onChange(exportedTo.map((e) => e.value))}
         />
     );
 }

@@ -102,17 +102,18 @@ function MultiSelectFilterComponents({filterKey, value = [], onChange}: MultiSel
     });
     const items = getMultiSelectFilterOptions(filterKey, type, translate);
     const normalizedValue = Array.isArray(value) ? value : value.split(',');
+    const multiSelectValues = items.filter((item) => normalizedValue.includes(item.value));
 
     return (
         <MultiSelect
             items={items}
-            value={normalizedValue}
+            value={multiSelectValues}
             onChange={(selectedItems) => {
                 if (filterKey === CONST.SEARCH.SYNTAX_FILTER_KEYS.STATUS) {
-                    onChange(selectedItems.length > 0 ? selectedItems : CONST.SEARCH.STATUS.EXPENSE.ALL);
+                    onChange(selectedItems.length > 0 ? selectedItems.map((item) => item.value) : CONST.SEARCH.STATUS.EXPENSE.ALL);
                     return;
                 }
-                onChange(selectedItems);
+                onChange(selectedItems.map((item) => item.value));
             }}
         />
     );

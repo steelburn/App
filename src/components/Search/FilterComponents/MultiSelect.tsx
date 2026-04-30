@@ -26,10 +26,10 @@ type MultiSelectProps<T> = {
     items: Array<MultiSelectItem<T>>;
 
     /** The currently selected items */
-    value: T[];
+    value: Array<MultiSelectItem<T>>;
 
     /** Function to call when changes are applied */
-    onChange: (item: T[]) => void;
+    onChange: (item: Array<MultiSelectItem<T>>) => void;
 
     /** Whether the search input should be displayed. */
     isSearchable?: boolean;
@@ -53,7 +53,7 @@ function MultiSelect<T extends string>({loading, value, items, isSearchable, sea
     const listData: ListItem[] = filteredItems.map((item) => ({
         text: item.text,
         keyForList: item.value,
-        isSelected: !!selectedItems.find((i) => i === item.value),
+        isSelected: !!selectedItems.find((i) => i.value === item.value),
         icons: item.icons,
         leftElement: item.leftElement,
     }));
@@ -62,13 +62,13 @@ function MultiSelect<T extends string>({loading, value, items, isSearchable, sea
 
     const updateSelectedItems = (item: ListItem) => {
         if (item.isSelected) {
-            const newSelectedItems = selectedItems.filter((i) => i !== item.keyForList);
+            const newSelectedItems = selectedItems.filter((i) => i.value !== item.keyForList);
             setSelectedItems(newSelectedItems);
             onChange(newSelectedItems);
             return;
         }
 
-        const newItem = items.find((i) => i.value === item.keyForList)?.value;
+        const newItem = items.find((i) => i.value === item.keyForList);
 
         if (newItem) {
             const newSelectedItems = [...selectedItems, newItem];

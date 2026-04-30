@@ -30,13 +30,14 @@ function TaxRateSelector({value = [], onChange}: TaxRateSelectorProps) {
         text: taxRateName,
         value: taxRateKeys.toString(),
     }));
+    const selectedTaxRates = taxItems.filter((tax) => value.includes(tax.value.toString()));
 
     return (
         <MultiSelect
-            value={value}
+            value={selectedTaxRates}
             items={taxItems}
             isSearchable={taxItems.length >= CONST.STANDARD_LIST_ITEM_LIMIT}
-            onChange={onChange}
+            onChange={(taxRates) => onChange(taxRates.map((taxRate) => taxRate.value))}
         />
     );
 }

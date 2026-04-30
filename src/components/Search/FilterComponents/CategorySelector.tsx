@@ -20,6 +20,13 @@ function CategorySelector({value = [], onChange}: CategorySelectorProps) {
     const [policyIDs] = useOnyx(ONYXKEYS.FORMS.SEARCH_ADVANCED_FILTERS_FORM, {selector: filterPolicyIDSelector});
     const [personalPolicyID] = useOnyx(ONYXKEYS.PERSONAL_POLICY_ID);
 
+    const selectedCategoriesItems = value.map((category) => {
+        if (category === CONST.SEARCH.CATEGORY_EMPTY_VALUE) {
+            return {text: translate('search.noCategory'), value: category};
+        }
+        return {text: category, value: category};
+    });
+
     const availableNonPersonalPolicyCategoriesSelector = (policyCategories: OnyxCollection<PolicyCategories>) =>
         Object.fromEntries(
             Object.entries(policyCategories ?? {}).filter(([key, categories]) => {
@@ -66,11 +73,11 @@ function CategorySelector({value = [], onChange}: CategorySelectorProps) {
 
     return (
         <MultiSelect
-            value={value}
+            value={selectedCategoriesItems}
             items={categoryItems}
             isSearchable={categoryItems.length >= CONST.STANDARD_LIST_ITEM_LIMIT}
             searchPlaceholder={translate('common.category')}
-            onChange={onChange}
+            onChange={(categories) => onChange(categories.map((category) => category.value))}
         />
     );
 }

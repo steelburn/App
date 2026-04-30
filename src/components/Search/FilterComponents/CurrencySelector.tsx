@@ -12,13 +12,14 @@ function CurrencySelector({value = [], onChange}: CurrencySelectorProps) {
     const {currencyList} = useCurrencyListState();
     const {getCurrencySymbol} = useCurrencyListActions();
     const currencyOptions = getCurrencyOptions(currencyList, getCurrencySymbol);
+    const currencyValues = currencyOptions.filter((option) => value.includes(option.value));
 
     return (
         <MultiSelect
-            value={value}
+            value={currencyValues}
             items={currencyOptions}
             isSearchable
-            onChange={onChange}
+            onChange={(currencies) => onChange(currencies.map((currency) => currency.value))}
         />
     );
 }

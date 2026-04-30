@@ -22,9 +22,9 @@ function FeedSelector({value, onChange}: FeedSelectorProps) {
 
     return (
         <MultiSelect
-            value={feedValue.map((feed) => feed.value)}
+            value={feedValue}
             items={feedOptions}
-            onChange={onChange}
+            onChange={(feeds) => onChange(feeds.map((feed) => feed.value))}
         />
     );
 }

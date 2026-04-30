@@ -19,8 +19,8 @@ type TagSelectorProps = {
 function TagSelector({value = [], onChange}: TagSelectorProps) {
     const {translate} = useLocalize();
     const [policyIDs] = useOnyx(ONYXKEYS.FORMS.SEARCH_ADVANCED_FILTERS_FORM, {selector: filterPolicyIDSelector});
-
     const [allPolicyTagLists = getEmptyObject<NonNullable<OnyxCollection<PolicyTagLists>>>()] = useOnyx(ONYXKEYS.COLLECTION.POLICY_TAGS, {selector: passthroughPolicyTagListSelector});
+
     const selectedPoliciesTagLists = Object.keys(allPolicyTagLists ?? {})
         .filter((key) => policyIDs?.map((policyID) => `${ONYXKEYS.COLLECTION.POLICY_TAGS}${policyID}`)?.includes(key))
         ?.map((key) => getTagNamesFromTagsLists(allPolicyTagLists?.[key] ?? {}))
@@ -40,12 +40,19 @@ function TagSelector({value = [], onChange}: TagSelectorProps) {
     }
     tagItems.push(...Array.from(uniqueTagNames).map((tagName) => ({text: getCleanedTagName(tagName), value: tagName})));
 
+    const selectedTagsItems = value.map((tag) => {
+        if (tag === CONST.SEARCH.TAG_EMPTY_VALUE) {
+            return {text: translate('search.noTag'), value: tag};
+        }
+        return {text: getCleanedTagName(tag), value: tag};
+    });
+
     return (
         <MultiSelect
-            value={value}
+            value={selectedTagsItems}
             items={tagItems}
             isSearchable={tagItems.length >= CONST.STANDARD_LIST_ITEM_LIMIT}
-            onChange={onChange}
+            onChange={(tags) => onChange(tags.map((tag) => tag.value))}
         />
     );
 }

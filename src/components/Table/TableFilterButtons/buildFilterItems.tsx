@@ -132,7 +132,12 @@ type MultiSelectPopoverFactoryProps<FilterKey extends string = string> = {
 function createMultiSelectPopover<FilterKey extends string = string>({filterKey, filterConfig, currentFilterValue, setFilter}: MultiSelectPopoverFactoryProps<FilterKey>) {
     return ({closeOverlay}: PopoverComponentProps) => {
         const currentValueArray = Array.isArray(currentFilterValue) ? currentFilterValue : [];
-        const selectedItems = filterConfig.options.filter((option) => currentValueArray.includes(option.value)).map((option) => option.value);
+        const selectedItems = filterConfig.options
+            .filter((option) => currentValueArray.includes(option.value))
+            .map((option) => ({
+                text: option.label,
+                value: option.value,
+            }));
 
         return (
             <MultiSelectPopup
@@ -143,7 +148,10 @@ function createMultiSelectPopover<FilterKey extends string = string>({filterKey,
                 }))}
                 value={selectedItems}
                 closeOverlay={closeOverlay}
-                onChange={(items) => setFilter(filterKey, items)}
+                onChange={(items) => {
+                    const values = items.map((item) => item.value);
+                    setFilter(filterKey, values);
+                }}
             />
         );
     };

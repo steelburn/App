@@ -21,13 +21,14 @@ function WorkspaceSelector({policyIDQuery, value, onChange}: WorkspaceSelectorPr
             icons: workspace.icons,
         }));
 
-    const policyIDs = value ?? policyIDQuery ?? [];
+    const policyID = value ?? policyIDQuery ?? [];
+    const selectedWorkspaceOptions = workspaceOptions.filter((option) => (Array.isArray(policyID) ? policyID : [policyID]).includes(option.value));
 
     return (
         <MultiSelect
             items={workspaceOptions}
-            value={policyIDs}
-            onChange={onChange}
+            value={selectedWorkspaceOptions}
+            onChange={(policyIDs) => onChange(policyIDs.map((policyID) => policyID.value))}
             isSearchable={shouldShowWorkspaceSearchInput}
         />
     );

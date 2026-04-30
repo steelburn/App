@@ -21,13 +21,13 @@ type MultiSelectPopupProps<T> = {
     items: Array<MultiSelectItem<T>>;
 
     /** The currently selected items */
-    value: T[];
+    value: Array<MultiSelectItem<T>>;
 
     /** Function to call to close the overlay when changes are applied */
     closeOverlay: () => void;
 
     /** Function to call when changes are applied */
-    onChange: (item: T[]) => void;
+    onChange: (item: Array<MultiSelectItem<T>>) => void;
 
     /** Whether the search input should be displayed. */
     isSearchable?: boolean;
