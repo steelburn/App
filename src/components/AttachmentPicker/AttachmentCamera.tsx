@@ -26,6 +26,23 @@ import CameraPermission from '@pages/iou/request/step/IOURequestStepScan/CameraP
 import variables from '@styles/variables';
 import CONST from '@src/CONST';
 
+// Module-level ref for camera focus — avoids "Cannot access refs during render" from React Compiler.
+// The ref is set via useEffect when the component mounts, and read only in event handlers.
+let activeCameraInstance: Camera | null = null;
+
+function focusCameraAtPoint(point: Point) {
+    if (!activeCameraInstance) {
+        return;
+    }
+
+    activeCameraInstance.focus(point).catch((error: Record<string, unknown>) => {
+        if (error.message === '[unknown/unknown] Cancelled by another startFocusAndMetering()') {
+            return;
+        }
+        Log.warn('Error focusing camera', error);
+    });
+}
+
 type CapturedPhoto = {
     uri: string;
     fileName: string;
@@ -58,7 +75,7 @@ function AttachmentCamera({isVisible, onCapture, onClose}: AttachmentCameraProps
     const [flash, setFlash] = useState(false);
     const [cameraPermissionStatus, setCameraPermissionStatus] = useState<string | null>(null);
     const isCapturing = useRef(false);
-    const camera = useRef<Camera>(null);
+    const cameraRef = useRef<Camera>(null);
 
     const device = useCameraDevice(cameraPosition, {
         physicalDevices: ['wide-angle-camera', 'ultra-wide-angle-camera'],
@@ -82,22 +99,18 @@ function AttachmentCamera({isVisible, onCapture, onClose}: AttachmentCameraProps
         transform: [{translateX: focusIndicatorPosition.get().x}, {translateY: focusIndicatorPosition.get().y}, {scale: focusIndicatorScale.get()}],
     }));
 
-    const focusCamera = useCallback((point: Point) => {
-        if (!camera.current) {
-            return;
-        }
-
-        camera.current.focus(point).catch((error: Record<string, unknown>) => {
-            if (error.message === '[unknown/unknown] Cancelled by another startFocusAndMetering()') {
-                return;
-            }
-            Log.warn('Error focusing camera', error);
-        });
-    }, []);
+    useEffect(() => {
+        activeCameraInstance = cameraRef.current;
+        return () => {
+            activeCameraInstance = null;
+        };
+    });
 
     const tapGesture = Gesture.Tap()
         .enabled(device?.supportsFocus ?? false)
         .onStart((ev: {x: number; y: number}) => {
+            'worklet';
+
             const point = {x: ev.x, y: ev.y};
 
             focusIndicatorOpacity.set(withSequence(withTiming(0.8, {duration: 250}), withDelay(1000, withTiming(0, {duration: 250}))));
@@ -105,7 +118,7 @@ function AttachmentCamera({isVisible, onCapture, onClose}: AttachmentCameraProps
             focusIndicatorScale.set(withSpring(1, {damping: 10, stiffness: 200}));
             focusIndicatorPosition.set(point);
 
-            scheduleOnRN(focusCamera, point);
+            scheduleOnRN(focusCameraAtPoint, point);
         });
 
     // Permission management
@@ -153,7 +166,7 @@ function AttachmentCamera({isVisible, onCapture, onClose}: AttachmentCameraProps
             return;
         }
 
-        if (!camera.current || isCapturing.current) {
+        if (!cameraRef.current || isCapturing.current) {
             return;
         }
 
@@ -161,7 +174,7 @@ function AttachmentCamera({isVisible, onCapture, onClose}: AttachmentCameraProps
 
         const path = getReceiptsUploadFolderPath();
 
-        camera.current
+        cameraRef.current
             .takePhoto({
                 flash: flash && hasFlash ? 'on' : 'off',
                 path,
@@ -259,7 +272,7 @@ function AttachmentCamera({isVisible, onCapture, onClose}: AttachmentCameraProps
                             <GestureDetector gesture={tapGesture}>
                                 <View style={StyleUtils.getCameraViewfinderStyle(cameraAspectRatio)}>
                                     <VisionCamera
-                                        ref={camera}
+                                        ref={cameraRef}
                                         device={device}
                                         format={format ?? undefined}
                                         style={styles.flex1}
