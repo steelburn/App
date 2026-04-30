@@ -170,7 +170,7 @@ type SearchContextData = {
     currentSearchHash: number;
     currentSimilarSearchHash: number;
     currentSearchKey: SearchKey | undefined;
-    currentSearchQueryJSON: SearchQueryJSON | undefined;
+    currentSearchQueryJSON: Readonly<SearchQueryJSON> | undefined;
     currentSearchResults: SearchResults | undefined;
     currentSelectedTransactionReportID: string | undefined;
     selectedTransactions: SelectedTransactions;
@@ -330,7 +330,7 @@ type SearchAutocompleteQueryRange = {
 };
 
 type SearchParams = {
-    queryJSON: SearchQueryJSON;
+    queryJSON: Readonly<SearchQueryJSON>;
     searchKey: SearchKey | undefined;
     offset: number;
     prevReportsLength?: number;

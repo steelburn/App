@@ -1,11 +1,11 @@
 import React from 'react';
 import type {OnyxCollection} from 'react-native-onyx';
-import {filterPolicyIDSelector} from '@components/Search/selectors/Search';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import {getDecodedCategoryName} from '@libs/CategoryUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
+import {filterPolicyIDSelector} from '@src/selectors/Search';
 import type {PolicyCategories, PolicyCategory} from '@src/types/onyx';
 import {getEmptyObject} from '@src/types/utils/EmptyObject';
 import MultiSelect from './MultiSelect';

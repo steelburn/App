@@ -2805,7 +2805,7 @@ function buildSpecificGroupQuery(queryJSON: SearchQueryJSON, filterKey: SearchFi
     return buildSearchQueryJSON(buildSearchQueryString(newQueryJSON));
 }
 
-function getActiveGroupSearchHashes(data: OnyxTypes.SearchResults['data'] | undefined, queryJSON: SearchQueryJSON | undefined): number[] {
+function getActiveGroupSearchHashes(data: OnyxTypes.SearchResults['data'] | undefined, queryJSON: Readonly<SearchQueryJSON> | undefined): number[] {
     if (!data || !queryJSON?.groupBy) {
         return [];
     }
@@ -4397,7 +4397,7 @@ function shouldShowEmptyState(isDataLoaded: boolean, dataLength: number, type: S
     return !isDataLoaded || dataLength === 0 || !type || !Object.values(CONST.SEARCH.DATA_TYPES).includes(type);
 }
 
-function isSearchDataLoaded(searchResults: SearchResults | undefined, queryJSON: SearchQueryJSON | undefined) {
+function isSearchDataLoaded(searchResults: SearchResults | undefined, queryJSON: Readonly<SearchQueryJSON> | undefined) {
     const {status} = queryJSON ?? {};
 
     const sortedSearchResultStatus = !Array.isArray(searchResults?.search?.status)
@@ -5815,7 +5815,6 @@ export {
     getSingleSelectFilterOptions,
     getMultiSelectFilterOptions,
     applySelectionToItem,
-    GENERIC_SEARCH_KEYS,
     TODO_SEARCH_KEYS,
     MONTHLY_ACCRUAL_SEARCH_KEYS,
     RECONCILIATION_SEARCH_KEYS,

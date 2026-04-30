@@ -1,9 +1,9 @@
 import React from 'react';
-import {filterPolicyIDSelector} from '@components/Search/selectors/Search';
 import useOnyx from '@hooks/useOnyx';
 import {getAllTaxRates} from '@libs/PolicyUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
+import {filterPolicyIDSelector} from '@src/selectors/Search';
 import type {Policy} from '@src/types/onyx';
 import MultiSelect from './MultiSelect';
 

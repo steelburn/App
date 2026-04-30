@@ -1,7 +1,7 @@
 import {addDays, endOfMonth, format, parse, startOfMonth, startOfYear, subMonths} from 'date-fns';
 import cloneDeep from 'lodash/cloneDeep';
 import Onyx from 'react-native-onyx';
-import type {OnyxCollection, OnyxUpdate} from 'react-native-onyx';
+import type {NullishDeep, OnyxCollection, OnyxUpdate} from 'react-native-onyx';
 import type {ValueOf} from 'type-fest';
 import type {LocaleContextProps, LocalizedTranslate} from '@components/LocaleContextProvider';
 import type {
@@ -35,7 +35,7 @@ import type {SearchAdvancedFiltersForm} from '@src/types/form';
 import FILTER_KEYS, {ALLOWED_TYPE_FILTERS, AMOUNT_FILTER_KEYS, DATE_FILTER_KEYS} from '@src/types/form/SearchAdvancedFiltersForm';
 import type {ExpenseTypeValue, ExpenseTypeValues, HasFilterValue, HasFilterValues, IsFilterValue, IsFilterValues, SearchAdvancedFiltersKey} from '@src/types/form/SearchAdvancedFiltersForm';
 import type * as OnyxTypes from '@src/types/onyx';
-import type {SearchDataTypes} from '@src/types/onyx/SearchResults';
+import type {SearchDataTypes, SearchResultDataType} from '@src/types/onyx/SearchResults';
 import {getCardFeedsForDisplay} from './CardFeedUtils';
 import {getCardDescription} from './CardUtils';
 import {convertToBackendAmount, convertToFrontendAmountAsInteger} from './CurrencyUtils';
@@ -452,7 +452,7 @@ function getDefaultSearchQueryJSON() {
     return defaultSearchQueryJSON;
 }
 
-function wasViewExplicitlySet(queryJSON?: SearchQueryJSON) {
+function wasViewExplicitlySet(queryJSON?: SearchQueryJSON | Readonly<SearchQueryJSON>) {
     if (!queryJSON?.view) {
         return false;
     }
@@ -580,17 +580,21 @@ function getRawFilterListFromQuery(rawQuery: SearchQueryString) {
 }
 
 // Cache for buildSearchQueryJSON to avoid re-running the PEG parser for identical queries.
+// Cached values are shallow-frozen; callers needing to change fields must spread into a new object first.
 // This is a pure function called from 64+ sites — many fire during the same render cycle
 // with identical query strings, each running the full parser from scratch.
-const buildSearchQueryJSONCache = new Map<string, SearchQueryJSON | undefined>();
+const buildSearchQueryJSONCache = new Map<string, Readonly<SearchQueryJSON> | undefined>();
 const BUILD_SEARCH_QUERY_JSON_CACHE_MAX_SIZE = 50;
 const BUILD_SEARCH_QUERY_JSON_CACHE_KEY_SEPARATOR = '\x00'; // Null byte prevents collisions if query/rawQuery contain arbitrary strings
 
-function buildSearchQueryJSON(query: SearchQueryString, rawQuery?: SearchQueryString) {
-    const cacheKey = rawQuery ? `${query}${BUILD_SEARCH_QUERY_JSON_CACHE_KEY_SEPARATOR}${rawQuery}` : query;
+function getBuildSearchQueryJSONCacheKey(query: SearchQueryString, rawQuery?: SearchQueryString) {
+    return rawQuery ? `${query}${BUILD_SEARCH_QUERY_JSON_CACHE_KEY_SEPARATOR}${rawQuery}` : query;
+}
+
+function getCachedSearchQueryJSON(query: SearchQueryString, rawQuery?: SearchQueryString): Readonly<SearchQueryJSON> | undefined {
+    const cacheKey = getBuildSearchQueryJSONCacheKey(query, rawQuery);
     if (buildSearchQueryJSONCache.has(cacheKey)) {
-        const cached = buildSearchQueryJSONCache.get(cacheKey);
-        return cached ? {...cached} : cached;
+        return buildSearchQueryJSONCache.get(cacheKey);
     }
 
     try {
@@ -630,12 +634,18 @@ function buildSearchQueryJSON(query: SearchQueryString, rawQuery?: SearchQuerySt
                 buildSearchQueryJSONCache.delete(firstKey);
             }
         }
-        buildSearchQueryJSONCache.set(cacheKey, result);
+        const frozen = Object.freeze(result);
+        buildSearchQueryJSONCache.set(cacheKey, frozen);
 
-        return {...result};
+        return frozen;
     } catch (e) {
         console.error(`Error when parsing SearchQuery: "${query}"`, e);
     }
+}
+
+/** Parses {@link query} (and optionally {@link rawQuery}) into JSON. Repeated calls share the same cached object identity for referential stability. */
+function buildSearchQueryJSON(query: SearchQueryString, rawQuery?: SearchQueryString): Readonly<SearchQueryJSON> | undefined {
+    return getCachedSearchQueryJSON(query, rawQuery);
 }
 
 /**
@@ -644,7 +654,7 @@ function buildSearchQueryJSON(query: SearchQueryString, rawQuery?: SearchQuerySt
  *
  * In a way this is the reverse of buildSearchQueryJSON()
  */
-function buildSearchQueryString(queryJSON?: SearchQueryJSON) {
+function buildSearchQueryString(queryJSON?: SearchQueryJSON | Readonly<SearchQueryJSON>) {
     const queryParts: string[] = [];
     const defaultQueryJSON = buildSearchQueryJSON('');
     const isViewExplicitlySet = wasViewExplicitlySet(queryJSON);
@@ -1786,11 +1796,11 @@ function buildCannedSearchQuery({
     return buildSearchQueryString(normalizedQueryJSON);
 }
 
-function isDefaultExpensesQuery(queryJSON: SearchQueryJSON) {
+function isDefaultExpensesQuery(queryJSON: SearchQueryJSON | Readonly<SearchQueryJSON>) {
     return queryJSON.type === CONST.SEARCH.DATA_TYPES.EXPENSE && !queryJSON.status && !queryJSON.filters && !queryJSON.groupBy && !queryJSON.policyID;
 }
 
-function isDefaultExpenseReportsQuery(queryJSON: SearchQueryJSON) {
+function isDefaultExpenseReportsQuery(queryJSON: SearchQueryJSON | Readonly<SearchQueryJSON>) {
     return queryJSON.type === CONST.SEARCH.DATA_TYPES.EXPENSE_REPORT && !queryJSON.status && !queryJSON.filters && !queryJSON.groupBy && !queryJSON.policyID;
 }
 
@@ -1810,8 +1820,8 @@ const sortOptionsWithEmptyValue = (a: string, b: string, localeCompare: LocaleCo
 /**
  *  Given a search query, this function will standardize the query by replacing display values with their corresponding IDs.
  */
-function traverseAndUpdatedQuery(queryJSON: SearchQueryJSON, computeNodeValue: (left: SyntaxFilterKey, right: string | string[]) => string | string[]) {
-    const standardQuery = cloneDeep(queryJSON);
+function traverseAndUpdatedQuery(queryJSON: SearchQueryJSON | Readonly<SearchQueryJSON>, computeNodeValue: (left: SyntaxFilterKey, right: string | string[]) => string | string[]) {
+    const standardQuery = cloneDeep(queryJSON) as SearchQueryJSON;
     const filters = standardQuery.filters;
     const traverse = (node: ASTNode) => {
         if (!node.operator) {
@@ -1997,7 +2007,7 @@ function buildFilterQueryWithSortDefaults(
 /**
  * Builds an optimistic Snapshot update to ensure offline data for Tasks and Chat messages appears in Search.
  */
-function buildOptimisticSnapshotData(type: SearchDataTypes, data: Record<string, unknown>): OnyxUpdate<typeof ONYXKEYS.COLLECTION.SNAPSHOT> | undefined {
+function buildOptimisticSnapshotData(type: SearchDataTypes, data: NullishDeep<SearchResultDataType>): OnyxUpdate<typeof ONYXKEYS.COLLECTION.SNAPSHOT> | undefined {
     const searchQuery = buildCannedSearchQuery({type});
     const searchQueryJSON = buildSearchQueryJSON(searchQuery);
     if (!searchQueryJSON) {
@@ -2007,7 +2017,6 @@ function buildOptimisticSnapshotData(type: SearchDataTypes, data: Record<string,
         onyxMethod: Onyx.METHOD.MERGE,
         key: `${ONYXKEYS.COLLECTION.SNAPSHOT}${searchQueryJSON.hash}`,
         value: {
-            // @ts-expect-error - will be solved in https://github.com/Expensify/App/issues/73830
             data,
         },
     };

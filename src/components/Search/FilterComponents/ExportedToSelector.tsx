@@ -2,7 +2,6 @@ import React from 'react';
 import {View} from 'react-native';
 import type {TupleToUnion} from 'type-fest';
 import Icon from '@components/Icon';
-import {filterPolicyIDSelector} from '@components/Search/selectors/Search';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
@@ -16,6 +15,7 @@ import {getIntegrationIcon} from '@libs/ReportUtils';
 import variables from '@styles/variables';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
+import {filterPolicyIDSelector} from '@src/selectors/Search';
 import getEmptyArray from '@src/types/utils/getEmptyArray';
 import MultiSelect from './MultiSelect';
 
