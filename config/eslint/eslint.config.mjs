@@ -738,6 +738,7 @@ const config = defineConfig([
         '**/*.config.mjs',
         '**/node_modules/**/*',
         '**/dist/**/*',
+        '.eslint-reports/**/*',
         'android/**/build/**/*',
         'docs/vendor/**/*',
         'docs/assets/**/*',
