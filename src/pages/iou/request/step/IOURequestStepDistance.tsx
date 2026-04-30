@@ -209,8 +209,15 @@ function IOURequestStepDistance({
 
     // Sync the manual tab input when the route recalculates (e.g. after waypoint edits on the map tab).
     // Skip the sync if the user is actively editing on the manual tab to avoid overwriting their input.
+    // Skip the very first render so we don't clobber a previously-saved manual quantity with the route
+    // distance on edit re-open.
     const routeDistance = currentTransaction?.routes?.route0?.distance;
+    const isInitialRouteSync = useRef(true);
     useEffect(() => {
+        if (isInitialRouteSync.current) {
+            isInitialRouteSync.current = false;
+            return;
+        }
         if (routeDistance == null || !distanceUnit || isManuallyEditing.current) {
             return;
         }

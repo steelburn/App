@@ -943,20 +943,45 @@ function getUpdateMoneyRequestParams(params: GetUpdateMoneyRequestParamsType): U
         >
     > = [];
 
-    // Step 1: Set any "pending fields" (ones updated while the user was offline) to have error messages in the failureData
-    const pendingFields: OnyxTypes.Transaction['pendingFields'] = Object.fromEntries(Object.keys(transactionChanges).map((key) => [key, CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE]));
-    const clearedPendingFields = getClearedPendingFields(transactionChanges);
-    const errorFields = Object.fromEntries(Object.keys(pendingFields).map((key) => [key, getMicroSecondOnyxErrorWithTranslationKey('iou.error.genericEditFailureMessage')]));
-
     // Step 2: Get all the collections being updated
     const transaction = getAllTransactions()?.[`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`];
 
+    // The manual-distance submit path always sends waypoints to keep the BE in sync, even when the user
+    // only edited the distance number. Detect whether the addresses actually changed so we can skip the
+    // optimistic side effects (pending field, route clearing, render-path swap to interactive map) that
+    // would otherwise make the parent map briefly disappear on a pure distance edit.
+    const haveWaypointsActuallyChanged =
+        'waypoints' in transactionChanges &&
+        (() => {
+            const oldWaypoints = transaction?.comment?.waypoints ?? {};
+            const newWaypoints = transactionChanges.waypoints ?? {};
+            const getAddresses = (collection: WaypointCollection) =>
+                Object.fromEntries(Object.entries(collection).map(([key, waypoint]) => [key, waypoint && 'address' in waypoint ? waypoint.address : undefined]));
+            return !deepEqual(getAddresses(oldWaypoints), getAddresses(newWaypoints));
+        })();
+    const shouldSuppressWaypointsAsPending = 'waypoints' in transactionChanges && !haveWaypointsActuallyChanged;
+
+    // Step 1: Set any "pending fields" (ones updated while the user was offline) to have error messages in the failureData
+    const pendingFields: OnyxTypes.Transaction['pendingFields'] = Object.fromEntries(
+        Object.keys(transactionChanges)
+            .filter((key) => !(shouldSuppressWaypointsAsPending && key === 'waypoints'))
+            .map((key) => [key, CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE]),
+    );
+    const clearedPendingFields = getClearedPendingFields(transactionChanges);
+    const errorFields = Object.fromEntries(Object.keys(pendingFields).map((key) => [key, getMicroSecondOnyxErrorWithTranslationKey('iou.error.genericEditFailureMessage')]));
+
     const isTransactionOnHold = isOnHold(transaction);
     const isFromExpenseReport = isExpenseReport(iouReport) || isInvoiceReportReportUtils(iouReport);
+    // Drop the waypoints from the changes fed to getUpdatedTransaction when they didn't actually change,
+    // so we skip the waypoints branch that flips isLoading and clobbers amount/merchant before being
+    // re-overridden by the distance branch.
+    const transactionChangesForOptimisticMerge: TransactionChanges = shouldSuppressWaypointsAsPending
+        ? Object.fromEntries(Object.entries(transactionChanges).filter(([key]) => key !== 'waypoints'))
+        : transactionChanges;
     const updatedTransaction: OnyxEntry<OnyxTypes.Transaction> = transaction
         ? getUpdatedTransaction({
               transaction,
-              transactionChanges,
+              transactionChanges: transactionChangesForOptimisticMerge,
               isFromExpenseReport,
               isSplitTransaction,
               policy,
@@ -984,18 +1009,6 @@ function getUpdateMoneyRequestParams(params: GetUpdateMoneyRequestParamsType): U
     };
 
     const hasPendingWaypoints = 'waypoints' in transactionChanges;
-    // The manual-distance submit path always passes the current waypoints to keep the merge consistent,
-    // even when the user only edited the distance number. Compare against the existing transaction so we
-    // can tell apart a real waypoint edit (route invalidated) from a pure distance edit (route still valid).
-    const haveWaypointsActuallyChanged =
-        hasPendingWaypoints &&
-        (() => {
-            const oldWaypoints = transaction?.comment?.waypoints ?? {};
-            const newWaypoints = transactionChanges.waypoints ?? {};
-            const getAddresses = (collection: WaypointCollection) =>
-                Object.fromEntries(Object.entries(collection).map(([key, waypoint]) => [key, waypoint && 'address' in waypoint ? waypoint.address : undefined]));
-            return !deepEqual(getAddresses(oldWaypoints), getAddresses(newWaypoints));
-        })();
     const hasModifiedDistanceRate = 'customUnitRateID' in transactionChanges;
     const hasModifiedCreated = 'created' in transactionChanges;
     const hasModifiedAmount = 'amount' in transactionChanges;
