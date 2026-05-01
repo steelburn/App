@@ -1,4 +1,3 @@
-import {Str} from 'expensify-common';
 import React, {useEffect, useRef} from 'react';
 import {View} from 'react-native';
 import useLocalize from '@hooks/useLocalize';
@@ -14,7 +13,7 @@ import Text from './Text';
 // cspell:disable
 function findColumnName(header: string, columnRoles?: ColumnRole[]): string {
     let attribute = '';
-    const formattedHeader = Str.removeSpaces(String(header).toLowerCase().trim());
+    const formattedHeader = String(header).toLowerCase().trim().replaceAll(' ', '');
     switch (formattedHeader) {
         case 'email':
         case 'emailaddress':
