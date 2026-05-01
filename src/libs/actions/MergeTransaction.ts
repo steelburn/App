@@ -544,6 +544,7 @@ function mergeTransactionRequest({
                 sourceTransaction.transactionID,
                 sourceIouAction,
                 false,
+                currentUserAccountIDParam,
                 undefined,
                 undefined,
                 actionableWhisperReportActionID,
@@ -587,7 +588,6 @@ function mergeTransactionRequest({
         },
     );
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const optimisticData: Array<OnyxUpdate<UpdateMoneyRequestDataKeys | typeof ONYXKEYS.COLLECTION.MERGE_TRANSACTION>> = [
         ...(onyxTargetTransactionData.optimisticData ?? []),
         optimisticMergeTransactionData,
@@ -595,7 +595,6 @@ function mergeTransactionRequest({
         ...sourceTransactionOptimisticData,
     ];
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const failureData: Array<OnyxUpdate<UpdateMoneyRequestDataKeys>> = [...(onyxTargetTransactionData.failureData ?? []), ...failureTransactionViolations, ...sourceTransactionFailureData];
 
     const successData: Array<OnyxUpdate<UpdateMoneyRequestDataKeys>> = [];
