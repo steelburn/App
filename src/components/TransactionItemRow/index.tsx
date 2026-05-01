@@ -239,7 +239,6 @@ function TransactionItemRow({
     const StyleUtils = useStyleUtils();
     const theme = useTheme();
     const isLargeScreenWidth = isLargeScreenWidthProp ?? !shouldUseNarrowLayout;
-    const hasCategoryOrTag = !isCategoryMissing(transactionItem?.category) || !!transactionItem.tag;
 
     // For unreported expenses (SelfDM), use active policy to show policy-specific fields like categories and tags
     const [activePolicyID] = useOnyx(ONYXKEYS.NVP_ACTIVE_POLICY_ID);
