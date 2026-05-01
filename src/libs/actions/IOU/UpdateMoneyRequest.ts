@@ -1,4 +1,3 @@
-import {deepEqual} from 'fast-equals';
 // eslint-disable-next-line you-dont-need-lodash-underscore/union-by
 import lodashUnionBy from 'lodash/unionBy';
 import type {NullishDeep, OnyxCollection, OnyxEntry, OnyxUpdate} from 'react-native-onyx';
@@ -29,6 +28,7 @@ import {
     getClearedPendingFields,
     getMerchant,
     getUpdatedTransaction,
+    haveWaypointAddressesChanged,
     isDistanceRequest as isDistanceRequestTransactionUtils,
     isFetchingWaypointsFromServer,
     isOnHold,
@@ -952,15 +952,7 @@ function getUpdateMoneyRequestParams(params: GetUpdateMoneyRequestParamsType): U
     // only edited the distance number. Detect whether the addresses actually changed so we can skip the
     // optimistic side effects (pending field, route clearing, render-path swap to interactive map) that
     // would otherwise make the parent map briefly disappear on a pure distance edit.
-    const haveWaypointsActuallyChanged =
-        'waypoints' in transactionChanges &&
-        (() => {
-            const oldWaypoints = transaction?.comment?.waypoints ?? {};
-            const newWaypoints = transactionChanges.waypoints ?? {};
-            const getAddresses = (collection: WaypointCollection) =>
-                Object.fromEntries(Object.entries(collection).map(([key, waypoint]) => [key, waypoint && 'address' in waypoint ? waypoint.address : undefined]));
-            return !deepEqual(getAddresses(oldWaypoints), getAddresses(newWaypoints));
-        })();
+    const haveWaypointsActuallyChanged = 'waypoints' in transactionChanges && haveWaypointAddressesChanged(transaction?.comment?.waypoints, transactionChanges.waypoints);
     const shouldSuppressWaypointsAsPending = 'waypoints' in transactionChanges && !haveWaypointsActuallyChanged;
 
     // Step 1: Set any "pending fields" (ones updated while the user was offline) to have error messages in the failureData

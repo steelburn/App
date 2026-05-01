@@ -189,6 +189,17 @@ function hasGPSWaypoints(transaction: OnyxEntry<Transaction>) {
     return !!waypoint?.keyForList?.startsWith('gps');
 }
 
+/**
+ * Compare two waypoint collections by their addresses only (ignoring coordinates/names), which is
+ * the meaningful signal for "did the user change the route?". Numeric fields like lat/lng can drift
+ * due to rounding in transaction backups, so they're excluded.
+ */
+function haveWaypointAddressesChanged(oldWaypoints: WaypointCollection | undefined, newWaypoints: WaypointCollection | undefined): boolean {
+    const toAddresses = (collection: WaypointCollection | undefined) =>
+        Object.fromEntries(Object.entries(collection ?? {}).map(([key, waypoint]) => [key, waypoint && 'address' in waypoint ? waypoint.address : undefined]));
+    return !deepEqual(toAddresses(oldWaypoints), toAddresses(newWaypoints));
+}
+
 function isMapDistanceRequest(transaction: OnyxEntry<Transaction>): boolean {
     // This is used during the expense creation flow before the transaction has been saved to the server
     if (transaction && Object.hasOwn(transaction, 'iouRequestType')) {
@@ -2883,6 +2894,7 @@ export {
     isReceiptBeingScanned,
     didReceiptScanSucceed,
     getValidWaypoints,
+    haveWaypointAddressesChanged,
     isDistanceRequest,
     isMapDistanceRequest,
     isGPSDistanceRequest,

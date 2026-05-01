@@ -43,7 +43,7 @@ import Navigation from '@libs/Navigation/Navigation';
 import OnyxTabNavigator, {TabScreenWithFocusTrapWrapper, TopTab} from '@libs/Navigation/OnyxTabNavigator';
 import {roundToTwoDecimalPlaces} from '@libs/NumberUtils';
 import {isPolicyExpenseChat as isPolicyExpenseChatUtil} from '@libs/ReportUtils';
-import {getDistanceInMeters, getRateID, getRequestType, hasRoute, isCustomUnitRateIDForP2P, isWaypointNullIsland} from '@libs/TransactionUtils';
+import {getDistanceInMeters, getRateID, getRequestType, hasRoute, haveWaypointAddressesChanged, isCustomUnitRateIDForP2P, isWaypointNullIsland} from '@libs/TransactionUtils';
 import CONST from '@src/CONST';
 import type {IOUType} from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -509,11 +509,8 @@ function IOURequestStepDistance({
 
             // If nothing was changed, simply go to transaction thread
             // We compare only addresses because numbers are rounded while backup
-            const oldWaypoints = transactionBackup?.comment?.waypoints ?? {};
-            const oldAddresses = Object.fromEntries(Object.entries(oldWaypoints).map(([key, waypoint]) => [key, 'address' in waypoint ? waypoint.address : {}]));
-            const addresses = Object.fromEntries(Object.entries(waypoints).map(([key, waypoint]) => [key, 'address' in waypoint ? waypoint.address : {}]));
             const hasRouteChanged = !deepEqual(transactionBackup?.routes, transaction?.routes);
-            if (deepEqual(oldAddresses, addresses)) {
+            if (!haveWaypointAddressesChanged(transactionBackup?.comment?.waypoints, waypoints)) {
                 transactionWasSaved.current = true;
                 navigateBackAfterSave();
                 return;
@@ -601,10 +598,7 @@ function IOURequestStepDistance({
 
         // Check if waypoints were edited on the map tab before the user switched to manual.
         // If so, we must still send the update even if the distance value itself didn't change.
-        const oldWaypoints = transactionBackup?.comment?.waypoints ?? {};
-        const oldAddresses = Object.fromEntries(Object.entries(oldWaypoints).map(([key, waypoint]) => [key, 'address' in waypoint ? waypoint.address : {}]));
-        const currentAddresses = Object.fromEntries(Object.entries(waypoints).map(([key, waypoint]) => [key, 'address' in waypoint ? waypoint.address : {}]));
-        const haveWaypointsChanged = !deepEqual(oldAddresses, currentAddresses);
+        const haveWaypointsChanged = haveWaypointAddressesChanged(transactionBackup?.comment?.waypoints, waypoints);
 
         if (!isDistanceChanged && !isDistanceUnitChanged && !haveWaypointsChanged) {
             transactionWasSaved.current = true;

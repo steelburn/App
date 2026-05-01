@@ -38,7 +38,7 @@ import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import {shouldUseTransactionDraft} from '@libs/IOUUtils';
 import Navigation from '@libs/Navigation/Navigation';
 import {isPolicyExpenseChat as isPolicyExpenseChatUtil} from '@libs/ReportUtils';
-import {getDistanceInMeters, getRateID, getRequestType, hasRoute, isCustomUnitRateIDForP2P, isWaypointNullIsland} from '@libs/TransactionUtils';
+import {getDistanceInMeters, getRateID, getRequestType, hasRoute, haveWaypointAddressesChanged, isCustomUnitRateIDForP2P, isWaypointNullIsland} from '@libs/TransactionUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
@@ -441,11 +441,8 @@ function IOURequestStepDistanceMap({
 
             // If nothing was changed, simply go to transaction thread
             // We compare only addresses because numbers are rounded while backup
-            const oldWaypoints = transactionBackup?.comment?.waypoints ?? {};
-            const oldAddresses = Object.fromEntries(Object.entries(oldWaypoints).map(([key, waypoint]) => [key, 'address' in waypoint ? waypoint.address : {}]));
-            const addresses = Object.fromEntries(Object.entries(waypoints).map(([key, waypoint]) => [key, 'address' in waypoint ? waypoint.address : {}]));
             const hasRouteChanged = !deepEqual(transactionBackup?.routes, transaction?.routes);
-            if (deepEqual(oldAddresses, addresses)) {
+            if (!haveWaypointAddressesChanged(transactionBackup?.comment?.waypoints, waypoints)) {
                 navigateBack();
                 return;
             }
