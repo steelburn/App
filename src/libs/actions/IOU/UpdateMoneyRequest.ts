@@ -9,7 +9,7 @@ import DistanceRequestUtils from '@libs/DistanceRequestUtils';
 import {getMicroSecondOnyxErrorWithTranslationKey} from '@libs/ErrorUtils';
 // eslint-disable-next-line @typescript-eslint/no-deprecated
 import {buildNextStepNew, buildOptimisticNextStep} from '@libs/NextStepUtils';
-import {getDistanceRateOriginalPolicyID, hasDependentTags, isPaidGroupPolicy} from '@libs/PolicyUtils';
+import {getDistanceRateOriginalPolicy, hasDependentTags, isPaidGroupPolicy} from '@libs/PolicyUtils';
 import type {TransactionDetails} from '@libs/ReportUtils';
 import {
     buildOptimisticModifiedExpenseReportAction,
@@ -951,13 +951,17 @@ function getUpdateMoneyRequestParams(params: GetUpdateMoneyRequestParamsType): U
 
     const isTransactionOnHold = isOnHold(transaction);
     const isFromExpenseReport = isExpenseReport(iouReport) || isInvoiceReportReportUtils(iouReport);
+    // For unreported distance expenses, resolve the policy that owns the customUnitRateID
+    // so the optimistic amount is calculated with the correct rate, not the default workspace rate.
+    const distanceOriginalPolicy = transaction && isDistanceRequestTransactionUtils(transaction) ? getDistanceRateOriginalPolicy(transaction) : undefined;
+    const policyForTransaction = distanceOriginalPolicy ?? policy;
     const updatedTransaction: OnyxEntry<OnyxTypes.Transaction> = transaction
         ? getUpdatedTransaction({
               transaction,
               transactionChanges,
               isFromExpenseReport,
               isSplitTransaction,
-              policy,
+              policy: policyForTransaction,
           })
         : undefined;
 
@@ -1472,12 +1476,17 @@ function getUpdateTrackExpenseParams(
     const transactionThread = getAllReports()?.[`${ONYXKEYS.COLLECTION.REPORT}${transactionThreadReportID}`] ?? null;
     const transaction = getAllTransactions()?.[`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`];
     const chatReport = getAllReports()?.[`${ONYXKEYS.COLLECTION.REPORT}${transactionThread?.parentReportID}`] ?? null;
+    // For unreported distance expenses, resolve the policy that owns the customUnitRateID
+    // so the optimistic amount is calculated with the correct rate, not the default workspace rate.
+    const isDistanceTransaction = transaction && isDistanceRequestTransactionUtils(transaction);
+    const distanceOriginalPolicy = isDistanceTransaction ? getDistanceRateOriginalPolicy(transaction) : undefined;
+    const policyForTransaction = distanceOriginalPolicy ?? policy;
     const updatedTransaction = transaction
         ? getUpdatedTransaction({
               transaction,
               transactionChanges,
               isFromExpenseReport: false,
-              policy,
+              policy: policyForTransaction,
           })
         : null;
     const transactionDetails = getTransactionDetails(updatedTransaction);
@@ -1488,11 +1497,7 @@ function getUpdateTrackExpenseParams(
 
     const dataToIncludeInParams: Partial<TransactionDetails> = Object.fromEntries(Object.entries(transactionDetails ?? {}).filter(([key]) => key in transactionChanges));
 
-    // For distance requests, resolve the policyID from the rate's original policy so the
-    // backend receives the correct workspace context, even when the expense is unreported
-    // and the caller's `policy` is the user's default workspace.
-    const isDistanceTransaction = transaction && isDistanceRequestTransactionUtils(transaction);
-    const distancePolicyID = isDistanceTransaction ? getDistanceRateOriginalPolicyID(transaction) : undefined;
+    const distancePolicyID = isDistanceTransaction ? distanceOriginalPolicy?.id : undefined;
 
     const apiParams: UpdateMoneyRequestParams = {
         ...dataToIncludeInParams,

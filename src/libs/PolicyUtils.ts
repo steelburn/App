@@ -260,6 +260,14 @@ function getDistanceRateOriginalPolicyID(transaction: OnyxEntry<Transaction>): s
 }
 
 /**
+ * Returns the full policy object that owns the transaction's distance customUnitRateID,
+ * using the module-level allPolicies cache.
+ */
+function getDistanceRateOriginalPolicy(transaction: OnyxEntry<Transaction>): OnyxEntry<Policy> {
+    return getPolicyByCustomUnitRateID(transaction, allPolicies);
+}
+
+/**
  * Retrieves custom unit rate object from the given customUnitRateID
  */
 function getDistanceRateCustomUnitRate(policy: OnyxEntry<Policy>, customUnitRateID: string): Rate | undefined {
@@ -2298,6 +2306,7 @@ export {
     getPolicyByCustomUnitID,
     getPolicyByCustomUnitRateID,
     getDistanceRateOriginalPolicyID,
+    getDistanceRateOriginalPolicy,
     getDistanceRateCustomUnitRate,
     getPerDiemRateCustomUnitRate,
     sortWorkspacesBySelected,
