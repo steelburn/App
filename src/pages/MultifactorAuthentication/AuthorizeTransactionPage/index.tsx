@@ -7,7 +7,6 @@ import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import {AuthorizeTransactionCancelConfirmModal} from '@components/MultifactorAuthentication/components/Modals';
 import ScenarioConfigs from '@components/MultifactorAuthentication/config/scenarios';
 import {
-    AlreadyReviewedFailureScreen,
     DeniedTransactionServerFailureScreen,
     DeniedTransactionSuccessScreen,
 } from '@components/MultifactorAuthentication/config/scenarios/AuthorizeTransaction';
@@ -26,6 +25,7 @@ import type {MultifactorAuthenticationParamList} from '@libs/Navigation/types';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type SCREENS from '@src/SCREENS';
+import FullScreenLoadingIndicator from '@components/FullscreenLoadingIndicator';
 import MultifactorAuthenticationAuthorizeTransactionActions from './AuthorizeTransactionActions';
 import MultifactorAuthenticationAuthorizeTransactionContent from './AuthorizeTransactionContent';
 
@@ -141,7 +141,7 @@ function MultifactorAuthenticationScenarioAuthorizeTransactionPage({route}: Mult
         addBreadcrumb('Transaction unavailable', {transactionID, isDenyingTransaction}, 'warning');
         return (
             <ScreenWrapper testID={MultifactorAuthenticationScenarioAuthorizeTransactionPage.displayName}>
-                <AlreadyReviewedFailureScreen />
+                <FullScreenLoadingIndicator reasonAttributes={{context: 'MultifactorAuthenticationScenarioAuthorizeTransactionPage'}} />
             </ScreenWrapper>
         );
     }
