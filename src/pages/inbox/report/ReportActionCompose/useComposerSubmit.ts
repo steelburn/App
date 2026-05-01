@@ -4,6 +4,7 @@ import type {OnyxEntry} from 'react-native-onyx';
 import {usePersonalDetails} from '@components/OnyxListItemProvider';
 import useAncestors from '@hooks/useAncestors';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
+import useDelegateAccountID from '@hooks/useDelegateAccountID';
 import useIsInSidePanel from '@hooks/useIsInSidePanel';
 import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
@@ -32,6 +33,7 @@ function useComposerSubmit(reportID: string): (comment: string) => void {
     const {availableLoginsList} = useShortMentionsList();
     const isInSidePanel = useIsInSidePanel();
     const [quickAction] = useOnyx(ONYXKEYS.NVP_QUICK_ACTION_GLOBAL_CREATE);
+    const delegateAccountID = useDelegateAccountID();
 
     const {attachmentFileRef} = useComposerMeta();
     const {scrollOffsetRef} = useContext(ActionListContext);
@@ -69,6 +71,7 @@ function useComposerSubmit(reportID: string): (comment: string) => void {
                 timezone: currentUserPersonalDetails.timezone,
                 shouldPlaySound: true,
                 isInSidePanel,
+                delegateAccountID,
             });
             attachmentFileRef.current = null;
             return;
@@ -140,6 +143,7 @@ function useComposerSubmit(reportID: string): (comment: string) => void {
             shouldPlaySound: true,
             isInSidePanel,
             reportActionID: optimisticReportActionID,
+            delegateAccountID,
         });
     };
 }
