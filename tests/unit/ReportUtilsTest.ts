@@ -117,6 +117,7 @@ import {
     getWorkspaceNameUpdatedMessage,
     hasActionWithErrorsForTransaction,
     hasEmptyReportsForPolicy,
+    hasPendingWorkflowUpdate,
     hasReceiptError,
     hasSmartscanError,
     hasVisibleReportFieldViolations,
@@ -5318,6 +5319,20 @@ describe('ReportUtils', () => {
 
         it('should return false when pendingFields exists but preview is not DELETE', () => {
             expect(isReportPendingDelete({pendingFields: {preview: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE}})).toBe(false);
+        });
+    });
+
+    describe('hasPendingWorkflowUpdate', () => {
+        it('should return true when pendingFields.nextStep is UPDATE', () => {
+            expect(hasPendingWorkflowUpdate({pendingFields: {nextStep: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE}})).toBe(true);
+        });
+
+        it('should return false when pendingFields.nextStep is not UPDATE', () => {
+            expect(hasPendingWorkflowUpdate({pendingFields: {nextStep: null}})).toBe(false);
+        });
+
+        it('should return false for undefined report', () => {
+            expect(hasPendingWorkflowUpdate(undefined)).toBe(false);
         });
     });
 
