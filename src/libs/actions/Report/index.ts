@@ -5507,7 +5507,10 @@ function resolveActionableMentionWhisper(
             parentInviteData = buildParticipantsInviteData(ancestorReport, inviteeAccountIDs);
         }
     }
-    const parentReportIDForUpdate = parentInviteData ? (parentReport?.reportID !== reportID ? parentReport?.reportID : report?.parentReportID) : undefined;
+    let parentReportIDForUpdate: string | undefined;
+    if (parentInviteData) {
+        parentReportIDForUpdate = parentReport?.reportID !== reportID ? parentReport?.reportID : report?.parentReportID;
+    }
     const parentParticipantsOptimisticData = parentInviteData?.optimistic;
     const parentParticipantsFailureData = parentInviteData?.failure;
 
