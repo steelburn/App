@@ -175,7 +175,7 @@ function useTransactionInlineEdit({
             transactionID,
             parentReport: parentReport ?? fallbackReport,
             transactionThreadReport,
-            policy,
+            policy: completePolicy ?? policy,
             policyCategories,
             policyTags,
             policyRecentlyUsedCategories,
