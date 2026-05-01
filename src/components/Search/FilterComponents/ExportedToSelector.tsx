@@ -17,6 +17,7 @@ import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import {filterPolicyIDSelector} from '@src/selectors/Search';
 import getEmptyArray from '@src/types/utils/getEmptyArray';
+import type IconAsset from '@src/types/utils/IconAsset';
 import MultiSelect from './MultiSelect';
 
 type ExportedToSelectorProps = {
@@ -34,7 +35,17 @@ function ExportedToSelector({value = [], onChange}: ExportedToSelectorProps) {
     const {translate} = useLocalize();
     const StyleUtils = useStyleUtils();
     const theme = useTheme();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['XeroSquare', 'QBOSquare', 'NetSuiteSquare', 'IntacctSquare', 'QBDSquare', 'CertiniaSquare', 'GustoSquare', 'Table']);
+    const expensifyIcons = useMemoizedLazyExpensifyIcons([
+        'XeroSquare',
+        'QBOSquare',
+        'NetSuiteSquare',
+        'IntacctSquare',
+        'QBDSquare',
+        'CertiniaSquare',
+        'GustoSquare',
+        'Table',
+        'TablePencil',
+    ]);
     const [integrationsExportTemplates] = useOnyx(ONYXKEYS.NVP_INTEGRATION_SERVER_EXPORT_TEMPLATES);
     const [csvExportLayouts] = useOnyx(ONYXKEYS.NVP_CSV_EXPORT_LAYOUTS);
     const [policyIDs = getEmptyArray<string>()] = useOnyx(ONYXKEYS.FORMS.SEARCH_ADVANCED_FILTERS_FORM, {selector: filterPolicyIDSelector});
@@ -44,10 +55,10 @@ function ExportedToSelector({value = [], onChange}: ExportedToSelectorProps) {
 
     const integrationConnectionNames = CONST.POLICY.CONNECTIONS.ACCOUNTING_CONNECTION_NAMES;
 
-    const tableIconForExportOption = (
+    const tableIconForExportOption = (tableIcon: IconAsset) => (
         <View style={[styles.mr3, styles.alignItemsCenter, styles.justifyContentCenter, StyleUtils.getWidthAndHeightStyle(variables.w28, variables.h28)]}>
             <Icon
-                src={expensifyIcons.Table}
+                src={tableIcon}
                 fill={theme.icon}
                 width={variables.iconSizeNormal}
                 height={variables.iconSizeNormal}
@@ -71,7 +82,7 @@ function ExportedToSelector({value = [], onChange}: ExportedToSelectorProps) {
                         />
                     </View>
                 ) : (
-                    tableIconForExportOption
+                    tableIconForExportOption(expensifyIcons.Table)
                 );
                 return {
                     text: CONST.POLICY.CONNECTIONS.NAME_USER_FRIENDLY[connectionName],
@@ -108,10 +119,11 @@ function ExportedToSelector({value = [], onChange}: ExportedToSelectorProps) {
             }
 
             usedPickerValueKeys.add(filterValue);
+            const isStandardTemplate = !!STANDARD_EXPORT_TEMPLATE_ID_TO_DISPLAY_LABEL[template.templateName];
             standardAndIntegrationCustomTemplatePickerItems.push({
                 text: displayName,
                 value: filterValue,
-                leftElement: tableIconForExportOption,
+                leftElement: tableIconForExportOption(isStandardTemplate ? expensifyIcons.Table : expensifyIcons.TablePencil),
             });
         }
 
