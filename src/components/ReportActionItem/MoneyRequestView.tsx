@@ -50,9 +50,11 @@ import {hasEnabledOptions, sortAlphabetically} from '@libs/OptionsListUtils';
 import Parser from '@libs/Parser';
 import {
     canSubmitPerDiemExpenseFromWorkspace,
+    getDistanceRateCustomUnit,
     getLengthOfTag,
     getPerDiemCustomUnit,
     getPolicyByCustomUnitID,
+    getPolicyByCustomUnitRateID,
     getTagLists,
     hasDependentTags as hasDependentTagsPolicyUtils,
     isAttendeeTrackingEnabled,
@@ -161,6 +163,15 @@ const perDiemPoliciesSelector = (policies: OnyxCollection<OnyxTypes.Policy>) => 
     );
 };
 
+const distancePoliciesSelector = (policies: OnyxCollection<OnyxTypes.Policy>) => {
+    return Object.fromEntries(
+        Object.entries(policies ?? {}).filter(([, policy]) => {
+            const distanceUnit = getDistanceRateCustomUnit(policy);
+            return !!distanceUnit?.rates && !isEmptyObject(distanceUnit.rates);
+        }),
+    );
+};
+
 function MoneyRequestView({
     transactionThreadReport,
     parentReportID,
@@ -209,6 +220,11 @@ function MoneyRequestView({
     });
     const isPerDiemRequest = isPerDiemRequestTransactionUtils(transaction);
     const perDiemOriginalPolicy = getPolicyByCustomUnitID(transaction, policiesWithPerDiem);
+
+    const [policiesWithDistance] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {
+        selector: distancePoliciesSelector,
+    });
+    const distanceOriginalPolicy = isDistanceRequestTransactionUtils(transaction) && isExpenseUnreported ? getPolicyByCustomUnitRateID(transaction, policiesWithDistance) : undefined;
 
     let policy;
     let policyID;
@@ -457,7 +473,7 @@ function MoneyRequestView({
     let amountDescription = `${translate('iou.amount')}`;
     let dateDescription = `${translate('common.date')}`;
 
-    const {unit, rate, name: rateName} = DistanceRequestUtils.getRate({transaction: updatedTransaction ?? transaction, policy});
+    const {unit, rate, name: rateName} = DistanceRequestUtils.getRate({transaction: updatedTransaction ?? transaction, policy: distanceOriginalPolicy ?? policy});
     const distance = getDistanceInMeters(transactionBackup ?? updatedTransaction ?? transaction, unit);
     const currency = transactionCurrency ?? CONST.CURRENCY.USD;
     const hasRequiredCompanyCardViolation = transactionViolations.some((violation) => violation.name === CONST.VIOLATIONS.COMPANY_CARD_REQUIRED);
