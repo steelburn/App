@@ -149,6 +149,9 @@ function updateMultipleMoneyRequests({
         // Category, tag, tax, and billable only apply to expense/invoice reports and unreported (track) expenses.
         // For plain IOU transactions these fields are not applicable and must be silently skipped.
         const supportsExpenseFields = isUnreportedExpense || isFromExpenseReport || isInvoiceReportReportUtils(baseIouReport ?? undefined);
+        // Split children must keep their amount/currency/tax in sync with the split parent's totals.
+        // Allow coding fields (category, tag, merchant, etc.) but block these so we never desync the split.
+        const isSplitChild = transaction.comment?.source === CONST.IOU.TYPE.SPLIT;
         // Use the transaction's own policy for all per-transaction checks (permissions, tax, change-diffing).
         // Falls back to the shared bulk-edit policy when the transaction's workspace cannot be resolved.
         const transactionPolicy = (iouReport?.policyID ? allPolicies?.[`${ONYXKEYS.COLLECTION.POLICY}${iouReport.policyID}`] : undefined) ?? policy;
@@ -170,7 +173,7 @@ function updateMultipleMoneyRequests({
         if (changes.created && canEditField(CONST.EDIT_REQUEST_FIELD.DATE)) {
             transactionChanges.created = changes.created;
         }
-        if (changes.amount !== undefined && canEditField(CONST.EDIT_REQUEST_FIELD.AMOUNT)) {
+        if (changes.amount !== undefined && !isSplitChild && canEditField(CONST.EDIT_REQUEST_FIELD.AMOUNT)) {
             transactionChanges.amount = changes.amount;
         }
         // When bulk-editing amount on a taxed expense without also changing taxCode, recompute
@@ -178,7 +181,7 @@ function updateMultipleMoneyRequests({
         // queued payload stay in sync with the new amount. Skip when the rate can't be resolved
         // (e.g. cross-policy bulk edit where the transaction's own policy is missing from cache)
         // to avoid silently overwriting a non-zero taxAmount with 0.
-        if (changes.amount !== undefined && !changes.taxCode && transaction.taxCode && supportsExpenseFields && canEditField(CONST.EDIT_REQUEST_FIELD.TAX_RATE)) {
+        if (changes.amount !== undefined && !isSplitChild && !changes.taxCode && transaction.taxCode && supportsExpenseFields && canEditField(CONST.EDIT_REQUEST_FIELD.TAX_RATE)) {
             const taxValue = getTaxValue(transactionPolicy, transaction, transaction.taxCode);
             if (taxValue) {
                 const decimals = getCurrencyDecimals(getCurrency(transaction));
@@ -186,7 +189,7 @@ function updateMultipleMoneyRequests({
                 transactionChanges.taxAmount = convertToBackendAmount(taxAmount);
             }
         }
-        if (changes.currency && canEditField(CONST.EDIT_REQUEST_FIELD.CURRENCY)) {
+        if (changes.currency && !isSplitChild && canEditField(CONST.EDIT_REQUEST_FIELD.CURRENCY)) {
             transactionChanges.currency = changes.currency;
         }
         if (changes.category !== undefined && supportsExpenseFields && canEditField(CONST.EDIT_REQUEST_FIELD.CATEGORY)) {
@@ -198,7 +201,7 @@ function updateMultipleMoneyRequests({
         if (changes.comment && canEditField(CONST.EDIT_REQUEST_FIELD.DESCRIPTION)) {
             transactionChanges.comment = getParsedComment(changes.comment);
         }
-        if (changes.taxCode && supportsExpenseFields && canEditField(CONST.EDIT_REQUEST_FIELD.TAX_RATE)) {
+        if (changes.taxCode && supportsExpenseFields && !isSplitChild && canEditField(CONST.EDIT_REQUEST_FIELD.TAX_RATE)) {
             transactionChanges.taxCode = changes.taxCode;
             const taxValue = getTaxValue(transactionPolicy, transaction, changes.taxCode);
             transactionChanges.taxValue = taxValue;
