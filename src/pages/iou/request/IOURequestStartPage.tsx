@@ -200,7 +200,6 @@ function IOURequestStartPage({
 
     const {isBetaEnabled} = usePermissions();
     const isNewManualExpenseFlowEnabled = isBetaEnabled(CONST.BETAS.NEW_MANUAL_EXPENSE_FLOW);
-    const shouldShowConfirmationOnStartPage = isNewManualExpenseFlowEnabled && shouldUseTab && (selectedTab === CONST.TAB_REQUEST.MANUAL || selectedTab === CONST.TAB_REQUEST.SCAN);
 
     const onBackButtonPress = () => {
         navigateBack();
@@ -226,7 +225,8 @@ function IOURequestStartPage({
                 testID="IOURequestStartPage"
                 focusTrapSettings={{containerElements: focusTrapContainerElements}}
             >
-                <DragAndDropProvider isDisabled={selectedTab !== CONST.TAB_REQUEST.SCAN || shouldShowConfirmationOnStartPage}>
+                {/* If the new manual expense flow is enabled, the confirmation screen is shown on the start page, so we do not want to disable the drag and drop provider in that case */}
+                <DragAndDropProvider isDisabled={selectedTab !== CONST.TAB_REQUEST.SCAN && !(isNewManualExpenseFlowEnabled && selectedTab === CONST.TAB_REQUEST.MANUAL)}>
                     <View style={styles.flex1}>
                         <FocusTrapContainerElement
                             onContainerElementChanged={setHeaderWithBackButtonContainerElement}
