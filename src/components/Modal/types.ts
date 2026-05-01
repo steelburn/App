@@ -126,6 +126,12 @@ type BaseModalProps = Partial<ReanimatedModalProps> &
         shouldDisplayBelowModals?: boolean;
 
         /**
+         * Whether a RIGHT_DOCKED modal should keep its backdrop when rendered in a narrow pane context.
+         * Use this only for nested flows that still require visual dimming.
+         */
+        shouldEnableBackdropInNarrowPane?: boolean;
+
+        /**
          * Whether the modal should wrap the children in a scroll view if it is a bottom docked modal in landscape mode.
          * Defaults to true.
          */

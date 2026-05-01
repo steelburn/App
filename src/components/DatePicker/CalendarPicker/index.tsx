@@ -58,6 +58,9 @@ type CalendarPickerProps = {
 
     /** Optional style override for the header container */
     headerContainerStyle?: StyleProp<ViewStyle>;
+
+    /** Whether Month/Year right-docked picker modals should keep backdrop in narrow pane context */
+    shouldEnableMonthYearBackdropInNarrowPane?: boolean;
 };
 
 function getInitialCurrentDateView(value: Date | string, minDate: Date, maxDate: Date) {
@@ -80,6 +83,7 @@ function CalendarPicker({
     DayComponent = Day,
     selectableDates,
     headerContainerStyle,
+    shouldEnableMonthYearBackdropInNarrowPane = false,
 }: CalendarPickerProps) {
     // eslint-disable-next-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidth
     const {isSmallScreenWidth} = useResponsiveLayout();
@@ -428,6 +432,7 @@ function CalendarPicker({
                 currentYear={currentYearView}
                 onYearChange={onYearSelected}
                 onClose={() => setIsYearPickerVisible(false)}
+                shouldEnableBackdropInNarrowPane={shouldEnableMonthYearBackdropInNarrowPane}
             />
             <MonthPickerModal
                 isVisible={isMonthPickerVisible}
@@ -437,6 +442,7 @@ function CalendarPicker({
                 maxDate={maxDate}
                 onMonthChange={onMonthSelected}
                 onClose={() => setIsMonthPickerVisible(false)}
+                shouldEnableBackdropInNarrowPane={shouldEnableMonthYearBackdropInNarrowPane}
             />
         </View>
     );

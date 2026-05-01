@@ -31,9 +31,21 @@ type MonthPickerModalProps = {
 
     /** Function to call when the user closes the month picker */
     onClose?: () => void;
+
+    /** Whether RIGHT_DOCKED modal should keep backdrop in narrow pane context */
+    shouldEnableBackdropInNarrowPane?: boolean;
 };
 
-function MonthPickerModal({isVisible, currentMonth = new Date().getMonth(), currentYear = new Date().getFullYear(), minDate, maxDate, onMonthChange, onClose}: MonthPickerModalProps) {
+function MonthPickerModal({
+    isVisible,
+    currentMonth = new Date().getMonth(),
+    currentYear = new Date().getFullYear(),
+    minDate,
+    maxDate,
+    onMonthChange,
+    onClose,
+    shouldEnableBackdropInNarrowPane = false,
+}: MonthPickerModalProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const [searchText, setSearchText] = useState('');
@@ -75,6 +87,7 @@ function MonthPickerModal({isVisible, currentMonth = new Date().getMonth(), curr
             shouldHandleNavigationBack
             shouldUseCustomBackdrop
             onBackdropPress={onClose}
+            shouldEnableBackdropInNarrowPane={shouldEnableBackdropInNarrowPane}
             enableEdgeToEdgeBottomSafeAreaPadding
         >
             <ScreenWrapper

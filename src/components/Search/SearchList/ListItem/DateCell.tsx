@@ -3,6 +3,7 @@ import DatePickerModal from '@components/DatePicker/DatePickerModal';
 import {EditableCell, usePopoverEditState} from '@components/Table/EditableCell';
 import type {EditableProps} from '@components/Table/EditableCell/types';
 import TextWithTooltip from '@components/TextWithTooltip';
+import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
 import DateUtils from '@libs/DateUtils';
 import CONST from '@src/CONST';
@@ -16,6 +17,7 @@ type DateCellProps = {
 
 function DateCell({date, showTooltip, isLargeScreenWidth, suffixText, canEdit, onSave}: DateCellProps) {
     const styles = useThemeStyles();
+    const {isInNarrowPaneModal} = useResponsiveLayout();
     const {isEditing, anchorRef, isPopoverVisible, popoverPosition, isInverted, startEditing, cancelEditing} = usePopoverEditState({canEdit});
 
     const formattedDate = DateUtils.formatWithUTCTimeZone(date, DateUtils.doesDateBelongToAPastYear(date) ? CONST.DATE.MONTH_DAY_YEAR_ABBR_FORMAT : CONST.DATE.MONTH_DAY_ABBR_FORMAT);
@@ -55,6 +57,7 @@ function DateCell({date, showTooltip, isLargeScreenWidth, suffixText, canEdit, o
                     minDate={CONST.CALENDAR_PICKER.MIN_DATE}
                     maxDate={CONST.CALENDAR_PICKER.MAX_DATE}
                     inputID="EditableDateCell"
+                    shouldEnableMonthYearBackdropInNarrowPane={isEditing && isInNarrowPaneModal}
                 />
             }
         >
