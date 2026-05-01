@@ -6,13 +6,9 @@ import useLocalize from '@hooks/useLocalize';
 import useOnboardingMessages from '@hooks/useOnboardingMessages';
 import useOnyx from '@hooks/useOnyx';
 import usePreferredPolicy from '@hooks/usePreferredPolicy';
-// eslint-disable-next-line no-restricted-syntax
 import * as navigateAfterOnboarding from '@libs/navigateAfterOnboarding';
-// eslint-disable-next-line no-restricted-syntax
 import * as Policy from '@userActions/Policy/Policy';
-// eslint-disable-next-line no-restricted-syntax
 import * as Report from '@userActions/Report';
-// eslint-disable-next-line no-restricted-syntax
 import * as Welcome from '@userActions/Welcome';
 import CONST from '@src/CONST';
 
