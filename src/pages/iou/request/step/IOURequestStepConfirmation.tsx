@@ -11,6 +11,7 @@ import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import {ModalActions} from '@components/Modal/Global/ModalContext';
 import MoneyRequestConfirmationList from '@components/MoneyRequestConfirmationList';
 import {usePersonalDetails, usePolicyCategories} from '@components/OnyxListItemProvider';
+import ParticipantPicker from '@components/ParticipantPicker';
 import PrevNextButtons from '@components/PrevNextButtons';
 import ScreenWrapper from '@components/ScreenWrapper';
 import useConfirmModal from '@hooks/useConfirmModal';
@@ -75,6 +76,7 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import type {Route} from '@src/ROUTES';
 import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
+import type {Participant} from '@src/types/onyx/IOU';
 import type {Receipt} from '@src/types/onyx/Transaction';
 import type {FileObject} from '@src/types/utils/Attachment';
 import isLoadingOnyxValue from '@src/types/utils/isLoadingOnyxValue';
@@ -297,7 +299,7 @@ function IOURequestStepConfirmation({
         ownerBillingGracePeriodEnd,
     ]);
 
-    const shouldOpenParticipantPicker = useMemo(() => {
+    const shouldAutoOpenParticipantPicker = useMemo(() => {
         if (!transaction?.transactionID) {
             return false;
         }
@@ -306,6 +308,38 @@ function IOURequestStepConfirmation({
         const hasDefaultParticipants = defaultParticipants.length > 0;
         return !hasTransactionParticipants && !hasDefaultParticipants && isNewManualExpenseFlowEnabled && isManualRequest;
     }, [transaction?.transactionID, transaction?.participants, defaultParticipants.length, isNewManualExpenseFlowEnabled, isManualRequest]);
+    const [isParticipantPickerVisible, setIsParticipantPickerVisible] = useState(false);
+    const [hasAutoOpenedParticipantPicker, setHasAutoOpenedParticipantPicker] = useState(false);
+    const participantPickerIOUType = iouType === CONST.IOU.TYPE.SUBMIT || iouType === CONST.IOU.TYPE.TRACK ? CONST.IOU.TYPE.CREATE : iouType;
+
+    useEffect(() => {
+        setHasAutoOpenedParticipantPicker(false);
+    }, [transaction?.transactionID]);
+
+    useEffect(() => {
+        if (!shouldAutoOpenParticipantPicker || hasAutoOpenedParticipantPicker) {
+            return;
+        }
+        setIsParticipantPickerVisible(true);
+        setHasAutoOpenedParticipantPicker(true);
+    }, [shouldAutoOpenParticipantPicker, hasAutoOpenedParticipantPicker]);
+
+    const closeParticipantPicker = useCallback(() => {
+        setIsParticipantPickerVisible(false);
+    }, []);
+
+    const handleParticipantsAdded = useCallback(
+        (participantsList: Participant[]) => {
+            if (!transaction?.transactionID) {
+                return;
+            }
+            setMoneyRequestParticipants(transaction.transactionID, participantsList);
+            if (participantsList.length > 0) {
+                setIsParticipantPickerVisible(false);
+            }
+        },
+        [transaction?.transactionID],
+    );
 
     useEffect(() => {
         if (!transaction?.transactionID) {
@@ -759,7 +793,7 @@ function IOURequestStepConfirmation({
                             <MoneyRequestConfirmationList
                                 transaction={transaction}
                                 selectedParticipants={participants}
-                                shouldOpenParticipantPicker={shouldOpenParticipantPicker}
+                                onOpenParticipantPicker={() => setIsParticipantPickerVisible(true)}
                                 onToggleBillable={setBillable}
                                 onConfirm={onConfirm}
                                 onSendMoney={sendMoney}
@@ -790,6 +824,19 @@ function IOURequestStepConfirmation({
                             />
                         )}
                     </SubmitExpenseOrchestrator>
+                    {isNewManualExpenseFlowEnabled && (
+                        <ParticipantPicker
+                            participants={participants}
+                            iouType={participantPickerIOUType}
+                            action={action}
+                            isPerDiemRequest={isPerDiemRequest}
+                            isTimeRequest={isTimeRequest}
+                            onParticipantsAdded={handleParticipantsAdded}
+                            onFinish={closeParticipantPicker}
+                            isVisible={isParticipantPickerVisible}
+                            onClose={closeParticipantPicker}
+                        />
+                    )}
                 </View>
             </DragAndDropProvider>
         </ScreenWrapper>

@@ -56,7 +56,6 @@ import {
 } from '@libs/TransactionUtils';
 import {isInvalidMerchantValue, isValidInputLength} from '@libs/ValidationUtils';
 import {getIsViolationFixed} from '@libs/Violations/ViolationsUtils';
-import {setMoneyRequestParticipants} from '@userActions/IOU';
 import {hasInvoicingDetails} from '@userActions/Policy/Policy';
 import type {IOUAction, IOUType} from '@src/CONST';
 import CONST from '@src/CONST';
@@ -78,7 +77,6 @@ import FieldAutoSelector from './MoneyRequestConfirmationList/FieldAutoSelector'
 import SplitBillController from './MoneyRequestConfirmationList/SplitBillController';
 import TaxController from './MoneyRequestConfirmationList/TaxController';
 import MoneyRequestConfirmationListFooter from './MoneyRequestConfirmationListFooter';
-import ParticipantPicker from './ParticipantPicker';
 import {PressableWithFeedback} from './Pressable';
 import {useProductTrainingContext} from './ProductTrainingContext';
 import UserListItem from './SelectionList/ListItem/UserListItem';
@@ -105,8 +103,8 @@ type MoneyRequestConfirmationListProps = {
     /** Selected participants from MoneyRequestModal with login / accountID */
     selectedParticipants: Participant[];
 
-    /** Trigger opening participant picker from parent flow */
-    shouldOpenParticipantPicker?: boolean;
+    /** Callback to open participant picker from parent flow */
+    onOpenParticipantPicker?: () => void;
 
     /** Payee of the expense with login */
     payeePersonalDetails?: OnyxEntry<OnyxTypes.PersonalDetails> | null;
@@ -209,7 +207,6 @@ function MoneyRequestConfirmationList({
     isEditingSplitBill,
     isReceiptEditable,
     selectedParticipants = [],
-    shouldOpenParticipantPicker = false,
     payeePersonalDetails,
     isReadOnly = false,
     policyID,
@@ -230,6 +227,7 @@ function MoneyRequestConfirmationList({
     showRemoveExpenseConfirmModal,
     isTimeRequest = false,
     shouldHideToSection = false,
+    onOpenParticipantPicker,
 }: MoneyRequestConfirmationListProps) {
     const [policyCategoriesReal] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${policyID}`);
     const [policyTags] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_TAGS}${policyID}`);
@@ -381,7 +379,6 @@ function MoneyRequestConfirmationList({
     const [didConfirm, setDidConfirm] = useState(isConfirmed);
     const [didConfirmSplit, setDidConfirmSplit] = useState(false);
     const [showMoreFields, setShowMoreFields] = useState(false);
-    const [isParticipantPickerVisible, setIsParticipantPickerVisible] = useState(false);
 
     useEffect(() => {
         setShowMoreFields(false);
@@ -700,7 +697,6 @@ function MoneyRequestConfirmationList({
     );
 
     const canEditParticipant = isFromGlobalCreateAndCanEditParticipant && !isTestReceipt && (!isRestrictedToPreferredPolicy || isTypeInvoice);
-    const participantPickerIOUType = iouType === CONST.IOU.TYPE.SUBMIT || iouType === CONST.IOU.TYPE.TRACK ? CONST.IOU.TYPE.CREATE : iouType;
     const participantRowErrors = useMemo(() => {
         if (formError !== 'iou.error.noParticipantSelected' && formError !== 'violations.missingAttendees') {
             return undefined;
@@ -709,29 +705,12 @@ function MoneyRequestConfirmationList({
         return {participants: translate(formError)};
     }, [formError, translate]);
 
-    const closeParticipantPicker = useCallback(() => {
-        setIsParticipantPickerVisible(false);
-    }, []);
-
     useEffect(() => {
-        if (shouldOpenParticipantPicker) {
-            setIsParticipantPickerVisible(true);
+        if (selectedParticipants.length === 0) {
             return;
         }
-        setIsParticipantPickerVisible(false);
-    }, [shouldOpenParticipantPicker]);
-
-    const handleParticipantsAdded = useCallback(
-        (participants: Participant[]) => {
-            if (!transactionID) {
-                return;
-            }
-
-            setMoneyRequestParticipants(transactionID, participants);
-            clearFormErrors(['iou.error.noParticipantSelected']);
-        },
-        [transactionID, clearFormErrors],
-    );
+        clearFormErrors(['iou.error.noParticipantSelected']);
+    }, [selectedParticipants.length, clearFormErrors]);
 
     const sections = useMemo(() => {
         const options: Array<Section<MoneyRequestConfirmationListItem>> = [];
@@ -802,7 +781,7 @@ function MoneyRequestConfirmationList({
 
         const newIOUType = iouType === CONST.IOU.TYPE.SUBMIT || iouType === CONST.IOU.TYPE.TRACK ? CONST.IOU.TYPE.CREATE : iouType;
         if (isNewManualExpenseFlowEnabled) {
-            setIsParticipantPickerVisible(true);
+            onOpenParticipantPicker?.();
             return;
         }
 
@@ -1284,18 +1263,6 @@ function MoneyRequestConfirmationList({
                     disableKeyboardShortcuts
                 />
             </MouseProvider>
-            {isNewManualExpenseFlowEnabled && (
-                <ParticipantPicker
-                    iouType={participantPickerIOUType}
-                    action={action}
-                    isPerDiemRequest={isPerDiemRequest}
-                    isTimeRequest={isTimeRequest}
-                    onParticipantsAdded={handleParticipantsAdded}
-                    onFinish={closeParticipantPicker}
-                    isVisible={isParticipantPickerVisible}
-                    onClose={closeParticipantPicker}
-                />
-            )}
         </>
     );
 }
