@@ -247,8 +247,8 @@ describe('AgentZeroStatusContext', () => {
         });
 
         it('should keep indicator visible while server label is active within the safety window', async () => {
-            // Server-label arrival restarts the polling safety timer (startPolling is called
-            // in the label-sync effect). Indicator stays visible for up to MAX_POLL_DURATION_MS
+            // Server-label arrival rearms the safety timer (startSafetyTimer is called in
+            // the label-sync effect). Indicator stays visible for up to MAX_INDICATOR_DURATION_MS
             // from the last label update; as long as the label keeps updating (or reasoning
             // events stream in), the timer keeps resetting. This test verifies the indicator
             // remains visible in the window following a server-label arrival.
@@ -412,43 +412,18 @@ describe('AgentZeroStatusContext', () => {
     });
 
     describe('batched Onyx updates (stuck indicator fix)', () => {
-        const POLL_INTERVAL_MS = 30000;
-        const MAX_POLL_DURATION_MS = 120000;
-        let pollIntervalId: ReturnType<typeof setInterval> | null;
+        const MAX_INDICATOR_DURATION_MS = 120000;
         let safetyTimerId: ReturnType<typeof setTimeout> | null;
-        let originalSetInterval: typeof setInterval;
-        let originalClearInterval: typeof clearInterval;
         let originalSetTimeout: typeof setTimeout;
         let originalClearTimeout: typeof clearTimeout;
 
         beforeEach(() => {
-            pollIntervalId = null;
             safetyTimerId = null;
-            originalSetInterval = global.setInterval;
-            originalClearInterval = global.clearInterval;
             originalSetTimeout = global.setTimeout;
             originalClearTimeout = global.clearTimeout;
 
-            jest.spyOn(global, 'setInterval').mockImplementation(((callback: () => void, ms?: number) => {
-                if (ms === POLL_INTERVAL_MS) {
-                    const id = originalSetInterval(() => {}, 999999);
-                    pollIntervalId = id;
-                    return id;
-                }
-                return originalSetInterval(callback, ms);
-            }) as typeof setInterval);
-
-            jest.spyOn(global, 'clearInterval').mockImplementation((id) => {
-                if (id !== undefined && id !== null && id === pollIntervalId) {
-                    pollIntervalId = null;
-                    originalClearInterval(id);
-                    return;
-                }
-                originalClearInterval(id);
-            });
-
             jest.spyOn(global, 'setTimeout').mockImplementation(((callback: () => void, ms?: number) => {
-                if (ms === MAX_POLL_DURATION_MS) {
+                if (ms === MAX_INDICATOR_DURATION_MS) {
                     const id = originalSetTimeout(() => {}, 0);
                     safetyTimerId = id;
                     return id;
@@ -507,7 +482,6 @@ describe('AgentZeroStatusContext', () => {
             // are the only paths that drop it.
             expect(result.current.isProcessing).toBe(true);
             expect(result.current.statusLabel).toBe('Thinking...');
-            expect(pollIntervalId).not.toBeNull();
             expect(safetyTimerId).not.toBeNull();
         });
     });
@@ -638,57 +612,25 @@ describe('AgentZeroStatusContext', () => {
         });
     });
 
-    describe('safety timeout (polling pattern)', () => {
-        // We spy on setInterval/clearInterval and setTimeout/clearTimeout to capture
-        // the polling and safety timer callbacks rather than using jest.useFakeTimers(),
-        // which interferes with Onyx's async batching.
-        //
-        // Polling: every 30s → getNewerActions, 120s safety → hard clear
-        const POLL_INTERVAL_MS = 30000;
-        const MAX_POLL_DURATION_MS = 120000;
-        let pollCallback: (() => void) | null;
+    describe('safety timeout', () => {
+        // We spy on setTimeout/clearTimeout to capture the 120s safety timer callback
+        // rather than using jest.useFakeTimers(), which interferes with Onyx's async
+        // batching.
+        const MAX_INDICATOR_DURATION_MS = 120000;
         let safetyCallback: (() => void) | null;
-        let pollIntervalId: ReturnType<typeof setInterval> | null;
         let safetyTimerId: ReturnType<typeof setTimeout> | null;
-        let originalSetInterval: typeof setInterval;
-        let originalClearInterval: typeof clearInterval;
         let originalSetTimeout: typeof setTimeout;
         let originalClearTimeout: typeof clearTimeout;
 
         beforeEach(() => {
-            pollCallback = null;
             safetyCallback = null;
-            pollIntervalId = null;
             safetyTimerId = null;
-            originalSetInterval = global.setInterval;
-            originalClearInterval = global.clearInterval;
             originalSetTimeout = global.setTimeout;
             originalClearTimeout = global.clearTimeout;
 
-            // Intercept setInterval to capture the 30s polling callback
-            jest.spyOn(global, 'setInterval').mockImplementation(((callback: () => void, ms?: number) => {
-                if (ms === POLL_INTERVAL_MS) {
-                    const id = originalSetInterval(() => {}, 999999);
-                    pollCallback = callback;
-                    pollIntervalId = id;
-                    return id;
-                }
-                return originalSetInterval(callback, ms);
-            }) as typeof setInterval);
-
-            jest.spyOn(global, 'clearInterval').mockImplementation((id) => {
-                if (id !== undefined && id !== null && id === pollIntervalId) {
-                    pollIntervalId = null;
-                    pollCallback = null;
-                    originalClearInterval(id);
-                    return;
-                }
-                originalClearInterval(id);
-            });
-
             // Intercept setTimeout to capture the 120s safety callback
             jest.spyOn(global, 'setTimeout').mockImplementation(((callback: () => void, ms?: number) => {
-                if (ms === MAX_POLL_DURATION_MS) {
+                if (ms === MAX_INDICATOR_DURATION_MS) {
                     const id = originalSetTimeout(() => {}, 0);
                     safetyCallback = callback;
                     safetyTimerId = id;
@@ -711,7 +653,7 @@ describe('AgentZeroStatusContext', () => {
             jest.restoreAllMocks();
         });
 
-        it('should poll every 30s and auto-clear after 120s safety timeout', async () => {
+        it('should auto-clear after 120s safety timeout when serverLabel is active', async () => {
             // Given a Concierge chat where the server sets a processing indicator
             const serverLabel = 'Concierge is looking up categories...';
 
@@ -722,25 +664,10 @@ describe('AgentZeroStatusContext', () => {
             const {result} = renderHook(() => useAgentZeroStatusIndicator(reportID));
             await waitForBatchedUpdates();
 
-            // Verify processing is active and polling was started
+            // Verify processing is active and the safety timer was armed
             expect(result.current.isProcessing).toBe(true);
             expect(result.current.statusLabel).toBe(serverLabel);
-            expect(pollCallback).not.toBeNull();
             expect(safetyCallback).not.toBeNull();
-
-            // When the poll fires at 30s — fetches newer actions, indicator stays
-            act(() => {
-                pollCallback?.();
-            });
-            await waitForBatchedUpdates();
-            expect(result.current.isProcessing).toBe(true);
-
-            // When another poll fires at 60s — fetches newer actions, indicator stays
-            act(() => {
-                pollCallback?.();
-            });
-            await waitForBatchedUpdates();
-            expect(result.current.isProcessing).toBe(true);
 
             // When the safety timeout fires at 120s — should hard-clear the indicator
             act(() => {
@@ -768,14 +695,7 @@ describe('AgentZeroStatusContext', () => {
             await waitForBatchedUpdates();
             expect(result.current.isProcessing).toBe(true);
             expect(result.current.statusLabel).toBe('Thinking...');
-            expect(pollCallback).not.toBeNull();
-
-            // When a poll fires — fetches newer actions, indicator stays
-            act(() => {
-                pollCallback?.();
-            });
-            await waitForBatchedUpdates();
-            expect(result.current.isProcessing).toBe(true);
+            expect(safetyCallback).not.toBeNull();
 
             // When the safety timeout fires at 120s — should hard-clear
             act(() => {
@@ -790,7 +710,7 @@ describe('AgentZeroStatusContext', () => {
             expect(result.current.statusLabel).toBe('');
         });
 
-        it('should cancel polling when indicator clears normally', async () => {
+        it('should cancel the safety timer when indicator clears normally', async () => {
             // Given a Concierge chat with an active processing indicator
             const serverLabel = 'Concierge is looking up categories...';
 
@@ -801,7 +721,7 @@ describe('AgentZeroStatusContext', () => {
             const {result} = renderHook(() => useAgentZeroStatusIndicator(reportID));
             await waitForBatchedUpdates();
             expect(result.current.isProcessing).toBe(true);
-            expect(pollCallback).not.toBeNull();
+            expect(safetyCallback).not.toBeNull();
 
             // When the server clears the indicator normally (before safety timeout)
             await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS}${reportID}`, {
@@ -810,12 +730,11 @@ describe('AgentZeroStatusContext', () => {
             await waitForBatchedUpdates();
             expect(result.current.isProcessing).toBe(false);
 
-            // Then polling should have been cancelled
-            expect(pollIntervalId).toBeNull();
+            // Then the safety timer should have been cancelled
             expect(safetyTimerId).toBeNull();
         });
 
-        it('should reset polling when a new server label arrives', async () => {
+        it('should rearm the safety timer when a new server label arrives', async () => {
             // Given a Concierge chat with an active processing indicator
             const serverLabel1 = 'Concierge is looking up categories...';
 
@@ -826,23 +745,25 @@ describe('AgentZeroStatusContext', () => {
             const {result} = renderHook(() => useAgentZeroStatusIndicator(reportID));
             await waitForBatchedUpdates();
             expect(result.current.isProcessing).toBe(true);
-            expect(pollCallback).not.toBeNull();
+            expect(safetyCallback).not.toBeNull();
+            const firstSafetyCallback = safetyCallback;
 
-            // When a new label arrives (still processing), polling should reset
+            // When a new label arrives (still processing), the safety timer should be rearmed
             const serverLabel2 = 'Concierge is preparing your response...';
             await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS}${reportID}`, {
                 agentZeroProcessingRequestIndicator: serverLabel2,
             });
             await waitForBatchedUpdates();
 
-            // Then polling should still be active (was reset with new interval)
-            expect(pollCallback).not.toBeNull();
+            // Then a fresh safety timer is in place (different callback identity, indicator still active)
+            expect(safetyCallback).not.toBeNull();
+            expect(safetyCallback).not.toBe(firstSafetyCallback);
             expect(result.current.isProcessing).toBe(true);
         });
     });
 
     describe('reconnect reset', () => {
-        it('should keep indicator on network reconnect and restart polling', async () => {
+        it('should keep indicator on network reconnect and rearm the safety timer', async () => {
             // Given a Concierge chat with an active processing indicator
             const serverLabel = 'Concierge is looking up categories...';
 
@@ -865,20 +786,21 @@ describe('AgentZeroStatusContext', () => {
             act(() => setForceOffline(false));
             await waitForBatchedUpdates();
 
-            // The indicator reappears (server NVP still has processing state)
-            // onReconnect fetches newer actions and restarts polling, but does NOT clear the indicator
+            // The indicator reappears (server NVP still has processing state).
+            // onReconnect fetches newer actions and rearms the safety timer, but does NOT
+            // clear the indicator.
             await waitFor(() => {
                 expect(result.current.isProcessing).toBe(true);
             });
             expect(result.current.statusLabel).toBe(serverLabel);
         });
 
-        it('should keep optimistic state and continue polling on reconnect to catch a late reply', async () => {
-            // Regression test: when the client reconnects while only optimistic state is active
-            // (no serverLabel yet), polling must continue. Without this, a late Concierge reply
-            // arriving while Pusher keeps dropping events would never be detected — the one-shot
-            // getNewerActions fetch in onReconnect is not enough. The stale NVP is still cleared
-            // locally (defensive, in case the server SET+CLEARED during offline).
+        it('should keep optimistic state and rearm the safety timer on reconnect', async () => {
+            // Regression test: when the client reconnects while only optimistic state is
+            // active (no serverLabel yet), the indicator must stay visible so the safety
+            // timer keeps running until the reply arrives via Pusher catch-up or the
+            // safety timer fires. The stale NVP is still cleared locally (defensive, in
+            // case the server SET+CLEARED during offline).
 
             const {result} = renderHook(() => useAgentZeroStatusIndicator(reportID));
             await waitForBatchedUpdates();
@@ -901,15 +823,16 @@ describe('AgentZeroStatusContext', () => {
                 expect(mockClearAgentZeroProcessingIndicator).toHaveBeenCalledWith(reportID);
             });
 
-            // Indicator stays visible so polling keeps running until reply or safety timeout
+            // Indicator stays visible so the safety timer keeps running until reply or timeout
             expect(result.current.isProcessing).toBe(true);
             expect(result.current.statusLabel).toBe('Thinking...');
         });
 
         it('should clear indicator after reconnect when a Concierge reply finally arrives', async () => {
-            // Full recovery path: optimistic state is preserved through reconnect, polling keeps
-            // running, and when a new Concierge action lands (via polling catch-up or Pusher
-            // recovery) the detection effect clears everything.
+            // Full recovery path: optimistic state is preserved through reconnect, the safety
+            // timer keeps running, and when a new Concierge action lands (via Pusher catch-up
+            // or the one-shot onReconnect getNewerActions) the detection effect clears
+            // everything.
 
             const {result} = renderHook(() => useAgentZeroStatusIndicator(reportID));
             await waitForBatchedUpdates();
@@ -928,7 +851,7 @@ describe('AgentZeroStatusContext', () => {
                 expect(result.current.isProcessing).toBe(true);
             });
 
-            // A new Concierge action arrives (simulating polling or Pusher catch-up)
+            // A new Concierge action arrives (simulating Pusher catch-up or onReconnect refetch)
             const replyActionID = '999';
             await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${reportID}`, {
                 [replyActionID]: {

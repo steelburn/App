@@ -25,23 +25,17 @@ type NewestReportAction = {
 };
 
 /**
- * Polling interval for fetching missed Concierge responses while the thinking indicator is visible.
+ * Maximum duration the indicator stays active before we hard-clear it as a safety net.
  *
- * While the indicator is active, we poll getNewerActions every 30s to recover from
- * WebSocket drops or missed Pusher events. If a Concierge reply arrives (via Pusher
- * or the poll response), the normal Onyx update clears the indicator automatically.
+ * Recovery for missed Pusher events relies on Pusher's own reconnect-and-replay buffer
+ * (most cases) plus the one-shot `getNewerActions` fetch fired by `useNetwork` on HTTP
+ * reconnect. If neither delivers within this window, the safety timeout clears the
+ * stuck local state.
  *
- * A hard safety clear at MAX_POLL_DURATION_MS ensures the indicator doesn't stay
- * forever if something goes wrong.
+ * Shared with `AgentZeroOptimisticStore` so the cross-mount remaining window stays
+ * consistent — a remount mid-thinking resumes the same cap from the original kickoff.
  */
-const POLL_INTERVAL_MS = 30000;
-
-/**
- * Maximum duration to poll before hard-clearing the indicator (safety net).
- * After this time, if we're online and no response has arrived, we clear the indicator.
- * Shared with AgentZeroOptimisticStore so the cross-mount remaining window stays consistent.
- */
-const MAX_POLL_DURATION_MS = OPTIMISTIC_MAX_AGE_MS;
+const MAX_INDICATOR_DURATION_MS = OPTIMISTIC_MAX_AGE_MS;
 
 // Minimum time to display a label before allowing change (prevents rapid flicker)
 const MIN_DISPLAY_TIME = 300; // ms
@@ -101,9 +95,9 @@ function useAgentZeroStatusIndicator(reportID: string): AgentZeroStatusState {
     // Track pending optimistic requests with a counter, backed by a module-level store so
     // the state survives ReportScreen remounts (switching chats and coming back). Each
     // kickoffWaitingIndicator() call increments the counter; when a Concierge reply is
-    // detected (via polling, Pusher, reconnect, or safety timeout), the entry is cleared —
-    // any signal that a response arrived resolves all pending requests (optimistic state
-    // is a display signal, not a queue).
+    // detected (via Pusher, reconnect, or safety timeout), the entry is cleared — any
+    // signal that a response arrived resolves all pending requests (optimistic state is
+    // a display signal, not a queue).
     const subscribeToOptimisticStore = (onStoreChange: () => void) =>
         AgentZeroOptimisticStore.subscribe((updatedReportID) => {
             if (updatedReportID !== reportID) {
@@ -123,8 +117,7 @@ function useAgentZeroStatusIndicator(reportID: string): AgentZeroStatusState {
     const prevServerLabelRef = useRef<string>(serverLabel ?? '');
     const updateTimerRef = useRef<NodeJS.Timeout | null>(null);
     const lastUpdateTimeRef = useRef<number>(0);
-    const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
-    const pollSafetyTimerRef = useRef<NodeJS.Timeout | null>(null);
+    const safetyTimerRef = useRef<NodeJS.Timeout | null>(null);
     const isOfflineRef = useRef<boolean>(false);
     // Newest reportActionID at the moment the indicator became active (raw state, ignoring
     // offline). Lets us distinguish "a pre-existing Concierge action was already the newest"
@@ -143,93 +136,72 @@ function useAgentZeroStatusIndicator(reportID: string): AgentZeroStatusState {
     const wasIndicatorActiveRef = useRef<boolean>(!!initialRestoredEntry);
 
     /**
-     * Clear the polling interval and safety timer. Called when the indicator clears normally,
-     * when a new processing cycle starts, or when the component unmounts.
+     * Clear the safety timer. Called when the indicator clears normally, when a new
+     * processing cycle starts (renewing the cap), or when the component unmounts.
      *
      * Kept in useCallback because it's referenced in several useEffect dep arrays below. The
      * react-compiler-compat ESLint processor (which would otherwise suppress the exhaustive-deps
      * false positive) only runs on .tsx/.jsx files, not .ts.
      */
-    const clearPolling = useCallback(() => {
-        if (pollIntervalRef.current) {
-            clearInterval(pollIntervalRef.current);
-            pollIntervalRef.current = null;
+    const clearSafetyTimer = useCallback(() => {
+        if (!safetyTimerRef.current) {
+            return;
         }
-        if (pollSafetyTimerRef.current) {
-            clearTimeout(pollSafetyTimerRef.current);
-            pollSafetyTimerRef.current = null;
-        }
+        clearTimeout(safetyTimerRef.current);
+        safetyTimerRef.current = null;
     }, []);
 
     /**
      * Hard-clear the indicator by resetting local state and clearing the Onyx NVP.
-     * Called as a safety net after MAX_POLL_DURATION_MS if no response has arrived.
+     * Called as a safety net after MAX_INDICATOR_DURATION_MS if no response has arrived.
      */
     const hardClearIndicator = useCallback(() => {
         // If offline, don't clear — the response may arrive when reconnected
         if (isOfflineRef.current) {
             return;
         }
-        clearPolling();
+        clearSafetyTimer();
         AgentZeroOptimisticStore.clear(reportID);
         displayedLabelRef.current = '';
         setDisplayedLabel('');
         clearAgentZeroProcessingIndicator(reportID);
         getNewerActions(reportID, newestReportActionRef.current?.reportActionID);
-    }, [clearPolling, reportID]);
+    }, [clearSafetyTimer, reportID]);
 
     /**
-     * Start polling for missed actions every POLL_INTERVAL_MS. Every time processing
-     * becomes active or the server label changes (renewal), the existing polling is
-     * cleared and restarted.
+     * (Re)arm the safety timer. Called when processing becomes active or the server label
+     * changes (renewing the cap). The timer fires `hardClearIndicator` after
+     * `safetyDurationMs` if nothing has cleared the indicator by then.
      *
-     * - Every 30s: call getNewerActions to fetch any missed Concierge responses
-     * - After MAX_POLL_DURATION_MS: hard-clear the indicator if still showing (safety net)
-     *
-     * Polling stops when: indicator clears, component unmounts, or user goes offline.
+     * Recovery itself is delegated upstream: Pusher's own reconnect-and-replay buffer
+     * delivers missed events on most drops, and `useNetwork().onReconnect` fires a
+     * one-shot `getNewerActions` on HTTP reconnect. The safety timer is the backstop
+     * for the long tail.
      */
-    const startPolling = useCallback(
-        (safetyDurationMs: number = MAX_POLL_DURATION_MS) => {
-            clearPolling();
+    const startSafetyTimer = useCallback(
+        (safetyDurationMs: number = MAX_INDICATOR_DURATION_MS) => {
+            clearSafetyTimer();
 
             if (safetyDurationMs <= 0) {
-                // Entry is already past the safety window (e.g. remount after >2 min) — skip
-                // polling and hard-clear immediately. The normal path runs the 30s poll and
-                // 120s safety timer, but there's no point starting either if the window is
-                // already spent.
+                // Entry is already past the safety window (e.g. remount after >2 min) —
+                // hard-clear immediately rather than rearming a timer that would fire at zero.
                 hardClearIndicator();
                 return;
             }
 
-            // Poll every 30s for missed actions. When `getNewerActions` lands a new Concierge
-            // reply, Onyx fires the reply-detection effect below, which clears the indicator.
-            // The poll's only job is to actively fetch — detection lives in one place.
-            pollIntervalRef.current = setInterval(() => {
-                if (isOfflineRef.current) {
-                    return;
-                }
-                getNewerActions(reportID, newestReportActionRef.current?.reportActionID);
-            }, POLL_INTERVAL_MS);
-
-            // Safety net: hard-clear after the remaining window elapses
-            pollSafetyTimerRef.current = setTimeout(() => {
+            safetyTimerRef.current = setTimeout(() => {
                 hardClearIndicator();
             }, safetyDurationMs);
         },
-        [clearPolling, hardClearIndicator, reportID],
+        [clearSafetyTimer, hardClearIndicator],
     );
 
-    // On reconnect, defensively clear any stale NVP, refetch missed actions, and keep polling
-    // running through the reconnect window.
+    // On reconnect, defensively clear any stale NVP, refetch missed actions, and rearm the
+    // safety timer so the cap measures from reconnect rather than the original kickoff.
     //
     // If the server SET+CLEARED the NVP while Pusher was disconnected, Onyx sync can deliver
     // only the stale SET on reconnect. Clearing the NVP locally when we were optimistic-only
     // prevents a stuck label.
-    //
-    // Polling must continue even when only optimistic state is active (no server label yet).
-    // If the client reconnected before the server wrote any label and Pusher events keep
-    // getting missed, polling via getNewerActions is our only way to catch the eventual reply.
-    // The safety timer inside startPolling is the hard backstop.
     const {isOffline} = useNetwork({
         onReconnect: () => {
             const wasOptimistic = pendingOptimisticRequests > 0;
@@ -242,7 +214,7 @@ function useAgentZeroStatusIndicator(reportID: string): AgentZeroStatusState {
             getNewerActions(reportID, newestReportActionRef.current?.reportActionID);
 
             if (serverLabel || wasOptimistic) {
-                startPolling();
+                startSafetyTimer();
             }
         },
     });
@@ -285,19 +257,19 @@ function useAgentZeroStatusIndicator(reportID: string): AgentZeroStatusState {
             targetLabel = translate('common.thinking');
         }
 
-        // Start/reset polling when server label arrives (acts as a lease renewal). Keep the
-        // optimistic store entry alive — the server NVP can briefly go truthy→falsy→truthy
+        // Rearm the safety timer when server label arrives (acts as a lease renewal). Keep
+        // the optimistic store entry alive — the server NVP can briefly go truthy→falsy→truthy
         // between processing phases (e.g., "thinking..." → (gap) → "searching documentation..."),
         // and clearing the optimistic floor here means a chat-switch during the gap lands on
         // "no optimistic, no serverLabel → no indicator." The optimistic entry is cleared by
         // authoritative signals only: the reply-detection effect (new Concierge action newer
         // than baseline), the 120s safety timeout, or the onReconnect handler.
         if (hasServerLabel) {
-            startPolling();
+            startSafetyTimer();
         }
-        // Clear polling when processing ends
+        // Clear the safety timer when processing ends
         else if (pendingOptimisticRequests === 0) {
-            clearPolling();
+            clearSafetyTimer();
             if (hadServerLabel && reasoningHistory.length > 0) {
                 ConciergeReasoningStore.clearReasoning(reportID);
             }
@@ -342,41 +314,42 @@ function useAgentZeroStatusIndicator(reportID: string): AgentZeroStatusState {
             }
             clearTimeout(updateTimerRef.current);
         };
-    }, [serverLabel, reasoningHistory.length, reportID, pendingOptimisticRequests, translate, startPolling, clearPolling]);
+    }, [serverLabel, reasoningHistory.length, reportID, pendingOptimisticRequests, translate, startSafetyTimer, clearSafetyTimer]);
 
     useEffect(() => {
         isOfflineRef.current = isOffline;
     }, [isOffline]);
 
-    // Clean up polling on unmount (and if clearPolling identity changes — no-op when no timers)
+    // Clean up safety timer on unmount (and if clearSafetyTimer identity changes — no-op
+    // when no timer).
     useEffect(
         () => () => {
-            clearPolling();
+            clearSafetyTimer();
         },
-        [clearPolling],
+        [clearSafetyTimer],
     );
 
     // If we restored optimistic state from a previous mount (e.g. user switched chats and
-    // came back mid-thinking), resume polling with whatever time remains on the safety
+    // came back mid-thinking), rearm the safety timer with whatever time remains on the
     // window. If a server label is also present on mount, the label-sync effect runs in
-    // the same commit and restarts polling with a fresh window — `startPolling` clears any
+    // the same commit and rearms with a fresh window — `startSafetyTimer` clears any
     // prior timer, so that restart wins naturally.
     //
-    // `startPolling` is a stable useCallback (keyed by reportID), so this effect runs once
-    // per mount and doesn't re-fire on unrelated renders.
+    // `startSafetyTimer` is stable for the lifetime of the mount (no reportID dep), so
+    // this effect runs once per mount and doesn't re-fire on unrelated renders.
     useEffect(() => {
         const restored = restoredOptimisticOnMountRef.current;
         if (!restored) {
             return;
         }
         const elapsed = Date.now() - restored.startedAt;
-        const remaining = MAX_POLL_DURATION_MS - elapsed;
-        startPolling(remaining);
-    }, [startPolling]);
+        const remaining = MAX_INDICATOR_DURATION_MS - elapsed;
+        startSafetyTimer(remaining);
+    }, [startSafetyTimer]);
 
     const kickoffWaitingIndicator = () => {
         AgentZeroOptimisticStore.increment(reportID, newestReportActionRef.current?.reportActionID ?? null);
-        startPolling();
+        startSafetyTimer();
     };
 
     // Capture the newest reportActionID as a baseline whenever the indicator transitions
@@ -419,9 +392,9 @@ function useAgentZeroStatusIndicator(reportID: string): AgentZeroStatusState {
             return;
         }
         clearAgentZeroProcessingIndicator(reportID);
-        clearPolling();
+        clearSafetyTimer();
         AgentZeroOptimisticStore.clear(reportID);
-    }, [newestActorAccountID, newestActionID, serverLabel, pendingOptimisticRequests, reportID, clearPolling]);
+    }, [newestActorAccountID, newestActionID, serverLabel, pendingOptimisticRequests, reportID, clearSafetyTimer]);
 
     const isProcessing = !isOffline && isIndicatorActive;
 
