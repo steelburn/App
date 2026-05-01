@@ -41,7 +41,7 @@ import type {ViolationField} from '@hooks/useViolations';
 import useViolations from '@hooks/useViolations';
 import {updateMoneyRequestBillable, updateMoneyRequestReimbursable, updateMoneyRequestTaxRate} from '@libs/actions/IOU/UpdateMoneyRequest';
 import initSplitExpense from '@libs/actions/SplitExpenses';
-import {getIsMissingAttendeesViolation} from '@libs/AttendeeUtils';
+import {convertAttendeesToArray, getIsMissingAttendeesViolation} from '@libs/AttendeeUtils';
 import {getBrokenConnectionUrlToFixPersonalCard, getCompanyCardDescription} from '@libs/CardUtils';
 import {getDecodedCategoryName, isCategoryMissing} from '@libs/CategoryUtils';
 import DistanceRequestUtils from '@libs/DistanceRequestUtils';
@@ -284,7 +284,7 @@ function MoneyRequestView({
     const isTransactionScanning = isScanning(updatedTransaction ?? transaction);
     const hasRoute = hasRouteTransactionUtils(transactionBackup ?? transaction, isDistanceRequest);
 
-    const actualAttendees = isFromMergeTransaction && updatedTransaction ? updatedTransaction.comment?.attendees : transactionAttendees;
+    const actualAttendees = isFromMergeTransaction && updatedTransaction ? convertAttendeesToArray(updatedTransaction.comment?.attendees) : transactionAttendees;
 
     // Use the updated transaction amount in merge flow to have correct positive/negative sign
     const actualAmount = isFromMergeTransaction && updatedTransaction ? updatedTransaction.amount : transactionAmount;

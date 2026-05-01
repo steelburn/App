@@ -10,7 +10,7 @@ import utils from '@components/MapView/utils';
 import type {UnreportedExpenseListItemType} from '@components/Search/SearchList/ListItem/types';
 import type {TransactionWithOptionalSearchFields} from '@components/TransactionItemRow';
 import type {MergeDuplicatesParams} from '@libs/API/parameters';
-import {normalizeAttendees} from '@libs/AttendeeUtils';
+import {convertAttendeesToArray, normalizeAttendees} from '@libs/AttendeeUtils';
 import {getCategoryDefaultTaxRate, isCategoryMissing} from '@libs/CategoryUtils';
 import {convertToBackendAmount, getCurrencyDecimals, getCurrencySymbol} from '@libs/CurrencyUtils';
 import DateUtils from '@libs/DateUtils';
@@ -1170,21 +1170,6 @@ function getReportOwnerAsAttendee(transaction: OnyxInputOrEntry<Transaction>, cu
             };
         }
     }
-}
-
-/**
- * Converts raw attendees value to an array.
- * Onyx may deserialize arrays as plain objects, so both shapes are handled.
- * @param rawAttendees - attendees value as stored in Onyx, may be an array or a plain object
- */
-function convertAttendeesToArray(rawAttendees: Attendee[] | undefined): Attendee[] {
-    if (Array.isArray(rawAttendees)) {
-        return rawAttendees;
-    }
-    if (rawAttendees && typeof rawAttendees === 'object') {
-        return Object.values(rawAttendees as Record<string, Attendee>);
-    }
-    return [];
 }
 
 /**
