@@ -9,7 +9,7 @@ import DistanceRequestUtils from '@libs/DistanceRequestUtils';
 import {getMicroSecondOnyxErrorWithTranslationKey} from '@libs/ErrorUtils';
 // eslint-disable-next-line @typescript-eslint/no-deprecated
 import {buildNextStepNew, buildOptimisticNextStep} from '@libs/NextStepUtils';
-import {getDistanceRateOriginalPolicyID, hasDependentTags, isPaidGroupPolicy} from '@libs/PolicyUtils';
+import {getDistanceRateOriginalPolicy, hasDependentTags, isPaidGroupPolicy} from '@libs/PolicyUtils';
 import type {TransactionDetails} from '@libs/ReportUtils';
 import {
     buildOptimisticModifiedExpenseReportAction,
@@ -1473,13 +1473,14 @@ function getUpdateTrackExpenseParams(
     const transaction = getAllTransactions()?.[`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`];
     const chatReport = getAllReports()?.[`${ONYXKEYS.COLLECTION.REPORT}${transactionThread?.parentReportID}`] ?? null;
     const isDistanceTransaction = transaction && isDistanceRequestTransactionUtils(transaction);
-    const distancePolicyID = isDistanceTransaction ? getDistanceRateOriginalPolicyID(transaction) : undefined;
+    const distanceOriginalPolicy = isDistanceTransaction ? getDistanceRateOriginalPolicy(transaction) : undefined;
+    const policyForTransaction = distanceOriginalPolicy ?? policy;
     const updatedTransaction = transaction
         ? getUpdatedTransaction({
               transaction,
               transactionChanges,
               isFromExpenseReport: false,
-              policy,
+              policy: policyForTransaction,
           })
         : null;
     const transactionDetails = getTransactionDetails(updatedTransaction);
@@ -1494,7 +1495,7 @@ function getUpdateTrackExpenseParams(
         ...dataToIncludeInParams,
         reportID: chatReport?.reportID,
         transactionID,
-        policyID: distancePolicyID ?? policy?.id,
+        policyID: policyForTransaction?.id,
     };
 
     const hasPendingWaypoints = 'waypoints' in transactionChanges;
