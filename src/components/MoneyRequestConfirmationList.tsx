@@ -983,6 +983,9 @@ function MoneyRequestConfirmationList({
     const focusTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     useFocusEffect(
         useCallback(() => {
+            if (isNewManualExpenseFlowEnabled) {
+                return undefined;
+            }
             focusTimeoutRef.current = setTimeout(() => {
                 // eslint-disable-next-line @typescript-eslint/no-deprecated
                 InteractionManager.runAfterInteractions(() => {
@@ -990,7 +993,7 @@ function MoneyRequestConfirmationList({
                 });
             }, CONST.ANIMATED_TRANSITION);
             return () => focusTimeoutRef.current && clearTimeout(focusTimeoutRef.current);
-        }, []),
+        }, [isNewManualExpenseFlowEnabled]),
     );
 
     const errorMessage = useMemo(() => {

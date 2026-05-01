@@ -1,12 +1,14 @@
-import React, {useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {View} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';
 import MenuItemWithTopDescription from '@components/MenuItemWithTopDescription';
 import NumberWithSymbolForm from '@components/NumberWithSymbolForm';
+import type {BaseTextInputRef} from '@components/TextInput/BaseTextInput/types';
 import {useCurrencyListActions} from '@hooks/useCurrencyList';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
+import useScreenWrapperTransitionStatus from '@hooks/useScreenWrapperTransitionStatus';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {clearMoneyRequestAmount, setMoneyRequestAmount} from '@libs/actions/IOU';
 import {convertToBackendAmount, convertToFrontendAmountAsString, getLocalizedCurrencySymbol} from '@libs/CurrencyUtils';
@@ -81,6 +83,8 @@ function AmountField({
     const [splitDraftTransaction] = useOnyx(`${ONYXKEYS.COLLECTION.SPLIT_TRANSACTION_DRAFT}${transactionID}`);
     const [currentUserAccountID] = useOnyx(ONYXKEYS.SESSION, {selector: (session) => session?.accountID});
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
+    const amountInputRef = useRef<BaseTextInputRef | null>(null);
+    const {didScreenTransitionEnd} = useScreenWrapperTransitionStatus();
 
     const [isCurrencyPickerVisible, setIsCurrencyPickerVisible] = useState(false);
 
@@ -106,6 +110,17 @@ function AmountField({
     // real value. This avoids showing "$0.00" as a pre-filled default.
     const transactionAmount = isNewManualExpenseFlowEnabled && !transaction?.isAmountSet ? '' : convertToFrontendAmountAsString(amount, decimals);
     const allowNegative = shouldEnableNegative(report, policy, iouType, transaction?.participants);
+
+    // `autoFocus` on our TextInput only runs on mount. Closing and reopening the RHP often keeps the same mounted
+    // instance, so autofocus does not run again. After `ScreenWrapper` finishes its entry transition the field is
+    // reliably focusable.
+    useEffect(() => {
+        if (!didScreenTransitionEnd || !autoFocus || isAmountFieldDisabled || !isNewManualExpenseFlowEnabled) {
+            return;
+        }
+
+        amountInputRef.current?.focus();
+    }, [didScreenTransitionEnd, autoFocus, isAmountFieldDisabled, isNewManualExpenseFlowEnabled]);
 
     const showCurrencyPicker = () => {
         setIsCurrencyPickerVisible(true);
@@ -247,6 +262,7 @@ function AmountField({
             {isNewManualExpenseFlowEnabled && !isAmountFieldDisabled ? (
                 <View style={[styles.mh4, styles.mv2]}>
                     <NumberWithSymbolForm
+                        ref={amountInputRef}
                         displayAsTextInput
                         autoFocus={autoFocus}
                         value={transactionAmount}
