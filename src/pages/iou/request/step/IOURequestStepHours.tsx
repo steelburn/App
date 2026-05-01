@@ -4,6 +4,7 @@ import Button from '@components/Button';
 import NumberWithSymbolForm from '@components/NumberWithSymbolForm';
 import type {NumberWithSymbolFormRef} from '@components/NumberWithSymbolForm';
 import type {BaseTextInputRef} from '@components/TextInput/BaseTextInput/types';
+import {useCurrencyListActions} from '@hooks/useCurrencyList';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
@@ -61,6 +62,7 @@ function IOURequestStepHours({
     const rate = transaction?.comment?.units?.rate ?? defaultPolicyRate;
 
     const {translate} = useLocalize();
+    const {convertToDisplayString} = useCurrencyListActions();
     const styles = useThemeStyles();
     const {isExtraSmallScreenHeight} = useResponsiveLayout();
     const canUseTouchScreen = canUseTouchScreenUtil();
@@ -101,7 +103,7 @@ function IOURequestStepHours({
         }
 
         setMoneyRequestAmount(transactionID, computeTimeAmount(rate, count), currency);
-        setMoneyRequestMerchant(transactionID, formatTimeMerchant(count, rate, currency, translate), isTransactionDraft);
+        setMoneyRequestMerchant(transactionID, formatTimeMerchant(count, rate, currency, translate, convertToDisplayString), isTransactionDraft);
         setMoneyRequestTimeCount(transactionID, count, isTransactionDraft);
 
         if (isEditingConfirmation) {
