@@ -4,7 +4,9 @@
  * than being duplicated across every surface that renders a transaction.
  */
 import {useCallback, useRef} from 'react';
-import {type OnyxEntry, useOnyx as originalUseOnyx} from 'react-native-onyx';
+// eslint-disable-next-line no-restricted-imports
+import {useOnyx as originalUseOnyx} from 'react-native-onyx';
+import type {OnyxEntry} from 'react-native-onyx';
 import {useSearchStateContext} from '@components/Search/SearchContext';
 import type {SearchQueryJSON} from '@components/Search/types';
 import type {TransactionInlineEditParams} from '@libs/actions/TransactionInlineEdit';
