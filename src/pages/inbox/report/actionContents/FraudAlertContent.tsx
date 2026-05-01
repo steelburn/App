@@ -50,6 +50,7 @@ function FraudAlertContent({action, reportID}: FraudAlertContentProps) {
     return (
         <View
             accessibilityRole={CONST.ROLE.ALERT}
+            accessibilityLiveRegion="assertive"
             accessibilityLabel={translate('reportFraudConfirmationPage.title')}
         >
             <ReportActionItemBasicMessage message={message} />
