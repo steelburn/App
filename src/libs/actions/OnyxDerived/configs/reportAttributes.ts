@@ -361,7 +361,11 @@ export default createOnyxDerivedValueConfig({
             // pass suppresses the child's own brickRoadStatus when the parent workspace chat is accessible —
             // we still need to propagate the error up so the parent shows the indicator.
             const attributes = reportAttributes[report.reportID];
-            if (report.chatReportID && report.reportID !== report.chatReportID && (attributes?.needsParentChatErrorPropagation || attributes?.brickRoadStatus === CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR)) {
+            if (
+                report.chatReportID &&
+                report.reportID !== report.chatReportID &&
+                (attributes?.needsParentChatErrorPropagation || attributes?.brickRoadStatus === CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR)
+            ) {
                 chatReportIDsWithErrors.add(report.chatReportID);
             }
         }
