@@ -9,7 +9,7 @@ import DistanceRequestUtils from '@libs/DistanceRequestUtils';
 import {getMicroSecondOnyxErrorWithTranslationKey} from '@libs/ErrorUtils';
 // eslint-disable-next-line @typescript-eslint/no-deprecated
 import {buildNextStepNew, buildOptimisticNextStep} from '@libs/NextStepUtils';
-import {getDistanceRateOriginalPolicy, getDistanceRateOriginalPolicyID, hasDependentTags, isPaidGroupPolicy} from '@libs/PolicyUtils';
+import {getDistanceRateOriginalPolicyID, hasDependentTags, isPaidGroupPolicy} from '@libs/PolicyUtils';
 import type {TransactionDetails} from '@libs/ReportUtils';
 import {
     buildOptimisticModifiedExpenseReportAction,
@@ -951,17 +951,13 @@ function getUpdateMoneyRequestParams(params: GetUpdateMoneyRequestParamsType): U
 
     const isTransactionOnHold = isOnHold(transaction);
     const isFromExpenseReport = isExpenseReport(iouReport) || isInvoiceReportReportUtils(iouReport);
-    // For unreported distance expenses, resolve the policy that owns the customUnitRateID
-    // so the optimistic amount is calculated with the correct rate, not the default workspace rate.
-    const distanceOriginalPolicy = transaction && isDistanceRequestTransactionUtils(transaction) ? getDistanceRateOriginalPolicy(transaction) : undefined;
-    const policyForTransaction = distanceOriginalPolicy ?? policy;
     const updatedTransaction: OnyxEntry<OnyxTypes.Transaction> = transaction
         ? getUpdatedTransaction({
               transaction,
               transactionChanges,
               isFromExpenseReport,
               isSplitTransaction,
-              policy: policyForTransaction,
+              policy,
           })
         : undefined;
 
