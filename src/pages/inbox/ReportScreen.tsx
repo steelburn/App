@@ -132,12 +132,9 @@ function ReportScreen({route, navigation}: ReportScreenProps) {
     const {reportPendingAction, reportErrors} = reportPendingActionAndErrors ?? {};
 
     const dismissReportCreationError = () => {
-        Navigation.goBack();
-        // Defer the Onyx wipe until after the back-navigation animation completes so the user
-        // doesn't see the report disappear from underneath them mid-transition. InteractionManager
-        // is the cross-platform primitive for this; the Promise-based replacement isn't available yet.
-        // eslint-disable-next-line @typescript-eslint/no-deprecated
-        InteractionManager.runAfterInteractions(() => removeFailedReport(reportIDFromRoute));
+        Navigation.goBack(undefined, {
+            afterTransition: () => removeFailedReport(reportIDFromRoute),
+        });
     };
 
     return (
