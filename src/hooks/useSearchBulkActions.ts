@@ -1389,7 +1389,7 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
                 icon: expensifyIcons.ArrowSplit,
                 value: CONST.SEARCH.BULK_ACTION_TYPES.SPLIT,
                 onSelected: () => {
-                    initSplitExpense(firstTransaction, firstTransactionPolicy);
+                    initSplitExpense(firstTransaction, firstTransactionPolicy, ownerBillingGracePeriodEnd, userBillingGracePeriodEnds, amountOwed);
                 },
             });
         }

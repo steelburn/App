@@ -300,7 +300,7 @@ function useExpenseActions({reportID, isReportInSearch = false, backTo, onDuplic
                 if (transactions.length !== 1) {
                     return;
                 }
-                initSplitExpense(currentTransaction, policy);
+                initSplitExpense(currentTransaction, policy, ownerBillingGracePeriodEnd, userBillingGracePeriodEnds, amountOwed);
             },
         },
         [CONST.REPORT.SECONDARY_ACTIONS.MERGE]: {
