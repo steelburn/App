@@ -150,7 +150,7 @@ function updateMultipleMoneyRequests({
         // For plain IOU transactions these fields are not applicable and must be silently skipped.
         const supportsExpenseFields = isUnreportedExpense || isFromExpenseReport || isInvoiceReportReportUtils(baseIouReport ?? undefined);
         // Split children must keep their amount/currency/tax in sync with the split parent's totals.
-        // Allow coding fields (category, tag, merchant, etc.) but block these so we never desync the split.
+        // Allow coding fields (category, tag, merchant, etc.) but block these so we never put the split out of sync.
         const isSplitChild = transaction.comment?.source === CONST.IOU.TYPE.SPLIT;
         // Use the transaction's own policy for all per-transaction checks (permissions, tax, change-diffing).
         // Falls back to the shared bulk-edit policy when the transaction's workspace cannot be resolved.

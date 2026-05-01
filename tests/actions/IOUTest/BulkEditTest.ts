@@ -1147,6 +1147,8 @@ describe('actions/IOU/BulkEdit', () => {
                 hash: undefined,
                 introSelected: undefined,
                 betas: undefined,
+                currentUserLogin: 'test@example.com',
+                currentUserAccountID: 1,
             });
 
             expect(writeSpy).toHaveBeenCalled();
