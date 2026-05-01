@@ -148,6 +148,11 @@ function MoneyRequestReportTransactionItem({
             <PressableWithFeedback
                 key={transaction.transactionID}
                 onPress={() => {
+                    // Prevent row press from firing while a cell is being inline-edited (e.g. pressing Space would otherwise open the expense)
+                    // See https://github.com/Expensify/App/issues/88646 for more details
+                    if (isEditingCell) {
+                        return;
+                    }
                     // If a cell was being edited when the user tapped the row, suppress navigation
                     // so the second tap doesn't immediately open the transaction detail.
                     if (wasEditingOnMouseDownRef.current) {
