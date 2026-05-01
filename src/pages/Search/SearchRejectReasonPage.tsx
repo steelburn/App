@@ -30,7 +30,7 @@ function SearchRejectReasonPage({route}: SearchRejectReasonPageProps) {
     const {translate} = useLocalize();
 
     const [betas] = useOnyx(ONYXKEYS.BETAS);
-    const {accountID: currentUserAccountID, email: currentUserLogin = ''} = useCurrentUserPersonalDetails();
+    const {accountID: currentUserAccountID, login: currentUserLogin} = useCurrentUserPersonalDetails();
     // When coming from the report view, selectedTransactions is empty, build it from selectedTransactionIDs
     const selectedTransactionsForReject = useMemo(() => {
         if (route.name === SCREENS.SEARCH.MONEY_REQUEST_REPORT_REJECT_TRANSACTIONS && reportID) {
@@ -58,7 +58,7 @@ function SearchRejectReasonPage({route}: SearchRejectReasonPageProps) {
                 allPolicies,
                 allReports,
                 currentUserAccountID,
-                currentUserLogin,
+                currentUserLogin ?? '',
                 betas,
             );
             if (route.name === SCREENS.SEARCH.MONEY_REQUEST_REPORT_REJECT_TRANSACTIONS) {
