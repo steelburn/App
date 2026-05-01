@@ -81,6 +81,7 @@ function CategoryDescriptionHintPage({
                             type="markdown"
                             autoGrowHeight
                             maxAutoGrowHeight={variables.textInputAutoGrowMaxHeight}
+                            excludedMarkdownStyles={['mentionReport']}
                         />
                         <Text style={[styles.mutedTextLabel, styles.mt2]}>{translate('workspace.rules.categoryRules.descriptionHintSubtitle')}</Text>
                     </View>
