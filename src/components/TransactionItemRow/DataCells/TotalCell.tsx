@@ -39,7 +39,12 @@ function TotalCell({shouldShowTooltip, transactionItem, canEdit, onSave}: TotalC
         if (!Number.isNaN(parsedValue) && parsedValue >= 0) {
             const normalizedValue = roundToTwoDecimalPlaces(parsedValue);
             const finalAmount = isNegative ? -normalizedValue : normalizedValue;
-            onSave?.(convertToBackendAmount(finalAmount));
+            const convertedAmount = convertToBackendAmount(finalAmount);
+            if (convertedAmount === amount) {
+                return;
+            }
+
+            onSave?.(convertedAmount);
         }
     };
 

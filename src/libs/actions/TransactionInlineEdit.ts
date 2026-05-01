@@ -8,11 +8,21 @@ import Onyx from 'react-native-onyx';
 import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
 import type {ValueOf} from 'type-fest';
 import {convertToBackendAmount, getCurrencyDecimals} from '@libs/CurrencyUtils';
+import {isValidMoneyRequestAmount} from '@libs/MoneyRequestUtils';
 import {hasEnabledOptions} from '@libs/OptionsListUtils';
 import Permissions from '@libs/Permissions';
 import {getTagLists, isMultiLevelTags} from '@libs/PolicyUtils';
 import {isMoneyRequestAction} from '@libs/ReportActionsUtils';
-import {canEditFieldOfMoneyRequest, canEditMoneyRequest, canUserPerformWriteAction, isArchivedReport, isIOUReport, isReportInGroupPolicy} from '@libs/ReportUtils';
+import {
+    canEditFieldOfMoneyRequest,
+    canEditMoneyRequest,
+    canUserPerformWriteAction,
+    isArchivedReport,
+    isInvoiceReport,
+    isIOUReport,
+    isReportInGroupPolicy,
+    shouldEnableNegative,
+} from '@libs/ReportUtils';
 import {hasEnabledTags} from '@libs/TagsOptionsListUtils';
 import {calculateTaxAmount, getCurrency, getOriginalTransactionWithSplitInfo, getTaxValue, isDistanceRequest, isExpenseUnreported, isScanning} from '@libs/TransactionUtils';
 import {isInvalidMerchantValue} from '@libs/ValidationUtils';
@@ -232,10 +242,15 @@ function editTransactionCategoryInline(params: TransactionInlineEditParams, newC
 
 /** Updates the amount and currency of an expense from the Search results table or the Expense Report page. */
 function editTransactionAmountInline(params: TransactionInlineEditParams, newAmount: number) {
-    if (newAmount < 0 || (newAmount === 0 && isIOUReport(params.parentReport))) {
+    const iouParams = getIouParamsForTransaction(params);
+    const iouType = isInvoiceReport(params.parentReport) ? CONST.IOU.TYPE.INVOICE : CONST.IOU.TYPE.SUBMIT;
+    const allowNegative = shouldEnableNegative(params.parentReport, iouParams.policy, iouType);
+    const isP2P = isIOUReport(params.parentReport);
+
+    if (!isValidMoneyRequestAmount(newAmount, iouType, allowNegative, isP2P)) {
         return;
     }
-    const iouParams = getIouParamsForTransaction(params);
+
     // Keep the existing currency — only the amount is changing from the search table
     const currency = iouParams.transaction?.modifiedCurrency ?? iouParams.transaction?.currency ?? CONST.CURRENCY.USD;
     // Recalculate tax from the existing tax code and the new amount
@@ -250,7 +265,7 @@ function editTransactionAmountInline(params: TransactionInlineEditParams, newAmo
         taxAmount,
         taxCode,
         taxValue: taxPercentage,
-        allowNegative: false,
+        allowNegative,
         transactions: allTransactions,
         transactionViolations: allTransactionViolations,
         policyRecentlyUsedCurrencies: [],

@@ -1,3 +1,4 @@
+import type {ValueOf} from 'type-fest';
 import CONST from '@src/CONST';
 
 /**
@@ -119,6 +120,39 @@ function handleNegativeAmountFlipping(amount: string, allowFlippingAmount: boole
     return amount;
 }
 
+const nonZeroMoneyRequestTypes = new Set<ValueOf<typeof CONST.IOU.TYPE>>([CONST.IOU.TYPE.PAY, CONST.IOU.TYPE.INVOICE, CONST.IOU.TYPE.SPLIT]);
+
+/**
+ * Validates a money request amount according to business rules.
+ *
+ * @param amount - Amount in backend format (cents as integer)
+ * @param iouType - Type of IOU (PAY, INVOICE, SPLIT, REQUEST, SUBMIT, etc.)
+ * @param allowNegative - Whether negative amounts are allowed
+ * @param isIOUReport - Whether this is an IOU report (zero amounts not allowed)
+ * @param isP2P - Whether this is a peer-to-peer transaction
+ */
+function isValidMoneyRequestAmount(amount: number | undefined, iouType: ValueOf<typeof CONST.IOU.TYPE>, allowNegative = true, isP2P = false): boolean {
+    if (amount === undefined || amount === null || Number.isNaN(amount)) {
+        return false;
+    }
+
+    if (amount < 0 && !allowNegative) {
+        return false;
+    }
+
+    const absoluteAmount = Math.abs(amount);
+
+    if ((iouType === CONST.IOU.TYPE.REQUEST || iouType === CONST.IOU.TYPE.SUBMIT) && isP2P) {
+        return absoluteAmount >= 1;
+    }
+
+    if (nonZeroMoneyRequestTypes.has(iouType)) {
+        return absoluteAmount >= 1;
+    }
+
+    return true;
+}
+
 export {
     addLeadingZero,
     replaceAllDigits,
@@ -129,4 +163,5 @@ export {
     validateAmount,
     validatePercentage,
     handleNegativeAmountFlipping,
+    isValidMoneyRequestAmount,
 };

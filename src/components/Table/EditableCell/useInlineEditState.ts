@@ -30,9 +30,7 @@ function useInlineEditState<T>(canEdit: boolean | undefined, value: T, onSave?: 
             return;
         }
         hasEndedRef.current = true;
-        if (localValue !== value) {
-            onSave?.(localValue);
-        }
+        onSave?.(localValue);
         // Always reset to the source-of-truth so a rejected save (e.g. empty merchant)
         // doesn't leave stale localValue displayed after edit mode closes.
         setLocalValue(value);
