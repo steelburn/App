@@ -1,7 +1,8 @@
 import {getReportChatType} from '@selectors/Report';
-import React, {createContext, useContext} from 'react';
+import React, {createContext, useContext, useEffect} from 'react';
 import useAgentZeroStatusIndicator from '@hooks/useAgentZeroStatusIndicator';
 import useOnyx from '@hooks/useOnyx';
+import {clearConciergeThinkingKickoff} from '@libs/actions/Report';
 import type {ReasoningEntry} from '@libs/ConciergeReasoningStore';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -65,6 +66,16 @@ function AgentZeroStatusProvider({reportID, children}: React.PropsWithChildren<{
 function AgentZeroStatusGate({reportID, children}: React.PropsWithChildren<{reportID: string}>) {
     const {kickoffWaitingIndicator, ...stateValue} = useAgentZeroStatusIndicator(reportID);
     const actionsValue = {kickoffWaitingIndicator};
+
+    // Auto-kickoff "thinking" indicator when opened from search (where kickoffWaitingIndicator isn't accessible)
+    const [shouldKickoff] = useOnyx(ONYXKEYS.CONCIERGE_THINKING_KICKOFF);
+    useEffect(() => {
+        if (!shouldKickoff) {
+            return;
+        }
+        clearConciergeThinkingKickoff();
+        kickoffWaitingIndicator();
+    }, [shouldKickoff, kickoffWaitingIndicator]);
 
     return (
         <AgentZeroStatusActionsContext.Provider value={actionsValue}>

@@ -316,7 +316,6 @@ function useAgentZeroStatusIndicator(reportID: string): AgentZeroStatusState {
         // authoritative signals only: the reply-detection effect (new Concierge action newer
         // than baseline), the 120s safety timeout, or the onReconnect handler.
         if (hasServerLabel) {
-            // eslint-disable-next-line react-hooks/set-state-in-effect -- startPolling transitively updates displayedLabel via the safety timeout; the synchronous call here only schedules timers
             startPolling();
         }
         // Clear polling when processing ends
@@ -345,7 +344,6 @@ function useAgentZeroStatusIndicator(reportID: string): AgentZeroStatusState {
         // Immediate update when enough time has passed or when clearing the label
         if (remainingMinTime === 0 || targetLabel === '') {
             displayedLabelRef.current = targetLabel;
-            // eslint-disable-next-line react-hooks/set-state-in-effect -- guarded by displayedLabelRef check above; fires once per serverLabel/optimistic transition
             setDisplayedLabel(targetLabel);
             lastUpdateTimeRef.current = now;
         } else {
