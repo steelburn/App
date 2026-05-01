@@ -231,58 +231,61 @@ function TransactionGroupListExpanded<TItem extends ListItem>({
                 const shouldShowBottomBorder = !isLastTransaction(index);
                 const exportedReportActions = Object.values(transactionsSnapshot?.data?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${transaction?.reportID}`] ?? {});
 
-                const transactionRow = (
-                    <TransactionItemRow
-                        report={transaction.report}
-                        policy={transaction.policy}
-                        transactionItem={transaction}
-                        violations={getTransactionViolations(transaction, violations, currentUserDetails.email ?? '', currentUserDetails.accountID, transaction.report, transaction.policy)}
-                        isSelected={!!transaction.isSelected}
-                        dateColumnSize={dateColumnSize}
-                        amountColumnSize={amountColumnSize}
-                        taxAmountColumnSize={taxAmountColumnSize}
-                        shouldShowTooltip={showTooltip}
-                        shouldUseNarrowLayout={!isLargeScreenWidth}
-                        shouldShowCheckbox={!!canSelectMultiple}
-                        checkboxSentryLabel={CONST.SENTRY_LABEL.SEARCH.EXPANDED_TRANSACTION_ROW_CHECKBOX}
-                        onCheckboxPress={() => onCheckboxPress?.(transaction as unknown as TItem)}
-                        columns={currentColumns}
-                        onButtonPress={() => handleButtonPress(transaction)}
-                        style={[styles.noBorderRadius, isLargeScreenWidth ? [styles.p3, styles.pv2, styles.searchTableRowHeight] : styles.p4, styles.flex1]}
-                        isReportItemChild
-                        isInSingleTransactionReport={isInSingleTransactionReport}
-                        shouldShowBottomBorder={shouldShowBottomBorder}
-                        onArrowRightPress={isDeletedTransaction(transaction) ? undefined : () => openReportInRHP(transaction)}
-                        shouldShowArrowRightOnNarrowLayout
-                        reportActions={exportedReportActions}
-                        policyForMovingExpenses={policyForMovingExpenses}
-                        nonPersonalAndWorkspaceCards={nonPersonalAndWorkspaceCards}
-                        isActionColumnWide={isActionColumnWide}
-                    />
-                );
                 return (
                     <OfflineWithFeedback
                         pendingAction={transaction.pendingAction}
                         key={transaction.transactionID}
                     >
-                        {!isLargeScreenWidth ? (
-                            <PressableWithFeedback
-                                onPress={() => handleOnPress(transaction)}
-                                onLongPress={() => onLongPress?.(transaction)}
-                                accessibilityRole={CONST.ROLE.BUTTON}
-                                accessibilityLabel={transaction.text ?? ''}
-                                isNested
-                                onMouseDown={(e) => e.preventDefault()}
-                                hoverStyle={[!transaction.isDisabled && styles.hoveredComponentBG]}
-                                dataSet={{[CONST.SELECTION_SCRAPER_HIDDEN_ELEMENT]: true, [CONST.INNER_BOX_SHADOW_ELEMENT]: false}}
-                                id={transaction.transactionID}
-                                sentryLabel={CONST.SENTRY_LABEL.SEARCH.EXPANDED_TRANSACTION_ROW}
-                            >
-                                {transactionRow}
-                            </PressableWithFeedback>
-                        ) : (
-                            transactionRow
-                        )}
+                        <PressableWithFeedback
+                            onPress={() => handleOnPress(transaction)}
+                            onLongPress={() => onLongPress?.(transaction)}
+                            accessibilityRole={CONST.ROLE.BUTTON}
+                            accessibilityLabel={transaction.text ?? ''}
+                            isNested
+                            onMouseDown={(e) => e.preventDefault()}
+                            hoverStyle={[!transaction.isDisabled && styles.hoveredComponentBG]}
+                            dataSet={{[CONST.SELECTION_SCRAPER_HIDDEN_ELEMENT]: true, [CONST.INNER_BOX_SHADOW_ELEMENT]: false}}
+                            id={transaction.transactionID}
+                            sentryLabel={CONST.SENTRY_LABEL.SEARCH.EXPANDED_TRANSACTION_ROW}
+                        >
+                            {({hovered}) => (
+                                <TransactionItemRow
+                                    report={transaction.report}
+                                    policy={transaction.policy}
+                                    transactionItem={transaction}
+                                    violations={getTransactionViolations(
+                                        transaction,
+                                        violations,
+                                        currentUserDetails.email ?? '',
+                                        currentUserDetails.accountID,
+                                        transaction.report,
+                                        transaction.policy,
+                                    )}
+                                    isSelected={!!transaction.isSelected}
+                                    dateColumnSize={dateColumnSize}
+                                    amountColumnSize={amountColumnSize}
+                                    taxAmountColumnSize={taxAmountColumnSize}
+                                    shouldShowTooltip={showTooltip}
+                                    shouldUseNarrowLayout={!isLargeScreenWidth}
+                                    shouldShowCheckbox={!!canSelectMultiple}
+                                    checkboxSentryLabel={CONST.SENTRY_LABEL.SEARCH.EXPANDED_TRANSACTION_ROW_CHECKBOX}
+                                    onCheckboxPress={() => onCheckboxPress?.(transaction as unknown as TItem)}
+                                    columns={currentColumns}
+                                    onButtonPress={() => handleButtonPress(transaction)}
+                                    style={[styles.noBorderRadius, isLargeScreenWidth ? [styles.p3, styles.pv2, styles.searchTableRowHeight] : styles.p4, styles.flex1]}
+                                    isReportItemChild
+                                    isInSingleTransactionReport={isInSingleTransactionReport}
+                                    shouldShowBottomBorder={shouldShowBottomBorder}
+                                    onArrowRightPress={isDeletedTransaction(transaction) ? undefined : () => openReportInRHP(transaction)}
+                                    shouldShowArrowRightOnNarrowLayout
+                                    reportActions={exportedReportActions}
+                                    policyForMovingExpenses={policyForMovingExpenses}
+                                    nonPersonalAndWorkspaceCards={nonPersonalAndWorkspaceCards}
+                                    isActionColumnWide={isActionColumnWide}
+                                    isHover={hovered}
+                                />
+                            )}
+                        </PressableWithFeedback>
                     </OfflineWithFeedback>
                 );
             })}
