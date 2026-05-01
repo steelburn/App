@@ -3,7 +3,7 @@ import agentZeroProcessingIndicatorSelector from '@selectors/ReportNameValuePair
 import React, {createContext, useContext, useEffect, useRef, useState} from 'react';
 import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
-import {clearConciergeThinkingKickoff, getReportChannelName} from '@libs/actions/Report';
+import {getReportChannelName} from '@libs/actions/Report';
 import Log from '@libs/Log';
 import Pusher from '@libs/Pusher';
 import CONST from '@src/CONST';
@@ -89,17 +89,6 @@ function AgentZeroStatusGate({reportID, children}: React.PropsWithChildren<{repo
     // Timestamp of the last label update — used to enforce MIN_DISPLAY_TIME
     const lastUpdateTimeRef = useRef<number>(0);
     const {isOffline} = useNetwork();
-
-    // Auto-kickoff "thinking" indicator when opened from search (where kickoffWaitingIndicator isn't accessible)
-    const [shouldKickoff] = useOnyx(ONYXKEYS.CONCIERGE_THINKING_KICKOFF);
-    useEffect(() => {
-        if (!shouldKickoff) {
-            return;
-        }
-        clearConciergeThinkingKickoff();
-        // eslint-disable-next-line react-hooks/set-state-in-effect -- one-shot kickoff from search; Onyx flag is cleared immediately so it cannot cascade
-        setOptimisticStartTime(Date.now());
-    }, [shouldKickoff]);
 
     // Tracks the current agentZeroRequestID so the Pusher callback can detect new requests
     const agentZeroRequestIDRef = useRef('');
