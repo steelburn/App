@@ -153,6 +153,7 @@ import {
     isAdminRoom as reportUtilsIsAdminRoom,
     isAnnounceRoom as reportUtilsIsAnnounceRoom,
     isChatReport as reportUtilsIsChatReport,
+    getEffectiveReportErrors,
     isChatRoom as reportUtilsIsChatRoom,
     isGroupChat as reportUtilsIsGroupChat,
     isMoneyRequestReport as reportUtilsIsMoneyRequestReport,
@@ -1075,11 +1076,7 @@ function createOption({
 
         // Type/category flags already set in initialization above, but update brickRoadIndicator
         const reportAttribute = reportAttributesDerived?.[report.reportID];
-        // When the child's RBR-worthy state is being propagated up to an accessible parent workspace chat,
-        // the per-report pass clears `brickRoadStatus`. Mirror that here so search/share-to pickers don't
-        // promote `reportErrors` to a duplicate RBR on the child row — the parent chat row carries it.
-        const isPropagatingToAccessibleParent = !!reportAttribute?.needsParentChatErrorPropagation && !reportAttribute?.brickRoadStatus;
-        result.allReportErrors = isPropagatingToAccessibleParent ? {} : (reportAttribute?.reportErrors ?? {});
+        result.allReportErrors = getEffectiveReportErrors(reportAttribute);
         result.brickRoadIndicator = !isEmptyObject(result.allReportErrors) ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : (reportAttribute?.brickRoadStatus ?? '');
 
         // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- below is a boolean expression
