@@ -22,7 +22,7 @@ function DomainMemberVacationDelegatePage({route}: DomainMemberVacationDelegateP
     const {domainAccountID, accountID} = route.params;
     const {translate} = useLocalize();
 
-    const {email: currentUserLogin = ''} = useCurrentUserPersonalDetails();
+    const {login: currentUserLogin} = useCurrentUserPersonalDetails();
 
     const [vacationDelegate] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {
         selector: vacationDelegateSelector(accountID),
@@ -46,7 +46,7 @@ function DomainMemberVacationDelegatePage({route}: DomainMemberVacationDelegateP
             return;
         }
 
-        setDomainVacationDelegate(domainAccountID, accountID, currentUserLogin, memberLogin, delegateLogin, vacationDelegate);
+        setDomainVacationDelegate(domainAccountID, accountID, currentUserLogin ?? '', memberLogin, delegateLogin, vacationDelegate);
         Navigation.goBack(ROUTES.DOMAIN_MEMBER_DETAILS.getRoute(domainAccountID, accountID));
     };
 
