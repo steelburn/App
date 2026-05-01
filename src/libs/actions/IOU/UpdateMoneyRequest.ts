@@ -9,7 +9,7 @@ import DistanceRequestUtils from '@libs/DistanceRequestUtils';
 import {getMicroSecondOnyxErrorWithTranslationKey} from '@libs/ErrorUtils';
 // eslint-disable-next-line @typescript-eslint/no-deprecated
 import {buildNextStepNew, buildOptimisticNextStep} from '@libs/NextStepUtils';
-import {getDistanceRateOriginalPolicy, hasDependentTags, isPaidGroupPolicy} from '@libs/PolicyUtils';
+import {getDistanceRateOriginalPolicy, getDistanceRateOriginalPolicyID, hasDependentTags, isPaidGroupPolicy} from '@libs/PolicyUtils';
 import type {TransactionDetails} from '@libs/ReportUtils';
 import {
     buildOptimisticModifiedExpenseReportAction,
@@ -1476,17 +1476,14 @@ function getUpdateTrackExpenseParams(
     const transactionThread = getAllReports()?.[`${ONYXKEYS.COLLECTION.REPORT}${transactionThreadReportID}`] ?? null;
     const transaction = getAllTransactions()?.[`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`];
     const chatReport = getAllReports()?.[`${ONYXKEYS.COLLECTION.REPORT}${transactionThread?.parentReportID}`] ?? null;
-    // For unreported distance expenses, resolve the policy that owns the customUnitRateID
-    // so the optimistic amount is calculated with the correct rate, not the default workspace rate.
     const isDistanceTransaction = transaction && isDistanceRequestTransactionUtils(transaction);
-    const distanceOriginalPolicy = isDistanceTransaction ? getDistanceRateOriginalPolicy(transaction) : undefined;
-    const policyForTransaction = distanceOriginalPolicy ?? policy;
+    const distancePolicyID = isDistanceTransaction ? getDistanceRateOriginalPolicyID(transaction) : undefined;
     const updatedTransaction = transaction
         ? getUpdatedTransaction({
               transaction,
               transactionChanges,
               isFromExpenseReport: false,
-              policy: policyForTransaction,
+              policy,
           })
         : null;
     const transactionDetails = getTransactionDetails(updatedTransaction);
@@ -1496,8 +1493,6 @@ function getUpdateTrackExpenseParams(
     }
 
     const dataToIncludeInParams: Partial<TransactionDetails> = Object.fromEntries(Object.entries(transactionDetails ?? {}).filter(([key]) => key in transactionChanges));
-
-    const distancePolicyID = isDistanceTransaction ? distanceOriginalPolicy?.id : undefined;
 
     const apiParams: UpdateMoneyRequestParams = {
         ...dataToIncludeInParams,
