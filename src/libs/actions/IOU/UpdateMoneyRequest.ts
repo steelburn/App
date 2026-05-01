@@ -9,7 +9,7 @@ import DistanceRequestUtils from '@libs/DistanceRequestUtils';
 import {getMicroSecondOnyxErrorWithTranslationKey} from '@libs/ErrorUtils';
 // eslint-disable-next-line @typescript-eslint/no-deprecated
 import {buildNextStepNew, buildOptimisticNextStep} from '@libs/NextStepUtils';
-import {getDistanceRateOriginalPolicyID, hasDependentTags, isPaidGroupPolicy} from '@libs/PolicyUtils';
+import {hasDependentTags, isPaidGroupPolicy} from '@libs/PolicyUtils';
 import type {TransactionDetails} from '@libs/ReportUtils';
 import {
     buildOptimisticModifiedExpenseReportAction,
@@ -969,19 +969,10 @@ function getUpdateMoneyRequestParams(params: GetUpdateMoneyRequestParamsType): U
 
     const dataToIncludeInParams: Partial<TransactionDetails> = Object.fromEntries(Object.entries(transactionDetails ?? {}).filter(([key]) => key in transactionChanges));
 
-    // For distance requests, resolve the policyID from the rate's original policy so the
-    // backend receives the correct workspace context, even when the expense is unreported
-    // and the caller's `policy` is the user's default workspace.
-    // Also, don't push error to failureData when updating distance requests —
-    // the error will be handled by API response for distance requests.
-    const isDistanceTransaction = transaction && isDistanceRequestTransactionUtils(transaction);
-    const distancePolicyID = isDistanceTransaction ? getDistanceRateOriginalPolicyID(transaction) : undefined;
-
     const apiParams: UpdateMoneyRequestParams = {
         ...dataToIncludeInParams,
         reportID: iouReport?.reportID,
         transactionID,
-        policyID: distancePolicyID ?? policy?.id,
     };
 
     const hasPendingWaypoints = 'waypoints' in transactionChanges;
@@ -1058,6 +1049,10 @@ function getUpdateMoneyRequestParams(params: GetUpdateMoneyRequestParamsType): U
                 [updatedReportAction.reportActionID]: {pendingAction: null},
             },
         });
+
+        // Don't push error to failureData when updating distance requests
+        // The error will be handled by API response for distance requests
+        const isDistanceTransaction = transaction && isDistanceRequestTransactionUtils(transaction);
 
         failureData.push({
             onyxMethod: Onyx.METHOD.MERGE,
@@ -1493,14 +1488,10 @@ function getUpdateTrackExpenseParams(
 
     const dataToIncludeInParams: Partial<TransactionDetails> = Object.fromEntries(Object.entries(transactionDetails ?? {}).filter(([key]) => key in transactionChanges));
 
-    const isDistanceTransaction = transaction && isDistanceRequestTransactionUtils(transaction);
-    const distancePolicyID = isDistanceTransaction ? getDistanceRateOriginalPolicyID(transaction) : undefined;
-
     const apiParams: UpdateMoneyRequestParams = {
         ...dataToIncludeInParams,
         reportID: chatReport?.reportID,
         transactionID,
-        policyID: distancePolicyID ?? policy?.id,
     };
 
     const hasPendingWaypoints = 'waypoints' in transactionChanges;
