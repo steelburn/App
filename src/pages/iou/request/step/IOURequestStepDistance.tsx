@@ -5,11 +5,8 @@ import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import type {ScrollView as RNScrollView} from 'react-native';
 import type {RenderItemParams} from 'react-native-draggable-flatlist/lib/typescript/types';
 import type {OnyxEntry} from 'react-native-onyx';
-import FullPageNotFoundView from '@components/BlockingViews/FullPageNotFoundView';
 import DistanceRequestRenderItem from '@components/DistanceRequest/DistanceRequestRenderItem';
-import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import type {NumberWithSymbolFormRef} from '@components/NumberWithSymbolForm';
-import ScreenWrapper from '@components/ScreenWrapper';
 import TabSelector from '@components/TabSelector/TabSelector';
 import type {BaseTextInputRef} from '@components/TextInput/BaseTextInput/types';
 import withCurrentUserPersonalDetails from '@components/withCurrentUserPersonalDetails';
@@ -37,7 +34,6 @@ import {init, stop} from '@libs/actions/MapboxToken';
 import {openReport} from '@libs/actions/Report';
 import {openDraftDistanceExpense, removeWaypoint, updateWaypoints as updateWaypointsUtil} from '@libs/actions/Transaction';
 import {createBackupTransaction, removeBackupTransaction, restoreOriginalTransactionFromBackup} from '@libs/actions/TransactionEdit';
-import {canUseTouchScreen} from '@libs/DeviceCapabilities';
 import DistanceRequestUtils from '@libs/DistanceRequestUtils';
 import type {MileageRate} from '@libs/DistanceRequestUtils';
 import {getLatestErrorField} from '@libs/ErrorUtils';
@@ -333,6 +329,10 @@ function IOURequestStepDistance({
         Navigation.goBack(backTo);
     }, [backTo]);
 
+    const navigateBackAfterSave = useCallback(() => {
+        Navigation.closeRHPFlow();
+    }, []);
+
     /**
      * Takes the user to the page for editing a specific waypoint
      * @param index of the waypoint to edit
@@ -503,7 +503,7 @@ function IOURequestStepDistance({
                     {waypoints: currentTransaction?.comment?.waypoints, routes: currentTransaction?.routes},
                     policy,
                 );
-                navigateBack();
+                navigateBackAfterSave();
                 return;
             }
 
@@ -515,16 +515,10 @@ function IOURequestStepDistance({
             const hasRouteChanged = !deepEqual(transactionBackup?.routes, transaction?.routes);
             if (deepEqual(oldAddresses, addresses)) {
                 transactionWasSaved.current = true;
-                navigateBack();
+                navigateBackAfterSave();
                 return;
             }
             if (transaction?.transactionID && report?.reportID) {
-                // Send the new route distance so the server replaces any stale manual quantity.
-                // Use full precision (no rounding) to avoid triggering the `increasedDistance`
-                // violation when the rounded display value drifts above the exact route distance.
-                const routeDistanceInMeters = transaction?.routes?.route0?.distance;
-                const routeDistanceInUnit = routeDistanceInMeters != null ? DistanceRequestUtils.convertDistanceUnit(routeDistanceInMeters, distanceUnit) : undefined;
-
                 updateMoneyRequestDistance({
                     transaction,
                     transactionThreadReport: report,
@@ -532,7 +526,6 @@ function IOURequestStepDistance({
                     waypoints,
                     recentWaypoints,
                     ...(hasRouteChanged ? {routes: transaction?.routes} : {}),
-                    ...(routeDistanceInUnit != null ? {distance: routeDistanceInUnit} : {}),
                     policy,
                     policyTagList: policyTags,
                     policyCategories,
@@ -547,7 +540,7 @@ function IOURequestStepDistance({
             // Remove the backup eagerly so the parent report view reads the optimistic transaction
             // immediately, instead of the stale backup, while the API request is still in flight.
             removeBackupTransaction(transaction?.transactionID);
-            navigateBack();
+            navigateBackAfterSave();
             return;
         }
 
@@ -561,13 +554,13 @@ function IOURequestStepDistance({
         isLoading,
         isCreatingNewRequest,
         navigateToNextStep,
+        navigateBackAfterSave,
         isEditingSplit,
         originalSplitTransactionDraft,
         transactionBackup,
         waypoints,
         transaction,
         report,
-        navigateBack,
         currentTransaction?.comment?.waypoints,
         currentTransaction?.routes,
         policy,
@@ -579,7 +572,6 @@ function IOURequestStepDistance({
         currentUserEmailParam,
         isASAPSubmitBetaEnabled,
         parentReportNextStep,
-        distanceUnit,
     ]);
 
     const submitManualDistance = useCallback(() => {
@@ -599,7 +591,7 @@ function IOURequestStepDistance({
         if (isEditingSplit && transaction) {
             setMoneyRequestDistance(transactionID, distanceAsFloat, shouldUseTransactionDraft(action, iouType), distanceUnit);
             setDraftSplitTransaction(CONST.IOU.OPTIMISTIC_TRANSACTION_ID, splitDraftTransaction, {distance: distanceAsFloat}, policy);
-            navigateBack();
+            navigateBackAfterSave();
             return;
         }
 
@@ -616,7 +608,7 @@ function IOURequestStepDistance({
 
         if (!isDistanceChanged && !isDistanceUnitChanged && !haveWaypointsChanged) {
             transactionWasSaved.current = true;
-            navigateBack();
+            navigateBackAfterSave();
             return;
         }
 
@@ -639,7 +631,7 @@ function IOURequestStepDistance({
             recentWaypoints,
         });
         transactionWasSaved.current = true;
-        navigateBack();
+        navigateBackAfterSave();
     }, [
         translate,
         distanceRate,
@@ -652,7 +644,7 @@ function IOURequestStepDistance({
         currentTransaction?.comment?.customUnit?.distanceUnit,
         splitDraftTransaction,
         policy,
-        navigateBack,
+        navigateBackAfterSave,
         currentDistance,
         waypoints,
         transactionBackup,
@@ -738,27 +730,23 @@ function IOURequestStepDistance({
     );
 
     if (isEditing) {
-        const hasRequiredData = !!currentTransaction?.comment?.waypoints && !shouldShowNotFoundPage;
         return (
-            <ScreenWrapper
-                shouldEnableMaxHeight={canUseTouchScreen()}
+            <StepScreenWrapper
+                headerTitle={translate('common.distance')}
+                onBackButtonPress={navigateBack}
                 testID="IOURequestStepDistance"
+                shouldShowNotFoundPage={!currentTransaction?.comment?.waypoints || shouldShowNotFoundPage}
+                shouldShowWrapper
             >
-                <FullPageNotFoundView shouldShow={!hasRequiredData}>
-                    <HeaderWithBackButton
-                        title={translate('common.distance')}
-                        onBackButtonPress={navigateBack}
-                    />
-                    <OnyxTabNavigator
-                        id={CONST.TAB.DISTANCE_EDIT_TYPE}
-                        defaultSelectedTab={CONST.TAB_REQUEST.DISTANCE_MAP}
-                        tabBar={TabSelector}
-                    >
-                        <TopTab.Screen name={CONST.TAB_REQUEST.DISTANCE_MAP}>{renderMapTab}</TopTab.Screen>
-                        <TopTab.Screen name={CONST.TAB_REQUEST.DISTANCE_MANUAL}>{renderManualTab}</TopTab.Screen>
-                    </OnyxTabNavigator>
-                </FullPageNotFoundView>
-            </ScreenWrapper>
+                <OnyxTabNavigator
+                    id={CONST.TAB.DISTANCE_EDIT_TYPE}
+                    defaultSelectedTab={CONST.TAB_REQUEST.DISTANCE_MAP}
+                    tabBar={TabSelector}
+                >
+                    <TopTab.Screen name={CONST.TAB_REQUEST.DISTANCE_MAP}>{renderMapTab}</TopTab.Screen>
+                    <TopTab.Screen name={CONST.TAB_REQUEST.DISTANCE_MANUAL}>{renderManualTab}</TopTab.Screen>
+                </OnyxTabNavigator>
+            </StepScreenWrapper>
         );
     }
 

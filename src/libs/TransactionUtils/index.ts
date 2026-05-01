@@ -748,6 +748,13 @@ function getUpdatedTransaction({
             updatedTransaction.amount = updatedAmount;
             updatedTransaction.modifiedAmount = updatedAmount;
             updatedTransaction.modifiedMerchant = updatedMerchant;
+
+            // Sync `customUnit.quantity` to the new route distance. Without this the prior manual
+            // quantity (set when the user edited distance manually before changing waypoints) would
+            // linger and drive `getDistanceInMeters`, since that helper prefers quantity over routes.
+            if (unit) {
+                lodashSet(updatedTransaction, 'comment.customUnit.quantity', roundToTwoDecimalPlaces(DistanceRequestUtils.convertDistanceUnit(distanceInMeters, unit)));
+            }
         }
     }
 

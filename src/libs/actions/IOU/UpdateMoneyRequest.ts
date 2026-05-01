@@ -509,7 +509,10 @@ function updateMoneyRequestDistance({
         // Don't sanitize waypoints here - keep all fields for Onyx optimistic data (e.g., keyForList)
         // Sanitization happens when building API params
         ...(waypoints && {waypoints}),
-        routes,
+        // Only include routes when the caller explicitly provided them. Including `routes: undefined`
+        // would make the optimistic merge wipe the existing route, briefly blanking the map thumbnail
+        // and report preview before the server response restores it.
+        ...(routes !== undefined && {routes}),
         ...(distance && {distance}),
         ...(odometerStart !== undefined && {odometerStart}),
         ...(odometerEnd !== undefined && {odometerEnd}),
@@ -966,6 +969,15 @@ function getUpdateMoneyRequestParams(params: GetUpdateMoneyRequestParamsType): U
             .filter((key) => !(shouldSuppressWaypointsAsPending && key === 'waypoints'))
             .map((key) => [key, CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE]),
     );
+    // Flag `merchant` as pending on any edit that causes the BE to regenerate the receipt
+    // (waypoints / distance / rate). `merchant` isn't in `transactionChanges`, so the success-data
+    // merge won't clear it via `clearedPendingFields` — it persists through the gap between API ack
+    // and the Pusher push that delivers the new `receipt.source`. The Pusher push then clears all
+    // pendingFields atomically together with the new URL, eliminating the broken-image flash.
+    // It also drives the Distance row's offline-feedback strikethrough for pure distance edits.
+    if ('waypoints' in transactionChanges || 'distance' in transactionChanges || 'customUnitRateID' in transactionChanges) {
+        pendingFields.merchant = CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE;
+    }
     const clearedPendingFields = getClearedPendingFields(transactionChanges);
     const errorFields = Object.fromEntries(Object.keys(pendingFields).map((key) => [key, getMicroSecondOnyxErrorWithTranslationKey('iou.error.genericEditFailureMessage')]));
 
@@ -1274,7 +1286,11 @@ function getUpdateMoneyRequestParams(params: GetUpdateMoneyRequestParamsType): U
     // Clear out the error fields and loading states on success.
     // Only clear `routes` when waypoints/rate changed (the server will push a fresh route via Pusher).
     // For pure distance edits the route is unchanged, and clearing it would make the map briefly disappear.
-    const shouldClearRoutes = haveWaypointsActuallyChanged || hasModifiedDistanceRate;
+    // When the caller already supplied a valid optimistic route (waypoint edit with route pre-fetched
+    // locally), keep it so the receipt thumbnail and ConfirmedRoute don't flicker between success and
+    // the Pusher route push.
+    const hasValidOptimisticRoute = !!transactionChanges.routes?.route0?.geometry?.coordinates?.length;
+    const shouldClearRoutes = (haveWaypointsActuallyChanged || hasModifiedDistanceRate) && !hasValidOptimisticRoute;
     successData.push({
         onyxMethod: Onyx.METHOD.MERGE,
         key: `${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`,
