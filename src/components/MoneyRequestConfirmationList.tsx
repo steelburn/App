@@ -810,20 +810,16 @@ function MoneyRequestConfirmationList({
                 return;
             }
 
-            // In the new manual expense flow the amount field starts empty (transaction.amount defaults to 0).
-            // We block submission until the user explicitly enters an amount (tracked by isAmountSet), unless the
-            // draft already has a non-zero total (e.g. tests, restored drafts). Time expenses derive totals from
-            // hours × rate, not the amount field. Scan flows use SmartScan instead of a typed amount. Distance
-            // totals come from route × rate (see DistanceRequestController); do not apply the manual-amount guard.
-            if (iouType !== CONST.IOU.TYPE.PAY && !isScanRequest && !isTimeRequest && !isDistanceRequest && isNewManualExpenseFlowEnabled && !transaction?.isAmountSet && iouAmount === 0) {
+            // In the new manual expense flow the amount field starts empty and submission is blocked until the user
+            // explicitly enters an amount (tracked by isAmountSet). Time expenses derive totals from hours × rate,
+            // scan flows use SmartScan, and distance totals come from route × rate (see DistanceRequestController),
+            // so this guard applies only to manual non-distance requests.
+            if (iouType !== CONST.IOU.TYPE.PAY && !isScanRequest && !isTimeRequest && !isDistanceRequest && isNewManualExpenseFlowEnabled && !transaction?.isAmountSet) {
                 setFormError('common.error.invalidAmount');
                 return;
             }
 
-            const isInvalidP2PAmount =
-                !isDistanceRequest &&
-                iouAmount === 0 &&
-                (isTypeRequest ? isP2P : iouType === CONST.IOU.TYPE.PAY || iouType === CONST.IOU.TYPE.INVOICE || (iouType === CONST.IOU.TYPE.SPLIT && !isScanRequest));
+            const isInvalidP2PAmount = !isScanRequest && !isTimeRequest && !isDistanceRequest && iouAmount === 0 && isP2P;
             if (isInvalidP2PAmount) {
                 setFormError('common.error.invalidAmount');
                 return;

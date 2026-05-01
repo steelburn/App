@@ -852,7 +852,7 @@ function setMoneyRequestAmount(transactionID: string, amount: number, currency: 
  * shows as empty and submission is blocked until a value is entered again.
  */
 function clearMoneyRequestAmount(transactionID: string) {
-    Onyx.merge(`${ONYXKEYS.COLLECTION.TRANSACTION_DRAFT}${transactionID}`, {isAmountSet: false});
+    Onyx.merge(`${ONYXKEYS.COLLECTION.TRANSACTION_DRAFT}${transactionID}`, {amount: 0, isAmountSet: false});
 }
 
 function clearMoneyRequestMerchant(transactionID: string, isDraft = true) {
