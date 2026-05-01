@@ -90,6 +90,7 @@ const translations = {
         optional: 'Optional',
         new: 'New',
         newFeature: 'New feature',
+        beta: 'Beta',
         search: 'Search',
         reports: 'Reports',
         spend: 'Spend',
@@ -2773,6 +2774,15 @@ const translations = {
         defaultPaymentMethod: 'Default',
         bankAccountLastFour: (lastFour: string) => `Bank Account • ${lastFour}`,
     },
+    agentsPage: {
+        title: 'Agents',
+        subtitle: 'Automate tasks with custom agents.',
+        newAgent: 'New agent',
+        emptyAgents: {
+            title: 'No agents created',
+            subtitle: 'Stop manually doing stuff. Instruct an agent instead and save yourself lots of time.',
+        },
+    },
     expenseRulesPage: {
         title: 'Expense rules',
         subtitle: 'These rules will apply to your expenses.',
@@ -3554,6 +3564,11 @@ const translations = {
         confirmationStepHeader: 'Check your info.',
         confirmationStepSubHeader: 'Double check the details below, and check the terms box to confirm.',
         toGetStarted: 'Add a personal bank account to receive reimbursements, pay invoices, or enable the Expensify Wallet.',
+        updatePersonalInfo: 'Update bank account',
+        updatePersonalInfoFailure: 'Unable to update bank account information. Please try again later.',
+        updateSuccessTitle: 'Bank account updated!',
+        updateSuccessHeader: 'Bank account updated',
+        updateSuccessMessage: 'Congrats, your bank account is set up and ready to receive reimbursements.',
     },
     addPersonalBankAccountPage: {
         enterPassword: 'Enter Expensify password',
@@ -5337,6 +5352,10 @@ const translations = {
             euUkDisclaimer:
                 'Cards provided to EEA residents are issued by Transact Payments Malta Limited and cards provided to UK residents are issued by Transact Payments Limited pursuant to license by Visa Europe Limited. Transact Payments Malta Limited is duly authorized and regulated by the Malta Financial Services Authority as a Financial Institution under the Financial Institution Act 1994. Registration number C 91879. Transact Payments Limited is authorized and regulated by the Gibraltar Financial Service Commission.',
             issueCard: 'Issue card',
+            exportAsCSV: 'Export as CSV',
+            csvColumnType: 'Type',
+            csvColumnLimitType: 'Limit type',
+            csvColumnLimit: 'Limit',
             findCard: 'Find card',
             newCard: 'New card',
             name: 'Name',
@@ -6857,8 +6876,6 @@ const translations = {
             customRules: {
                 title: 'Expense policy',
                 cardSubtitle: "Here's where your team's expense policy lives, so everyone's on the same page about what's covered.",
-                policyDocument: 'Policy document',
-                policyText: 'Policy text',
             },
             spendRules: {
                 title: 'Spend',
@@ -7799,6 +7816,7 @@ const translations = {
         recentSearches: 'Recent searches',
         recentChats: 'Recent chats',
         searchIn: 'Search in',
+        askConcierge: (message: string) => `Ask Concierge “${message}”`,
         searchPlaceholder: 'Search for something...',
         suggestions: 'Suggestions',
         suggestionsAvailable: ({count}: {count: number}, query = '') => ({
