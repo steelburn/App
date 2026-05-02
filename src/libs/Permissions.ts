@@ -1,4 +1,4 @@
-import type { OnyxEntry } from 'react-native-onyx';
+import type {OnyxEntry} from 'react-native-onyx';
 import CONST from '@src/CONST';
 import type Beta from '@src/types/onyx/Beta';
 import type BetaConfiguration from '@src/types/onyx/BetaConfiguration';
@@ -35,8 +35,16 @@ function canUseTrackFlows(): boolean {
     return false;
 }
 
+/**
+ * Private notes are temporarily disabled.
+ */
+function canUsePrivateNotes(): boolean {
+    return false;
+}
+
 export default {
     canUseLinkPreviews,
     canUseTrackFlows,
+    canUsePrivateNotes,
     isBetaEnabled,
 };
