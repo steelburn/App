@@ -13,12 +13,13 @@ import {useCallback, useEffect, useRef, useState} from 'react';
 function useInlineEditState<T>(canEdit: boolean | undefined, value: T, onSave?: (value: T) => void) {
     const [isEditing, setIsEditing] = useState(false);
     const [localValue, setLocalValue] = useState(value);
+    const [prevValue, setPrevValue] = useState(value);
     const hasEndedRef = useRef(false);
 
-    // Sync local value when the source-of-truth changes externally
-    useEffect(() => {
+    if (prevValue !== value) {
+        setPrevValue(value);
         setLocalValue(value);
-    }, [value]);
+    }
 
     const startEditing = useCallback(() => {
         hasEndedRef.current = false;
