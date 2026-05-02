@@ -169,7 +169,7 @@ function isValidMerchant(merchant: string | undefined, transaction?: OnyxEntry<T
     const trimmedMerchant = merchant?.trim() ?? '';
     const isEmpty = !trimmedMerchant;
 
-    // Business rule: unreported transactions can have empty merchants (allows clearing)
+    // Unreported transactions can have empty merchants (allows clearing)
     const isUnreported = transaction ? isExpenseUnreported(transaction) : false;
     if (isEmpty && isUnreported) {
         return true;
