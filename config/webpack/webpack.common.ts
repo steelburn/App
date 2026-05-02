@@ -147,9 +147,11 @@ const getCommonConfiguration = ({file = '.env', platform = 'web'}: Environment):
                           runtimeCaching: [
                               {
                                   // Same-origin user media (receipts, chat attachments) — cache opportunistically
-                                  // so they're viewable on offline refresh.
-                                  urlPattern: ({url, request}) =>
-                                      url.origin === self.location.origin && (request.destination === 'image' || /\/(receipts|chat-attachments)\//.test(url.pathname)),
+                                  // so they're viewable on offline refresh. The function below is serialized into
+                                  // the generated service worker, so it executes in the SW context where
+                                  // `sameOrigin` is the appropriate Workbox match (no need to read `self.location`).
+                                  urlPattern: ({sameOrigin, url, request}) =>
+                                      sameOrigin && (request.destination === 'image' || /\/(receipts|chat-attachments)\//.test(url.pathname)),
                                   handler: 'StaleWhileRevalidate',
                                   options: {
                                       cacheName: 'user-media',
