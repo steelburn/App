@@ -63,6 +63,7 @@ function AnimatedBadge({text, isExpanded}: AnimatedBadgeProps) {
                 text={text}
                 badgeStyles={styles.todoBadge}
                 success
+                isCondensed
             />
         </Animated.View>
     );
