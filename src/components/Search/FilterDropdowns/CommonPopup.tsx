@@ -14,14 +14,6 @@ type CommonPopupProps = {
     updateFilterForm: (value: Partial<SearchAdvancedFiltersForm>) => void;
 };
 
-function getFilterApplySentryLabel(filterKey: CommonPopupProps['filterKey']) {
-    return `Search-FilterPopupApply-${filterKey}`;
-}
-
-function getFilterResetSentryLabel(filterKey: CommonPopupProps['filterKey']) {
-    return `Search-FilterPopupReset-${filterKey}`;
-}
-
 function CommonPopup({filterKey, value: initialValue, label, policyIDQuery, updateFilterForm, closeOverlay}: CommonPopupProps) {
     const [value, setValue] = useState(initialValue);
 
@@ -40,8 +32,8 @@ function CommonPopup({filterKey, value: initialValue, label, policyIDQuery, upda
             label={label}
             onApply={applyChanges}
             onReset={resetChanges}
-            applySentryLabel={getFilterApplySentryLabel(filterKey)}
-            resetSentryLabel={getFilterResetSentryLabel(filterKey)}
+            applySentryLabel={`Search-FilterPopupApply-${filterKey}`}
+            resetSentryLabel={`Search-FilterPopupReset-${filterKey}`}
         >
             <FilterComponents
                 filterKey={filterKey}
