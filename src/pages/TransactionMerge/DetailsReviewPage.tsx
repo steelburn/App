@@ -43,7 +43,7 @@ type DetailsReviewPageProps = PlatformStackScreenProps<MergeTransactionNavigator
 function DetailsReviewPage({route}: DetailsReviewPageProps) {
     const {translate, localeCompare} = useLocalize();
     const styles = useThemeStyles();
-    const {getCurrencyDecimals} = useCurrencyListActions();
+    const {getCurrencyDecimals, convertToDisplayString} = useCurrencyListActions();
     const {transactionID, isOnSearch, backTo} = route.params;
 
     const [mergeTransaction, mergeTransactionMetadata] = useOnyx(`${ONYXKEYS.COLLECTION.MERGE_TRANSACTION}${getNonEmptyStringOnyxID(transactionID)}`);
@@ -150,10 +150,17 @@ function DetailsReviewPage({route}: DetailsReviewPageProps) {
     // Build merge fields array with all necessary information
     const mergeFields = useMemo(
         () =>
-            buildMergeFieldsData(conflictFields, targetTransaction, sourceTransaction, mergeTransaction, targetTransactionPolicy, sourceTransactionPolicy, translate, [
-                targetTransactionReport,
-                sourceTransactionReport,
-            ]),
+            buildMergeFieldsData(
+                conflictFields,
+                targetTransaction,
+                sourceTransaction,
+                mergeTransaction,
+                targetTransactionPolicy,
+                sourceTransactionPolicy,
+                translate,
+                convertToDisplayString,
+                [targetTransactionReport, sourceTransactionReport],
+            ),
         [
             conflictFields,
             targetTransaction,
@@ -164,6 +171,7 @@ function DetailsReviewPage({route}: DetailsReviewPageProps) {
             targetTransactionPolicy,
             sourceTransactionPolicy,
             translate,
+            convertToDisplayString,
         ],
     );
 
