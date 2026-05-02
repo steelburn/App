@@ -181,58 +181,58 @@ function SuggestionMention({
         return breakerIndex === -1 ? rest : rest.slice(0, breakerIndex);
     }
 
-    function isPrivateDomainShortMention(token: string): boolean {
-        if (!token.startsWith('@')) {
-            return false;
-        }
-        const currentLogin = currentUserPersonalDetails.login ?? '';
-        return Object.values(personalDetails ?? {}).some(
-            (detail) =>
-                !!detail?.login &&
-                areEmailsFromSamePrivateDomain(detail.login, currentLogin) &&
-                `@${formatLoginPrivateDomain(detail.login, detail.login)}`.toLowerCase() === token.toLowerCase(),
-        );
-    }
-
-    function isCompleteAtMention(token: string): boolean {
-        if (!token.startsWith('@')) {
-            return false;
-        }
-        const withoutAt = token.slice(1);
-        return (
-            Str.isValidEmail(withoutAt) ||
-            token.toLowerCase() === CONST.AUTO_COMPLETE_SUGGESTER.HERE_TEXT.toLowerCase() ||
-            Str.isValidPhoneFormat(withoutAt) ||
-            isPrivateDomainShortMention(token)
-        );
-    }
-
-    function findTrailingMentionIndex(scannedMention: string, minIndex: number): number {
-        for (let i = scannedMention.length - 1; i >= minIndex; i--) {
-            const trigger = scannedMention[i];
-            if (trigger !== '@' && trigger !== '#') {
-                continue;
-            }
-
-            const token = getOriginalMentionText(scannedMention, i, 0);
-            if (i + token.length !== scannedMention.length) {
-                continue;
-            }
-            if (trigger === '@' && isCompleteAtMention(token)) {
-                return i;
-            }
-            if (trigger === '#' && isValidRoomName(token)) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
     /**
      * Replace the code of mention and update selection
      */
     const insertSelectedMention = useCallback(
         (highlightedMentionIndexInner: number) => {
+            const isPrivateDomainShortMention = (token: string): boolean => {
+                if (!token.startsWith('@')) {
+                    return false;
+                }
+                const currentLogin = currentUserPersonalDetails.login ?? '';
+                return Object.values(personalDetails ?? {}).some(
+                    (detail) =>
+                        !!detail?.login &&
+                        areEmailsFromSamePrivateDomain(detail.login, currentLogin) &&
+                        `@${formatLoginPrivateDomain(detail.login, detail.login)}`.toLowerCase() === token.toLowerCase(),
+                );
+            };
+
+            const isCompleteAtMention = (token: string): boolean => {
+                if (!token.startsWith('@')) {
+                    return false;
+                }
+                const withoutAt = token.slice(1);
+                return (
+                    Str.isValidEmail(withoutAt) ||
+                    token.toLowerCase() === CONST.AUTO_COMPLETE_SUGGESTER.HERE_TEXT.toLowerCase() ||
+                    Str.isValidPhoneFormat(withoutAt) ||
+                    isPrivateDomainShortMention(token)
+                );
+            };
+
+            const findTrailingMentionIndex = (scannedMention: string, minIndex: number): number => {
+                for (let i = scannedMention.length - 1; i >= minIndex; i--) {
+                    const trigger = scannedMention[i];
+                    if (trigger !== '@' && trigger !== '#') {
+                        continue;
+                    }
+
+                    const token = getOriginalMentionText(scannedMention, i, 0);
+                    if (i + token.length !== scannedMention.length) {
+                        continue;
+                    }
+                    if (trigger === '@' && isCompleteAtMention(token)) {
+                        return i;
+                    }
+                    if (trigger === '#' && isValidRoomName(token)) {
+                        return i;
+                    }
+                }
+                return -1;
+            };
+
             const commentBeforeAtSign = value.slice(0, suggestionValues.atSignIndex);
             const mentionObject = suggestionValues.suggestedMentions.at(highlightedMentionIndexInner);
             if (!mentionObject || highlightedMentionIndexInner === -1) {
@@ -295,7 +295,9 @@ function SuggestionMention({
             updateComment,
             setSelection,
             suggestionValues.mentionPrefix,
-            findTrailingMentionIndex,
+            currentUserPersonalDetails.login,
+            personalDetails,
+            formatLoginPrivateDomain,
         ],
     );
 
