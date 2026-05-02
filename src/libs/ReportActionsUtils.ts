@@ -2811,11 +2811,9 @@ function getExportIntegrationActionFragments(translate: LocalizedTranslate, repo
         if (travelInvoicingUrls.length === 1) {
             const travelInvoicingUrl = travelInvoicingUrls.at(0) ?? '';
             url = travelInvoicingUrl.startsWith('https://') ? travelInvoicingUrl : '';
-        } else {
-            if (label === CONST.POLICY.CONNECTIONS.NAME_USER_FRIENDLY.netsuite) {
-                url = NETSUITE_NON_REIMBURSABLE_EXPENSES_URL_PREFIX;
-                url += wasExportedAfterBase62 ? base62ReportID : reportID;
-            }
+        } else if (label === CONST.POLICY.CONNECTIONS.NAME_USER_FRIENDLY.netsuite) {
+            url = NETSUITE_NON_REIMBURSABLE_EXPENSES_URL_PREFIX;
+            url += wasExportedAfterBase62 ? base62ReportID : reportID;
         }
 
         result.push({text, url});
