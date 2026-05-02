@@ -425,6 +425,7 @@
         "McAfee",
         "mchmod",
         "MCTEST",
+        "Menlo",
         "mechler",
         "mediumitalic",
         "memberof",
@@ -508,6 +509,7 @@
         "NTSB",
         "Nuevo",
         "nullptr",
+        "nums",
         "numberformat",
         "objc",
         "objdump",
@@ -848,6 +850,7 @@
         "workshopping",
         "workspacename",
         "worktree",
+        "worktrees",
         "writeitdown",
         "xcconfig",
         "xcodeproj",
@@ -924,6 +927,7 @@
         "Kolkata"
     ],
     "ignorePaths": [
+        ".gitignore",
         "src/languages/de.ts",
         "src/languages/es.ts",
         "src/languages/fr.ts",

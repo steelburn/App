@@ -5,7 +5,7 @@
  */
 
 // Import the web implementation directly (Jest resolves index.native.ts by default).
-/* eslint-disable @typescript-eslint/no-require-imports, import/extensions */
+/* eslint-disable import/extensions */
 const {focusFirstInteractiveElement} = require<{
     focusFirstInteractiveElement: (container: HTMLElement | null) => boolean;
 }>('../../src/hooks/useDialogContainerFocus/index.ts');
@@ -14,8 +14,11 @@ const {resetCycle: resetArbiter, tryClaim: arbiterClaim, Priorities: arbiterPrio
     tryClaim: (priority: 1 | 2 | 3) => boolean;
     Priorities: {INITIAL: 1; AUTO: 2; RETURN: 3};
 }>('../../src/libs/ScreenFocusArbiter.ts');
-const {teardownHadTabNavigation, setupHadTabNavigation} = require<{teardownHadTabNavigation: () => void; setupHadTabNavigation: () => void}>('../../src/libs/hadTabNavigation.ts');
-/* eslint-enable @typescript-eslint/no-require-imports, import/extensions */
+const {teardownHadTabNavigation, setupHadTabNavigation} = require<{
+    teardownHadTabNavigation: () => void;
+    setupHadTabNavigation: () => void;
+}>('../../src/libs/hadTabNavigation.ts');
+/* eslint-enable import/extensions */
 
 setupHadTabNavigation();
 
@@ -74,7 +77,10 @@ describe('focusFirstInteractiveElement', () => {
             const spy = jest.spyOn(button, 'focus');
 
             expect(focusFirstInteractiveElement(container)).toBe(true);
-            expect(spy).toHaveBeenCalledWith({preventScroll: true, focusVisible: true});
+            expect(spy).toHaveBeenCalledWith({
+                preventScroll: true,
+                focusVisible: true,
+            });
         });
 
         it('should not focus when container is null', () => {

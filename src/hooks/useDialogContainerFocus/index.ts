@@ -1,4 +1,5 @@
 import {useEffect} from 'react';
+// eslint-disable-next-line no-restricted-imports
 import {InteractionManager} from 'react-native';
 import FOCUSABLE_SELECTOR from '@libs/focusableSelector';
 import {hasFocusableAttributes} from '@libs/focusGuards';
