@@ -306,13 +306,14 @@ function getTransactionEditPermissions({
     disabled,
     shouldSelectPolicyForUnreported,
 }: TransactionEditPermissionsParams): TransactionEditPermissions {
-    if (disabled || !transaction || isScanning(transaction)) {
+    if (disabled || !transaction) {
         return NO_EDIT;
     }
 
     const isUnreported = isExpenseUnreported(transaction);
     const isChatReportArchived = isArchivedReport(chatReportNVP);
     const isTransactionThreadArchived = isArchivedReport(transactionThreadNVP);
+    const isTransactionScanning = isScanning(transaction);
 
     // Matches MoneyRequestView's isEditable.
     // For unreported expenses the user always owns these. When the transaction
@@ -342,11 +343,21 @@ function getTransactionEditPermissions({
             if (isExpenseSplit) {
                 return false;
             }
+
+            // Amount field shows "Scanning..." during SmartScan
+            if (isTransactionScanning) {
+                return false;
+            }
         }
 
         if (field === CONST.EDIT_REQUEST_FIELD.MERCHANT) {
             // Distance expenses cannot have their merchant edited
             if (isDistanceRequest(transaction)) {
+                return false;
+            }
+
+            // Merchant field shows "Scanning..." during SmartScan
+            if (isTransactionScanning) {
                 return false;
             }
         }
