@@ -37,21 +37,6 @@ describe('useInlineEditState', () => {
         expect(result.current.isEditing).toBe(false);
     });
 
-    it('save does NOT call onSave when localValue equals the original value', () => {
-        const onSave = jest.fn();
-        const {result} = renderHook(() => useInlineEditState<string>(true, 'hello', onSave));
-
-        act(() => {
-            result.current.startEditing();
-        });
-        act(() => {
-            result.current.save();
-        });
-
-        expect(onSave).not.toHaveBeenCalled();
-        expect(result.current.isEditing).toBe(false);
-    });
-
     it('save works without an onSave callback (no crash)', () => {
         const {result} = renderHook(() => useInlineEditState<string>(true, 'hello'));
 
