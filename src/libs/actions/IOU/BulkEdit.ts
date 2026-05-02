@@ -22,7 +22,7 @@ import {
     isSelfDM,
     shouldEnableNegative,
 } from '@libs/ReportUtils';
-import {calculateTaxAmount, getAmount, getClearedPendingFields, getCurrency, getTaxValue, getUpdatedTransaction, isOnHold} from '@libs/TransactionUtils';
+import {calculateTaxAmount, getAmount, getClearedPendingFields, getCurrency, getTaxValue, getUpdatedTransaction, isOnHold, isSplitChildTransaction} from '@libs/TransactionUtils';
 import ViolationsUtils from '@libs/Violations/ViolationsUtils';
 import {createTransactionThreadReport} from '@userActions/Report';
 import CONST from '@src/CONST';
@@ -151,7 +151,7 @@ function updateMultipleMoneyRequests({
         const supportsExpenseFields = isUnreportedExpense || isFromExpenseReport || isInvoiceReportReportUtils(baseIouReport ?? undefined);
         // Split children must keep their amount/currency/tax in sync with the split parent's totals.
         // Allow coding fields (category, tag, merchant, etc.) but block these so we never put the split out of sync.
-        const isSplitChild = transaction.comment?.source === CONST.IOU.TYPE.SPLIT;
+        const isSplitChild = isSplitChildTransaction(transaction);
         // Use the transaction's own policy for all per-transaction checks (permissions, tax, change-diffing).
         // Falls back to the shared bulk-edit policy when the transaction's workspace cannot be resolved.
         const transactionPolicy = (iouReport?.policyID ? allPolicies?.[`${ONYXKEYS.COLLECTION.POLICY}${iouReport.policyID}`] : undefined) ?? policy;
