@@ -21,6 +21,7 @@ import {READ_COMMANDS, WRITE_COMMANDS} from '@libs/API/types';
 import type {CustomRNImageManipulatorResult} from '@libs/cropOrRotateImage/types';
 import DateUtils from '@libs/DateUtils';
 import * as ErrorUtils from '@libs/ErrorUtils';
+import * as Localize from '@libs/Localize';
 import * as LoginUtils from '@libs/LoginUtils';
 import Navigation from '@libs/Navigation/Navigation';
 import * as PersonalDetailsUtils from '@libs/PersonalDetailsUtils';
@@ -539,6 +540,7 @@ function updatePrivatePersonalDetails(values: FormOnyxValues<typeof ONYXKEYS.FOR
                 key: ONYXKEYS.PRIVATE_PERSONAL_DETAILS,
                 value: {
                     isLoading: true,
+                    errorFields: {personalDetails: null},
                 },
             },
         ],
@@ -557,6 +559,7 @@ function updatePrivatePersonalDetails(values: FormOnyxValues<typeof ONYXKEYS.FOR
                 key: ONYXKEYS.PRIVATE_PERSONAL_DETAILS,
                 value: {
                     isLoading: false,
+                    errorFields: {personalDetails: {[DateUtils.getMicroseconds()]: Localize.translateLocal('common.genericErrorMessage')}},
                 },
             },
         ],
