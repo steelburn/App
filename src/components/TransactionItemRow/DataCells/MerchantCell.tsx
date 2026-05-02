@@ -30,7 +30,13 @@ function MerchantOrDescriptionCell({merchantOrDescription, shouldShowTooltip, sh
         return StringUtils.lineBreaksToSpaces(Parser.htmlToText(merchantOrDescription));
     }, [merchantOrDescription, isDescription]);
 
-    const {isEditing, localValue, setLocalValue, startEditing, save, cancelEditing} = useInlineEditState(canEdit, text, onSave);
+    const handleSave = (value: string) => {
+        // Trim merchant values before saving (descriptions can keep whitespace)
+        const valueToSave = !isDescription ? value.trim() : value;
+        onSave?.(valueToSave);
+    };
+
+    const {isEditing, localValue, setLocalValue, startEditing, save, cancelEditing} = useInlineEditState(canEdit, text, handleSave);
 
     const isMultilineInput = isDescription;
 
