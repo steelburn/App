@@ -332,10 +332,6 @@ function getTransactionEditPermissions({
         return NO_EDIT;
     }
 
-    const policyTagLists = getTagLists(policyTags);
-    const isPolicyExpenseChat = isReportInGroupPolicy(parentReport, policy);
-    const categoryForDisplay = transaction?.category ?? '';
-
     // For restricted fields, delegate to canEditFieldOfMoneyRequest.
     // Unreported expenses bypass this (all restricted fields editable by owner).
     const canEditRestricted = (field: ValueOf<typeof CONST.EDIT_REQUEST_FIELD>) => {
@@ -356,10 +352,13 @@ function getTransactionEditPermissions({
         }
 
         if (field === CONST.EDIT_REQUEST_FIELD.CATEGORY) {
+            if (!policy?.areCategoriesEnabled) {
+                return false;
+            }
             // Matches MoneyRequestView's shouldShowCategory logic
             // For policy expenses, check if there's a category or enabled options
-            if (isPolicyExpenseChat) {
-                return !!categoryForDisplay || hasEnabledOptions(policyCategories ?? {});
+            if (isReportInGroupPolicy(parentReport, policy)) {
+                return !!(transaction?.category ?? '') || hasEnabledOptions(policyCategories ?? {});
             }
             // For unreported expenses, disable inline category editing while workspace selection is required.
             if (isUnreported) {
@@ -372,7 +371,7 @@ function getTransactionEditPermissions({
             if (isMultiLevelTags(policyTags)) {
                 return false;
             }
-            return !!transaction?.tag || hasEnabledTags(policyTagLists);
+            return !!transaction?.tag || hasEnabledTags(getTagLists(policyTags));
         }
 
         return (
