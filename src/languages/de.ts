@@ -182,6 +182,7 @@ const translations: TranslationDeepObject<typeof en> = {
         members: 'Mitglieder',
         invite: 'Einladen',
         here: 'hier',
+        avatar: 'Avatar',
         date: 'Datum',
         dob: 'Geburtsdatum',
         currentYear: 'Laufendes Jahr',

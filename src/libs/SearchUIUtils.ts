@@ -4010,6 +4010,8 @@ function getCustomColumnDefault(value?: SearchDataTypes | SearchGroupBy): Search
 
 function getSearchColumnTranslationKey(column: SearchColumnType): TranslationPaths {
     switch (column) {
+        case CONST.SEARCH.TABLE_COLUMNS.AVATAR:
+            return 'common.avatar';
         case CONST.SEARCH.TABLE_COLUMNS.DATE:
             return 'common.date';
         case CONST.SEARCH.TABLE_COLUMNS.SUBMITTED:
