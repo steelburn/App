@@ -5500,7 +5500,8 @@ function resolveActionableMentionWhisper(
     // the parent report's participants so the members list the user is viewing updates immediately.
     // When parentReport is the same as the current report (e.g. viewing a transaction thread directly),
     // fall back to the report's parentReportID to find the actual ancestor (IOU/expense/invoice report).
-    let parentInviteData = isInviteResolution && parentReport?.reportID && parentReport.reportID !== reportID ? buildParticipantsInviteData(parentReport, inviteeAccountIDs) : undefined;
+    const isParentReportDifferent = !!parentReport?.reportID && parentReport.reportID !== reportID;
+    let parentInviteData = isInviteResolution && isParentReportDifferent ? buildParticipantsInviteData(parentReport, inviteeAccountIDs) : undefined;
     if (!parentInviteData && isInviteResolution && report?.parentReportID && report.parentReportID !== reportID) {
         const ancestorReport = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${report.parentReportID}`];
         if (ancestorReport && (isMoneyRequestReport(ancestorReport) || isInvoiceReport(ancestorReport))) {
@@ -5509,7 +5510,7 @@ function resolveActionableMentionWhisper(
     }
     let parentReportIDForUpdate: string | undefined;
     if (parentInviteData) {
-        parentReportIDForUpdate = parentReport?.reportID && parentReport.reportID !== reportID ? parentReport.reportID : report?.parentReportID;
+        parentReportIDForUpdate = isParentReportDifferent ? parentReport.reportID : report?.parentReportID;
     }
     const parentParticipantsOptimisticData = parentInviteData?.optimistic;
     const parentParticipantsFailureData = parentInviteData?.failure;
