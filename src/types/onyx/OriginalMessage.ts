@@ -1229,7 +1229,7 @@ type OriginalMessageExportIntegration = {
     reimbursableUrls?: string[];
 
     /**
-     * A list of URLs to the Travel Invoicing Journal Entry records in NetSuite (only present for ER/VB workspaces with TI configured)
+     * A list of URLs to the Travel Invoicing Journal Entry records
      */
     travelInvoicingUrls?: string[];
 
