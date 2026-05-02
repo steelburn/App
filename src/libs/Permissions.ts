@@ -1,11 +1,11 @@
-import type {OnyxEntry} from 'react-native-onyx';
+import type { OnyxEntry } from 'react-native-onyx';
 import CONST from '@src/CONST';
 import type Beta from '@src/types/onyx/Beta';
 import type BetaConfiguration from '@src/types/onyx/BetaConfiguration';
 
 // eslint-disable-next-line rulesdir/no-beta-handler
 function canUseAllBetas(betas: OnyxEntry<Beta[]>): boolean {
-    return true;
+    return !!betas?.includes(CONST.BETAS.ALL);
 }
 
 /**
@@ -35,16 +35,8 @@ function canUseTrackFlows(): boolean {
     return false;
 }
 
-/**
- * Private notes are temporarily disabled.
- */
-function canUsePrivateNotes(): boolean {
-    return false;
-}
-
 export default {
     canUseLinkPreviews,
     canUseTrackFlows,
-    canUsePrivateNotes,
     isBetaEnabled,
 };
