@@ -1,5 +1,6 @@
 import {useRoute} from '@react-navigation/native';
 import {subYears} from 'date-fns';
+import {CONST as COMMON_CONST} from 'expensify-common';
 import React, {useEffect, useState} from 'react';
 import {View} from 'react-native';
 import CountrySelector from '@components/CountrySelector';
@@ -58,7 +59,15 @@ function PrivatePersonalDetailsPage() {
     const country = address?.country ?? '';
 
     const [selectedCountry, setSelectedCountry] = useState<Country | ''>(country);
-    const [selectedState, setSelectedState] = useState(state);
+    const [selectedState, setSelectedState] = useState(() => {
+        // If the stored state value is a full name (e.g. "California"), resolve it to a 2-letter code
+        // so the StateSelector dropdown can display it correctly.
+        if (state && !(state in COMMON_CONST.STATES)) {
+            const match = Object.entries(COMMON_CONST.STATES).find(([, v]) => v.stateName.toLowerCase() === state.toLowerCase());
+            return match ? match[0] : state;
+        }
+        return state;
+    });
 
     useEffect(
         () => () => {
@@ -126,13 +135,21 @@ function PrivatePersonalDetailsPage() {
         const effectiveCountry = (values[INPUT_IDS.COUNTRY] || selectedCountry) ?? '';
         if (effectiveCountry === CONST.COUNTRY.US && !stateValue) {
             errors[INPUT_IDS.STATE] = translate('common.error.fieldRequired');
-        } else if (state && !stateValue.trim()) {
-            errors[INPUT_IDS.STATE] = translate('common.error.fieldRequired');
         }
 
         const zipValue = values[INPUT_IDS.ZIP_POST_CODE] ?? '';
-        if (!zipValue.trim()) {
-            errors[INPUT_IDS.ZIP_POST_CODE] = translate('common.error.fieldRequired');
+        const countryRegexDetails = effectiveCountry ? (CONST.COUNTRY_ZIP_REGEX_DATA?.[effectiveCountry] as {regex?: RegExp; samples?: string}) : undefined;
+        const countrySpecificZipRegex = countryRegexDetails?.regex;
+        if (countrySpecificZipRegex) {
+            if (!countrySpecificZipRegex.test(zipValue.trim().toUpperCase())) {
+                if (isRequiredFulfilled(zipValue.trim())) {
+                    errors[INPUT_IDS.ZIP_POST_CODE] = translate('privatePersonalDetails.error.incorrectZipFormat', countryRegexDetails?.samples ?? '');
+                } else {
+                    errors[INPUT_IDS.ZIP_POST_CODE] = translate('common.error.fieldRequired');
+                }
+            }
+        } else if (!CONST.GENERIC_ZIP_CODE_REGEX.test(zipValue.trim().toUpperCase())) {
+            errors[INPUT_IDS.ZIP_POST_CODE] = translate('privatePersonalDetails.error.incorrectZipFormat');
         }
 
         if (!effectiveCountry) {
@@ -355,7 +372,16 @@ function PrivatePersonalDetailsPage() {
                             InputComponent={CountrySelector}
                             inputID={INPUT_IDS.COUNTRY}
                             value={selectedCountry}
-                            onValueChange={(value: unknown) => setSelectedCountry((value ?? '') as Country | '')}
+                            onValueChange={(value: unknown) => {
+                                const newCountry = (value ?? '') as Country | '';
+                                setSelectedCountry(newCountry);
+                                if (newCountry === CONST.COUNTRY.US && selectedState && !(selectedState in COMMON_CONST.STATES)) {
+                                    const match = Object.entries(COMMON_CONST.STATES).find(([, v]) => v.stateName.toLowerCase() === selectedState.toLowerCase());
+                                    if (match) {
+                                        setSelectedState(match[0]);
+                                    }
+                                }
+                            }}
                             shouldSaveDraft
                         />
                     </View>
