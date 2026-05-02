@@ -150,8 +150,7 @@ const getCommonConfiguration = ({file = '.env', platform = 'web'}: Environment):
                                   // so they're viewable on offline refresh. The function below is serialized into
                                   // the generated service worker, so it executes in the SW context where
                                   // `sameOrigin` is the appropriate Workbox match (no need to read `self.location`).
-                                  urlPattern: ({sameOrigin, url, request}) =>
-                                      sameOrigin && (request.destination === 'image' || /\/(receipts|chat-attachments)\//.test(url.pathname)),
+                                  urlPattern: ({sameOrigin, url, request}) => sameOrigin && (request.destination === 'image' || /\/(receipts|chat-attachments)\//.test(url.pathname)),
                                   handler: 'StaleWhileRevalidate',
                                   options: {
                                       cacheName: 'user-media',
