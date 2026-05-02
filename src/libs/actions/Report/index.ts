@@ -5509,7 +5509,7 @@ function resolveActionableMentionWhisper(
     }
     let parentReportIDForUpdate: string | undefined;
     if (parentInviteData) {
-        parentReportIDForUpdate = parentReport?.reportID !== reportID ? parentReport?.reportID : report?.parentReportID;
+        parentReportIDForUpdate = parentReport?.reportID && parentReport.reportID !== reportID ? parentReport.reportID : report?.parentReportID;
     }
     const parentParticipantsOptimisticData = parentInviteData?.optimistic;
     const parentParticipantsFailureData = parentInviteData?.failure;
