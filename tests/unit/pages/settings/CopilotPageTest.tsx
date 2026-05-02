@@ -141,14 +141,13 @@ describe('CopilotPage', () => {
         });
     }
 
-    it('renders the empty-state row when the user has no delegators', () => {
+    it('hides the top card when the user has no delegators', () => {
         setOnyxAccount({validated: true, delegatedAccess: {delegators: [], delegates: []}});
 
         const {toJSON} = render(<CopilotPage />);
         const output = JSON.stringify(toJSON());
 
-        expect(output).toContain('delegate.youCanAccessTheseAccounts');
-        expect(output).toContain('delegate.noAccountsToAccess');
+        expect(output).not.toContain('delegate.youCanAccessTheseAccounts');
         expect(output).toContain('delegate.membersCanAccessYourAccount');
         expect(output).toContain('delegate.addCopilot');
     });
@@ -167,7 +166,7 @@ describe('CopilotPage', () => {
 
         expect(output).toContain('boss@example.com');
         expect(output).toContain('delegate.switch');
-        expect(output).not.toContain('delegate.noAccountsToAccess');
+        expect(output).toContain('delegate.youCanAccessTheseAccounts');
     });
 
     it('places the delegators (top) section before the delegates (bottom) section', () => {

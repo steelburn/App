@@ -8765,7 +8765,6 @@ er bestedingsregels toe om de kasstroom van het bedrijf te beschermen.`,
         addCopilot: 'Copiloot toevoegen',
         membersCanAccessYourAccount: 'Deze leden hebben toegang tot je account:',
         youCanAccessTheseAccounts: 'Je hebt toegang tot deze accounts:',
-        noAccountsToAccess: 'Je hebt nog geen toegang tot andere accounts.',
         role: ({role}: OptionalParam<DelegateRoleParams> = {}) => {
             switch (role) {
                 case CONST.DELEGATE_ROLE.ALL:

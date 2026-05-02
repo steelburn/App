@@ -8751,7 +8751,6 @@ Dodaj więcej zasad wydatków, żeby chronić płynność finansową firmy.`,
         addCopilot: 'Dodaj pilota',
         membersCanAccessYourAccount: 'Ci członkowie mają dostęp do Twojego konta:',
         youCanAccessTheseAccounts: 'Masz dostęp do tych kont:',
-        noAccountsToAccess: 'Nie masz jeszcze dostępu do żadnych kont.',
         role: ({role}: OptionalParam<DelegateRoleParams> = {}) => {
             switch (role) {
                 case CONST.DELEGATE_ROLE.ALL:

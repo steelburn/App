@@ -8758,7 +8758,6 @@ Adicione mais regras de gasto para proteger o fluxo de caixa da empresa.`,
         addCopilot: 'Adicionar copiloto',
         membersCanAccessYourAccount: 'Esses membros podem acessar sua conta:',
         youCanAccessTheseAccounts: 'Você pode acessar essas contas:',
-        noAccountsToAccess: 'Você ainda não tem acesso a nenhuma conta.',
         role: ({role}: OptionalParam<DelegateRoleParams> = {}) => {
             switch (role) {
                 case CONST.DELEGATE_ROLE.ALL:

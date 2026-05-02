@@ -329,23 +329,17 @@ function CopilotPage() {
                     />
                     <ScrollView contentContainerStyle={styles.pt3}>
                         <View style={[styles.flex1, shouldUseNarrowLayout ? styles.workspaceSectionMobile : styles.workspaceSection]}>
-                            <Section
-                                title={translate('delegate.youCanAccessTheseAccounts')}
-                                isCentralPane
-                                subtitleMuted
-                                titleStyles={styles.accountSettingsSectionTitle}
-                                childrenStyles={styles.pt5}
-                            >
-                                {hasDelegators ? (
+                            {hasDelegators && (
+                                <Section
+                                    title={translate('delegate.youCanAccessTheseAccounts')}
+                                    isCentralPane
+                                    subtitleMuted
+                                    titleStyles={styles.accountSettingsSectionTitle}
+                                    childrenStyles={styles.pt5}
+                                >
                                     <MenuItemList menuItems={delegatorMenuItems} />
-                                ) : (
-                                    <MenuItem
-                                        title={translate('delegate.noAccountsToAccess')}
-                                        interactive={false}
-                                        wrapperStyle={[styles.sectionMenuItemTopDescription]}
-                                    />
-                                )}
-                            </Section>
+                                </Section>
+                            )}
                             <View style={safeAreaPaddingBottomStyle}>
                                 <Section
                                     title={translate('delegate.membersCanAccessYourAccount')}

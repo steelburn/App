@@ -8824,7 +8824,6 @@ Ajoutez davantage de règles de dépenses pour protéger la trésorerie de l’e
         addCopilot: 'Ajouter un copilote',
         switch: 'Changer',
         copilot: 'Copilot',
-        noAccountsToAccess: "Vous n'avez encore accès à aucun compte.",
         membersCanAccessYourAccount: 'Ces membres peuvent accéder à votre compte :',
         youCanAccessTheseAccounts: 'Vous pouvez accéder à ces comptes :',
         role: ({role}: OptionalParam<DelegateRoleParams> = {}) => {

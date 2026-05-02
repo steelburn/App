@@ -8793,7 +8793,6 @@ Aggiungi altre regole di spesa per proteggere il flusso di cassa aziendale.`,
         addCopilot: 'Aggiungi copilota',
         membersCanAccessYourAccount: 'Questi membri possono accedere al tuo account:',
         youCanAccessTheseAccounts: 'Puoi accedere a questi account:',
-        noAccountsToAccess: 'Non hai ancora accesso a nessun account.',
         role: ({role}: OptionalParam<DelegateRoleParams> = {}) => {
             switch (role) {
                 case CONST.DELEGATE_ROLE.ALL:

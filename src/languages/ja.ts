@@ -8684,7 +8684,6 @@ ${reportName}
         addCopilot: 'コパイロットを追加',
         membersCanAccessYourAccount: '次のメンバーがあなたのアカウントにアクセスできます:',
         youCanAccessTheseAccounts: 'これらのアカウントにアクセスできます:',
-        noAccountsToAccess: 'アクセスできるアカウントはまだありません。',
         role: ({role}: OptionalParam<DelegateRoleParams> = {}) => {
             switch (role) {
                 case CONST.DELEGATE_ROLE.ALL:

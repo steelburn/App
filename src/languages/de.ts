@@ -8805,7 +8805,6 @@ Fügen Sie weitere Ausgabelimits hinzu, um den Cashflow Ihres Unternehmens zu sc
         addCopilot: 'Copilot hinzufügen',
         membersCanAccessYourAccount: 'Diese Mitglieder haben Zugriff auf Ihr Konto:',
         youCanAccessTheseAccounts: 'Du kannst auf diese Konten zugreifen:',
-        noAccountsToAccess: 'Du hast noch keinen Zugriff auf andere Konten.',
         role: ({role}: OptionalParam<DelegateRoleParams> = {}) => {
             switch (role) {
                 case CONST.DELEGATE_ROLE.ALL:

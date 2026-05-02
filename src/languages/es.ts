@@ -9011,7 +9011,6 @@ ${amount} para ${merchant} - ${date}`,
         addCopilot: 'Agregar copiloto',
         membersCanAccessYourAccount: 'Estos miembros pueden acceder a tu cuenta:',
         youCanAccessTheseAccounts: 'Puedes acceder a estas cuentas:',
-        noAccountsToAccess: 'Aún no tienes acceso a ninguna cuenta.',
         role: ({role} = {}) => {
             switch (role) {
                 case CONST.DELEGATE_ROLE.ALL:

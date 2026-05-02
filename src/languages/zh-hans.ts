@@ -8529,7 +8529,6 @@ ${reportName}
         addCopilot: '添加副驾',
         membersCanAccessYourAccount: '这些成员可以访问你的账户：',
         youCanAccessTheseAccounts: '您可以访问这些账户：',
-        noAccountsToAccess: '您还没有访问任何账户的权限。',
         role: ({role}: OptionalParam<DelegateRoleParams> = {}) => {
             switch (role) {
                 case CONST.DELEGATE_ROLE.ALL:
