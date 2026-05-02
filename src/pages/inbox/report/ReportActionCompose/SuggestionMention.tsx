@@ -286,7 +286,17 @@ function SuggestionMention({
                 shouldShowSuggestionMenu: false,
             }));
         },
-        [value, suggestionValues.atSignIndex, suggestionValues.suggestedMentions, suggestionValues.prefixType, getMentionCode, updateComment, setSelection, suggestionValues.mentionPrefix],
+        [
+            value,
+            suggestionValues.atSignIndex,
+            suggestionValues.suggestedMentions,
+            suggestionValues.prefixType,
+            getMentionCode,
+            updateComment,
+            setSelection,
+            suggestionValues.mentionPrefix,
+            findTrailingMentionIndex,
+        ],
     );
 
     /**
