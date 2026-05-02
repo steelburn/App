@@ -65,7 +65,7 @@ function SingleSelectPopup<T extends string>({
     }, [closeOverlay, onChange, selectedItem]);
 
     const resetChanges = useCallback(() => {
-        onChange(defaultValue ? items.find((item) => item.value === defaultValue) : undefined);
+        onChange(items.find((item) => item.value === defaultValue));
         closeOverlay();
     }, [closeOverlay, onChange, defaultValue, items]);
 
