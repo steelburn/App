@@ -8,7 +8,7 @@ import Onyx from 'react-native-onyx';
 import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
 import type {ValueOf} from 'type-fest';
 import {convertToBackendAmount, getCurrencyDecimals} from '@libs/CurrencyUtils';
-import {isValidMoneyRequestAmount} from '@libs/MoneyRequestUtils';
+import {isValidMerchant, isValidMoneyRequestAmount} from '@libs/MoneyRequestUtils';
 import {hasEnabledOptions} from '@libs/OptionsListUtils';
 import Permissions from '@libs/Permissions';
 import {getTagLists, isMultiLevelTags} from '@libs/PolicyUtils';
@@ -25,7 +25,6 @@ import {
 } from '@libs/ReportUtils';
 import {hasEnabledTags} from '@libs/TagsOptionsListUtils';
 import {calculateTaxAmount, getCurrency, getOriginalTransactionWithSplitInfo, getTaxValue, isDistanceRequest, isExpenseUnreported, isScanning} from '@libs/TransactionUtils';
-import {isInvalidMerchantValue} from '@libs/ValidationUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {
@@ -205,13 +204,11 @@ function editTransactionDateInline(params: TransactionInlineEditParams, newDate:
 /** Updates the merchant of an expense from the Search results table or the Expense Report page. */
 function editTransactionMerchantInline(params: TransactionInlineEditParams, newMerchant: string) {
     const transaction = allTransactions[`${ONYXKEYS.COLLECTION.TRANSACTION}${params.transactionID}`];
-    const isUnreportedTransaction = isExpenseUnreported(transaction);
-    const isClearingMerchant = newMerchant === '';
-    const isInvalidMerchantForUpdate = isInvalidMerchantValue(newMerchant) && !(isUnreportedTransaction && isClearingMerchant);
 
-    if (isInvalidMerchantForUpdate) {
+    if (!isValidMerchant(newMerchant, transaction)) {
         return;
     }
+
     const iouParams = getIouParamsForTransaction(params);
     updateMoneyRequestMerchant({
         ...iouParams,

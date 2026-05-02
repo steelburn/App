@@ -1,5 +1,10 @@
+import type {OnyxEntry} from 'react-native-onyx';
 import type {ValueOf} from 'type-fest';
 import CONST from '@src/CONST';
+import type {Transaction} from '@src/types/onyx';
+import StringUtils from './StringUtils';
+import {isExpenseUnreported} from './TransactionUtils';
+import {isInvalidMerchantValue} from './ValidationUtils';
 
 /**
  * Strip comma from the amount
@@ -153,6 +158,37 @@ function isValidMoneyRequestAmount(amount: number | undefined, iouType: ValueOf<
     return true;
 }
 
+/**
+ * Validates a merchant value according to business rules.
+ *
+ * @param merchant - The merchant name to validate
+ * @param transaction - The transaction to validate merchant for (used to determine if clearing is allowed)
+ * @returns Whether the merchant value is valid
+ */
+function isValidMerchant(merchant: string | undefined, transaction?: OnyxEntry<Transaction>): boolean {
+    const trimmedMerchant = merchant?.trim() ?? '';
+    const isEmpty = !trimmedMerchant;
+
+    // Business rule: unreported transactions can have empty merchants (allows clearing)
+    const isUnreported = transaction ? isExpenseUnreported(transaction) : false;
+    if (isEmpty && isUnreported) {
+        return true;
+    }
+
+    // Reported transactions or non-empty merchants must pass validation
+    if (isEmpty) {
+        return false;
+    }
+
+    // Check if it's an invalid merchant value (PARTIAL or DEFAULT constants)
+    if (isInvalidMerchantValue(trimmedMerchant)) {
+        return false;
+    }
+
+    const valueByteLength = StringUtils.getUTF8ByteLength(trimmedMerchant);
+    return valueByteLength <= CONST.MERCHANT_NAME_MAX_BYTES;
+}
+
 export {
     addLeadingZero,
     replaceAllDigits,
@@ -164,4 +200,5 @@ export {
     validatePercentage,
     handleNegativeAmountFlipping,
     isValidMoneyRequestAmount,
+    isValidMerchant,
 };
