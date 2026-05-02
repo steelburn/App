@@ -197,6 +197,8 @@ function WorkspaceOverviewPage({policyDraft, policy: policyProp, route}: Workspa
     const [lastPaymentMethod] = useOnyx(ONYXKEYS.NVP_LAST_PAYMENT_METHOD);
     const {isBetaEnabled} = usePermissions();
     const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false);
+    const [pendingRulesDocumentFile, setPendingRulesDocumentFile] = useState<FileObject | undefined>();
+    const [isProtectedRulesDocumentVisible, setIsProtectedRulesDocumentVisible] = useState(false);
     const [session] = useOnyx(ONYXKEYS.SESSION);
 
     const rulesDocumentSourceURL = useMemo(
@@ -457,7 +459,7 @@ function WorkspaceOverviewPage({policyDraft, policy: policyProp, route}: Workspa
         if (!policyID || !file) {
             return;
         }
-        updatePolicyRulesDocument(policyID, file as File, policy?.rulesDocumentURL);
+        setPendingRulesDocumentFile(file);
     };
 
     const getRulesDocumentMenuItems = (openPicker: (options: {onPicked: (files: FileObject[]) => void}) => void): PopoverMenuItem[] => [
@@ -622,6 +624,34 @@ function WorkspaceOverviewPage({policyDraft, policy: policyProp, route}: Workspa
                 success={false}
             />
             {outstandingBalanceModal}
+            {!!pendingRulesDocumentFile && (
+                <PDFThumbnail
+                    style={styles.invisiblePDF}
+                    previewSourceURL={pendingRulesDocumentFile.uri ?? ''}
+                    onLoadSuccess={() => {
+                        if (policyID) {
+                            updatePolicyRulesDocument(policyID, pendingRulesDocumentFile as File, policy?.rulesDocumentURL);
+                        }
+                        setPendingRulesDocumentFile(undefined);
+                    }}
+                    onPassword={() => {
+                        setPendingRulesDocumentFile(undefined);
+                        setIsProtectedRulesDocumentVisible(true);
+                    }}
+                    onLoadError={() => {
+                        setPendingRulesDocumentFile(undefined);
+                    }}
+                />
+            )}
+            <ConfirmModal
+                title={translate('attachmentPicker.attachmentError')}
+                isVisible={isProtectedRulesDocumentVisible}
+                onConfirm={() => setIsProtectedRulesDocumentVisible(false)}
+                onCancel={() => setIsProtectedRulesDocumentVisible(false)}
+                prompt={translate('attachmentPicker.protectedPDFNotSupported')}
+                confirmText={translate('common.close')}
+                shouldShowCancelButton={false}
+            />
         </>
     );
     return (
@@ -864,7 +894,7 @@ function WorkspaceOverviewPage({policyDraft, policy: policyProp, route}: Workspa
                                                     >
                                                         <PDFThumbnail
                                                             previewSourceURL={rulesDocumentSourceURL}
-                                                            style={styles.flex1}
+                                                            style={[styles.flex1, styles.w100]}
                                                         />
                                                     </PressableWithoutFeedback>
                                                     {isPolicyAdmin && (
