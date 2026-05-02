@@ -952,8 +952,8 @@ function getUpdateMoneyRequestParams(params: GetUpdateMoneyRequestParamsType): U
     // only edited the distance number. Detect whether the addresses actually changed so we can skip the
     // optimistic side effects (pending field, route clearing, render-path swap to interactive map) that
     // would otherwise make the parent map briefly disappear on a pure distance edit.
-    const haveWaypointsActuallyChanged = 'waypoints' in transactionChanges && haveWaypointAddressesChanged(transaction?.comment?.waypoints, transactionChanges.waypoints);
-    const shouldSuppressWaypointsAsPending = 'waypoints' in transactionChanges && !haveWaypointsActuallyChanged;
+    const hasWaypointAddressesChanged = 'waypoints' in transactionChanges && haveWaypointAddressesChanged(transaction?.comment?.waypoints, transactionChanges.waypoints);
+    const shouldSuppressWaypointsAsPending = 'waypoints' in transactionChanges && !hasWaypointAddressesChanged;
 
     // Step 1: Set any "pending fields" (ones updated while the user was offline) to have error messages in the failureData
     const pendingFields: OnyxTypes.Transaction['pendingFields'] = Object.fromEntries(
@@ -1282,7 +1282,7 @@ function getUpdateMoneyRequestParams(params: GetUpdateMoneyRequestParamsType): U
     // locally), keep it so the receipt thumbnail and ConfirmedRoute don't flicker between success and
     // the Pusher route push.
     const hasValidOptimisticRoute = !!transactionChanges.routes?.route0?.geometry?.coordinates?.length;
-    const shouldClearRoutes = (haveWaypointsActuallyChanged || hasModifiedDistanceRate) && !hasValidOptimisticRoute;
+    const shouldClearRoutes = (hasWaypointAddressesChanged || hasModifiedDistanceRate) && !hasValidOptimisticRoute;
     successData.push({
         onyxMethod: Onyx.METHOD.MERGE,
         key: `${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`,
