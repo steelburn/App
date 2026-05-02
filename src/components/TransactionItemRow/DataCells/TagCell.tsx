@@ -20,7 +20,7 @@ type TagCellProps = TransactionDataCellProps &
 function TagCell({canEdit, onSave, shouldUseNarrowLayout, shouldShowTooltip, transactionItem, policyID}: TagCellProps) {
     const icons = useMemoizedLazyExpensifyIcons(['Tag']);
     const styles = useThemeStyles();
-    const {isEditing, anchorRef, isPopoverVisible, popoverPosition, isInverted, startEditing, cancelEditing} = usePopoverEditState({canEdit});
+    const {isEditing, anchorRef, isPopoverVisible, popoverPosition, isInverted, adjustedPopoverHeight, startEditing, cancelEditing} = usePopoverEditState({canEdit});
 
     const [policy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`);
     const [policyTags] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_TAGS}${policyID}`);
@@ -67,6 +67,7 @@ function TagCell({canEdit, onSave, shouldUseNarrowLayout, shouldShowTooltip, tra
                     anchorPosition={popoverPosition}
                     shouldMeasureAnchorPositionFromTop={!isInverted}
                     onSelected={handleTagSelected}
+                    popoverHeight={adjustedPopoverHeight}
                 />
             }
         >

@@ -13,11 +13,6 @@ const DEFAULT_ANCHOR_ALIGNMENT = {
     vertical: CONST.MODAL.ANCHOR_ORIGIN_VERTICAL.TOP,
 };
 
-const popoverDimensions = {
-    width: CONST.POPOVER_DROPDOWN_WIDTH,
-    height: CONST.POPOVER_DROPDOWN_MAX_HEIGHT,
-};
-
 type CategoryPickerModalProps = {
     /** Callback to close the modal */
     onClose: () => void;
@@ -30,6 +25,9 @@ type CategoryPickerModalProps = {
 
     /** Called when the user confirms a category selection */
     onSelected?: (item: ListItem) => void;
+
+    /** Adjusted popover height for adaptive sizing on small screens */
+    popoverHeight?: number;
 } & Omit<PopoverWithMeasuredContentProps, 'anchorRef' | 'children' | 'onClose'>;
 
 function CategoryPickerModal({
@@ -41,10 +39,16 @@ function CategoryPickerModal({
     onSelected,
     anchorAlignment = DEFAULT_ANCHOR_ALIGNMENT,
     shouldMeasureAnchorPositionFromTop = false,
+    popoverHeight = CONST.POPOVER_DROPDOWN_MIN_HEIGHT,
 }: CategoryPickerModalProps) {
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
     const anchorRef = useRef<View>(null);
+
+    const popoverDimensions = {
+        width: CONST.POPOVER_DROPDOWN_WIDTH,
+        height: popoverHeight,
+    };
 
     const handleCategorySelect = (item: ListItem) => {
         // If clicking the same category that's already selected, treat it as deselection
@@ -72,7 +76,7 @@ function CategoryPickerModal({
             shouldSkipRemeasurement
             shouldDisplayBelowModals
         >
-            <View style={[StyleUtils.getHeight(CONST.POPOVER_DROPDOWN_MAX_HEIGHT), styles.flexColumn, styles.pt4]}>
+            <View style={[StyleUtils.getHeight(popoverHeight), styles.flexColumn, styles.pt4]}>
                 <CategoryPicker
                     selectedCategory={selectedCategory}
                     policyID={policyID}

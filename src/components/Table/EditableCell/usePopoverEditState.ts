@@ -1,6 +1,6 @@
 import {useEffect, useRef, useState} from 'react';
 import type {View} from 'react-native';
-import {InteractionManager} from 'react-native';
+import type {ValueOf} from 'type-fest';
 import useWindowDimensions from '@hooks/useWindowDimensions';
 import CONST from '@src/CONST';
 
@@ -21,10 +21,11 @@ type UsePopoverEditStateOptions = {
 
     /**
      * Which horizontal edge of the anchor to use as the popover's x-origin.
-     * 'right' = x + width (right edge of anchor)
-     * 'left' = x (left edge of anchor)
      */
-    anchorEdge?: 'left' | 'right';
+    anchorEdge?: ValueOf<typeof CONST.MODAL.ANCHOR_ORIGIN_HORIZONTAL>;
+
+    /** Minimum height for the popover when space is limited. */
+    minPopoverHeight?: number;
 };
 
 /**
@@ -34,25 +35,48 @@ type UsePopoverEditStateOptions = {
  *   - Anchor ref for popover positioning
  *   - measureInWindow-based position calculation
  *   - Overflow detection (inverts when too close to bottom)
+ *   - Adaptive height calculation (shrinks popover when space is limited)
  *   - Auto-open after layout via InteractionManager
  *   - isEditing + isPopoverVisible toggling
  *   - Auto-cancel when canEdit becomes false
  */
-function usePopoverEditState({canEdit, popoverHeight = CONST.POPOVER_DATE_MAX_HEIGHT, padding = 8, anchorEdge = 'left'}: UsePopoverEditStateOptions) {
+function usePopoverEditState({
+    canEdit,
+    popoverHeight = CONST.POPOVER_DROPDOWN_MAX_HEIGHT,
+    padding = CONST.MODAL.POPOVER_MENU_PADDING,
+    anchorEdge = CONST.MODAL.ANCHOR_ORIGIN_HORIZONTAL.LEFT,
+    minPopoverHeight = CONST.POPOVER_MIN_ADJUSTED_HEIGHT,
+}: UsePopoverEditStateOptions) {
     const {windowHeight} = useWindowDimensions();
     const anchorRef = useRef<View>(null);
     const [isEditing, setIsEditing] = useState(false);
     const [isPopoverVisible, setIsPopoverVisible] = useState(false);
     const [popoverPosition, setPopoverPosition] = useState<PopoverPosition>({horizontal: 0, vertical: 0});
     const [isInverted, setIsInverted] = useState(false);
+    const [adjustedPopoverHeight, setAdjustedPopoverHeight] = useState(popoverHeight);
 
     const openPopover = () => {
         anchorRef.current?.measureInWindow((x, y, width, height) => {
-            const wouldExceedBottom = y + popoverHeight + padding > windowHeight;
-            setIsInverted(wouldExceedBottom);
+            const availableSpaceBelow = windowHeight - (y + height + padding);
+            const availableSpaceAbove = y - padding;
+
+            const largerSpaceIsBelow = availableSpaceBelow >= availableSpaceAbove;
+            const shouldInvert = !largerSpaceIsBelow;
+            const availableSpace = largerSpaceIsBelow ? availableSpaceBelow : availableSpaceAbove;
+            let finalHeight = popoverHeight;
+
+            if (availableSpace >= popoverHeight) {
+                finalHeight = popoverHeight;
+            } else {
+                // Not enough space — shrink to fit with buffer
+                finalHeight = Math.max(Math.min(popoverHeight, availableSpace * CONST.POPOVER_ADAPTIVE_HEIGHT_BUFFER), minPopoverHeight);
+            }
+
+            setIsInverted(shouldInvert);
+            setAdjustedPopoverHeight(finalHeight);
             setPopoverPosition({
-                horizontal: anchorEdge === 'left' ? x : x + width,
-                vertical: y + (wouldExceedBottom ? 0 : height + padding),
+                horizontal: anchorEdge === CONST.MODAL.ANCHOR_ORIGIN_HORIZONTAL.LEFT ? x : x + width,
+                vertical: y + (shouldInvert ? 0 : height + padding),
             });
             setIsPopoverVisible(true);
         });
@@ -87,6 +111,7 @@ function usePopoverEditState({canEdit, popoverHeight = CONST.POPOVER_DATE_MAX_HE
         isPopoverVisible,
         popoverPosition,
         isInverted,
+        adjustedPopoverHeight,
         startEditing,
         cancelEditing,
     };

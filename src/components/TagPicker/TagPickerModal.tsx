@@ -16,11 +16,6 @@ const DEFAULT_ANCHOR_ALIGNMENT = {
     vertical: CONST.MODAL.ANCHOR_ORIGIN_VERTICAL.TOP,
 };
 
-const popoverDimensions = {
-    width: CONST.POPOVER_DROPDOWN_WIDTH,
-    height: CONST.POPOVER_DROPDOWN_MAX_HEIGHT,
-};
-
 type TagPickerModalProps = {
     /** Callback to close the modal */
     onClose: () => void;
@@ -39,6 +34,9 @@ type TagPickerModalProps = {
 
     /** Called when the user confirms a tag selection */
     onSelected?: (tag: string) => void;
+
+    /** Adjusted popover height for adaptive sizing on small screens */
+    popoverHeight?: number;
 } & Omit<PopoverWithMeasuredContentProps, 'anchorRef' | 'children' | 'onClose'>;
 
 function TagPickerModal({
@@ -52,6 +50,7 @@ function TagPickerModal({
     onSelected,
     anchorAlignment = DEFAULT_ANCHOR_ALIGNMENT,
     shouldMeasureAnchorPositionFromTop = false,
+    popoverHeight = CONST.POPOVER_DROPDOWN_MIN_HEIGHT,
 }: TagPickerModalProps) {
     const styles = useThemeStyles();
     // eslint-disable-next-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidth
@@ -60,6 +59,11 @@ function TagPickerModal({
 
     const [policyTags] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_TAGS}${policyID}`);
     const tagListName = getTagList(policyTags, 0).name;
+
+    const popoverDimensions = {
+        width: CONST.POPOVER_DROPDOWN_WIDTH,
+        height: popoverHeight,
+    };
 
     const handleTagSelected = (item: Partial<OptionData>) => {
         // If clicking the same tag that's already selected, treat it as deselection
@@ -87,7 +91,7 @@ function TagPickerModal({
             shouldSkipRemeasurement
             shouldDisplayBelowModals
         >
-            <View style={[{height: CONST.POPOVER_DROPDOWN_MAX_HEIGHT, flexDirection: 'column'}, styles.pt4]}>
+            <View style={[{height: popoverHeight, flexDirection: 'column'}, styles.pt4]}>
                 <TagPicker
                     policyID={policyID}
                     tagListName={tagListName}

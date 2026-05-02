@@ -18,7 +18,7 @@ type CategoryCellProps = TransactionDataCellProps &
 function CategoryCell({shouldUseNarrowLayout, shouldShowTooltip, transactionItem, canEdit, onSave, policyID}: CategoryCellProps) {
     const icons = useMemoizedLazyExpensifyIcons(['Folder']);
     const styles = useThemeStyles();
-    const {isEditing, anchorRef, isPopoverVisible, popoverPosition, isInverted, startEditing, cancelEditing} = usePopoverEditState({canEdit});
+    const {isEditing, anchorRef, isPopoverVisible, popoverPosition, isInverted, adjustedPopoverHeight, startEditing, cancelEditing} = usePopoverEditState({canEdit});
 
     // For display: decoded category name for user-readable text
     const categoryForDisplay = isCategoryMissing(transactionItem?.category) ? '' : getDecodedCategoryName(transactionItem?.category ?? '');
@@ -62,6 +62,7 @@ function CategoryCell({shouldUseNarrowLayout, shouldShowTooltip, transactionItem
                     anchorPosition={popoverPosition}
                     shouldMeasureAnchorPositionFromTop={!isInverted}
                     onSelected={handleCategorySelected}
+                    popoverHeight={adjustedPopoverHeight}
                 />
             }
         >
