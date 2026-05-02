@@ -52,6 +52,7 @@ function WorkspaceHRPage({
     const gustoConnection = policy?.connections?.gusto;
     const isConnected = isGustoConnected(policy);
     const isGustoSyncInProgress = connectionSyncProgress?.connectionName === CONST.POLICY.CONNECTIONS.NAME.GUSTO && isConnectionInProgress(connectionSyncProgress, policy);
+    const stageInProgress = connectionSyncProgress?.stageInProgress;
     const successfulDate = getIntegrationLastSuccessfulDate(
         getLocalDateFromDatetime,
         gustoConnection,
@@ -60,8 +61,8 @@ function WorkspaceHRPage({
     const hasGustoSyncError = !isGustoSyncInProgress && gustoConnection?.lastSync?.isSuccessful === false && !!gustoConnection?.lastSync?.errorDate;
     const lastSyncErrorMessage = hasGustoSyncError ? (gustoConnection?.lastSync?.errorMessage ?? translate('workspace.hr.gusto.syncError')) : undefined;
     const connectionDescription = useMemo(() => {
-        if (isGustoSyncInProgress && connectionSyncProgress?.stageInProgress) {
-            return translate('workspace.hr.syncStageName', {stage: connectionSyncProgress.stageInProgress});
+        if (isGustoSyncInProgress && stageInProgress) {
+            return translate('workspace.hr.syncStageName', {stage: stageInProgress});
         }
 
         if (successfulDate && !lastSyncErrorMessage) {
@@ -69,7 +70,7 @@ function WorkspaceHRPage({
         }
 
         return undefined;
-    }, [connectionSyncProgress?.stageInProgress, datetimeToRelative, isGustoSyncInProgress, lastSyncErrorMessage, successfulDate, translate]);
+    }, [datetimeToRelative, isGustoSyncInProgress, lastSyncErrorMessage, stageInProgress, successfulDate, translate]);
 
     useWorkspaceDocumentTitle(undefined, 'workspace.common.hr');
 
