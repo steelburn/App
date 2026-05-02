@@ -203,22 +203,23 @@ function IOURequestStepDistance({
     // from overwriting in-progress manual input.
     const isManuallyEditing = useRef(false);
 
-    // Sync the manual tab input when the route recalculates (e.g. after waypoint edits on the map tab).
-    // Skip the sync if the user is actively editing on the manual tab to avoid overwriting their input.
-    // Skip the very first render so we don't clobber a previously-saved manual quantity with the route
-    // distance on edit re-open.
+    // Push the route distance into the manual tab input only on a real waypoint-driven recalculation
+    // (a non-null → different non-null transition). Skip the initial null → value transition, which
+    // is the post-save re-fetch, so we don't overwrite a saved manual quantity with the route distance.
     const routeDistance = currentTransaction?.routes?.route0?.distance;
-    const isInitialRouteSync = useRef(true);
+    const lastSyncedRouteDistance = useRef<number | null | undefined>(routeDistance);
     useEffect(() => {
-        if (isInitialRouteSync.current) {
-            isInitialRouteSync.current = false;
+        if (routeDistance == null || !distanceUnit || isManuallyEditing.current) {
+            lastSyncedRouteDistance.current = routeDistance;
             return;
         }
-        if (routeDistance == null || !distanceUnit || isManuallyEditing.current) {
+        if (lastSyncedRouteDistance.current == null || lastSyncedRouteDistance.current === routeDistance) {
+            lastSyncedRouteDistance.current = routeDistance;
             return;
         }
         const routeDistanceInUnit = roundToTwoDecimalPlaces(DistanceRequestUtils.convertDistanceUnit(routeDistance, distanceUnit));
         manualNumberFormRef.current?.updateNumber(routeDistanceInUnit.toString());
+        lastSyncedRouteDistance.current = routeDistance;
     }, [routeDistance, distanceUnit]);
 
     // Sets `amount` and `split` share data before moving to the next step to avoid briefly showing `0.00` as the split share for participants
@@ -625,6 +626,9 @@ function IOURequestStepDistance({
             recentWaypoints,
         });
         transactionWasSaved.current = true;
+        // Remove the backup eagerly so the parent report view reads the optimistic transaction
+        // immediately, instead of the stale backup, while the API request is still in flight.
+        removeBackupTransaction(transaction?.transactionID);
         navigateBackAfterSave();
     }, [
         translate,
