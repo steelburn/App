@@ -1,6 +1,6 @@
 import {useIsFocused} from '@react-navigation/native';
 import {accountIDSelector} from '@selectors/Session';
-import type React from 'react';
+import React from 'react';
 import MenuItemList from '@components/MenuItemList';
 import {usePersonalDetails} from '@components/OnyxListItemProvider';
 import {useProductTrainingContext} from '@components/ProductTrainingContext';
