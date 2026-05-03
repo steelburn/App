@@ -1494,6 +1494,7 @@ const CONST = {
                 RETRACTED: 'RETRACTED',
                 REOPENED: 'REOPENED',
                 REPORT_PREVIEW: 'REPORTPREVIEW',
+                REASSIGN_APPROVER: 'REASSIGNAPPROVER',
                 REROUTE: 'REROUTE',
                 SELECTED_FOR_RANDOM_AUDIT: 'SELECTEDFORRANDOMAUDIT', // OldDot Action
                 SETTLEMENT_ACCOUNT_LOCKED: 'SETTLEMENTACCOUNTLOCKED',
@@ -9151,6 +9152,7 @@ const CONST = {
         ACCOUNT: {
             PROFILE: 'Account-Profile',
             WALLET: 'Account-Wallet',
+            AGENTS: 'Account-Agents',
             RULES: 'Account-Rules',
             PREFERENCES: 'Account-Preferences',
             SECURITY: 'Account-Security',
