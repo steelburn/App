@@ -52,7 +52,7 @@ function BaseOnboardingPurpose({shouldUseNativeStyles, shouldEnableMaxHeight, ro
         () => ({
             [CONST.ONBOARDING_CHOICES.EMPLOYER]: illustrations.ReceiptUpload,
             [CONST.ONBOARDING_CHOICES.MANAGE_TEAM]: illustrations.Abacus,
-            [CONST.ONBOARDING_CHOICES.TRACK_BUSINESS]: illustrations.ReceiptUpload,
+            [CONST.ONBOARDING_CHOICES.TRACK_BUSINESS]: illustrations.Abacus,
             [CONST.ONBOARDING_CHOICES.TRACK_PERSONAL]: illustrations.PiggyBank,
             [CONST.ONBOARDING_CHOICES.LOOKING_AROUND]: illustrations.Binoculars,
         }),
