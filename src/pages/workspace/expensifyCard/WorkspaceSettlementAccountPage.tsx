@@ -76,11 +76,11 @@ function WorkspaceSettlementAccountPage({route}: WorkspaceSettlementAccountPageP
     }, [policyID]);
 
     useEffect(() => {
-        if (!cardSettings || !hasActiveAccountingConnection || continuousReconciliation?.value !== undefined || reconciliationConnection !== undefined) {
+        if (!cardSettings || !hasActiveAccountingConnection || continuousReconciliation !== undefined || reconciliationConnection !== undefined) {
             return;
         }
         fetchPolicyAccountingData();
-    }, [cardSettings, hasActiveAccountingConnection, continuousReconciliation?.value, reconciliationConnection, fetchPolicyAccountingData]);
+    }, [cardSettings, hasActiveAccountingConnection, continuousReconciliation, reconciliationConnection, fetchPolicyAccountingData]);
 
     const eligibleBankAccountsOptions: BankAccountListItem[] = eligibleBankAccounts.map((bankAccount) => {
         const bankName = (bankAccount.accountData?.addressName ?? '') as BankName;
@@ -124,7 +124,7 @@ function WorkspaceSettlementAccountPage({route}: WorkspaceSettlementAccountPageP
         return (
             <>
                 <Text style={[styles.mh5, styles.mv4]}>{translate('workspace.expensifyCard.settlementAccountDescription')}</Text>
-                {!!continuousReconciliation?.value && !!connectionParam && hasActiveAccountingConnection && (
+                {!!continuousReconciliation && !!connectionParam && hasActiveAccountingConnection && (
                     <View style={[styles.renderHTML, styles.mh5, styles.mb6]}>
                         <RenderHTML
                             html={translate(

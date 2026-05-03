@@ -74,6 +74,7 @@ function CardReconciliationPage({policy, route}: CardReconciliationPageProps) {
     const effectiveDomainID = Number(domainID ?? workspaceAccountID);
 
     const [continuousReconciliation] = useOnyx(`${ONYXKEYS.COLLECTION.EXPENSIFY_CARD_USE_CONTINUOUS_RECONCILIATION}${effectiveDomainID}`);
+    const [continuousReconciliationPendingAction] = useOnyx(`${ONYXKEYS.COLLECTION.EXPENSIFY_CARD_USE_CONTINUOUS_RECONCILIATION_PENDING_ACTION}${effectiveDomainID}`);
     const [currentConnectionName] = useOnyx(`${ONYXKEYS.COLLECTION.EXPENSIFY_CARD_CONTINUOUS_RECONCILIATION_CONNECTION}${effectiveDomainID}`);
     const [reconciliationBankAccountID] = useOnyx(`${ONYXKEYS.COLLECTION.EXPENSIFY_CARD_RECONCILIATION_BANK_ACCOUNT_ID}${effectiveDomainID}`);
 
@@ -124,11 +125,11 @@ function CardReconciliationPage({policy, route}: CardReconciliationPageProps) {
     }, [policyID]);
 
     useEffect(() => {
-        if (continuousReconciliation?.value !== undefined) {
+        if (continuousReconciliation !== undefined) {
             return;
         }
         fetchPolicyAccountingData();
-    }, [continuousReconciliation?.value, fetchPolicyAccountingData]);
+    }, [continuousReconciliation, fetchPolicyAccountingData]);
 
     return (
         <AccessOrNotFoundWrapper
@@ -153,10 +154,10 @@ function CardReconciliationPage({policy, route}: CardReconciliationPageProps) {
                         shouldPlaceSubtitleBelowSwitch
                         switchAccessibilityLabel={translate('workspace.accounting.continuousReconciliation')}
                         disabled={!autoSync}
-                        isActive={!!continuousReconciliation?.value}
+                        isActive={!!continuousReconciliation}
                         onToggle={handleToggleContinuousReconciliation}
                         wrapperStyle={styles.ph5}
-                        pendingAction={continuousReconciliation?.pendingAction}
+                        pendingAction={continuousReconciliationPendingAction?.pendingAction}
                     />
                     {!autoSync && (
                         <View style={[styles.renderHTML, styles.ph5, styles.mt2]}>
@@ -169,8 +170,8 @@ function CardReconciliationPage({policy, route}: CardReconciliationPageProps) {
                             />
                         </View>
                     )}
-                    <OfflineWithFeedback pendingAction={continuousReconciliation?.pendingAction}>
-                        {!!paymentBankAccountID && !!continuousReconciliation?.value && (
+                    <OfflineWithFeedback pendingAction={continuousReconciliationPendingAction?.pendingAction}>
+                        {!!paymentBankAccountID && !!continuousReconciliation && (
                             <MenuItemWithTopDescription
                                 style={styles.mt5}
                                 title={bankAccountTitle}
