@@ -940,6 +940,7 @@ function getUpdateMoneyRequestParams(params: GetUpdateMoneyRequestParamsType): U
             | typeof ONYXKEYS.COLLECTION.REPORT
             | typeof ONYXKEYS.COLLECTION.TRANSACTION
             | typeof ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS
+            | typeof ONYXKEYS.COLLECTION.SNAPSHOT
         >
     > = [];
     const failureData: Array<
@@ -1345,29 +1346,30 @@ function getUpdateMoneyRequestParams(params: GetUpdateMoneyRequestParamsType): U
             key: `${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${transactionID}`,
             value: currentTransactionViolations,
         });
-        if (hash) {
-            // Initializing as an empty typed object to allow dynamic key assignment resolves TypeScript type inference issue
-            const optimisticSnapshotData: SearchResultDataType = {};
-            optimisticSnapshotData[`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${transactionID}`] = Array.isArray(violationsOnyxData.value) ? violationsOnyxData.value : [];
-            optimisticData.push({
-                onyxMethod: Onyx.METHOD.MERGE,
-                key: `${ONYXKEYS.COLLECTION.SNAPSHOT}${hash}`,
-                value: {
-                    data: optimisticSnapshotData,
-                },
-            });
 
-            // Initializing as an empty typed object to allow dynamic key assignment resolves TypeScript type inference issue
-            const failureSnapshotData: SearchResultDataType = {};
-            failureSnapshotData[`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${transactionID}`] = currentTransactionViolations;
-            failureData.push({
-                onyxMethod: Onyx.METHOD.MERGE,
-                key: `${ONYXKEYS.COLLECTION.SNAPSHOT}${hash}`,
-                value: {
-                    data: failureSnapshotData,
-                },
-            });
+        // Optimistically update the search snapshot so the search list reflects the
+        // new values immediately (the snapshot is the exclusive data source for search
+        // result rendering and is not automatically updated by the TRANSACTION write above).
+        if (hash) {
+            const snapshotKey = `${ONYXKEYS.COLLECTION.SNAPSHOT}${hash}` as const;
+            const transactionKey = `${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}` as const;
+            const violationsKey = `${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${transactionID}` as const;
+
+            const optimisticSnapshotData: SearchResultDataType = {};
+            optimisticSnapshotData[transactionKey] = {...updatedTransaction, pendingFields};
+            optimisticSnapshotData[violationsKey] = Array.isArray(violationsOnyxData.value) ? violationsOnyxData.value : [];
+            optimisticData.push({onyxMethod: Onyx.METHOD.MERGE, key: snapshotKey, value: {data: optimisticSnapshotData}});
+
+            const successSnapshotData: NullishDeep<SearchResultDataType> = {};
+            successSnapshotData[transactionKey] = {pendingFields: clearedPendingFields};
+            successData.push({onyxMethod: Onyx.METHOD.MERGE, key: snapshotKey, value: {data: successSnapshotData}});
+
+            const failureSnapshotData: NullishDeep<SearchResultDataType> = {};
+            failureSnapshotData[transactionKey] = {...transaction, pendingFields: clearedPendingFields};
+            failureSnapshotData[violationsKey] = currentTransactionViolations;
+            failureData.push({onyxMethod: Onyx.METHOD.MERGE, key: snapshotKey, value: {data: failureSnapshotData}});
         }
+
         if (
             violationsOnyxData &&
             ((iouReport?.statusNum ?? CONST.REPORT.STATUS_NUM.OPEN) === CONST.REPORT.STATUS_NUM.OPEN ||
