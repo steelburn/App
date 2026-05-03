@@ -4176,7 +4176,6 @@ function getOverflowMenu(
             shouldShowRightIcon: false,
             shouldShowRightComponent: false,
             success: shareProps?.isCopied,
-            disabled: shareProps?.isCopied,
             shouldCloseModalOnSelect: false,
         },
         {
