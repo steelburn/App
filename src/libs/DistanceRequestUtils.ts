@@ -424,6 +424,7 @@ function getRate({
     policyForMovingExpenses,
     isFakeP2PRate,
     isMovingTransactionFromTrackExpense,
+    personalPolicyOutputCurrency,
 }: {
     transaction: OnyxEntry<Transaction>;
     policy: OnyxEntry<Policy>;
@@ -432,13 +433,14 @@ function getRate({
     useTransactionDistanceUnit?: boolean;
     isFakeP2PRate?: boolean;
     isMovingTransactionFromTrackExpense?: boolean;
+    personalPolicyOutputCurrency?: string;
 }): MileageRate {
     let mileageRates = getMileageRates(policy, true, transaction?.comment?.customUnit?.customUnitRateID);
     if (isEmptyObject(mileageRates) && policyDraft) {
         mileageRates = getMileageRates(policyDraft, true, transaction?.comment?.customUnit?.customUnitRateID);
     }
     const mileageRatesForMovingExpenses = getMileageRates(policyForMovingExpenses, true, transaction?.comment?.customUnit?.customUnitRateID);
-    const policyCurrency = policy?.outputCurrency ?? getPersonalPolicy()?.outputCurrency ?? CONST.CURRENCY.USD;
+    const policyCurrency = policy?.outputCurrency ?? personalPolicyOutputCurrency ?? getPersonalPolicy()?.outputCurrency ?? CONST.CURRENCY.USD;
     const isUnreportedExpense = isExpenseUnreported(transaction);
     const defaultMileageRate = getDefaultMileageRate(policy);
     const customUnitRateID = getRateID(transaction);
@@ -461,8 +463,18 @@ function getRate({
  * For example, if an expense is '10 mi @ $1.00 / mi' and the rate is updated to '$1.00 / km',
  * then the updated distance unit should be 'km' from the updated rate, not 'mi' from the currently stored transaction distance unit.
  */
-function getUpdatedDistanceUnit({transaction, policy, policyDraft}: {transaction: OnyxEntry<Transaction>; policy: OnyxEntry<Policy>; policyDraft?: OnyxEntry<Policy>}) {
-    return getRate({transaction, policy, policyDraft, useTransactionDistanceUnit: false}).unit;
+function getUpdatedDistanceUnit({
+    transaction,
+    policy,
+    policyDraft,
+    personalPolicyOutputCurrency,
+}: {
+    transaction: OnyxEntry<Transaction>;
+    policy: OnyxEntry<Policy>;
+    policyDraft?: OnyxEntry<Policy>;
+    personalPolicyOutputCurrency?: string;
+}) {
+    return getRate({transaction, policy, policyDraft, useTransactionDistanceUnit: false, personalPolicyOutputCurrency}).unit;
 }
 
 /**
