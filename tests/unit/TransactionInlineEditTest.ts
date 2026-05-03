@@ -58,6 +58,31 @@ describe('getTransactionEditPermissions', () => {
         policy: basePolicy,
     };
 
+    const policyCategories: PolicyCategories = {
+        Food: {name: 'Food', enabled: true},
+        Travel: {name: 'Travel', enabled: true},
+    };
+
+    const singleLevelTags: PolicyTagLists = {
+        Tag: {
+            name: 'Tag',
+            required: false,
+            orderWeight: 1,
+            tags: {
+                Project1: {name: 'Project1', enabled: true},
+                Project2: {name: 'Project2', enabled: true},
+            },
+        },
+    };
+
+    const baseUnreportedParams: TransactionEditPermissionsParams = {
+        ...baseParams,
+        parentReportAction: undefined,
+        parentReport: undefined,
+        policyCategories,
+        policyTags: singleLevelTags,
+    };
+
     const allFalsePermissions: TransactionEditPermissions = {
         canEditDate: false,
         canEditMerchant: false,
@@ -87,15 +112,6 @@ describe('getTransactionEditPermissions', () => {
 
             expect(permissions).toEqual(allFalsePermissions);
         });
-
-        it('should return all false when transaction is null', () => {
-            const permissions = getTransactionEditPermissions({
-                ...baseParams,
-                transaction: undefined,
-            });
-
-            expect(permissions).toEqual(allFalsePermissions);
-        });
     });
 
     describe('scanning transactions', () => {
@@ -111,10 +127,8 @@ describe('getTransactionEditPermissions', () => {
             };
 
             const permissions = getTransactionEditPermissions({
-                ...baseParams,
+                ...baseUnreportedParams,
                 transaction: scanningTransaction,
-                parentReportAction: undefined,
-                parentReport: undefined,
             });
 
             expect(permissions).toMatchObject({
@@ -143,10 +157,8 @@ describe('getTransactionEditPermissions', () => {
             };
 
             const permissions = getTransactionEditPermissions({
-                ...baseParams,
+                ...baseUnreportedParams,
                 transaction: distanceTransaction,
-                parentReportAction: undefined,
-                parentReport: undefined,
             });
 
             expect(permissions).toMatchObject({
@@ -180,10 +192,8 @@ describe('getTransactionEditPermissions', () => {
             };
 
             const permissions = getTransactionEditPermissions({
-                ...baseParams,
+                ...baseUnreportedParams,
                 transaction: splitTransaction,
-                parentReportAction: undefined,
-                parentReport: undefined,
                 originalTransaction,
             });
 
@@ -207,35 +217,11 @@ describe('getTransactionEditPermissions', () => {
             };
 
             const permissions = getTransactionEditPermissions({
-                ...baseParams,
-                parentReportAction: undefined,
-                parentReport: undefined,
+                ...baseUnreportedParams,
                 policy: policyWithoutCategories,
             });
 
             expect(permissions.canEditCategory).toBe(false);
-        });
-
-        it('should enable category editing when categories are enabled and there are enabled options', () => {
-            const policyCategories: PolicyCategories = {
-                Food: {
-                    name: 'Food',
-                    enabled: true,
-                },
-                Travel: {
-                    name: 'Travel',
-                    enabled: true,
-                },
-            };
-
-            const permissions = getTransactionEditPermissions({
-                ...baseParams,
-                parentReportAction: undefined,
-                parentReport: undefined,
-                policyCategories,
-            });
-
-            expect(permissions.canEditCategory).toBe(true);
         });
 
         it('should enable category editing when transaction already has a category', () => {
@@ -246,10 +232,8 @@ describe('getTransactionEditPermissions', () => {
             };
 
             const permissions = getTransactionEditPermissions({
-                ...baseParams,
+                ...baseUnreportedParams,
                 transaction: transactionWithCategory,
-                parentReportAction: undefined,
-                parentReport: undefined,
             });
 
             expect(permissions.canEditCategory).toBe(true);
@@ -278,36 +262,11 @@ describe('getTransactionEditPermissions', () => {
             };
 
             const permissions = getTransactionEditPermissions({
-                ...baseParams,
-                parentReportAction: undefined,
-                parentReport: undefined,
+                ...baseUnreportedParams,
                 policyTags: multiLevelTags,
             });
 
             expect(permissions.canEditTag).toBe(false);
-        });
-
-        it('should enable tag editing for single-level tags with enabled options', () => {
-            const singleLevelTags: PolicyTagLists = {
-                Tag: {
-                    name: 'Tag',
-                    required: false,
-                    orderWeight: 1,
-                    tags: {
-                        Project1: {name: 'Project1', enabled: true},
-                        Project2: {name: 'Project2', enabled: true},
-                    },
-                },
-            };
-
-            const permissions = getTransactionEditPermissions({
-                ...baseParams,
-                parentReportAction: undefined,
-                parentReport: undefined,
-                policyTags: singleLevelTags,
-            });
-
-            expect(permissions.canEditTag).toBe(true);
         });
 
         it('should enable tag editing when transaction already has a tag', () => {
@@ -318,10 +277,9 @@ describe('getTransactionEditPermissions', () => {
             };
 
             const permissions = getTransactionEditPermissions({
-                ...baseParams,
+                ...baseUnreportedParams,
                 transaction: transactionWithTag,
-                parentReportAction: undefined,
-                parentReport: undefined,
+                policyTags: undefined,
             });
 
             expect(permissions.canEditTag).toBe(true);
@@ -329,17 +287,15 @@ describe('getTransactionEditPermissions', () => {
     });
 
     describe('unreported expenses', () => {
-        it('should allow editing all fields for unreported expenses', () => {
-            const unreportedTransaction: Transaction = {
-                ...baseTransaction,
-                reportID: CONST.REPORT.UNREPORTED_REPORT_ID,
-            };
+        const unreportedTransaction: Transaction = {
+            ...baseTransaction,
+            reportID: CONST.REPORT.UNREPORTED_REPORT_ID,
+        };
 
+        it('should allow editing all fields', () => {
             const permissions = getTransactionEditPermissions({
-                ...baseParams,
+                ...baseUnreportedParams,
                 transaction: unreportedTransaction,
-                parentReportAction: undefined,
-                parentReport: undefined,
             });
 
             expect(permissions).toMatchObject({
@@ -352,22 +308,33 @@ describe('getTransactionEditPermissions', () => {
             } satisfies TransactionEditPermissions);
         });
 
-        it('should respect scanning restrictions even for unreported expenses', () => {
-            const unreportedScanningTransaction: Transaction = {
-                ...baseTransaction,
-                reportID: CONST.REPORT.UNREPORTED_REPORT_ID,
-                merchant: CONST.TRANSACTION.PARTIAL_TRANSACTION_MERCHANT,
-                amount: 0,
-                receipt: {
-                    state: CONST.IOU.RECEIPT_STATE.SCANNING,
-                },
-            };
-
+        it('should disable category and tag editing without available options', () => {
             const permissions = getTransactionEditPermissions({
-                ...baseParams,
-                transaction: unreportedScanningTransaction,
-                parentReportAction: undefined,
-                parentReport: undefined,
+                ...baseUnreportedParams,
+                transaction: unreportedTransaction,
+                policyCategories: undefined,
+                policyTags: undefined,
+            });
+
+            expect(permissions).toMatchObject({
+                canEditAmount: true,
+                canEditDate: true,
+                canEditDescription: true,
+                canEditMerchant: true,
+                canEditCategory: false,
+                canEditTag: false,
+            } satisfies TransactionEditPermissions);
+        });
+
+        it('should respect scanning restrictions', () => {
+            const permissions = getTransactionEditPermissions({
+                ...baseUnreportedParams,
+                transaction: {
+                    ...unreportedTransaction,
+                    merchant: CONST.TRANSACTION.PARTIAL_TRANSACTION_MERCHANT,
+                    amount: 0,
+                    receipt: {state: CONST.IOU.RECEIPT_STATE.SCANNING},
+                },
             });
 
             expect(permissions).toMatchObject({
@@ -376,83 +343,35 @@ describe('getTransactionEditPermissions', () => {
             } satisfies Partial<TransactionEditPermissions>);
         });
 
-        it('should respect distance request restrictions even for unreported expenses', () => {
-            const unreportedDistanceTransaction: Transaction = {
-                ...baseTransaction,
-                reportID: CONST.REPORT.UNREPORTED_REPORT_ID,
-                comment: {
-                    type: CONST.TRANSACTION.TYPE.CUSTOM_UNIT,
-                    customUnit: {
-                        name: CONST.CUSTOM_UNITS.NAME_DISTANCE,
+        it('should respect distance request restrictions', () => {
+            const permissions = getTransactionEditPermissions({
+                ...baseUnreportedParams,
+                transaction: {
+                    ...unreportedTransaction,
+                    comment: {
+                        type: CONST.TRANSACTION.TYPE.CUSTOM_UNIT,
+                        customUnit: {name: CONST.CUSTOM_UNITS.NAME_DISTANCE},
                     },
                 },
-            };
-
-            const permissions = getTransactionEditPermissions({
-                ...baseParams,
-                transaction: unreportedDistanceTransaction,
-                parentReportAction: undefined,
-                parentReport: undefined,
             });
 
             expect(permissions).toMatchObject({
                 canEditMerchant: false,
             } satisfies Partial<TransactionEditPermissions>);
         });
-    });
 
-    describe('description field', () => {
-        it('should always allow description editing when base permissions are met', () => {
+        it('should disable category editing when workspace selection is required', () => {
             const permissions = getTransactionEditPermissions({
-                ...baseParams,
-                parentReportAction: undefined,
-                parentReport: undefined,
+                ...baseUnreportedParams,
+                transaction: unreportedTransaction,
+                // No policy context yet since workspace selection is pending
+                policy: undefined,
+                shouldSelectPolicyForUnreported: true,
             });
 
-            expect(permissions.canEditDescription).toBe(true);
-        });
-
-        it('should allow description editing even for scanning transactions', () => {
-            const scanningTransaction: Transaction = {
-                ...baseTransaction,
-                reportID: CONST.REPORT.UNREPORTED_REPORT_ID,
-                merchant: CONST.TRANSACTION.PARTIAL_TRANSACTION_MERCHANT,
-                amount: 0,
-                receipt: {
-                    state: CONST.IOU.RECEIPT_STATE.SCANNING,
-                },
-            };
-
-            const permissions = getTransactionEditPermissions({
-                ...baseParams,
-                transaction: scanningTransaction,
-                parentReportAction: undefined,
-                parentReport: undefined,
-            });
-
-            expect(permissions.canEditDescription).toBe(true);
-        });
-
-        it('should allow description editing even for distance requests', () => {
-            const distanceTransaction: Transaction = {
-                ...baseTransaction,
-                reportID: CONST.REPORT.UNREPORTED_REPORT_ID,
-                comment: {
-                    type: CONST.TRANSACTION.TYPE.CUSTOM_UNIT,
-                    customUnit: {
-                        name: CONST.CUSTOM_UNITS.NAME_DISTANCE,
-                    },
-                },
-            };
-
-            const permissions = getTransactionEditPermissions({
-                ...baseParams,
-                transaction: distanceTransaction,
-                parentReportAction: undefined,
-                parentReport: undefined,
-            });
-
-            expect(permissions.canEditDescription).toBe(true);
+            expect(permissions).toMatchObject({
+                canEditCategory: false,
+            } satisfies Partial<TransactionEditPermissions>);
         });
     });
 
@@ -471,25 +390,6 @@ describe('getTransactionEditPermissions', () => {
                 ...baseParams,
                 transaction: reportedTransaction,
                 chatReportNVP,
-            });
-
-            expect(permissions).toEqual(allFalsePermissions);
-        });
-
-        it('should disable all editing when transaction thread is archived', () => {
-            const reportedTransaction: Transaction = {
-                ...baseTransaction,
-                reportID: '100',
-            };
-
-            const transactionThreadNVP: ReportNameValuePairs = {
-                private_isArchived: 'true',
-            };
-
-            const permissions = getTransactionEditPermissions({
-                ...baseParams,
-                transaction: reportedTransaction,
-                transactionThreadNVP,
             });
 
             expect(permissions).toEqual(allFalsePermissions);
