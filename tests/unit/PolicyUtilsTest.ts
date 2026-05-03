@@ -370,7 +370,11 @@ describe('PolicyUtils', () => {
                 ...createRandomPolicy(0),
                 customUnits: {[distanceUnitWithMultipleRates.customUnitID]: distanceUnitWithMultipleRates},
             };
-            const result = getCustomUnitsForDuplication(policyWithMultipleRates, true, false, {distanceCustomUnitID: 'newDist', perDiemCustomUnitID: 'newPerDiem', customUnitRateID: 'newRate'});
+            const result = getCustomUnitsForDuplication(policyWithMultipleRates, true, false, {
+                distanceCustomUnitID: 'newDist',
+                perDiemCustomUnitID: 'newPerDiem',
+                customUnitRateID: 'newRate',
+            });
             expect(result).toEqual({
                 newDist: {
                     ...distanceUnitWithMultipleRates,

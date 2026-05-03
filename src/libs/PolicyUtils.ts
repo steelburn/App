@@ -335,7 +335,7 @@ function getCustomUnitsForDuplication(
     customUnitIDs: {
         distanceCustomUnitID: string;
         perDiemCustomUnitID: string;
-        customUnitRateID: string;
+        customUnitRateID?: string;
     },
 ): Record<string, CustomUnit> | undefined {
     const customUnits = policy?.customUnits;
