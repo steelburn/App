@@ -416,4 +416,4 @@ export {
     getTransactionEditPermissions,
 };
 
-export type {TransactionInlineEditParams, TransactionEditPermissions};
+export type {TransactionEditPermissions, TransactionInlineEditParams, TransactionEditPermissionsParams};

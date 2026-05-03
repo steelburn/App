@@ -119,4 +119,79 @@ describe('useInlineEditState', () => {
         expect(onSave).toHaveBeenCalledWith(99);
         expect(result.current.isEditing).toBe(false);
     });
+
+    it('cancels editing when canEdit becomes false while editing', () => {
+        let canEdit = true;
+        const onSave = jest.fn();
+        const {result, rerender} = renderHook(() => useInlineEditState<string>(canEdit, 'hello', onSave));
+
+        act(() => {
+            result.current.startEditing();
+        });
+
+        expect(result.current.isEditing).toBe(true);
+
+        act(() => {
+            result.current.setLocalValue('modified');
+        });
+
+        // Revoke permission while editing
+        canEdit = false;
+        rerender({});
+
+        // Should auto-cancel due to useEffect
+        expect(result.current.isEditing).toBe(false);
+        expect(result.current.localValue).toBe('hello'); // Reverted to original
+        expect(onSave).not.toHaveBeenCalled();
+    });
+
+    it('prevents duplicate onSave calls when save is called multiple times', () => {
+        const onSave = jest.fn();
+        const {result} = renderHook(() => useInlineEditState<string>(true, 'hello', onSave));
+
+        act(() => {
+            result.current.startEditing();
+        });
+        act(() => {
+            result.current.setLocalValue('world');
+        });
+
+        // Call save twice
+        act(() => {
+            result.current.save();
+            result.current.save(); // Second call should be ignored
+        });
+
+        // onSave should only be called once
+        expect(onSave).toHaveBeenCalledTimes(1);
+        expect(onSave).toHaveBeenCalledWith('world');
+    });
+
+    it('prevents duplicate cancel when cancelEditing is called multiple times', () => {
+        const onSave = jest.fn();
+        const {result} = renderHook(() => useInlineEditState<string>(true, 'hello', onSave));
+
+        act(() => {
+            result.current.startEditing();
+        });
+        act(() => {
+            result.current.setLocalValue('modified');
+        });
+
+        // Call cancelEditing twice
+        act(() => {
+            result.current.cancelEditing();
+            result.current.cancelEditing(); // Second call should be ignored
+        });
+
+        expect(result.current.isEditing).toBe(false);
+        expect(result.current.localValue).toBe('hello');
+        expect(onSave).not.toHaveBeenCalled();
+
+        // Verify we can start editing again after cancel
+        act(() => {
+            result.current.startEditing();
+        });
+        expect(result.current.isEditing).toBe(true);
+    });
 });
