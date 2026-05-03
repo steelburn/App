@@ -4175,7 +4175,8 @@ function getOverflowMenu(
             icon: shareProps?.isCopied ? icons.Checkmark : icons.LinkCopy,
             shouldShowRightIcon: false,
             shouldShowRightComponent: false,
-            success: shareProps?.isCopied,
+            disabled: shareProps?.isCopied,
+            shouldGreyOutWhenDisabled: false,
             shouldCloseModalOnSelect: false,
         },
         {
