@@ -773,7 +773,7 @@ function getCombinedReportActions(
     reportActions: ReportAction[],
     transactionThreadReportID: string | null,
     transactionThreadReportActions: ReportAction[],
-    reportID?: string,
+    report: OnyxEntry<Report>,
 ): ReportAction[] {
     const isSentMoneyReport = reportActions.some((action) => isSentMoneyReportAction(action));
 
@@ -797,7 +797,6 @@ function getCombinedReportActions(
         filteredParentReportActions = reportActions?.filter((action) => action.actionName !== CONST.REPORT.ACTIONS.TYPE.CREATED);
     }
 
-    const report = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${reportID}`];
     const isSelfDM = report?.chatType === CONST.REPORT.CHAT_TYPE.SELF_DM;
     // Filter out request and send money request actions because we don't want to show any preview actions for one transaction reports
     const filteredReportActions = [...filteredParentReportActions, ...filteredTransactionThreadReportActions].filter((action) => {
