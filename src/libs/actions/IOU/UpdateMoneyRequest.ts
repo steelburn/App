@@ -30,6 +30,7 @@ import {
     getMerchant,
     getUpdatedTransaction,
     isDistanceRequest as isDistanceRequestTransactionUtils,
+    isExpenseUnreported,
     isFetchingWaypointsFromServer,
     isOnHold,
     isScanning,
@@ -1473,7 +1474,8 @@ function getUpdateTrackExpenseParams(
     const transaction = getAllTransactions()?.[`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`];
     const chatReport = getAllReports()?.[`${ONYXKEYS.COLLECTION.REPORT}${transactionThread?.parentReportID}`] ?? null;
     const isDistanceTransaction = transaction && isDistanceRequestTransactionUtils(transaction);
-    const distanceOriginalPolicy = isDistanceTransaction ? getDistanceRateOriginalPolicy(transaction) : undefined;
+    const isUnreported = transaction && isExpenseUnreported(transaction);
+    const distanceOriginalPolicy = isDistanceTransaction && isUnreported ? getDistanceRateOriginalPolicy(transaction) : undefined;
     const policyForTransaction = distanceOriginalPolicy ?? policy;
     const updatedTransaction = transaction
         ? getUpdatedTransaction({
