@@ -30,7 +30,7 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import type * as OnyxTypes from '@src/types/onyx';
 import type {SearchResultDataType} from '@src/types/onyx/SearchResults';
 import type {TransactionChanges} from '@src/types/onyx/Transaction';
-import {getAllTransactionViolations, getCurrentUserEmail, getUpdatedMoneyRequestReportData, getUserAccountID} from '.';
+import {getAllTransactionViolations, getUpdatedMoneyRequestReportData} from '.';
 
 function removeUnchangedBulkEditFields(
     transactionChanges: TransactionChanges,
@@ -80,6 +80,8 @@ type UpdateMultipleMoneyRequestsParams = {
     allPolicies?: OnyxCollection<OnyxTypes.Policy>;
     introSelected: OnyxEntry<OnyxTypes.IntroSelected>;
     betas: OnyxEntry<OnyxTypes.Beta[]>;
+    currentUserLogin: string;
+    currentUserAccountID: number;
 };
 
 function updateMultipleMoneyRequests({
@@ -95,6 +97,8 @@ function updateMultipleMoneyRequests({
     allPolicies,
     introSelected,
     betas,
+    currentUserAccountID,
+    currentUserLogin,
 }: UpdateMultipleMoneyRequestsParams) {
     // Track running totals per report so multiple edits in the same report compound correctly.
     const optimisticReportsByID: Record<string, OnyxTypes.Report> = {};
@@ -133,7 +137,7 @@ function updateMultipleMoneyRequests({
         // bulk-edit comments are visible immediately while still offline.
         let didCreateThreadInThisIteration = false;
         if (!transactionThreadReportID && iouReport?.reportID) {
-            const optimisticTransactionThread = createTransactionThreadReport(introSelected, getCurrentUserEmail(), getUserAccountID(), betas, iouReport, reportAction, transaction);
+            const optimisticTransactionThread = createTransactionThreadReport(introSelected, currentUserLogin, currentUserAccountID, betas, iouReport, reportAction, transaction);
             if (optimisticTransactionThread?.reportID) {
                 transactionThreadReportID = optimisticTransactionThread.reportID;
                 transactionThread = optimisticTransactionThread;
