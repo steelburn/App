@@ -148,7 +148,7 @@ function MoneyRequestReportTransactionItem({
                 }}
                 disabled={isTransactionPendingDelete(transaction)}
                 ref={viewRef}
-                wrapperStyle={[animatedHighlightStyle, styles.userSelectNone, shouldUseNarrowLayout && !isLastItem && StyleUtils.getSelectedBorderBottomStyle(isSelected)]}
+                wrapperStyle={[animatedHighlightStyle, styles.userSelectNone, shouldUseNarrowLayout && !isLastItem && styles.borderBottom]}
             >
                 {({hovered}) => (
                     <TransactionItemRow

@@ -5320,7 +5320,6 @@ _詳しい手順については、[ヘルプサイトをご覧ください](${CO
                 monthly: '毎月',
             },
             cardDetails: 'カード情報',
-            cardPending: ({name}: {name: string}) => `カードは現在保留中で、${name} さんのアカウントが認証され次第、発行されます。`,
             virtual: 'バーチャル',
             physical: '物理',
             deactivate: 'カードを無効化',

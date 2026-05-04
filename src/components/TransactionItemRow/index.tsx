@@ -814,7 +814,7 @@ function TransactionItemRow({
                 {!!shouldShowBottomBorder && (
                     <View style={bgActiveStyles}>
                         <View style={styles.ph3}>
-                            <View style={[StyleUtils.getSelectedBorderBottomStyle(isSelected)]} />
+                            <View style={[styles.borderBottom]} />
                         </View>
                     </View>
                 )}
@@ -889,7 +889,7 @@ function TransactionItemRow({
             {!!shouldShowBottomBorder && (
                 <View style={bgActiveStyles}>
                     <View style={styles.ph3}>
-                        <View style={[StyleUtils.getSelectedBorderBottomStyle(isSelected)]} />
+                        <View style={styles.borderBottom} />
                     </View>
                 </View>
             )}

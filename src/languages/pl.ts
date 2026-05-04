@@ -5350,7 +5350,6 @@ _Aby uzyskać bardziej szczegółowe instrukcje, [odwiedź naszą stronę pomocy
                 monthly: 'Miesięcznie',
             },
             cardDetails: 'Dane karty',
-            cardPending: ({name}: {name: string}) => `Karta jest obecnie w oczekiwaniu i zostanie wydana po zweryfikowaniu konta ${name}.`,
             virtual: 'Wirtualna',
             physical: 'Fizyczny',
             deactivate: 'Dezaktywuj kartę',

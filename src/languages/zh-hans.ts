@@ -5235,7 +5235,6 @@ _如需更详细的说明，请[访问我们的帮助网站](${CONST.NETSUITE_IM
                 monthly: '每月',
             },
             cardDetails: '卡片详情',
-            cardPending: ({name}: {name: string}) => `卡片目前处于待处理状态，将在验证完 ${name} 的账户后发行。`,
             virtual: '虚拟',
             physical: '实体',
             deactivate: '停用卡片',

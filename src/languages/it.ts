@@ -5370,7 +5370,6 @@ _Per istruzioni più dettagliate, [visita il nostro sito di assistenza](${CONST.
                 monthly: 'Mensile',
             },
             cardDetails: 'Dettagli carta',
-            cardPending: ({name}: {name: string}) => `La carta è al momento in sospeso e verrà emessa non appena l'account di ${name} sarà convalidato.`,
             virtual: 'Virtuale',
             physical: 'Fisico',
             deactivate: 'Disattiva carta',
