@@ -1,0 +1,18 @@
+# agent-device-pr-media issues
+
+- Skill pre-flight didn't inline Metro check - linked to agent-device skill instead, easy to skip
+- App opened before Metro was running - got stuck on "No script URL provided" even after Metro started
+- action point: base `/agent-device` prereq guidance ("run `npm run start` + installed dev build before `open`") is not reliable for this workflow; update skill docs/flow to require `agent-device metro prepare --public-base-url http://localhost:8081` immediately before `agent-device open`, with an explicit readiness check in the same skill
+- Opened wrong bundle ID (`com.expensify.chat.dev`) - HybridApp build uses `org.me.mobiexpensifyg.dev`
+- Skill didn't check `agent-device devices` for already-booted simulators - hardcoded device model instead; fix: check `booted=true` first and prefer that device
+- `agent-device apps --device X` silently fails when a session is bound to a different device - must close existing session first; caused false "no apps installed" conclusion
+- iOS HybridApp dev bundle ID is `com.expensify.expensifylite` (same as production, Debug config) - NOT `org.me.mobiexpensifyg.dev`; that ID is Android-only from `run-build.sh`; skill had wrong ID for iOS HybridApp
+- recording should only start for the testing steps (skip setup if not needed)
+- recording too long: screenshot verification between every step added 3-4s dead time per action; wrong coordinate taps required retries (PLN button miss, back button miss x2); actual test content should be ~10s; fix: two-phase approach - (1) warm-up run: navigate to starting state, discover selectors/coordinates per step, generate a `.ad` script from what worked; (2) recording run: `record start` → `replay <generated.ad>` → `record stop` - deterministic, no verification overhead, reusable across platforms and future runs
+- simulator snapshots: use `xcrun simctl io booted saveState` after first sign-in + onboarding to avoid repeating preamble on subsequent runs
+- PR handoff table snippet is unnecessary - users drag-and-drop the MP4 into GitHub's input field which auto-uploads and generates the URL; just report the file path
+- sign-in flow `@desc` was skipped - used base email without `-e EMAIL=...+<9digits>` randomization, hitting suspended account; fix via `@param` contract scanning: prompt user (or auto-randomize with confirmation) before replaying `@tag auth` flows
+- accessibility tree returns 0 nodes on two screens: (1) native camera view - expected, AVCaptureSession doesn't expose a11y nodes; (2) BigNumberPad/amount screen - NOT expected, this is a custom RN component that should expose a11y nodes but doesn't; missing `accessible`/`accessibilityLabel` props; this is an app-level accessibility bug, not a skill/agent-device limitation - screen readers also can't describe this screen to users; should be filed as a separate a11y issue
+- skill fell back to coordinate-based taps when a11y was dead - defeats the main advantage of agent-device; fix: detect 0-node snapshot early, surface as a hard blocker with message "a11y tree empty on this screen - check component accessibility props before proceeding" (no accessibility exposure); `agent-device back` also fails in this state; fix: `xcrun simctl terminate + launch` to force-relaunch the app cleanly
+- new account flow has intermediate "Join" button screen before onboarding - `complete-onboarding.ad` `@pre` doesn't cover it; skill needs to detect and tap "Join" before replaying onboarding
+- iOS notification permission prompt appears after "Join" tap - blocks onboarding flow; skill must handle `alert` nodes (tap "Don't Allow" to dismiss) before continuing
