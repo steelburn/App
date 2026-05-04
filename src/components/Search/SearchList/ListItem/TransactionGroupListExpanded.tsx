@@ -265,7 +265,7 @@ function TransactionGroupListExpanded<TItem extends ListItem>({
                                         transaction.policy,
                                     )}
                                     isSelected={!!transaction.isSelected}
-                                    isDisabled={isDeletedOrPendingDelete}
+                                    isDisabled={isTransactionPendingDelete(transaction)}
                                     dateColumnSize={dateColumnSize}
                                     amountColumnSize={amountColumnSize}
                                     taxAmountColumnSize={taxAmountColumnSize}
