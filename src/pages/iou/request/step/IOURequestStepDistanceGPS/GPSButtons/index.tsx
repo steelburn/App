@@ -68,26 +68,36 @@ function GPSButtons({navigateToNextStep, setShouldShowStartError, setShouldShowP
         setStartPermissionsFlow(true);
     };
 
-    const startGpsTrip = async () => {
+    // Returns true if location tracking was successfully initialized, false otherwise
+    const initLocationTracking = async (): Promise<boolean> => {
         try {
             await startLocationUpdatesAsync(BACKGROUND_LOCATION_TRACKING_TASK_NAME, BACKGROUND_LOCATION_TASK_OPTIONS);
         } catch (error) {
             console.error('[GPS distance request] Failed to start location tracking', error);
             setShouldShowStartError(true);
+            return false;
+        }
+        return true;
+    };
+
+    const startGpsTrip = async () => {
+        const locationTrackingInitSuccessfully = await initLocationTracking();
+
+        if (!locationTrackingInitSuccessfully) {
             return;
         }
+
         initGpsDraft(reportID, unit);
         startGpsTripNotification(translate, reportID, unit);
     };
 
     const resumeGpsTrip = async () => {
-        try {
-            await startLocationUpdatesAsync(BACKGROUND_LOCATION_TRACKING_TASK_NAME, BACKGROUND_LOCATION_TASK_OPTIONS);
-        } catch (error) {
-            console.error('[GPS distance request] Failed to start location tracking', error);
-            setShouldShowStartError(true);
+        const locationTrackingInitSuccessfully = await initLocationTracking();
+
+        if (!locationTrackingInitSuccessfully) {
             return;
         }
+
         resumeGpsTripUtil(gpsDraftDetails);
         startGpsTripNotification(translate, reportID, unit, gpsDraftDetails?.distanceInMeters);
     };

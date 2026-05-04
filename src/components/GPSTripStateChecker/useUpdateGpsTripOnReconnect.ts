@@ -29,14 +29,15 @@ function useUpdateGpsTripOnReconnect() {
 
         for (const tripSegment of gpsPoints) {
             for (const [index, point] of tripSegment.entries()) {
-                if (point.address?.type === 'coordinates') {
+                // If the address is not a coordinates (already human readable), we don't need to update it
+                if (point.address?.type === 'address') {
                     continue;
                 }
 
                 if (index === 0) {
-                    updateAddressToHumanReadable(point, (address) => setStartWaypointAddress(address, 0, gpsDraftDetails));
+                    updateAddressToHumanReadable(point, (address) => setStartWaypointAddress(address, 0, gpsPoints));
                 } else if (index === tripSegment.length - 1) {
-                    updateAddressToHumanReadable(point, (address) => setEndAddress(address, gpsDraftDetails.gpsPoints));
+                    updateAddressToHumanReadable(point, (address) => setEndAddress(address, gpsPoints));
                 }
             }
         }

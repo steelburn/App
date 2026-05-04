@@ -14,17 +14,17 @@ function resetGPSDraftDetails() {
     Onyx.merge(ONYXKEYS.GPS_DRAFT_DETAILS, null);
 }
 
-function setStartWaypointAddress(startAddress: GPSPointAddress, tripSegmentIndex: number, gpsDraftDetails: OnyxEntry<GpsDraftDetails>) {
-    const gpsPoints = getGpsPoints(gpsDraftDetails);
+function setStartWaypointAddress(startAddress: GPSPointAddress, tripSegmentIndex: number, gpsPoints: GPSPoint[][]) {
     const tripSegment = gpsPoints.at(tripSegmentIndex);
-    const firstPoint = tripSegment?.at(0);
+    const segmentFirstPoint = tripSegment?.at(0);
 
-    if (!firstPoint || !tripSegment) {
+    if (!segmentFirstPoint || !tripSegment) {
         return;
     }
 
+    const newSegment = [{...segmentFirstPoint, address: startAddress}, ...tripSegment.slice(1)];
     const newGpsPoints = [...gpsPoints];
-    newGpsPoints.splice(tripSegmentIndex, 1, [{...firstPoint, address: startAddress}, ...tripSegment.slice(1)]);
+    newGpsPoints.splice(tripSegmentIndex, 1, newSegment);
 
     Onyx.merge(ONYXKEYS.GPS_DRAFT_DETAILS, {
         gpsPoints: newGpsPoints,
@@ -49,13 +49,13 @@ function setEndAddress(endAddress: GPSPointAddress, gpsPoints: GPSPoint[][]) {
 
 function isLastSegmentEmptyOrHasOnlyOnePoint(gpsPoints: GPSPoint[][]): boolean {
     if (gpsPoints.length <= 1) {
-        return false;
+        return true;
     }
 
     const lastSegment = gpsPoints.at(-1);
 
     if (!lastSegment) {
-        return false;
+        return true;
     }
 
     // If the last segment (which is not the only one) is empty or has only one point, remove it

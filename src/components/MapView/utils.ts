@@ -2,7 +2,7 @@ import type {LngLat} from 'react-map-gl';
 import getArrayDepth from '@libs/getArrayDepth';
 import type {Coordinate} from './MapViewTypes';
 
-function isSingleRoute(directionCoordinates: Coordinate[] | Coordinate[][]): directionCoordinates is Coordinate[] {
+function isSingleSegmentRoute(directionCoordinates: Coordinate[] | Coordinate[][]): directionCoordinates is Coordinate[] {
     return getArrayDepth(directionCoordinates) === 2;
 }
 
@@ -127,5 +127,5 @@ export default {
     areSameCoordinate,
     findClosestCoordinateOnLineFromCenter,
     getBoundsCenter,
-    isSingleRoute,
+    isSingleSegmentRoute,
 };

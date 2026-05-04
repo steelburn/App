@@ -14,26 +14,31 @@ import {roundToTwoDecimalPlaces} from './NumberUtils';
 
 type GPSWaypointCollection = Record<string, SetRequired<Waypoint, 'keyForList' | 'lat' | 'lng' | 'address'>>;
 
+function getGPSWaypoint(gpsPoint: GPSPoint, waypointIndex: number): GPSWaypointCollection[string] {
+    return {
+        keyForList: `gps${waypointIndex}`,
+        lat: gpsPoint.lat,
+        lng: gpsPoint.long,
+        address: gpsPoint.address?.value ?? coordinatesToString(gpsPoint),
+    };
+}
+
 function getGPSWaypoints(gpsDraftDetails: GpsDraftDetails | undefined): GPSWaypointCollection {
     const gpsCoordinates = getGpsPoints(gpsDraftDetails);
 
     const waypointCollection: GPSWaypointCollection = {};
     let waypointsCounter = 0;
 
-    for (const point of gpsCoordinates.flat()) {
-        if (!point.address) {
+    for (const segment of gpsCoordinates) {
+        const segmentFirstPoint = segment.at(0);
+        const segmentLastPoint = segment.at(-1);
+        if (!segmentFirstPoint || !segmentLastPoint) {
             continue;
         }
 
-        const key = `gps${waypointsCounter}`;
-        waypointsCounter++;
-
-        waypointCollection[`waypoint${waypointsCounter}`] = {
-            keyForList: key,
-            lat: point.lat,
-            lng: point.long,
-            address: point.address.value || coordinatesToString(point),
-        };
+        waypointCollection[`waypoint${waypointsCounter}`] = getGPSWaypoint(segmentFirstPoint, waypointsCounter);
+        waypointCollection[`waypoint${waypointsCounter + 1}`] = getGPSWaypoint(segmentLastPoint, waypointsCounter + 1);
+        waypointsCounter += 2;
     }
 
     return waypointCollection;
@@ -55,7 +60,7 @@ function getGPSRoutes(gpsDraftDetails: GpsDraftDetails | undefined): Routes {
     };
 }
 
-function getGPSCoordinates(gpsDraftDetails: GpsDraftDetails | undefined): string | undefined {
+function getStringifiedGPSCoordinates(gpsDraftDetails: GpsDraftDetails | undefined): string | undefined {
     return gpsDraftDetails?.gpsPoints ? JSON.stringify(gpsDraftDetails.gpsPoints.map((points) => points.map(({lat, long}) => ({lng: long, lat})))) : undefined;
 }
 
@@ -173,7 +178,7 @@ export {
     getGPSWaypoints,
     stopGpsTrip,
     getGPSConvertedDistance,
-    getGPSCoordinates,
+    getStringifiedGPSCoordinates,
     addressFromGpsPoint,
     coordinatesToString,
     calculateGPSDistance,

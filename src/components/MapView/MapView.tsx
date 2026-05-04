@@ -42,10 +42,7 @@ function MapView({
     unit,
     ref,
 }: MapViewProps) {
-    const directionCoordinates = useMemo(
-        () => (!directionCoordinatesProp || utils.isSingleRoute(directionCoordinatesProp) ? directionCoordinatesProp : directionCoordinatesProp.flat()),
-        [directionCoordinatesProp],
-    );
+    const directionCoordinates = !directionCoordinatesProp || utils.isSingleSegmentRoute(directionCoordinatesProp) ? directionCoordinatesProp : directionCoordinatesProp.flat();
 
     const [userLocation] = useOnyx(ONYXKEYS.USER_LOCATION);
     const navigation = useNavigation();
