@@ -10,6 +10,7 @@ import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import HapticFeedback from '@libs/HapticFeedback';
 import type {SkeletonSpanReasonAttributes} from '@libs/telemetry/useSkeletonSpan';
+import variables from '@styles/variables';
 import CONST from '@src/CONST';
 import {ButtonContext} from './context';
 import type {ButtonProps} from './types';
@@ -181,7 +182,7 @@ function Button({
                 <ActivityIndicator
                     color={variant === 'success' || variant === 'danger' ? theme.textLight : theme.text}
                     style={[styles.pAbsolute, styles.l0, styles.r0]}
-                    size={size === CONST.DROPDOWN_BUTTON_SIZE.EXTRA_SMALL ? 12 : undefined}
+                    size={size === CONST.DROPDOWN_BUTTON_SIZE.EXTRA_SMALL ? variables.iconSizeExtraSmall : undefined}
                     reasonAttributes={buttonLoadingReasonAttributes}
                 />
             )}
