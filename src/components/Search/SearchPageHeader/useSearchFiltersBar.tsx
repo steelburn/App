@@ -199,9 +199,10 @@ function useSearchFiltersBar(queryJSON: SearchQueryJSON): UseSearchFiltersBarRes
 
         if (filterKey.startsWith(CONST.SEARCH.REPORT_FIELD.GLOBAL_PREFIX)) {
             return {
-                PopoverComponent: ({closeOverlay}) => (
+                PopoverComponent: ({closeOverlay, setPopoverWidth}) => (
                     <ReportFieldPopup
                         closeOverlay={closeOverlay}
+                        setPopoverWidth={setPopoverWidth}
                         updateFilterForm={updateFilterForm}
                     />
                 ),

@@ -323,7 +323,7 @@ function SearchPageNarrow({
                 shouldEnableMaxHeight
                 offlineIndicatorStyle={styles.mtAuto}
                 shouldShowOfflineIndicator={!!searchResults}
-                bottomContent={tabBarContent}
+                bottomContent={!searchRouterListVisible && tabBarContent}
                 bottomContentStyle={styles.overflowVisible}
             >
                 <View style={[styles.flex1, styles.overflowHidden]}>
