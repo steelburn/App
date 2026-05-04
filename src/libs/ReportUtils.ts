@@ -7955,8 +7955,8 @@ function buildOptimisticGroupChatReport(
 type BuildOptimisticCreatedReportActionParams = {
     emailCreatingAction: string;
     created?: string;
-    // TODO: optimisticReportActionID will be required eventually. Refactor issue: https://github.com/Expensify/App/issues/66412
     optimisticReportActionID?: string;
+    // TODO: currentUserAccountID, currentUserDisplayName, currentUserEmail, currentUserAvatar will be required eventually. Refactor issue: https://github.com/Expensify/App/issues/66412
     currentUserAccountID?: number;
     currentUserDisplayName?: string;
     currentUserEmail?: string;
