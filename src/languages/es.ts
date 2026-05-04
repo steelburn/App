@@ -9419,6 +9419,11 @@ ${amount} para ${merchant} - ${date}`,
             restrictExpenseWorkspaceCreation: 'Restringir la creación/eliminación de espacios de trabajo de gastos',
             restrictExpenseWorkspaceCreationDescription:
                 'Evita que los miembros creen un espacio de trabajo de gastos o se eliminen a sí mismos de uno. Esto, cuando se combina con la aplicación estricta de espacios de trabajo, es útil para evitar que se utilice Expensify para enviar informes destinados a usarse fuera de tu dominio.',
+            deleteGroup: 'Eliminar grupo',
+            deleteGroupDangerConfirmationModal: 'Eliminar grupo',
+            deleteGroupDangerConfirmationModalDescription: (defaultGroupName: string) =>
+                `¿Estás seguro? Esto reasignará a todos los miembros al grupo predeterminado (${defaultGroupName}) y no se puede deshacer.`,
+            deleteGroupError: 'No se pudo eliminar este grupo. Por favor, inténtalo de nuevo.',
         },
     },
     gps: {

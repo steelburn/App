@@ -9138,6 +9138,11 @@ Oto *paragon testowy*, żeby pokazać Ci, jak to działa:`,
             restrictExpenseWorkspaceCreation: 'Ogranicz tworzenie/usuwanie przestrzeni roboczej wydatków',
             restrictExpenseWorkspaceCreationDescription:
                 'Uniemożliw członkom tworzenie przestrzeni roboczej wydatków lub usuwanie siebie z przestrzeni roboczej wydatków. Jest to przydatne, aby zapobiec używaniu Expensify do przesyłania raportów przeznaczonych do użytku poza Twoją domeną, w połączeniu ze ścisłym egzekwowaniem przestrzeni roboczej.',
+            deleteGroup: 'Usuń grupę',
+            deleteGroupDangerConfirmationModal: 'Usuń grupę',
+            deleteGroupDangerConfirmationModalDescription: (defaultGroupName: string) =>
+                `Czy na pewno? Spowoduje to ponowne przypisanie wszystkich członków do domyślnej grupy (${defaultGroupName}) i nie można tego cofnąć.`,
+            deleteGroupError: 'Nie udało się usunąć tej grupy. Spróbuj ponownie.',
         },
     },
     proactiveAppReview: {

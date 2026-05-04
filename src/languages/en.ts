@@ -9188,6 +9188,11 @@ const translations = {
             restrictExpenseWorkspaceCreation: 'Restrict expense workspace creation/removal',
             restrictExpenseWorkspaceCreationDescription:
                 'Prevent members from being able to create an expense workspace or remove themselves from an expense workspace. This is useful for preventing people from using Expensify to submit reports for use outside your domain when combined with strict workspace enforcement.',
+            deleteGroup: 'Delete Group',
+            deleteGroupDangerConfirmationModal: 'Delete Group',
+            deleteGroupDangerConfirmationModalDescription: (defaultGroupName: string) =>
+                `Are you sure? This will reassign all members to the default group (${defaultGroupName}) and can't be undone.`,
+            deleteGroupError: 'Unable to delete this group. Please try again.',
         },
     },
 };

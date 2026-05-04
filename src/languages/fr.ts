@@ -9218,6 +9218,11 @@ Voici un *reçu test* pour vous montrer comment ça fonctionne :`,
             restrictExpenseWorkspaceCreation: 'Restreindre la création/suppression d’espaces de travail de dépenses',
             restrictExpenseWorkspaceCreationDescription:
                 'Empêchez les membres de pouvoir créer un espace de travail de dépenses ou de se retirer d’un espace de travail de dépenses. Ceci est utile pour empêcher les gens d’utiliser Expensify afin de soumettre des rapports destinés à un usage hors de votre domaine, lorsqu’il est combiné à une application stricte des espaces de travail.',
+            deleteGroup: 'Supprimer le groupe',
+            deleteGroupDangerConfirmationModal: 'Supprimer le groupe',
+            deleteGroupDangerConfirmationModalDescription: (defaultGroupName: string) =>
+                `Êtes-vous sûr ? Cela réaffectera tous les membres au groupe par défaut (${defaultGroupName}) et ne pourra pas être annulé.`,
+            deleteGroupError: 'Impossible de supprimer ce groupe. Veuillez réessayer.',
         },
     },
     proactiveAppReview: {

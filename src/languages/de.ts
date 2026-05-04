@@ -9194,6 +9194,11 @@ Hier ist ein *Testbeleg*, um dir zu zeigen, wie es funktioniert:`,
             restrictExpenseWorkspaceCreation: 'Erstellen/Entfernen von Ausgaben-Workspaces einschränken',
             restrictExpenseWorkspaceCreationDescription:
                 'Verhindert, dass Mitglieder einen Ausgaben-Workspace erstellen oder sich selbst aus einem Ausgaben-Workspace entfernen können. Dies ist nützlich, um zu verhindern, dass Personen Expensify verwenden, um Berichte für die Nutzung außerhalb deiner Domain einzureichen, wenn es mit einer strikten Workspace-Durchsetzung kombiniert wird.',
+            deleteGroup: 'Gruppe löschen',
+            deleteGroupDangerConfirmationModal: 'Gruppe löschen',
+            deleteGroupDangerConfirmationModalDescription: (defaultGroupName: string) =>
+                `Bist du sicher? Dadurch werden alle Mitglieder der Standardgruppe (${defaultGroupName}) neu zugewiesen und dies kann nicht rückgängig gemacht werden.`,
+            deleteGroupError: 'Diese Gruppe konnte nicht gelöscht werden. Bitte versuche es erneut.',
         },
     },
     proactiveAppReview: {

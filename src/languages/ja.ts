@@ -9070,6 +9070,11 @@ ${reportName}
             restrictExpenseWorkspaceCreation: '経費ワークスペースの作成／削除を制限する',
             restrictExpenseWorkspaceCreationDescription:
                 'メンバーが経費ワークスペースを作成したり、経費ワークスペースから自分自身を削除したりできないようにします。これは、厳格なワークスペース適用と組み合わせることで、ドメイン外での使用を目的としたレポートの提出に Expensify が利用されるのを防ぐのに役立ちます。',
+            deleteGroup: 'グループを削除',
+            deleteGroupDangerConfirmationModal: 'グループを削除',
+            deleteGroupDangerConfirmationModalDescription: (defaultGroupName: string) =>
+                `本当によろしいですか？これにより、すべてのメンバーがデフォルトグループ（${defaultGroupName}）に再割り当てされ、元に戻すことはできません。`,
+            deleteGroupError: 'このグループを削除できませんでした。もう一度お試しください。',
         },
     },
     proactiveAppReview: {

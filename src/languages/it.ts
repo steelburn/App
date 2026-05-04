@@ -9184,6 +9184,11 @@ Ecco una *ricevuta di prova* per mostrarti come funziona:`,
             restrictExpenseWorkspaceCreation: 'Limita la creazione/rimozione dell’area di lavoro spese',
             restrictExpenseWorkspaceCreationDescription:
                 'Impedisci ai membri di poter creare un’area di lavoro spese o di rimuoversi da un’area di lavoro spese. Questo è utile per impedire alle persone di utilizzare Expensify per inviare report destinati a un uso al di fuori del tuo dominio, se combinato con un’applicazione rigorosa dell’area di lavoro.',
+            deleteGroup: 'Elimina gruppo',
+            deleteGroupDangerConfirmationModal: 'Elimina gruppo',
+            deleteGroupDangerConfirmationModalDescription: (defaultGroupName: string) =>
+                `Sei sicuro? Questo riassegnerà tutti i membri al gruppo predefinito (${defaultGroupName}) e non potrà essere annullato.`,
+            deleteGroupError: 'Impossibile eliminare questo gruppo. Riprova.',
         },
     },
     proactiveAppReview: {
