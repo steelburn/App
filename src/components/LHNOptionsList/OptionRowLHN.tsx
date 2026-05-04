@@ -1,10 +1,10 @@
-import React, {useMemo, useRef} from 'react';
+import React, {useRef} from 'react';
 import type {GestureResponderEvent, ViewStyle} from 'react-native';
 import {StyleSheet, View} from 'react-native';
 import DisplayNames from '@components/DisplayNames';
 import Icon from '@components/Icon';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
-import {usePersonalDetails, useSession} from '@components/OnyxListItemProvider';
+import {useSession} from '@components/OnyxListItemProvider';
 import Text from '@components/Text';
 import Tooltip from '@components/Tooltip';
 import getContextMenuAccessibilityHint from '@components/utils/getContextMenuAccessibilityHint';
@@ -18,19 +18,18 @@ import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import DateUtils from '@libs/DateUtils';
 import FS from '@libs/Fullstory';
-import {shouldOptionShowTooltip, shouldUseBoldText} from '@libs/OptionsListUtils';
+import {shouldUseBoldText} from '@libs/OptionsListUtils';
 import ReportActionComposeFocusManager from '@libs/ReportActionComposeFocusManager';
-import {getDelegateAccountIDFromReportAction} from '@libs/ReportActionsUtils';
 import {isAdminRoom, isChatUsedForOnboarding as isChatUsedForOnboardingReportUtils, isConciergeChatReport, isGroupChat, isOneOnOneChat, isSystemChat} from '@libs/ReportUtils';
 import {startSpan} from '@libs/telemetry/activeSpans';
 import FreeTrial from '@pages/settings/Subscription/FreeTrial';
 import variables from '@styles/variables';
 import CONST from '@src/CONST';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
-import LHNAvatar from './LHNAvatar';
 import {useLHNTooltipContext} from './LHNTooltipContext';
 import OptionRowActionBadge from './OptionRowActionBadge';
 import OptionRowAlternateText from './OptionRowAlternateText';
+import OptionRowAvatar from './OptionRowAvatar';
 import OptionRowPressable from './OptionRowPressable';
 import OptionRowTooltipLayer from './OptionRowTooltipLayer';
 import type {OptionRowLHNProps} from './types';
@@ -58,7 +57,6 @@ function OptionRowLHN({
     const {onboardingPurpose, onboarding, firstReportIDWithGBRorRBR, isScreenFocused} = useLHNTooltipContext();
     const shouldShowRBRorGBRTooltip = firstReportIDWithGBRorRBR === reportID;
 
-    const personalDetails = usePersonalDetails();
     const session = useSession();
     const isOnboardingGuideAssigned = onboardingPurpose === CONST.ONBOARDING_CHOICES.MANAGE_TEAM && !session?.email?.includes('+');
     const isChatUsedForOnboarding = isChatUsedForOnboardingReportUtils(report, onboarding, conciergeReportID, onboardingPurpose);
@@ -76,45 +74,6 @@ function OptionRowLHN({
             ? [styles.chatLinkRowPressable, styles.flexGrow1, styles.optionItemAvatarNameWrapper, styles.optionRowCompact, styles.justifyContentCenter]
             : [styles.chatLinkRowPressable, styles.flexGrow1, styles.optionItemAvatarNameWrapper, styles.optionRow, styles.justifyContentCenter],
     );
-
-    const delegateAccountID = useMemo(
-        () => getDelegateAccountIDFromReportAction(optionItem?.parentReportAction),
-
-        [optionItem?.parentReportAction],
-    );
-
-    // Match the header's delegate avatar logic: when a delegate exists on the
-    // parent report action, the header (useReportActionAvatars) shows the
-    // delegate's avatar as primary instead of the report owner's.
-    const skipDelegate = report?.type === CONST.REPORT.TYPE.INVOICE || (optionItem?.isTaskReport && !report?.chatReportID);
-    const icons = useMemo(() => {
-        let result = optionItem?.icons ?? [];
-        if (!skipDelegate && delegateAccountID && personalDetails && result.length > 0) {
-            const delegateDetails = personalDetails[delegateAccountID];
-            if (delegateDetails) {
-                const updatedIcons = [...result];
-                const firstIcon = updatedIcons.at(0);
-                if (firstIcon) {
-                    updatedIcons[0] = {
-                        ...firstIcon,
-                        source: delegateDetails.avatar ?? '',
-                        name: delegateDetails.displayName ?? '',
-                        id: delegateAccountID,
-                    };
-                }
-                result = updatedIcons;
-            }
-        }
-
-        return result;
-    }, [optionItem?.icons, skipDelegate, delegateAccountID, personalDetails]);
-
-    const delegateTooltipAccountID = useMemo(() => {
-        if (!skipDelegate && delegateAccountID && personalDetails?.[delegateAccountID] && optionItem?.icons?.length) {
-            return Number(optionItem.icons.at(0)?.id ?? CONST.DEFAULT_NUMBER_ID);
-        }
-        return undefined;
-    }, [skipDelegate, delegateAccountID, personalDetails, optionItem?.icons]);
 
     const singleAvatarContainerStyle = [styles.actionAvatar, styles.mr3];
 
@@ -164,7 +123,6 @@ function OptionRowLHN({
     const isStatusVisible = !!emojiCode && isOneOnOneChat(!isEmptyObject(report) ? report : undefined);
 
     const subscriptAvatarBorderColor = isOptionFocused ? focusedBackgroundColor : theme.sidebar;
-    const firstIcon = optionItem.icons?.at(0);
 
     // This is used to ensure that we display the text exactly as the user entered it when displaying LHN title, instead of parsing their text to HTML.
     const shouldParseFullTitle = optionItem?.parentReportAction?.actionName !== CONST.REPORT.ACTIONS.TYPE.ADD_COMMENT && !isGroupChat(report);
@@ -221,20 +179,14 @@ function OptionRowLHN({
                     <>
                         <View style={sidebarInnerRowStyle}>
                             <View style={[styles.flexRow, styles.alignItemsCenter]}>
-                                {!!optionItem.icons?.length && !!firstIcon && (
-                                    <LHNAvatar
-                                        icons={icons}
-                                        shouldShowSubscript={!!optionItem.shouldShowSubscript}
-                                        size={isInFocusMode ? CONST.AVATAR_SIZE.SMALL : CONST.AVATAR_SIZE.DEFAULT}
-                                        subscriptAvatarBorderColor={hovered && !isOptionFocused ? hoveredBackgroundColor : subscriptAvatarBorderColor}
-                                        useMidSubscriptSize={isInFocusMode}
-                                        secondaryAvatarBackgroundColor={secondaryAvatarBgColor}
-                                        singleAvatarContainerStyle={singleAvatarContainerStyle}
-                                        shouldShowTooltip={shouldOptionShowTooltip(optionItem)}
-                                        delegateAccountID={skipDelegate ? undefined : delegateAccountID}
-                                        delegateTooltipAccountID={delegateTooltipAccountID}
-                                    />
-                                )}
+                                <OptionRowAvatar
+                                    optionItem={optionItem}
+                                    report={report}
+                                    isInFocusMode={isInFocusMode}
+                                    subscriptAvatarBorderColor={hovered && !isOptionFocused ? hoveredBackgroundColor : subscriptAvatarBorderColor}
+                                    secondaryAvatarBackgroundColor={secondaryAvatarBgColor}
+                                    singleAvatarContainerStyle={singleAvatarContainerStyle}
+                                />
                                 <View style={contentContainerStyles}>
                                     <View style={[styles.flexRow, styles.alignItemsCenter, styles.mw100, styles.overflowHidden]}>
                                         <DisplayNames
