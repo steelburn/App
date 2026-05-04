@@ -5,6 +5,7 @@ import {GPS_DISTANCE_INTERVAL_METERS} from '@pages/iou/request/step/IOURequestSt
 import {updateGpsTripNotificationDistance} from '@pages/iou/request/step/IOURequestStepDistanceGPS/GPSNotifications';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {GpsDraftDetails} from '@src/types/onyx';
+import type {GPSPoint, GPSPointAddress} from '@src/types/onyx/GpsDraftDetails';
 import type {Unit} from '@src/types/onyx/Policy';
 import geodesicDistance from '@src/utils/geodesicDistance';
 import {setUserLocation} from './UserLocation';
@@ -13,9 +14,7 @@ function resetGPSDraftDetails() {
     Onyx.merge(ONYXKEYS.GPS_DRAFT_DETAILS, null);
 }
 
-type GPSPoint = GpsDraftDetails['gpsPoints'][number][number];
-
-function setStartWaypointAddress(startAddress: GPSPoint['address'], tripSegmentIndex: number, gpsDraftDetails: OnyxEntry<GpsDraftDetails>) {
+function setStartWaypointAddress(startAddress: GPSPointAddress, tripSegmentIndex: number, gpsDraftDetails: OnyxEntry<GpsDraftDetails>) {
     const gpsPoints = getGpsPoints(gpsDraftDetails);
     const tripSegment = gpsPoints.at(tripSegmentIndex);
     const firstPoint = tripSegment?.at(0);
@@ -32,7 +31,7 @@ function setStartWaypointAddress(startAddress: GPSPoint['address'], tripSegmentI
     });
 }
 
-function setEndAddress(endAddress: GPSPoint['address'], gpsPoints: GpsDraftDetails['gpsPoints']) {
+function setEndAddress(endAddress: GPSPointAddress, gpsPoints: GPSPoint[][]) {
     const lastSegment = gpsPoints.at(-1);
     const lastPoint = lastSegment?.at(-1);
 
@@ -48,7 +47,7 @@ function setEndAddress(endAddress: GPSPoint['address'], gpsPoints: GpsDraftDetai
     });
 }
 
-function isLastSegmentEmptyOrHasOnlyOnePoint(gpsPoints: GpsDraftDetails['gpsPoints']): boolean {
+function isLastSegmentEmptyOrHasOnlyOnePoint(gpsPoints: GPSPoint[][]): boolean {
     if (gpsPoints.length <= 1) {
         return false;
     }
@@ -59,7 +58,7 @@ function isLastSegmentEmptyOrHasOnlyOnePoint(gpsPoints: GpsDraftDetails['gpsPoin
         return false;
     }
 
-    // If the last segment (which is not the only one) is empty is only has one point, remove it
+    // If the last segment (which is not the only one) is empty or has only one point, remove it
     if (lastSegment.length <= 1) {
         const newGpsPoints = [...gpsPoints];
         newGpsPoints.pop();
@@ -108,7 +107,7 @@ function setIsTracking(isTracking: boolean) {
     });
 }
 
-function addGpsPoints(gpsDraftDetails: OnyxEntry<GpsDraftDetails>, newGpsPoints: GpsDraftDetails['gpsPoints'][number]) {
+function addGpsPoints(gpsDraftDetails: OnyxEntry<GpsDraftDetails>, newGpsPoints: GPSPoint[]) {
     const capturedPoints = getGpsPoints(gpsDraftDetails);
     const lastTripSegment = capturedPoints.at(-1);
 

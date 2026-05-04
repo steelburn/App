@@ -16,7 +16,7 @@ import {BACKGROUND_LOCATION_TASK_OPTIONS, BACKGROUND_LOCATION_TRACKING_TASK_NAME
 import {startGpsTripNotification} from '@pages/iou/request/step/IOURequestStepDistanceGPS/GPSNotifications';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
-import type {GpsDraftDetails} from '@src/types/onyx';
+import type {GPSPoint} from '@src/types/onyx/GpsDraftDetails';
 import type {Unit} from '@src/types/onyx/Policy';
 import GPSTooltip from './GPSTooltip';
 import openSettings from './openSettings';
@@ -38,7 +38,7 @@ type ButtonsProps = {
     unit: Unit;
 
     /** Captured GPS points */
-    gpsPoints: GpsDraftDetails['gpsPoints'];
+    gpsPoints: GPSPoint[][];
 };
 
 function GPSButtons({navigateToNextStep, setShouldShowStartError, setShouldShowPermissionsError, reportID, unit, gpsPoints}: ButtonsProps) {

@@ -5,6 +5,7 @@ import {BACKGROUND_LOCATION_TRACKING_TASK_NAME} from '@pages/iou/request/step/IO
 import {stopGpsTripNotification} from '@pages/iou/request/step/IOURequestStepDistanceGPS/GPSNotifications';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {GpsDraftDetails} from '@src/types/onyx';
+import type {GPSPoint} from '@src/types/onyx/GpsDraftDetails';
 import type {Unit} from '@src/types/onyx/Policy';
 import type {Routes, Waypoint} from '@src/types/onyx/Transaction';
 import {isLastSegmentEmptyOrHasOnlyOnePoint, setEndAddress, setIsTracking} from './actions/GPSDraftDetails';
@@ -94,7 +95,7 @@ async function getLastPoint() {
     return gpsTrip?.gpsPoints?.at(-1)?.at(-1);
 }
 
-async function stopGpsTrip(isOffline: boolean, gpsPoints: GpsDraftDetails['gpsPoints'], skipLastPointAddressFetching = false) {
+async function stopGpsTrip(isOffline: boolean, gpsPoints: GPSPoint[][], skipLastPointAddressFetching = false) {
     const isBackgroundTaskRunning = await hasStartedLocationUpdatesAsync(BACKGROUND_LOCATION_TRACKING_TASK_NAME);
 
     if (isBackgroundTaskRunning) {
@@ -143,6 +144,10 @@ function getTotalGpsTripPoints(gpsDraftDetails: GpsDraftDetails | undefined): nu
     return gpsDraftDetails?.gpsPoints?.flat().length ?? 0;
 }
 
+function getTotalGpsTripSegments(gpsDraftDetails: GpsDraftDetails | undefined): number {
+    return gpsDraftDetails?.gpsPoints?.length ?? 0;
+}
+
 function getTotalGpsTripPointsInLastSegment(gpsDraftDetails: GpsDraftDetails | undefined): number {
     return gpsDraftDetails?.gpsPoints?.at(-1)?.length ?? 0;
 }
@@ -151,15 +156,15 @@ function isTripStopped(gpsDraftDetails: GpsDraftDetails | undefined): boolean {
     return !gpsDraftDetails?.isTracking && getTotalGpsTripPoints(gpsDraftDetails) > 0;
 }
 
-function getGpsPoints(gpsDraftDetails: GpsDraftDetails | undefined): GpsDraftDetails['gpsPoints'] {
+function getGpsPoints(gpsDraftDetails: GpsDraftDetails | undefined): GPSPoint[][] {
     return gpsDraftDetails?.gpsPoints ?? [[]];
 }
 
-function getFirstGpsPoint(gpsDraftDetails: GpsDraftDetails | undefined): GpsDraftDetails['gpsPoints'][number][number] | undefined {
+function getFirstGpsPoint(gpsDraftDetails: GpsDraftDetails | undefined): GPSPoint | undefined {
     return gpsDraftDetails?.gpsPoints?.at(0)?.at(0);
 }
 
-function getLastGpsPoint(gpsDraftDetails: GpsDraftDetails | undefined): GpsDraftDetails['gpsPoints'][number][number] | undefined {
+function getLastGpsPoint(gpsDraftDetails: GpsDraftDetails | undefined): GPSPoint | undefined {
     return gpsDraftDetails?.gpsPoints?.at(-1)?.at(-1);
 }
 
@@ -174,6 +179,7 @@ export {
     calculateGPSDistance,
     isTripStopped,
     getTotalGpsTripPoints,
+    getTotalGpsTripSegments,
     getTotalGpsTripPointsInLastSegment,
     getGpsPoints,
     getFirstGpsPoint,
