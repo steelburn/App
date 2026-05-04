@@ -34,7 +34,7 @@ function UserInfoAndActionButtonRow({
     const {translate} = useLocalize();
     const statusText = getReportStatusTranslation({stateNum, statusNum, translate});
     const reportStatusColorStyle = getReportStatusColorStyle(theme, stateNum, statusNum);
-    const isUnreported = stateNum === undefined && statusNum === undefined;
+    const isUnreported = stateNum === undefined || statusNum === undefined;
     const badgeBackgroundColor = isSelected && isUnreported ? theme.buttonHoveredBG : reportStatusColorStyle?.backgroundColor;
     const participantFromDisplayName = item.formattedFrom ?? item?.from?.displayName ?? '';
     return (

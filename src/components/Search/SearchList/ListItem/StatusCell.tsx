@@ -35,7 +35,7 @@ function StatusCell({stateNum, statusNum, isPending, isDeleted, isSelected}: Sta
         return null;
     }
 
-    const isUnreported = stateNum === undefined && statusNum === undefined && !isDeleted;
+    const isUnreported = (stateNum === undefined || statusNum === undefined) && !isDeleted;
     const backgroundColor = isSelected && isUnreported ? theme.buttonHoveredBG : reportStatusColorStyle.backgroundColor;
 
     return (
