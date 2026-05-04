@@ -196,7 +196,6 @@ function IOURequestStepDistanceGPS({
     const getWaypointMarkers = (): WayPoint[] => {
         const waypointMarkers = Object.entries(gpsWaypoints).map(([key, waypoint], index): WayPoint | null => {
             const tripSegmentsCount = getGpsPoints(gpsDraftDetails).length;
-            // eslint-disable-next-line no-nested-ternary
             let icon = DotIndicator;
             if (index === 0) {
                 icon = DotIndicatorUnfilled;
