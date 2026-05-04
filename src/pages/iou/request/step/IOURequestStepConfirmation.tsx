@@ -847,7 +847,7 @@ const IOURequestStepConfirmationWithFullTransactionOrNotFound = withFullTransact
 
 const IOURequestStepConfirmationWithWritableReportOrNotFound = withWritableReportOrNotFound(IOURequestStepConfirmationWithFullTransactionOrNotFound);
 
-/** Props for the default export (HOC-wrapped). Use for type-safe bridging from other money-request routes (e.g. CREATE). */
-export type IOURequestStepConfirmationPublicProps = ComponentProps<typeof IOURequestStepConfirmationWithWritableReportOrNotFound>;
+type IOURequestStepConfirmationPublicProps = ComponentProps<typeof IOURequestStepConfirmationWithWritableReportOrNotFound>;
 
 export default IOURequestStepConfirmationWithWritableReportOrNotFound;
+export type {IOURequestStepConfirmationPublicProps};
