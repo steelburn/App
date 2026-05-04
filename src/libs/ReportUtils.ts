@@ -13774,7 +13774,6 @@ export type {
     SortableColumnName,
     Ancestor,
     DisplayNameWithTooltips,
-    BuildOptimisticCreatedReportActionParams,
     OptimisticAddCommentReportAction,
     OptimisticChatReport,
     OptimisticClosedReportAction,
