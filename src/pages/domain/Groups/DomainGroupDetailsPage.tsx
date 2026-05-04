@@ -20,6 +20,7 @@ import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
 import DefaultGroupToggle from './DefaultGroupToggle';
 import RestrictDefaultLoginSelectionToggle from './RestrictDefaultLoginSelectionToggle';
+import StrictlyEnforceWorkspaceRulesToggle from './StrictlyEnforceWorkspaceRulesToggle';
 
 type DomainGroupDetailsPageProps = PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.DOMAIN.GROUP_DETAILS>;
 
@@ -65,8 +66,12 @@ function DomainGroupDetailsPage({route}: DomainGroupDetailsPageProps) {
                         groupID={groupID}
                         groupName={group?.name}
                     />
-                    <View style={[styles.sectionDividerLine, styles.ph5, styles.mv6]} />
+                    <View style={[styles.sectionDividerLine, styles.mh5, styles.mv6]} />
                     <Text style={[styles.textNormal, styles.textStrong, styles.ph5]}>{translate('domain.groups.permissions')}</Text>
+                    <StrictlyEnforceWorkspaceRulesToggle
+                        domainAccountID={domainAccountID}
+                        groupID={groupID}
+                    />
                     <RestrictDefaultLoginSelectionToggle
                         domainAccountID={domainAccountID}
                         groupID={groupID}
