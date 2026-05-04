@@ -70,7 +70,7 @@ function TransactionListItem<TItem extends ListItem>({
     const theme = useTheme();
     const StyleUtils = useStyleUtils();
 
-    const {isLargeScreenWidth, shouldUseNarrowLayout} = useResponsiveLayout();
+    const {isLargeScreenWidth} = useResponsiveLayout();
     const {currentSearchHash, currentSearchKey, currentSearchResults, currentSearchQueryJSON} = useSearchStateContext();
     const snapshotReport = (currentSearchResults?.data?.[`${ONYXKEYS.COLLECTION.REPORT}${transactionItem.reportID}`] ?? {}) as Report;
 
@@ -123,6 +123,7 @@ function TransactionListItem<TItem extends ListItem>({
               }
             : {...styles.flexColumn, ...styles.alignItemsStretch},
         isLargeScreenWidth && isLastItem && [styles.searchTableBottomRadius, styles.overflowHidden],
+        !isLargeScreenWidth && !isLastItem && StyleUtils.getSelectedBorderBottomStyle(item.isSelected),
         !isLargeScreenWidth && isFirstItem && [styles.searchTableTopRadius, styles.overflowHidden],
         !isLargeScreenWidth && isLastItem && [styles.searchTableBottomRadius, styles.overflowHidden],
     ];
@@ -293,7 +294,6 @@ function TransactionListItem<TItem extends ListItem>({
                     isLargeScreenWidth && isLastItem && styles.searchTableBottomRadius,
                     !isLargeScreenWidth && isFirstItem && styles.searchTableTopRadius,
                     !isLargeScreenWidth && isLastItem && styles.searchTableBottomRadius,
-                    !isLargeScreenWidth && !isLastItem && styles.borderBottom,
                 ]}
             >
                 {({hovered}) => (
@@ -329,7 +329,12 @@ function TransactionListItem<TItem extends ListItem>({
                             isActionColumnWide={transactionItem.isActionColumnWide}
                             shouldShowCheckbox={!!canSelectMultiple}
                             checkboxSentryLabel={CONST.SENTRY_LABEL.SEARCH.TRANSACTION_LIST_ITEM_CHECKBOX}
-                            style={[styles.p3, styles.pv2, shouldUseNarrowLayout ? [styles.p0, styles.pt3, styles.noBorderRadius] : isLargeScreenWidth && styles.noBorderRadius]}
+                            style={[
+                                styles.p3,
+                                styles.pv2,
+                                !isLargeScreenWidth && [styles.p0, styles.pt3, isLastItem ? styles.searchTableBottomRadius : styles.noBorderRadius],
+                                isLargeScreenWidth && (isLastItem ? styles.searchTableBottomRadius : styles.noBorderRadius),
+                            ]}
                             violations={transactionViolations}
                             onArrowRightPress={isDeletedTransaction ? undefined : () => onSelectRow(item, transactionPreviewData)}
                             isHover={hovered}

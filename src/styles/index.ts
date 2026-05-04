@@ -4499,6 +4499,10 @@ const staticStyles = (theme: ThemeColors) =>
             minWidth: 22,
         },
 
+        filterDropDownCloseIcon: {
+            minWidth: 24,
+        },
+
         dropDownSmallButtonArrowContain: {
             marginLeft: 3,
             marginRight: 6,
@@ -5039,7 +5043,7 @@ const staticStyles = (theme: ThemeColors) =>
             height: 34,
             width: 202,
         },
-        searchPageInputNarrowTouchableWrapper: {height: variables.componentSizeLarge},
+        searchPageInputNarrowTouchableWrapper: {height: 44},
 
         walletStaticIllustration: {
             width: 262,
@@ -6077,10 +6081,10 @@ const staticStyles = (theme: ThemeColors) =>
             borderRadius: variables.componentBorderRadiusLarge,
         },
         chartContent: {
-            minHeight: CHART_CONTENT_MIN_HEIGHT,
+            height: CHART_CONTENT_MIN_HEIGHT,
         },
         chartActivityIndicator: {
-            minHeight: CHART_CONTENT_MIN_HEIGHT,
+            height: CHART_CONTENT_MIN_HEIGHT,
             justifyContent: 'center',
             alignItems: 'center',
         },
