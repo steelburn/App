@@ -4448,6 +4448,10 @@ const staticStyles = (theme: ThemeColors) =>
             minWidth: 22,
         },
 
+        filterDropDownCloseIcon: {
+            minWidth: 24,
+        },
+
         dropDownSmallButtonArrowContain: {
             marginLeft: 3,
             marginRight: 6,
