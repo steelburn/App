@@ -54,7 +54,7 @@ import type {OnyxData} from '@src/types/onyx/Request';
 import type {SearchResultDataType} from '@src/types/onyx/SearchResults';
 import type {TransactionChanges} from '@src/types/onyx/Transaction';
 import {getCleanUpTransactionThreadReportOnyxData} from './DeleteMoneyRequest';
-import {getAllReports, getMoneyRequestInformation, getMoneyRequestParticipantsFromReport, getMoneyRequestPolicyTags, getReportPreviewAction} from './index';
+import {getAllReports, getMoneyRequestInformation, getMoneyRequestParticipantsFromReport, getMoneyRequestPolicyTags, getPolicyTagsData, getReportPreviewAction} from './index';
 import type {BuildOnyxDataForMoneyRequestKeys, MoneyRequestInformationParams} from './index';
 import {getDeleteTrackExpenseInformation} from './TrackExpense';
 import {getUpdateMoneyRequestParams} from './UpdateMoneyRequest';
@@ -520,6 +520,9 @@ function updateSplitTransactions({
                     transactionChanges,
                     policy,
                     policyTagList: policyTags ?? null,
+                    // TODO: Replace getPolicyTagsData (https://github.com/Expensify/App/issues/72721) with useOnyx hook
+                    // eslint-disable-next-line @typescript-eslint/no-deprecated
+                    reportPolicyTags: getPolicyTagsData(transactionIOUReport?.policyID),
                     policyCategories: policyCategories ?? null,
                     newTransactionReportID: splitExpense?.reportID,
                     policyRecentlyUsedCategories,
