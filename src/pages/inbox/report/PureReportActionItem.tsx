@@ -333,7 +333,6 @@ function PureReportActionItem({
     const [isPaymentMethodPopoverActive, setIsPaymentMethodPopoverActive] = useState<boolean | undefined>();
     const shouldRenderViewBasedOnAction = useTableReportViewActionRenderConditionals(action);
     const [isHidden, setIsHidden] = useState(false);
-    const [moderationDecision, setModerationDecision] = useState<OnyxTypes.DecisionName>(CONST.MODERATION.MODERATOR_DECISION_APPROVED);
     const {isActiveReportAction: isActiveReactionListReportAction, hideReactionList} = useContext(ReactionListContext);
     const {updateHiddenAttachments} = useContext(AttachmentModalContext);
     const composerTextInputRef = useRef<TextInput | HTMLTextAreaElement>(null);
@@ -487,12 +486,10 @@ function PureReportActionItem({
 
         // Hide reveal message button and show the message if latestDecision is changed to empty
         if (!latestDecision) {
-            setModerationDecision(CONST.MODERATION.MODERATOR_DECISION_APPROVED);
             setIsHidden(false);
             return;
         }
 
-        setModerationDecision(latestDecision);
         if (![CONST.MODERATION.MODERATOR_DECISION_APPROVED, CONST.MODERATION.MODERATOR_DECISION_PENDING].some((item) => item === latestDecision) && !isPendingRemove(action)) {
             setIsHidden(true);
             return;
