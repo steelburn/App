@@ -1,12 +1,12 @@
 import React, {useMemo} from 'react';
 import type {GestureResponderEvent} from 'react-native';
+import {useLHNTooltipContext} from '@components/LHNOptionsList/LHNTooltipContext';
 import {useProductTrainingContext} from '@components/ProductTrainingContext';
 import EducationalTooltip from '@components/Tooltip/EducationalTooltip';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
 import variables from '@styles/variables';
 import CONST from '@src/CONST';
-import {useLHNTooltipContext} from '@components/LHNOptionsList/LHNTooltipContext';
 
 type OptionRowTooltipLayerProps = {
     /** Whether the row qualifies to show the RBR/GBR tooltip */
@@ -22,14 +22,12 @@ type OptionRowTooltipLayerProps = {
     renderChildren: (onPress: (event: GestureResponderEvent | KeyboardEvent | undefined) => void) => React.ReactNode;
 };
 
-function OptionRowTooltipLayer({shouldShowRBRorGBRTooltip, shouldShowGetStartedTooltip, onOptionPress, renderChildren}: OptionRowTooltipLayerProps) {
+type OptionRowTooltipLayerInnerProps = Omit<OptionRowTooltipLayerProps, 'shouldShowRBRorGBRTooltip' | 'shouldShowGetStartedTooltip'>;
+
+function OptionRowTooltipLayerInner({onOptionPress, renderChildren}: OptionRowTooltipLayerInnerProps) {
     const styles = useThemeStyles();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const {isFullscreenVisible, isScreenFocused, isReportsSplitNavigatorLast} = useLHNTooltipContext();
-
-    // When neither tooltip qualifies, skip the EducationalTooltip wrapper entirely so
-    // the row avoids useProductTrainingContext and the tooltip-config useMemo cost.
-    const shouldEvaluateTooltip = shouldShowRBRorGBRTooltip || shouldShowGetStartedTooltip;
 
     const {tooltipToRender, shouldShowTooltip} = useMemo(() => {
         // TODO: CONCIERGE_LHN_GBR tooltip will be replaced by a tooltip in the #admins room
@@ -39,9 +37,9 @@ function OptionRowTooltipLayer({shouldShowRBRorGBRTooltip, shouldShowGetStartedT
 
         return {
             tooltipToRender: tooltip,
-            shouldShowTooltip: shouldEvaluateTooltip && shouldTooltipBeVisible,
+            shouldShowTooltip: shouldTooltipBeVisible,
         };
-    }, [shouldEvaluateTooltip, isScreenFocused, shouldUseNarrowLayout, isReportsSplitNavigatorLast, isFullscreenVisible]);
+    }, [isScreenFocused, shouldUseNarrowLayout, isReportsSplitNavigatorLast, isFullscreenVisible]);
 
     const {shouldShowProductTrainingTooltip, renderProductTrainingTooltip, hideProductTrainingTooltip} = useProductTrainingContext(tooltipToRender, shouldShowTooltip);
 
@@ -49,10 +47,6 @@ function OptionRowTooltipLayer({shouldShowRBRorGBRTooltip, shouldShowGetStartedT
         hideProductTrainingTooltip();
         onOptionPress(event);
     };
-
-    if (!shouldEvaluateTooltip) {
-        return renderChildren(onOptionPress);
-    }
 
     return (
         <EducationalTooltip
@@ -70,6 +64,24 @@ function OptionRowTooltipLayer({shouldShowRBRorGBRTooltip, shouldShowGetStartedT
         >
             {renderChildren(onPress)}
         </EducationalTooltip>
+    );
+}
+
+OptionRowTooltipLayerInner.displayName = 'OptionRowTooltipLayerInner';
+
+function OptionRowTooltipLayer({shouldShowRBRorGBRTooltip, shouldShowGetStartedTooltip, onOptionPress, renderChildren}: OptionRowTooltipLayerProps) {
+    // Skip the inner component (and its hooks) entirely when the row can never show a tooltip.
+    // This avoids per-row useProductTrainingContext / useThemeStyles / useResponsiveLayout cost
+    // for the common case where neither tooltip qualifies.
+    if (!shouldShowRBRorGBRTooltip && !shouldShowGetStartedTooltip) {
+        return renderChildren(onOptionPress);
+    }
+
+    return (
+        <OptionRowTooltipLayerInner
+            onOptionPress={onOptionPress}
+            renderChildren={renderChildren}
+        />
     );
 }
 
