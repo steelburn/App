@@ -2,12 +2,13 @@ import React, {useMemo} from 'react';
 import type {GestureResponderEvent} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';
 import {useLHNTooltipContext} from '@components/LHNOptionsList/LHNTooltipContext';
+import OfflineWithFeedback from '@components/OfflineWithFeedback';
 import {useSession} from '@components/OnyxListItemProvider';
 import {useProductTrainingContext} from '@components/ProductTrainingContext';
 import EducationalTooltip from '@components/Tooltip/EducationalTooltip';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
-import {isAdminRoom, isChatUsedForOnboarding as isChatUsedForOnboardingReportUtils, isConciergeChatReport} from '@libs/ReportUtils';
+import {isAdminRoom, isChatUsedForOnboarding as isChatUsedForOnboardingReportUtils, isConciergeChatReport, type OptionData} from '@libs/ReportUtils';
 import variables from '@styles/variables';
 import CONST from '@src/CONST';
 import type {Report} from '@src/types/onyx';
@@ -21,6 +22,9 @@ type OptionRowTooltipLayerProps = {
 
     /** Concierge report ID, used to determine onboarding eligibility */
     conciergeReportID: string | undefined;
+
+    /** Option data, used to forward pendingAction and errors to OfflineWithFeedback */
+    optionItem: OptionData;
 
     /** Press handler forwarded to EducationalTooltip's onTooltipPress and exposed to children via renderChildren */
     onOptionPress: (event: GestureResponderEvent | KeyboardEvent | undefined) => void;
@@ -76,7 +80,7 @@ function OptionRowTooltipLayerInner({onOptionPress, renderChildren}: OptionRowTo
 
 OptionRowTooltipLayerInner.displayName = 'OptionRowTooltipLayerInner';
 
-function OptionRowTooltipLayer({reportID, report, conciergeReportID, onOptionPress, renderChildren}: OptionRowTooltipLayerProps) {
+function OptionRowTooltipLayer({reportID, report, conciergeReportID, optionItem, onOptionPress, renderChildren}: OptionRowTooltipLayerProps) {
     const {firstReportIDWithGBRorRBR, onboardingPurpose, onboarding} = useLHNTooltipContext();
     const session = useSession();
 
@@ -86,15 +90,24 @@ function OptionRowTooltipLayer({reportID, report, conciergeReportID, onOptionPre
     const shouldShowGetStartedTooltip = isOnboardingGuideAssigned ? isAdminRoom(report) && isChatUsedForOnboarding : isConciergeChatReport(report);
 
     // Skip the inner component (and its heavy hooks) entirely when the row can never show a tooltip.
-    if (!shouldShowRBRorGBRTooltip && !shouldShowGetStartedTooltip) {
-        return renderChildren(onOptionPress);
-    }
+    const shouldEvaluateTooltip = shouldShowRBRorGBRTooltip || shouldShowGetStartedTooltip;
 
     return (
-        <OptionRowTooltipLayerInner
-            onOptionPress={onOptionPress}
-            renderChildren={renderChildren}
-        />
+        <OfflineWithFeedback
+            pendingAction={optionItem.pendingAction}
+            errors={optionItem.allReportErrors}
+            shouldShowErrorMessages={false}
+            needsOffscreenAlphaCompositing
+        >
+            {shouldEvaluateTooltip ? (
+                <OptionRowTooltipLayerInner
+                    onOptionPress={onOptionPress}
+                    renderChildren={renderChildren}
+                />
+            ) : (
+                renderChildren(onOptionPress)
+            )}
+        </OfflineWithFeedback>
     );
 }
 

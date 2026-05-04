@@ -5,7 +5,6 @@ import DisplayNames from '@components/DisplayNames';
 import Icon from '@components/Icon';
 import {useLHNTooltipContext} from '@components/LHNOptionsList/LHNTooltipContext';
 import type {OptionRowLHNProps} from '@components/LHNOptionsList/types';
-import OfflineWithFeedback from '@components/OfflineWithFeedback';
 import Text from '@components/Text';
 import Tooltip from '@components/Tooltip';
 import getContextMenuAccessibilityHint from '@components/utils/getContextMenuAccessibilityHint';
@@ -21,15 +20,16 @@ import DateUtils from '@libs/DateUtils';
 import FS from '@libs/Fullstory';
 import {shouldUseBoldText} from '@libs/OptionsListUtils';
 import ReportActionComposeFocusManager from '@libs/ReportActionComposeFocusManager';
-import {isGroupChat, isOneOnOneChat, isSystemChat} from '@libs/ReportUtils';
+import {isChatUsedForOnboarding as isChatUsedForOnboardingReportUtils, isGroupChat, isOneOnOneChat, isSystemChat} from '@libs/ReportUtils';
 import {startSpan} from '@libs/telemetry/activeSpans';
 import FreeTrial from '@pages/settings/Subscription/FreeTrial';
 import variables from '@styles/variables';
 import CONST from '@src/CONST';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
-import OptionRowActionBadge from './OptionRowActionBadge';
 import OptionRowAlternateText from './OptionRowAlternateText';
 import OptionRowAvatar from './OptionRowAvatar';
+import OptionRowErrorBadge from './OptionRowErrorBadge';
+import OptionRowInfoBadge from './OptionRowInfoBadge';
 import OptionRowPressable from './OptionRowPressable';
 import OptionRowTooltipLayer from './OptionRowTooltipLayer';
 
@@ -53,7 +53,8 @@ function OptionRowLHN({
     const StyleUtils = useStyleUtils();
     const expensifyIcons = useMemoizedLazyExpensifyIcons(['Pencil', 'Pin']);
 
-    const {isScreenFocused} = useLHNTooltipContext();
+    const {onboardingPurpose, onboarding, isScreenFocused} = useLHNTooltipContext();
+    const isChatUsedForOnboarding = isChatUsedForOnboardingReportUtils(report, onboarding, conciergeReportID, onboardingPurpose);
 
     const {translate} = useLocalize();
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
@@ -225,21 +226,17 @@ function OptionRowLHN({
                                         <Text style={[styles.textLabel]}>{optionItem.descriptiveText}</Text>
                                     </View>
                                 ) : null}
-                                {brickRoadIndicator === CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR && (
-                                    <OptionRowActionBadge
-                                        severity="error"
-                                        actionBadgeText={actionBadgeText}
-                                    />
-                                )}
+                                <OptionRowErrorBadge
+                                    brickRoadIndicator={brickRoadIndicator}
+                                    actionBadgeText={actionBadgeText}
+                                />
                             </View>
                         </View>
                         <View style={[styles.flexRow, styles.alignItemsCenter]}>
-                            {brickRoadIndicator === CONST.BRICK_ROAD_INDICATOR_STATUS.INFO && (
-                                <OptionRowActionBadge
-                                    severity="info"
-                                    actionBadgeText={actionBadgeText}
-                                />
-                            )}
+                            <OptionRowInfoBadge
+                                brickRoadIndicator={brickRoadIndicator}
+                                actionBadgeText={actionBadgeText}
+                            />
                             {hasDraftComment && !!optionItem.isAllowedToComment && (
                                 <View
                                     style={styles.ml2}
@@ -276,20 +273,14 @@ function OptionRowLHN({
     );
 
     return (
-        <OfflineWithFeedback
-            pendingAction={optionItem.pendingAction}
-            errors={optionItem.allReportErrors}
-            shouldShowErrorMessages={false}
-            needsOffscreenAlphaCompositing
-        >
-            <OptionRowTooltipLayer
-                reportID={reportID}
-                report={report}
-                conciergeReportID={conciergeReportID}
-                onOptionPress={onOptionPress}
-                renderChildren={renderRow}
-            />
-        </OfflineWithFeedback>
+        <OptionRowTooltipLayer
+            reportID={reportID}
+            report={report}
+            conciergeReportID={conciergeReportID}
+            optionItem={optionItem}
+            onOptionPress={onOptionPress}
+            renderChildren={renderRow}
+        />
     );
 }
 
