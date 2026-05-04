@@ -1,5 +1,6 @@
 import {findFocusedRoute} from '@react-navigation/core';
 import type {NavigationState, PartialState} from '@react-navigation/native';
+// eslint-disable-next-line no-restricted-imports -- idiomatic defer primitive past navigation transitions.
 import {InteractionManager} from 'react-native';
 import compoundParamsKey, {COMPOUND_KEY_DELIMITER} from './compoundParamsKey';
 import FOCUSABLE_SELECTOR from './focusableSelector';
@@ -25,7 +26,7 @@ let lastInteractiveElement: HTMLElement | null = null;
 // Cross-modality: mouse-click-forward → keyboard-back still needs focus returned (WCAG 2.4.3).
 let lastMouseTrigger: HTMLElement | null = null;
 let lastMouseTriggerAt = 0;
-// A click long before a timer-triggered nav shouldn't get captured as that nav's trigger. 3s comfortably covers typical click→nav latency while rejecting unrelated later navigations.
+// A click long before a timer-triggered nav shouldn't get captured as that nav's trigger.
 const MOUSE_TRIGGER_TTL_MS = 3_000;
 const triggerMap = new Map<string, TriggerEntry>();
 
@@ -48,7 +49,7 @@ let focusinHandler: ((e: FocusEvent) => void) | null = null;
 let mouseActivationHandler: ((e: MouseEvent) => void) | null = null;
 let stateUnsubscribe: (() => void) | null = null;
 
-// pointerdown covers touch/pen and PointerEvent-shim mice that bypass mousedown; mousedown is the legacy fallback; click covers drag-to-release. All three update the same handler idempotently.
+// Three events for touch/pen/legacy/drag-to-release coverage; handler is idempotent.
 const MOUSE_ACTIVATION_EVENTS = ['pointerdown', 'mousedown', 'click'] as const;
 
 function collectRouteKeys(state: AnyState, out = new Set<string>()): Set<string> {
@@ -255,7 +256,7 @@ const RESTORE_RETRY_MS = 50;
 
 function scheduleRestore(routeKey: string): void {
     cancelPendingRestore();
-    // Belt-and-suspenders: cancel primitives + cancelled flag, in case a cancel doesn't prevent the already-queued callback.
+    // `cancelled` flag in case a primitive's cancel races a queued callback.
     let cancelled = false;
     let attempts = 0;
     let frameId: number | undefined;
@@ -328,7 +329,7 @@ function handleStateChange(newState: NavigationState | undefined): void {
 
     for (const key of removedKeys) {
         triggerMap.delete(key);
-        // Also drop compound PUSH_PARAMS entries for this route. Map iteration is safe under in-loop delete per ES6 spec — already-visited and deleted-before-visit entries are skipped correctly.
+        // Also drop compound PUSH_PARAMS entries for this route (Map iteration is safe under in-loop delete).
         const compoundPrefix = `${key}${COMPOUND_KEY_DELIMITER}`;
         for (const mapKey of triggerMap.keys()) {
             if (mapKey.startsWith(compoundPrefix)) {
@@ -368,7 +369,7 @@ function setupNavigationFocusReturn(): void {
                 return;
             }
             const closest = e.target.closest(FOCUSABLE_SELECTOR);
-            // SVG role="button" matches would return SVGElement; instanceof filters to HTMLElement. A non-focusable activation (e.g. a <div onClick>) clears the cache so a prior focusable click can't leak into an unrelated capture.
+            // instanceof filters SVG matches to HTMLElement; null clears the cache so a non-focusable activation can't leak a prior click.
             const next = closest instanceof HTMLElement ? closest : null;
             if (next !== lastMouseTrigger) {
                 lastMouseTrigger = next;

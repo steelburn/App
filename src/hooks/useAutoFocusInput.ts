@@ -2,7 +2,7 @@ import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import {useCallback, useEffect, useRef, useState} from 'react';
 import type {RefObject} from 'react';
 import type {TextInput} from 'react-native';
-// eslint-disable-next-line no-restricted-imports
+// eslint-disable-next-line no-restricted-imports -- idiomatic defer primitive past navigation transitions.
 import {InteractionManager} from 'react-native';
 import Accessibility from '@libs/Accessibility';
 import ComposerFocusManager from '@libs/ComposerFocusManager';
@@ -66,7 +66,7 @@ export default function useAutoFocusInput(isMultiline = false): UseAutoFocusInpu
         ) {
             return;
         }
-        // eslint-disable-next-line @typescript-eslint/no-deprecated
+        // eslint-disable-next-line @typescript-eslint/no-deprecated -- idiomatic defer primitive despite type-def deprecation.
         const focusTaskHandle = InteractionManager.runAfterInteractions(() => {
             if (inputRef.current && isMultiline) {
                 moveSelectionToEnd(inputRef.current);

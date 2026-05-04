@@ -17,7 +17,6 @@ jest.mock('focus-trap-react', () => ({
     },
 }));
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 jest.mock('@libs/Accessibility/blurActiveElement', () => ({__esModule: true, default: jest.fn()}));
 
 // document.activeElement isn't settable under the RN-web test harness — stub via Document.prototype descriptor.

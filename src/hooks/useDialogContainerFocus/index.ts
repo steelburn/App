@@ -1,5 +1,5 @@
 import {useEffect} from 'react';
-// eslint-disable-next-line no-restricted-imports
+// eslint-disable-next-line no-restricted-imports -- idiomatic defer primitive past navigation transitions.
 import {InteractionManager} from 'react-native';
 import FOCUSABLE_SELECTOR from '@libs/focusableSelector';
 import {hasFocusableAttributes} from '@libs/focusGuards';
@@ -33,8 +33,8 @@ const useDialogContainerFocus: UseDialogContainerFocus = (ref, isReady, claimIni
         }
         let cancelled = false;
         let frameId: number;
-        // Deferred past useAutoFocusInput's InteractionManager + Promise chain. InteractionManager is the idiomatic defer primitive despite type-def deprecation.
-        // eslint-disable-next-line @typescript-eslint/no-deprecated
+        // Deferred past useAutoFocusInput's InteractionManager + Promise chain.
+        // eslint-disable-next-line @typescript-eslint/no-deprecated -- idiomatic defer primitive despite type-def deprecation.
         const interactionHandle = InteractionManager.runAfterInteractions(() => {
             if (cancelled) {
                 return;

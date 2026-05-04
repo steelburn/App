@@ -1,10 +1,10 @@
 // Typed require with explicit .ts path — matches the project's test-file convention.
-/* eslint-disable @typescript-eslint/no-require-imports, import/extensions */
+/* eslint-disable import/extensions */
 const {default: compoundParamsKey, normalizeForKey} = require<{
     default: (routeKey: string, params: unknown) => string;
     normalizeForKey: (value: unknown) => unknown;
 }>('../../src/libs/compoundParamsKey.ts');
-/* eslint-enable @typescript-eslint/no-require-imports, import/extensions */
+/* eslint-enable import/extensions */
 
 describe('compoundParamsKey', () => {
     describe('null / undefined params', () => {

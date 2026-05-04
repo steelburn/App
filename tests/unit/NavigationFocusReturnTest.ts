@@ -1,5 +1,5 @@
 // Typed require with explicit .ts path — matches the project's test-file convention.
-/* eslint-disable @typescript-eslint/no-require-imports, import/extensions */
+/* eslint-disable import/extensions */
 const {resetCycle: resetArbiter, tryClaim, Priorities} = require<{
     resetCycle: () => void;
     tryClaim: (priority: number) => boolean;
@@ -46,7 +46,7 @@ const {shouldSkipAutoFocusDueToExistingFocus, hasFocusableAttributes} = require<
     shouldSkipAutoFocusDueToExistingFocus: () => boolean;
     hasFocusableAttributes: (el: Element) => boolean;
 }>('../../src/libs/focusGuards.ts');
-/* eslint-enable @typescript-eslint/no-require-imports, import/extensions */
+/* eslint-enable import/extensions */
 
 function simulateTab() {
     document.dispatchEvent(new KeyboardEvent('keydown', {key: 'Tab', bubbles: true}));
@@ -1539,7 +1539,7 @@ describe('teardown / setup lifecycle', () => {
     });
 
     it('should seed prevState from navigationRef so the first transition is not misclassified as noop', () => {
-        // eslint-disable-next-line @typescript-eslint/no-require-imports, import/extensions
+        // eslint-disable-next-line import/extensions
         const navigationRefModule = require<{default: {getRootState: () => unknown; isReady: () => boolean}}>('../../src/libs/Navigation/navigationRef.ts');
         const navigationRef = navigationRefModule.default;
         const originalGetRootState = navigationRef.getRootState.bind(navigationRef);
@@ -1573,7 +1573,7 @@ describe('teardown / setup lifecycle', () => {
     });
 
     it('should seed prevState on the NavigationRoot.onReady re-invocation even when the module-load call already attached the listener', () => {
-        // eslint-disable-next-line @typescript-eslint/no-require-imports, import/extensions
+        // eslint-disable-next-line import/extensions
         const navigationRefModule = require<{default: {getRootState: () => unknown; isReady: () => boolean}}>('../../src/libs/Navigation/navigationRef.ts');
         const navigationRef = navigationRefModule.default;
         const originalGetRootState = navigationRef.getRootState.bind(navigationRef);
@@ -1613,7 +1613,7 @@ describe('teardown / setup lifecycle', () => {
     });
 
     it('teardown clears cached nav state so a later setup re-seeds against the new container (logout → login / HMR remount)', () => {
-        // eslint-disable-next-line @typescript-eslint/no-require-imports, import/extensions
+        // eslint-disable-next-line import/extensions
         const navigationRefModule = require<{default: {getRootState: () => unknown; isReady: () => boolean}}>('../../src/libs/Navigation/navigationRef.ts');
         const navigationRef = navigationRefModule.default;
         const originalGetRootState = navigationRef.getRootState.bind(navigationRef);
