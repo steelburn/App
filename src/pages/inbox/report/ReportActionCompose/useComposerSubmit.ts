@@ -25,6 +25,7 @@ import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type * as OnyxTypes from '@src/types/onyx';
 import {useComposerMeta} from './ComposerContext';
+import useSidePanelContext from './useSidePanelContext';
 
 function useComposerSubmit(reportID: string): (comment: string) => void {
     const {isOffline} = useNetwork();
@@ -32,6 +33,7 @@ function useComposerSubmit(reportID: string): (comment: string) => void {
     const personalDetails = usePersonalDetails();
     const {availableLoginsList} = useShortMentionsList();
     const isInSidePanel = useIsInSidePanel();
+    const sidePanelContext = useSidePanelContext(reportID);
     const [quickAction] = useOnyx(ONYXKEYS.NVP_QUICK_ACTION_GLOBAL_CREATE);
     const delegateAccountID = useDelegateAccountID();
 
@@ -72,6 +74,7 @@ function useComposerSubmit(reportID: string): (comment: string) => void {
                 shouldPlaySound: true,
                 isInSidePanel,
                 delegateAccountID,
+                sidePanelContext,
             });
             attachmentFileRef.current = null;
             return;
@@ -142,6 +145,7 @@ function useComposerSubmit(reportID: string): (comment: string) => void {
             currentUserAccountID: currentUserPersonalDetails.accountID,
             shouldPlaySound: true,
             isInSidePanel,
+            sidePanelContext,
             reportActionID: optimisticReportActionID,
             delegateAccountID,
         });

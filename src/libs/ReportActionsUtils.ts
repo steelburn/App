@@ -1664,41 +1664,6 @@ function isNewerReportAction(a: ReportAction, b: ReportAction): boolean {
 }
 
 /**
- * Finds the newest report action matching each of two filter criteria in a single pass.
- * Returns:
- * - lastVisibleAction: newest visible action
- * - lastActionForDisplay: newest displayable action (not CREATED)
- */
-function findLastReportActions(reportActions: OnyxEntry<ReportActions>, canUserPerformWriteAction?: boolean) {
-    if (!reportActions) {
-        return {lastVisibleAction: undefined, lastActionForDisplay: undefined};
-    }
-
-    let lastVisibleAction: ReportAction | undefined;
-    let lastActionForDisplay: ReportAction | undefined;
-
-    for (const [key, action] of Object.entries(reportActions)) {
-        if (!action) {
-            continue;
-        }
-
-        if (shouldReportActionBeVisible(action, key, canUserPerformWriteAction)) {
-            if (!lastVisibleAction || isNewerReportAction(action, lastVisibleAction)) {
-                lastVisibleAction = action;
-            }
-        }
-
-        if (isReportActionVisibleAsLastAction(action, canUserPerformWriteAction) && action.actionName !== CONST.REPORT.ACTIONS.TYPE.CREATED) {
-            if (!lastActionForDisplay || isNewerReportAction(action, lastActionForDisplay)) {
-                lastActionForDisplay = action;
-            }
-        }
-    }
-
-    return {lastVisibleAction, lastActionForDisplay};
-}
-
-/**
  * The first visible action is the second last action in sortedReportActions which satisfy following conditions:
  * 1. That is not pending deletion as pending deletion actions are kept in sortedReportActions in memory.
  * 2. That has at least one visible child action.
@@ -3442,6 +3407,12 @@ function getWorkspaceAttendeeTrackingUpdateMessage(translate: LocalizedTranslate
     return translate('workspaceActions.updatedAttendeeTracking', {enabled: !!enabled});
 }
 
+function getRequireCompanyCardsEnabledMessage(translate: LocalizedTranslate, action: ReportAction): string {
+    const {enabled} = getOriginalMessage(action as ReportAction<typeof CONST.REPORT.ACTIONS.TYPE.POLICY_CHANGE_LOG.UPDATE_REQUIRE_COMPANY_CARDS_ENABLED>) ?? {};
+
+    return translate('workspaceActions.updatedRequireCompanyCards', {enabled: !!enabled});
+}
+
 function getAutoPayApprovedReportsEnabledMessage(translate: LocalizedTranslate, action: ReportAction): string {
     const {enabled} = getOriginalMessage(action as ReportAction<typeof CONST.REPORT.ACTIONS.TYPE.POLICY_CHANGE_LOG.UPDATE_AUTO_PAY_APPROVED_REPORTS_ENABLED>) ?? {};
 
@@ -4701,7 +4672,6 @@ export {
     isCardIssuedAction,
     getCardIssuedMessage,
     getRemovedConnectionMessage,
-    findLastReportActions,
     getFilteredReportActionsForReportView,
     wasMessageReceivedWhileOffline,
     shouldShowAddMissingDetails,
@@ -4712,6 +4682,7 @@ export {
     getWorkspaceUpdateFieldMessage,
     getWorkspaceFeatureEnabledMessage,
     getWorkspaceAttendeeTrackingUpdateMessage,
+    getRequireCompanyCardsEnabledMessage,
     getAutoPayApprovedReportsEnabledMessage,
     getAutoReimbursementMessage,
     formatAddressToString,

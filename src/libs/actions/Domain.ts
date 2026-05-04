@@ -1814,6 +1814,24 @@ function changeDomainSecurityGroup(
     API.write(WRITE_COMMANDS.CHANGE_DOMAIN_SECURITY_GROUP, parameters, {optimisticData, successData, failureData});
 }
 
+function clearChangeDomainSecurityGroupError(domainAccountID: number, memberEmail: string) {
+    Onyx.merge(`${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`, {
+        memberErrors: {
+            [memberEmail]: {
+                changeDomainSecurityGroupErrors: null,
+            },
+        },
+    });
+
+    Onyx.merge(`${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`, {
+        member: {
+            [memberEmail]: {
+                changeDomainSecurityGroup: null,
+            },
+        },
+    });
+}
+
 function setDomainMembersSelectedForMove(memberAccountIDs: string[]) {
     Onyx.set(ONYXKEYS.DOMAIN_MEMBERS_SELECTED_FOR_MOVE, memberAccountIDs);
 }
@@ -1836,7 +1854,7 @@ function updateDomainSecurityGroup(
     groupID: string,
     currentSecurityGroup: DomainSecurityGroup,
     newSettingValue: Partial<DomainSecurityGroup>,
-    settingsName: keyof Pick<DomainSecurityGroup, 'name'>,
+    settingsName: keyof Pick<DomainSecurityGroup, 'name' | 'enableStrictPolicyRules' | 'enableRestrictedPolicyCreation'>,
 ) {
     const SECURITY_GROUP_KEY = `${CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX}${groupID}`;
     const newSecurityGroup = {...currentSecurityGroup, ...newSettingValue};
@@ -1879,9 +1897,9 @@ function updateDomainSecurityGroup(
             key: `${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`,
             value: {
                 [SECURITY_GROUP_KEY]: {
-                    [settingsName]: currentSecurityGroup[settingsName],
+                    [settingsName]: currentSecurityGroup[settingsName] ?? null,
                 },
-            } as PrefixedRecord<typeof CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX, DomainSecurityGroup>,
+            } as PrefixedRecord<typeof CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX, Partial<DomainSecurityGroup>>,
         },
         {
             onyxMethod: Onyx.METHOD.MERGE,
@@ -2075,6 +2093,7 @@ export {
     resetDomainMemberTwoFactorAuth,
     exportMembersToCSV,
     changeDomainSecurityGroup,
+    clearChangeDomainSecurityGroupError,
     setDomainMembersSelectedForMove,
     clearDomainMembersSelectedForMove,
     updateDomainSecurityGroup,

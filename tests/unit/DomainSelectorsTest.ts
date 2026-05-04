@@ -390,6 +390,42 @@ describe('domainSelectors', () => {
                 securityGroup: group1,
             });
         });
+
+        it('Should skip a group whose shared entry for the account is a null tombstone and return the active group', () => {
+            // After changeDomainSecurityGroup fires optimistically, the old group gets
+            // shared[accountID] = null while the new group gets shared[accountID] = 'read'.
+            // The selector must skip the tombstone and return the new (active) group.
+            const key1 = `${CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX}1`;
+            const key2 = `${CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX}2`;
+
+            const domain: Domain = {
+                validated: true,
+                accountID: 1,
+                email: 'test@example.com',
+                // eslint-disable-next-line @typescript-eslint/naming-convention
+                [key1]: {shared: {'123': null}, enableRestrictedPrimaryLogin: false, enableRestrictedPolicyCreation: false},
+                // eslint-disable-next-line @typescript-eslint/naming-convention
+                [key2]: {shared: {'123': 'read'}, enableRestrictedPrimaryLogin: false, enableRestrictedPolicyCreation: false},
+            } as unknown as Domain;
+
+            const result = selectSecurityGroupForAccount(123)(domain);
+
+            expect(result?.key).toBe(key2);
+        });
+
+        it('Should return undefined when the only matching shared entry is a null tombstone', () => {
+            const key1 = `${CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX}1`;
+
+            const domain: Domain = {
+                validated: true,
+                accountID: 1,
+                email: 'test@example.com',
+                // eslint-disable-next-line @typescript-eslint/naming-convention
+                [key1]: {shared: {'123': null}, enableRestrictedPrimaryLogin: false, enableRestrictedPolicyCreation: false},
+            } as unknown as Domain;
+
+            expect(selectSecurityGroupForAccount(123)(domain)).toBeUndefined();
+        });
     });
 
     describe('isSecurityGroupEntry', () => {
