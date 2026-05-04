@@ -19,6 +19,7 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
 import DefaultGroupToggle from './DefaultGroupToggle';
+import StrictlyEnforceWorkspaceRulesToggle from './StrictlyEnforceWorkspaceRulesToggle';
 import DeleteGroupRow from './DeleteGroupRow';
 
 type DomainGroupDetailsPageProps = PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.DOMAIN.GROUP_DETAILS>;
@@ -66,7 +67,11 @@ function DomainGroupDetailsPage({route}: DomainGroupDetailsPageProps) {
                         groupName={group?.name}
                     />
                     <View style={[styles.sectionDividerLine, styles.mh5, styles.mv6]} />
-                    <Text style={[styles.textNormal, styles.textStrong, styles.ph5, styles.pb3]}>{translate('domain.groups.permissions')}</Text>
+                    <Text style={[styles.textNormal, styles.textStrong, styles.ph5]}>{translate('domain.groups.permissions')}</Text>
+                    <StrictlyEnforceWorkspaceRulesToggle
+                        domainAccountID={domainAccountID}
+                        groupID={groupID}
+                    />
                     <DeleteGroupRow
                         domainAccountID={domainAccountID}
                         groupID={groupID}
