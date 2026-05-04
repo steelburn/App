@@ -247,7 +247,7 @@ function TransactionGroupListExpanded<TItem extends ListItem>({
                             isNested
                             onMouseDown={(e) => e.preventDefault()}
                             hoverStyle={[!transaction.isDisabled && styles.hoveredComponentBG, transaction.isSelected && styles.activeComponentBG]}
-                            style={[isDeletedOrPendingDelete && styles.cursorDefault]}
+                            wrapperStyle={isDeletedOrPendingDelete ? styles.cursorDisabled : undefined}
                             dataSet={{[CONST.SELECTION_SCRAPER_HIDDEN_ELEMENT]: true, [CONST.INNER_BOX_SHADOW_ELEMENT]: false}}
                             id={transaction.transactionID}
                             sentryLabel={CONST.SENTRY_LABEL.SEARCH.EXPANDED_TRANSACTION_ROW}
