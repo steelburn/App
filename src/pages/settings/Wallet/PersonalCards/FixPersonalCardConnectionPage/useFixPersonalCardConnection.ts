@@ -26,12 +26,14 @@ function useFixPersonalCardConnection(cardID: string) {
         if (isLoadingOnyxValue(cardListMetadata)) {
             return;
         }
-        if (!card || isCardBroken) {
+        // The Plaid flow drives its own SyncCard from onSuccess, so skip the auto-sync here
+        // to avoid a duplicate call when our optimistic update flips isCardBroken before unmount.
+        if (!card || isCardBroken || isPlaid) {
             return;
         }
         updatePersonalCardConnection(card.cardID.toString(), card.lastScrapeResult);
         Navigation.goBack(ROUTES.SETTINGS_WALLET_PERSONAL_CARD_DETAILS.getRoute(cardID));
-    }, [isCardBroken, card, cardID, cardListMetadata]);
+    }, [isCardBroken, card, cardID, cardListMetadata, isPlaid]);
 
     return {card, bankDisplayName, url, isCardBroken, isOffline, isPlaid, country};
 }
