@@ -3001,7 +3001,6 @@ const staticStyles = (theme: ThemeColors) =>
 
         navigationScreenCardStyle: {
             height: '100%',
-            backfaceVisibility: 'hidden',
         },
 
         invisible: {
