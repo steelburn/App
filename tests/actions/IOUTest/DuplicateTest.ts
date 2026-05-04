@@ -198,6 +198,7 @@ describe('actions/Duplicate', () => {
                 billable: true,
                 reimbursable: false,
                 tag: 'UpdatedProject',
+                taxCode: '',
                 receiptID: 123,
                 reportID,
             };
@@ -532,6 +533,7 @@ describe('actions/Duplicate', () => {
                 billable: true,
                 reimbursable: false,
                 tag: 'UpdatedProject',
+                taxCode: '',
                 receiptID: 123,
                 reportID,
             };
