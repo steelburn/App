@@ -37,7 +37,6 @@ const policyIDsWithEmptyReportsSelector = (accountID: number | undefined) => (re
     return getPolicyIDsWithEmptyReportsForAccount(reports, accountID);
 };
 
-export {getArchiveReason, getReportChatType, getReportOwnerAccountID, getReportPolicyID, policyIDsWithEmptyReportsSelector};
 function openExpenseReportIDsSelector(reports: OnyxCollection<Report>): OpenExpenseReportIDMap {
     if (!reports) {
         return {};
@@ -55,4 +54,4 @@ function openExpenseReportIDsSelector(reports: OnyxCollection<Report>): OpenExpe
     return openExpenseReportIDMap;
 }
 
-export {getArchiveReason, getReportChatType, getReportOwnerAccountID, getReportPolicyID, openExpenseReportIDsSelector};
+export {getArchiveReason, getReportChatType, getReportOwnerAccountID, getReportPolicyID, policyIDsWithEmptyReportsSelector, openExpenseReportIDsSelector};
