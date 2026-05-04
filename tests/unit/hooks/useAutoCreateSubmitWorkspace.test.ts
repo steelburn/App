@@ -13,7 +13,6 @@ import * as Welcome from '@userActions/Welcome';
 import CONST from '@src/CONST';
 
 jest.mock('@hooks/useOnyx', () => {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
     return {__esModule: true, default: jest.fn(() => [undefined])};
 });
 

@@ -11,6 +11,7 @@ import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import {lastWorkspaceNumberSelector} from '@src/selectors/Policy';
 import type {Policy} from '@src/types/onyx';
+import useActivePolicy from './useActivePolicy';
 import useCurrentUserPersonalDetails from './useCurrentUserPersonalDetails';
 import useHasActiveAdminPolicies from './useHasActiveAdminPolicies';
 import useLocalize from './useLocalize';
@@ -46,7 +47,7 @@ function useAutoCreateSubmitWorkspace() {
     );
     const [hasEditableGroupPolicy] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {selector: groupPolicySelector});
     const [lastWorkspaceNumber] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {selector: lastWorkspaceNumberWithEmailSelector});
-    const [activePolicyID] = useOnyx(ONYXKEYS.NVP_ACTIVE_POLICY_ID);
+    const activePolicy = useActivePolicy();
     const {translate, formatPhoneNumber} = useLocalize();
     const {isRestrictedPolicyCreation} = usePreferredPolicy();
     const hasActiveAdminPolicies = useHasActiveAdminPolicies();
@@ -70,7 +71,7 @@ function useAutoCreateSubmitWorkspace() {
                       file: undefined,
                       shouldAddOnboardingTasks: false,
                       introSelected,
-                      activePolicyID,
+                      activePolicy,
                       currentUserAccountIDParam: currentUserAccountID ?? CONST.DEFAULT_NUMBER_ID,
                       currentUserEmailParam: currentUserEmail,
                       shouldAddGuideWelcomeMessage: false,
@@ -110,7 +111,7 @@ function useAutoCreateSubmitWorkspace() {
             onboardingAdminsChatReportID,
             currentUserPersonalDetails.localCurrencyCode,
             introSelected,
-            activePolicyID,
+            activePolicy,
             isSelfTourViewed,
             onboardingMessages,
             betas,
