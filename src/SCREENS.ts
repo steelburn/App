@@ -19,7 +19,6 @@ const SCREENS = {
     REPORT: 'Report',
     PROFILE_AVATAR: 'ProfileAvatar',
     WORKSPACE_AVATAR: 'WorkspaceAvatar',
-    WORKSPACE_DOCUMENT: 'WorkspaceDocument',
     REPORT_AVATAR: 'ReportAvatar',
     NOT_FOUND: 'not-found',
     TRANSITION_BETWEEN_APPS: 'TransitionBetweenApps',
@@ -123,6 +122,7 @@ const SCREENS = {
         ADD_BANK_ACCOUNT: 'Settings_Add_Bank_Account',
         ADD_US_BANK_ACCOUNT: 'Settings_Add_US_Bank_Account',
         ADD_US_BANK_ACCOUNT_ENTRY_POINT: 'Settings_Add_US_Bank_Account_Entry_Point',
+        UPDATE_PERSONAL_BANK_ACCOUNT: 'Settings_Update_Personal_Bank_Account',
         ADD_BANK_ACCOUNT_SELECT_COUNTRY_VERIFY_ACCOUNT: 'Settings_Add_Bank_Account_Select_Country_Verify_Account',
         BANK_ACCOUNT_PURPOSE: 'Settings_Bank_Account_Purpose',
         CLOSE: 'Settings_Close',
@@ -168,6 +168,10 @@ const SCREENS = {
             LANGUAGE: 'Settings_Preferences_Language',
             THEME: 'Settings_Preferences_Theme',
             PAYMENT_CURRENCY: 'Settings_Payment_Currency',
+        },
+
+        AGENTS: {
+            ROOT: 'Settings_Agents',
         },
 
         RULES: {
@@ -773,6 +777,7 @@ const SCREENS = {
         NAME: 'Workspace_Overview_Name',
         CLIENT_ID: 'Workspace_Overview_Client_ID',
         CATEGORY_CREATE: 'Category_Create',
+        DYNAMIC_CATEGORY_CREATE: 'Dynamic_Category_Create',
         CATEGORY_EDIT: 'Category_Edit',
         CATEGORY_PAYROLL_CODE: 'Category_Payroll_Code',
         CATEGORY_GL_CODE: 'Category_GL_Code',
@@ -785,8 +790,11 @@ const SCREENS = {
         CATEGORY_REQUIRE_ITEMIZED_RECEIPTS_OVER: 'Category_Require_Itemized_Receipts_Over',
         CATEGORY_REQUIRED_FIELDS: 'Category_Required_Fields',
         CATEGORIES_SETTINGS: 'Categories_Settings',
+        DYNAMIC_CATEGORIES_SETTINGS: 'Dynamic_Categories_Settings',
         DYNAMIC_CATEGORIES_IMPORT: 'Dynamic_Categories_Import',
         DYNAMIC_CATEGORIES_IMPORTED: 'Dynamic_Categories_Imported',
+        DYNAMIC_SPEND_CATEGORY_SELECTOR: 'Dynamic_Spend_Category_Selector',
+        DYNAMIC_DEFAULT_CATEGORY_SELECTOR: 'Dynamic_Default_Category_Selector',
         MORE_FEATURES: 'Workspace_More_Features',
         MEMBER_DETAILS: 'Workspace_Member_Details',
         MEMBER_DETAILS_ROLE: 'Workspace_Member_Details_Role',
