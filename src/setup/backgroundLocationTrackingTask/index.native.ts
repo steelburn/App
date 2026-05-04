@@ -28,7 +28,7 @@ defineTask<BackgroundLocationTrackingTaskData>(BACKGROUND_LOCATION_TRACKING_TASK
     const updatedGpsPoints = addGpsPoints(gpsDraftDetails, newGpsPoints);
 
     if (shouldUpdateStartAddress(getGpsPoints(gpsDraftDetails), updatedGpsPoints)) {
-        updateStartAddress(updatedGpsPoints, updatedGpsPoints.at(-1)?.at(0), isOffline);
+        updateStartAddress(updatedGpsPoints, isOffline);
     }
 });
 
@@ -37,18 +37,14 @@ function shouldUpdateStartAddress(gpsPoints: GPSPoint[][], updatedGpsPoints: GPS
     return getTotalGpsTripPointsInLastSegment(gpsPoints) === 0 && getTotalGpsTripPointsInLastSegment(updatedGpsPoints) !== 0;
 }
 
-async function updateStartAddress(gpsPoints: GPSPoint[][], startPoint: GPSPoint | undefined, isOffline: boolean) {
-    // If the last segment is not empty or the start point is not provided, return
-    if (getTotalGpsTripPointsInLastSegment(gpsPoints) !== 0 || !startPoint) {
+async function updateStartAddress(gpsPoints: GPSPoint[][], isOffline: boolean) {
+    const startPoint = gpsPoints.at(-1)?.at(0);
+    if (!startPoint) {
         return;
     }
 
     // Get the index of the current (last) segment
     const tripSegmentIndex = gpsPoints.length - 1;
-
-    if (tripSegmentIndex === -1) {
-        return;
-    }
 
     if (!isOffline) {
         const address = await addressFromGpsPoint({lat: startPoint.lat, long: startPoint.long});
