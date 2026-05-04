@@ -19,14 +19,15 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
 import DefaultGroupToggle from './DefaultGroupToggle';
+import StrictlyEnforceWorkspaceRulesToggle from './StrictlyEnforceWorkspaceRulesToggle';
 import PreferredWorkspaceToggle from './PreferredWorkspaceToggle';
 
 type DomainGroupDetailsPageProps = PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.DOMAIN.GROUP_DETAILS>;
 
 function DomainGroupDetailsPage({route}: DomainGroupDetailsPageProps) {
+    const styles = useThemeStyles();
     const {domainAccountID, groupID} = route.params;
 
-    const styles = useThemeStyles();
     const {translate} = useLocalize();
 
     const [group] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {
@@ -65,8 +66,12 @@ function DomainGroupDetailsPage({route}: DomainGroupDetailsPageProps) {
                         groupID={groupID}
                         groupName={group?.name}
                     />
-                    <View style={[styles.sectionDividerLine, styles.ph5, styles.mv6]} />
+                    <View style={[styles.sectionDividerLine, styles.mh5, styles.mv6]} />
                     <Text style={[styles.textNormal, styles.textStrong, styles.ph5]}>{translate('domain.groups.permissions')}</Text>
+                    <StrictlyEnforceWorkspaceRulesToggle
+                        domainAccountID={domainAccountID}
+                        groupID={groupID}
+                    />
                     <PreferredWorkspaceToggle
                         domainAccountID={domainAccountID}
                         groupID={groupID}
