@@ -219,10 +219,7 @@ function SuggestionMention({
                         continue;
                     }
 
-                    const token = getOriginalMentionText(scannedMention, i, 0);
-                    if (i + token.length !== scannedMention.length) {
-                        continue;
-                    }
+                    const token = scannedMention.slice(i);
                     if (trigger === '@' && isCompleteAtMention(token)) {
                         return i;
                     }
