@@ -9,9 +9,8 @@ import createDynamicRoute from '@libs/Navigation/helpers/dynamicRoutesUtils/crea
 import {areSettingsInErrorFields, settingsPendingAction} from '@libs/PolicyUtils';
 import Navigation from '@navigation/Navigation';
 import type {WithPolicyConnectionsProps} from '@pages/workspace/withPolicyConnections';
-import withPolicyConnections from '@pages/workspace/withPolicyConnections';
 import CONST from '@src/CONST';
-import ROUTES, {DYNAMIC_ROUTES} from '@src/ROUTES';
+import {DYNAMIC_ROUTES} from '@src/ROUTES';
 import type {Route} from '@src/ROUTES';
 import type {PendingAction} from '@src/types/onyx/OnyxCommon';
 
@@ -28,7 +27,7 @@ const vendorSetting = [CONST.SAGE_INTACCT_CONFIG.TRAVEL_INVOICING_VENDOR];
 const payableAccountSetting = [CONST.SAGE_INTACCT_CONFIG.TRAVEL_INVOICING_PAYABLE_ACCOUNT];
 
 type SageIntacctTravelInvoicingConfigurationPageProps = WithPolicyConnectionsProps & {
-    backPath?: Route;
+    backPath: Route;
 };
 
 function SageIntacctTravelInvoicingConfigurationPage({policy, backPath}: SageIntacctTravelInvoicingConfigurationPageProps) {
@@ -37,7 +36,6 @@ function SageIntacctTravelInvoicingConfigurationPage({policy, backPath}: SageInt
 
     const policyID = policy?.id ?? String(CONST.DEFAULT_NUMBER_ID);
     const config = policy?.connections?.intacct?.config;
-    const fallbackBackPath = ROUTES.POLICY_ACCOUNTING_SAGE_INTACCT_EXPORT.getRoute(policyID);
 
     const {vendors, bankAccounts} = policy?.connections?.intacct?.data ?? {};
     const travelVendor = vendors?.find((vendor) => vendor.id === config?.export?.travelInvoicingVendorID);
@@ -82,7 +80,7 @@ function SageIntacctTravelInvoicingConfigurationPage({policy, backPath}: SageInt
             contentContainerStyle={styles.pb2}
             titleStyle={styles.ph5}
             connectionName={CONST.POLICY.CONNECTIONS.NAME.SAGE_INTACCT}
-            onBackButtonPress={() => Navigation.goBack(backPath ?? fallbackBackPath)}
+            onBackButtonPress={() => Navigation.goBack(backPath)}
         >
             {sections.map((section) => (
                 <OfflineWithFeedback
@@ -104,4 +102,3 @@ function SageIntacctTravelInvoicingConfigurationPage({policy, backPath}: SageInt
 }
 
 export {SageIntacctTravelInvoicingConfigurationPage};
-export default withPolicyConnections(SageIntacctTravelInvoicingConfigurationPage);

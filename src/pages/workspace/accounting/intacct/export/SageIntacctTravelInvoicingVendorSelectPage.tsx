@@ -1,47 +1,26 @@
 import React from 'react';
-import BlockingView from '@components/BlockingViews/BlockingView';
-import RadioListItem from '@components/SelectionList/ListItem/RadioListItem';
-import type {ListItem} from '@components/SelectionList/types';
-import SelectionScreen from '@components/SelectionScreen';
-import {useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
-import useLocalize from '@hooks/useLocalize';
-import useThemeStyles from '@hooks/useThemeStyles';
+import type {SelectorType} from '@components/SelectionScreen';
 import {updateSageIntacctTravelInvoicingVendor} from '@libs/actions/connections/SageIntacct';
 import {clearSageIntacctErrorField} from '@libs/actions/Policy/Policy';
 import {getLatestErrorField} from '@libs/ErrorUtils';
-import createDynamicRoute from '@libs/Navigation/helpers/dynamicRoutesUtils/createDynamicRoute';
 import {settingsPendingAction} from '@libs/PolicyUtils';
 import Navigation from '@navigation/Navigation';
+import TravelInvoicingVendorSelectPage from '@pages/workspace/accounting/common/TravelInvoicingVendorSelectPage';
 import type {WithPolicyConnectionsProps} from '@pages/workspace/withPolicyConnections';
-import withPolicyConnections from '@pages/workspace/withPolicyConnections';
-import variables from '@styles/variables';
 import CONST from '@src/CONST';
-import ROUTES, {DYNAMIC_ROUTES} from '@src/ROUTES';
 import type {Route} from '@src/ROUTES';
 
-type VendorListItem = ListItem & {
-    value: string;
-};
-
 type SageIntacctTravelInvoicingVendorSelectPageProps = WithPolicyConnectionsProps & {
-    backPath?: Route;
+    backPath: Route;
 };
 
 function SageIntacctTravelInvoicingVendorSelectPage({policy, backPath}: SageIntacctTravelInvoicingVendorSelectPageProps) {
-    const {translate} = useLocalize();
-    const styles = useThemeStyles();
-    const illustrations = useMemoizedLazyIllustrations(['Telescope']);
-
     const policyID = policy?.id ?? String(CONST.DEFAULT_NUMBER_ID);
-    const fallbackBackPath = createDynamicRoute(
-        DYNAMIC_ROUTES.POLICY_ACCOUNTING_SAGE_INTACCT_TRAVEL_INVOICING_CONFIGURATION.path,
-        ROUTES.POLICY_ACCOUNTING_SAGE_INTACCT_EXPORT.getRoute(policyID),
-    );
     const config = policy?.connections?.intacct?.config;
     const {vendors} = policy?.connections?.intacct?.data ?? {};
     const selectedVendorID = config?.export?.travelInvoicingVendorID;
 
-    const data: VendorListItem[] =
+    const data: Array<SelectorType<string>> =
         vendors?.map((vendor) => ({
             value: vendor.id,
             text: vendor.value,
@@ -49,46 +28,28 @@ function SageIntacctTravelInvoicingVendorSelectPage({policy, backPath}: SageInta
             isSelected: vendor.id === selectedVendorID,
         })) ?? [];
 
-    const selectVendor = (row: VendorListItem) => {
+    const selectVendor = (row: SelectorType<string>) => {
         if (row.value !== selectedVendorID) {
             updateSageIntacctTravelInvoicingVendor(policyID, row.value, selectedVendorID);
         }
-        Navigation.goBack(backPath ?? fallbackBackPath);
+        Navigation.goBack(backPath);
     };
 
-    const listEmptyContent = (
-        <BlockingView
-            icon={illustrations.Telescope}
-            iconWidth={variables.emptyListIconWidth}
-            iconHeight={variables.emptyListIconHeight}
-            title={translate('workspace.sageIntacct.noAccountsFound')}
-            subtitle={translate('workspace.sageIntacct.noAccountsFoundDescription')}
-            containerStyle={styles.pb10}
-        />
-    );
-
     return (
-        <SelectionScreen
+        <TravelInvoicingVendorSelectPage
             policyID={policyID}
-            accessVariants={[CONST.POLICY.ACCESS_VARIANTS.ADMIN]}
-            featureName={CONST.POLICY.MORE_FEATURES.ARE_CONNECTIONS_ENABLED}
             displayName="SageIntacctTravelInvoicingVendorSelectPage"
-            title="workspace.common.travelInvoicingVendor"
             data={data}
-            listItem={RadioListItem}
-            onSelectRow={selectVendor}
-            shouldSingleExecuteRowSelect
-            initiallyFocusedOptionKey={data.find((option) => option.isSelected)?.keyForList}
-            listEmptyContent={listEmptyContent}
             connectionName={CONST.POLICY.CONNECTIONS.NAME.SAGE_INTACCT}
-            onBackButtonPress={() => Navigation.goBack(backPath ?? fallbackBackPath)}
+            emptyStateTitle="workspace.sageIntacct.noAccountsFound"
+            emptyStateSubtitle="workspace.sageIntacct.noAccountsFoundDescription"
+            onSelect={selectVendor}
+            onBack={() => Navigation.goBack(backPath)}
             pendingAction={settingsPendingAction([CONST.SAGE_INTACCT_CONFIG.TRAVEL_INVOICING_VENDOR], config?.pendingFields)}
             errors={getLatestErrorField(config, CONST.SAGE_INTACCT_CONFIG.TRAVEL_INVOICING_VENDOR)}
-            errorRowStyles={[styles.ph5, styles.pv3]}
             onClose={() => clearSageIntacctErrorField(policyID, CONST.SAGE_INTACCT_CONFIG.TRAVEL_INVOICING_VENDOR)}
         />
     );
 }
 
 export {SageIntacctTravelInvoicingVendorSelectPage};
-export default withPolicyConnections(SageIntacctTravelInvoicingVendorSelectPage);
