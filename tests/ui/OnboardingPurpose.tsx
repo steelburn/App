@@ -138,6 +138,60 @@ describe('OnboardingPurpose Page', () => {
         await waitForBatchedUpdatesWithAct();
     });
 
+    it('should navigate to personal details page when user selects TRACK_BUSINESS and is from public domain', async () => {
+        await TestHelper.signInWithTestUser();
+
+        await act(async () => {
+            await Onyx.merge(ONYXKEYS.ACCOUNT, {
+                isFromPublicDomain: true,
+                hasAccessibleDomainPolicies: false,
+            });
+        });
+
+        const {unmount} = renderOnboardingPurposePage(SCREENS.ONBOARDING.PURPOSE, {backTo: ''});
+
+        await waitForBatchedUpdatesWithAct();
+
+        const user = userEvent.setup();
+        const trackBusinessLabel = translatePurpose(CONST.ONBOARDING_CHOICES.TRACK_BUSINESS);
+        const trackBusinessOption = screen.getByLabelText(trackBusinessLabel);
+        await user.press(trackBusinessOption);
+
+        await waitFor(() => {
+            expect(navigate).toHaveBeenCalledWith(ROUTES.ONBOARDING_PERSONAL_DETAILS.getRoute(''));
+        });
+
+        unmount();
+        await waitForBatchedUpdatesWithAct();
+    });
+
+    it('should navigate to personal details page when user selects TRACK_PERSONAL and is from public domain', async () => {
+        await TestHelper.signInWithTestUser();
+
+        await act(async () => {
+            await Onyx.merge(ONYXKEYS.ACCOUNT, {
+                isFromPublicDomain: true,
+                hasAccessibleDomainPolicies: false,
+            });
+        });
+
+        const {unmount} = renderOnboardingPurposePage(SCREENS.ONBOARDING.PURPOSE, {backTo: ''});
+
+        await waitForBatchedUpdatesWithAct();
+
+        const user = userEvent.setup();
+        const trackPersonalLabel = translatePurpose(CONST.ONBOARDING_CHOICES.TRACK_PERSONAL);
+        const trackPersonalOption = screen.getByLabelText(trackPersonalLabel);
+        await user.press(trackPersonalOption);
+
+        await waitFor(() => {
+            expect(navigate).toHaveBeenCalledWith(ROUTES.ONBOARDING_PERSONAL_DETAILS.getRoute(''));
+        });
+
+        unmount();
+        await waitForBatchedUpdatesWithAct();
+    });
+
     it('should call completeOnboarding with introSelected when user is from private domain and selects a direct-complete choice', async () => {
         await TestHelper.signInWithTestUser();
 
