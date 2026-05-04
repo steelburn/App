@@ -11,7 +11,9 @@ import waitForBatchedUpdates from '../../../utils/waitForBatchedUpdates';
 
 const mockNavigate = jest.fn();
 jest.mock('@libs/Navigation/Navigation', () => ({
-    navigate: (...args: unknown[]) => mockNavigate(...args),
+    navigate: (...args: unknown[]) => {
+        mockNavigate(...args);
+    },
 }));
 
 describe('MigratedUserWelcomeModalGuard', () => {
