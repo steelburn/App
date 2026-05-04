@@ -9,7 +9,7 @@ import {isMobile} from '@libs/Browser';
 import {isLocalFile as isLocalFileFileUtils} from '@libs/fileDownload/FileUtils';
 import getCurrentPosition from '@libs/getCurrentPosition';
 import Navigation from '@libs/Navigation/Navigation';
-import {endSpan} from '@libs/telemetry/activeSpans';
+import {cancelSpan, endSpan} from '@libs/telemetry/activeSpans';
 import withFullTransactionOrNotFound from '@pages/iou/request/step/withFullTransactionOrNotFound';
 import withWritableReportOrNotFound from '@pages/iou/request/step/withWritableReportOrNotFound';
 import {updateLastLocationPermissionPrompt} from '@userActions/IOU';
@@ -41,9 +41,17 @@ function IOURequestStepScan({
 
     const [policyTagList] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_TAGS}${policy?.id}`);
 
-    // End the create expense span on mount for web (no camera init tracking needed)
+    // End telemetry spans on mount for web (no camera init tracking needed)
     useEffect(() => {
         endSpan(CONST.TELEMETRY.SPAN_OPEN_CREATE_EXPENSE);
+
+        endSpan(CONST.TELEMETRY.SPAN_ENTRY_TO_SCAN_NAVIGATION);
+        endSpan(CONST.TELEMETRY.SPAN_ENTRY_TO_SCAN);
+
+        return () => {
+            cancelSpan(CONST.TELEMETRY.SPAN_ENTRY_TO_SCAN_NAVIGATION);
+            cancelSpan(CONST.TELEMETRY.SPAN_ENTRY_TO_SCAN);
+        };
     }, []);
 
     const navigateBack = useCallback(() => {
@@ -211,9 +219,9 @@ function IOURequestStepScan({
 }
 
 const IOURequestStepScanWithCurrentUserPersonalDetails = withCurrentUserPersonalDetails(IOURequestStepScan);
-// eslint-disable-next-line rulesdir/no-negated-variables
+
 const IOURequestStepScanWithWritableReportOrNotFound = withWritableReportOrNotFound(IOURequestStepScanWithCurrentUserPersonalDetails, true);
-// eslint-disable-next-line rulesdir/no-negated-variables
+
 const IOURequestStepScanWithFullTransactionOrNotFound = withFullTransactionOrNotFound(IOURequestStepScanWithWritableReportOrNotFound);
 
 export default IOURequestStepScanWithFullTransactionOrNotFound;
