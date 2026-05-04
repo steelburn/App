@@ -9211,12 +9211,11 @@ Voici un *reçu test* pour vous montrer comment ça fonctionne :`,
             makeDefault: 'Définir par défaut',
             neverMind: 'Peu importe',
             permissions: 'Autorisations du groupe',
-            StrictlyEnforceWorkspaceRules: 'Appliquer strictement les règles de l’espace de travail',
-            StrictlyEnforceWorkspaceRulesDescription:
+            strictlyEnforceWorkspaceRules: 'Appliquer strictement les règles de l’espace de travail',
+            strictlyEnforceWorkspaceRulesDescription:
                 'Toutes les règles de l’espace de travail doivent être respectées avant de soumettre un rapport. Aucune exception manuelle n’est autorisée.',
-            permissions: 'Permissions du groupe',
-            RestrictDefaultLoginSelection: 'Restreindre la sélection de connexion par défaut',
-            RestrictDefaultLoginSelectionDescription:
+            restrictDefaultLoginSelection: 'Restreindre la sélection de connexion par défaut',
+            restrictDefaultLoginSelectionDescription:
                 'Empêche les membres de modifier leur e-mail de connexion en dehors du domaine de leur entreprise afin d’éviter les restrictions de politique.',
         },
     },

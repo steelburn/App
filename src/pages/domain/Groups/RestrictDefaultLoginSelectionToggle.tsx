@@ -9,7 +9,10 @@ import {clearDomainSecurityGroupSettingError, updateDomainSecurityGroup} from '@
 import ONYXKEYS from '@src/ONYXKEYS';
 
 type RestrictDefaultLoginSelectionToggleProps = {
+    /** The account ID of the domain */
     domainAccountID: number;
+
+    /** The ID of the security group */
     groupID: string;
 };
 
@@ -33,9 +36,9 @@ function RestrictDefaultLoginSelectionToggle({domainAccountID, groupID}: Restric
     return (
         <View style={styles.mv3}>
             <ToggleSettingOptionRow
-                title={translate('domain.groups.RestrictDefaultLoginSelection')}
-                subtitle={translate('domain.groups.RestrictDefaultLoginSelectionDescription')}
-                switchAccessibilityLabel={translate('domain.groups.RestrictDefaultLoginSelection')}
+                title={translate('domain.groups.restrictDefaultLoginSelection')}
+                subtitle={translate('domain.groups.restrictDefaultLoginSelectionDescription')}
+                switchAccessibilityLabel={translate('domain.groups.restrictDefaultLoginSelection')}
                 shouldPlaceSubtitleBelowSwitch
                 isActive={isEnabled}
                 onToggle={(enabled) => {

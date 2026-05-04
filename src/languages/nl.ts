@@ -9150,12 +9150,11 @@ Hier is een *proefbon* om je te laten zien hoe het werkt:`,
             makeDefault: 'Standaard maken',
             neverMind: 'Laat maar',
             permissions: 'Groepsmachtigingen',
-            StrictlyEnforceWorkspaceRules: 'Werkruimteregels strikt afdwingen',
-            StrictlyEnforceWorkspaceRulesDescription:
+            strictlyEnforceWorkspaceRules: 'Werkruimteregels strikt afdwingen',
+            strictlyEnforceWorkspaceRulesDescription:
                 'Aan alle werkruimteregels moet worden voldaan voordat een rapport kan worden ingediend. Handmatige uitzonderingen zijn niet toegestaan.',
-            permissions: 'Groepsmachtigingen',
-            RestrictDefaultLoginSelection: 'Standaard login-selectie beperken',
-            RestrictDefaultLoginSelectionDescription: 'Voorkomt dat leden hun login-e-mail wijzigen naar een adres buiten het bedrijfsdomein om beleidsbeperkingen te omzeilen.',
+            restrictDefaultLoginSelection: 'Standaard login-selectie beperken',
+            restrictDefaultLoginSelectionDescription: 'Voorkomt dat leden hun login-e-mail wijzigen naar een adres buiten het bedrijfsdomein om beleidsbeperkingen te omzeilen.',
         },
     },
     proactiveAppReview: {
