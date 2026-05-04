@@ -38,7 +38,7 @@ import {
     getParsedComment,
     getReportTransactions,
     hasHeldExpenses,
-    hasPendingWorkflowUpdate,
+    hasPendingReportRetract,
     isExpenseReport,
     isInvoiceReport,
     isIOUReport as isIOUReportUtil,
@@ -618,7 +618,7 @@ function search({
 
 function submitMoneyRequestOnSearch(hash: number, reportList: Report[], policy: Policy[], currentSearchKey?: SearchKey) {
     const firstReport = (reportList.at(0) ?? {}) as Report;
-    if (hasPendingWorkflowUpdate(firstReport)) {
+    if (hasPendingReportRetract(firstReport)) {
         return;
     }
 
