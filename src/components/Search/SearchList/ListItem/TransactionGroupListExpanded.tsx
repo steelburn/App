@@ -231,7 +231,6 @@ function TransactionGroupListExpanded<TItem extends ListItem>({
                 const shouldShowBottomBorder = !isLastTransaction(index);
                 const exportedReportActions = Object.values(transactionsSnapshot?.data?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${transaction?.reportID}`] ?? {});
                 const isDeletedOrPendingDelete = isDeletedTransaction(transaction) || isTransactionPendingDelete(transaction);
-                const isRowDisabled = isDeletedOrPendingDelete;
 
                 return (
                     <OfflineWithFeedback
@@ -240,7 +239,7 @@ function TransactionGroupListExpanded<TItem extends ListItem>({
                     >
                         <PressableWithFeedback
                             onPress={isDeletedOrPendingDelete && !canSelectMultiple ? undefined : () => handleOnPress(transaction)}
-                            disabled={isRowDisabled && !transaction.isSelected}
+                            disabled={isDeletedOrPendingDelete && !transaction.isSelected}
                             onLongPress={() => onLongPress?.(transaction)}
                             accessibilityRole={CONST.ROLE.BUTTON}
                             accessibilityLabel={transaction.text ?? ''}
@@ -266,7 +265,7 @@ function TransactionGroupListExpanded<TItem extends ListItem>({
                                         transaction.policy,
                                     )}
                                     isSelected={!!transaction.isSelected}
-                                    isDisabled={isRowDisabled}
+                                    isDisabled={isDeletedOrPendingDelete}
                                     dateColumnSize={dateColumnSize}
                                     amountColumnSize={amountColumnSize}
                                     taxAmountColumnSize={taxAmountColumnSize}
