@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import Animated from 'react-native-reanimated';
 import {useSearchActionsContext, useSearchStateContext} from '@components/Search/SearchContext';
 import type {SearchParams} from '@components/Search/types';
@@ -39,10 +39,14 @@ function SearchPage({route}: SearchPageProps) {
     const isMobileSelectionModeEnabled = useMobileSelectionMode(clearSelectedTransactions);
     const [hasFilterBars = false] = useOnyx(ONYXKEYS.FORMS.SEARCH_ADVANCED_FILTERS_FORM, {selector: hasFilterBarsSelector});
 
-    const lastNonEmptySearchResults = useRef<SearchResults | undefined>(undefined);
+    const [lastNonEmptySearchResults, setLastNonEmptySearchResults] = useState<SearchResults | undefined>(undefined);
 
     useConfirmReadyToOpenApp();
     useSearchPageSetup(currentSearchQueryJSON);
+
+    if (currentSearchResults?.data && currentSearchResults !== lastNonEmptySearchResults) {
+        setLastNonEmptySearchResults(currentSearchResults);
+    }
 
     useEffect(() => {
         if (!currentSearchResults?.search?.type) {
@@ -50,10 +54,7 @@ function SearchPage({route}: SearchPageProps) {
         }
 
         setLastSearchType(currentSearchResults.search.type);
-        if (currentSearchResults.data) {
-            lastNonEmptySearchResults.current = currentSearchResults;
-        }
-    }, [lastSearchType, currentSearchQueryJSON, setLastSearchType, currentSearchResults]);
+    }, [lastSearchType, currentSearchQueryJSON, setLastSearchType, currentSearchResults?.search?.type]);
 
     const selectedTransactionsKeys = Object.keys(selectedTransactions ?? {});
 
@@ -65,7 +66,7 @@ function SearchPage({route}: SearchPageProps) {
     if (currentSearchResults?.data != null || currentSearchResults?.errors) {
         searchResults = currentSearchResults;
     } else if (isSorting) {
-        searchResults = lastNonEmptySearchResults.current;
+        searchResults = lastNonEmptySearchResults;
     }
 
     const metadata = searchResults?.search;
