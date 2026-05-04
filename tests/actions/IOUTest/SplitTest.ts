@@ -2088,6 +2088,7 @@ describe('updateSplitTransactionsFromSplitExpensesFlow', () => {
             isSelfTourViewed: false,
             betas: undefined,
             hasActiveAdminPolicies: false,
+            activePolicy: undefined,
         });
         const policy = await getOnyxValue(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`);
         setWorkspaceApprovalMode(policy, CARLOS_EMAIL, CONST.POLICY.APPROVAL_MODE.BASIC, RORY_ACCOUNT_ID, RORY_EMAIL);
@@ -2310,6 +2311,7 @@ describe('updateSplitTransactionsFromSplitExpensesFlow', () => {
             currentUserEmailParam: CARLOS_EMAIL,
             isSelfTourViewed: false,
             hasActiveAdminPolicies: false,
+            activePolicy: undefined,
             betas: [],
         });
         const policy = await getOnyxValue(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`);
@@ -2890,6 +2892,7 @@ describe('updateSplitTransactionsFromSplitExpensesFlow', () => {
             isSelfTourViewed: false,
             betas: undefined,
             hasActiveAdminPolicies: false,
+            activePolicy: undefined,
         });
 
         const policy = await getOnyxValue(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`);
@@ -3067,6 +3070,7 @@ describe('updateSplitTransactionsFromSplitExpensesFlow', () => {
             isSelfTourViewed: false,
             betas: undefined,
             hasActiveAdminPolicies: false,
+            activePolicy: undefined,
         });
 
         const policy = await getOnyxValue(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`);
@@ -3248,6 +3252,7 @@ describe('updateSplitTransactionsFromSplitExpensesFlow', () => {
             isSelfTourViewed: false,
             betas: undefined,
             hasActiveAdminPolicies: false,
+            activePolicy: undefined,
         });
 
         const policy = await getOnyxValue(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`);
@@ -3438,6 +3443,7 @@ describe('updateSplitTransactionsFromSplitExpensesFlow', () => {
             isSelfTourViewed: false,
             betas: undefined,
             hasActiveAdminPolicies: false,
+            activePolicy: undefined,
         });
 
         const policy = await getOnyxValue(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`);
@@ -3705,6 +3711,7 @@ describe('updateSplitTransactions', () => {
             isSelfTourViewed: false,
             betas: undefined,
             hasActiveAdminPolicies: false,
+            activePolicy: undefined,
         });
         const policy = await getOnyxValue(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`);
         setWorkspaceApprovalMode(policy, CARLOS_EMAIL, CONST.POLICY.APPROVAL_MODE.BASIC, RORY_ACCOUNT_ID, RORY_EMAIL);
@@ -3835,6 +3842,7 @@ describe('updateSplitTransactions', () => {
             isSelfTourViewed: false,
             betas: undefined,
             hasActiveAdminPolicies: false,
+            activePolicy: undefined,
         });
         const policy = await getOnyxValue(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`);
         setWorkspaceApprovalMode(policy, CARLOS_EMAIL, CONST.POLICY.APPROVAL_MODE.BASIC, RORY_ACCOUNT_ID, RORY_EMAIL);
@@ -3966,6 +3974,7 @@ describe('updateSplitTransactions', () => {
             isSelfTourViewed: false,
             betas: undefined,
             hasActiveAdminPolicies: false,
+            activePolicy: undefined,
         });
         const policy = await getOnyxValue(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`);
         setWorkspaceApprovalMode(policy, CARLOS_EMAIL, CONST.POLICY.APPROVAL_MODE.BASIC, RORY_ACCOUNT_ID, RORY_EMAIL);
@@ -4106,6 +4115,7 @@ describe('updateSplitTransactions', () => {
             isSelfTourViewed: false,
             betas: undefined,
             hasActiveAdminPolicies: false,
+            activePolicy: undefined,
         });
         const policy = await getOnyxValue(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`);
         setWorkspaceApprovalMode(policy, CARLOS_EMAIL, CONST.POLICY.APPROVAL_MODE.BASIC, RORY_ACCOUNT_ID, RORY_EMAIL);
