@@ -92,6 +92,7 @@ import {
 import {
     canWriteInReport,
     getMovedActionMessage,
+    getTransactionsWithReceipts,
     isCompletedTaskReport,
     isExpenseReport,
     isHarvestCreatedExpenseReport as isHarvestCreatedExpenseReportUtils,
@@ -221,9 +222,6 @@ type PureReportActionItemProps = {
     /** Whether the provided report is a closed expense report with no expenses */
     isClosedExpenseReportWithNoExpenses?: boolean;
 
-    /** Gets all transactions on an IOU report with a receipt */
-    getTransactionsWithReceipts?: (iouReportID: string | undefined) => OnyxTypes.Transaction[];
-
     /** User payment card ID */
     userBillingFundID?: number;
 
@@ -275,7 +273,6 @@ function PureReportActionItem({
     isArchivedRoom,
     isChronosReport,
     isClosedExpenseReportWithNoExpenses,
-    getTransactionsWithReceipts = () => [],
     userBillingFundID,
     shouldShowBorder,
     shouldHighlight = false,
@@ -1040,8 +1037,7 @@ function PureReportActionItem({
     const whisperedTo = getWhisperedTo(action);
 
     const iouReportID = isMoneyRequestAction(action) && getOriginalMessage(action)?.IOUReportID ? getOriginalMessage(action)?.IOUReportID?.toString() : undefined;
-    const transactionsWithReceipts = getTransactionsWithReceipts(iouReportID);
-    const isWhisper = whisperedTo.length > 0 && transactionsWithReceipts.length === 0;
+    const isWhisper = whisperedTo.length > 0 && getTransactionsWithReceipts(iouReportID).length === 0;
 
     // Calculating accessibilityLabel for chat message with sender, date and time and the message content.
     const displayName = getDisplayNameOrDefault(personalDetails?.[action.actorAccountID ?? CONST.DEFAULT_NUMBER_ID]);
