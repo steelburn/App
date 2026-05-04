@@ -51,7 +51,7 @@ function OptionRowTooltipLayer({shouldShowRBRorGBRTooltip, shouldShowGetStartedT
     };
 
     if (!shouldEvaluateTooltip) {
-        return <>{renderChildren(onOptionPress)}</>;
+        return renderChildren(onOptionPress);
     }
 
     return (
