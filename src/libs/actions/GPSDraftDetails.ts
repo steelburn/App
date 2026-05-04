@@ -51,6 +51,12 @@ function setEndWaypointAddress(endAddress: GPSPointAddress, gpsPoints: GPSPoint[
     });
 }
 
+function updateGpsPoints(gpsPoints: GPSPoint[][]) {
+    Onyx.merge(ONYXKEYS.GPS_DRAFT_DETAILS, {
+        gpsPoints,
+    });
+}
+
 function removeLastSegment(gpsPoints: GPSPoint[][]) {
     const newGpsPoints = [...gpsPoints];
     newGpsPoints.pop();
@@ -150,4 +156,4 @@ function addGpsPoints(gpsDraftDetails: OnyxEntry<GpsDraftDetails>, newGpsPoints:
     return newCapturedPoints;
 }
 
-export {resetGPSDraftDetails, initGpsDraft, setStartWaypointAddress, setEndWaypointAddress, addGpsPoints, setIsTracking, resumeGpsTrip, removeLastSegment};
+export {resetGPSDraftDetails, initGpsDraft, setStartWaypointAddress, setEndWaypointAddress, addGpsPoints, setIsTracking, resumeGpsTrip, removeLastSegment, updateGpsPoints};

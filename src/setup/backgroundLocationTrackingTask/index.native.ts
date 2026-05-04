@@ -50,7 +50,7 @@ async function updateStartAddress(gpsPoints: GPSPoint[][], isOffline: boolean) {
         const address = await addressFromGpsPoint({lat: startPoint.lat, long: startPoint.long});
 
         // To avoid race conditions, we need to get the latest gpsDraftDetails, because reverse geocoding may even take a few seconds
-        const [gpsDraftDetailsPromiseResult] = await Promise.all([OnyxUtils.get(ONYXKEYS.GPS_DRAFT_DETAILS).catch(() => undefined), NetInfo.fetch()]);
+        const gpsDraftDetailsPromiseResult = await OnyxUtils.get(ONYXKEYS.GPS_DRAFT_DETAILS).catch(() => undefined);
         const updatedGpsDraftDetails = gpsDraftDetailsPromiseResult ?? undefined;
 
         if (address !== null) {

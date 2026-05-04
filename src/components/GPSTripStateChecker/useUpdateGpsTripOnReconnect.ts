@@ -1,31 +1,22 @@
+import OnyxUtils from 'react-native-onyx/dist/OnyxUtils';
 import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
-import {setEndWaypointAddress, setStartWaypointAddress} from '@libs/actions/GPSDraftDetails';
+import {updateGpsPoints} from '@libs/actions/GPSDraftDetails';
 import {addressFromGpsPoint, getGpsPoints} from '@libs/GPSDraftDetailsUtils';
 import ONYXKEYS from '@src/ONYXKEYS';
-import type {GPSPoint, GPSPointAddress} from '@src/types/onyx/GpsDraftDetails';
+import type {GPSPoint} from '@src/types/onyx/GpsDraftDetails';
 
 function useUpdateGpsTripOnReconnect() {
     const [gpsDraftDetails] = useOnyx(ONYXKEYS.GPS_DRAFT_DETAILS);
 
-    const updateAddressToHumanReadable = async (gpsPoint: GPSPoint | undefined, setAddress: (address: GPSPointAddress) => void) => {
-        if (!gpsPoint) {
-            return;
-        }
-
-        const address = await addressFromGpsPoint(gpsPoint);
-
-        if (address !== null) {
-            setAddress({value: address, type: 'address'});
-        }
-    };
-
-    const updateAddressesToHumanReadable = () => {
+    const updateAddressesToHumanReadable = async () => {
         if (!gpsDraftDetails) {
             return;
         }
 
         const gpsPoints = getGpsPoints(gpsDraftDetails);
+
+        const waypointUpdates: Array<Promise<{point: GPSPoint; segmentIndex: number; type: 'start' | 'end'}>> = [];
 
         for (const [segmentIndex, tripSegment] of gpsPoints.entries()) {
             for (const [pointIndex, point] of tripSegment.entries()) {
@@ -35,16 +26,54 @@ function useUpdateGpsTripOnReconnect() {
                 }
 
                 if (pointIndex === 0) {
-                    updateAddressToHumanReadable(point, (address) => setStartWaypointAddress(address, segmentIndex, gpsPoints));
+                    waypointUpdates.push(
+                        addressFromGpsPoint(point).then((address) => ({
+                            point: {...point, address: address ? {value: address, type: 'address'} : point.address},
+                            segmentIndex,
+                            type: 'start',
+                        })),
+                    );
                 } else if (pointIndex === tripSegment.length - 1) {
-                    updateAddressToHumanReadable(point, (address) => setEndWaypointAddress(address, gpsPoints, segmentIndex));
+                    waypointUpdates.push(
+                        addressFromGpsPoint(point).then((address) => ({
+                            point: {...point, address: address ? {value: address, type: 'address'} : point.address},
+                            segmentIndex,
+                            type: 'end',
+                        })),
+                    );
                 }
             }
         }
+
+        const waypointAddresses = (await Promise.all(waypointUpdates)).filter((waypoints) => !!waypoints.point.address);
+
+        // To avoid race conditions, we need to get the latest gpsDraftDetails, because reverse geocoding may even take a few seconds
+        const gpsDraftDetailsPromiseResult = await OnyxUtils.get(ONYXKEYS.GPS_DRAFT_DETAILS).catch(() => undefined);
+        const latestGpsDraftDetails = gpsDraftDetailsPromiseResult ?? gpsDraftDetails;
+
+        const latestGpsPoints = getGpsPoints(latestGpsDraftDetails);
+        const newGpsPoints = [...latestGpsPoints];
+
+        for (const {point, segmentIndex, type} of waypointAddresses) {
+            const segment = newGpsPoints.at(segmentIndex);
+            if (!segment) {
+                continue;
+            }
+
+            if (type === 'start') {
+                const newSegment = [point, ...segment.slice(1)];
+                newGpsPoints.splice(segmentIndex, 1, newSegment);
+            } else if (type === 'end') {
+                const newSegment = [...segment.slice(0, -1), point];
+                newGpsPoints.splice(segmentIndex, 1, newSegment);
+            }
+        }
+
+        updateGpsPoints(newGpsPoints);
     };
 
     // This is intentional to use async/await pattern for better readability
-
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     useNetwork({onReconnect: updateAddressesToHumanReadable});
 }
 
