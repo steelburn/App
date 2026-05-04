@@ -5353,7 +5353,6 @@ _Para instruções mais detalhadas, [visite nossa central de ajuda](${CONST.NETS
                 monthly: 'Mensal',
             },
             cardDetails: 'Detalhes do cartão',
-            cardPending: ({name}: {name: string}) => `O cartão está atualmente pendente e será emitido quando a conta de ${name} for validada.`,
             virtual: 'Virtual',
             physical: 'Físico',
             deactivate: 'Desativar cartão',
