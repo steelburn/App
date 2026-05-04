@@ -1,9 +1,19 @@
 import type * as ReactNavigationNative from '@react-navigation/native';
 import {fireEvent, render, screen, userEvent, within} from '@testing-library/react-native';
 import {addMonths, addYears, subMonths, subYears} from 'date-fns';
+import type {ComponentType, ReactNode} from 'react';
 import CalendarPicker from '@components/DatePicker/CalendarPicker';
 import DateUtils from '@libs/DateUtils';
 import CONST from '@src/CONST';
+
+type MockPressableProps = {testID?: string; accessibilityLabel?: string; role?: string; onPress?: () => void; children?: ReactNode};
+type MockTextProps = {children?: ReactNode};
+type MockViewProps = {testID?: string; children?: ReactNode};
+type MockReactNativePrimitives = {
+    Pressable: ComponentType<MockPressableProps>;
+    Text: ComponentType<MockTextProps>;
+    View: ComponentType<MockViewProps>;
+};
 
 const monthNames = DateUtils.getMonthNames();
 
@@ -21,18 +31,30 @@ jest.mock('../../src/hooks/useLocalize', () =>
 
 jest.mock('@src/components/ConfirmedRoute.tsx');
 
+type MockMonthPickerModalProps = {isVisible: boolean; onMonthChange?: (month: number) => void; onClose?: () => void};
+type MockYearPickerModalProps = {
+    isVisible: boolean;
+    years: Array<{value: number; text: string}>;
+    onYearChange?: (year: number) => void;
+    onClose?: () => void;
+};
+
 jest.mock('@components/DatePicker/CalendarPicker/MonthPickerModal', () => {
-    const {Pressable, Text, View} = jest.requireActual('react-native');
-    return function MockMonthPickerModal({isVisible, onMonthChange, onClose}: {isVisible: boolean; currentMonth?: number; onMonthChange?: (month: number) => void; onClose?: () => void}) {
+    const ReactNativeActual = jest.requireActual<MockReactNativePrimitives>('react-native');
+    const {Pressable, Text, View} = ReactNativeActual;
+    const MONTH_KEYS = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+    function MockMonthPickerModal({isVisible, onMonthChange, onClose}: MockMonthPickerModalProps) {
         if (!isVisible) {
             return null;
         }
         return (
             <View testID="MonthPickerModal">
-                {Array.from({length: 12}).map((_, i) => (
+                {MONTH_KEYS.map((key, i) => (
                     <Pressable
-                        key={i}
+                        key={key}
                         testID={`month-option-${i}`}
+                        accessibilityLabel={`month-${i}`}
+                        role="button"
                         onPress={() => onMonthChange?.(i)}
                     >
                         <Text>{`month-${i}`}</Text>
@@ -40,29 +62,22 @@ jest.mock('@components/DatePicker/CalendarPicker/MonthPickerModal', () => {
                 ))}
                 <Pressable
                     testID="month-modal-close"
+                    accessibilityLabel="close"
+                    role="button"
                     onPress={onClose}
                 >
                     <Text>close</Text>
                 </Pressable>
             </View>
         );
-    };
+    }
+    return MockMonthPickerModal;
 });
 
 jest.mock('@components/DatePicker/CalendarPicker/YearPickerModal', () => {
-    const {Pressable, Text, View} = jest.requireActual('react-native');
-    return function MockYearPickerModal({
-        isVisible,
-        years,
-        onYearChange,
-        onClose,
-    }: {
-        isVisible: boolean;
-        years: Array<{value: number; text: string}>;
-        currentYear?: number;
-        onYearChange?: (year: number) => void;
-        onClose?: () => void;
-    }) {
+    const ReactNativeActual = jest.requireActual<MockReactNativePrimitives>('react-native');
+    const {Pressable, Text, View} = ReactNativeActual;
+    function MockYearPickerModal({isVisible, years, onYearChange, onClose}: MockYearPickerModalProps) {
         if (!isVisible) {
             return null;
         }
@@ -72,6 +87,8 @@ jest.mock('@components/DatePicker/CalendarPicker/YearPickerModal', () => {
                     <Pressable
                         key={year.value}
                         testID={`year-option-${year.value}`}
+                        accessibilityLabel={year.text}
+                        role="button"
                         onPress={() => onYearChange?.(year.value)}
                     >
                         <Text>{year.text}</Text>
@@ -79,13 +96,16 @@ jest.mock('@components/DatePicker/CalendarPicker/YearPickerModal', () => {
                 ))}
                 <Pressable
                     testID="year-modal-close"
+                    accessibilityLabel="close"
+                    role="button"
                     onPress={onClose}
                 >
                     <Text>close</Text>
                 </Pressable>
             </View>
         );
-    };
+    }
+    return MockYearPickerModal;
 });
 
 describe('CalendarPicker', () => {
