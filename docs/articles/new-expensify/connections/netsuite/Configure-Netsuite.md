@@ -76,7 +76,7 @@ To manage how reports are exported from Expensify to NetSuite:
 - **Invoice Item** – Select or create the item line for invoices
 - **Export Foreign Currency Amount** – Enable to export original currency values
 - **Export to Next Open Period** – Enable to skip closed periods and use the next available NetSuite period
-- **Export Expensify Travel Payable To** – If Expensify Travel is enabled, configure where travel card expenses are exported:
+- **Export Expensify Travel Payable To** – If Expensify Travel's Central invoicing feature is enabled, configure where travel card expenses are exported:
   - **Travel vendor** – Select the clearing vendor for Expensify Travel expenses
   - **Travel payable account** – Select the payable account for Expensify Travel expenses
 
