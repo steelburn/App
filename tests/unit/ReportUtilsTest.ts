@@ -117,7 +117,7 @@ import {
     getWorkspaceNameUpdatedMessage,
     hasActionWithErrorsForTransaction,
     hasEmptyReportsForPolicy,
-    hasPendingWorkflowUpdate,
+    hasPendingReportRetract,
     hasReceiptError,
     hasSmartscanError,
     hasVisibleReportFieldViolations,
@@ -5322,17 +5322,17 @@ describe('ReportUtils', () => {
         });
     });
 
-    describe('hasPendingWorkflowUpdate', () => {
-        it('should return true when pendingFields.nextStep is UPDATE', () => {
-            expect(hasPendingWorkflowUpdate({pendingFields: {nextStep: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE}})).toBe(true);
+    describe('hasPendingReportRetract', () => {
+        it('should return true when pendingFields.hasReportBeenRetracted is UPDATE', () => {
+            expect(hasPendingReportRetract({pendingFields: {hasReportBeenRetracted: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE}})).toBe(true);
         });
 
-        it('should return false when pendingFields.nextStep is not UPDATE', () => {
-            expect(hasPendingWorkflowUpdate({pendingFields: {nextStep: null}})).toBe(false);
+        it('should return false when only pendingFields.nextStep is UPDATE', () => {
+            expect(hasPendingReportRetract({pendingFields: {nextStep: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE}})).toBe(false);
         });
 
         it('should return false for undefined report', () => {
-            expect(hasPendingWorkflowUpdate(undefined)).toBe(false);
+            expect(hasPendingReportRetract(undefined)).toBe(false);
         });
     });
 
