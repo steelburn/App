@@ -6,6 +6,7 @@ import type CONST from '@src/CONST';
 import type {IOUAction, IOUType} from '@src/CONST';
 import type * as OnyxTypes from '@src/types/onyx';
 import type {Participant} from '@src/types/onyx/IOU';
+import type {FieldVisibility} from './fieldVisibility';
 
 type SettingsFieldsProps = {
     /** Action being performed (drives section navigation targets) */
@@ -52,6 +53,9 @@ type SettingsFieldsProps = {
 
     /** When true, suppresses all fields in this group (all are below show-more) */
     isCompactMode: boolean;
+
+    /** Per-field visibility decisions resolved by `computeFieldVisibility` */
+    fieldVisibility: Pick<FieldVisibility, 'toggles' | 'report'>;
 };
 
 /**
@@ -75,14 +79,14 @@ function SettingsFields({
     onToggleReimbursable,
     onToggleBillable,
     isCompactMode,
+    fieldVisibility,
 }: SettingsFieldsProps) {
     if (isCompactMode) {
         return null;
     }
-    const showToggles = shouldShowReimbursable || shouldShowBillable;
     return (
         <>
-            {showToggles && (
+            {fieldVisibility.toggles && (
                 <ToggleFields
                     isReadOnly={isReadOnly}
                     shouldShowReimbursable={shouldShowReimbursable}
@@ -92,7 +96,7 @@ function SettingsFields({
                     transaction={transaction}
                 />
             )}
-            {isPolicyExpenseChat && (
+            {fieldVisibility.report && (
                 <ReportField
                     selectedParticipants={selectedParticipants}
                     isPolicyExpenseChat={isPolicyExpenseChat}

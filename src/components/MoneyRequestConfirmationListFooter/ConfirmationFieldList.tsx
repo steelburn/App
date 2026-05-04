@@ -16,6 +16,7 @@ import type * as OnyxTypes from '@src/types/onyx';
 import type {Participant} from '@src/types/onyx/IOU';
 import type {Unit} from '@src/types/onyx/Policy';
 import ClassificationFields from './fieldGroups/ClassificationFields';
+import computeFieldVisibility, {hasBelowShowMore} from './fieldGroups/fieldVisibility';
 import SettingsFields from './fieldGroups/SettingsFields';
 import TransactionDetailsFields from './fieldGroups/TransactionDetailsFields';
 
@@ -251,23 +252,24 @@ function ConfirmationFieldList({
     const {translate} = useLocalize();
     const icons = useMemoizedLazyExpensifyIcons(['Sparkles', 'DownArrow']);
 
-    const showAmount = shouldShowSmartScanFields && shouldShowAmountField;
-    const showCategoryBelowShowMore = shouldShowCategories && !isCategoryRequired;
-    const hasOptionalTags = tagVisibility.some((entry) => entry.shouldShow && !entry.isTagRequired);
-
-    const hasBelowShowMore =
-        showAmount ||
-        isDistanceRequest ||
-        shouldShowMerchant ||
-        shouldShowTimeRequestFields ||
-        showCategoryBelowShowMore ||
-        shouldShowDate ||
-        hasOptionalTags ||
-        shouldShowTax ||
-        shouldShowAttendees ||
-        shouldShowReimbursable ||
-        shouldShowBillable ||
-        isPolicyExpenseChat;
+    const fieldVisibility = computeFieldVisibility({
+        shouldShowSmartScanFields,
+        shouldShowAmountField,
+        isDistanceRequest,
+        shouldShowMerchant,
+        shouldShowTimeRequestFields,
+        shouldShowCategories,
+        isCategoryRequired,
+        shouldShowDate,
+        tagVisibility,
+        policyTagLists,
+        shouldShowTax,
+        shouldShowAttendees,
+        shouldShowReimbursable,
+        shouldShowBillable,
+        isPolicyExpenseChat,
+    });
+    const shouldShowMoreButton = hasBelowShowMore(fieldVisibility);
 
     return (
         <View style={[styles.mb5, styles.mt2]}>
@@ -296,15 +298,10 @@ function ConfirmationFieldList({
                 isNewManualExpenseFlowEnabled={isNewManualExpenseFlowEnabled}
                 isEditingSplitBill={isEditingSplitBill}
                 isPolicyExpenseChat={isPolicyExpenseChat}
-                isDistanceRequest={isDistanceRequest}
                 isManualDistanceRequest={isManualDistanceRequest}
                 isOdometerDistanceRequest={isOdometerDistanceRequest}
                 isGPSDistanceRequest={isGPSDistanceRequest}
-                shouldShowAmountField={shouldShowAmountField}
-                shouldShowSmartScanFields={shouldShowSmartScanFields}
-                shouldShowMerchant={shouldShowMerchant}
                 isMerchantRequired={isMerchantRequired}
-                shouldShowTimeRequestFields={shouldShowTimeRequestFields}
                 isDescriptionRequired={isDescriptionRequired}
                 shouldDisplayFieldError={shouldDisplayFieldError}
                 formError={formError}
@@ -320,6 +317,7 @@ function ConfirmationFieldList({
                 distanceRateName={distanceRateName}
                 distanceRateCurrency={distanceRateCurrency}
                 isCompactMode={isCompactMode}
+                fieldVisibility={fieldVisibility}
             />
 
             <ClassificationFields
@@ -332,16 +330,11 @@ function ConfirmationFieldList({
                 policy={policy}
                 policyForMovingExpenses={policyForMovingExpenses}
                 policyTagLists={policyTagLists}
-                tagVisibility={tagVisibility}
                 previousTagsVisibility={previousTagsVisibility}
                 isReadOnly={isReadOnly}
                 didConfirm={didConfirm}
-                shouldShowCategories={shouldShowCategories}
                 isCategoryRequired={isCategoryRequired}
-                shouldShowDate={shouldShowDate}
-                shouldShowTax={shouldShowTax}
                 canModifyTaxFields={canModifyTaxFields}
-                shouldShowAttendees={shouldShowAttendees}
                 shouldDisplayFieldError={shouldDisplayFieldError}
                 shouldNavigateToUpgradePath={shouldNavigateToUpgradePath}
                 shouldSelectPolicy={shouldSelectPolicy}
@@ -349,6 +342,7 @@ function ConfirmationFieldList({
                 formattedAmountPerAttendee={formattedAmountPerAttendee}
                 formError={formError}
                 isCompactMode={isCompactMode}
+                fieldVisibility={fieldVisibility}
             />
 
             <SettingsFields
@@ -367,9 +361,10 @@ function ConfirmationFieldList({
                 onToggleReimbursable={onToggleReimbursable}
                 onToggleBillable={onToggleBillable}
                 isCompactMode={isCompactMode}
+                fieldVisibility={fieldVisibility}
             />
 
-            {isCompactMode && hasBelowShowMore && (
+            {isCompactMode && shouldShowMoreButton && (
                 <View style={[styles.mt3, styles.alignItemsCenter, styles.pRelative, styles.mh5]}>
                     <View style={[styles.dividerLine, styles.pAbsolute, styles.w100, styles.justifyContentCenter, {transform: [{translateY: -0.5}]}]} />
                     <Button

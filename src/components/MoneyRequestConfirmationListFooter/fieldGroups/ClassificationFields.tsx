@@ -9,13 +9,7 @@ import TaxFields from '@components/MoneyRequestConfirmationList/sections/TaxFiel
 import type CONST from '@src/CONST';
 import type {IOUAction, IOUType} from '@src/CONST';
 import type * as OnyxTypes from '@src/types/onyx';
-
-type TagVisibilityEntry = {
-    /** Whether this tag list should be displayed */
-    shouldShow: boolean;
-    /** Whether the tag for this list is required to submit */
-    isTagRequired: boolean;
-};
+import type {FieldVisibility, TagEntry} from './fieldVisibility';
 
 type ClassificationFieldsProps = {
     /** Action being performed (drives section navigation targets) */
@@ -42,11 +36,8 @@ type ClassificationFieldsProps = {
     /** Resolved policy used when moving an expense off track-expense (drives tax fallback) */
     policyForMovingExpenses: OnyxEntry<OnyxTypes.Policy> | undefined;
 
-    /** Tag lists configured on the policy */
+    /** Tag lists configured on the policy (used to look up the list at each tag entry's index) */
     policyTagLists: Array<ValueOf<OnyxTypes.PolicyTagLists>>;
-
-    /** Per-tag-list visibility (parallel to `policyTagLists` order) */
-    tagVisibility: TagVisibilityEntry[];
 
     /** Previous render's per-tag-list `shouldShow` projection (drives `TagFields` transitions) */
     previousTagsVisibility: boolean[];
@@ -57,23 +48,11 @@ type ClassificationFieldsProps = {
     /** Whether the user has confirmed (locks editable controls) */
     didConfirm: boolean;
 
-    /** Whether the categories field should be displayed */
-    shouldShowCategories: boolean;
-
     /** Whether the categories field is required (drives above-show-more placement) */
     isCategoryRequired: boolean;
 
-    /** Whether the date field should be displayed */
-    shouldShowDate: boolean;
-
-    /** Whether the tax field should be displayed */
-    shouldShowTax: boolean;
-
     /** Whether tax field modifications are allowed */
     canModifyTaxFields: boolean;
-
-    /** Whether the attendees field should be displayed */
-    shouldShowAttendees: boolean;
 
     /** Whether to display per-field validation errors */
     shouldDisplayFieldError: boolean;
@@ -95,6 +74,9 @@ type ClassificationFieldsProps = {
 
     /** When true, suppresses optional fields (only required Category + required Tags render) */
     isCompactMode: boolean;
+
+    /** Per-field visibility decisions resolved by `computeFieldVisibility` */
+    fieldVisibility: Pick<FieldVisibility, 'categoryRequired' | 'categoryOptional' | 'date' | 'tagsRequired' | 'tagsOptional' | 'tax' | 'attendees'>;
 };
 
 function ClassificationFields({
@@ -107,16 +89,11 @@ function ClassificationFields({
     policy,
     policyForMovingExpenses,
     policyTagLists,
-    tagVisibility,
     previousTagsVisibility,
     isReadOnly,
     didConfirm,
-    shouldShowCategories,
     isCategoryRequired,
-    shouldShowDate,
-    shouldShowTax,
     canModifyTaxFields,
-    shouldShowAttendees,
     shouldDisplayFieldError,
     shouldNavigateToUpgradePath,
     shouldSelectPolicy,
@@ -124,24 +101,37 @@ function ClassificationFields({
     formattedAmountPerAttendee,
     formError,
     isCompactMode,
+    fieldVisibility,
 }: ClassificationFieldsProps) {
-    const showCategory = shouldShowCategories && (isCompactMode ? isCategoryRequired : true);
-
-    const visibleTagEntries = policyTagLists
-        .map(({name}, index) => {
-            const tagVisibilityItem = tagVisibility.at(index);
-            return {
-                name,
-                index,
-                isTagRequired: tagVisibilityItem?.isTagRequired ?? false,
-                tagShouldShow: tagVisibilityItem?.shouldShow ?? false,
-            };
-        })
-        .filter(({tagShouldShow, isTagRequired}) => tagShouldShow && (isCompactMode ? isTagRequired : true));
+    const renderTagFields = (entries: TagEntry[]) =>
+        entries.map(({name, index, isTagRequired}) => {
+            const policyTagList = policyTagLists.at(index);
+            if (!policyTagList) {
+                return null;
+            }
+            return (
+                <TagFields
+                    key={`tag_${name}`}
+                    tagIndex={index}
+                    policyTagList={policyTagList}
+                    isTagRequired={isTagRequired}
+                    previousShouldShow={previousTagsVisibility.at(index) ?? false}
+                    didConfirm={didConfirm}
+                    isReadOnly={isReadOnly}
+                    transactionID={transactionID}
+                    action={action}
+                    iouType={iouType}
+                    reportID={reportID}
+                    reportActionID={reportActionID}
+                    transaction={transaction}
+                    formError={formError}
+                />
+            );
+        });
 
     return (
         <>
-            {showCategory && (
+            {(fieldVisibility.categoryRequired || (!isCompactMode && fieldVisibility.categoryOptional)) && (
                 <CategoryField
                     isCategoryRequired={isCategoryRequired}
                     didConfirm={didConfirm}
@@ -159,7 +149,7 @@ function ClassificationFields({
                 />
             )}
 
-            {!isCompactMode && shouldShowDate && (
+            {!isCompactMode && fieldVisibility.date && (
                 <DateField
                     shouldDisplayFieldError={shouldDisplayFieldError}
                     didConfirm={didConfirm}
@@ -173,32 +163,11 @@ function ClassificationFields({
                 />
             )}
 
-            {visibleTagEntries.map(({name, index, isTagRequired}) => {
-                const policyTagList = policyTagLists.at(index);
-                if (!policyTagList) {
-                    return null;
-                }
-                return (
-                    <TagFields
-                        key={`tag_${name}`}
-                        tagIndex={index}
-                        policyTagList={policyTagList}
-                        isTagRequired={isTagRequired}
-                        previousShouldShow={previousTagsVisibility.at(index) ?? false}
-                        didConfirm={didConfirm}
-                        isReadOnly={isReadOnly}
-                        transactionID={transactionID}
-                        action={action}
-                        iouType={iouType}
-                        reportID={reportID}
-                        reportActionID={reportActionID}
-                        transaction={transaction}
-                        formError={formError}
-                    />
-                );
-            })}
+            {renderTagFields(fieldVisibility.tagsRequired)}
 
-            {!isCompactMode && shouldShowTax && (
+            {!isCompactMode && renderTagFields(fieldVisibility.tagsOptional)}
+
+            {!isCompactMode && fieldVisibility.tax && (
                 <TaxFields
                     policy={policy}
                     policyForMovingExpenses={policyForMovingExpenses}
@@ -214,7 +183,7 @@ function ClassificationFields({
                 />
             )}
 
-            {!isCompactMode && shouldShowAttendees && (
+            {!isCompactMode && fieldVisibility.attendees && (
                 <AttendeeField
                     formattedAmountPerAttendee={formattedAmountPerAttendee}
                     isReadOnly={isReadOnly}

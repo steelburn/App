@@ -10,6 +10,7 @@ import type CONST from '@src/CONST';
 import type {IOUAction, IOUType} from '@src/CONST';
 import type * as OnyxTypes from '@src/types/onyx';
 import type {Unit} from '@src/types/onyx/Policy';
+import type {FieldVisibility} from './fieldVisibility';
 
 type TransactionDetailsFieldsProps = {
     /** Action being performed (drives section navigation targets) */
@@ -48,9 +49,6 @@ type TransactionDetailsFieldsProps = {
     /** Whether the surface is in a policy-expense chat */
     isPolicyExpenseChat: boolean;
 
-    /** Whether the active transaction is a distance request */
-    isDistanceRequest: boolean;
-
     /** Whether the active transaction is a manual distance request */
     isManualDistanceRequest: boolean;
 
@@ -60,20 +58,11 @@ type TransactionDetailsFieldsProps = {
     /** Whether the active transaction is a GPS-driven distance request */
     isGPSDistanceRequest: boolean;
 
-    /** Whether the smart-scan-driven amount field should be displayed */
-    shouldShowAmountField: boolean;
-
-    /** Whether the smart-scan fields are shown (gates AmountField visibility) */
-    shouldShowSmartScanFields: boolean;
-
-    /** Whether the merchant field should be displayed */
-    shouldShowMerchant: boolean;
-
     /** Whether the merchant is required to submit */
     isMerchantRequired: boolean | undefined;
 
-    /** Whether the time-request fields should be displayed */
-    shouldShowTimeRequestFields: boolean;
+    /** Per-field visibility decisions resolved by `computeFieldVisibility` */
+    fieldVisibility: Pick<FieldVisibility, 'amount' | 'distance' | 'rate' | 'merchant' | 'time'>;
 
     /** Whether the description is required to submit */
     isDescriptionRequired: boolean;
@@ -134,15 +123,10 @@ function TransactionDetailsFields({
     isNewManualExpenseFlowEnabled,
     isEditingSplitBill,
     isPolicyExpenseChat,
-    isDistanceRequest,
     isManualDistanceRequest,
     isOdometerDistanceRequest,
     isGPSDistanceRequest,
-    shouldShowAmountField,
-    shouldShowSmartScanFields,
-    shouldShowMerchant,
     isMerchantRequired,
-    shouldShowTimeRequestFields,
     isDescriptionRequired,
     shouldDisplayFieldError,
     formError,
@@ -158,22 +142,22 @@ function TransactionDetailsFields({
     distanceRateName,
     distanceRateCurrency,
     isCompactMode,
+    fieldVisibility,
 }: TransactionDetailsFieldsProps) {
-    const showAmount = shouldShowSmartScanFields && shouldShowAmountField;
     return (
         <>
-            {!isCompactMode && showAmount && (
+            {!isCompactMode && fieldVisibility.amount && (
                 <AmountField
                     action={action}
                     amount={amount}
                     formattedAmount={formattedAmount}
                     distanceRateCurrency={distanceRateCurrency}
                     iouCurrencyCode={iouCurrencyCode}
-                    isDistanceRequest={isDistanceRequest}
+                    isDistanceRequest={fieldVisibility.distance}
                     isNewManualExpenseFlowEnabled={isNewManualExpenseFlowEnabled}
                     didConfirm={didConfirm}
                     isReadOnly={isReadOnly}
-                    shouldShowTimeRequestFields={shouldShowTimeRequestFields}
+                    shouldShowTimeRequestFields={fieldVisibility.time}
                     shouldDisplayFieldError={shouldDisplayFieldError}
                     formError={formError}
                     transaction={transaction}
@@ -201,7 +185,7 @@ function TransactionDetailsFields({
                 isEditingSplitBill={isEditingSplitBill}
             />
 
-            {isDistanceRequest && (
+            {fieldVisibility.distance && (
                 <DistanceField
                     hasRoute={hasRoute}
                     distance={distance}
@@ -220,7 +204,7 @@ function TransactionDetailsFields({
                 />
             )}
 
-            {!isCompactMode && isDistanceRequest && (
+            {!isCompactMode && fieldVisibility.rate && (
                 <RateField
                     distanceRateName={distanceRateName}
                     distanceRateCurrency={distanceRateCurrency}
@@ -241,7 +225,7 @@ function TransactionDetailsFields({
                 />
             )}
 
-            {!isCompactMode && shouldShowMerchant && (
+            {!isCompactMode && fieldVisibility.merchant && (
                 <MerchantField
                     isMerchantRequired={isMerchantRequired}
                     isNewManualExpenseFlowEnabled={isNewManualExpenseFlowEnabled}
@@ -259,7 +243,7 @@ function TransactionDetailsFields({
                 />
             )}
 
-            {!isCompactMode && shouldShowTimeRequestFields && (
+            {!isCompactMode && fieldVisibility.time && (
                 <TimeFields
                     transaction={transaction}
                     isReadOnly={isReadOnly}
