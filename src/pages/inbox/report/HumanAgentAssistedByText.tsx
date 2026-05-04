@@ -1,4 +1,4 @@
-import React, {useCallback} from 'react';
+import React from 'react';
 import type {OnyxEntry} from 'react-native-onyx';
 import Text from '@components/Text';
 import useLocalize from '@hooks/useLocalize';
@@ -16,8 +16,9 @@ type HumanAgentAssistedByTextProps = {
 function HumanAgentAssistedByText({action}: HumanAgentAssistedByTextProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const nameSelector = useCallback((list: OnyxEntry<OnyxTypes.PersonalDetailsList>) => getHumanAgentFirstName(action, list), [action]);
-    const [humanAgentName] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST, {selector: nameSelector});
+    const [humanAgentName] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST, {
+        selector: (list: OnyxEntry<OnyxTypes.PersonalDetailsList>) => getHumanAgentFirstName(action, list),
+    });
     return <Text style={[styles.chatDelegateMessage]}>{translate('reportAction.assistedBy', humanAgentName ?? translate('reportAction.humanSupportAgent'))}</Text>;
 }
 

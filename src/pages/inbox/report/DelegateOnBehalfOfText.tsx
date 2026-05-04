@@ -1,4 +1,4 @@
-import React, {useCallback} from 'react';
+import React from 'react';
 import type {OnyxEntry} from 'react-native-onyx';
 import Text from '@components/Text';
 import useLocalize from '@hooks/useLocalize';
@@ -19,8 +19,9 @@ type DelegateOnBehalfOfTextProps = {
 function DelegateOnBehalfOfText({mainAccountID, fallbackLogin}: DelegateOnBehalfOfTextProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const loginSelector = useCallback((list: OnyxEntry<OnyxTypes.PersonalDetailsList>) => (mainAccountID ? list?.[mainAccountID]?.login : undefined), [mainAccountID]);
-    const [resolvedLogin] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST, {selector: loginSelector});
+    const [resolvedLogin] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST, {
+        selector: (list: OnyxEntry<OnyxTypes.PersonalDetailsList>) => (mainAccountID ? list?.[mainAccountID]?.login : undefined),
+    });
     const mainAccountLogin = resolvedLogin ?? fallbackLogin;
     const accountOwnerDetails = getPersonalDetailByEmail(String(mainAccountLogin ?? ''));
     return <Text style={[styles.chatDelegateMessage]}>{translate('delegate.onBehalfOfMessage', accountOwnerDetails?.displayName ?? '')}</Text>;
