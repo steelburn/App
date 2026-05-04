@@ -1,14 +1,12 @@
 import {hasStartedLocationUpdatesAsync, reverseGeocodeAsync, stopLocationUpdatesAsync} from 'expo-location';
-import OnyxUtils from 'react-native-onyx/dist/OnyxUtils';
 import type {SetRequired} from 'type-fest';
 import {BACKGROUND_LOCATION_TRACKING_TASK_NAME} from '@pages/iou/request/step/IOURequestStepDistanceGPS/const';
 import {stopGpsTripNotification} from '@pages/iou/request/step/IOURequestStepDistanceGPS/GPSNotifications';
-import ONYXKEYS from '@src/ONYXKEYS';
 import type {GpsDraftDetails} from '@src/types/onyx';
 import type {GPSPoint} from '@src/types/onyx/GpsDraftDetails';
 import type {Unit} from '@src/types/onyx/Policy';
 import type {Routes, Waypoint} from '@src/types/onyx/Transaction';
-import {isLastSegmentEmptyOrHasOnlyOnePoint, setEndAddress, setIsTracking} from './actions/GPSDraftDetails';
+import {removeLastSegment, setEndWaypointAddress, setIsTracking} from './actions/GPSDraftDetails';
 import DistanceRequestUtils from './DistanceRequestUtils';
 import {roundToTwoDecimalPlaces} from './NumberUtils';
 
@@ -94,10 +92,12 @@ function coordinatesToString(gpsPoint: {lat: number; long: number}): string {
     return `${gpsPoint.lat},${gpsPoint.long}`;
 }
 
-async function getLastPoint() {
-    const gpsTrip = await OnyxUtils.get(ONYXKEYS.GPS_DRAFT_DETAILS);
+function isLastSegmentEmptyOrHasOnlyOnePoint(lastSegment: GPSPoint[]): boolean {
+    if (lastSegment.length <= 1) {
+        return true;
+    }
 
-    return gpsTrip?.gpsPoints?.at(-1)?.at(-1);
+    return false;
 }
 
 async function stopGpsTrip(isOffline: boolean, gpsPoints: GPSPoint[][], skipLastPointAddressFetching = false) {
@@ -110,23 +110,30 @@ async function stopGpsTrip(isOffline: boolean, gpsPoints: GPSPoint[][], skipLast
     setIsTracking(false);
     stopGpsTripNotification();
 
-    if (isLastSegmentEmptyOrHasOnlyOnePoint(gpsPoints)) {
+    const lastSegment = gpsPoints.at(-1);
+
+    if (!lastSegment) {
+        return;
+    }
+
+    if (isLastSegmentEmptyOrHasOnlyOnePoint(lastSegment)) {
+        removeLastSegment(gpsPoints);
         return;
     }
 
     if (skipLastPointAddressFetching) {
-        const lastPoint = await getLastPoint();
+        const lastPoint = lastSegment.at(-1);
 
         if (!lastPoint) {
             return;
         }
 
         const formattedCoordinates = coordinatesToString(lastPoint);
-        setEndAddress({value: formattedCoordinates, type: 'coordinates'}, gpsPoints);
+        setEndWaypointAddress({value: formattedCoordinates, type: 'coordinates'}, gpsPoints);
         return;
     }
 
-    const lastPoint = await getLastPoint();
+    const lastPoint = lastSegment.at(-1);
 
     if (!lastPoint) {
         return;
@@ -136,13 +143,13 @@ async function stopGpsTrip(isOffline: boolean, gpsPoints: GPSPoint[][], skipLast
         const endAddress = await addressFromGpsPoint(lastPoint);
 
         if (endAddress !== null) {
-            setEndAddress({value: endAddress, type: 'address'}, gpsPoints);
+            setEndWaypointAddress({value: endAddress, type: 'address'}, gpsPoints);
             return;
         }
     }
 
     const formattedCoordinates = coordinatesToString(lastPoint);
-    setEndAddress({value: formattedCoordinates, type: 'coordinates'}, gpsPoints);
+    setEndWaypointAddress({value: formattedCoordinates, type: 'coordinates'}, gpsPoints);
 }
 
 function getTotalGpsTripPoints(gpsDraftDetails: GpsDraftDetails | undefined): number {

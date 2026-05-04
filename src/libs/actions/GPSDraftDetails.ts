@@ -1,6 +1,5 @@
 import Onyx from 'react-native-onyx';
 import type {OnyxEntry} from 'react-native-onyx';
-import {getGpsPoints} from '@libs/GPSDraftDetailsUtils';
 import {GPS_DISTANCE_INTERVAL_METERS} from '@pages/iou/request/step/IOURequestStepDistanceGPS/const';
 import {updateGpsTripNotificationDistance} from '@pages/iou/request/step/IOURequestStepDistanceGPS/GPSNotifications';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -12,6 +11,10 @@ import {setUserLocation} from './UserLocation';
 
 function resetGPSDraftDetails() {
     Onyx.merge(ONYXKEYS.GPS_DRAFT_DETAILS, null);
+}
+
+function getGpsPoints(gpsDraftDetails: GpsDraftDetails | undefined): GPSPoint[][] {
+    return gpsDraftDetails?.gpsPoints ?? [[]];
 }
 
 function setStartWaypointAddress(startAddress: GPSPointAddress, tripSegmentIndex: number, gpsPoints: GPSPoint[][]) {
@@ -31,46 +34,30 @@ function setStartWaypointAddress(startAddress: GPSPointAddress, tripSegmentIndex
     });
 }
 
-function setEndAddress(endAddress: GPSPointAddress, gpsPoints: GPSPoint[][]) {
-    const lastSegment = gpsPoints.at(-1);
-    const lastPoint = lastSegment?.at(-1);
+function setEndWaypointAddress(endAddress: GPSPointAddress, gpsPoints: GPSPoint[][], tripSegmentIndex = -1) {
+    const tripSegment = gpsPoints.at(tripSegmentIndex);
+    const segmentLastPoint = tripSegment?.at(-1);
 
-    if (!lastPoint || !lastSegment) {
+    if (!segmentLastPoint || !tripSegment) {
         return;
     }
 
-    const newLastSegment = [...lastSegment.slice(0, -1), {...lastPoint, address: endAddress}];
-    const newGpsPoints = [...gpsPoints.slice(0, -1), newLastSegment];
+    const newSegment = [...tripSegment.slice(0, -1), {...segmentLastPoint, address: endAddress}];
+    const newGpsPoints = [...gpsPoints];
+    newGpsPoints.splice(tripSegmentIndex, 1, newSegment);
 
     Onyx.merge(ONYXKEYS.GPS_DRAFT_DETAILS, {
         gpsPoints: newGpsPoints,
     });
 }
 
-function isLastSegmentEmptyOrHasOnlyOnePoint(gpsPoints: GPSPoint[][]): boolean {
-    if (gpsPoints.length <= 1) {
-        return true;
-    }
+function removeLastSegment(gpsPoints: GPSPoint[][]) {
+    const newGpsPoints = [...gpsPoints];
+    newGpsPoints.pop();
 
-    const lastSegment = gpsPoints.at(-1);
-
-    if (!lastSegment) {
-        return true;
-    }
-
-    // If the last segment (which is not the only one) is empty or has only one point, remove it
-    if (lastSegment.length <= 1) {
-        const newGpsPoints = [...gpsPoints];
-        newGpsPoints.pop();
-
-        Onyx.merge(ONYXKEYS.GPS_DRAFT_DETAILS, {
-            gpsPoints: newGpsPoints,
-        });
-
-        return true;
-    }
-
-    return false;
+    Onyx.merge(ONYXKEYS.GPS_DRAFT_DETAILS, {
+        gpsPoints: newGpsPoints,
+    });
 }
 
 function initGpsDraft(reportID: string, unit: Unit) {
@@ -89,14 +76,14 @@ function resumeGpsTrip(gpsDraftDetails: OnyxEntry<GpsDraftDetails>) {
     }
 
     const lastTripSegment = gpsDraftDetails.gpsPoints.at(-1);
-    const gpsPoints = gpsDraftDetails.gpsPoints;
+    const newGpsPoints = [...gpsDraftDetails.gpsPoints];
 
     if (lastTripSegment && lastTripSegment.length !== 0) {
-        gpsPoints.push([]);
+        newGpsPoints.push([]);
     }
 
     Onyx.merge(ONYXKEYS.GPS_DRAFT_DETAILS, {
-        gpsPoints,
+        gpsPoints: newGpsPoints,
         isTracking: true,
     });
 }
@@ -139,9 +126,10 @@ function addGpsPoints(gpsDraftDetails: OnyxEntry<GpsDraftDetails>, newGpsPoints:
 
     const updatedDistance = capturedDistance + distanceToAdd;
 
-    capturedPoints.splice(capturedPoints.length - 1, 1, [...lastTripSegment, ...gpsPointsToAdd]);
+    const newCapturedPoints = [...capturedPoints];
+    newCapturedPoints.splice(newCapturedPoints.length - 1, 1, [...lastTripSegment, ...gpsPointsToAdd]);
 
-    const latestPoint = capturedPoints.at(-1)?.at(-1);
+    const latestPoint = newCapturedPoints.at(-1)?.at(-1);
 
     if (latestPoint) {
         setUserLocation({longitude: latestPoint.long, latitude: latestPoint.lat});
@@ -152,9 +140,9 @@ function addGpsPoints(gpsDraftDetails: OnyxEntry<GpsDraftDetails>, newGpsPoints:
     }
 
     Onyx.merge(ONYXKEYS.GPS_DRAFT_DETAILS, {
-        gpsPoints: capturedPoints,
+        gpsPoints: newCapturedPoints,
         distanceInMeters: updatedDistance,
     });
 }
 
-export {resetGPSDraftDetails, initGpsDraft, setStartWaypointAddress, setEndAddress, addGpsPoints, setIsTracking, resumeGpsTrip, isLastSegmentEmptyOrHasOnlyOnePoint};
+export {resetGPSDraftDetails, initGpsDraft, setStartWaypointAddress, setEndWaypointAddress, addGpsPoints, setIsTracking, resumeGpsTrip, removeLastSegment};

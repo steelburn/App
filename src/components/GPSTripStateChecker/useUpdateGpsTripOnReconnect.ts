@@ -1,6 +1,6 @@
 import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
-import {setEndAddress, setStartWaypointAddress} from '@libs/actions/GPSDraftDetails';
+import {setEndWaypointAddress, setStartWaypointAddress} from '@libs/actions/GPSDraftDetails';
 import {addressFromGpsPoint, getGpsPoints} from '@libs/GPSDraftDetailsUtils';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {GPSPoint, GPSPointAddress} from '@src/types/onyx/GpsDraftDetails';
@@ -27,17 +27,17 @@ function useUpdateGpsTripOnReconnect() {
 
         const gpsPoints = getGpsPoints(gpsDraftDetails);
 
-        for (const tripSegment of gpsPoints) {
-            for (const [index, point] of tripSegment.entries()) {
+        for (const [segmentIndex, tripSegment] of gpsPoints.entries()) {
+            for (const [pointIndex, point] of tripSegment.entries()) {
                 // If the address is not a coordinates (already human readable), we don't need to update it
                 if (point.address?.type === 'address') {
                     continue;
                 }
 
-                if (index === 0) {
-                    updateAddressToHumanReadable(point, (address) => setStartWaypointAddress(address, 0, gpsPoints));
-                } else if (index === tripSegment.length - 1) {
-                    updateAddressToHumanReadable(point, (address) => setEndAddress(address, gpsPoints));
+                if (pointIndex === 0) {
+                    updateAddressToHumanReadable(point, (address) => setStartWaypointAddress(address, segmentIndex, gpsPoints));
+                } else if (pointIndex === tripSegment.length - 1) {
+                    updateAddressToHumanReadable(point, (address) => setEndWaypointAddress(address, gpsPoints, segmentIndex));
                 }
             }
         }
