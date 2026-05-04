@@ -41,6 +41,17 @@ const KEYS_TO_PRESERVE_DELEGATE_ACCESS = [
     ONYXKEYS.COLLECTION.DEVICE_BIOMETRICS,
 ];
 
+/**
+ * Atomically reset Onyx for a delegate-access transition while keeping IS_LOADING_APP=true
+ * so consumers never observe the post-clear state with HAS_LOADED_APP=true and
+ * IS_LOADING_APP=undefined. That combination falsely looks like a stuck app and triggers
+ * DelegateAccessHandler's recovery effect, producing a duplicate openApp queued behind the
+ * explicit openApp the caller is about to make.
+ */
+function clearOnyxForDelegateTransition(): Promise<void> {
+    return Onyx.merge(ONYXKEYS.IS_LOADING_APP, true).then(() => Onyx.clear([...KEYS_TO_PRESERVE_DELEGATE_ACCESS, ONYXKEYS.IS_LOADING_APP]));
+}
+
 type WithDelegatedAccess = {
     // Optional keeps call sites clean, but still encourages passing `account?.delegatedAccess`.
     delegatedAccess: DelegatedAccess | undefined;
@@ -199,7 +210,7 @@ function connect({email, delegatedAccess, credentials, session, activePolicyID, 
                 })
                 .then(() => {
                     NetworkStore.setAuthToken(response?.restrictedToken ?? null);
-                    return Onyx.clear(KEYS_TO_PRESERVE_DELEGATE_ACCESS);
+                    return clearOnyxForDelegateTransition();
                 })
                 .then(() => {
                     confirmReadyToOpenApp();
@@ -298,7 +309,7 @@ function disconnect({stashedCredentials, stashedSession}: DisconnectParams) {
                 })
                 .then(() => {
                     NetworkStore.setAuthToken(response?.authToken ?? null);
-                    return Onyx.clear(KEYS_TO_PRESERVE_DELEGATE_ACCESS);
+                    return clearOnyxForDelegateTransition();
                 })
                 .then(() => {
                     Onyx.set(ONYXKEYS.CREDENTIALS, {
@@ -667,7 +678,7 @@ function updateDelegateRole({email, role, validateCode, delegatedAccess}: Update
 }
 
 function restoreDelegateSession<TKey extends OnyxKey>(authenticateResponse: Response<TKey>) {
-    Onyx.clear(KEYS_TO_PRESERVE_DELEGATE_ACCESS).then(() => {
+    clearOnyxForDelegateTransition().then(() => {
         updateSessionAuthTokens(authenticateResponse?.authToken, authenticateResponse?.encryptedAuthToken);
         updateSessionUser(authenticateResponse?.accountID, authenticateResponse?.email);
 
@@ -694,5 +705,6 @@ export {
     updateDelegateRole,
     removeDelegate,
     openSecuritySettingsPage,
+    clearOnyxForDelegateTransition,
     KEYS_TO_PRESERVE_DELEGATE_ACCESS,
 };
