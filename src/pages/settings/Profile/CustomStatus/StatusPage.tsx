@@ -146,7 +146,7 @@ function StatusPage() {
         if (navigateBackToPreviousScreenTask.current) {
             return;
         }
-        clearCustomStatus();
+        clearCustomStatus(currentUserPersonalDetails.accountID);
         updateDraftCustomStatus({
             text: '',
             emojiCode: '',

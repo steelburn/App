@@ -4,8 +4,8 @@ import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails'
 import * as User from '@userActions/User';
 import CONST from '@src/CONST';
 
-function clearStatus() {
-    User.clearCustomStatus();
+function clearStatus(currentUserAccountID: number) {
+    User.clearCustomStatus(currentUserAccountID);
     User.clearDraftCustomStatus();
 }
 
@@ -25,6 +25,7 @@ function UserStatusHandler() {
         if (!currentUserPersonalDetails.status?.clearAfter) {
             return;
         }
+        const currentUserAccountID = currentUserPersonalDetails.accountID;
         const currentTime = new Date();
         const clearAfterTime = new Date(currentUserPersonalDetails.status.clearAfter);
         if (Number.isNaN(clearAfterTime.getTime())) {
@@ -41,7 +42,7 @@ function UserStatusHandler() {
                     const remainingTime = clearAfterTime.getTime() - now.getTime();
 
                     if (remainingTime <= 0) {
-                        clearStatus();
+                        clearStatus(currentUserAccountID);
                         if (intervalId) {
                             clearInterval(intervalId);
                         }
@@ -50,13 +51,13 @@ function UserStatusHandler() {
                             clearInterval(intervalId);
                         }
                         timeoutId = setTimeout(() => {
-                            clearStatus();
+                            clearStatus(currentUserAccountID);
                         }, remainingTime);
                     }
                 }, CONST.LIMIT_TIMEOUT);
             } else {
                 timeoutId = setTimeout(() => {
-                    clearStatus();
+                    clearStatus(currentUserAccountID);
                 }, subMillisecondsTime);
             }
 
@@ -70,8 +71,8 @@ function UserStatusHandler() {
             };
         }
 
-        clearStatus();
-    }, [currentUserPersonalDetails.status?.clearAfter]);
+        clearStatus(currentUserAccountID);
+    }, [currentUserPersonalDetails.accountID, currentUserPersonalDetails.status?.clearAfter]);
 
     return null;
 }
