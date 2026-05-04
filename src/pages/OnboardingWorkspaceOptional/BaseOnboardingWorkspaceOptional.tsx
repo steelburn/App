@@ -163,7 +163,10 @@ function BaseOnboardingWorkspaceOptional({shouldUseNativeStyles}: BaseOnboarding
 
         const email = session?.email ?? '';
         const lastWorkspaceNumber = lastWorkspaceNumberSelector(allPolicies, email);
-        const engagementChoice = onboardingPurposeSelected === CONST.ONBOARDING_CHOICES.TRACK_PERSONAL ? CONST.ONBOARDING_CHOICES.TRACK_PERSONAL : CONST.ONBOARDING_CHOICES.TRACK_WORKSPACE;
+        const engagementChoice =
+            onboardingPurposeSelected === CONST.ONBOARDING_CHOICES.TRACK_PERSONAL || onboardingPurposeSelected === CONST.ONBOARDING_CHOICES.PERSONAL_SPEND
+                ? CONST.ONBOARDING_CHOICES.TRACK_PERSONAL
+                : CONST.ONBOARDING_CHOICES.TRACK_WORKSPACE;
 
         const {adminsChatReportID, policyID} = shouldCreateWorkspace
             ? createWorkspace({
@@ -279,7 +282,11 @@ function BaseOnboardingWorkspaceOptional({shouldUseNativeStyles}: BaseOnboarding
                             text={translate('onboarding.workspace.createWorkspace')}
                             onPress={() => {
                                 setOnboardingErrorMessage(null);
-                                if (onboardingPurposeSelected === CONST.ONBOARDING_CHOICES.TRACK_BUSINESS || onboardingPurposeSelected === CONST.ONBOARDING_CHOICES.TRACK_PERSONAL) {
+                                if (
+                                    onboardingPurposeSelected === CONST.ONBOARDING_CHOICES.TRACK_BUSINESS ||
+                                    onboardingPurposeSelected === CONST.ONBOARDING_CHOICES.TRACK_PERSONAL ||
+                                    onboardingPurposeSelected === CONST.ONBOARDING_CHOICES.PERSONAL_SPEND
+                                ) {
                                     createWorkspaceAndCompleteOnboarding();
                                     return;
                                 }
