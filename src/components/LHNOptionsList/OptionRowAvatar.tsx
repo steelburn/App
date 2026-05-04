@@ -18,7 +18,7 @@ type OptionRowAvatarProps = {
     singleAvatarContainerStyle: ViewStyle[];
 };
 
-function OptionRowAvatar({optionItem, report, isInFocusMode, subscriptAvatarBorderColor, secondaryAvatarBackgroundColor, singleAvatarContainerStyle}: OptionRowAvatarProps) {
+function OptionRowAvatarInner({optionItem, report, isInFocusMode, subscriptAvatarBorderColor, secondaryAvatarBackgroundColor, singleAvatarContainerStyle}: OptionRowAvatarProps) {
     const personalDetails = usePersonalDetails();
 
     const delegateAccountID = getDelegateAccountIDFromReportAction(optionItem?.parentReportAction);
@@ -51,12 +51,6 @@ function OptionRowAvatar({optionItem, report, isInFocusMode, subscriptAvatarBord
         delegateTooltipAccountID = Number(optionItem.icons.at(0)?.id ?? CONST.DEFAULT_NUMBER_ID);
     }
 
-    const firstIcon = optionItem.icons?.at(0);
-
-    if (!optionItem.icons?.length || !firstIcon) {
-        return null;
-    }
-
     return (
         <LHNAvatar
             icons={icons}
@@ -71,6 +65,16 @@ function OptionRowAvatar({optionItem, report, isInFocusMode, subscriptAvatarBord
             delegateTooltipAccountID={delegateTooltipAccountID}
         />
     );
+}
+
+OptionRowAvatarInner.displayName = 'OptionRowAvatarInner';
+
+function OptionRowAvatar(props: OptionRowAvatarProps) {
+    // Bail out before subscribing to personal details when the row has no avatar to render.
+    if (!props.optionItem.icons?.length || !props.optionItem.icons.at(0)) {
+        return null;
+    }
+    return <OptionRowAvatarInner {...props} />;
 }
 
 OptionRowAvatar.displayName = 'OptionRowAvatar';

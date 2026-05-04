@@ -27,18 +27,21 @@ function OptionRowTooltipLayer({shouldShowRBRorGBRTooltip, shouldShowGetStartedT
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const {isFullscreenVisible, isScreenFocused, isReportsSplitNavigatorLast} = useLHNTooltipContext();
 
+    // When neither tooltip qualifies, skip the EducationalTooltip wrapper entirely so
+    // the row avoids useProductTrainingContext and the tooltip-config useMemo cost.
+    const shouldEvaluateTooltip = shouldShowRBRorGBRTooltip || shouldShowGetStartedTooltip;
+
     const {tooltipToRender, shouldShowTooltip} = useMemo(() => {
         // TODO: CONCIERGE_LHN_GBR tooltip will be replaced by a tooltip in the #admins room
         // https://github.com/Expensify/App/issues/57045#issuecomment-2701455668
         const tooltip = CONST.PRODUCT_TRAINING_TOOLTIP_NAMES.CONCIERGE_LHN_GBR;
-        const shouldShowTooltips = shouldShowRBRorGBRTooltip || shouldShowGetStartedTooltip;
         const shouldTooltipBeVisible = shouldUseNarrowLayout ? isScreenFocused && isReportsSplitNavigatorLast : isReportsSplitNavigatorLast && !isFullscreenVisible;
 
         return {
             tooltipToRender: tooltip,
-            shouldShowTooltip: shouldShowTooltips && shouldTooltipBeVisible,
+            shouldShowTooltip: shouldEvaluateTooltip && shouldTooltipBeVisible,
         };
-    }, [shouldShowRBRorGBRTooltip, shouldShowGetStartedTooltip, isScreenFocused, shouldUseNarrowLayout, isReportsSplitNavigatorLast, isFullscreenVisible]);
+    }, [shouldEvaluateTooltip, isScreenFocused, shouldUseNarrowLayout, isReportsSplitNavigatorLast, isFullscreenVisible]);
 
     const {shouldShowProductTrainingTooltip, renderProductTrainingTooltip, hideProductTrainingTooltip} = useProductTrainingContext(tooltipToRender, shouldShowTooltip);
 
@@ -46,6 +49,10 @@ function OptionRowTooltipLayer({shouldShowRBRorGBRTooltip, shouldShowGetStartedT
         hideProductTrainingTooltip();
         onOptionPress(event);
     };
+
+    if (!shouldEvaluateTooltip) {
+        return <>{renderChildren(onOptionPress)}</>;
+    }
 
     return (
         <EducationalTooltip

@@ -62,10 +62,6 @@ function OptionRowLHN({
     const isChatUsedForOnboarding = isChatUsedForOnboardingReportUtils(report, onboarding, conciergeReportID, onboardingPurpose);
     const shouldShowGetStartedTooltip = isOnboardingGuideAssigned ? isAdminRoom(report) && isChatUsedForOnboarding : isConciergeChatReport(report);
 
-    // When neither tooltip qualifies, skip mounting the tooltip layer so the row avoids
-    // useProductTrainingContext, the tooltip-config useMemo, and the EducationalTooltip wrapper.
-    const shouldEvaluateTooltip = shouldShowRBRorGBRTooltip || shouldShowGetStartedTooltip;
-
     const {translate} = useLocalize();
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const isInFocusMode = viewMode === CONST.OPTION_MODE.COMPACT;
@@ -293,16 +289,12 @@ function OptionRowLHN({
             shouldShowErrorMessages={false}
             needsOffscreenAlphaCompositing
         >
-            {shouldEvaluateTooltip ? (
-                <OptionRowTooltipLayer
-                    shouldShowRBRorGBRTooltip={shouldShowRBRorGBRTooltip}
-                    shouldShowGetStartedTooltip={shouldShowGetStartedTooltip}
-                    onOptionPress={onOptionPress}
-                    renderChildren={renderRow}
-                />
-            ) : (
-                renderRow(onOptionPress)
-            )}
+            <OptionRowTooltipLayer
+                shouldShowRBRorGBRTooltip={shouldShowRBRorGBRTooltip}
+                shouldShowGetStartedTooltip={shouldShowGetStartedTooltip}
+                onOptionPress={onOptionPress}
+                renderChildren={renderRow}
+            />
         </OfflineWithFeedback>
     );
 }
