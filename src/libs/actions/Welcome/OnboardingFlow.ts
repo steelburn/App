@@ -370,7 +370,7 @@ const getOnboardingMessages = (locale?: Locale) => {
             [CONST.ONBOARDING_CHOICES.SUBMIT]: onboardingEmployerOrSubmitMessage,
             [CONST.ONBOARDING_CHOICES.MANAGE_TEAM]: onboardingManageTeamMessage,
             [CONST.ONBOARDING_CHOICES.TRACK_WORKSPACE]: onboardingTrackWorkspaceMessage,
-            [CONST.ONBOARDING_CHOICES.TRACK_PERSONAL]: onboardingPersonalSpendMessage,
+            [CONST.ONBOARDING_CHOICES.TRACK_PERSONAL]: onboardingTrackWorkspaceMessage,
             [CONST.ONBOARDING_CHOICES.PERSONAL_SPEND]: onboardingPersonalSpendMessage,
             [CONST.ONBOARDING_CHOICES.CHAT_SPLIT]: onboardingChatSplitMessage,
             [CONST.ONBOARDING_CHOICES.ADMIN]: onboardingAdminMessage,
