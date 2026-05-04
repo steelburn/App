@@ -8,7 +8,6 @@ const SESSION_EMAIL = 'me@example.com';
 const mockUseOnyx = jest.fn<unknown[], [string]>();
 
 jest.mock('@hooks/useOnyx', () => ({
-    // eslint-disable-next-line @typescript-eslint/naming-convention
     __esModule: true,
     default: (key: string) => mockUseOnyx(key),
 }));
