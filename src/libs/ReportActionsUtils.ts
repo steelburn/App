@@ -2805,7 +2805,7 @@ function getExportIntegrationActionFragments(translate: LocalizedTranslate, repo
         });
     }
     if (travelInvoicingUrls.length) {
-        const text = 'travel card expenses';
+        const text = translate('report.actions.type.exportedToIntegration.travelCardLink');
         let url = '';
 
         if (travelInvoicingUrls.length === 1) {
