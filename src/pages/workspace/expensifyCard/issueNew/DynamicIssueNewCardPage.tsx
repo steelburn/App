@@ -46,7 +46,7 @@ function getStartStepIndex(issueNewCard: OnyxEntry<IssueNewCard>): number {
     return issueNewCard.isChangeAssigneeDisabled ? stepIndex - 1 : stepIndex;
 }
 
-function IssueNewCardPage({policy, route}: IssueNewCardPageProps) {
+function DynamicIssueNewCardPage({policy, route}: IssueNewCardPageProps) {
     const policyID = policy?.id;
     const [issueNewCard] = useOnyx(`${ONYXKEYS.COLLECTION.RAM_ONLY_ISSUE_NEW_EXPENSIFY_CARD}${policyID}`);
     const {currentStep} = issueNewCard ?? {};
@@ -156,4 +156,4 @@ function IssueNewCardPage({policy, route}: IssueNewCardPageProps) {
     );
 }
 
-export default withPolicyAndFullscreenLoading(IssueNewCardPage);
+export default withPolicyAndFullscreenLoading(DynamicIssueNewCardPage);
