@@ -1537,6 +1537,7 @@ function updateSplitTransactions({
                 comment: currentSplit?.comment?.comment,
                 customUnitRateID: currentSplit?.customUnitRateID ?? CONST.CUSTOM_UNITS.FAKE_P2P_ID,
             } as TransactionChanges;
+            delete transactionChanges.reportID;
 
             const existing = getTransactionDetails(splitTransaction);
             const oldTransactionChanges = {
