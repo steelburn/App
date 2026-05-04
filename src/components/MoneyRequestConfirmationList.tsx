@@ -453,7 +453,6 @@ function MoneyRequestConfirmationList({
         isDistanceRequestWithPendingRoute,
         isPerDiemRequest,
         isTimeRequest,
-        isNewManualExpenseFlowEnabled,
         routeError,
     });
 

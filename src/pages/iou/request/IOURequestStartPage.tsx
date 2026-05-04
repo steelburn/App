@@ -44,7 +44,7 @@ import IOURequestStepHours from './step/IOURequestStepHours';
 import IOURequestStepPerDiemWorkspace from './step/IOURequestStepPerDiemWorkspace';
 import IOURequestStepScan from './step/IOURequestStepScan';
 import IOURequestStepTimeWorkspace from './step/IOURequestStepTimeWorkspace';
-import {WithWritableReportOrNotFoundProps} from './step/withWritableReportOrNotFound';
+import type {WithWritableReportOrNotFoundProps} from './step/withWritableReportOrNotFound';
 
 type IOURequestStartPageProps = WithWritableReportOrNotFoundProps<typeof SCREENS.MONEY_REQUEST.CREATE> & {
     defaultSelectedTab: SelectedTabRequest;

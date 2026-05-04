@@ -19,7 +19,7 @@ import type {CurrentUserPersonalDetails} from '@src/types/onyx/PersonalDetails';
 
 type ValidationResult = {errorKey: TranslationPaths; shouldSetDidConfirmSplit?: boolean} | {errorKey: null};
 
-type UseConfirmationValidationParams = {
+export type UseConfirmationValidationParams = {
     /** Transaction being validated */
     transaction: OnyxEntry<OnyxTypes.Transaction>;
 
@@ -95,9 +95,6 @@ type UseConfirmationValidationParams = {
     /** Whether the transaction is a time-tracking request */
     isTimeRequest: boolean;
 
-    /** Whether the new manual expense flow beta is enabled */
-    isNewManualExpenseFlowEnabled: boolean;
-
     /** Truthy when the route to the confirmation page has a known error */
     routeError: string | null | undefined;
 };
@@ -142,7 +139,6 @@ function useConfirmationValidation({
     isDistanceRequestWithPendingRoute,
     isPerDiemRequest,
     isTimeRequest,
-    isNewManualExpenseFlowEnabled,
     routeError,
 }: UseConfirmationValidationParams): {validate: (paymentType?: PaymentMethodType) => ValidationResult | null} {
     const {getCurrencyDecimals} = useCurrencyListActions();
