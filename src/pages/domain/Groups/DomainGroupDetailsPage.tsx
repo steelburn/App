@@ -19,8 +19,8 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
 import DefaultGroupToggle from './DefaultGroupToggle';
-import StrictlyEnforceWorkspaceRulesToggle from './StrictlyEnforceWorkspaceRulesToggle';
 import PreferredWorkspaceToggle from './PreferredWorkspaceToggle';
+import StrictlyEnforceWorkspaceRulesToggle from './StrictlyEnforceWorkspaceRulesToggle';
 
 type DomainGroupDetailsPageProps = PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.DOMAIN.GROUP_DETAILS>;
 
