@@ -336,10 +336,8 @@ type SettingsNavigatorParamList = {
         // eslint-disable-next-line no-restricted-syntax -- `backTo` usages in this file are legacy. Do not add new `backTo` params to screens. See contributingGuides/NAVIGATION.md
         backTo?: Routes;
     };
-    [SCREENS.WORKSPACE.CATEGORY_CREATE]: {
+    [SCREENS.WORKSPACE.DYNAMIC_CATEGORY_CREATE]: {
         policyID: string;
-        // eslint-disable-next-line no-restricted-syntax -- `backTo` usages in this file are legacy. Do not add new `backTo` params to screens. See contributingGuides/NAVIGATION.md
-        backTo?: Routes;
     };
     [SCREENS.SETTINGS_CATEGORIES.SETTINGS_CATEGORY_CREATE]: {
         policyID: string;
@@ -385,6 +383,10 @@ type SettingsNavigatorParamList = {
         categoryName: string;
     };
     [SCREENS.WORKSPACE.CATEGORY_FLAG_AMOUNTS_OVER]: {
+        policyID: string;
+        categoryName: string;
+    };
+    [SCREENS.WORKSPACE.DYNAMIC_EXPENSE_LIMIT_TYPE_SELECTOR]: {
         policyID: string;
         categoryName: string;
     };
@@ -435,10 +437,8 @@ type SettingsNavigatorParamList = {
     [SCREENS.WORKSPACE.PAY_AND_DOWNGRADE]: {
         policyID?: string;
     };
-    [SCREENS.WORKSPACE.CATEGORIES_SETTINGS]: {
+    [SCREENS.WORKSPACE.DYNAMIC_CATEGORIES_SETTINGS]: {
         policyID: string;
-        // eslint-disable-next-line no-restricted-syntax -- `backTo` usages in this file are legacy. Do not add new `backTo` params to screens. See contributingGuides/NAVIGATION.md
-        backTo?: Routes;
     };
     [SCREENS.SETTINGS_CATEGORIES.SETTINGS_CATEGORIES_SETTINGS]: {
         policyID: string;
@@ -1622,6 +1622,10 @@ type SettingsNavigatorParamList = {
     [SCREENS.DOMAIN.MEMBERS_MOVE_TO_GROUP]: {
         domainAccountID: number;
     };
+    [SCREENS.DOMAIN.MEMBER_MOVE_TO_GROUP]: {
+        domainAccountID: number;
+        accountID: number;
+    };
     [SCREENS.DOMAIN.GROUP_DETAILS]: {
         domainAccountID: number;
         groupID: string;
@@ -1888,6 +1892,15 @@ type MoneyRequestNavigatorParamList = {
         reportID: string;
         // eslint-disable-next-line no-restricted-syntax -- `backTo` usages in this file are legacy. Do not add new `backTo` params to screens. See contributingGuides/NAVIGATION.md
         backTo: Routes;
+    };
+    [SCREENS.MONEY_REQUEST.STEP_CATEGORY_CREATE]: {
+        action: IOUAction;
+        iouType: Exclude<IOUType, typeof CONST.IOU.TYPE.REQUEST | typeof CONST.IOU.TYPE.SEND>;
+        transactionID: string;
+        reportID: string;
+        reportActionID?: string;
+        // eslint-disable-next-line no-restricted-syntax -- backTo is needed to track where editing was initiated from (search/view or r/:reportID)
+        backTo?: Routes;
     };
     [SCREENS.MONEY_REQUEST.STEP_TAX_AMOUNT]: {
         action: IOUAction;

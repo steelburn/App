@@ -8,6 +8,7 @@ import type {LocalizedTranslate} from '@components/LocaleContextProvider';
 import type {PopoverMenuItem} from '@components/PopoverMenu';
 import type {TransactionListItemType, TransactionReportGroupListItemType} from '@components/Search/SearchList/ListItem/types';
 import type {BankAccountMenuItem, BulkPaySelectionData, PaymentData, SearchQueryJSON, SelectedReports, SelectedTransactionInfo, SelectedTransactions} from '@components/Search/types';
+import type {CurrencyListActionsContextType} from '@hooks/useCurrencyList';
 import * as API from '@libs/API';
 import {waitForWrites} from '@libs/API';
 import type {
@@ -20,7 +21,6 @@ import type {
 } from '@libs/API/parameters';
 import {READ_COMMANDS, SIDE_EFFECT_REQUEST_COMMANDS, WRITE_COMMANDS} from '@libs/API/types';
 import {getCommandURL} from '@libs/ApiUtils';
-import {convertToDisplayString} from '@libs/CurrencyUtils';
 import {getMicroSecondOnyxErrorWithTranslationKey} from '@libs/ErrorUtils';
 import fileDownload from '@libs/fileDownload';
 import isSearchTopmostFullScreenRoute from '@libs/Navigation/helpers/isSearchTopmostFullScreenRoute';
@@ -1458,7 +1458,12 @@ function getPayMoneyOnSearchInvoiceParams(policyID: string | undefined, payAsBus
 /**
  * Return the total amount of selected transactions/reports.
  */
-function getTotalFormattedAmount(selectedReports: SelectedReports[], selectedTransactions: SelectedTransactions, currency?: string): string {
+function getTotalFormattedAmount(
+    convertToDisplayString: CurrencyListActionsContextType['convertToDisplayString'],
+    selectedReports: SelectedReports[],
+    selectedTransactions: SelectedTransactions,
+    currency?: string,
+): string {
     const transactionKeys = Object.keys(selectedTransactions ?? {});
     const totalAmount =
         selectedReports.length > 0
