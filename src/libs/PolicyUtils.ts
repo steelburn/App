@@ -1256,7 +1256,7 @@ function getSubmitReportManagerAccountID(policy: OnyxEntry<Policy>, expenseRepor
         !!ruleApprover ||
         !!policy?.employeeList?.[employeeLogin];
 
-    if ((hasReliablePolicyRoute || expenseReport?.hasReportBeenRetracted) && isValidSubmitToAccountID) {
+    if (hasReliablePolicyRoute && isValidSubmitToAccountID) {
         return submitToAccountID;
     }
 
