@@ -24,7 +24,7 @@ import {getReportAction} from '@libs/ReportActionsUtils';
 import {getReportOrDraftReport} from '@libs/ReportUtils';
 import {createAndOpenSearchTransactionThread, getColumnsToShow, getTableMinWidth} from '@libs/SearchUIUtils';
 import type {SkeletonSpanReasonAttributes} from '@libs/telemetry/useSkeletonSpan';
-import {getTransactionViolations, isDeletedTransaction} from '@libs/TransactionUtils';
+import {getTransactionViolations, isDeletedTransaction, isTransactionPendingDelete} from '@libs/TransactionUtils';
 import type {TransactionPreviewData} from '@userActions/Search';
 import {setActiveTransactionIDs} from '@userActions/TransactionThreadNavigation';
 import CONST from '@src/CONST';
@@ -230,6 +230,8 @@ function TransactionGroupListExpanded<TItem extends ListItem>({
             {visibleTransactions.map((transaction, index) => {
                 const shouldShowBottomBorder = !isLastTransaction(index);
                 const exportedReportActions = Object.values(transactionsSnapshot?.data?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${transaction?.reportID}`] ?? {});
+                const isDeletedOrPendingDelete = isDeletedTransaction(transaction) || isTransactionPendingDelete(transaction);
+                const isRowDisabled = isDeletedOrPendingDelete;
 
                 return (
                     <OfflineWithFeedback
@@ -237,13 +239,15 @@ function TransactionGroupListExpanded<TItem extends ListItem>({
                         key={transaction.transactionID}
                     >
                         <PressableWithFeedback
-                            onPress={() => handleOnPress(transaction)}
+                            onPress={isDeletedOrPendingDelete && !canSelectMultiple ? undefined : () => handleOnPress(transaction)}
+                            disabled={isRowDisabled && !transaction.isSelected}
                             onLongPress={() => onLongPress?.(transaction)}
                             accessibilityRole={CONST.ROLE.BUTTON}
                             accessibilityLabel={transaction.text ?? ''}
                             isNested
                             onMouseDown={(e) => e.preventDefault()}
                             hoverStyle={[!transaction.isDisabled && styles.hoveredComponentBG]}
+                            style={[isDeletedOrPendingDelete && styles.cursorDefault]}
                             dataSet={{[CONST.SELECTION_SCRAPER_HIDDEN_ELEMENT]: true, [CONST.INNER_BOX_SHADOW_ELEMENT]: false}}
                             id={transaction.transactionID}
                             sentryLabel={CONST.SENTRY_LABEL.SEARCH.EXPANDED_TRANSACTION_ROW}
@@ -262,6 +266,7 @@ function TransactionGroupListExpanded<TItem extends ListItem>({
                                         transaction.policy,
                                     )}
                                     isSelected={!!transaction.isSelected}
+                                    isDisabled={isRowDisabled}
                                     dateColumnSize={dateColumnSize}
                                     amountColumnSize={amountColumnSize}
                                     taxAmountColumnSize={taxAmountColumnSize}
@@ -276,7 +281,7 @@ function TransactionGroupListExpanded<TItem extends ListItem>({
                                     isReportItemChild
                                     isInSingleTransactionReport={isInSingleTransactionReport}
                                     shouldShowBottomBorder={shouldShowBottomBorder}
-                                    onArrowRightPress={isDeletedTransaction(transaction) ? undefined : () => openReportInRHP(transaction)}
+                                    onArrowRightPress={isDeletedOrPendingDelete ? undefined : () => openReportInRHP(transaction)}
                                     shouldShowArrowRightOnNarrowLayout
                                     reportActions={exportedReportActions}
                                     policyForMovingExpenses={policyForMovingExpenses}
