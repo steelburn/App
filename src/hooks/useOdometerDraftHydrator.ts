@@ -4,7 +4,7 @@ import type {IOURequestType} from '@userActions/IOU';
 import {hydrateOdometerDraftIntoTransaction} from '@userActions/OdometerTransactionUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
-import type {Transaction} from '@src/types/onyx';
+import type {OdometerDraft, Transaction} from '@src/types/onyx';
 import useOnyx from './useOnyx';
 
 type UseOdometerDraftHydratorParams = {
@@ -16,7 +16,7 @@ type UseOdometerDraftHydratorParams = {
 
 // Module-level so it survives host screen remounts; otherwise the mount effect re-fires and
 // clobbers Replace/Crop/Rotate results with the stale rehydrated draft.
-let lastHydratedDraft: object | null = null;
+let lastHydratedDraft: OdometerDraft | null = null;
 
 function useOdometerDraftHydrator({
     transaction,
