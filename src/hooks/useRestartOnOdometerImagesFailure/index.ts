@@ -71,6 +71,8 @@ const useRestartOnOdometerImagesFailure = (
         ].filter(({path}) => !!path && path.startsWith('blob:'));
 
         if (urlsToCheck.length === 0) {
+            // No stale blobs at mount = later additions are session-fresh
+            setAsyncVerificationPassed(true);
             return;
         }
 
