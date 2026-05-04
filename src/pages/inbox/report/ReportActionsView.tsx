@@ -1,5 +1,5 @@
 import {useRoute} from '@react-navigation/native';
-import React, {useCallback, useEffect, useMemo, useRef} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import type {LayoutChangeEvent} from 'react-native';
 import ReportActionsSkeletonView from '@components/ReportActionsSkeletonView';
 import useConciergeSidePanelReportActions from '@hooks/useConciergeSidePanelReportActions';
@@ -271,7 +271,23 @@ function ReportActionsView({reportID, onLayout}: ReportActionsViewProps) {
     // When an expense is added optimistically, the transaction thread report ID is available
     // before useOnyx returns the report data (new subscription takes one render cycle).
     // Detect this transient state so we can keep showing a skeleton instead of a partial view.
-    const isWaitingForTransactionThread = isSingleExpenseReport && !!transactionThreadReportID && transactionThreadReportID !== CONST.FAKE_REPORT_ID && !transactionThreadReport?.reportID;
+    // Bounded by a timeout so a missing/failed report load doesn't block the view indefinitely.
+    const isTransactionThreadPending = isSingleExpenseReport && !!transactionThreadReportID && transactionThreadReportID !== CONST.FAKE_REPORT_ID && !transactionThreadReport?.reportID;
+    const [transactionThreadTimedOutID, setTransactionThreadTimedOutID] = useState<string | undefined>();
+
+    useEffect(() => {
+        if (!isTransactionThreadPending || !transactionThreadReportID) {
+            return;
+        }
+
+        const timeoutID = setTimeout(() => {
+            setTransactionThreadTimedOutID(transactionThreadReportID);
+        }, CONST.SKELETON_LOADING_TIMEOUT_MS);
+
+        return () => clearTimeout(timeoutID);
+    }, [isTransactionThreadPending, transactionThreadReportID]);
+
+    const isWaitingForTransactionThread = isTransactionThreadPending && transactionThreadTimedOutID !== transactionThreadReportID;
 
     const allReportActionIDs = useMemo(() => allReportActions?.map((action) => action.reportActionID) ?? [], [allReportActions]);
 
