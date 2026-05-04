@@ -328,7 +328,6 @@ function BasePopoverMenu({
     });
     const expensifyIcons = useMemoizedLazyExpensifyIcons(['BackArrow', 'ReceiptScan', 'MoneyCircle']);
     const prevMenuItems = usePrevious(menuItems);
-    const prevIsVisible = usePrevious(isVisible);
     const [hasKeyBeenPressed, setHasKeyBeenPressed] = useState(false);
 
     const getPreviousSubMenu = () => {
@@ -344,10 +343,6 @@ function BasePopoverMenu({
     };
 
     const isRadioButtonMode = enteredSubMenuIndexes.length === 0 ? shouldShowRadioButton : !!getPreviousSubMenu().at(enteredSubMenuIndexes.at(-1) ?? -1)?.shouldShowRadioButton;
-
-    if (isRadioButtonMode && isVisible && !prevIsVisible) {
-        setHasKeyBeenPressed(false);
-    }
 
     // In radio-button mode, suppress the visual highlight until the user starts navigating,
     // even though the selected item is already focused (for immediate Enter/arrow support).
@@ -543,6 +538,7 @@ function BasePopoverMenu({
 
     const handleModalHide = () => {
         onModalHide?.();
+        setHasKeyBeenPressed(false);
         const keyPath = buildKeyPathFromIndexPath(menuItems, enteredSubMenuIndexes);
         const resolved = resolveIndexPathByKeyPath(menuItems, keyPath);
 
