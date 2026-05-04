@@ -2354,7 +2354,7 @@ function getActions(
 
     // We're not supporting approve partial amount on search page now
     if (
-        canApproveIOU(report, policy, reportMetadata, allReportTransactions) &&
+        canApproveIOU(report, policy, reportMetadata, currentUserAccountID, allReportTransactions) &&
         isAllowedToApproveExpenseReport &&
         !hasOnlyPendingCardOrScanningTransactions &&
         !hasHeldExpenses(report.reportID, allReportTransactions)
