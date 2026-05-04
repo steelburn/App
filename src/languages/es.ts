@@ -2618,6 +2618,13 @@ ${amount} para ${merchant} - ${date}`,
             subtitle: 'Deja de hacer las cosas manualmente. En su lugar, instruye a un agente y ahorra mucho tiempo.',
         },
     },
+    newAgentPage: {
+        title: 'Nuevo agente',
+        agentName: 'Nombre del agente',
+        instructions: 'Escribe instrucciones personalizadas',
+        createAgent: 'Crear agente',
+        switchAvatar: 'Cambiar avatar',
+    },
     expenseRulesPage: {
         title: 'Reglas de gastos',
         subtitle: 'Estas reglas se aplicarán a tus gastos.',

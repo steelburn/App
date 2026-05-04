@@ -3289,6 +3289,11 @@ const staticStyles = (theme: ThemeColors) =>
             borderColor: theme.appBG,
         },
 
+        smallEditIconAgent: {
+            backgroundColor: theme.icon,
+            borderWidth: 0,
+        },
+
         smallAvatarEditIcon: {
             position: 'absolute',
             right: -8,
