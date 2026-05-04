@@ -1,7 +1,6 @@
 import type {OnyxKey, OnyxUpdate} from 'react-native-onyx';
 import Onyx from 'react-native-onyx';
 import {updateSageIntacctTravelInvoicingPayableAccount, updateSageIntacctTravelInvoicingVendor} from '@libs/actions/connections/SageIntacct';
-// eslint-disable-next-line no-restricted-syntax -- this is required to allow mocking
 import * as API from '@libs/API';
 import type {WriteCommand} from '@libs/API/types';
 import {WRITE_COMMANDS} from '@libs/API/types';
@@ -72,7 +71,6 @@ describe('actions/connections/SageIntacct', () => {
             expect(command).toBe(WRITE_COMMANDS.UPDATE_MANY_POLICY_CONNECTION_CONFIGS);
 
             const call = writeSpy.mock.calls.at(0);
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- API.write's params argument is typed as a broad union, so narrow to the shape this command sends
             const params = call?.[1] as {connectionName: string; configUpdate: string; idempotencyKey: string; policyID: string};
             expect(params.policyID).toBe(MOCK_POLICY_ID);
             expect(params.connectionName).toBe(CONST.POLICY.CONNECTIONS.NAME.SAGE_INTACCT);
@@ -145,7 +143,6 @@ describe('actions/connections/SageIntacct', () => {
             expect(command).toBe(WRITE_COMMANDS.UPDATE_MANY_POLICY_CONNECTION_CONFIGS);
 
             const call = writeSpy.mock.calls.at(0);
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- API.write's params argument is typed as a broad union, so narrow to the shape this command sends
             const params = call?.[1] as {connectionName: string; configUpdate: string; idempotencyKey: string; policyID: string};
             expect(params.policyID).toBe(MOCK_POLICY_ID);
             expect(params.connectionName).toBe(CONST.POLICY.CONNECTIONS.NAME.SAGE_INTACCT);

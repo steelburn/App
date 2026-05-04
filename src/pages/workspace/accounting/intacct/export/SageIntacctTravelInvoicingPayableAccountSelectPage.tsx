@@ -52,4 +52,4 @@ function SageIntacctTravelInvoicingPayableAccountSelectPage({policy, backPath}: 
     );
 }
 
-export {SageIntacctTravelInvoicingPayableAccountSelectPage};
+export default SageIntacctTravelInvoicingPayableAccountSelectPage;

@@ -52,4 +52,4 @@ function SageIntacctTravelInvoicingVendorSelectPage({policy, backPath}: SageInta
     );
 }
 
-export {SageIntacctTravelInvoicingVendorSelectPage};
+export default SageIntacctTravelInvoicingVendorSelectPage;

@@ -101,4 +101,4 @@ function SageIntacctTravelInvoicingConfigurationPage({policy, backPath}: SageInt
     );
 }
 
-export {SageIntacctTravelInvoicingConfigurationPage};
+export default SageIntacctTravelInvoicingConfigurationPage;
