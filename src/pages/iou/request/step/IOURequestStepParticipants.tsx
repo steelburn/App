@@ -145,7 +145,7 @@ function IOURequestStepParticipants({
                 />
             )}
             <MoneyRequestParticipantsSelector
-                participants={isSplitRequest ? participants : participants?.filter((participant) => !participant.isSender && !participant.isSelfDM)}
+                participants={isSplitRequest ? participants : CONST.EMPTY_ARRAY}
                 onParticipantsAdded={addParticipant}
                 onFinish={goToNextStep}
                 iouType={iouType}
@@ -154,7 +154,8 @@ function IOURequestStepParticipants({
                 isTimeRequest={isTime}
                 isWorkspacesOnly={isWorkspacesOnly}
                 isCorporateCardTransaction={isCorporateCard}
-                initiallySelectedReportID={!isSplitRequest ? participants?.find((participant) => participant.isSelfDM)?.reportID : undefined}
+                initiallySelectedReportID={!isSplitRequest ? participants?.find((participant) => participant.selected && !participant.isSender)?.reportID : undefined}
+                shouldMoveSelectedToTop
             />
         </StepScreenWrapper>
     );

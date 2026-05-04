@@ -38,6 +38,9 @@ type MoneyRequestParticipantsSelectorProps = {
     /** Report ID of a pre-selected participant whose selection state can't be derived from the participants array (e.g. self DM with accountID 0) */
     initiallySelectedReportID?: string | number;
 
+    /** Whether to find the participant matching initiallySelectedReportID and move it to the top of the list */
+    shouldMoveSelectedToTop?: boolean;
+
     /** Reference to the outer element */
     ref?: Ref<InputFocusRef>;
 };
@@ -58,6 +61,7 @@ function MoneyRequestParticipantsSelector({
     isWorkspacesOnly = false,
     isCorporateCardTransaction = false,
     initiallySelectedReportID,
+    shouldMoveSelectedToTop = false,
     ref,
 }: MoneyRequestParticipantsSelectorProps) {
     const platform = getPlatform();
@@ -90,6 +94,7 @@ function MoneyRequestParticipantsSelector({
             onParticipantsAdded={onParticipantsAdded}
             onFinish={onFinish}
             initiallySelectedReportID={initiallySelectedReportID}
+            shouldMoveSelectedToTop={shouldMoveSelectedToTop}
         />
     );
 }

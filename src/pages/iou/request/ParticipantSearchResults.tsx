@@ -97,6 +97,9 @@ type ParticipantSearchResultsProps = {
 
     /** Report ID of a pre-selected participant whose selection state can't be derived from the participants array (e.g. self DM with accountID 0) */
     initiallySelectedReportID?: string | number;
+
+    /** Whether to find the participant matching initiallySelectedReportID and move it to the top of the list */
+    shouldMoveSelectedToTop?: boolean;
 };
 
 function ParticipantSearchResults({
@@ -114,6 +117,7 @@ function ParticipantSearchResults({
     onParticipantsAdded,
     onFinish,
     initiallySelectedReportID,
+    shouldMoveSelectedToTop = false,
 }: ParticipantSearchResultsProps) {
     const isIOUSplit = iouType === CONST.IOU.TYPE.SPLIT;
     const isCategorizeOrShareAction = action === CONST.IOU.ACTION.CATEGORIZE || action === CONST.IOU.ACTION.SHARE;
@@ -350,12 +354,25 @@ function ParticipantSearchResults({
         }
 
         if (initiallySelectedReportID !== undefined) {
-            for (const section of sections) {
-                section.data = section.data.map((item) => ({
-                    ...item,
-                    isSelected: item.reportID === initiallySelectedReportID,
-                    canShowSeveralIndicators: true,
-                }));
+            if (shouldMoveSelectedToTop && debouncedSearchTerm.trim() === '') {
+                const selectedEntry = sections
+                    .flatMap((section) => section.data.map((item, index) => ({item, section, index})))
+                    .find((entry) => entry.item.reportID === initiallySelectedReportID);
+                if (selectedEntry) {
+                    selectedEntry.section.data.splice(selectedEntry.index, 1);
+                    const firstSection = sections.at(0);
+                    if (firstSection) {
+                        firstSection.data = [{...selectedEntry.item, isSelected: true}, ...firstSection.data];
+                    }
+                }
+            } else {
+                for (const section of sections) {
+                    section.data = section.data.map((item) => ({
+                        ...item,
+                        isSelected: item.reportID === initiallySelectedReportID,
+                        canShowSeveralIndicators: true,
+                    }));
+                }
             }
         }
 
