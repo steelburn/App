@@ -402,9 +402,7 @@ describe('domainSelectors', () => {
                 validated: true,
                 accountID: 1,
                 email: 'test@example.com',
-                // eslint-disable-next-line @typescript-eslint/naming-convention
                 [key1]: {shared: {'123': null}, enableRestrictedPrimaryLogin: false, enableRestrictedPolicyCreation: false},
-                // eslint-disable-next-line @typescript-eslint/naming-convention
                 [key2]: {shared: {'123': 'read'}, enableRestrictedPrimaryLogin: false, enableRestrictedPolicyCreation: false},
             } as unknown as Domain;
 
@@ -420,7 +418,6 @@ describe('domainSelectors', () => {
                 validated: true,
                 accountID: 1,
                 email: 'test@example.com',
-                // eslint-disable-next-line @typescript-eslint/naming-convention
                 [key1]: {shared: {'123': null}, enableRestrictedPrimaryLogin: false, enableRestrictedPolicyCreation: false},
             } as unknown as Domain;
 
