@@ -36,7 +36,7 @@ type MoneyRequestParticipantsSelectorProps = {
     isCorporateCardTransaction?: boolean;
 
     /** Report ID of a pre-selected participant whose selection state can't be derived from the participants array (e.g. self DM with accountID 0) */
-    initiallySelectedReportID?: string | number;
+    initiallySelectedReportID?: string;
 
     /** Whether to find the participant matching initiallySelectedReportID and move it to the top of the list */
     shouldMoveSelectedToTop?: boolean;

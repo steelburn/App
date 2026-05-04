@@ -29,7 +29,7 @@ function ShareTabParticipantsSelectorComponent({detailsPageRouteObject, ref}: Sh
         <MoneyRequestParticipantsSelector
             ref={ref}
             iouType={CONST.IOU.TYPE.SUBMIT}
-            initiallySelectedReportID={selectedReportID}
+            initiallySelectedReportID={typeof selectedReportID === 'string' ? selectedReportID : undefined}
             onParticipantsAdded={(value) => {
                 // clear the existing draft transaction from the previous flow to prevent the old data from being displayed
                 clearMoneyRequest(CONST.IOU.OPTIMISTIC_TRANSACTION_ID, draftTransactionIDs);

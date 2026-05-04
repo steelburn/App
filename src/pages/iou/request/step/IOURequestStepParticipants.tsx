@@ -128,6 +128,11 @@ function IOURequestStepParticipants({
         return initialTransaction?.amount !== undefined && initialTransaction?.amount !== null && initialTransaction?.amount <= 0;
     };
     const isWorkspacesOnly = getIsWorkspacesOnly();
+    const selectedParticipant = isSplitRequest ? undefined : participants?.find((participant) => participant.selected && !participant.isSender);
+    // Participants with a reportID are found in the list and highlighted via initiallySelectedReportID.
+    // Those without one (e.g. users to invite who don't have an account yet) must be passed explicitly
+    // so formatSectionsFromSearchTerm can render them in the selected section.
+    const selectedParticipantsWithoutReport = selectedParticipant && !selectedParticipant.reportID ? [selectedParticipant] : CONST.EMPTY_ARRAY;
 
     return (
         <StepScreenWrapper
@@ -145,7 +150,7 @@ function IOURequestStepParticipants({
                 />
             )}
             <MoneyRequestParticipantsSelector
-                participants={isSplitRequest ? participants : CONST.EMPTY_ARRAY}
+                participants={isSplitRequest ? participants : selectedParticipantsWithoutReport}
                 onParticipantsAdded={addParticipant}
                 onFinish={goToNextStep}
                 iouType={iouType}
@@ -154,7 +159,7 @@ function IOURequestStepParticipants({
                 isTimeRequest={isTime}
                 isWorkspacesOnly={isWorkspacesOnly}
                 isCorporateCardTransaction={isCorporateCard}
-                initiallySelectedReportID={!isSplitRequest ? participants?.find((participant) => participant.selected && !participant.isSender)?.reportID : undefined}
+                initiallySelectedReportID={selectedParticipant?.reportID}
                 shouldMoveSelectedToTop
             />
         </StepScreenWrapper>
