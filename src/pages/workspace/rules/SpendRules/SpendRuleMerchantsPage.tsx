@@ -1,6 +1,6 @@
 import type {NavigationProp} from '@react-navigation/native';
 import {useNavigation} from '@react-navigation/native';
-import React, {useEffect, useRef} from 'react';
+import React, {useEffect} from 'react';
 import BlockingView from '@components/BlockingViews/BlockingView';
 import FormAlertWithSubmitButton from '@components/FormAlertWithSubmitButton';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
@@ -12,7 +12,7 @@ import {useMemoizedLazyExpensifyIcons, useMemoizedLazyIllustrations} from '@hook
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
-import {updateDraftSpendRule} from '@libs/actions/User';
+import {clearSpendRuleFormDraft, initDraftSpendRuleMerchants, updateDraftSpendRule} from '@libs/actions/User';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
 import type {SettingsNavigatorParamList} from '@libs/Navigation/types';
 import AccessOrNotFoundWrapper from '@pages/workspace/AccessOrNotFoundWrapper';
@@ -29,31 +29,23 @@ function SpendRuleMerchantsPage({route}: SpendRuleMerchantsPageProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
     const [spendRuleForm] = useOnyx(ONYXKEYS.FORMS.SPEND_RULE_FORM);
+    const [spendRuleFormDraft] = useOnyx(ONYXKEYS.FORMS.SPEND_RULE_FORM_DRAFT);
     const illustrations = useMemoizedLazyIllustrations(['FoodTruck']);
     const expensifyIcons = useMemoizedLazyExpensifyIcons(['Plus']);
 
     const restrictionAction = spendRuleForm?.restrictionAction ?? CONST.SPEND_RULES.ACTION.ALLOW;
-    const merchantNames = spendRuleForm?.merchantNames ?? [];
-    const merchantMatchTypes = spendRuleForm?.merchantMatchTypes ?? [];
-
-    const originalMerchantNamesRef = useRef(merchantNames);
-    const originalMerchantMatchTypesRef = useRef(merchantMatchTypes);
-    const didSaveRef = useRef(false);
+    const merchantNames = spendRuleFormDraft?.merchantNames ?? spendRuleForm?.merchantNames ?? [];
+    const merchantMatchTypes = spendRuleFormDraft?.merchantMatchTypes ?? spendRuleForm?.merchantMatchTypes ?? [];
 
     useEffect(() => {
-        const originalMerchantNames = originalMerchantNamesRef.current;
-        const originalMerchantMatchTypes = originalMerchantMatchTypesRef.current;
+        initDraftSpendRuleMerchants(spendRuleForm?.merchantNames ?? [], spendRuleForm?.merchantMatchTypes ?? []);
 
         return () => {
-            if (didSaveRef.current) {
-                return;
-            }
-            updateDraftSpendRule({
-                merchantNames: originalMerchantNames,
-                merchantMatchTypes: originalMerchantMatchTypes,
-            });
+            clearSpendRuleFormDraft();
         };
-    }, [originalMerchantNamesRef, originalMerchantMatchTypesRef, didSaveRef]);
+        // eslint-disable-next-line react-compiler/react-compiler
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const emptyStateTitle =
         restrictionAction === CONST.SPEND_RULES.ACTION.BLOCK ? translate('workspace.rules.spendRules.noBlockedMerchants') : translate('workspace.rules.spendRules.noAllowedMerchants');
@@ -66,7 +58,7 @@ function SpendRuleMerchantsPage({route}: SpendRuleMerchantsPageProps) {
     const goBack = () => navigation.goBack();
 
     const handleSave = () => {
-        didSaveRef.current = true;
+        updateDraftSpendRule({merchantNames, merchantMatchTypes});
         goBack();
     };
 

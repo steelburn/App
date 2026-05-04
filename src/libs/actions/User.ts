@@ -1892,6 +1892,18 @@ function clearDraftSpendRule() {
     Onyx.set(ONYXKEYS.FORMS.SPEND_RULE_FORM, null);
 }
 
+function initDraftSpendRuleMerchants(merchantNames: string[], merchantMatchTypes: Array<ValueOf<typeof CONST.SEARCH.SYNTAX_OPERATORS>>) {
+    Onyx.merge(ONYXKEYS.FORMS.SPEND_RULE_FORM_DRAFT, {merchantNames, merchantMatchTypes});
+}
+
+function updateSpendRuleFormDraft(draftData: Partial<SpendRuleForm>) {
+    Onyx.merge(ONYXKEYS.FORMS.SPEND_RULE_FORM_DRAFT, draftData);
+}
+
+function clearSpendRuleFormDraft() {
+    Onyx.set(ONYXKEYS.FORMS.SPEND_RULE_FORM_DRAFT, null);
+}
+
 export {
     closeAccount,
     setServerErrorsOnForm,
@@ -1946,6 +1958,9 @@ export {
     setDraftSpendRule,
     updateDraftSpendRule,
     clearDraftSpendRule,
+    initDraftSpendRuleMerchants,
+    updateSpendRuleFormDraft,
+    clearSpendRuleFormDraft,
     openTroubleshootSettingsPage,
     openMultifactorAuthenticationRevokePage,
 };

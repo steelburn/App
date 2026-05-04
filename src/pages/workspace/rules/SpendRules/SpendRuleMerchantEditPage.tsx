@@ -16,7 +16,7 @@ import useDiscardChangesConfirmation from '@hooks/useDiscardChangesConfirmation'
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
-import {updateDraftSpendRule} from '@libs/actions/User';
+import {updateSpendRuleFormDraft} from '@libs/actions/User';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
 import type {SettingsNavigatorParamList} from '@libs/Navigation/types';
 import AccessOrNotFoundWrapper from '@pages/workspace/AccessOrNotFoundWrapper';
@@ -38,10 +38,10 @@ function SpendRuleMerchantEditPage({route}: SpendRuleMerchantEditPageProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
     const {inputCallbackRef} = useAutoFocusInput();
-    const [spendRuleForm] = useOnyx(ONYXKEYS.FORMS.SPEND_RULE_FORM);
+    const [spendRuleFormDraft] = useOnyx(ONYXKEYS.FORMS.SPEND_RULE_FORM_DRAFT);
 
-    const merchantNames = spendRuleForm?.merchantNames ?? [];
-    const merchantMatchTypes = spendRuleForm?.merchantMatchTypes ?? [];
+    const merchantNames = spendRuleFormDraft?.merchantNames ?? [];
+    const merchantMatchTypes = spendRuleFormDraft?.merchantMatchTypes ?? [];
     const isNew = merchantIndex === ROUTES.NEW;
     const index = isNew ? -1 : Number(merchantIndex);
     const existingMerchantName = isNew ? undefined : merchantNames.at(index);
@@ -69,7 +69,7 @@ function SpendRuleMerchantEditPage({route}: SpendRuleMerchantEditPageProps) {
             if (!isNew) {
                 const updatedMerchantNames = merchantNames.filter((_, merchantArrayIndex) => merchantArrayIndex !== index);
                 const updatedMerchantMatchTypes = merchantMatchTypes.filter((_, merchantArrayIndex) => merchantArrayIndex !== index);
-                updateDraftSpendRule({merchantNames: updatedMerchantNames, merchantMatchTypes: updatedMerchantMatchTypes});
+                updateSpendRuleFormDraft({merchantNames: updatedMerchantNames, merchantMatchTypes: updatedMerchantMatchTypes});
             }
             goBack();
             return;
@@ -82,7 +82,7 @@ function SpendRuleMerchantEditPage({route}: SpendRuleMerchantEditPageProps) {
         const updatedMerchantMatchTypes = isNew
             ? [...merchantMatchTypes, matchType]
             : merchantMatchTypes.map((type, merchantArrayIndex) => (merchantArrayIndex === index ? matchType : type));
-        updateDraftSpendRule({merchantNames: updatedMerchantNames, merchantMatchTypes: updatedMerchantMatchTypes});
+        updateSpendRuleFormDraft({merchantNames: updatedMerchantNames, merchantMatchTypes: updatedMerchantMatchTypes});
         goBack();
     };
 
