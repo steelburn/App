@@ -14,7 +14,7 @@ jest.mock('@libs/TransactionUtils', () => {
     return {
         isViolationDismissed: jest.fn(),
         shouldShowViolation: jest.fn(),
-        mergeProhibitedViolations: (transactionViolations: Array<{name: string; type: string; data?: {prohibitedExpenseRule?: string | string[]}}>) => {
+        mergeProhibitedViolations: (transactionViolations: Array<{name: string; type: string; showInReview?: boolean; data?: {prohibitedExpenseRule?: string | string[]}}>) => {
             const prohibitedViolations = transactionViolations.filter((violation) => violation.name === CONST_MOCK.VIOLATIONS.PROHIBITED_EXPENSE);
 
             if (prohibitedViolations.length === 0) {
@@ -35,7 +35,7 @@ jest.mock('@libs/TransactionUtils', () => {
                     prohibitedExpenseRule: prohibitedExpenses,
                 },
                 type: CONST_MOCK.VIOLATION_TYPES.VIOLATION,
-                showInReview: prohibitedViolations.some((v: {showInReview?: boolean}) => v.showInReview),
+                showInReview: prohibitedViolations.some((v) => v.showInReview),
             };
 
             return [...transactionViolations.filter((violation) => violation.name !== CONST_MOCK.VIOLATIONS.PROHIBITED_EXPENSE), mergedProhibitedViolations];
