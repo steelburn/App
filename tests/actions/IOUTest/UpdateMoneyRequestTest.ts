@@ -793,7 +793,7 @@ describe('actions/IOU/UpdateMoneyRequest', () => {
     });
 
     describe('updateMoneyRequestBillable', () => {
-        it('should update the transaction billable field when called with isOffline: false', async () => {
+        it('should update the transaction billable field', async () => {
             // Given an expense transaction with billable = false
             const transactionID = 'txnBillable1';
             const transactionThreadReportID = 'threadBillable1';
@@ -826,7 +826,7 @@ describe('actions/IOU/UpdateMoneyRequest', () => {
             await Onyx.set(`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`, fakeTransaction);
             await Onyx.set(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`, fakePolicy);
 
-            // When updating billable to true with isOffline: false
+            // When updating billable to true
             updateMoneyRequestBillable({
                 transactionID,
                 transactionThreadReport,
@@ -847,62 +847,6 @@ describe('actions/IOU/UpdateMoneyRequest', () => {
             // Then the transaction billable field should be updated
             const transactionAfter = await getOnyxValue(`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`);
             expect(transactionAfter?.billable).toBe(true);
-        });
-
-        it('should update the transaction billable field when called with isOffline: true', async () => {
-            // Given an expense transaction that is edited while the user is offline
-            const transactionID = 'txnBillable2';
-            const transactionThreadReportID = 'threadBillable2';
-            const parentReportID = 'parentBillable2';
-            const policyID = '21';
-
-            const parentReport: Report = {
-                ...createRandomReport(1, undefined),
-                reportID: parentReportID,
-                type: CONST.REPORT.TYPE.EXPENSE,
-                policyID,
-                ownerAccountID: RORY_ACCOUNT_ID,
-            };
-            const transactionThreadReport: Report = {
-                ...createRandomReport(2, undefined),
-                reportID: transactionThreadReportID,
-                parentReportID,
-                type: CONST.REPORT.TYPE.CHAT,
-            };
-            const fakeTransaction: Transaction = {
-                ...createRandomTransaction(3),
-                transactionID,
-                reportID: parentReportID,
-                billable: true,
-            };
-            const fakePolicy: Policy = createRandomPolicy(Number(policyID));
-
-            await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT}${parentReportID}`, parentReport);
-            await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT}${transactionThreadReportID}`, transactionThreadReport);
-            await Onyx.set(`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`, fakeTransaction);
-            await Onyx.set(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`, fakePolicy);
-
-            // When updating billable to false with isOffline: true
-            updateMoneyRequestBillable({
-                transactionID,
-                transactionThreadReport,
-                parentReport,
-                value: false,
-                policy: fakePolicy,
-                policyTagList: {},
-                policyCategories: {},
-                currentUserAccountIDParam: RORY_ACCOUNT_ID,
-                currentUserEmailParam: RORY_EMAIL,
-                isASAPSubmitBetaEnabled: false,
-                parentReportNextStep: undefined,
-                isOffline: true,
-            });
-
-            await waitForBatchedUpdates();
-
-            // Then the transaction billable field should be updated optimistically
-            const transactionAfter = await getOnyxValue(`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`);
-            expect(transactionAfter?.billable).toBe(false);
         });
 
         it('should not update anything if transactionID is missing', async () => {
