@@ -29,7 +29,7 @@ function ImportSpreadsheetConfirmModal({isVisible, closeImportPageAndModal, onMo
         ? translate(spreadsheet.importFinalModal.promptKey, spreadsheet.importFinalModal.promptKeyParams as TranslationParameters<typeof spreadsheet.importFinalModal.promptKey>[0])
         : '';
     const pendingText = spreadsheet?.shouldShowPendingMessage ? translate('spreadsheet.importCompanyCardTransactionsPendingMessage') : '';
-    const fullPromptText = pendingText ? `${promptText}\n\n${pendingText}` : promptText;
+    const fullPromptText = pendingText ? `${promptText} ${pendingText}` : promptText;
 
     useEffect(() => {
         if (!isVisible || !titleText || !promptText || !spreadsheet?.importFinalModal) {
