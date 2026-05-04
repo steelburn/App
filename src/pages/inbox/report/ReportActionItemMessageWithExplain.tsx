@@ -44,8 +44,7 @@ function ReportActionItemMessageWithExplain({message, action, childReport, origi
     const delegateAccountID = useDelegateAccountID();
 
     const actionHasReasoning = hasReasoning(action);
-    // Strip a trailing period before appending AskToExplain (which starts with ". ") to avoid double periods.
-    const computedMessage = actionHasReasoning ? `${message.replace(/\.\s*$/, '')}${translate('iou.AskToExplain')}` : message;
+    const computedMessage = actionHasReasoning ? `${message}${translate('iou.AskToExplain')}` : message;
 
     const handleLinkPress = (event: GestureResponderEvent | KeyboardEvent, href: string) => {
         // Handle the special "Explain" link

@@ -2757,7 +2757,7 @@ function getExportIntegrationActionFragments(translate: LocalizedTranslate, repo
     }
 
     if (reimbursableUrls.length === 1) {
-        const shouldAddPeriod = nonReimbursableUrls.length === 0;
+        const shouldAddPeriod = nonReimbursableUrls.length === 0 && !hasReasoning(reportAction);
         const reimbursableUrl = reimbursableUrls.at(0) ?? '';
         result.push({
             text: translate('report.actions.type.exportedToIntegration.reimburseableLink') + (shouldAddPeriod ? '.' : ''),
