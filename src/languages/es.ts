@@ -7750,6 +7750,7 @@ ${amount} para ${merchant} - ${date}`,
                     automaticActionThree: 'y creó un registro con éxito para',
                     reimburseableLink: 'Exportar gastos por cuenta propia como',
                     nonReimbursableLink: 'gastos de la tarjeta de empresa',
+                    travelCardLink: 'travel card expenses',
                     pending: (label) => `comenzó a exportar este informe a ${label}...`,
                 },
                 integrationsMessage: (errorMessage, label, linkText, linkURL) =>
