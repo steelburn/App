@@ -98,21 +98,22 @@ function WorkspaceCardSettingsPage({route}: WorkspaceCardSettingsPageProps) {
                             />
                         </OfflineWithFeedback>
                         {shouldShowCashbackToggle && (
-                            <OfflineWithFeedback errorRowStyles={styles.mh5}>
-                                <ToggleSettingOptionRow
-                                    title={translate('workspace.expensifyCard.applyCashbackToBill')}
-                                    subtitle={translate('workspace.expensifyCard.applyCashbackToBillDescription')}
-                                    switchAccessibilityLabel={translate('workspace.expensifyCard.applyCashbackToBill')}
-                                    isActive={shouldApplyCashbackToBill}
-                                    wrapperStyle={[styles.mv3, styles.mh5]}
-                                    onToggle={(isEnabled: boolean) => {
-                                        if (!programKey) {
-                                            return;
-                                        }
-                                        toggleCashbackToBill(defaultFundID, programKey, isEnabled, settings?.shouldApplyCashbackToBill);
-                                    }}
-                                />
-                            </OfflineWithFeedback>
+                            <ToggleSettingOptionRow
+                                title={translate('workspace.expensifyCard.applyCashbackToBill')}
+                                subtitle={translate('workspace.expensifyCard.applyCashbackToBillDescription')}
+                                switchAccessibilityLabel={translate('workspace.expensifyCard.applyCashbackToBill')}
+                                isActive={shouldApplyCashbackToBill}
+                                shouldPlaceSubtitleBelowSwitch
+                                wrapperStyle={[styles.mv3, styles.mh5]}
+                                pendingAction={settings?.pendingFields?.shouldApplyCashbackToBill}
+                                errors={settings?.errors}
+                                onToggle={(isEnabled: boolean) => {
+                                    if (!programKey) {
+                                        return;
+                                    }
+                                    toggleCashbackToBill(defaultFundID, programKey, isEnabled, settings?.shouldApplyCashbackToBill);
+                                }}
+                            />
                         )}
                     </View>
                 </ScrollView>
