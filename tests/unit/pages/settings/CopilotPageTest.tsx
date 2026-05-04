@@ -57,8 +57,8 @@ jest.mock('@hooks/useDocumentTitle', () => jest.fn());
 jest.mock('@hooks/useWindowDimensions', () => jest.fn(() => ({windowWidth: 1280, windowHeight: 800})));
 
 jest.mock('@hooks/useLazyAsset', () => ({
-    useMemoizedLazyIllustrations: jest.fn(() => ({LockClosed: 1})),
-    useMemoizedLazyExpensifyIcons: jest.fn(() => ({FallbackAvatar: 1, Pencil: 1, ThreeDots: 1, Trashcan: 1, UserPlus: 1})),
+    useMemoizedLazyIllustrations: jest.fn(() => ({TvScreenRobot: 1})),
+    useMemoizedLazyExpensifyIcons: jest.fn(() => ({FallbackAvatar: 1, Pencil: 1, ThreeDots: 1, Trashcan: 1, UserPlus: 1, Users: 1})),
 }));
 
 jest.mock('@libs/actions/Delegate', () => ({
@@ -140,14 +140,15 @@ describe('CopilotPage', () => {
         });
     }
 
-    it('hides the top card when the user has no delegators', () => {
+    it('hides both section labels when the user has no delegators or delegates', () => {
         setOnyxAccount({validated: true, delegatedAccess: {delegators: [], delegates: []}});
 
         const {toJSON} = render(<CopilotPage />);
         const output = JSON.stringify(toJSON());
 
         expect(output).not.toContain('delegate.youCanAccessTheseAccounts');
-        expect(output).toContain('delegate.membersCanAccessYourAccount');
+        expect(output).not.toContain('delegate.membersCanAccessYourAccount');
+        expect(output).toContain('delegate.copilotDelegatedAccess');
         expect(output).toContain('delegate.addCopilot');
     });
 
@@ -166,6 +167,7 @@ describe('CopilotPage', () => {
         expect(output).toContain('boss@example.com');
         expect(output).toContain('delegate.switch');
         expect(output).toContain('delegate.youCanAccessTheseAccounts');
+        expect(output).not.toContain('delegate.membersCanAccessYourAccount');
     });
 
     it('places the delegators (top) section before the delegates (bottom) section', () => {

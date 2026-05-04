@@ -119,6 +119,7 @@ function InitialSettingsPage({currentUserPersonalDetails}: InitialSettingsPagePr
         'Lightbulb',
         'Lock',
         'UserPlus',
+        'Users',
         'Emoji',
         'CreditCard',
         'Wallet',
@@ -281,7 +282,7 @@ function InitialSettingsPage({currentUserPersonalDetails}: InitialSettingsPagePr
         },
         {
             translationKey: 'delegate.copilot',
-            icon: icons.UserPlus,
+            icon: icons.Users,
             screenName: SCREENS.SETTINGS.COPILOT,
             sentryLabel: CONST.SENTRY_LABEL.ACCOUNT.COPILOT,
             action: () => Navigation.navigate(ROUTES.SETTINGS_COPILOT),

@@ -17,6 +17,7 @@ import ScreenWrapper from '@components/ScreenWrapper';
 import ScrollView from '@components/ScrollView';
 import Section from '@components/Section';
 import SectionSubtitleHTML from '@components/SectionSubtitleHTML';
+import Text from '@components/Text';
 import useConfirmModal from '@hooks/useConfirmModal';
 import useDocumentTitle from '@hooks/useDocumentTitle';
 import {useMemoizedLazyExpensifyIcons, useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
@@ -33,6 +34,7 @@ import Navigation from '@libs/Navigation/Navigation';
 import {sortAlphabetically} from '@libs/OptionsListUtils';
 import {getPersonalDetailByEmail} from '@libs/PersonalDetailsUtils';
 import type {AnchorPosition} from '@styles/index';
+import colors from '@styles/theme/colors';
 import {close as modalClose} from '@userActions/Modal';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -42,8 +44,8 @@ import type {Delegate} from '@src/types/onyx/Account';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
 
 function CopilotPage() {
-    const icons = useMemoizedLazyExpensifyIcons(['FallbackAvatar', 'Pencil', 'ThreeDots', 'Trashcan', 'UserPlus']);
-    const illustrations = useMemoizedLazyIllustrations(['LockClosed']);
+    const icons = useMemoizedLazyExpensifyIcons(['FallbackAvatar', 'Pencil', 'ThreeDots', 'Trashcan', 'UserPlus', 'Users']);
+    const illustrations = useMemoizedLazyIllustrations(['TvScreenRobot']);
     const styles = useThemeStyles();
     const {localeCompare, translate, formatPhoneNumber} = useLocalize();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
@@ -116,6 +118,7 @@ function CopilotPage() {
     const delegators = account?.delegatedAccess?.delegators ?? [];
 
     const hasDelegators = delegators.length > 0;
+    const hasDelegates = delegates.length > 0;
 
     const setMenuPosition = useCallback(() => {
         if (!delegateButtonRef.current) {
@@ -322,63 +325,64 @@ function CopilotPage() {
                         title={translate('delegate.copilot')}
                         shouldShowBackButton={shouldUseNarrowLayout}
                         onBackButtonPress={Navigation.goBack}
-                        icon={illustrations.LockClosed}
+                        icon={icons.Users}
                         shouldUseHeadlineHeader
                         shouldDisplaySearchRouter
                         shouldDisplayHelpButton
                     />
                     <ScrollView contentContainerStyle={styles.pt3}>
-                        <View style={[styles.flex1, shouldUseNarrowLayout ? styles.workspaceSectionMobile : styles.workspaceSection]}>
-                            {hasDelegators && (
-                                <Section
-                                    title={translate('delegate.youCanAccessTheseAccounts')}
-                                    isCentralPane
-                                    subtitleMuted
-                                    titleStyles={styles.accountSettingsSectionTitle}
-                                    childrenStyles={styles.pt5}
-                                >
-                                    <MenuItemList menuItems={delegatorMenuItems} />
-                                </Section>
-                            )}
-                            <View style={safeAreaPaddingBottomStyle}>
-                                <Section
-                                    title={translate('delegate.membersCanAccessYourAccount')}
-                                    renderSubtitle={() => (
-                                        <SectionSubtitleHTML
-                                            html={`${translate('delegate.copilotDelegatedAccessDescription')} <a href="${CONST.COPILOT_HELP_URL}" accessibilityLabel="${translate('delegate.learnMoreAboutDelegatedAccess')}">${translate('common.learnMore')}</a>.`}
-                                            subtitleMuted
-                                        />
-                                    )}
-                                    isCentralPane
-                                    subtitleMuted
-                                    titleStyles={styles.accountSettingsSectionTitle}
-                                    childrenStyles={styles.pt5}
-                                >
-                                    <MenuItemList menuItems={delegateMenuItems} />
-                                    <MenuItem
-                                        title={translate('delegate.addCopilot')}
-                                        icon={icons.UserPlus}
-                                        sentryLabel={CONST.SENTRY_LABEL.SETTINGS_SECURITY.ADD_COPILOT}
-                                        onPress={() => {
-                                            if (isActingAsDelegate) {
-                                                modalClose(() => showDelegateNoAccessModal());
-                                                return;
-                                            }
-                                            if (!isUserValidated) {
-                                                Navigation.navigate(ROUTES.SETTINGS_DELEGATE_VERIFY_ACCOUNT);
-                                                return;
-                                            }
-                                            if (isAccountLocked) {
-                                                showLockedAccountModal();
-                                                return;
-                                            }
-                                            Navigation.navigate(ROUTES.SETTINGS_ADD_DELEGATE);
-                                        }}
-                                        shouldShowRightIcon
-                                        wrapperStyle={[styles.sectionMenuItemTopDescription]}
+                        <View style={[styles.flex1, shouldUseNarrowLayout ? styles.workspaceSectionMobile : styles.workspaceSection, safeAreaPaddingBottomStyle]}>
+                            <Section
+                                title={translate('delegate.copilotDelegatedAccess')}
+                                renderSubtitle={() => (
+                                    <SectionSubtitleHTML
+                                        html={`${translate('delegate.copilotDelegatedAccessDescription')} <a href="${CONST.COPILOT_HELP_URL}" accessibilityLabel="${translate('delegate.learnMoreAboutDelegatedAccess')}">${translate('common.learnMore')}</a>.`}
+                                        subtitleMuted
                                     />
-                                </Section>
-                            </View>
+                                )}
+                                isCentralPane
+                                subtitleMuted
+                                illustration={illustrations.TvScreenRobot}
+                                illustrationContainerStyle={styles.cardSectionIllustrationContainer}
+                                illustrationBackgroundColor={colors.blue500}
+                                titleStyles={styles.accountSettingsSectionTitle}
+                                childrenStyles={styles.pt5}
+                            >
+                                {hasDelegators && (
+                                    <>
+                                        <Text style={[styles.textLabelSupporting, styles.pv1]}>{translate('delegate.youCanAccessTheseAccounts')}</Text>
+                                        <MenuItemList menuItems={delegatorMenuItems} />
+                                    </>
+                                )}
+                                {hasDelegates && (
+                                    <>
+                                        <Text style={[styles.textLabelSupporting, styles.pv1, hasDelegators && styles.mt5]}>{translate('delegate.membersCanAccessYourAccount')}</Text>
+                                        <MenuItemList menuItems={delegateMenuItems} />
+                                    </>
+                                )}
+                                <MenuItem
+                                    title={translate('delegate.addCopilot')}
+                                    icon={icons.UserPlus}
+                                    sentryLabel={CONST.SENTRY_LABEL.SETTINGS_SECURITY.ADD_COPILOT}
+                                    onPress={() => {
+                                        if (isActingAsDelegate) {
+                                            modalClose(() => showDelegateNoAccessModal());
+                                            return;
+                                        }
+                                        if (!isUserValidated) {
+                                            Navigation.navigate(ROUTES.SETTINGS_DELEGATE_VERIFY_ACCOUNT);
+                                            return;
+                                        }
+                                        if (isAccountLocked) {
+                                            showLockedAccountModal();
+                                            return;
+                                        }
+                                        Navigation.navigate(ROUTES.SETTINGS_ADD_DELEGATE);
+                                    }}
+                                    shouldShowRightIcon
+                                    wrapperStyle={[styles.sectionMenuItemTopDescription]}
+                                />
+                            </Section>
                             <PopoverMenu
                                 isVisible={shouldShowDelegatePopoverMenu}
                                 anchorRef={delegateButtonRef as RefObject<View | null>}
