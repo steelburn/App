@@ -1622,6 +1622,10 @@ type SettingsNavigatorParamList = {
     [SCREENS.DOMAIN.MEMBERS_MOVE_TO_GROUP]: {
         domainAccountID: number;
     };
+    [SCREENS.DOMAIN.MEMBER_MOVE_TO_GROUP]: {
+        domainAccountID: number;
+        accountID: number;
+    };
     [SCREENS.DOMAIN.GROUP_DETAILS]: {
         domainAccountID: number;
         groupID: string;

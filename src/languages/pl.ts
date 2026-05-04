@@ -9112,6 +9112,8 @@ Oto *paragon testowy*, żeby pokazać Ci, jak to działa:`,
             emptyMembers: {title: 'Brak członków w tej grupie', subtitle: 'Dodaj członka lub spróbuj zmienić filtr powyżej.'},
             moveToGroup: 'Przenieś do grupy',
             chooseWhereToMove: ({count}: {count: number}) => `Wybierz, dokąd przenieść ${count} ${count === 1 ? 'członka' : 'członków'}.`,
+            domainGroup: 'Grupa domen',
+            chooseWhereToMoveName: ({name}: {name: string}) => `Wybierz, dokąd przenieść ${name}.`,
         },
         common: {
             settings: 'Ustawienia',

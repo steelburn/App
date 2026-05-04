@@ -9145,7 +9145,9 @@ const translations = {
                 other: 'Close accounts',
             }),
             moveToGroup: 'Move to group',
+            domainGroup: 'Domain group',
             chooseWhereToMove: ({count}: {count: number}) => `Choose where to move ${count} ${count === 1 ? 'member' : 'members'}.`,
+            chooseWhereToMoveName: ({name}: {name: string}) => `Choose where to move ${name}.`,
             error: {
                 addMember: 'Unable to add this member. Please try again.',
                 removeMember: 'Unable to remove this user. Please try again.',

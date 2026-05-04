@@ -9191,6 +9191,8 @@ Voici un *reçu test* pour vous montrer comment ça fonctionne :`,
             emptyMembers: {title: 'Aucun membre dans ce groupe', subtitle: 'Ajoutez un membre ou essayez de modifier le filtre ci-dessus.'},
             moveToGroup: 'Déplacer vers le groupe',
             chooseWhereToMove: ({count}: {count: number}) => `Choisissez où déplacer ${count} ${count === 1 ? 'membre' : 'membres'}.`,
+            domainGroup: 'Groupe de domaines',
+            chooseWhereToMoveName: ({name}: {name: string}) => `Choisissez où déplacer ${name}.`,
         },
         common: {
             settings: 'Paramètres',

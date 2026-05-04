@@ -1814,6 +1814,24 @@ function changeDomainSecurityGroup(
     API.write(WRITE_COMMANDS.CHANGE_DOMAIN_SECURITY_GROUP, parameters, {optimisticData, successData, failureData});
 }
 
+function clearChangeDomainSecurityGroupError(domainAccountID: number, memberEmail: string) {
+    Onyx.merge(`${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`, {
+        memberErrors: {
+            [memberEmail]: {
+                changeDomainSecurityGroupErrors: null,
+            },
+        },
+    });
+
+    Onyx.merge(`${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`, {
+        member: {
+            [memberEmail]: {
+                changeDomainSecurityGroup: null,
+            },
+        },
+    });
+}
+
 function setDomainMembersSelectedForMove(memberAccountIDs: string[]) {
     Onyx.set(ONYXKEYS.DOMAIN_MEMBERS_SELECTED_FOR_MOVE, memberAccountIDs);
 }
@@ -2075,6 +2093,7 @@ export {
     resetDomainMemberTwoFactorAuth,
     exportMembersToCSV,
     changeDomainSecurityGroup,
+    clearChangeDomainSecurityGroupError,
     setDomainMembersSelectedForMove,
     clearDomainMembersSelectedForMove,
     updateDomainSecurityGroup,
