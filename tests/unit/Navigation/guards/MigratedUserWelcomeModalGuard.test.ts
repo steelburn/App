@@ -377,7 +377,7 @@ describe('MigratedUserWelcomeModalGuard', () => {
             await waitForBatchedUpdates();
             mockNavigate.mockClear();
 
-            onSessionOrLoadingAppChanged(null, false);
+            onSessionOrLoadingAppChanged(undefined, false);
 
             expect(mockNavigate).not.toHaveBeenCalled();
         });
