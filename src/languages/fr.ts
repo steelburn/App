@@ -5399,7 +5399,6 @@ _Pour des instructions plus détaillées, [visitez notre site d’aide](${CONST.
                 monthly: 'Mensuel',
             },
             cardDetails: 'Détails de la carte',
-            cardPending: ({name}: {name: string}) => `La carte est actuellement en attente et sera émise une fois le compte de ${name} validé.`,
             virtual: 'Virtuelle',
             physical: 'Physique',
             deactivate: 'Désactiver la carte',

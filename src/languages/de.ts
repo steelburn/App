@@ -5390,7 +5390,6 @@ _Für ausführlichere Anweisungen [besuchen Sie unsere Hilfeseite](${CONST.NETSU
                 monthly: 'Monatlich',
             },
             cardDetails: 'Kartendaten',
-            cardPending: ({name}: {name: string}) => `Die Karte ist derzeit ausstehend und wird ausgestellt, sobald das Konto von ${name} verifiziert wurde.`,
             virtual: 'Virtuell',
             physical: 'Physisch',
             deactivate: 'Karte deaktivieren',
