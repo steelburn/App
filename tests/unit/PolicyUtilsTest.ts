@@ -386,7 +386,7 @@ describe('PolicyUtils', () => {
             });
         });
 
-        it('falls back to the first rate when no enabled rate exists', () => {
+        it('drops all rates when no enabled rate exists', () => {
             const distanceUnitAllDisabled = {
                 customUnitID: 'srcDist',
                 name: CONST.CUSTOM_UNITS.NAME_DISTANCE,
@@ -400,9 +400,36 @@ describe('PolicyUtils', () => {
                 ...createRandomPolicy(0),
                 customUnits: {[distanceUnitAllDisabled.customUnitID]: distanceUnitAllDisabled},
             };
-            const result = getCustomUnitsForDuplication(policyAllDisabled, true, false, {distanceCustomUnitID: 'newDist', perDiemCustomUnitID: 'newPerDiem', customUnitRateID: 'newRate'});
+            const result = getCustomUnitsForDuplication(policyAllDisabled, true, false, {
+                distanceCustomUnitID: 'newDist',
+                perDiemCustomUnitID: 'newPerDiem',
+                customUnitRateID: 'newRate',
+            });
+            expect(result?.newDist.rates).toEqual({});
+        });
+
+        it('treats missing index as 0 when picking the default rate', () => {
+            const distanceUnitWithMissingIndex = {
+                customUnitID: 'srcDist',
+                name: CONST.CUSTOM_UNITS.NAME_DISTANCE,
+                enabled: true,
+                attributes: {unit: CONST.CUSTOM_UNITS.DISTANCE_UNIT_MILES},
+                rates: {
+                    rateB: {customUnitRateID: 'rateB', name: 'Indexed Rate', rate: 100, currency: 'USD', enabled: true, index: 1},
+                    rateA: {customUnitRateID: 'rateA', name: 'No-Index Rate', rate: 70, currency: 'USD', enabled: true},
+                },
+            };
+            const policyWithMissingIndex: Policy = {
+                ...createRandomPolicy(0),
+                customUnits: {[distanceUnitWithMissingIndex.customUnitID]: distanceUnitWithMissingIndex},
+            };
+            const result = getCustomUnitsForDuplication(policyWithMissingIndex, true, false, {
+                distanceCustomUnitID: 'newDist',
+                perDiemCustomUnitID: 'newPerDiem',
+                customUnitRateID: 'newRate',
+            });
             expect(result?.newDist.rates).toEqual({
-                newRate: {customUnitRateID: 'newRate', name: 'Disabled', rate: 50, currency: 'USD', enabled: false, index: 0},
+                newRate: {customUnitRateID: 'newRate', name: 'No-Index Rate', rate: 70, currency: 'USD', enabled: true},
             });
         });
     });
