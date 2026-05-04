@@ -22,6 +22,10 @@ import waitForBatchedUpdatesWithAct from '../utils/waitForBatchedUpdatesWithAct'
 import wrapOnyxWithWaitForBatchedUpdates from '../utils/wrapOnyxWithWaitForBatchedUpdates';
 
 jest.mock('@react-navigation/native');
+jest.mock('@libs/actions/ClearReportActionErrors', () => ({
+    clearAllRelatedReportActionErrors: jest.fn(),
+}));
+const mockClearAllRelatedReportActionErrors = clearAllRelatedReportActionErrors as jest.MockedFunction<typeof clearAllRelatedReportActionErrors>;
 
 const ACTOR_ACCOUNT_ID = 123456789;
 const ACTOR_EMAIL = 'test@test.com';
@@ -82,11 +86,10 @@ describe('ClearReportActionErrors UI', () => {
         action: ReportAction,
         report: Report,
         options?: {
-            clearErrorFn?: typeof clearAllRelatedReportActionErrors;
             originalReportID?: string;
         },
     ) {
-        const {clearErrorFn, originalReportID = report.reportID} = options ?? {};
+        const {originalReportID = report.reportID} = options ?? {};
         return render(
             <ComposeProviders components={[OnyxListItemProvider, LocaleContextProvider, HTMLEngineProvider]}>
                 <OptionsListContextProvider>
@@ -100,7 +103,6 @@ describe('ClearReportActionErrors UI', () => {
                                 shouldDisplayNewMarker={false}
                                 index={0}
                                 isFirstVisibleReportAction={false}
-                                clearAllRelatedReportActionErrors={clearErrorFn}
                                 originalReportID={originalReportID}
                             />
                         </PortalProvider>
@@ -133,10 +135,10 @@ describe('ClearReportActionErrors UI', () => {
         });
 
         it('should call clearAllRelatedReportActionErrors when error is dismissed', async () => {
-            // Given a rendered report action with errors and a mock clear function
+            // Given a rendered report action with errors and a mocked module-level clear function
             const action = getFakeReportAction(Number(REPORT_ACTION_ID), {actorAccountID: ACTOR_ACCOUNT_ID, errors: DEFAULT_ERRORS});
             const report = createMockReport({reportID: REPORT_ID, ownerAccountID: ACTOR_ACCOUNT_ID});
-            const mockClearErrors = jest.fn();
+            mockClearAllRelatedReportActionErrors.mockClear();
 
             await act(async () => {
                 await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT}${REPORT_ID}`, report);
@@ -146,10 +148,7 @@ describe('ClearReportActionErrors UI', () => {
             });
             await waitForBatchedUpdatesWithAct();
 
-            renderReportActionItem(action, report, {
-                clearErrorFn: mockClearErrors,
-                originalReportID: REPORT_ID,
-            });
+            renderReportActionItem(action, report, {originalReportID: REPORT_ID});
             await waitForBatchedUpdatesWithAct();
 
             // When the user presses the dismiss button
@@ -157,7 +156,7 @@ describe('ClearReportActionErrors UI', () => {
             fireEvent.press(dismissButton);
 
             // Then clearAllRelatedReportActionErrors should be called with correct arguments
-            expect(mockClearErrors).toHaveBeenCalledWith(REPORT_ID, expect.objectContaining({reportActionID: REPORT_ACTION_ID}), REPORT_ID);
+            expect(mockClearAllRelatedReportActionErrors).toHaveBeenCalledWith(REPORT_ID, expect.objectContaining({reportActionID: REPORT_ACTION_ID}), REPORT_ID);
         });
 
         it('should clear error from Onyx when dismissed', async () => {
@@ -178,7 +177,6 @@ describe('ClearReportActionErrors UI', () => {
             await waitForBatchedUpdatesWithAct();
 
             renderReportActionItem(action, report, {
-                clearErrorFn: clearAllRelatedReportActionErrors,
                 originalReportID: REPORT_ID,
             });
             await waitForBatchedUpdatesWithAct();
@@ -235,7 +233,6 @@ describe('ClearReportActionErrors UI', () => {
             await waitForBatchedUpdatesWithAct();
 
             renderReportActionItem(parentAction, parentReport, {
-                clearErrorFn: clearAllRelatedReportActionErrors,
                 originalReportID: REPORT_ID,
             });
             await waitForBatchedUpdatesWithAct();
@@ -275,7 +272,6 @@ describe('ClearReportActionErrors UI', () => {
             await waitForBatchedUpdatesWithAct();
 
             renderReportActionItem(action, report, {
-                clearErrorFn: clearAllRelatedReportActionErrors,
                 originalReportID: REPORT_ID,
             });
             await waitForBatchedUpdatesWithAct();

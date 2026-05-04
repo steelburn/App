@@ -101,9 +101,10 @@ import {
 import SelectionScraper from '@libs/SelectionScraper';
 import {ReactionListContext} from '@pages/inbox/ReportScreenContext';
 import AttachmentModalContext from '@pages/media/AttachmentModalScreen/AttachmentModalContext';
-import type {IgnoreDirection} from '@userActions/ClearReportActionErrors';
+import {clearAllRelatedReportActionErrors} from '@userActions/ClearReportActionErrors';
 import {hideEmojiPicker, isActive} from '@userActions/EmojiPickerAction';
 import {expandURLPreview} from '@userActions/Report';
+import {clearError} from '@userActions/Transaction';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type SCREENS from '@src/SCREENS';
@@ -223,18 +224,6 @@ type PureReportActionItemProps = {
     /** Gets all transactions on an IOU report with a receipt */
     getTransactionsWithReceipts?: (iouReportID: string | undefined) => OnyxTypes.Transaction[];
 
-    /** Function to clear an error from a transaction */
-    clearError?: (transactionID: string) => void;
-
-    /** Function to clear all errors from a report action */
-    clearAllRelatedReportActionErrors?: (
-        reportID: string | undefined,
-        reportAction: OnyxTypes.ReportAction | null | undefined,
-        originalReportID: string | undefined,
-        ignore?: IgnoreDirection,
-        keys?: string[],
-    ) => void;
-
     /** User payment card ID */
     userBillingFundID?: number;
 
@@ -287,8 +276,6 @@ function PureReportActionItem({
     isChronosReport,
     isClosedExpenseReportWithNoExpenses,
     getTransactionsWithReceipts = () => [],
-    clearError = () => {},
-    clearAllRelatedReportActionErrors = () => {},
     userBillingFundID,
     shouldShowBorder,
     shouldHighlight = false,
@@ -365,7 +352,7 @@ function PureReportActionItem({
             clearError(transactionID);
         }
         clearAllRelatedReportActionErrors(reportID, action, originalReportID);
-    }, [action, isSendingMoney, reportID, clearAllRelatedReportActionErrors, originalReportID, isReportActionLinked, report, chatReport, clearError, navigation]);
+    }, [action, isSendingMoney, reportID, originalReportID, isReportActionLinked, report, chatReport, navigation]);
 
     const showDismissReceiptErrorModal = useCallback(async () => {
         const result = await showConfirmModal({

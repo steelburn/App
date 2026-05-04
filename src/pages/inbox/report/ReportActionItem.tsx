@@ -6,9 +6,7 @@ import useReportIsArchived from '@hooks/useReportIsArchived';
 import useReportTransactions from '@hooks/useReportTransactions';
 import {getIOUReportIDFromReportActionPreview, getOriginalMessage, isMoneyRequestAction} from '@libs/ReportActionsUtils';
 import {chatIncludesChronosWithID, getTransactionsWithReceipts, isArchivedNonExpenseReport, isClosedExpenseReportWithNoExpenses} from '@libs/ReportUtils';
-import {clearAllRelatedReportActionErrors} from '@userActions/ClearReportActionErrors';
 import {deleteReportActionDraft} from '@userActions/Report';
-import {clearError} from '@userActions/Transaction';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {PersonalDetailsList, Transaction} from '@src/types/onyx';
 import type {PureReportActionItemProps} from './PureReportActionItem';
@@ -76,8 +74,6 @@ function ReportActionItem({
             isChronosReport={chatIncludesChronosWithID(originalReportID)}
             isClosedExpenseReportWithNoExpenses={isClosedExpenseReportWithNoExpenses(iouReport, transactionsOnIOUReport)}
             getTransactionsWithReceipts={getTransactionsWithReceipts}
-            clearError={clearError}
-            clearAllRelatedReportActionErrors={clearAllRelatedReportActionErrors}
             userBillingFundID={userBillingFundID}
             isTryNewDotNVPDismissed={isTryNewDotNVPDismissed}
         />
