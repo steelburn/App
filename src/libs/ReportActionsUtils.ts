@@ -2756,22 +2756,33 @@ function getExportIntegrationActionFragments(translate: LocalizedTranslate, repo
         });
     }
 
+    const hasReimbursable = reimbursableUrls.length > 0;
+    const hasNonReimbursable = nonReimbursableUrls.length > 0;
+    const hasTravelInvoicing = travelInvoicingUrls.length > 0;
+    const linkItemCount = (hasReimbursable ? 1 : 0) + (hasNonReimbursable ? 1 : 0) + (hasTravelInvoicing ? 1 : 0);
+
     if (reimbursableUrls.length === 1) {
-        const shouldAddPeriod = nonReimbursableUrls.length === 0;
         const reimbursableUrl = reimbursableUrls.at(0) ?? '';
+        let suffix = '';
+        if (linkItemCount === 1) {
+            suffix = '.';
+        } else if (linkItemCount === 3) {
+            suffix = ',';
+        }
         result.push({
-            text: translate('report.actions.type.exportedToIntegration.reimburseableLink') + (shouldAddPeriod ? '.' : ''),
+            text: translate('report.actions.type.exportedToIntegration.reimburseableLink') + suffix,
             url: reimbursableUrl.startsWith('https://') ? reimbursableUrl : '',
         });
     }
-    if (reimbursableUrls.length === 1 && (nonReimbursableUrls.length || travelInvoicingUrls.length)) {
+    if (hasReimbursable && (hasNonReimbursable || hasTravelInvoicing) && linkItemCount === 2) {
         result.push({
             text: translate('common.and'),
             url: '',
         });
     }
     if (nonReimbursableUrls.length) {
-        const text = translate('report.actions.type.exportedToIntegration.nonReimbursableLink');
+        const baseText = translate('report.actions.type.exportedToIntegration.nonReimbursableLink');
+        const text = linkItemCount === 3 ? `${baseText},` : baseText;
         let url = '';
 
         if (nonReimbursableUrls.length === 1) {
