@@ -1,7 +1,7 @@
 ---
 name: agent-device
 description: Drive iOS and Android devices for the Expensify App - testing, debugging, performance profiling, bug reproduction, and feature verification. Use when the developer needs to interact with the mobile app on a device.
-allowed-tools: Bash(agent-device *) Bash(npm root *) Bash(scripts/is-hybrid-app.sh) Bash(test *)
+allowed-tools: Bash(agent-device *) Bash(npm root *) Bash(scripts/is-hybrid-app.sh)
 ---
 
 # agent-device
@@ -56,7 +56,7 @@ agent-device devices --platform <p> --json
 ```
 
 - Prefer the first device with `booted=true`.
-- If none are booted, let `agent-device open` boot the default - skip step 6 (no session can conflict yet).
+- If none are booted, choose the default target device (usually the first listed), then continue to step 6 to detect and clear any stale session bound to that device before opening.
 - If multiple are booted, ask the user which.
 
 Capture the device name and (for iOS) the simulator UDID, or (for Android) the serial.
@@ -95,4 +95,4 @@ Read these files directly for device automation guidance (bootstrap, exploration
 
 ## Flows
 
-Repeatable steps (sign-in, onboarding, etc.) are captured as composable `.ad` snippets under [`flows/`](flows/README.md). For interactive usage, propose and run only `flows/macros/` helpers. `flows/tests/` belongs to a separate QA workflow and must not be proposed by this skill.
+Repeatable steps (sign-in, onboarding, etc.) are captured as composable `.ad` snippets under [`flows/`](flows/README.md). For interactive usage, propose and run only `flows/macros/` helpers. `flows/tests/` belongs to a separate QA workflow and must not be proposed by this skill; QA/perf runs execute them via `agent-device test <path>`.

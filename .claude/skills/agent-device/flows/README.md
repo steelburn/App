@@ -2,8 +2,8 @@
 
 ## Directory layout
 
-- `macros/` - reusable helpers for common setup/navigation actions.
-- `tests/` - critical-scenario scripts for outcome verification (QA workflow only; not proposed in interactive agent usage).
+- `macros/` - reusable helpers for common setup/navigation actions that stop in a navigable state for further interactive work.
+- `tests/` - critical-scenario scripts for QA/perf verification that assert explicit outcomes (for example Sentry spans) and then stop.
 
 Composable `.ad` snippets - bounded units of work. A flow may span one or multiple screens as long as it represents a coherent, reusable action with clear start (`@pre`) and completion (`@post`) checkpoints. Each flow advertises machine-matchable metadata (`@pre`, `@post`, `@tag`, `@param`) via `# @`-prefixed comment headers, while flow type is derived from location (`flows/macros/` or `flows/tests/`).
 
@@ -14,16 +14,21 @@ Before manually navigating, use this human-in-the-loop loop:
 1. `agent-device snapshot -i` - see current state.
 2. `grep -H '^# @' .claude/skills/agent-device/flows/macros/*.ad` - interactive catalog.
 3. For each candidate flow, run `agent-device is exists "<selector>"` per `@pre`. Keep flows where every `@pre` passes.
-4. Rank survivors by goal closeness (`@post` overlap with the requested destination when present) and present top macro candidates to the user with a short "why this flow" note.
-6. Wait for user selection before replaying. **Auto-run is allowed only when there is exactly one survivor and it is an unambiguous match for an explicit user request.**
+4. Rank survivors by goal closeness and present top macro candidates to the user with a short "why this flow" note:
+   - Prefer flows whose `@post` selectors literally match destination language from the user request (same `text`, `label`, or selector phrase).
+5. Wait for user selection before replaying. **Auto-run is allowed only when there is exactly one survivor and it is an unambiguous match for an explicit user request.**
    - Only propose flows from `flows/macros/` in interactive usage.
-7. Scan selected flow `# @param` headers. Ask the user for any missing parameter values, then build explicit CLI args (`-e KEY=VALUE`) for replay.
-8. `agent-device replay <path> -e KEY=VALUE ...`.
-9. If the flow declares `@post`, verify each `@post` with `is exists`. On success, re-enter the loop only if the user's stated goal is not complete; otherwise stop and report completion. On failure, propose peer flow/manual fallback options and ask before continuing. If no `@post` is declared (utility flow), rely on explicit user confirmation or the next snapshot before continuing.
+6. Scan selected flow `# @param` headers. Ask the user for any missing parameter values, then build explicit CLI args (`-e KEY=VALUE`) for replay.
+7. `agent-device replay <path> -e KEY=VALUE ...`.
+8. If the flow declares `@post`, verify each `@post` with `is exists`. On success, re-enter the loop only if the user's stated goal is not complete; otherwise stop and report completion. On failure, propose peer flow/manual fallback options and ask before continuing. If no `@post` is declared (utility flow), rely on explicit user confirmation or the next snapshot before continuing.
 
 ## QA workflow (separate)
 
-`flows/tests/` is reserved for dedicated QA automation and should not be offered to users as part of the interactive helper loop above.
+`flows/tests/` is reserved for dedicated QA automation and should not be offered to users as part of the interactive helper loop above. Run these flows with the dedicated test runner:
+
+```bash
+agent-device test .claude/skills/agent-device/flows/tests/<name>.ad -e KEY=VALUE ...
+```
 
 ## Metadata header spec
 
@@ -35,7 +40,7 @@ Each flow starts with `# @key value` comment lines. The `.ad` parser treats `#` 
 | `@pre`   | 1..N        | Selector that must resolve in the current snapshot. Multiple lines are ANDed.                    |
 | `@post`  | 0..N        | Selector expected after replay. Multiple lines are ANDed. Used for chaining + success.           |
 | `@tag`   | 0..N        | Free-form category (`auth`, `onboarding`, ...) or scoped (`sentry-<spanName>`).                  |
-| `@param` | 0..N        | Runtime input contract: `@param KEY description...`. Use with `${KEY}` in flow body.             |
+| `@param` | 0..N        | Runtime input contract: `@param KEY description.` Use with `${KEY}` in flow body.                |
 
 Selector syntax matches the body: `id="..."`, `role="..." label="..."`, `text="..."`, `||` for fallbacks.
 
@@ -67,7 +72,7 @@ agent-device replay <flow>.ad -e EMAIL=other@example.com
 - **Choose directory intentionally.** Put reusable setup/navigation steps in `flows/macros/`; put outcome verification scenarios in `flows/tests/`.
 - **Keep scope coherent, not artificially tiny.** Flows can span multiple screens when that sequence is the reusable intent (for example "create and submit manual expense").
 - **Peers share `@pre` and differ on `@post`.** One flow per narrow outcome is better than a mega-flow with conditional branches.
-- **Use `@param` for substituted values.** If a literal is interpolated into the body, declare `# @param KEY description` and reference it as `${KEY}`.
+- **Use `@param` for substituted values.** If a literal is interpolated into the body, declare `# @param KEY description.` and reference it as `${KEY}`.
 - **Do not use `env` directives in repo flows.** Runtime values must come from `-e KEY=VALUE` (preferred) or `AD_VAR_KEY=...`.
 - **Use inline defaults sparingly.** Optional tuning values can use `${KEY:-fallback}` in the body; required values should have no fallback and must be provided by caller input.
 
@@ -93,4 +98,4 @@ Heal selector drift in place:
 agent-device replay -u .claude/skills/agent-device/flows/<kind>/<name>.ad
 ```
 
-Re-verify `@pre`/`@post` still hold, then commit. Note: `replay -u` can rewrite interpolated lines to concrete selectors/values; review diffs and restore `${KEY}` placeholders where needed.
+Re-verify `@pre`/`@post` still hold, then commit. Note: `replay -u` can rewrite interpolated lines to concrete selectors/values; review diffs and restore `${KEY}` placeholders where needed. Keep runtime inputs in `@param` + `-e`/`AD_VAR_*`; do not reintroduce in-file `env` directives.
