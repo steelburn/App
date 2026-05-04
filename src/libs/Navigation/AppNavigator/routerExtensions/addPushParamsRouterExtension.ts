@@ -90,6 +90,9 @@ function isPopAction(action: PushParamsRouterAction): boolean {
     return action.type === CONST.NAVIGATION.ACTION_TYPE.POP;
 }
 
+// Bound PUSH_PARAMS history so a long stack-top-PUSH-only session can't grow it indefinitely.
+const PUSH_PARAMS_HISTORY_MAX = 32;
+
 /**
  * Higher-order function that extends a stack router with push-params history functionality.
  * It maintains a separate history stack of route snapshots that can diverge from the routes array,
@@ -154,7 +157,9 @@ function addPushParamsRouterExtension<RouterOptions extends PlatformStackRouterO
                     const existingHistory = stateWithUpdatedParams.history;
                     const baseHistory =
                         pushParamsHistoryPosition >= 0 && pushParamsHistoryPosition < existingHistory.length - 1 ? existingHistory.slice(0, pushParamsHistoryPosition + 1) : existingHistory;
-                    const newHistory = [...baseHistory, focusedRoute];
+                    const appended = [...baseHistory, focusedRoute];
+                    // Drop oldest entries on overflow — the most recent PUSH_PARAMS snapshots are the most useful for GO_BACK.
+                    const newHistory = appended.length > PUSH_PARAMS_HISTORY_MAX ? appended.slice(appended.length - PUSH_PARAMS_HISTORY_MAX) : appended;
                     pushParamsHistoryPosition = newHistory.length - 1;
                     return {...stateWithUpdatedParams, history: newHistory};
                 }
@@ -251,6 +256,7 @@ function addPushParamsRouterExtension<RouterOptions extends PlatformStackRouterO
                 if (newFocused?.key) {
                     const outcome = resolveCursorForReset(history, pushParamsHistoryPosition, {key: newFocused.key, params: newFocused.params});
                     if (outcome.type === 'backward' || outcome.type === 'ambiguous') {
+                        // Ambiguous: cursor advances forward (per resolver) but we still fire backward notify — WCAG 2.4.3 prefers attempting focus restoration on direction-uncertain RESETs.
                         notifyPushParamsBackward(newFocused.key, newFocused.params);
                         pushParamsHistoryPosition = outcome.cursor;
                     } else if (outcome.type === 'forward') {
@@ -272,7 +278,7 @@ function addPushParamsRouterExtension<RouterOptions extends PlatformStackRouterO
 
                 const preservedHistory = preserveHistoryForRoutes(history, rehydratedState.routes);
                 if (preservedHistory.length > 0) {
-                    // Remap cursor when preservation removed entries so the numeric index still points at the same logical entry.
+                    // Remap cursor when preservation removed entries so the numeric index still points at the same logical entry. indexOf relies on reference equality — preserveHistoryForRoutes filters without cloning; if it ever clones, the remap silently falls back to length-1.
                     if (preservedHistory.length !== history.length) {
                         const cursorEntry = pushParamsHistoryPosition >= 0 && pushParamsHistoryPosition < history.length ? history.at(pushParamsHistoryPosition) : null;
                         if (cursorEntry) {

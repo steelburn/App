@@ -679,6 +679,23 @@ describe('addPushParamsRouterExtension', () => {
         expect((afterPush.routes.at(0)?.params as {tab: string}).tab).toBe('bar');
     });
 
+    it('PUSH_PARAMS history is FIFO-capped at PUSH_PARAMS_HISTORY_MAX so long sessions cannot grow it indefinitely', () => {
+        // Bound is 32; pushing 40 entries should leave the most recent 32 in history.
+        const factory = createMockRouterFactory();
+        const enhancedRouter = addPushParamsRouterExtension(factory)({} as PlatformStackRouterOptions);
+        const initial = makeRoute('Search', 'search-1', {q: '0'});
+        let state: TestState = makeState([initial], {history: [{...initial}] as CustomHistoryEntry[]});
+
+        for (let i = 1; i <= 40; i += 1) {
+            state = enhancedRouter.getStateForAction(state, {type: CONST.NAVIGATION.ACTION_TYPE.PUSH_PARAMS, payload: {params: {q: String(i)}}}, CONFIG_OPTIONS) as TestState;
+        }
+
+        expect(state.history).toHaveLength(32);
+        // Oldest 9 entries (q=0..8) dropped; newest entries (q=9..40) survive.
+        expect((asRouteEntry(state.history?.at(0) as CustomHistoryEntry).params as {q: string}).q).toBe('9');
+        expect((asRouteEntry(state.history?.at(-1) as CustomHistoryEntry).params as {q: string}).q).toBe('40');
+    });
+
     it('PUSH_PARAMS on a non-terminal-index state captures the focused route (not routes.at(-1))', () => {
         const factory = createMockRouterFactory((state, action) => {
             if (action.type === 'SET_PARAMS') {
