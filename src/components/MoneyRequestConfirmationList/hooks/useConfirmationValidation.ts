@@ -19,7 +19,7 @@ import type {CurrentUserPersonalDetails} from '@src/types/onyx/PersonalDetails';
 
 type ValidationResult = {errorKey: TranslationPaths; shouldSetDidConfirmSplit?: boolean} | {errorKey: null};
 
-export type UseConfirmationValidationParams = {
+type UseConfirmationValidationParams = {
     /** Transaction being validated */
     transaction: OnyxEntry<OnyxTypes.Transaction>;
 
@@ -257,4 +257,4 @@ function useConfirmationValidation({
 }
 
 export default useConfirmationValidation;
-export type {ValidationResult};
+export type {ValidationResult, UseConfirmationValidationParams};
