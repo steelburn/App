@@ -1580,6 +1580,9 @@ function updateSplitTransactions({
                     transactionChanges,
                     policy,
                     policyTagList: policyTags ?? null,
+                    // TODO: Replace getPolicyTagsData (https://github.com/Expensify/App/issues/72721) with useOnyx hook
+                    // eslint-disable-next-line @typescript-eslint/no-deprecated
+                    reportPolicyTags: getPolicyTagsData(transactionIOUReport?.policyID),
                     policyCategories: policyCategories ?? null,
                     newTransactionReportID: splitExpense?.reportID,
                     policyRecentlyUsedCategories,
