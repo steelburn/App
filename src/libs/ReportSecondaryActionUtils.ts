@@ -445,10 +445,6 @@ function isReceivedPaymentAction(report: Report, reportActions: ReportAction[] =
         return false;
     }
 
-    const {reimbursableSpend} = getMoneyRequestSpendBreakdown(report);
-    if (reimbursableSpend <= 0) {
-        return false;
-    }
 
     if (policy?.role === CONST.POLICY.ROLE.ADMIN || report.isWaitingOnBankAccount) {
         return false;
