@@ -8976,8 +8976,8 @@ function hasEmptyReportsForPolicy(
  */
 function getPolicyIDsWithEmptyReportsForAccount(
     reports: OnyxCollection<Report> | undefined,
-    accountID?: number,
-    reportsTransactionsParam: Record<string, Transaction[]> = deprecatedReportsTransactions,
+    accountID: number | undefined,
+    reportsTransactionsParam: Record<string, Transaction[]>,
 ): Record<string, boolean> {
     if (!accountID) {
         return {};
@@ -9004,9 +9004,7 @@ function getPolicyIDsWithEmptyReportsForAccount(
         }
 
         // Ignore transactions that are already pending deletion so we treat the report as empty once the removal is queued.
-        const transactions = getReportTransactions(report.reportID, reportsTransactionsParam).filter(
-            (transaction) => transaction.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE,
-        );
+        const transactions = (reportsTransactionsParam[report.reportID] ?? []).filter((transaction) => transaction.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE);
         if (transactions.length === 0) {
             policyLookup[report.policyID] = true;
         }
