@@ -9,7 +9,6 @@ import Button from '@components/Button';
 import type {ButtonWithDropdownMenuRef} from '@components/ButtonWithDropdownMenu/types';
 import {useDelegateNoAccessActions, useDelegateNoAccessState} from '@components/DelegateNoAccessModalProvider';
 import {KYCWallContext} from '@components/KYCWall/KYCWallContext';
-import {ModalActions} from '@components/Modal/Global/ModalContext';
 import MoneyReportHeaderKYCDropdown from '@components/MoneyReportHeaderKYCDropdown';
 import {useMoneyReportHeaderModals} from '@components/MoneyReportHeaderModalsContext';
 import NavigationDeferredMount from '@components/NavigationDeferredMount';
@@ -18,7 +17,6 @@ import type {PopoverMenuItem} from '@components/PopoverMenu';
 import {useSearchStateContext} from '@components/Search/SearchContext';
 import type {PaymentActionParams} from '@components/SettlementButton/types';
 import useActiveAdminPolicies from '@hooks/useActiveAdminPolicies';
-import useConfirmModal from '@hooks/useConfirmModal';
 import {useCurrencyListActions} from '@hooks/useCurrencyList';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useExpenseActions from '@hooks/useExpenseActions';
@@ -61,7 +59,7 @@ import {
     navigateToDetailsPage,
 } from '@libs/ReportUtils';
 import {isExpensifyCardTransaction, isPending} from '@libs/TransactionUtils';
-import {markReportPaymentReceived, payInvoice, payMoneyRequest} from '@userActions/IOU/PayMoneyRequest';
+import {payInvoice, payMoneyRequest} from '@userActions/IOU/PayMoneyRequest';
 import {canApproveIOU, canIOUBePaid as canIOUBePaidAction} from '@userActions/IOU/ReportWorkflow';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -82,7 +80,6 @@ function MoneyReportHeaderSecondaryActionsInner({reportID, primaryAction, isRepo
 
     const {translate, localeCompare} = useLocalize();
     const kycWallRef = useContext(KYCWallContext);
-    const {showConfirmModal} = useConfirmModal();
 
     const [moneyRequestReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportID}`);
     const [policy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${getNonEmptyStringOnyxID(moneyRequestReport?.policyID)}`);
@@ -248,7 +245,7 @@ function MoneyReportHeaderSecondaryActionsInner({reportID, primaryAction, isRepo
             ? sortPoliciesByName(activeAdminPolicies, localeCompare)
             : [];
 
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Info', 'Cash', 'ArrowRight', 'Building', 'MoneyBag']);
+    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Info', 'Cash', 'ArrowRight', 'Building']);
 
     // Build PAY action sub-items. Workspace-policy entries carry the policy as data and have no onSelected;
     // MoneyReportHeaderKYCDropdown picks them up via onSubItemSelected where triggerKYCFlow is in scope.
@@ -275,9 +272,10 @@ function MoneyReportHeaderSecondaryActionsInner({reportID, primaryAction, isRepo
     const lifecycleActions = useLifecycleActions({
         reportID,
         startApprovedAnimation,
+        startAnimation,
         startSubmittingAnimation,
-        onHoldMenuOpen: (requestType, onConfirm) => {
-            openHoldMenu({requestType, onConfirm: onConfirm ?? (() => startApprovedAnimation())});
+        onHoldMenuOpen: (requestType, onConfirm, paymentType) => {
+            openHoldMenu({requestType, onConfirm: onConfirm ?? (() => startApprovedAnimation()), paymentType});
         },
     });
 
@@ -343,44 +341,6 @@ function MoneyReportHeaderSecondaryActionsInner({reportID, primaryAction, isRepo
             sentryLabel: CONST.SENTRY_LABEL.MORE_MENU.VIEW_DETAILS,
             onSelected: () => {
                 navigateToDetailsPage(moneyRequestReport, Navigation.getReportRHPActiveRoute());
-            },
-        },
-        [CONST.REPORT.SECONDARY_ACTIONS.RECEIVED_PAYMENT]: {
-            value: CONST.REPORT.SECONDARY_ACTIONS.RECEIVED_PAYMENT,
-            text: translate('iou.receivedPayment'),
-            icon: expensifyIcons.MoneyBag,
-            sentryLabel: CONST.SENTRY_LABEL.MORE_MENU.RECEIVED_PAYMENT,
-            onSelected: async () => {
-                if (isDelegateAccessRestricted) {
-                    showDelegateNoAccessModal();
-                    return;
-                }
-
-                const result = await showConfirmModal({
-                    title: translate('iou.confirmPaymentReceived'),
-                    prompt: translate('iou.receivedPaymentConfirmation'),
-                    confirmText: translate('iou.yesIHaveReceivedPayment'),
-                    cancelText: translate('common.cancel'),
-                });
-
-                if (result.action !== ModalActions.CONFIRM) {
-                    return;
-                }
-
-                if (isAnyTransactionOnHold) {
-                    openHoldMenu({
-                        requestType: CONST.IOU.REPORT_ACTION_TYPE.PAY,
-                        paymentType: CONST.IOU.PAYMENT_TYPE.ELSEWHERE,
-                        onConfirm: () => {
-                            startAnimation();
-                            markReportPaymentReceived(chatReport, moneyRequestReport, nextStep);
-                        },
-                    });
-                    return;
-                }
-
-                startAnimation();
-                markReportPaymentReceived(chatReport, moneyRequestReport, nextStep);
             },
         },
         ...exportActionEntries,
