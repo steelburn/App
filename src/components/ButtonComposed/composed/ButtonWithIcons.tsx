@@ -56,6 +56,7 @@ function ButtonWithIcons({
     id = '',
     testID = undefined,
     accessibilityLabel = '',
+    accessibilityState,
     isPressOnEnterActive,
     isNested = false,
     shouldBlendOpacity = false,
@@ -102,6 +103,7 @@ function ButtonWithIcons({
             id={id}
             testID={testID}
             accessibilityLabel={accessibilityLabel}
+            accessibilityState={accessibilityState}
             isNested={isNested}
             shouldBlendOpacity={shouldBlendOpacity}
             shouldStayNormalOnDisable={shouldStayNormalOnDisable}
