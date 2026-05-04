@@ -123,10 +123,7 @@ function useReportActionsNewActionLiveTail({
                 }
             } else {
                 setIsFloatingMessageCounterVisible(false);
-                // Wait for the next frame so the list has laid out new items before scrolling
-                requestAnimationFrame(() => {
-                    reportScrollManager.scrollToBottom();
-                });
+                reportScrollManager.scrollToBottom();
             }
 
             setIsScrollToBottomEnabled(true);

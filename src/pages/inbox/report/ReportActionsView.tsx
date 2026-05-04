@@ -135,7 +135,7 @@ function ReportActionsView({reportID, onLayout}: ReportActionsViewProps) {
 
     const lastAction = allReportActions?.at(-1);
     const isInitiallyLoadingTransactionThread = isReportTransactionThread && (!!isLoadingInitialReportActions || (allReportActions ?? [])?.length <= 1);
-    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+
     const shouldAddCreatedAction = !isCreatedAction(lastAction) && (isMoneyRequestReport(report) || isInvoiceReport(report) || isInitiallyLoadingTransactionThread || isConciergeSidePanel);
 
     useEffect(() => {
@@ -300,7 +300,6 @@ function ReportActionsView({reportID, onLayout}: ReportActionsViewProps) {
                 setTreatAsNoPaginationAnchor={setTreatAsNoPaginationAnchor}
                 listID={listID}
                 hasCreatedActionAdded={shouldAddCreatedAction}
-                isConciergeSidePanel={isConciergeSidePanel}
                 showHiddenHistory={!showFullHistory}
                 hasPreviousMessages={hasPreviousMessages}
                 onShowPreviousMessages={handleShowPreviousMessages}
