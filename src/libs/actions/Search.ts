@@ -8,6 +8,7 @@ import type {LocalizedTranslate} from '@components/LocaleContextProvider';
 import type {PopoverMenuItem} from '@components/PopoverMenu';
 import type {TransactionListItemType, TransactionReportGroupListItemType} from '@components/Search/SearchList/ListItem/types';
 import type {BankAccountMenuItem, BulkPaySelectionData, PaymentData, SearchQueryJSON, SelectedReports, SelectedTransactionInfo, SelectedTransactions} from '@components/Search/types';
+import type {CurrencyListActionsContextType} from '@hooks/useCurrencyList';
 import * as API from '@libs/API';
 import {waitForWrites} from '@libs/API';
 import type {
@@ -20,7 +21,6 @@ import type {
 } from '@libs/API/parameters';
 import {READ_COMMANDS, SIDE_EFFECT_REQUEST_COMMANDS, WRITE_COMMANDS} from '@libs/API/types';
 import {getCommandURL} from '@libs/ApiUtils';
-import {convertToDisplayString} from '@libs/CurrencyUtils';
 import {getMicroSecondOnyxErrorWithTranslationKey} from '@libs/ErrorUtils';
 import fileDownload from '@libs/fileDownload';
 import isSearchTopmostFullScreenRoute from '@libs/Navigation/helpers/isSearchTopmostFullScreenRoute';
@@ -29,7 +29,7 @@ import type {SearchFullscreenNavigatorParamList} from '@libs/Navigation/types';
 import enhanceParameters from '@libs/Network/enhanceParameters';
 import {rand64} from '@libs/NumberUtils';
 import {getActivePaymentType} from '@libs/PaymentUtils';
-import {getSubmitReportManagerAccountID, getValidConnectedIntegration, isDelayedSubmissionEnabled} from '@libs/PolicyUtils';
+import {getSubmitToAccountID, getValidConnectedIntegration, isDelayedSubmissionEnabled} from '@libs/PolicyUtils';
 import type {OptimisticExportIntegrationAction} from '@libs/ReportUtils';
 import {
     buildOptimisticExportIntegrationAction,
@@ -295,7 +295,7 @@ function getPayActionCallback(
 
 function getOnyxLoadingData(
     hash: number,
-    queryJSON?: SearchQueryJSON,
+    queryJSON?: Readonly<SearchQueryJSON>,
     offset?: number,
     isOffline?: boolean,
     isSearchAPI = false,
@@ -354,7 +354,7 @@ function getOnyxLoadingData(
     return {optimisticData, finallyData, failureData};
 }
 
-function saveSearch({queryJSON, newName}: {queryJSON: SearchQueryJSON; newName?: string}) {
+function saveSearch({queryJSON, newName}: {queryJSON: Readonly<SearchQueryJSON>; newName?: string}) {
     const saveSearchName = newName ?? queryJSON?.inputQuery ?? '';
     const jsonQuery = JSON.stringify(queryJSON);
 
@@ -521,7 +521,7 @@ function search({
     shouldUpdateLastSearchParams = true,
     skipWaitForWrites = false,
 }: {
-    queryJSON: SearchQueryJSON;
+    queryJSON: Readonly<SearchQueryJSON>;
     searchKey: SearchKey | undefined;
     offset?: number;
     shouldCalculateTotals?: boolean;
@@ -661,7 +661,7 @@ function submitMoneyRequestOnSearch(hash: number, reportList: Report[], policy: 
     const report = (reportList.at(0) ?? {}) as Report;
     const parameters: SubmitReportParams = {
         reportID: report.reportID,
-        managerAccountID: getSubmitReportManagerAccountID(policy.at(0), report),
+        managerAccountID: getSubmitToAccountID(policy.at(0), report) ?? report?.managerID,
         reportActionID: rand64(),
     };
 
@@ -1458,7 +1458,12 @@ function getPayMoneyOnSearchInvoiceParams(policyID: string | undefined, payAsBus
 /**
  * Return the total amount of selected transactions/reports.
  */
-function getTotalFormattedAmount(selectedReports: SelectedReports[], selectedTransactions: SelectedTransactions, currency?: string): string {
+function getTotalFormattedAmount(
+    convertToDisplayString: CurrencyListActionsContextType['convertToDisplayString'],
+    selectedReports: SelectedReports[],
+    selectedTransactions: SelectedTransactions,
+    currency?: string,
+): string {
     const transactionKeys = Object.keys(selectedTransactions ?? {});
     const totalAmount =
         selectedReports.length > 0
