@@ -3,6 +3,7 @@ import Clipboard from '@libs/Clipboard';
 import ROUTES from '@src/ROUTES';
 import useEnvironment from './useEnvironment';
 
+// Matches the success state duration in useThrottledButtonState used by ContextMenuItem
 const SHARE_FEEDBACK_DURATION_MS = 1800;
 
 function useShareSavedSearch() {

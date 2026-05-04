@@ -43,6 +43,7 @@ type SavedSearchMenuItemBuilderParams = {
     renderSavedSearchTooltip: () => React.JSX.Element;
     itemStyle: SavedSearchMenuItem['style'];
     tooltipWrapperStyle: SavedSearchMenuItem['tooltipWrapperStyle'];
+    isCopied: boolean;
 };
 
 function buildSavedSearchMenuItem({
@@ -57,6 +58,7 @@ function buildSavedSearchMenuItem({
     renderSavedSearchTooltip,
     itemStyle,
     tooltipWrapperStyle,
+    isCopied,
 }: SavedSearchMenuItemBuilderParams): SavedSearchMenuItem {
     const isItemFocused = Number(key) === hash;
     const baseMenuItem: SavedSearchMenuItem = createBaseSavedSearchMenuItem(item, key, index, title, isItemFocused);
@@ -76,6 +78,7 @@ function buildSavedSearchMenuItem({
                 hideProductTrainingTooltip={index === 0 && shouldShowSavedSearchTooltip ? hideSavedSearchTooltip : undefined}
                 shouldRenderTooltip={index === 0 && shouldShowSavedSearchTooltip}
                 renderTooltipContent={renderSavedSearchTooltip}
+                isCopied={isCopied}
             />
         ),
         style: itemStyle,
@@ -157,6 +160,7 @@ function SavedSearchList({hash}: SavedSearchListProps) {
                   renderSavedSearchTooltip,
                   itemStyle,
                   tooltipWrapperStyle,
+                  isCopied: copiedHash === Number(key),
               }),
           )
         : [];

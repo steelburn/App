@@ -1,9 +1,14 @@
-import React from 'react';
+import React, {useEffect, useRef} from 'react';
 import {View} from 'react-native';
 import type {PopoverMenuItem} from '@components/PopoverMenu';
 import ThreeDotsMenu from '@components/ThreeDotsMenu';
 import useThemeStyles from '@hooks/useThemeStyles';
 import CONST from '@src/CONST';
+
+type ThreeDotsMenuHandle = {hidePopoverMenu: () => void; isPopupMenuVisible: boolean};
+
+// Matches the shouldDelay close timing in hideContextMenu (ReportActionContextMenu.ts)
+const MENU_CLOSE_DELAY_MS = 800;
 
 type SavedSearchItemThreeDotMenuProps = {
     menuItems: PopoverMenuItem[];
@@ -11,10 +16,22 @@ type SavedSearchItemThreeDotMenuProps = {
     hideProductTrainingTooltip?: () => void;
     renderTooltipContent: () => React.JSX.Element;
     shouldRenderTooltip: boolean;
+    isCopied?: boolean;
 };
 
-function SavedSearchItemThreeDotMenu({menuItems, isDisabledItem, hideProductTrainingTooltip, renderTooltipContent, shouldRenderTooltip}: SavedSearchItemThreeDotMenuProps) {
+function SavedSearchItemThreeDotMenu({menuItems, isDisabledItem, hideProductTrainingTooltip, renderTooltipContent, shouldRenderTooltip, isCopied}: SavedSearchItemThreeDotMenuProps) {
     const styles = useThemeStyles();
+    const threeDotsMenuRef = useRef<ThreeDotsMenuHandle | null>(null);
+
+    useEffect(() => {
+        if (!isCopied) {
+            return;
+        }
+        const timer = setTimeout(() => {
+            threeDotsMenuRef.current?.hidePopoverMenu();
+        }, MENU_CLOSE_DELAY_MS);
+        return () => clearTimeout(timer);
+    }, [isCopied]);
 
     return (
         <View style={[isDisabledItem && styles.pointerEventsNone]}>
@@ -30,6 +47,7 @@ function SavedSearchItemThreeDotMenu({menuItems, isDisabledItem, hideProductTrai
                 iconStyles={styles.wAuto}
                 hideProductTrainingTooltip={hideProductTrainingTooltip}
                 sentryLabel={CONST.SENTRY_LABEL.SEARCH.SAVED_SEARCH_THREE_DOT_MENU}
+                threeDotsMenuRef={threeDotsMenuRef}
             />
         </View>
     );
