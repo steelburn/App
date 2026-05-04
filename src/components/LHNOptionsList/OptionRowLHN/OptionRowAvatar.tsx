@@ -7,7 +7,7 @@ import {getDelegateAccountIDFromReportAction} from '@libs/ReportActionsUtils';
 import type {OptionData} from '@libs/ReportUtils';
 import CONST from '@src/CONST';
 import type {Report} from '@src/types/onyx';
-import LHNAvatar from './LHNAvatar';
+import LHNAvatar from '../LHNAvatar';
 
 type OptionRowAvatarProps = {
     optionItem: OptionData;

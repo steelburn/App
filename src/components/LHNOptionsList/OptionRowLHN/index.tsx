@@ -26,13 +26,13 @@ import FreeTrial from '@pages/settings/Subscription/FreeTrial';
 import variables from '@styles/variables';
 import CONST from '@src/CONST';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
-import {useLHNTooltipContext} from './LHNTooltipContext';
+import {useLHNTooltipContext} from '../LHNTooltipContext';
+import type {OptionRowLHNProps} from '../types';
 import OptionRowActionBadge from './OptionRowActionBadge';
 import OptionRowAlternateText from './OptionRowAlternateText';
 import OptionRowAvatar from './OptionRowAvatar';
 import OptionRowPressable from './OptionRowPressable';
 import OptionRowTooltipLayer from './OptionRowTooltipLayer';
-import type {OptionRowLHNProps} from './types';
 
 function OptionRowLHN({
     reportID,
