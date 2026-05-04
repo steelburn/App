@@ -137,7 +137,11 @@ function BaseOnboardingPersonalDetails({currentUserPersonalDetails, shouldUseNat
                 return;
             }
 
-            if (onboardingPurposeSelected === CONST.ONBOARDING_CHOICES.TRACK_BUSINESS || onboardingPurposeSelected === CONST.ONBOARDING_CHOICES.TRACK_PERSONAL) {
+            if (
+                onboardingPurposeSelected === CONST.ONBOARDING_CHOICES.TRACK_BUSINESS ||
+                onboardingPurposeSelected === CONST.ONBOARDING_CHOICES.TRACK_PERSONAL ||
+                onboardingPurposeSelected === CONST.ONBOARDING_CHOICES.PERSONAL_SPEND
+            ) {
                 updateDisplayName(firstName, lastName, formatPhoneNumber, session?.accountID ?? CONST.DEFAULT_NUMBER_ID, session?.email ?? '');
                 autoCreateTrackWorkspace(firstName, lastName, onboardingPurposeSelected);
                 return;
