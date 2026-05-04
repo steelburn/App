@@ -9,7 +9,7 @@ import {LocaleContextProvider} from '@components/LocaleContextProvider';
 import OnyxListItemProvider from '@components/OnyxListItemProvider';
 import OptionsListContextProvider from '@components/OptionListContextProvider';
 import ScreenWrapper from '@components/ScreenWrapper';
-import {clearAllRelatedReportActionErrors} from '@libs/actions/ClearReportActionErrors';
+import * as ClearReportActionErrorsActions from '@libs/actions/ClearReportActionErrors';
 import {setHasRadio} from '@libs/NetworkState';
 import {getIOUActionForReportID} from '@libs/ReportActionsUtils';
 import PureReportActionItem from '@pages/inbox/report/PureReportActionItem';
@@ -22,10 +22,6 @@ import waitForBatchedUpdatesWithAct from '../utils/waitForBatchedUpdatesWithAct'
 import wrapOnyxWithWaitForBatchedUpdates from '../utils/wrapOnyxWithWaitForBatchedUpdates';
 
 jest.mock('@react-navigation/native');
-jest.mock('@libs/actions/ClearReportActionErrors', () => ({
-    clearAllRelatedReportActionErrors: jest.fn(),
-}));
-const mockClearAllRelatedReportActionErrors = clearAllRelatedReportActionErrors as jest.MockedFunction<typeof clearAllRelatedReportActionErrors>;
 
 const ACTOR_ACCOUNT_ID = 123456789;
 const ACTOR_EMAIL = 'test@test.com';
@@ -135,10 +131,10 @@ describe('ClearReportActionErrors UI', () => {
         });
 
         it('should call clearAllRelatedReportActionErrors when error is dismissed', async () => {
-            // Given a rendered report action with errors and a mocked module-level clear function
+            // Given a rendered report action with errors and a spy on the clear function
             const action = getFakeReportAction(Number(REPORT_ACTION_ID), {actorAccountID: ACTOR_ACCOUNT_ID, errors: DEFAULT_ERRORS});
             const report = createMockReport({reportID: REPORT_ID, ownerAccountID: ACTOR_ACCOUNT_ID});
-            mockClearAllRelatedReportActionErrors.mockClear();
+            const spy = jest.spyOn(ClearReportActionErrorsActions, 'clearAllRelatedReportActionErrors');
 
             await act(async () => {
                 await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT}${REPORT_ID}`, report);
@@ -156,7 +152,8 @@ describe('ClearReportActionErrors UI', () => {
             fireEvent.press(dismissButton);
 
             // Then clearAllRelatedReportActionErrors should be called with correct arguments
-            expect(mockClearAllRelatedReportActionErrors).toHaveBeenCalledWith(REPORT_ID, expect.objectContaining({reportActionID: REPORT_ACTION_ID}), REPORT_ID);
+            expect(spy).toHaveBeenCalledWith(REPORT_ID, expect.objectContaining({reportActionID: REPORT_ACTION_ID}), REPORT_ID);
+            spy.mockRestore();
         });
 
         it('should clear error from Onyx when dismissed', async () => {
