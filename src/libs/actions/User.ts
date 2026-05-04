@@ -1309,7 +1309,7 @@ function setShouldShowBranchNameInTitle(value: boolean) {
     Onyx.set(ONYXKEYS.SHOULD_SHOW_BRANCH_NAME_IN_TITLE, value);
 }
 
-function lockAccount(accountID?: number, domainAccountID?: number, domainName?: string) {
+function lockAccount(currentUserAccountIDParam: number, accountID: number | undefined, domainAccountID: number | undefined, domainName: string | undefined) {
     let domainOptimisticData: DomainOnyxUpdate[] = [];
     let domainFailureData: DomainOnyxUpdate[] = [];
     let domainSuccessData: DomainOnyxUpdate[] = [];
@@ -1398,7 +1398,7 @@ function lockAccount(accountID?: number, domainAccountID?: number, domainName?: 
     let currentUserOptimisticData: AccountOnyxUpdate[] = [];
     let currentUserFailureData: AccountOnyxUpdate[] = [];
     let currentUserSuccessData: AccountOnyxUpdate[] = [];
-    if (!accountID || accountID === currentUserAccountID) {
+    if (!accountID || accountID === currentUserAccountIDParam) {
         currentUserOptimisticData = [
             {
                 onyxMethod: Onyx.METHOD.MERGE,
@@ -1442,7 +1442,7 @@ function lockAccount(accountID?: number, domainAccountID?: number, domainName?: 
     const failureData: LockAccountOnyxUpdate[] = [...domainFailureData, ...currentUserFailureData];
 
     const params: LockAccountParams = {
-        accountID: accountID ?? currentUserAccountID,
+        accountID: accountID ?? currentUserAccountIDParam,
         domainAccountID,
         domainName,
     };
