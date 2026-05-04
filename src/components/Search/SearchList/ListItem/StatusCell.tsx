@@ -18,9 +18,12 @@ type StatusCellProps = {
 
     /** Whether the transaction is deleted */
     isDeleted?: boolean;
+
+    /** Whether the parent row is selected */
+    isSelected?: boolean;
 };
 
-function StatusCell({stateNum, statusNum, isPending, isDeleted}: StatusCellProps) {
+function StatusCell({stateNum, statusNum, isPending, isDeleted, isSelected}: StatusCellProps) {
     const styles = useThemeStyles();
     const theme = useTheme();
     const {translate} = useLocalize();
@@ -32,11 +35,14 @@ function StatusCell({stateNum, statusNum, isPending, isDeleted}: StatusCellProps
         return null;
     }
 
+    const isUnreported = stateNum === undefined && statusNum === undefined && !isDeleted;
+    const backgroundColor = isSelected && isUnreported ? theme.buttonHoveredBG : reportStatusColorStyle.backgroundColor;
+
     return (
         <View style={[styles.w100, styles.justifyContentCenter, isPending && styles.offlineFeedbackPending]}>
             <StatusBadge
                 text={statusText}
-                backgroundColor={reportStatusColorStyle.backgroundColor}
+                backgroundColor={backgroundColor}
                 textColor={reportStatusColorStyle.textColor}
             />
         </View>
