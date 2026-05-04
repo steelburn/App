@@ -31,7 +31,7 @@ import {
     hasExportError as hasExportErrorUtil,
     hasOnlyHeldExpenses,
     hasOnlyNonReimbursableTransactions,
-    hasPendingWorkflowUpdate,
+    hasPendingReportRetract,
     isArchivedReport,
     isClosedReport as isClosedReportUtils,
     isCurrentUserSubmitter,
@@ -124,7 +124,7 @@ function isSubmitAction(
         return false;
     }
 
-    if (hasPendingWorkflowUpdate(report)) {
+    if (hasPendingReportRetract(report)) {
         return false;
     }
 
