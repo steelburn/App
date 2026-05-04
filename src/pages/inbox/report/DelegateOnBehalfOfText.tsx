@@ -19,10 +19,10 @@ type DelegateOnBehalfOfTextProps = {
 function DelegateOnBehalfOfText({mainAccountID, fallbackLogin}: DelegateOnBehalfOfTextProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const [resolvedLogin] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST, {
-        selector: (list: OnyxEntry<OnyxTypes.PersonalDetailsList>) => (mainAccountID ? list?.[mainAccountID]?.login : undefined),
+    const [resolvedDetail] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST, {
+        selector: (list: OnyxEntry<OnyxTypes.PersonalDetailsList>) => (mainAccountID ? list?.[mainAccountID] : undefined),
     });
-    const mainAccountLogin = resolvedLogin ?? fallbackLogin;
+    const mainAccountLogin = resolvedDetail?.login ?? fallbackLogin;
     const accountOwnerDetails = getPersonalDetailByEmail(String(mainAccountLogin ?? ''));
     return <Text style={[styles.chatDelegateMessage]}>{translate('delegate.onBehalfOfMessage', accountOwnerDetails?.displayName ?? '')}</Text>;
 }
