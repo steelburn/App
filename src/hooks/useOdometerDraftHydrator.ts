@@ -14,12 +14,10 @@ type UseOdometerDraftHydratorParams = {
     isLoadingSelectedTab?: boolean;
 };
 
-// Restores save-for-later odometer draft into the active TRANSACTION_DRAFT whenever the user lands
-// on DISTANCE_ODOMETER. Web blob URLs in transaction.comment.odometer* die on page reload while
-// ODOMETER_DRAFT (base64) survives, so we re-mint blobs from the draft on landing.
-//
-// Two trigger points: the mount effect catches Cmd+R (no tab change fires); the returned callback
-// is invoked from useResetIOUType after initMoneyRequest's rebuild branch wipes the comment.
+// Module-level so it survives host screen remounts; otherwise the mount effect re-fires and
+// clobbers Replace/Crop/Rotate results with the stale rehydrated draft.
+let lastHydratedDraft: object | null = null;
+
 function useOdometerDraftHydrator({
     transaction,
     transactionRequestType,
@@ -38,8 +36,12 @@ function useOdometerDraftHydrator({
         if (isLoadingTransaction || isLoadingSelectedTab) {
             return;
         }
+        if (lastHydratedDraft === odometerDraft) {
+            return;
+        }
         hydrateOdometerDraftIntoTransaction(transaction?.transactionID ?? CONST.IOU.OPTIMISTIC_TRANSACTION_ID, odometerDraft, transaction?.comment);
-        // Narrow deps: only react to landing-on-odometer signals — transaction.comment changes would re-fire after our own merge.
+        lastHydratedDraft = odometerDraft;
+        // transaction.comment intentionally excluded — it changes after our own merge and would re-fire.
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [transactionRequestType, odometerDraft, isLoadingTransaction, isLoadingSelectedTab]);
 
@@ -47,7 +49,9 @@ function useOdometerDraftHydrator({
         if (newIOUType !== CONST.IOU.REQUEST_TYPE.DISTANCE_ODOMETER) {
             return;
         }
+        // No guard: callers invoke this right after initMoneyRequest wipes the comment, so re-hydration is intended.
         hydrateOdometerDraftIntoTransaction(transaction?.transactionID ?? CONST.IOU.OPTIMISTIC_TRANSACTION_ID, odometerDraft, transaction?.comment);
+        lastHydratedDraft = odometerDraft ?? null;
     };
 }
 
