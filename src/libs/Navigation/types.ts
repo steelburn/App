@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention  */
 import type {
     CommonActions,
     NavigationContainerRefWithCurrent,
@@ -117,6 +116,11 @@ type SettingsNavigatorParamList = {
     };
     [SCREENS.SETTINGS.PROFILE.NEW_CONTACT_METHOD_CONFIRM_MAGIC_CODE]: {
         newContactMethod: string;
+        // eslint-disable-next-line no-restricted-syntax -- `backTo` usages in this file are legacy. Do not add new `backTo` params to screens. See contributingGuides/NAVIGATION.md
+        backTo?: Routes;
+    };
+    [SCREENS.SETTINGS.PROFILE.CONTACT_METHOD_SET_DEFAULT_CONFIRM]: {
+        contactMethod: string;
         // eslint-disable-next-line no-restricted-syntax -- `backTo` usages in this file are legacy. Do not add new `backTo` params to screens. See contributingGuides/NAVIGATION.md
         backTo?: Routes;
     };
@@ -244,6 +248,9 @@ type SettingsNavigatorParamList = {
     };
     [SCREENS.SETTINGS.ADD_US_BANK_ACCOUNT]: undefined;
     [SCREENS.SETTINGS.ADD_US_BANK_ACCOUNT_ENTRY_POINT]: undefined;
+    [SCREENS.SETTINGS.UPDATE_PERSONAL_BANK_ACCOUNT]: {
+        subPage?: string;
+    };
     [SCREENS.SETTINGS.BANK_ACCOUNT_PURPOSE]: undefined;
     [SCREENS.SETTINGS.ADD_BANK_ACCOUNT_SELECT_COUNTRY_VERIFY_ACCOUNT]: undefined;
     [SCREENS.SETTINGS.RULES.ADD]: undefined;
@@ -329,10 +336,8 @@ type SettingsNavigatorParamList = {
         // eslint-disable-next-line no-restricted-syntax -- `backTo` usages in this file are legacy. Do not add new `backTo` params to screens. See contributingGuides/NAVIGATION.md
         backTo?: Routes;
     };
-    [SCREENS.WORKSPACE.CATEGORY_CREATE]: {
+    [SCREENS.WORKSPACE.DYNAMIC_CATEGORY_CREATE]: {
         policyID: string;
-        // eslint-disable-next-line no-restricted-syntax -- `backTo` usages in this file are legacy. Do not add new `backTo` params to screens. See contributingGuides/NAVIGATION.md
-        backTo?: Routes;
     };
     [SCREENS.SETTINGS_CATEGORIES.SETTINGS_CATEGORY_CREATE]: {
         policyID: string;
@@ -378,6 +383,10 @@ type SettingsNavigatorParamList = {
         categoryName: string;
     };
     [SCREENS.WORKSPACE.CATEGORY_FLAG_AMOUNTS_OVER]: {
+        policyID: string;
+        categoryName: string;
+    };
+    [SCREENS.WORKSPACE.DYNAMIC_EXPENSE_LIMIT_TYPE_SELECTOR]: {
         policyID: string;
         categoryName: string;
     };
@@ -428,15 +437,21 @@ type SettingsNavigatorParamList = {
     [SCREENS.WORKSPACE.PAY_AND_DOWNGRADE]: {
         policyID?: string;
     };
-    [SCREENS.WORKSPACE.CATEGORIES_SETTINGS]: {
+    [SCREENS.WORKSPACE.DYNAMIC_CATEGORIES_SETTINGS]: {
         policyID: string;
-        // eslint-disable-next-line no-restricted-syntax -- `backTo` usages in this file are legacy. Do not add new `backTo` params to screens. See contributingGuides/NAVIGATION.md
-        backTo?: Routes;
     };
     [SCREENS.SETTINGS_CATEGORIES.SETTINGS_CATEGORIES_SETTINGS]: {
         policyID: string;
         // eslint-disable-next-line no-restricted-syntax -- `backTo` usages in this file are legacy. Do not add new `backTo` params to screens. See contributingGuides/NAVIGATION.md
         backTo?: Routes;
+    };
+    [SCREENS.WORKSPACE.DYNAMIC_SPEND_CATEGORY_SELECTOR]: {
+        policyID: string;
+        groupID: string;
+    };
+    [SCREENS.WORKSPACE.DYNAMIC_DEFAULT_CATEGORY_SELECTOR]: {
+        policyID: string;
+        customUnitID: string;
     };
     [SCREENS.WORKSPACE.DYNAMIC_CATEGORIES_IMPORT]: {
         policyID: string;
@@ -1903,7 +1918,7 @@ type MoneyRequestNavigatorParamList = {
     [SCREENS.MONEY_REQUEST.STEP_WAYPOINT]: {
         iouType: IOUType;
         reportID: string;
-        // eslint-disable-next-line no-restricted-syntax -- `backTo` usages in this file are legacy. Do not add new `backTo` params to screens. See contributingGuides/NAVIGATION.md
+
         // eslint-disable-next-line no-restricted-syntax -- `backTo` usages in this file are legacy. Do not add new `backTo` params to screens. See contributingGuides/NAVIGATION.md
         backTo: Routes | undefined;
         action: IOUAction;
@@ -2631,6 +2646,7 @@ type SettingsSplitNavigatorParamList = {
         backTo?: Routes;
     };
     [SCREENS.SETTINGS.WALLET.ROOT]: undefined;
+    [SCREENS.SETTINGS.AGENTS.ROOT]: undefined;
     [SCREENS.SETTINGS.RULES.ROOT]: undefined;
     [SCREENS.SETTINGS.ABOUT]: undefined;
     [SCREENS.SETTINGS.HELP]: undefined;
@@ -2930,7 +2946,7 @@ type SharedScreensParamList = {
         shortLivedAuthToken?: string;
         shortLivedToken?: string;
         authTokenType?: ValueOf<typeof CONST.AUTH_TOKEN_TYPES>;
-        // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
+
         exitTo?: Routes;
         shouldForceLogin: string;
         domain?: Routes;
@@ -2940,7 +2956,7 @@ type SharedScreensParamList = {
     [SCREENS.VALIDATE_LOGIN]: {
         accountID: string;
         validateCode: string;
-        // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
+
         exitTo?: Routes;
     };
 };
@@ -3008,9 +3024,6 @@ type AttachmentModalScreensParamList = {
     [SCREENS.WORKSPACE_AVATAR]: AttachmentModalContainerModalProps & {
         policyID: string;
         letter?: UpperCaseCharacters;
-    };
-    [SCREENS.WORKSPACE_DOCUMENT]: AttachmentModalContainerModalProps & {
-        policyID: string;
     };
     [SCREENS.REPORT_AVATAR]: AttachmentModalContainerModalProps & {
         reportID: string;

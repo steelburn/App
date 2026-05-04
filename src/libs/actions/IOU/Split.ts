@@ -1,4 +1,3 @@
-/* eslint-disable max-lines */
 import {fastMerge} from 'expensify-common';
 // eslint-disable-next-line no-restricted-imports
 import {InteractionManager} from 'react-native';
@@ -116,9 +115,7 @@ import {
     getAllTransactions,
     getMoneyRequestInformation,
     getMoneyRequestParticipantsFromReport,
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
     getMoneyRequestPolicyTags,
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
     getPolicyTagsData,
     getReceiptError,
     getReportPreviewAction,
@@ -219,7 +216,7 @@ type UpdateSplitTransactionsParams = {
         reportID: string;
         originalTransactionID: string;
         splitExpenses: SplitExpense[];
-        splitExpensesTotal?: number;
+        splitExpensesTotal: number | undefined;
     };
     searchContext?: (Partial<SearchStateContextValue & SearchActionsContextValue> & {activeGroupSearchHashes?: number[]}) | undefined;
     policyCategories: OnyxTypes.PolicyCategories | undefined;
@@ -1967,6 +1964,7 @@ function updateSplitTransactions({
             undeletedTransaction?.transactionID,
             currentReportAction,
             undefined,
+            currentUserPersonalDetails.accountID,
             undefined,
             undefined,
             undefined,
