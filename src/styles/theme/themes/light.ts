@@ -198,7 +198,7 @@ const lightTheme = {
             textColor: colors.productLight100,
         },
         unreported: {
-            backgroundColor: colors.productLight400,
+            backgroundColor: colors.productLight500,
             textColor: colors.productLight900,
         },
     },
