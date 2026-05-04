@@ -94,12 +94,15 @@ function setIsTracking(isTracking: boolean) {
     });
 }
 
-function addGpsPoints(gpsDraftDetails: OnyxEntry<GpsDraftDetails>, newGpsPoints: GPSPoint[]) {
+/**
+ * Adds new GPS points to the captured points and updates the start address if the last segment is empty
+ */
+function addGpsPoints(gpsDraftDetails: OnyxEntry<GpsDraftDetails>, newGpsPoints: GPSPoint[]): GPSPoint[][] {
     const capturedPoints = getGpsPoints(gpsDraftDetails);
     const lastTripSegment = capturedPoints.at(-1);
 
     if (!lastTripSegment) {
-        return;
+        return capturedPoints;
     }
 
     let previousPoint: GPSPoint | undefined = lastTripSegment.at(-1);
@@ -143,6 +146,8 @@ function addGpsPoints(gpsDraftDetails: OnyxEntry<GpsDraftDetails>, newGpsPoints:
         gpsPoints: newCapturedPoints,
         distanceInMeters: updatedDistance,
     });
+
+    return newCapturedPoints;
 }
 
 export {resetGPSDraftDetails, initGpsDraft, setStartWaypointAddress, setEndWaypointAddress, addGpsPoints, setIsTracking, resumeGpsTrip, removeLastSegment};

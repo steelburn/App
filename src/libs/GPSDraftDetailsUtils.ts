@@ -160,8 +160,8 @@ function getTotalGpsTripSegments(gpsDraftDetails: GpsDraftDetails | undefined): 
     return gpsDraftDetails?.gpsPoints?.length ?? 0;
 }
 
-function getTotalGpsTripPointsInLastSegment(gpsDraftDetails: GpsDraftDetails | undefined): number {
-    return gpsDraftDetails?.gpsPoints?.at(-1)?.length ?? 0;
+function getTotalGpsTripPointsInLastSegment(gpsPoints: GPSPoint[][]): number {
+    return gpsPoints.at(-1)?.length ?? 0;
 }
 
 function isTripStopped(gpsDraftDetails: GpsDraftDetails | undefined): boolean {
