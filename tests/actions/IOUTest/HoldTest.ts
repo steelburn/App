@@ -604,24 +604,24 @@ describe('actions/IOU/Hold', () => {
                   })
                 : undefined;
 
-            const onyxData: Record<string, unknown> = {
+            const reportCollection: ReportCollectionDataSet = {
                 [`${ONYXKEYS.COLLECTION.REPORT}${iouReport.reportID}`]: iouReport,
                 [`${ONYXKEYS.COLLECTION.REPORT}${chatReport.reportID}`]: chatReport,
             };
-            if (heldTransaction) {
-                onyxData[`${ONYXKEYS.COLLECTION.TRANSACTION}${heldTransaction.transactionID}`] = heldTransaction;
-            }
-            if (heldIouAction) {
-                onyxData[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${iouReport.reportID}`] = {
-                    [heldIouAction.reportActionID]: heldIouAction,
-                };
-            }
+            const transactionCollection: TransactionCollectionDataSet = heldTransaction ? {[`${ONYXKEYS.COLLECTION.TRANSACTION}${heldTransaction.transactionID}`]: heldTransaction} : {};
+            const actionCollection: ReportActionsCollectionDataSet = heldIouAction
+                ? {
+                      [`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${iouReport.reportID}`]: {
+                          [heldIouAction.reportActionID]: heldIouAction,
+                      },
+                  }
+                : {};
 
-            return {chatReport, iouReport, onyxData};
+            return {chatReport, iouReport, reportCollection, transactionCollection, actionCollection};
         };
 
         test('should optimistically update original report total to unheldTotal when held transactions are moved out', () => {
-            const {chatReport, iouReport, onyxData} = buildScenario({
+            const {chatReport, iouReport, reportCollection, transactionCollection, actionCollection} = buildScenario({
                 total: 300,
                 nonReimbursableTotal: 50,
                 unheldTotal: 200,
@@ -630,7 +630,7 @@ describe('actions/IOU/Hold', () => {
             });
 
             return waitForBatchedUpdates()
-                .then(() => Onyx.multiSet(onyxData))
+                .then(() => Onyx.multiSet({...reportCollection, ...transactionCollection, ...actionCollection}))
                 .then(() => {
                     const result = getReportFromHoldRequestsOnyxData({
                         chatReport,
@@ -646,7 +646,7 @@ describe('actions/IOU/Hold', () => {
         });
 
         test('should include matching failureData entry to restore original totals on rollback', () => {
-            const {chatReport, iouReport, onyxData} = buildScenario({
+            const {chatReport, iouReport, reportCollection, transactionCollection, actionCollection} = buildScenario({
                 total: 300,
                 nonReimbursableTotal: 50,
                 unheldTotal: 200,
@@ -655,7 +655,7 @@ describe('actions/IOU/Hold', () => {
             });
 
             return waitForBatchedUpdates()
-                .then(() => Onyx.multiSet(onyxData))
+                .then(() => Onyx.multiSet({...reportCollection, ...transactionCollection, ...actionCollection}))
                 .then(() => {
                     const result = getReportFromHoldRequestsOnyxData({
                         chatReport,
@@ -676,7 +676,7 @@ describe('actions/IOU/Hold', () => {
         });
 
         test('should not push a totals update when no held transactions exist', () => {
-            const {chatReport, iouReport, onyxData} = buildScenario({
+            const {chatReport, iouReport, reportCollection, transactionCollection, actionCollection} = buildScenario({
                 total: 300,
                 nonReimbursableTotal: 50,
                 unheldTotal: 300,
@@ -685,7 +685,7 @@ describe('actions/IOU/Hold', () => {
             });
 
             return waitForBatchedUpdates()
-                .then(() => Onyx.multiSet(onyxData))
+                .then(() => Onyx.multiSet({...reportCollection, ...transactionCollection, ...actionCollection}))
                 .then(() => {
                     const result = getReportFromHoldRequestsOnyxData({
                         chatReport,
@@ -703,7 +703,7 @@ describe('actions/IOU/Hold', () => {
         });
 
         test('should not push a totals update when iouReport.unheldTotal is undefined', () => {
-            const {chatReport, iouReport, onyxData} = buildScenario({
+            const {chatReport, iouReport, reportCollection, transactionCollection, actionCollection} = buildScenario({
                 total: 300,
                 nonReimbursableTotal: 50,
                 unheldTotal: undefined,
@@ -712,7 +712,7 @@ describe('actions/IOU/Hold', () => {
             });
 
             return waitForBatchedUpdates()
-                .then(() => Onyx.multiSet(onyxData))
+                .then(() => Onyx.multiSet({...reportCollection, ...transactionCollection, ...actionCollection}))
                 .then(() => {
                     const result = getReportFromHoldRequestsOnyxData({
                         chatReport,
