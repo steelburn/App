@@ -159,12 +159,9 @@ Onyx.connectWithoutView({
             return;
         }
 
-        Onyx.clear(KEYS_TO_PRESERVE).then(() => {
+        clearOnyxAndResetApp().finally(() => {
             // Set this to false to reset the flag for this client
             Onyx.set(ONYXKEYS.RESET_REQUIRED, false);
-
-            // eslint-disable-next-line @typescript-eslint/no-use-before-define
-            openApp();
         });
     },
 });
@@ -564,7 +561,7 @@ type CreateWorkspaceWithPolicyDraftParams = {
     file?: File;
     routeToNavigateAfterCreate?: Route;
     lastUsedPaymentMethod?: OnyxTypes.LastPaymentMethodType;
-    activePolicyID: string | undefined;
+    activePolicy: OnyxEntry<OnyxTypes.Policy>;
     currentUserAccountIDParam: number;
     currentUserEmailParam: string;
     shouldCreateControlPolicy?: boolean;
@@ -590,7 +587,7 @@ function createWorkspaceWithPolicyDraftAndNavigateToIt(params: CreateWorkspaceWi
         file,
         routeToNavigateAfterCreate,
         lastUsedPaymentMethod,
-        activePolicyID,
+        activePolicy,
         currentUserAccountIDParam,
         currentUserEmailParam,
         shouldCreateControlPolicy,
@@ -618,7 +615,7 @@ function createWorkspaceWithPolicyDraftAndNavigateToIt(params: CreateWorkspaceWi
             file,
             lastUsedPaymentMethod,
             introSelected,
-            activePolicyID,
+            activePolicy,
             currentUserAccountIDParam,
             currentUserEmailParam,
             allReportsParam: allReports,
@@ -652,7 +649,7 @@ function createWorkspaceWithPolicyDraft(params: CreateWorkspaceWithPolicyDraftPa
         currency,
         file,
         lastUsedPaymentMethod,
-        activePolicyID,
+        activePolicy,
         currentUserAccountIDParam,
         currentUserEmailParam,
         shouldCreateControlPolicy,
@@ -671,7 +668,7 @@ function createWorkspaceWithPolicyDraft(params: CreateWorkspaceWithPolicyDraftPa
         file,
         lastUsedPaymentMethod,
         introSelected,
-        activePolicyID,
+        activePolicy,
         currentUserAccountIDParam,
         currentUserEmailParam,
         allReportsParam: allReports,
@@ -692,7 +689,7 @@ type SavePolicyDraftByNewWorkspaceParams = {
     file?: File;
     lastUsedPaymentMethod?: OnyxTypes.LastPaymentMethodType;
     introSelected: OnyxEntry<OnyxTypes.IntroSelected>;
-    activePolicyID?: string;
+    activePolicy: OnyxEntry<OnyxTypes.Policy>;
     currentUserAccountIDParam: number;
     currentUserEmailParam: string;
     allReportsParam: OnyxCollection<OnyxTypes.Report>;
@@ -715,7 +712,7 @@ function savePolicyDraftByNewWorkspace({
     file,
     lastUsedPaymentMethod,
     introSelected,
-    activePolicyID,
+    activePolicy,
     currentUserAccountIDParam,
     currentUserEmailParam,
     allReportsParam,
@@ -736,7 +733,7 @@ function savePolicyDraftByNewWorkspace({
         file,
         lastUsedPaymentMethod,
         introSelected,
-        activePolicyID,
+        activePolicy,
         currentUserAccountIDParam,
         currentUserEmailParam,
         allReportsParam,
@@ -768,7 +765,7 @@ function setUpPoliciesAndNavigate(
     session: OnyxEntry<OnyxTypes.Session>,
     introSelected: OnyxEntry<OnyxTypes.IntroSelected>,
     currency: string,
-    activePolicyID: string | undefined,
+    activePolicy: OnyxEntry<OnyxTypes.Policy>,
     isSelfTourViewed: boolean | undefined,
     betas: OnyxEntry<OnyxTypes.Beta[]>,
     hasActiveAdminPolicies: boolean,
@@ -802,7 +799,7 @@ function setUpPoliciesAndNavigate(
             policyName: policyName || generateDefaultWorkspaceName(policyOwnerEmail, lastWorkspaceNumber, translate),
             transitionFromOldDot: true,
             makeMeAdmin,
-            activePolicyID,
+            activePolicy,
             currentUserAccountIDParam: currentSessionData.accountID ?? CONST.DEFAULT_NUMBER_ID,
             currentUserEmailParam: currentSessionData.email ?? '',
             isSelfTourViewed,
@@ -847,11 +844,11 @@ function setPreservedAccount(account: OnyxTypes.Account) {
 function clearOnyxAndResetApp(shouldNavigateToHomepage?: boolean) {
     // The value of isUsingImportedState will be lost once Onyx is cleared, so we need to store it
     const isStateImported = isUsingImportedState;
+    rollbackOngoingRequest();
     const sequentialQueue = getAll();
 
-    rollbackOngoingRequest();
     Navigation.clearPreloadedRoutes();
-    Onyx.clear(KEYS_TO_PRESERVE)
+    const resetPromise = Onyx.clear(KEYS_TO_PRESERVE)
         .then(() => {
             // Network key is preserved, so when exiting imported state, we should:
             // 1. Stop forcing offline mode so the app can reconnect
@@ -893,6 +890,7 @@ function clearOnyxAndResetApp(shouldNavigateToHomepage?: boolean) {
             });
         });
     clearSoundAssetsCache();
+    return resetPromise;
 }
 
 /**

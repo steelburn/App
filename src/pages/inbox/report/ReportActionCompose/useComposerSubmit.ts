@@ -20,13 +20,13 @@ import {addDomainToShortMention} from '@libs/ParsingUtils';
 import {getFilteredReportActionsForReportView, getOneTransactionThreadReportID, isSentMoneyReportAction} from '@libs/ReportActionsUtils';
 import {startSpan} from '@libs/telemetry/activeSpans';
 import {generateAccountID} from '@libs/UserUtils';
-import {useAgentZeroStatusActions} from '@pages/inbox/AgentZeroStatusContext';
 import {ActionListContext} from '@pages/inbox/ReportScreenContext';
 import {setIsComposerFullSize} from '@userActions/Report';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type * as OnyxTypes from '@src/types/onyx';
 import {useComposerActions, useComposerEditActions, useComposerEditState, useComposerMeta, useComposerSendState, useComposerState} from './ComposerContext';
+import useSidePanelContext from './useSidePanelContext';
 
 type ComposerSubmitFunctions = {
     validateAndSubmitDraft: (draftMessage: string) => void;
@@ -35,11 +35,11 @@ type ComposerSubmitFunctions = {
 
 function useComposerSubmit(reportID: string): ComposerSubmitFunctions {
     const {isOffline} = useNetwork();
-    const {kickoffWaitingIndicator} = useAgentZeroStatusActions();
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const personalDetails = usePersonalDetails();
     const {availableLoginsList} = useShortMentionsList();
     const isInSidePanel = useIsInSidePanel();
+    const sidePanelContext = useSidePanelContext(reportID);
     const [quickAction] = useOnyx(ONYXKEYS.NVP_QUICK_ACTION_GLOBAL_CREATE);
     const [isComposerFullSize = false] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_IS_COMPOSER_FULL_SIZE}${reportID}`);
     const delegateAccountID = useDelegateAccountID();
@@ -86,7 +86,6 @@ function useComposerSubmit(reportID: string): ComposerSubmitFunctions {
         if (!draftMessageTrimmed && !attachmentFileRef.current) {
             return;
         }
-        kickoffWaitingIndicator();
 
         if (attachmentFileRef.current) {
             addAttachmentWithComment({
@@ -100,6 +99,7 @@ function useComposerSubmit(reportID: string): ComposerSubmitFunctions {
                 shouldPlaySound: true,
                 isInSidePanel,
                 delegateAccountID,
+                sidePanelContext,
             });
             attachmentFileRef.current = null;
             return;
@@ -170,6 +170,7 @@ function useComposerSubmit(reportID: string): ComposerSubmitFunctions {
             currentUserAccountID: currentUserPersonalDetails.accountID,
             shouldPlaySound: true,
             isInSidePanel,
+            sidePanelContext,
             reportActionID: optimisticReportActionID,
             delegateAccountID,
         });
