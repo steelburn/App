@@ -14,7 +14,6 @@ import useBeforeRemove from '@hooks/useBeforeRemove';
 import useLocalize from '@hooks/useLocalize';
 import useNetworkWithOfflineStatus from '@hooks/useNetworkWithOfflineStatus';
 import useOnyx from '@hooks/useOnyx';
-import usePrevious from '@hooks/usePrevious';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {denyTransaction, fireAndForgetDenyTransaction} from '@libs/actions/MultifactorAuthentication';
 import Navigation from '@libs/Navigation/Navigation';
@@ -124,18 +123,17 @@ function MultifactorAuthenticationScenarioAuthorizeTransactionPage({route}: Mult
         Navigation.closeRHPFlow();
     }, [denyOutcomeScreen, transaction, isDenyingTransaction, transactionID]);
 
-    // Keep track of the previous value of transaction to avoid a brief flash in the deny flow
-    // Onyx removes the transaction a moment before denyTransaction resolves
-    const previousTransaction = usePrevious(transaction);
-    const displayTransaction = transaction ?? previousTransaction;
-
     if (denyOutcomeScreen) {
         return <ScreenWrapper testID={MultifactorAuthenticationScenarioAuthorizeTransactionPage.displayName}>{denyOutcomeScreen}</ScreenWrapper>;
     }
 
-    // This case should not be possible to reach given the useEffect above, but we must satisfy the type system
-    if (!displayTransaction) {
-        addBreadcrumb('Transaction unavailable', {transactionID, isDenyingTransaction}, 'warning');
+    // This will briefly be true after the transaction deny call has succeeded and Onyx has removed the transaction
+    // from state, but denyTransaction has not yet resolved. If we reach this case and isDenyingTransaction isn't
+    // true, then something unexpected has happened (we should've navigated away due to the useEffect above)
+    if (!transaction) {
+        if (!isDenyingTransaction) {
+            addBreadcrumb('Transaction unavailable', {transactionID}, 'warning');
+        }
         return (
             <ScreenWrapper testID={MultifactorAuthenticationScenarioAuthorizeTransactionPage.displayName}>
                 <FullScreenLoadingIndicator reasonAttributes={{context: 'MultifactorAuthenticationScenarioAuthorizeTransactionPage'}} />
@@ -152,7 +150,7 @@ function MultifactorAuthenticationScenarioAuthorizeTransactionPage({route}: Mult
             />
             <FullPageOfflineBlockingView>
                 <View style={[styles.flex1, styles.flexColumn, styles.justifyContentBetween]}>
-                    <MultifactorAuthenticationAuthorizeTransactionContent transaction={displayTransaction} />
+                    <MultifactorAuthenticationAuthorizeTransactionContent transaction={transaction} />
                     <MultifactorAuthenticationAuthorizeTransactionActions
                         isLoading={isDenyingTransaction}
                         onAuthorize={onApproveTransaction}
