@@ -11146,6 +11146,7 @@ function shouldCreateNewMoneyRequestReport(
     isScanRequest: boolean,
     betas: OnyxEntry<Beta[]>,
     action?: IOUAction,
+    isFromExistingReport?: boolean,
 ): boolean {
     if (existingIOUReport && !!existingIOUReport.errorFields?.createChat) {
         return true;
@@ -11156,7 +11157,7 @@ function shouldCreateNewMoneyRequestReport(
         !existingIOUReport ||
         hasIOUWaitingOnCurrentUserBankAccount(chatReport) ||
         !canAddTransaction(existingIOUReport) ||
-        (action !== CONST.IOU.ACTION.SUBMIT && isScanRequest && isASAPSubmitBetaEnabled)
+        (!isFromExistingReport && action !== CONST.IOU.ACTION.SUBMIT && isScanRequest && isASAPSubmitBetaEnabled)
     );
 }
 
