@@ -235,36 +235,19 @@ function getPolicyByCustomUnitID(transaction: OnyxEntry<Transaction>, policies: 
 }
 
 /**
- * Finds a policy that contains the customUnitRateID from the transaction's distance rate
+ * Finds a policy that contains the customUnitRateID from the transaction's distance rate.
  */
-function getPolicyByCustomUnitRateID(transaction: OnyxEntry<Transaction>, policies: OnyxCollection<Policy>): OnyxEntry<Policy> {
+function getPolicyByCustomUnitRateID(transaction: OnyxEntry<Transaction>): OnyxEntry<Policy> {
     const customUnitRateID = transaction?.comment?.customUnit?.customUnitRateID;
 
-    if (!customUnitRateID || !policies) {
+    if (!customUnitRateID || !allPolicies) {
         return undefined;
     }
 
-    return Object.values(policies).find((policy) => {
+    return Object.values(allPolicies).find((policy) => {
         const distanceUnit = getDistanceRateCustomUnit(policy);
         return !!distanceUnit?.rates && customUnitRateID in distanceUnit.rates;
     });
-}
-
-/**
- * Returns the policyID of the policy that owns the transaction's distance customUnitRateID,
- * using the module-level allPolicies cache. Useful in action files that don't have access
- * to an Onyx-subscribed policies collection.
- */
-function getDistanceRateOriginalPolicyID(transaction: OnyxEntry<Transaction>): string | undefined {
-    return getPolicyByCustomUnitRateID(transaction, allPolicies)?.id;
-}
-
-/**
- * Returns the full policy object that owns the transaction's distance customUnitRateID,
- * using the module-level allPolicies cache.
- */
-function getDistanceRateOriginalPolicy(transaction: OnyxEntry<Transaction>): OnyxEntry<Policy> {
-    return getPolicyByCustomUnitRateID(transaction, allPolicies);
 }
 
 /**
@@ -2305,8 +2288,6 @@ export {
     getPerDiemCustomUnit,
     getPolicyByCustomUnitID,
     getPolicyByCustomUnitRateID,
-    getDistanceRateOriginalPolicyID,
-    getDistanceRateOriginalPolicy,
     getDistanceRateCustomUnitRate,
     getPerDiemRateCustomUnitRate,
     sortWorkspacesBySelected,

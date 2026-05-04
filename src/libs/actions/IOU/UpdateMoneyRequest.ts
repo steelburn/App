@@ -9,7 +9,7 @@ import DistanceRequestUtils from '@libs/DistanceRequestUtils';
 import {getMicroSecondOnyxErrorWithTranslationKey} from '@libs/ErrorUtils';
 // eslint-disable-next-line @typescript-eslint/no-deprecated
 import {buildNextStepNew, buildOptimisticNextStep} from '@libs/NextStepUtils';
-import {getDistanceRateOriginalPolicy, hasDependentTags, isPaidGroupPolicy} from '@libs/PolicyUtils';
+import {getPolicyByCustomUnitRateID, hasDependentTags, isPaidGroupPolicy} from '@libs/PolicyUtils';
 import type {TransactionDetails} from '@libs/ReportUtils';
 import {
     buildOptimisticModifiedExpenseReportAction,
@@ -1475,7 +1475,7 @@ function getUpdateTrackExpenseParams(
     const chatReport = getAllReports()?.[`${ONYXKEYS.COLLECTION.REPORT}${transactionThread?.parentReportID}`] ?? null;
     const isDistanceTransaction = transaction && isDistanceRequestTransactionUtils(transaction);
     const isUnreported = transaction && isExpenseUnreported(transaction);
-    const distanceOriginalPolicy = isDistanceTransaction && isUnreported ? getDistanceRateOriginalPolicy(transaction) : undefined;
+    const distanceOriginalPolicy = isDistanceTransaction && isUnreported ? getPolicyByCustomUnitRateID(transaction) : undefined;
     const policyForTransaction = distanceOriginalPolicy ?? policy;
     const updatedTransaction = transaction
         ? getUpdatedTransaction({

@@ -50,7 +50,6 @@ import {hasEnabledOptions, sortAlphabetically} from '@libs/OptionsListUtils';
 import Parser from '@libs/Parser';
 import {
     canSubmitPerDiemExpenseFromWorkspace,
-    getDistanceRateCustomUnit,
     getLengthOfTag,
     getPerDiemCustomUnit,
     getPolicyByCustomUnitID,
@@ -163,15 +162,6 @@ const perDiemPoliciesSelector = (policies: OnyxCollection<OnyxTypes.Policy>) => 
     );
 };
 
-const distancePoliciesSelector = (policies: OnyxCollection<OnyxTypes.Policy>) => {
-    return Object.fromEntries(
-        Object.entries(policies ?? {}).filter(([, policy]) => {
-            const distanceUnit = getDistanceRateCustomUnit(policy);
-            return !!distanceUnit?.rates && !isEmptyObject(distanceUnit.rates);
-        }),
-    );
-};
-
 function MoneyRequestView({
     transactionThreadReport,
     parentReportID,
@@ -221,10 +211,7 @@ function MoneyRequestView({
     const isPerDiemRequest = isPerDiemRequestTransactionUtils(transaction);
     const perDiemOriginalPolicy = getPolicyByCustomUnitID(transaction, policiesWithPerDiem);
 
-    const [policiesWithDistance] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {
-        selector: distancePoliciesSelector,
-    });
-    const distanceOriginalPolicy = isDistanceRequestTransactionUtils(transaction) && isExpenseUnreported ? getPolicyByCustomUnitRateID(transaction, policiesWithDistance) : undefined;
+    const distanceOriginalPolicy = isDistanceRequestTransactionUtils(transaction) && isExpenseUnreported ? getPolicyByCustomUnitRateID(transaction) : undefined;
 
     let policy;
     let policyID;
