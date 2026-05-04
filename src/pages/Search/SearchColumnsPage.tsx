@@ -26,7 +26,6 @@ function SearchColumnsPage() {
     // We need at least one element with flex1 in the table to ensure the table looks good in the UI, so we don't allow removing the total columns
     // since it makes sense for them to show up in an expense management App and it fixes the layout issues.
     const requiredColumns = new Set<SearchCustomColumnIds>([
-        CONST.SEARCH.TABLE_COLUMNS.AVATAR,
         CONST.SEARCH.TABLE_COLUMNS.TOTAL_AMOUNT,
         CONST.SEARCH.TABLE_COLUMNS.TOTAL,
         CONST.SEARCH.TABLE_COLUMNS.GROUP_CARD,
