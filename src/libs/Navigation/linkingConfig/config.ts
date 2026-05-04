@@ -1382,6 +1382,9 @@ const config: LinkingOptions<RootNavigatorParamList>['config'] = {
                         [SCREENS.DOMAIN.MEMBERS_MOVE_TO_GROUP]: {
                             path: ROUTES.DOMAIN_MEMBERS_MOVE_TO_GROUP.route,
                         },
+                        [SCREENS.DOMAIN.MEMBER_MOVE_TO_GROUP]: {
+                            path: ROUTES.DOMAIN_MEMBER_MOVE_TO_GROUP.route,
+                        },
                         [SCREENS.DOMAIN.GROUP_DETAILS]: {
                             path: ROUTES.DOMAIN_GROUP_DETAILS.route,
                         },

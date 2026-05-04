@@ -8887,6 +8887,8 @@ ${reportName}
             emptyMembers: {title: '此群组中没有成员', subtitle: '添加成员或尝试更改上方的筛选条件。'},
             moveToGroup: '移至群组',
             chooseWhereToMove: ({count}: {count: number}) => `选择将 ${count} 个 ${count === 1 ? '成员' : '成员'} 移动到哪里。`,
+            domainGroup: '域名组',
+            chooseWhereToMoveName: ({name}: {name: string}) => `选择将 ${name} 移动到哪里。`,
         },
         common: {
             settings: '设置',
@@ -8905,8 +8907,11 @@ ${reportName}
             makeDefault: '设为默认',
             neverMind: '算了',
             permissions: '群组权限',
-            StrictlyEnforceWorkspaceRules: '严格执行工作空间规则',
-            StrictlyEnforceWorkspaceRulesDescription: '提交报告前必须满足所有工作空间规则。不允许手动例外。',
+            strictlyEnforceWorkspaceRules: '严格执行工作空间规则',
+            strictlyEnforceWorkspaceRulesDescription: '提交报告前必须满足所有工作空间规则。不允许手动例外。',
+            restrictExpenseWorkspaceCreation: '限制创建/删除费用工作区',
+            restrictExpenseWorkspaceCreationDescription:
+                '阻止成员创建费用工作区或将自己从费用工作区中移除。当与严格的工作区执行相结合时，这有助于防止他人使用 Expensify 提交用于您域外的报表。',
         },
     },
     proactiveAppReview: {title: '喜欢全新的 Expensify 吗？', description: '请告诉我们，这样我们就能帮助您让报销体验变得更好。', positiveButton: '太棒了！', negativeButton: '不太是'},

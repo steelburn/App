@@ -9130,6 +9130,8 @@ Hier is een *proefbon* om je te laten zien hoe het werkt:`,
             emptyMembers: {title: 'Geen leden in deze groep', subtitle: 'Voeg een lid toe of probeer het filter hierboven te wijzigen.'},
             moveToGroup: 'Verplaatsen naar groep',
             chooseWhereToMove: ({count}: {count: number}) => `Kies waar je ${count} ${count === 1 ? 'lid' : 'leden'} naartoe wilt verplaatsen.`,
+            domainGroup: 'Domeingroep',
+            chooseWhereToMoveName: ({name}: {name: string}) => `Kies waar je ${name} naartoe wilt verplaatsen.`,
         },
         common: {
             settings: 'Instellingen',
@@ -9150,9 +9152,12 @@ Hier is een *proefbon* om je te laten zien hoe het werkt:`,
             makeDefault: 'Standaard maken',
             neverMind: 'Laat maar',
             permissions: 'Groepsmachtigingen',
-            StrictlyEnforceWorkspaceRules: 'Werkruimteregels strikt afdwingen',
-            StrictlyEnforceWorkspaceRulesDescription:
+            strictlyEnforceWorkspaceRules: 'Werkruimteregels strikt afdwingen',
+            strictlyEnforceWorkspaceRulesDescription:
                 'Aan alle werkruimteregels moet worden voldaan voordat een rapport kan worden ingediend. Handmatige uitzonderingen zijn niet toegestaan.',
+            restrictExpenseWorkspaceCreation: 'Aanmaken/verwijderen van onkostenwerkruimte beperken',
+            restrictExpenseWorkspaceCreationDescription:
+                'Voorkom dat leden een onkostenwerkruimte kunnen aanmaken of zichzelf uit een onkostenwerkruimte kunnen verwijderen. Dit is nuttig om te voorkomen dat mensen Expensify gebruiken om rapporten in te dienen voor gebruik buiten jouw domein, wanneer dit wordt gecombineerd met strikte werkruimtehandhaving.',
         },
     },
     proactiveAppReview: {
