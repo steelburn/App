@@ -16,16 +16,7 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import ControlSelection from '@libs/ControlSelection';
 import DateUtils from '@libs/DateUtils';
 import Navigation from '@libs/Navigation/Navigation';
-import {getPersonalDetailByEmail} from '@libs/PersonalDetailsUtils';
-import {
-    getDelegateAccountIDFromReportAction,
-    getHumanAgentAccountIDFromReportAction,
-    getManagerOnVacation,
-    getModerationFlagState,
-    getOriginalMessage,
-    getSubmittedTo,
-    getVacationer,
-} from '@libs/ReportActionsUtils';
+import {getDelegateAccountIDFromReportAction, getHumanAgentAccountIDFromReportAction, getManagerOnVacation, getModerationFlagState, getVacationer} from '@libs/ReportActionsUtils';
 import {isOptimisticPersonalDetail} from '@libs/ReportUtils';
 import CONST from '@src/CONST';
 import ROUTES from '@src/ROUTES';
@@ -35,6 +26,7 @@ import DelegateOnBehalfOfText from './DelegateOnBehalfOfText';
 import HumanAgentAssistedByText from './HumanAgentAssistedByText';
 import ReportActionItemDate from './ReportActionItemDate';
 import ReportActionItemFragment from './ReportActionItemFragment';
+import VacationDelegateText from './VacationDelegateText';
 
 type ReportActionItemSingleProps = Partial<ChildrenProps> & {
     /** All the data of the action */
@@ -98,19 +90,7 @@ function ReportActionItemSingle({
     const mainAccountID = delegateAccountID ? (reportPreviewSenderID ?? potentialIOUReport?.ownerAccountID ?? action?.childOwnerAccountID) : undefined;
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
 
-    // Vacation delegate details for submitted action
-    const vacationer = getVacationer(action);
-    const submittedTo = getSubmittedTo(action);
-    const vacationDelegateDetailsForSubmit = getPersonalDetailByEmail(vacationer ?? '');
-    const submittedToDetails = getPersonalDetailByEmail(submittedTo ?? '');
-
-    // Vacation delegate details for approved action
-    const managerOnVacation = getManagerOnVacation(action);
-    const vacationDelegateDetailsForApprove = getPersonalDetailByEmail(managerOnVacation ?? '');
-
-    // Check if this is an automatic action
-    const originalMessage = getOriginalMessage(action);
-    const isAutomaticAction = originalMessage && 'automaticAction' in originalMessage ? originalMessage.automaticAction : false;
+    const hasVacationDelegate = !!getVacationer(action) || !!getManagerOnVacation(action);
 
     const headingText = avatarType === CONST.REPORT_ACTION_AVATARS.TYPE.MULTIPLE ? `${primaryAvatar.name} & ${secondaryAvatar.name}` : primaryAvatar.name;
 
@@ -233,18 +213,7 @@ function ReportActionItemSingle({
                     />
                 )}
                 {!!humanAgentAccountID && <HumanAgentAssistedByText action={action} />}
-                {!!vacationer && !!submittedTo && (
-                    <Text style={[styles.chatDelegateMessage]}>
-                        {translate(
-                            'statusPage.toAsVacationDelegate',
-                            submittedToDetails?.displayName ?? submittedTo ?? '',
-                            vacationDelegateDetailsForSubmit?.displayName ?? vacationer ?? '',
-                        )}
-                    </Text>
-                )}
-                {!!managerOnVacation && !isAutomaticAction && (
-                    <Text style={[styles.chatDelegateMessage]}>{translate('statusPage.asVacationDelegate', vacationDelegateDetailsForApprove?.displayName ?? managerOnVacation ?? '')}</Text>
-                )}
+                {hasVacationDelegate && <VacationDelegateText action={action} />}
                 <View style={hasBeenFlagged ? styles.blockquote : {}}>{children}</View>
             </View>
         </View>
