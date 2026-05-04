@@ -50,10 +50,10 @@ import {hasEnabledOptions, sortAlphabetically} from '@libs/OptionsListUtils';
 import Parser from '@libs/Parser';
 import {
     canSubmitPerDiemExpenseFromWorkspace,
+    getDistanceRateOriginalPolicy,
     getLengthOfTag,
     getPerDiemCustomUnit,
     getPolicyByCustomUnitID,
-    getPolicyByCustomUnitRateID,
     getTagLists,
     hasDependentTags as hasDependentTagsPolicyUtils,
     isAttendeeTrackingEnabled,
@@ -211,7 +211,8 @@ function MoneyRequestView({
     const isPerDiemRequest = isPerDiemRequestTransactionUtils(transaction);
     const perDiemOriginalPolicy = getPolicyByCustomUnitID(transaction, policiesWithPerDiem);
 
-    const distanceOriginalPolicy = isDistanceRequestTransactionUtils(transaction) && isExpenseUnreported ? getPolicyByCustomUnitRateID(transaction) : undefined;
+    const distanceOriginalPolicy =
+        isDistanceRequestTransactionUtils(transaction) && isExpenseUnreported ? getDistanceRateOriginalPolicy(transaction?.comment?.customUnit?.customUnitRateID) : undefined;
 
     let policy;
     let policyID;
