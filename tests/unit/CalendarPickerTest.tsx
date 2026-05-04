@@ -21,6 +21,73 @@ jest.mock('../../src/hooks/useLocalize', () =>
 
 jest.mock('@src/components/ConfirmedRoute.tsx');
 
+jest.mock('@components/DatePicker/CalendarPicker/MonthPickerModal', () => {
+    const {Pressable, Text, View} = jest.requireActual('react-native');
+    return function MockMonthPickerModal({isVisible, onMonthChange, onClose}: {isVisible: boolean; currentMonth?: number; onMonthChange?: (month: number) => void; onClose?: () => void}) {
+        if (!isVisible) {
+            return null;
+        }
+        return (
+            <View testID="MonthPickerModal">
+                {Array.from({length: 12}).map((_, i) => (
+                    <Pressable
+                        key={i}
+                        testID={`month-option-${i}`}
+                        onPress={() => onMonthChange?.(i)}
+                    >
+                        <Text>{`month-${i}`}</Text>
+                    </Pressable>
+                ))}
+                <Pressable
+                    testID="month-modal-close"
+                    onPress={onClose}
+                >
+                    <Text>close</Text>
+                </Pressable>
+            </View>
+        );
+    };
+});
+
+jest.mock('@components/DatePicker/CalendarPicker/YearPickerModal', () => {
+    const {Pressable, Text, View} = jest.requireActual('react-native');
+    return function MockYearPickerModal({
+        isVisible,
+        years,
+        onYearChange,
+        onClose,
+    }: {
+        isVisible: boolean;
+        years: Array<{value: number; text: string}>;
+        currentYear?: number;
+        onYearChange?: (year: number) => void;
+        onClose?: () => void;
+    }) {
+        if (!isVisible) {
+            return null;
+        }
+        return (
+            <View testID="YearPickerModal">
+                {years.map((year) => (
+                    <Pressable
+                        key={year.value}
+                        testID={`year-option-${year.value}`}
+                        onPress={() => onYearChange?.(year.value)}
+                    >
+                        <Text>{year.text}</Text>
+                    </Pressable>
+                ))}
+                <Pressable
+                    testID="year-modal-close"
+                    onPress={onClose}
+                >
+                    <Text>close</Text>
+                </Pressable>
+            </View>
+        );
+    };
+});
+
 describe('CalendarPicker', () => {
     test('renders calendar component', () => {
         render(<CalendarPicker />);
@@ -486,6 +553,70 @@ describe('CalendarPicker', () => {
         // Should remain on January of MIN_YEAR
         expect(within(screen.getByTestId('currentYearText')).getByText(CONST.CALENDAR_PICKER.MIN_YEAR.toString())).toBeTruthy();
         expect(within(screen.getByTestId('currentMonthText')).getByText(monthNames.at(0) ?? '')).toBeTruthy();
+    });
+
+    test('clicking the month button opens the month picker and selecting a month updates the calendar', () => {
+        const minDate = new Date('2020-01-01');
+        const maxDate = new Date('2030-12-31');
+        const value = '2025-06-15';
+        render(
+            <CalendarPicker
+                value={value}
+                minDate={minDate}
+                maxDate={maxDate}
+            />,
+        );
+
+        fireEvent.press(screen.getByTestId('currentMonthButton'));
+
+        const monthPickerModal = screen.getByTestId('MonthPickerModal');
+        expect(monthPickerModal).toBeTruthy();
+
+        fireEvent.press(within(monthPickerModal).getByTestId('month-option-8'));
+
+        expect(within(screen.getByTestId('currentMonthText')).getByText(monthNames.at(8) ?? '')).toBeTruthy();
+    });
+
+    test('clicking the year button opens the year picker and selecting a year updates the calendar', () => {
+        const minDate = new Date('2020-01-01');
+        const maxDate = new Date('2030-12-31');
+        const value = '2025-06-15';
+        render(
+            <CalendarPicker
+                value={value}
+                minDate={minDate}
+                maxDate={maxDate}
+            />,
+        );
+
+        fireEvent.press(screen.getByTestId('currentYearButton'));
+
+        const yearPickerModal = screen.getByTestId('YearPickerModal');
+        expect(yearPickerModal).toBeTruthy();
+
+        fireEvent.press(within(yearPickerModal).getByTestId('year-option-2027'));
+
+        expect(within(screen.getByTestId('currentYearText')).getByText('2027')).toBeTruthy();
+    });
+
+    test('closing the year picker via onClose hides the modal', () => {
+        render(<CalendarPicker />);
+
+        fireEvent.press(screen.getByTestId('currentYearButton'));
+        expect(screen.getByTestId('YearPickerModal')).toBeTruthy();
+
+        fireEvent.press(screen.getByTestId('year-modal-close'));
+        expect(screen.queryByTestId('YearPickerModal')).toBeNull();
+    });
+
+    test('closing the month picker via onClose hides the modal', () => {
+        render(<CalendarPicker />);
+
+        fireEvent.press(screen.getByTestId('currentMonthButton'));
+        expect(screen.getByTestId('MonthPickerModal')).toBeTruthy();
+
+        fireEvent.press(screen.getByTestId('month-modal-close'));
+        expect(screen.queryByTestId('MonthPickerModal')).toBeNull();
     });
 
     test('month picker should always return all 12 months', () => {
