@@ -161,7 +161,7 @@ describe('useAutoCreateSubmitWorkspace', () => {
         // Then the user should be navigated to the newly created Submit workspace
         // so they land on their workspace immediately after onboarding
         expect(navigateSpy).toHaveBeenCalledTimes(1);
-        expect(navigateSpy).toHaveBeenCalledWith(MOCK_POLICY_ID);
+        expect(navigateSpy).toHaveBeenCalledWith(MOCK_POLICY_ID, expect.any(Boolean));
     });
 
     it('reuses the existing onboarding workspace instead of creating a new one', () => {

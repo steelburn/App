@@ -131,7 +131,7 @@ function navigateAfterOnboardingWithMicrotaskQueue(
  * navigate to Workspace > Categories with the side panel open so
  * the #admins room is visible in Concierge Anywhere.
  */
-function navigateToSubmitWorkspaceAfterOnboarding(policyID?: string) {
+function navigateToSubmitWorkspaceAfterOnboarding(policyID?: string, isSmallScreenWidth = false) {
     setDisableDismissOnEscape(false);
 
     if (!policyID) {
@@ -140,21 +140,17 @@ function navigateToSubmitWorkspaceAfterOnboarding(policyID?: string) {
     }
 
     setOnboardingRHPVariant(CONST.ONBOARDING_RHP_VARIANT.RHP_ADMINS_ROOM);
-    // Push the Workspaces list first so the native back stack lands there
-    // after the user finishes exploring their newly created/joined Submit
-    // workspace. The second navigate is queued on the microtask queue so
-    // both calls are processed sequentially rather than batched.
     Navigation.navigate(ROUTES.WORKSPACES_LIST.route);
     Navigation.setNavigationActionToMicrotaskQueue(() => {
         Navigation.navigate(ROUTES.WORKSPACE_CATEGORIES.getRoute(policyID));
-        SidePanelActions.openSidePanel(false);
+        SidePanelActions.openSidePanel(!isSmallScreenWidth);
     });
 }
 
-function navigateToSubmitWorkspaceAfterOnboardingWithMicrotaskQueue(policyID?: string) {
+function navigateToSubmitWorkspaceAfterOnboardingWithMicrotaskQueue(policyID?: string, isSmallScreenWidth = false) {
     Navigation.dismissModal();
     Navigation.setNavigationActionToMicrotaskQueue(() => {
-        navigateToSubmitWorkspaceAfterOnboarding(policyID);
+        navigateToSubmitWorkspaceAfterOnboarding(policyID, isSmallScreenWidth);
     });
 }
 

@@ -17,6 +17,7 @@ import useLocalize from './useLocalize';
 import useOnboardingMessages from './useOnboardingMessages';
 import useOnyx from './useOnyx';
 import usePreferredPolicy from './usePreferredPolicy';
+import useResponsiveLayout from './useResponsiveLayout';
 
 /**
  * Hook that provides a function to auto-create a Submit workspace for EMPLOYER
@@ -50,6 +51,8 @@ function useAutoCreateSubmitWorkspace() {
     const {isRestrictedPolicyCreation} = usePreferredPolicy();
     const hasActiveAdminPolicies = useHasActiveAdminPolicies();
     const {onboardingMessages} = useOnboardingMessages();
+    // eslint-disable-next-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidth
+    const {isSmallScreenWidth} = useResponsiveLayout();
 
     const autoCreateSubmitWorkspace = useCallback(
         (firstName: string, lastName: string) => {
@@ -93,7 +96,7 @@ function useAutoCreateSubmitWorkspace() {
             setOnboardingAdminsChatReportID();
             setOnboardingPolicyID();
 
-            navigateToSubmitWorkspaceAfterOnboardingWithMicrotaskQueue(newPolicyID);
+            navigateToSubmitWorkspaceAfterOnboardingWithMicrotaskQueue(newPolicyID, isSmallScreenWidth);
         },
         [
             currentUserEmail,
@@ -112,6 +115,7 @@ function useAutoCreateSubmitWorkspace() {
             onboardingMessages,
             betas,
             hasActiveAdminPolicies,
+            isSmallScreenWidth,
         ],
     );
 
