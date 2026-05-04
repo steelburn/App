@@ -504,6 +504,7 @@ function getDisplayValue(
     policy: Policy | undefined,
     translate: LocaleContextProps['translate'],
     convertToDisplayString: CurrencyListActionsContextType['convertToDisplayString'],
+    localeCompare: LocaleContextProps['localeCompare'],
     reports?: Array<OnyxEntry<Report>>,
 ): string {
     const fieldValue = getMergeFieldValue(getTransactionDetails(transaction), transaction, field);
@@ -535,7 +536,7 @@ function getDisplayValue(
         return transaction?.reportName ?? getReportName(getReportOrDraftReport(SafeString(fieldValue), reports));
     }
     if (field === 'attendees') {
-        return Array.isArray(fieldValue) ? getAttendeesListDisplayString(fieldValue) : '';
+        return Array.isArray(fieldValue) ? getAttendeesListDisplayString(fieldValue, localeCompare) : '';
     }
 
     if (field === 'taxValue') {
@@ -562,6 +563,7 @@ function buildMergeFieldsData(
     sourceTransactionPolicy: Policy | undefined,
     translate: LocaleContextProps['translate'],
     convertToDisplayString: CurrencyListActionsContextType['convertToDisplayString'],
+    localeCompare: LocaleContextProps['localeCompare'],
     reports: Array<OnyxEntry<Report>> = [],
 ): MergeFieldData[] {
     if (!targetTransaction || !sourceTransaction) {
@@ -576,12 +578,12 @@ function buildMergeFieldsData(
         const options: MergeFieldOption[] = [
             {
                 transaction: targetTransaction,
-                displayValue: getDisplayValue(field, targetTransaction, targetTransactionPolicy, translate, convertToDisplayString, reports),
+                displayValue: getDisplayValue(field, targetTransaction, targetTransactionPolicy, translate, convertToDisplayString, localeCompare, reports),
                 isSelected: selectedTransactionId === targetTransaction.transactionID,
             },
             {
                 transaction: sourceTransaction,
-                displayValue: getDisplayValue(field, sourceTransaction, sourceTransactionPolicy, translate, convertToDisplayString, reports),
+                displayValue: getDisplayValue(field, sourceTransaction, sourceTransactionPolicy, translate, convertToDisplayString, localeCompare, reports),
                 isSelected: selectedTransactionId === sourceTransaction.transactionID,
             },
         ];

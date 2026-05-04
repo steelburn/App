@@ -159,6 +159,7 @@ function DetailsReviewPage({route}: DetailsReviewPageProps) {
                 sourceTransactionPolicy,
                 translate,
                 convertToDisplayString,
+                localeCompare,
                 [targetTransactionReport, sourceTransactionReport],
             ),
         [
@@ -172,6 +173,7 @@ function DetailsReviewPage({route}: DetailsReviewPageProps) {
             sourceTransactionPolicy,
             translate,
             convertToDisplayString,
+            localeCompare,
         ],
     );
 
