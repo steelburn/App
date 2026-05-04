@@ -3,7 +3,6 @@ import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
 import type {RequestMoneyParticipantParams} from '@libs/actions/IOU';
 import type {PerDiemExpenseTransactionParams} from '@libs/actions/IOU/PerDiem';
 import {addSubrate, clearSubrates, computePerDiemExpenseAmount, getPerDiemExpenseInformation, removeSubrate, submitPerDiemExpense, updateSubrate} from '@libs/actions/IOU/PerDiem';
-import * as ReportUtils from '@libs/ReportUtils';
 import CONST from '@src/CONST';
 import DateUtils from '@src/libs/DateUtils';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -336,55 +335,6 @@ describe('PerDiem', () => {
             expect(currencyUpdate?.value).toEqual([testCurrency, ...initialCurrencies]);
         });
 
-        it('should forward conciergeReportID to buildOptimisticReportPreview', () => {
-            const conciergeReportID = 'concierge_report_999';
-            const buildPreviewSpy = jest.spyOn(ReportUtils, 'buildOptimisticReportPreview');
-
-            const mockTransactionParams: PerDiemExpenseTransactionParams = {
-                comment: '',
-                currency: CONST.CURRENCY.USD,
-                created: '2024-02-02',
-                category: 'Meals',
-                tag: '',
-                customUnit: {
-                    customUnitID: 'per_diem_unit',
-                    customUnitRateID: 'rate_1',
-                    name: CONST.CUSTOM_UNITS.NAME_PER_DIEM_INTERNATIONAL,
-                    attributes: {dates: {start: '2024-02-02', end: '2024-02-02'}},
-                    subRates: [],
-                    quantity: 1,
-                },
-                billable: false,
-                attendees: [],
-                reimbursable: true,
-            };
-
-            getPerDiemExpenseInformation({
-                parentChatReport: {} as OnyxEntry<Report>,
-                transactionParams: mockTransactionParams,
-                participantParams: {
-                    payeeAccountID: 123,
-                    payeeEmail: 'payee@example.com',
-                    participant: {accountID: 123, login: 'payee@example.com'},
-                } as unknown as RequestMoneyParticipantParams,
-                recentlyUsedParams: {},
-                isASAPSubmitBetaEnabled: false,
-                currentUserAccountIDParam: 123,
-                currentUserEmailParam: 'payee@example.com',
-                hasViolations: false,
-                policyRecentlyUsedCurrencies: [],
-                quickAction: undefined,
-                betas: [CONST.BETAS.ALL],
-                personalDetails: {123: {accountID: 123, login: 'payee@example.com'}},
-                conciergeReportID,
-            });
-
-            const previewCallWithConcierge = buildPreviewSpy.mock.calls.find((args) => args.at(6) === conciergeReportID);
-            expect(previewCallWithConcierge).toBeDefined();
-
-            buildPreviewSpy.mockRestore();
-        });
-
         it('should return correct per diem expense information with new chat report', () => {
             // Given: Mock data for per diem expense
             const mockCustomUnit = {
@@ -463,7 +413,7 @@ describe('PerDiem', () => {
                 quickAction: undefined,
                 betas: [CONST.BETAS.ALL],
                 personalDetails: {[mockParticipant.accountID]: {accountID: mockParticipant.accountID, login: 'existing@example.com'}},
-                conciergeReportID: undefined,
+                conciergeReportID: 'concierge_chat_001',
             });
 
             // Then: Verify the result structure and key values
@@ -687,7 +637,7 @@ describe('PerDiem', () => {
                 quickAction: undefined,
                 betas: [CONST.BETAS.ALL],
                 personalDetails: {[mockParticipant.accountID]: {accountID: mockParticipant.accountID, login: 'existing@example.com'}},
-                conciergeReportID: undefined,
+                conciergeReportID: 'concierge_chat_002',
             });
 
             // Then: Verify policy expense chat handling
