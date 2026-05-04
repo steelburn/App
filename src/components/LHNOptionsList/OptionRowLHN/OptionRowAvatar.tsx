@@ -1,13 +1,13 @@
 import React from 'react';
 import type {ColorValue, ViewStyle} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';
+import LHNAvatar from '@components/LHNOptionsList/LHNAvatar';
 import {usePersonalDetails} from '@components/OnyxListItemProvider';
 import {shouldOptionShowTooltip} from '@libs/OptionsListUtils';
 import {getDelegateAccountIDFromReportAction} from '@libs/ReportActionsUtils';
 import type {OptionData} from '@libs/ReportUtils';
 import CONST from '@src/CONST';
 import type {Report} from '@src/types/onyx';
-import LHNAvatar from '@components/LHNOptionsList/LHNAvatar';
 
 type OptionRowAvatarProps = {
     optionItem: OptionData;
