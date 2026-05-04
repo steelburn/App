@@ -7,7 +7,7 @@ import useReportTransactions from '@hooks/useReportTransactions';
 import {getIOUReportIDFromReportActionPreview, getOriginalMessage, isMoneyRequestAction} from '@libs/ReportActionsUtils';
 import {chatIncludesChronosWithID, getTransactionsWithReceipts, isArchivedNonExpenseReport, isClosedExpenseReportWithNoExpenses} from '@libs/ReportUtils';
 import {clearAllRelatedReportActionErrors} from '@userActions/ClearReportActionErrors';
-import {deleteReportActionDraft, resolveActionableMentionWhisper, resolveActionableReportMentionWhisper} from '@userActions/Report';
+import {deleteReportActionDraft} from '@userActions/Report';
 import {clearError} from '@userActions/Transaction';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {PersonalDetailsList, Transaction} from '@src/types/onyx';
@@ -74,8 +74,6 @@ function ReportActionItem({
             deleteReportActionDraft={deleteReportActionDraft}
             isArchivedRoom={isArchivedNonExpenseReport(originalReport, isOriginalReportArchived)}
             isChronosReport={chatIncludesChronosWithID(originalReportID)}
-            resolveActionableReportMentionWhisper={resolveActionableReportMentionWhisper}
-            resolveActionableMentionWhisper={resolveActionableMentionWhisper}
             isClosedExpenseReportWithNoExpenses={isClosedExpenseReportWithNoExpenses(iouReport, transactionsOnIOUReport)}
             getTransactionsWithReceipts={getTransactionsWithReceipts}
             clearError={clearError}

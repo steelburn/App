@@ -6,7 +6,6 @@ import React, {memo, useCallback, useContext, useEffect, useMemo, useRef, useSta
 import type {GestureResponderEvent, TextInput} from 'react-native';
 import {Keyboard, View} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';
-import type {ValueOf} from 'type-fest';
 import * as ActionSheetAwareScrollView from '@components/ActionSheetAwareScrollView';
 import Hoverable from '@components/Hoverable';
 import InlineSystemMessage from '@components/InlineSystemMessage';
@@ -218,23 +217,6 @@ type PureReportActionItemProps = {
     /** Whether the room is a chronos report */
     isChronosReport?: boolean;
 
-    /** Function to resolve actionable report mention whisper */
-    resolveActionableReportMentionWhisper?: (
-        report: OnyxEntry<OnyxTypes.Report>,
-        reportAction: OnyxEntry<OnyxTypes.ReportAction>,
-        resolution: ValueOf<typeof CONST.REPORT.ACTIONABLE_REPORT_MENTION_WHISPER_RESOLUTION>,
-        isReportArchived?: boolean,
-    ) => void;
-
-    /** Function to resolve actionable mention whisper */
-    resolveActionableMentionWhisper?: (
-        report: OnyxEntry<OnyxTypes.Report>,
-        reportAction: OnyxEntry<OnyxTypes.ReportAction>,
-        resolution: ValueOf<typeof CONST.REPORT.ACTIONABLE_MENTION_WHISPER_RESOLUTION>,
-        isReportArchived: boolean,
-        parentReport?: OnyxEntry<OnyxTypes.Report>,
-    ) => void;
-
     /** Whether the provided report is a closed expense report with no expenses */
     isClosedExpenseReportWithNoExpenses?: boolean;
 
@@ -303,8 +285,6 @@ function PureReportActionItem({
     deleteReportActionDraft = () => {},
     isArchivedRoom,
     isChronosReport,
-    resolveActionableReportMentionWhisper = () => {},
-    resolveActionableMentionWhisper = () => {},
     isClosedExpenseReportWithNoExpenses,
     getTransactionsWithReceipts = () => [],
     clearError = () => {},
@@ -832,7 +812,6 @@ function PureReportActionItem({
                     report={report}
                     originalReport={originalReport}
                     originalReportID={originalReportID}
-                    resolveActionableMentionWhisper={resolveActionableMentionWhisper}
                 />
             );
         } else if (isActionableReportMentionWhisper(action)) {
@@ -843,7 +822,6 @@ function PureReportActionItem({
                     report={report}
                     originalReport={originalReport}
                     isReportArchived={isReportArchived}
-                    resolveActionableReportMentionWhisper={resolveActionableReportMentionWhisper}
                 />
             );
         } else if (isActionableMentionInviteToSubmitExpenseConfirmWhisper(action)) {
