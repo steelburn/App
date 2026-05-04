@@ -12983,8 +12983,8 @@ function hasReportBeenRetracted(report: OnyxEntry<Report>, reportActions?: OnyxE
     return reportActionList.some((action) => isRetractedAction(action));
 }
 
-function hasPendingWorkflowUpdate(report: OnyxEntry<Pick<Report, 'pendingFields'>>): boolean {
-    return report?.pendingFields?.nextStep === CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE;
+function hasPendingReportRetract(report: OnyxEntry<Pick<Report, 'pendingFields'>>): boolean {
+    return report?.pendingFields?.hasReportBeenRetracted === CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE;
 }
 
 function selectFilteredReportActions(
@@ -13722,7 +13722,7 @@ export {
     canRejectReportAction,
     hasReportBeenReopened,
     hasReportBeenRetracted,
-    hasPendingWorkflowUpdate,
+    hasPendingReportRetract,
     getNextApproverAccountID,
     isWorkspaceTaskReport,
     isWorkspaceThread,
