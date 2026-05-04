@@ -2783,7 +2783,7 @@ const translations = {
     },
     agentsPage: {
         title: 'Agents',
-        subtitle: 'Automate tasks with custom agents.',
+        subtitle: 'Create agents to handle your workflow. Skip the manual work and get hours back in your day.',
         newAgent: 'New agent',
         emptyAgents: {
             title: 'No agents created',
@@ -9145,7 +9145,9 @@ const translations = {
                 other: 'Close accounts',
             }),
             moveToGroup: 'Move to group',
+            domainGroup: 'Domain group',
             chooseWhereToMove: ({count}: {count: number}) => `Choose where to move ${count} ${count === 1 ? 'member' : 'members'}.`,
+            chooseWhereToMoveName: ({name}: {name: string}) => `Choose where to move ${name}.`,
             error: {
                 addMember: 'Unable to add this member. Please try again.',
                 removeMember: 'Unable to remove this user. Please try again.',
@@ -9182,8 +9184,11 @@ const translations = {
             makeDefault: 'Make default',
             neverMind: 'Never mind',
             permissions: 'Group permissions',
-            StrictlyEnforceWorkspaceRules: 'Strictly enforce workspace rules',
-            StrictlyEnforceWorkspaceRulesDescription: 'All workspace rules must be met before submitting a report. No manual exceptions allowed.',
+            strictlyEnforceWorkspaceRules: 'Strictly enforce workspace rules',
+            strictlyEnforceWorkspaceRulesDescription: 'All workspace rules must be met before submitting a report. No manual exceptions allowed.',
+            restrictExpenseWorkspaceCreation: 'Restrict expense workspace creation/removal',
+            restrictExpenseWorkspaceCreationDescription:
+                'Prevent members from being able to create an expense workspace or remove themselves from an expense workspace. This is useful for preventing people from using Expensify to submit reports for use outside your domain when combined with strict workspace enforcement.',
             deleteGroup: 'Delete Group',
             deleteGroupDangerConfirmationModal: 'Delete Group',
             deleteGroupDangerConfirmationModalDescription: (defaultGroupName: string) =>

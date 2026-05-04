@@ -56,6 +56,11 @@ type DomainSecurityGroupErrors = {
     enableStrictPolicyRulesErrors?: OnyxCommon.Errors;
 
     /**
+     * Errors related to the restricted expense workspace creation
+     */
+    enableRestrictedPolicyCreationErrors?: OnyxCommon.Errors;
+
+    /**
      * Errors related to deleting the security group
      */
     errors?: OnyxCommon.Errors;

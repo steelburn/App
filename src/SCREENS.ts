@@ -1021,6 +1021,7 @@ const SCREENS = {
         MEMBER_FORCE_TWO_FACTOR_AUTH: 'Member_Force_Two_Factor_Auth',
         MEMBER_LOCK_ACCOUNT: 'Member_Lock_Account',
         MEMBERS_MOVE_TO_GROUP: 'Members_Move_To_Group',
+        MEMBER_MOVE_TO_GROUP: 'Member_Move_To_Group',
         GROUP_DETAILS: 'Domain_Group_Details',
         GROUP_EDIT_NAME: 'Domain_Group_Edit_Name',
     },

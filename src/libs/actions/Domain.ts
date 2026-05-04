@@ -1815,6 +1815,24 @@ function changeDomainSecurityGroup(
     API.write(WRITE_COMMANDS.CHANGE_DOMAIN_SECURITY_GROUP, parameters, {optimisticData, successData, failureData});
 }
 
+function clearChangeDomainSecurityGroupError(domainAccountID: number, memberEmail: string) {
+    Onyx.merge(`${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`, {
+        memberErrors: {
+            [memberEmail]: {
+                changeDomainSecurityGroupErrors: null,
+            },
+        },
+    });
+
+    Onyx.merge(`${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`, {
+        member: {
+            [memberEmail]: {
+                changeDomainSecurityGroup: null,
+            },
+        },
+    });
+}
+
 function setDomainMembersSelectedForMove(memberAccountIDs: string[]) {
     Onyx.set(ONYXKEYS.DOMAIN_MEMBERS_SELECTED_FOR_MOVE, memberAccountIDs);
 }
@@ -1837,7 +1855,7 @@ function updateDomainSecurityGroup(
     groupID: string,
     currentSecurityGroup: DomainSecurityGroup,
     newSettingValue: Partial<DomainSecurityGroup>,
-    settingsName: keyof Pick<DomainSecurityGroup, 'name' | 'enableStrictPolicyRules'>,
+    settingsName: keyof Pick<DomainSecurityGroup, 'name' | 'enableStrictPolicyRules' | 'enableRestrictedPolicyCreation'>,
 ) {
     const SECURITY_GROUP_KEY = `${CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX}${groupID}`;
     const newSecurityGroup = {...currentSecurityGroup, ...newSettingValue};
@@ -2179,6 +2197,7 @@ export {
     resetDomainMemberTwoFactorAuth,
     exportMembersToCSV,
     changeDomainSecurityGroup,
+    clearChangeDomainSecurityGroupError,
     setDomainMembersSelectedForMove,
     clearDomainMembersSelectedForMove,
     updateDomainSecurityGroup,
