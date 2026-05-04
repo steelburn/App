@@ -65,7 +65,7 @@ function WorkspaceEditCardLimitTypePage({route}: WorkspaceEditCardLimitTypePageP
     const [isConfirmModalVisible, setIsConfirmModalVisible] = useState(false);
     const [expirationToggle, setExpirationToggle] = useState(!!card?.nameValuePairs?.validFrom);
     const currency = useCurrencyForExpensifyCard({policyID});
-    const isWorkspaceRhp = route.name === SCREENS.WORKSPACE.EXPENSIFY_CARD_LIMIT_TYPE;
+    const isWorkspaceRhp = route.name === SCREENS.WORKSPACE.DYNAMIC_WORKSPACE_EXPENSIFY_CARD_LIMIT_TYPE;
     const personalDetails = usePersonalDetails();
     const assigneePersonalDetails = personalDetails?.[card?.accountID ?? CONST.DEFAULT_NUMBER_ID];
     const assigneeTimeZone = assigneePersonalDetails?.timezone?.selected;
@@ -75,6 +75,7 @@ function WorkspaceEditCardLimitTypePage({route}: WorkspaceEditCardLimitTypePageP
 
     const validThru = card?.nameValuePairs?.validThru;
     const validThruDefaultValue = validThru ? DateUtils.formatUTCDateTimeToDateInTimezone(validThru, assigneeTimeZone) : undefined;
+    const backPath = useDynamicBackPath(DYNAMIC_ROUTES.WORKSPACE_EXPENSIFY_CARD_LIMIT_TYPE.path);
 
     const goBack = () => {
         if (isWorkspaceRhp) {
