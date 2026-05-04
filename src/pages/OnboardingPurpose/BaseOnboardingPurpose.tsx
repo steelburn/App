@@ -46,17 +46,17 @@ function getOnboardingChoices(customChoices: OnboardingPurpose[]) {
 function BaseOnboardingPurpose({shouldUseNativeStyles, shouldEnableMaxHeight, route}: BaseOnboardingPurposeProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const illustrations = useMemoizedLazyIllustrations(['Abacus', 'Binoculars', 'ReceiptUpload', 'PiggyBank']);
+    const illustrations = useMemoizedLazyIllustrations(['Abacus', 'Binoculars', 'CalculatorMoney', 'ReceiptUpload', 'PiggyBank']);
 
     const menuIcons = useMemo(
         () => ({
             [CONST.ONBOARDING_CHOICES.EMPLOYER]: illustrations.ReceiptUpload,
             [CONST.ONBOARDING_CHOICES.MANAGE_TEAM]: illustrations.Abacus,
-            [CONST.ONBOARDING_CHOICES.TRACK_BUSINESS]: illustrations.Abacus,
+            [CONST.ONBOARDING_CHOICES.TRACK_BUSINESS]: illustrations.CalculatorMoney,
             [CONST.ONBOARDING_CHOICES.TRACK_PERSONAL]: illustrations.PiggyBank,
             [CONST.ONBOARDING_CHOICES.LOOKING_AROUND]: illustrations.Binoculars,
         }),
-        [illustrations.Abacus, illustrations.Binoculars, illustrations.ReceiptUpload, illustrations.PiggyBank],
+        [illustrations.Abacus, illustrations.Binoculars, illustrations.CalculatorMoney, illustrations.ReceiptUpload, illustrations.PiggyBank],
     );
     const {onboardingIsMediumOrLargerScreenWidth} = useResponsiveLayout();
     const onboardingStep = useOnboardingStepCounter(SCREENS.ONBOARDING.PURPOSE);
