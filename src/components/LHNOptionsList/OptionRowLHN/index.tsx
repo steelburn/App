@@ -6,7 +6,6 @@ import Icon from '@components/Icon';
 import {useLHNTooltipContext} from '@components/LHNOptionsList/LHNTooltipContext';
 import type {OptionRowLHNProps} from '@components/LHNOptionsList/types';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
-import {useSession} from '@components/OnyxListItemProvider';
 import Text from '@components/Text';
 import Tooltip from '@components/Tooltip';
 import getContextMenuAccessibilityHint from '@components/utils/getContextMenuAccessibilityHint';
@@ -22,7 +21,7 @@ import DateUtils from '@libs/DateUtils';
 import FS from '@libs/Fullstory';
 import {shouldUseBoldText} from '@libs/OptionsListUtils';
 import ReportActionComposeFocusManager from '@libs/ReportActionComposeFocusManager';
-import {isAdminRoom, isChatUsedForOnboarding as isChatUsedForOnboardingReportUtils, isConciergeChatReport, isGroupChat, isOneOnOneChat, isSystemChat} from '@libs/ReportUtils';
+import {isGroupChat, isOneOnOneChat, isSystemChat} from '@libs/ReportUtils';
 import {startSpan} from '@libs/telemetry/activeSpans';
 import FreeTrial from '@pages/settings/Subscription/FreeTrial';
 import variables from '@styles/variables';
@@ -54,13 +53,7 @@ function OptionRowLHN({
     const StyleUtils = useStyleUtils();
     const expensifyIcons = useMemoizedLazyExpensifyIcons(['Pencil', 'Pin']);
 
-    const {onboardingPurpose, onboarding, firstReportIDWithGBRorRBR, isScreenFocused} = useLHNTooltipContext();
-    const shouldShowRBRorGBRTooltip = firstReportIDWithGBRorRBR === reportID;
-
-    const session = useSession();
-    const isOnboardingGuideAssigned = onboardingPurpose === CONST.ONBOARDING_CHOICES.MANAGE_TEAM && !session?.email?.includes('+');
-    const isChatUsedForOnboarding = isChatUsedForOnboardingReportUtils(report, onboarding, conciergeReportID, onboardingPurpose);
-    const shouldShowGetStartedTooltip = isOnboardingGuideAssigned ? isAdminRoom(report) && isChatUsedForOnboarding : isConciergeChatReport(report);
+    const {isScreenFocused} = useLHNTooltipContext();
 
     const {translate} = useLocalize();
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
@@ -290,8 +283,9 @@ function OptionRowLHN({
             needsOffscreenAlphaCompositing
         >
             <OptionRowTooltipLayer
-                shouldShowRBRorGBRTooltip={shouldShowRBRorGBRTooltip}
-                shouldShowGetStartedTooltip={shouldShowGetStartedTooltip}
+                reportID={reportID}
+                report={report}
+                conciergeReportID={conciergeReportID}
                 onOptionPress={onOptionPress}
                 renderChildren={renderRow}
             />

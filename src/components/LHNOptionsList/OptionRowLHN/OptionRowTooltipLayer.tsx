@@ -1,19 +1,26 @@
 import React, {useMemo} from 'react';
 import type {GestureResponderEvent} from 'react-native';
+import type {OnyxEntry} from 'react-native-onyx';
 import {useLHNTooltipContext} from '@components/LHNOptionsList/LHNTooltipContext';
+import {useSession} from '@components/OnyxListItemProvider';
 import {useProductTrainingContext} from '@components/ProductTrainingContext';
 import EducationalTooltip from '@components/Tooltip/EducationalTooltip';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
+import {isAdminRoom, isChatUsedForOnboarding as isChatUsedForOnboardingReportUtils, isConciergeChatReport} from '@libs/ReportUtils';
 import variables from '@styles/variables';
 import CONST from '@src/CONST';
+import type {Report} from '@src/types/onyx';
 
 type OptionRowTooltipLayerProps = {
-    /** Whether the row qualifies to show the RBR/GBR tooltip */
-    shouldShowRBRorGBRTooltip: boolean;
+    /** Report ID of the row */
+    reportID: string | undefined;
 
-    /** Whether the row qualifies to show the onboarding "Get started" tooltip */
-    shouldShowGetStartedTooltip: boolean;
+    /** Report data of the row, used to determine onboarding eligibility */
+    report: OnyxEntry<Report>;
+
+    /** Concierge report ID, used to determine onboarding eligibility */
+    conciergeReportID: string | undefined;
 
     /** Press handler forwarded to EducationalTooltip's onTooltipPress and exposed to children via renderChildren */
     onOptionPress: (event: GestureResponderEvent | KeyboardEvent | undefined) => void;
@@ -22,7 +29,7 @@ type OptionRowTooltipLayerProps = {
     renderChildren: (onPress: (event: GestureResponderEvent | KeyboardEvent | undefined) => void) => React.ReactNode;
 };
 
-type OptionRowTooltipLayerInnerProps = Omit<OptionRowTooltipLayerProps, 'shouldShowRBRorGBRTooltip' | 'shouldShowGetStartedTooltip'>;
+type OptionRowTooltipLayerInnerProps = Pick<OptionRowTooltipLayerProps, 'onOptionPress' | 'renderChildren'>;
 
 function OptionRowTooltipLayerInner({onOptionPress, renderChildren}: OptionRowTooltipLayerInnerProps) {
     const styles = useThemeStyles();
@@ -69,10 +76,16 @@ function OptionRowTooltipLayerInner({onOptionPress, renderChildren}: OptionRowTo
 
 OptionRowTooltipLayerInner.displayName = 'OptionRowTooltipLayerInner';
 
-function OptionRowTooltipLayer({shouldShowRBRorGBRTooltip, shouldShowGetStartedTooltip, onOptionPress, renderChildren}: OptionRowTooltipLayerProps) {
-    // Skip the inner component (and its hooks) entirely when the row can never show a tooltip.
-    // This avoids per-row useProductTrainingContext / useThemeStyles / useResponsiveLayout cost
-    // for the common case where neither tooltip qualifies.
+function OptionRowTooltipLayer({reportID, report, conciergeReportID, onOptionPress, renderChildren}: OptionRowTooltipLayerProps) {
+    const {firstReportIDWithGBRorRBR, onboardingPurpose, onboarding} = useLHNTooltipContext();
+    const session = useSession();
+
+    const shouldShowRBRorGBRTooltip = firstReportIDWithGBRorRBR === reportID;
+    const isOnboardingGuideAssigned = onboardingPurpose === CONST.ONBOARDING_CHOICES.MANAGE_TEAM && !session?.email?.includes('+');
+    const isChatUsedForOnboarding = isChatUsedForOnboardingReportUtils(report, onboarding, conciergeReportID, onboardingPurpose);
+    const shouldShowGetStartedTooltip = isOnboardingGuideAssigned ? isAdminRoom(report) && isChatUsedForOnboarding : isConciergeChatReport(report);
+
+    // Skip the inner component (and its heavy hooks) entirely when the row can never show a tooltip.
     if (!shouldShowRBRorGBRTooltip && !shouldShowGetStartedTooltip) {
         return renderChildren(onOptionPress);
     }
