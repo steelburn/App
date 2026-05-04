@@ -20,18 +20,22 @@ function UserInfoAndActionButtonRow({
     containerStyles,
     stateNum,
     statusNum,
+    isSelected,
 }: {
     item: TransactionReportGroupListItemType | TransactionListItemType | ExpenseReportListItemType;
     shouldShowUserInfo: boolean;
     containerStyles?: StyleProp<ViewStyle>;
     stateNum: ExpenseReportListItemType['stateNum'];
     statusNum: ExpenseReportListItemType['statusNum'];
+    isSelected?: boolean;
 }) {
     const styles = useThemeStyles();
     const theme = useTheme();
     const {translate} = useLocalize();
     const statusText = getReportStatusTranslation({stateNum, statusNum, translate});
     const reportStatusColorStyle = getReportStatusColorStyle(theme, stateNum, statusNum);
+    const isUnreported = stateNum === undefined && statusNum === undefined;
+    const badgeBackgroundColor = isSelected && isUnreported ? theme.buttonHoveredBG : reportStatusColorStyle?.backgroundColor;
     const participantFromDisplayName = item.formattedFrom ?? item?.from?.displayName ?? '';
     return (
         <View style={[styles.pt0, styles.flexRow, styles.alignItemsCenter, shouldShowUserInfo ? styles.justifyContentBetween : styles.justifyContentEnd, styles.gap2, containerStyles]}>
@@ -53,7 +57,7 @@ function UserInfoAndActionButtonRow({
             {!!statusText && !!reportStatusColorStyle && (
                 <StatusBadge
                     text={statusText}
-                    backgroundColor={reportStatusColorStyle.backgroundColor}
+                    backgroundColor={badgeBackgroundColor}
                     textColor={reportStatusColorStyle.textColor}
                 />
             )}
