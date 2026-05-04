@@ -415,6 +415,16 @@ function Search({
         shouldUseLiveData,
     });
 
+    // Mirror `newSearchResultKeys` into a ref so the post-create-flow `useFocusEffect`
+    // (which has empty deps) can read the latest value without re-creating its callback.
+    // Used to skip the deferral that would otherwise hide the freshly-added row from
+    // FlashList during the RHP dismiss transition, which would prevent the highlight
+    // animation from ever firing on it.
+    const newSearchResultKeysRef = useRef(newSearchResultKeys);
+    useEffect(() => {
+        newSearchResultKeysRef.current = newSearchResultKeys;
+    }, [newSearchResultKeys]);
+
     // There's a race condition in Onyx which makes it return data from the previous Search, so in addition to checking that the data is loaded
     // we also need to check that the searchResults matches the type and status of the current search
     const isDataLoaded = shouldUseLiveData || isSearchDataLoaded(searchResults, queryJSON);
@@ -467,6 +477,14 @@ function Search({
 
             if (skipDeferralOnFocusRef.current) {
                 skipDeferralOnFocusRef.current = false;
+                return;
+            }
+
+            // If the highlight hook already queued rows for the post-create animation,
+            // skip the skeleton-during-transition defer. Otherwise FlashList stays empty
+            // for ~1s while the RHP dismiss transition runs, the row never mounts inside
+            // the 300ms highlight window, and `useAnimatedHighlightStyle` never fires.
+            if (newSearchResultKeysRef.current && newSearchResultKeysRef.current.size > 0) {
                 return;
             }
 
