@@ -177,8 +177,8 @@ function useConfirmationValidation({
             if (isEditingSplitBill && (isMerchantEmpty || (shouldDisplayFieldError && isMerchantMissing(transaction)))) {
                 return {errorKey: 'iou.error.invalidMerchant'};
             }
-        }else if(transaction?.isMerchantSet && !isMerchantFieldValid) {
-                return {errorKey: 'iou.error.invalidMerchant'};
+        } else if (transaction?.isMerchantSet && !isMerchantFieldValid) {
+            return {errorKey: 'iou.error.invalidMerchant'};
         }
 
         if (iouCategory.length > CONST.API_TRANSACTION_CATEGORY_MAX_LENGTH) {
