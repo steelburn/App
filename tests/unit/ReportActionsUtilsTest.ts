@@ -38,8 +38,6 @@ import {
     getReportActionActorAccountID,
     getRequireCompanyCardsEnabledMessage,
     getSendMoneyFlowAction,
-    getSortedReportActions,
-    getSortedReportActionsForDisplay,
     getUnassignedCompanyCardMessage,
     getUpdateACHAccountMessage,
     getUpdatedCardFeedLiabilityMessage,
@@ -49,7 +47,6 @@ import {
     isConsecutiveActionMadeByPreviousActor,
     isIOUActionMatchingTransactionList,
     isNewerReportAction,
-    isReportActionVisibleAsLastAction,
     isResolvedActionableWhisper,
     shouldHideNewMarker,
 } from '../../src/libs/ReportActionsUtils';
