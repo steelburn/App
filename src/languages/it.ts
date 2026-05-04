@@ -7913,6 +7913,7 @@ Aggiungi altre regole di spesa per proteggere il flusso di cassa aziendale.`,
                     reimburseableLink: 'spese vive',
                     nonReimbursableLink: 'spese con carta aziendale',
                     pending: (label: string) => `ha iniziato a esportare questo resoconto su ${label}...`,
+                    travelCardLink: 'spese con carta di viaggio',
                 },
                 integrationsMessage: (errorMessage: string, label: string, linkText?: string, linkURL?: string) =>
                     `esportazione di questo report su ${label} non riuscita ("${errorMessage}${linkText ? `<a href="${linkURL}">${linkText}</a>` : ''}")`,

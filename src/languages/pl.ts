@@ -7877,6 +7877,7 @@ Dodaj więcej zasad wydatków, żeby chronić płynność finansową firmy.`,
                     reimburseableLink: 'wydatki z własnej kieszeni',
                     nonReimbursableLink: 'wydatki z firmowej karty',
                     pending: (label: string) => `rozpoczęto eksport tego raportu do ${label}...`,
+                    travelCardLink: 'wydatki z karty podróżnej',
                 },
                 integrationsMessage: (errorMessage: string, label: string, linkText?: string, linkURL?: string) =>
                     `nie udało się wyeksportować tego raportu do ${label} („${errorMessage}${linkText ? `<a href="${linkURL}">${linkText}</a>` : ''}”)`,

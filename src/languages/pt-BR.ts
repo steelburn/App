@@ -7880,6 +7880,7 @@ Adicione mais regras de gasto para proteger o fluxo de caixa da empresa.`,
                     reimburseableLink: 'despesas reembolsáveis',
                     nonReimbursableLink: 'despesas com cartão corporativo',
                     pending: (label: string) => `iniciou a exportação deste relatório para ${label}...`,
+                    travelCardLink: 'despesas do cartão de viagem',
                 },
                 integrationsMessage: (errorMessage: string, label: string, linkText?: string, linkURL?: string) =>
                     `falha ao exportar este relatório para ${label} ("${errorMessage}${linkText ? `<a href="${linkURL}">${linkText}</a>` : ''}")`,

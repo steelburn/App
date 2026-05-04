@@ -7815,6 +7815,7 @@ ${reportName}
                     reimburseableLink: '立替経費',
                     nonReimbursableLink: '会社カード経費',
                     pending: (label: string) => `このレポートの${label}へのエクスポートを開始しました…`,
+                    travelCardLink: 'トラベルカード経費',
                 },
                 integrationsMessage: (errorMessage: string, label: string, linkText?: string, linkURL?: string) =>
                     `このレポートを${label}にエクスポートできませんでした（"${errorMessage}${linkText ? `<a href="${linkURL}">${linkText}</a>` : ''}"）`,

@@ -7678,6 +7678,7 @@ ${reportName}
                     reimburseableLink: '自付报销费用',
                     nonReimbursableLink: '公司卡消费',
                     pending: (label: string) => `已开始将此报表导出到 ${label}…`,
+                    travelCardLink: '差旅卡费用',
                 },
                 integrationsMessage: (errorMessage: string, label: string, linkText?: string, linkURL?: string) =>
                     `未能将此报表导出到 ${label}（“${errorMessage}${linkText ? `<a href="${linkURL}">${linkText}</a>` : ''}”）`,

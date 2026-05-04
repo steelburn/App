@@ -7946,6 +7946,7 @@ Ajoutez davantage de règles de dépenses pour protéger la trésorerie de l’e
                     reimburseableLink: 'dépenses personnelles',
                     nonReimbursableLink: 'Dépenses de carte d’entreprise',
                     pending: (label: string) => `a commencé à exporter cette note de frais vers ${label}...`,
+                    travelCardLink: 'dépenses par carte de voyage',
                 },
                 integrationsMessage: (errorMessage: string, label: string, linkText?: string, linkURL?: string) =>
                     `échec de l’exportation de cette note de frais vers ${label} (« ${errorMessage}${linkText ? `<a href="${linkURL}">${linkText}</a>` : ''} »)`,

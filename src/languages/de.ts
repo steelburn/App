@@ -7924,6 +7924,7 @@ Fügen Sie weitere Ausgabelimits hinzu, um den Cashflow Ihres Unternehmens zu sc
                     reimburseableLink: 'Auslagen',
                     nonReimbursableLink: 'Firmenkarten-Ausgaben',
                     pending: (label: string) => `hat begonnen, diesen Bericht nach ${label} zu exportieren...`,
+                    travelCardLink: 'Reisespesen mit Firmenkarte',
                 },
                 integrationsMessage: (errorMessage: string, label: string, linkText?: string, linkURL?: string) =>
                     `Fehler beim Exportieren dieses Berichts nach ${label} („${errorMessage}${linkText ? `<a href="${linkURL}">${linkText}</a>` : ''}“)`,
