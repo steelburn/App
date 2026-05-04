@@ -7,7 +7,7 @@ import {getDelegateAccountIDFromReportAction} from '@libs/ReportActionsUtils';
 import type {OptionData} from '@libs/ReportUtils';
 import CONST from '@src/CONST';
 import type {Report} from '@src/types/onyx';
-import LHNAvatar from '../LHNAvatar';
+import LHNAvatar from '@components/LHNOptionsList/LHNAvatar';
 
 type OptionRowAvatarProps = {
     optionItem: OptionData;
@@ -69,12 +69,21 @@ function OptionRowAvatarInner({optionItem, report, isInFocusMode, subscriptAvata
 
 OptionRowAvatarInner.displayName = 'OptionRowAvatarInner';
 
-function OptionRowAvatar(props: OptionRowAvatarProps) {
+function OptionRowAvatar({optionItem, report, isInFocusMode, subscriptAvatarBorderColor, secondaryAvatarBackgroundColor, singleAvatarContainerStyle}: OptionRowAvatarProps) {
     // Bail out before subscribing to personal details when the row has no avatar to render.
-    if (!props.optionItem.icons?.length || !props.optionItem.icons.at(0)) {
+    if (!optionItem.icons?.length || !optionItem.icons.at(0)) {
         return null;
     }
-    return <OptionRowAvatarInner {...props} />;
+    return (
+        <OptionRowAvatarInner
+            optionItem={optionItem}
+            report={report}
+            isInFocusMode={isInFocusMode}
+            subscriptAvatarBorderColor={subscriptAvatarBorderColor}
+            secondaryAvatarBackgroundColor={secondaryAvatarBackgroundColor}
+            singleAvatarContainerStyle={singleAvatarContainerStyle}
+        />
+    );
 }
 
 OptionRowAvatar.displayName = 'OptionRowAvatar';

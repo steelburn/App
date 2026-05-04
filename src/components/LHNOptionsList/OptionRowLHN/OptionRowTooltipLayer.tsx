@@ -6,7 +6,7 @@ import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
 import variables from '@styles/variables';
 import CONST from '@src/CONST';
-import {useLHNTooltipContext} from '../LHNTooltipContext';
+import {useLHNTooltipContext} from '@components/LHNOptionsList/LHNTooltipContext';
 
 type OptionRowTooltipLayerProps = {
     /** Whether the row qualifies to show the RBR/GBR tooltip */
