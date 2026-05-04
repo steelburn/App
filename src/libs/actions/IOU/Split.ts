@@ -2083,8 +2083,6 @@ function createDistanceRequest(distanceRequestInformation: CreateDistanceRequest
 export {
     completeSplitBill,
     createDistanceRequest,
-    createSplitsAndOnyxData,
-    getOrCreateOptimisticSplitChatReport,
     splitBill,
     splitBillAndOpenReport,
     startSplitBill,
