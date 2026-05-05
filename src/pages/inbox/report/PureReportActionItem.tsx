@@ -347,7 +347,6 @@ function PureReportActionItem({
     const isHarvestCreatedExpenseReport = isHarvestCreatedExpenseReportUtils(reportNameValuePairsOrigin, reportNameValuePairsOriginalID);
 
     const [chatReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(report?.chatReportID)}`);
-    const [childReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(action.childReportID)}`);
 
     const highlightedBackgroundColorIfNeeded = useMemo(
         () => (isReportActionLinked || shouldHighlight ? StyleUtils.getBackgroundColorStyle(theme.messageHighlightBG) : {}),
@@ -881,7 +880,6 @@ function PureReportActionItem({
             children = (
                 <ExportIntegration
                     action={action}
-                    childReport={childReport}
                     originalReport={originalReport}
                 />
             );
