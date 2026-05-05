@@ -7946,6 +7946,7 @@ const translations = {
                     automaticActionThree: 'and successfully created a record for',
                     reimburseableLink: 'out-of-pocket expenses',
                     nonReimbursableLink: 'company card expenses',
+                    travelCardLink: 'travel card expenses',
                     pending: (label: string) => `started exporting this report to ${label}...`,
                 },
                 integrationsMessage: (errorMessage: string, label: string, linkText?: string, linkURL?: string) =>
