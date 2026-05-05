@@ -13,6 +13,7 @@ import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails'
 import useEnvironment from '@hooks/useEnvironment';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
+import useOnyx from '@hooks/useOnyx';
 import useStyleUtils from '@hooks/useStyleUtils';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
@@ -23,6 +24,7 @@ import {isChatUsedForOnboarding as isChatUsedForOnboardingReportUtils, isGroupCh
 import FreeTrial from '@pages/settings/Subscription/FreeTrial';
 import variables from '@styles/variables';
 import CONST from '@src/CONST';
+import ONYXKEYS from '@src/ONYXKEYS';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
 import OptionRowAlternateText from './OptionRowAlternateText';
 import OptionRowAvatar from './OptionRowAvatar';
@@ -43,7 +45,6 @@ function OptionRowLHN({
     onLayout = () => {},
     hasDraftComment,
     testID,
-    conciergeReportID,
 }: OptionRowLHNProps) {
     const {isProduction} = useEnvironment();
     const theme = useTheme();
@@ -53,6 +54,7 @@ function OptionRowLHN({
     const expensifyIcons = useMemoizedLazyExpensifyIcons(['Pencil', 'Pin']);
 
     const {onboardingPurpose, onboarding, isScreenFocused} = useLHNTooltipContext();
+    const [conciergeReportID] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID);
     const isChatUsedForOnboarding = isChatUsedForOnboardingReportUtils(report, onboarding, conciergeReportID, onboardingPurpose);
 
     const {translate} = useLocalize();

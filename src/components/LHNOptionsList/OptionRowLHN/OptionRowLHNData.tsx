@@ -35,7 +35,6 @@ function OptionRowLHNData({
     personalDetails = {},
     policy,
     invoiceReceiverPolicy,
-    conciergeReportID,
     viewMode = 'default',
     ...propsToForward
 }: OptionRowLHNDataProps) {
@@ -47,6 +46,7 @@ function OptionRowLHNData({
     const {login, accountID: currentUserAccountID} = useCurrentUserPersonalDetails();
 
     const oneTransactionThreadReportID = oneTransactionThreadReport?.reportID;
+    const [conciergeReportID] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID);
 
     const [reportActions] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${reportID}`);
     const [parentReportActions] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${getNonEmptyStringOnyxID(fullReport?.parentReportID)}`);
@@ -168,16 +168,8 @@ function OptionRowLHNData({
             : [styles.chatLinkRowPressable, styles.flexGrow1, styles.optionItemAvatarNameWrapper, styles.optionRow, styles.justifyContentCenter],
     );
 
-    if (!finalOptionItem && isReportFocused) {
-        return null;
-    }
-
-    if (!finalOptionItem && !isReportFocused) {
-        return <View style={placeholderRowStyle} />;
-    }
-
     if (!finalOptionItem) {
-        return null;
+        return isReportFocused ? null : <View style={placeholderRowStyle} />;
     }
 
     return (
@@ -189,7 +181,6 @@ function OptionRowLHNData({
             optionItem={finalOptionItem}
             report={fullReport}
             hasDraftComment={hasDraftComment}
-            conciergeReportID={conciergeReportID}
         />
     );
 }
