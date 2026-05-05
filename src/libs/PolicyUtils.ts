@@ -935,16 +935,17 @@ function isSubmitPolicy(policy: OnyxInputOrEntry<Policy>): boolean {
     return policy?.type === CONST.POLICY.TYPE.SUBMIT;
 }
 
-function isPolicyEditor(policy: OnyxInputOrEntry<Policy>): boolean {
-    return policy?.role === CONST.POLICY.ROLE.EDITOR;
-}
+const isPolicyEditor = (policy: OnyxInputOrEntry<Policy>, login?: string): boolean => getPolicyRole(policy, login) === CONST.POLICY.ROLE.EDITOR;
 
 /**
  * Returns true if the current user can edit workspace settings — admins on any workspace,
  * or editors on Submit workspaces (Submit has no admin role, so editors manage it).
+ *
+ * `login` enables the per-employee role fallback in `getPolicyRole`, so partially-loaded/summary
+ * policies (where `policy.role` isn't populated yet) don't incorrectly route admins/editors away.
  */
-function canEditWorkspaceSettings(policy: OnyxInputOrEntry<Policy>): boolean {
-    return isPolicyAdmin(policy) || (isSubmitPolicy(policy) && isPolicyEditor(policy));
+function canEditWorkspaceSettings(policy: OnyxInputOrEntry<Policy>, login?: string): boolean {
+    return isPolicyAdmin(policy, login) || (isSubmitPolicy(policy) && isPolicyEditor(policy, login));
 }
 
 /**
