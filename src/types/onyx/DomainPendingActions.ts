@@ -59,6 +59,11 @@ type DomainSecurityGroupPendingActions = {
      * Pending action for the restricted expense workspace creation
      */
     enableRestrictedPolicyCreation?: OnyxCommon.PendingAction;
+
+    /**
+     * Base pending action for group-level operations (create, delete)
+     */
+    pendingAction?: OnyxCommon.PendingAction;
 };
 
 /**
