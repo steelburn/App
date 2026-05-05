@@ -45,11 +45,13 @@ function ListSelectionButton<TItem extends ListItem>({
     testID,
     tabIndex,
 }: ListSelectionButtonProps<TItem> & {role: typeof CONST.ROLE.CHECKBOX | typeof CONST.ROLE.RADIO}) {
+    const label = accessibilityLabel ?? item.text ?? '';
+
     return (
         <SelectionButton
             shouldSelectOnPressEnter
             role={role}
-            accessibilityLabel={accessibilityLabel ?? item.text ?? ''}
+            accessibilityLabel={label}
             isChecked={item.isSelected ?? false}
             onPress={() => onSelectRow(item)}
             disabled={disabled}
@@ -57,7 +59,7 @@ function ListSelectionButton<TItem extends ListItem>({
             containerStyle={containerStyle}
             shouldStopMouseDownPropagation={shouldStopMouseDownPropagation}
             sentryLabel={CONST.SENTRY_LABEL.USER_LIST_ITEM.CHECKBOX}
-            testID={testID}
+            testID={testID ?? `${CONST.SELECTION_BUTTON_TEST_ID}${label}`}
             tabIndex={tabIndex}
             accessible={false}
         />
