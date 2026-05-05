@@ -467,7 +467,7 @@ const SCREENS = {
         DYNAMIC_SETTINGS_TAG_SETTINGS: 'Dynamic_Settings_Tag_Settings',
         DYNAMIC_SETTINGS_TAG_APPROVER: 'Dynamic_Settings_Tag_Approver',
         DYNAMIC_SETTINGS_TAG_LIST_VIEW: 'Dynamic_Settings_Tag_List_View',
-        SETTINGS_TAG_GL_CODE: 'Settings_Tag_GL_Code',
+        DYNAMIC_SETTINGS_TAG_GL_CODE: 'Dynamic_Settings_Tag_GL_Code',
         SETTINGS_TAGS_IMPORT: 'Settings_Tags_Import',
         SETTINGS_TAGS_IMPORTED: 'Settings_Tags_Imported',
     },
