@@ -226,7 +226,7 @@ function cancelSubmitFollowUpActionSpan() {
 // ---------------------------------------------------------------------------
 
 function startTracking(context: SubmitExpenseContext, options?: StartTrackingOptions) {
-    if (!navListenerRegistered) {
+    if (!navListenerRegistered && navigationRef.addListener) {
         navListenerRegistered = true;
         navigationRef.addListener('state', cancelIfStaleForNavState);
     }
