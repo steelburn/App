@@ -28,7 +28,7 @@ import OptionRowAlternateText from './OptionRowAlternateText';
 import OptionRowAvatar from './OptionRowAvatar';
 import OptionRowErrorBadge from './OptionRowErrorBadge';
 import OptionRowInfoBadge from './OptionRowInfoBadge';
-import type {OptionRowLHNPCorePressHandler} from './OptionRowPressable';
+import type {OptionRowLHNCorePressHandler} from './OptionRowPressable';
 import OptionRowPressable from './OptionRowPressable';
 import OptionRowTooltipLayer from './OptionRowTooltipLayer';
 
@@ -109,7 +109,7 @@ function OptionRowLHN({
         contextMenuHint,
     });
 
-    const renderPressableRow = (pressHandler: OptionRowLHNPCorePressHandler) => (
+    const renderPressableRow = (pressHandler: OptionRowLHNCorePressHandler) => (
         <OptionRowPressable
             reportID={reportID}
             optionItem={optionItem}

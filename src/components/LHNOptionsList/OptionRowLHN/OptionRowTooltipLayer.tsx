@@ -16,8 +16,8 @@ import variables from '@styles/variables';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {Report} from '@src/types/onyx';
-import type {OptionRowLHNPCorePressHandler} from './OptionRowPressable';
-import {useOptionRowLHNPCorePress} from './OptionRowPressable';
+import type {OptionRowLHNCorePressHandler} from './OptionRowPressable';
+import {useOptionRowLHNCorePress} from './OptionRowPressable';
 
 type OptionRowTooltipLayerProps = {
     /** Report ID of the row */
@@ -35,12 +35,12 @@ type OptionRowTooltipLayerProps = {
     popoverAnchor: RefObject<View | null>;
 
     /** Renders pressable row content with the resolved press handler (tooltip hide + core press when applicable). */
-    renderChildren: (onPress: OptionRowLHNPCorePressHandler) => React.ReactNode;
+    renderChildren: (onPress: OptionRowLHNCorePressHandler) => React.ReactNode;
 };
 
 type OptionRowTooltipLayerInnerProps = {
-    corePress: OptionRowLHNPCorePressHandler;
-    renderChildren: (onPress: OptionRowLHNPCorePressHandler) => React.ReactNode;
+    corePress: OptionRowLHNCorePressHandler;
+    renderChildren: (onPress: OptionRowLHNCorePressHandler) => React.ReactNode;
 };
 
 function OptionRowTooltipLayerInner({corePress, renderChildren}: OptionRowTooltipLayerInnerProps) {
@@ -104,7 +104,7 @@ function OptionRowTooltipLayer({reportID, report, optionItem, onSelectRow, popov
     // Skip the inner component (and its heavy hooks) entirely when the row can never show a tooltip.
     const shouldEvaluateTooltip = shouldShowRBRorGBRTooltip || shouldShowGetStartedTooltip;
 
-    const corePress = useOptionRowLHNPCorePress({
+    const corePress = useOptionRowLHNCorePress({
         reportID,
         optionItem,
         popoverAnchor,

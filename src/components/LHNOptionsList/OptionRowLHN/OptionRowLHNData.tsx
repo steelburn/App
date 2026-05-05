@@ -23,10 +23,8 @@ import type {Icon} from '@src/types/onyx/OnyxCommon';
 import OptionRowLHN from './OptionRowLHNCore';
 
 /*
- * This component gets the data from onyx for the actual
- * OptionRowLHN component.
- * The OptionRowLHN component is memoized, so it will only
- * re-render if the data really changed.
+ * Onyx-backed props for one LHN row; renders OptionRowLHNCore (memoized; re-renders when derived data changes).
+ * Colocated under OptionRowLHN/; consumers import ./OptionRowLHN for OptionRowLHNData only (see index.ts).
  */
 function OptionRowLHNData({
     isOptionFocused = false,

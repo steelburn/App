@@ -15,17 +15,17 @@ import {showContextMenu} from '@pages/inbox/report/ContextMenu/ReportActionConte
 import variables from '@styles/variables';
 import CONST from '@src/CONST';
 
-type OptionRowLHNPCorePressHandler = (event: GestureResponderEvent | KeyboardEvent | undefined) => void;
+type OptionRowLHNCorePressHandler = (event: GestureResponderEvent | KeyboardEvent | undefined) => void;
 
-type UseOptionRowLHNPCorePressParams = {
+type UseOptionRowLHNCorePressParams = {
     reportID: string;
     optionItem: OptionData;
     popoverAnchor: RefObject<View | null>;
     onSelectRow: (optionItem: OptionData, popoverAnchor: RefObject<View | null>) => void;
 };
 
-/** Core LHN row press behavior (telemetry, composer focus, selection). Used by OptionRowTooltipLayer and kept next to OptionRowPressable per review feedback. */
-function useOptionRowLHNPCorePress({reportID, optionItem, popoverAnchor, onSelectRow}: UseOptionRowLHNPCorePressParams): OptionRowLHNPCorePressHandler {
+/** LHN row press: telemetry span, composer focus, then onSelectRow. Lives next to OptionRowPressable per review. */
+function useOptionRowLHNCorePress({reportID, optionItem, popoverAnchor, onSelectRow}: UseOptionRowLHNCorePressParams): OptionRowLHNCorePressHandler {
     return useCallback(
         (event: GestureResponderEvent | KeyboardEvent | undefined) => {
             startSpan(`${CONST.TELEMETRY.SPAN_OPEN_REPORT}_${reportID}`, {
@@ -151,6 +151,6 @@ function OptionRowPressable({
 
 OptionRowPressable.displayName = 'OptionRowPressable';
 
-export type {OptionRowLHNPCorePressHandler};
-export {useOptionRowLHNPCorePress};
+export type {OptionRowLHNCorePressHandler};
+export {useOptionRowLHNCorePress};
 export default OptionRowPressable;
