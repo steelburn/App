@@ -1173,6 +1173,7 @@ function MenuItem({
                                                             isChecked={isSelected}
                                                             onPress={onPressAction}
                                                             accessibilityLabel={title ?? ''}
+                                                            accessible={false}
                                                             tabIndex={-1}
                                                         />
                                                     </View>

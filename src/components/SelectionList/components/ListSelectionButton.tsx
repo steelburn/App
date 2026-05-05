@@ -59,6 +59,7 @@ function ListSelectionButton<TItem extends ListItem>({
             sentryLabel={CONST.SENTRY_LABEL.USER_LIST_ITEM.CHECKBOX}
             testID={testID}
             tabIndex={tabIndex}
+            accessible={false}
         />
     );
 }
