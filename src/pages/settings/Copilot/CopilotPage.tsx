@@ -173,19 +173,30 @@ function CopilotPage() {
     );
 
     const renderTitleWithRole = useCallback(
-        (titleText: string, role: DelegateRole | undefined) => (
-            <View style={[styles.flexRow, styles.alignItemsCenter, styles.flexShrink1, styles.ml3]}>
-                <Text
-                    style={[styles.textStrong, styles.flexShrink1]}
-                    numberOfLines={1}
-                >
-                    {titleText}
-                </Text>
-                {!!role && (
-                    <Badge
-                        text={translate('delegate.role', {role})}
-                        badgeStyles={[styles.ml2, styles.flexShrink0]}
-                    />
+        (titleText: string, descriptionText: string, role: DelegateRole | undefined) => (
+            <View style={[styles.flexShrink1, styles.ml3]}>
+                <View style={[styles.flexRow, styles.alignItemsCenter, styles.flexShrink1]}>
+                    <Text
+                        style={[styles.textStrong, styles.flexShrink1]}
+                        numberOfLines={1}
+                    >
+                        {titleText}
+                    </Text>
+                    {!!role && (
+                        <Badge
+                            text={translate('delegate.role', {role})}
+                            isCondensed
+                            badgeStyles={[styles.ml3, styles.flexShrink0]}
+                        />
+                    )}
+                </View>
+                {!!descriptionText && (
+                    <Text
+                        style={[styles.textLabelSupporting, styles.mt1]}
+                        numberOfLines={1}
+                    >
+                        {descriptionText}
+                    </Text>
                 )}
             </View>
         ),
@@ -222,13 +233,12 @@ function CopilotPage() {
 
             const formattedEmail = formatPhoneNumber(email);
             const titleText = personalDetail?.displayName ?? formattedEmail;
+            const descriptionText = personalDetail?.displayName ? formattedEmail : '';
             return {
-                titleComponent: renderTitleWithRole(titleText, role),
-                description: personalDetail?.displayName ? formattedEmail : '',
+                titleComponent: renderTitleWithRole(titleText, descriptionText, role),
                 avatarID: personalDetail?.accountID ?? CONST.DEFAULT_NUMBER_ID,
                 icon: personalDetail?.avatar ?? icons.FallbackAvatar,
                 iconType: CONST.ICON_TYPE_AVATAR,
-                numberOfLinesDescription: 1,
                 wrapperStyle: [styles.sectionMenuItemTopDescription],
                 iconRight: icons.ThreeDots,
                 shouldShowRightIcon: true,
@@ -268,14 +278,13 @@ function CopilotPage() {
             const isCurrentUser = email === session?.email;
             const isPending = !!pendingAction;
             const titleText = personalDetail?.displayName ?? formattedEmail;
+            const descriptionText = personalDetail?.displayName ? formattedEmail : '';
 
             return {
-                titleComponent: renderTitleWithRole(titleText, role),
-                description: personalDetail?.displayName ? formattedEmail : '',
+                titleComponent: renderTitleWithRole(titleText, descriptionText, role),
                 avatarID: personalDetail?.accountID ?? CONST.DEFAULT_NUMBER_ID,
                 icon: personalDetail?.avatar ?? icons.FallbackAvatar,
                 iconType: CONST.ICON_TYPE_AVATAR,
-                numberOfLinesDescription: 1,
                 wrapperStyle: [styles.sectionMenuItemTopDescription],
                 interactive: false,
                 error: connectError,
