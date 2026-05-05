@@ -237,6 +237,9 @@ type SettingsNavigatorParamList = {
     [SCREENS.SETTINGS.WALLET.PERSONAL_CARD_BANK_CONNECTION]: {
         feed: PersonalCardFeed;
     };
+    [SCREENS.SETTINGS.WALLET.PERSONAL_CARD_FIX_CONNECTION]: {
+        cardID: string;
+    };
     [SCREENS.SETTINGS.WALLET.PERSONAL_CARD_WARNING]: undefined;
     [SCREENS.SETTINGS.WALLET.PERSONAL_CARD_UPGRADE]: undefined;
     [SCREENS.SETTINGS.ADD_DEBIT_CARD]: undefined;
@@ -1631,6 +1634,10 @@ type SettingsNavigatorParamList = {
         groupID: string;
     };
     [SCREENS.DOMAIN.GROUP_EDIT_NAME]: {
+        domainAccountID: number;
+        groupID: string;
+    };
+    [SCREENS.DOMAIN.SECURITY_GROUPS_PREFERRED_WORKSPACE]: {
         domainAccountID: number;
         groupID: string;
     };
