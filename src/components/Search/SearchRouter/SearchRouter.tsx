@@ -32,7 +32,7 @@ import type {SearchOption} from '@libs/OptionsListUtils';
 import {createOptionFromReport} from '@libs/OptionsListUtils';
 import Parser from '@libs/Parser';
 import {getReportAction} from '@libs/ReportActionsUtils';
-import {getReportOrDraftReport, isHiddenForCurrentUser} from '@libs/ReportUtils';
+import {isHiddenForCurrentUser} from '@libs/ReportUtils';
 import type {OptionData} from '@libs/ReportUtils';
 import {getAutocompleteQueryWithComma, getTrimmedUserSearchQueryPreservingComma} from '@libs/SearchAutocompleteUtils';
 import {getQueryWithUpdatedValues, sanitizeSearchValue} from '@libs/SearchQueryUtils';
