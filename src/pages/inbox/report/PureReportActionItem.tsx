@@ -1086,7 +1086,6 @@ function PureReportActionItem({
     }
 
     const hasErrors = !isEmptyValueObject(action.errors);
-    const canShowMenu = draftMessage === undefined && !hasErrors;
     const whisperedTo = getWhisperedTo(action);
 
     const iouReportID = isMoneyRequestAction(action) && getOriginalMessage(action)?.IOUReportID ? getOriginalMessage(action)?.IOUReportID?.toString() : undefined;
@@ -1138,7 +1137,7 @@ function PureReportActionItem({
                     {(hovered) => (
                         <View style={highlightedBackgroundColorIfNeeded}>
                             {shouldDisplayNewMarker && (!shouldUseThreadDividerLine || !isFirstVisibleReportAction) && <UnreadActionIndicator reportActionID={action.reportActionID} />}
-                            {shouldDisplayContextMenuValue && hovered && canShowMenu && (
+                            {shouldDisplayContextMenuValue && hovered && draftMessage === undefined && !hasErrors && (
                                 <MiniReportActionContextMenu
                                     reportID={reportID}
                                     reportActionID={action.reportActionID}
