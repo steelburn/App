@@ -567,7 +567,7 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
         });
     }
 
-    const handleRoleFilterChange = (item: WorkspaceMemberFilterOption | null) => {
+    const handleRoleFilterChange = (item: WorkspaceMemberFilterOption | undefined) => {
         setSelectedEmployees([]);
 
         if (!item || item.value === WORKSPACE_MEMBER_FILTER_VALUES.ALL) {
@@ -645,7 +645,7 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
         <SingleSelectPopup
             label={translate('common.role')}
             items={roleFilterOptions}
-            value={selectedRoleFilter ?? roleFilterOptions.at(0) ?? null}
+            value={selectedRoleFilter ?? roleFilterOptions.at(0)}
             closeOverlay={closeOverlay}
             onChange={handleRoleFilterChange}
             defaultValue={roleFilterOptions.at(0)?.value}
