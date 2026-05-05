@@ -20,6 +20,7 @@ import Log from '@libs/Log';
 import Navigation from '@libs/Navigation/Navigation';
 import Visibility from '@libs/Visibility';
 import {clearSignInData} from '@userActions/Session';
+import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type {Account, Credentials} from '@src/types/onyx';
@@ -355,16 +356,22 @@ function SignInPageWrapper({ref}: SignInPageProps) {
 }
 
 // WithTheme is a HOC that provides theme-related contexts (e.g. to the SignInPageWrapper component since these contexts are required for variable declarations).
+// The sign-in page always uses the dark theme, but respects the user's contrast preference (nvp_preferredTheme) which is preserved on sign-out.
 function WithTheme(Component: React.ComponentType<SignInPageProps>) {
-    return ({ref}: SignInPageProps) => (
-        <ThemeProvider>
-            <ThemeStylesProvider>
-                <HTMLEngineProvider>
-                    <Component ref={ref} />
-                </HTMLEngineProvider>
-            </ThemeStylesProvider>
-        </ThemeProvider>
-    );
+    return ({ref}: SignInPageProps) => {
+        const [preferredTheme] = useOnyx(ONYXKEYS.PREFERRED_THEME);
+        const signInTheme = preferredTheme?.endsWith('-contrast') ? CONST.THEME.DARK_CONTRAST : CONST.THEME.DARK;
+
+        return (
+            <ThemeProvider theme={signInTheme}>
+                <ThemeStylesProvider>
+                    <HTMLEngineProvider>
+                        <Component ref={ref} />
+                    </HTMLEngineProvider>
+                </ThemeStylesProvider>
+            </ThemeProvider>
+        );
+    };
 }
 
 const SignInPageThemed = WithTheme(SignInPage);
