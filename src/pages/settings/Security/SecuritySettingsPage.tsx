@@ -4,6 +4,7 @@ import type {StyleProp, ViewStyle} from 'react-native';
 import {useDelegateNoAccessActions, useDelegateNoAccessState} from '@components/DelegateNoAccessModalProvider';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import {useLockedAccountActions, useLockedAccountState} from '@components/LockedAccountModalProvider';
+import type {MenuItemProps} from '@components/MenuItem';
 import MenuItemList from '@components/MenuItemList';
 import ScreenWrapper from '@components/ScreenWrapper';
 import ScrollView from '@components/ScrollView';
@@ -18,6 +19,7 @@ import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
 import useWaitForNavigation from '@hooks/useWaitForNavigation';
 import Navigation from '@libs/Navigation/Navigation';
+import {hasDeviceManagementError} from '@libs/UserUtils';
 import colors from '@styles/theme/colors';
 import CONST from '@src/CONST';
 import type {TranslationPaths} from '@src/languages/types';
@@ -34,10 +36,11 @@ type BaseMenuItemType = WithSentryLabel & {
     action: () => Promise<void> | void;
     link?: string;
     wrapperStyle?: StyleProp<ViewStyle>;
+    brickRoadIndicator?: MenuItemProps['brickRoadIndicator'];
 };
 
 function SecuritySettingsPage() {
-    const icons = useMemoizedLazyExpensifyIcons(['ArrowCollapse', 'ClosedSign', 'Fingerprint', 'Shield', 'UserLock']);
+    const icons = useMemoizedLazyExpensifyIcons(['ArrowCollapse', 'ClosedSign', 'Fingerprint', 'Monitor', 'Shield', 'UserLock']);
     const illustrations = useMemoizedLazyIllustrations(['LockClosed']);
     const securitySettingsIllustration = useSecuritySettingsSectionIllustration();
     const styles = useThemeStyles();
@@ -46,6 +49,7 @@ function SecuritySettingsPage() {
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     useDocumentTitle(translate('initialSettingsPage.security'));
     const [account] = useOnyx(ONYXKEYS.ACCOUNT);
+    const [hasDeviceManagementErrorValue] = useOnyx(ONYXKEYS.LOGINS, {selector: hasDeviceManagementError});
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const privateSubscription = usePrivateSubscription();
     const isUserValidated = account?.validated;
@@ -128,6 +132,15 @@ function SecuritySettingsPage() {
             });
         }
 
+        const deviceManagementBrickRoadIndicator = hasDeviceManagementErrorValue ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined;
+        baseMenuItems.push({
+            translationKey: 'deviceManagementPage.title',
+            icon: icons.Monitor,
+            brickRoadIndicator: deviceManagementBrickRoadIndicator,
+            sentryLabel: CONST.SENTRY_LABEL.SETTINGS_SECURITY.DEVICE_MANAGEMENT,
+            action: () => Navigation.navigate(ROUTES.SETTINGS_DEVICE_MANAGEMENT),
+        });
+
         baseMenuItems.push({
             translationKey: 'closeAccountPage.closeAccount',
             icon: icons.ClosedSign,
@@ -149,6 +162,7 @@ function SecuritySettingsPage() {
             link: '',
             wrapperStyle: [styles.sectionMenuItemTopDescription],
             sentryLabel: item.sentryLabel,
+            brickRoadIndicator: item.brickRoadIndicator,
         }));
     }, [
         icons.ArrowCollapse,
@@ -156,6 +170,7 @@ function SecuritySettingsPage() {
         icons.UserLock,
         icons.Shield,
         icons.Fingerprint,
+        icons.Monitor,
         isAccountLocked,
         isActingAsDelegate,
         isUserValidated,
@@ -167,6 +182,7 @@ function SecuritySettingsPage() {
         translate,
         styles.sectionMenuItemTopDescription,
         hasEverRegisteredForMultifactorAuthentication,
+        hasDeviceManagementErrorValue,
     ]);
 
     return (

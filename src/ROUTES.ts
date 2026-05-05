@@ -661,6 +661,7 @@ const ROUTES = {
     SETTINGS_THEME: 'settings/preferences/theme',
     SETTINGS_COPILOT: 'settings/copilot',
     SETTINGS_SECURITY: 'settings/security',
+    SETTINGS_DEVICE_MANAGEMENT: 'settings/security/device-management',
     SETTINGS_CLOSE: 'settings/security/closeAccount',
     SETTINGS_MERGE_ACCOUNTS: {
         route: 'settings/security/merge-accounts',
@@ -814,6 +815,10 @@ const ROUTES = {
     SETTINGS_WALLET_PERSONAL_CARD_BANK_CONNECTION: {
         route: 'settings/wallet/add-personal-card/:feed/bank-connection',
         getRoute: (feed: PersonalCardFeed) => `settings/wallet/add-personal-card/${feed}/bank-connection` as const,
+    },
+    SETTINGS_WALLET_PERSONAL_CARD_FIX_CONNECTION: {
+        route: 'settings/wallet/personal-card/:cardID/fix-connection',
+        getRoute: (cardID: string) => `settings/wallet/personal-card/${cardID}/fix-connection` as const,
     },
     SETTINGS_WALLET_PERSONAL_CARD_UPGRADE: 'settings/wallet/add-personal-card/upgrade',
     SETTINGS_WALLET_PERSONAL_CARD_WARNING: 'settings/wallet/add-personal-card/warning',
@@ -4162,6 +4167,11 @@ const ROUTES = {
     DOMAIN_GROUP_EDIT_NAME: {
         route: 'domain/:domainAccountID/groups/:groupID/name',
         getRoute: (domainAccountID: number, groupID: string) => `domain/${domainAccountID}/groups/${groupID}/name` as const,
+    },
+
+    DOMAIN_SECURITY_GROUPS_PREFERRED_WORKSPACE: {
+        route: 'domain/:domainAccountID/groups/:groupID/preferred-workspace',
+        getRoute: (domainAccountID: number, groupID: string) => `domain/${domainAccountID}/groups/${groupID}/preferred-workspace` as const,
     },
 } as const;
 

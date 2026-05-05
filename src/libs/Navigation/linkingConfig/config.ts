@@ -180,6 +180,10 @@ const config: LinkingOptions<RootNavigatorParamList>['config'] = {
                             path: ROUTES.SETTINGS_PAYMENT_CURRENCY,
                             exact: true,
                         },
+                        [SCREENS.SETTINGS.DEVICE_MANAGEMENT]: {
+                            path: ROUTES.SETTINGS_DEVICE_MANAGEMENT,
+                            exact: true,
+                        },
                         [SCREENS.SETTINGS.CLOSE]: {
                             path: ROUTES.SETTINGS_CLOSE,
                             exact: true,
@@ -272,6 +276,10 @@ const config: LinkingOptions<RootNavigatorParamList>['config'] = {
                         },
                         [SCREENS.SETTINGS.WALLET.PERSONAL_CARD_BANK_CONNECTION]: {
                             path: ROUTES.SETTINGS_WALLET_PERSONAL_CARD_BANK_CONNECTION.route,
+                            exact: true,
+                        },
+                        [SCREENS.SETTINGS.WALLET.PERSONAL_CARD_FIX_CONNECTION]: {
+                            path: ROUTES.SETTINGS_WALLET_PERSONAL_CARD_FIX_CONNECTION.route,
                             exact: true,
                         },
                         [SCREENS.SETTINGS.WALLET.PERSONAL_CARD_WARNING]: {
@@ -1390,6 +1398,9 @@ const config: LinkingOptions<RootNavigatorParamList>['config'] = {
                         },
                         [SCREENS.DOMAIN.GROUP_EDIT_NAME]: {
                             path: ROUTES.DOMAIN_GROUP_EDIT_NAME.route,
+                        },
+                        [SCREENS.DOMAIN.SECURITY_GROUPS_PREFERRED_WORKSPACE]: {
+                            path: ROUTES.DOMAIN_SECURITY_GROUPS_PREFERRED_WORKSPACE.route,
                         },
                     },
                 },
