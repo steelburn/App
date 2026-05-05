@@ -62,7 +62,7 @@ function formatRequiredFieldsTitle(translate: LocaleContextProps['translate'], p
  */
 function convertAttendeesToArray(rawAttendees: unknown): Attendee[] {
     if (Array.isArray(rawAttendees)) {
-        return rawAttendees;
+        return rawAttendees as Attendee[];
     }
     if (rawAttendees && typeof rawAttendees === 'object') {
         return Object.values(rawAttendees as Record<string, Attendee>);
