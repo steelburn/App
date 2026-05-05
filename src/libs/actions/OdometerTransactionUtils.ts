@@ -165,38 +165,31 @@ async function saveOdometerDraft({startReading, endReading, startImage, endImage
     await Onyx.set(ONYXKEYS.ODOMETER_DRAFT, odometerDraft);
 }
 
-function buildOdometerCommentFromDraft(transactionID: string, odometerDraft: OnyxEntry<OdometerDraft>, currentComment?: Partial<Comment>): Partial<Comment> | undefined {
+type OdometerCommentUpdate = {
+    odometerStart: number | null;
+    odometerEnd: number | null;
+    odometerStartImage: FileObject | string | null;
+    odometerEndImage: FileObject | string | null;
+};
+
+function buildOdometerCommentFromDraft(transactionID: string, odometerDraft: OnyxEntry<OdometerDraft>, currentComment?: Partial<Comment>): OdometerCommentUpdate | undefined {
     if (!odometerDraft) {
         return;
     }
 
-    const commentUpdate: Partial<Comment> = {};
+    const startImage = deserializeOdometerDraftImage(odometerDraft.odometerStartImage, transactionID, CONST.IOU.ODOMETER_IMAGE_TYPE.START) ?? null;
+    const endImage = deserializeOdometerDraftImage(odometerDraft.odometerEndImage, transactionID, CONST.IOU.ODOMETER_IMAGE_TYPE.END) ?? null;
 
-    if (odometerDraft.odometerStartReading !== undefined) {
-        commentUpdate.odometerStart = odometerDraft.odometerStartReading;
-    }
+    // Free the previous blob URL before the merge drops the reference - covers both replace and wipe-to-null; helper no-ops if non-blob or unchanged.
+    revokeOdometerImageUri(currentComment?.odometerStartImage, startImage);
+    revokeOdometerImageUri(currentComment?.odometerEndImage, endImage);
 
-    if (odometerDraft.odometerEndReading !== undefined) {
-        commentUpdate.odometerEnd = odometerDraft.odometerEndReading;
-    }
-
-    const startImage = deserializeOdometerDraftImage(odometerDraft.odometerStartImage, transactionID, CONST.IOU.ODOMETER_IMAGE_TYPE.START);
-    if (startImage !== undefined) {
-        revokeOdometerImageUri(currentComment?.odometerStartImage, startImage);
-        commentUpdate.odometerStartImage = startImage;
-    }
-
-    const endImage = deserializeOdometerDraftImage(odometerDraft.odometerEndImage, transactionID, CONST.IOU.ODOMETER_IMAGE_TYPE.END);
-    if (endImage !== undefined) {
-        revokeOdometerImageUri(currentComment?.odometerEndImage, endImage);
-        commentUpdate.odometerEndImage = endImage;
-    }
-
-    if (Object.keys(commentUpdate).length === 0) {
-        return;
-    }
-
-    return commentUpdate;
+    return {
+        odometerStart: odometerDraft.odometerStartReading ?? null,
+        odometerEnd: odometerDraft.odometerEndReading ?? null,
+        odometerStartImage: startImage,
+        odometerEndImage: endImage,
+    };
 }
 
 /**
@@ -223,10 +216,10 @@ function isOdometerDraftPendingHydration(odometerDraft: OnyxEntry<OdometerDraft>
         return false;
     }
     return (
-        (odometerDraft.odometerStartReading !== undefined && comment?.odometerStart == null) ||
-        (odometerDraft.odometerEndReading !== undefined && comment?.odometerEnd == null) ||
-        (!!odometerDraft.odometerStartImage && !comment?.odometerStartImage) ||
-        (!!odometerDraft.odometerEndImage && !comment?.odometerEndImage)
+        (odometerDraft.odometerStartReading ?? null) !== (comment?.odometerStart ?? null) ||
+        (odometerDraft.odometerEndReading ?? null) !== (comment?.odometerEnd ?? null) ||
+        !!odometerDraft.odometerStartImage !== !!comment?.odometerStartImage ||
+        !!odometerDraft.odometerEndImage !== !!comment?.odometerEndImage
     );
 }
 
