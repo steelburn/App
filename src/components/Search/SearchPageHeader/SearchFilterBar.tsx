@@ -11,11 +11,11 @@ import type {SearchFilter} from '@libs/SearchUIUtils';
 import CONST from '@src/CONST';
 import type {FilterItem} from './useSearchFiltersBar';
 
-type DropdownProps = Pick<DropdownButtonProps, 'label' | 'PopoverComponent' | 'sentryLabel'> & {
+type DropdownProps = Pick<DropdownButtonProps, 'label' | 'PopoverComponent' | 'sentryLabel' | 'onClosePress'> & {
     value: SearchFilter['value'];
 };
 
-function UserDropdown({label, value, PopoverComponent, sentryLabel}: DropdownProps) {
+function UserDropdown({label, value, PopoverComponent, sentryLabel, onClosePress}: DropdownProps) {
     const users = useFilterUserValue(value);
     return (
         <DropdownButton
@@ -23,11 +23,12 @@ function UserDropdown({label, value, PopoverComponent, sentryLabel}: DropdownPro
             value={users ?? []}
             PopoverComponent={PopoverComponent}
             sentryLabel={sentryLabel}
+            onClosePress={onClosePress}
         />
     );
 }
 
-function WorkspaceDropdown({label, value, PopoverComponent, sentryLabel}: DropdownProps) {
+function WorkspaceDropdown({label, value, PopoverComponent, sentryLabel, onClosePress}: DropdownProps) {
     const workspaceValue = useFilterWorkspaceValue(value);
     return (
         <DropdownButton
@@ -35,11 +36,12 @@ function WorkspaceDropdown({label, value, PopoverComponent, sentryLabel}: Dropdo
             value={workspaceValue ?? []}
             PopoverComponent={PopoverComponent}
             sentryLabel={sentryLabel}
+            onClosePress={onClosePress}
         />
     );
 }
 
-function FeedDropdown({label, value, PopoverComponent, sentryLabel}: DropdownProps) {
+function FeedDropdown({label, value, PopoverComponent, sentryLabel, onClosePress}: DropdownProps) {
     const feedValue = useFilterFeedValue(value as string[]);
     return (
         <DropdownButton
@@ -47,11 +49,12 @@ function FeedDropdown({label, value, PopoverComponent, sentryLabel}: DropdownPro
             value={feedValue}
             PopoverComponent={PopoverComponent}
             sentryLabel={sentryLabel}
+            onClosePress={onClosePress}
         />
     );
 }
 
-function CardDropdown({label, value, PopoverComponent, sentryLabel}: DropdownProps) {
+function CardDropdown({label, value, PopoverComponent, sentryLabel, onClosePress}: DropdownProps) {
     const cardValue = useFilterCardValue(value as string[]);
     return (
         <DropdownButton
@@ -59,11 +62,12 @@ function CardDropdown({label, value, PopoverComponent, sentryLabel}: DropdownPro
             value={cardValue}
             PopoverComponent={PopoverComponent}
             sentryLabel={sentryLabel}
+            onClosePress={onClosePress}
         />
     );
 }
 
-function TaxRateDropdown({label, value, PopoverComponent, sentryLabel}: DropdownProps) {
+function TaxRateDropdown({label, value, PopoverComponent, sentryLabel, onClosePress}: DropdownProps) {
     const taxRateValue = useFilterTaxRateValue(value as string[]);
     return (
         <DropdownButton
@@ -71,11 +75,12 @@ function TaxRateDropdown({label, value, PopoverComponent, sentryLabel}: Dropdown
             value={taxRateValue}
             PopoverComponent={PopoverComponent}
             sentryLabel={sentryLabel}
+            onClosePress={onClosePress}
         />
     );
 }
 
-function ReportDropdown({label, value, PopoverComponent, sentryLabel}: DropdownProps) {
+function ReportDropdown({label, value, PopoverComponent, sentryLabel, onClosePress}: DropdownProps) {
     const reportValue = useFilterReportValue(value);
     return (
         <DropdownButton
@@ -83,6 +88,7 @@ function ReportDropdown({label, value, PopoverComponent, sentryLabel}: DropdownP
             value={reportValue}
             PopoverComponent={PopoverComponent}
             sentryLabel={sentryLabel}
+            onClosePress={onClosePress}
         />
     );
 }
@@ -112,6 +118,7 @@ function SearchFilterBar({item}: {item: SearchFilter & FilterItem}) {
             value={item.value}
             PopoverComponent={item.PopoverComponent}
             sentryLabel={item.sentryLabel}
+            onClosePress={item.onClosePress}
         />
     );
 }

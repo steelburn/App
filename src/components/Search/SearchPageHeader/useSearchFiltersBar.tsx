@@ -24,6 +24,7 @@ import DatePickerFilterPopup from './DatePickerFilterPopup';
 
 type FilterItem = WithSentryLabel & {
     PopoverComponent: (props: PopoverComponentProps) => ReactNode;
+    onClosePress: () => void;
 };
 
 type UseSearchFiltersBarResult = {
@@ -49,6 +50,7 @@ const SKIPPED_FILTERS = new Set<SearchAdvancedFiltersKey>([
     FILTER_KEYS.PAYER,
     FILTER_KEYS.ACTION,
     FILTER_KEYS.COLUMNS,
+    FILTER_KEYS.KEYWORD,
 ]);
 
 function getFilterSentryLabel(filterKey: SearchAdvancedFiltersKey | SearchFilterKey | ReportFieldKey) {
@@ -124,6 +126,7 @@ function useSearchFiltersBar(queryJSON: SearchQueryJSON): UseSearchFiltersBarRes
     const {translate, localeCompare} = useLocalize();
     const {isOffline} = useNetwork();
     const {shouldShowFiltersBarLoading, currentSearchResults} = useSearchStateContext();
+    const updateFilterForm = useUpdateFilterQuery(queryJSON, false);
     const filters = mapFiltersFormToLabelValueList<FilterItem>(searchAdvancedFiltersForm, queryJSON.policyID, SKIPPED_FILTERS, translate, localeCompare, (filterKey) => ({
         PopoverComponent: ({closeOverlay, setPopoverWidth}) => (
             <ListFilterHeightContextProvider>
@@ -137,6 +140,39 @@ function useSearchFiltersBar(queryJSON: SearchQueryJSON): UseSearchFiltersBarRes
             </ListFilterHeightContextProvider>
         ),
         sentryLabel: getFilterSentryLabel(filterKey),
+        onClosePress: () => {
+            if (isAmountFilterKey(filterKey)) {
+                updateFilterForm({
+                    [`${filterKey}${CONST.SEARCH.AMOUNT_MODIFIERS.EQUAL_TO}`]: undefined,
+                    [`${filterKey}${CONST.SEARCH.AMOUNT_MODIFIERS.GREATER_THAN}`]: undefined,
+                    [`${filterKey}${CONST.SEARCH.AMOUNT_MODIFIERS.LESS_THAN}`]: undefined,
+                });
+                return;
+            }
+
+            if (isDateFilterKey(filterKey)) {
+                updateFilterForm({
+                    [`${filterKey}${CONST.SEARCH.DATE_MODIFIERS.ON}`]: undefined,
+                    [`${filterKey}${CONST.SEARCH.DATE_MODIFIERS.BEFORE}`]: undefined,
+                    [`${filterKey}${CONST.SEARCH.DATE_MODIFIERS.AFTER}`]: undefined,
+                    [`${filterKey}${CONST.SEARCH.DATE_MODIFIERS.RANGE}`]: undefined,
+                });
+                return;
+            }
+
+            if (filterKey === CONST.SEARCH.REPORT_FIELD.GLOBAL_PREFIX) {
+                const formValues = Object.keys(searchAdvancedFiltersForm).reduce((acc, curr) => {
+                    if (curr.startsWith(CONST.SEARCH.REPORT_FIELD.GLOBAL_PREFIX)) {
+                        acc[curr as SearchAdvancedFiltersKey] = undefined;
+                    }
+                    return acc;
+                }, {} as Partial<SearchAdvancedFiltersForm>);
+                updateFilterForm(formValues);
+                return;
+            }
+
+            updateFilterForm({[filterKey]: undefined});
+        },
     }));
 
     return {
