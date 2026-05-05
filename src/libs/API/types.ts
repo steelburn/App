@@ -83,6 +83,7 @@ const WRITE_COMMANDS = {
     REFER_TEACHERS_UNITE_VOLUNTEER: 'ReferTeachersUniteVolunteer',
     ADD_SCHOOL_PRINCIPAL: 'AddSchoolPrincipal',
     CLOSE_ACCOUNT: 'CloseAccount',
+    REVOKE_DEVICE: 'RevokeDevice',
     REQUEST_CONTACT_METHOD_VALIDATE_CODE: 'RequestContactMethodValidateCode',
     UPDATE_NEWSLETTER_SUBSCRIPTION: 'UpdateNewsletterSubscription',
     DELETE_CONTACT_METHOD: 'DeleteContactMethod',
@@ -586,6 +587,7 @@ const WRITE_COMMANDS = {
     CHANGE_DOMAIN_SECURITY_GROUP: 'ChangeDomainSecurityGroup',
     UPDATE_DOMAIN_SECURITY_GROUP: 'UpdateDomainSecurityGroupForNewDot',
     SET_DEFAULT_DOMAIN_SECURITY_GROUP: 'SetDefaultDomainSecurityGroup',
+    DELETE_DOMAIN_SECURITY_GROUP: 'DeleteDomainSecurityGroup',
 } as const;
 
 type WriteCommand = ValueOf<typeof WRITE_COMMANDS>;
@@ -644,6 +646,7 @@ type WriteCommandParameters = {
     [WRITE_COMMANDS.REFER_TEACHERS_UNITE_VOLUNTEER]: Parameters.ReferTeachersUniteVolunteerParams;
     [WRITE_COMMANDS.ADD_SCHOOL_PRINCIPAL]: Parameters.AddSchoolPrincipalParams;
     [WRITE_COMMANDS.CLOSE_ACCOUNT]: Parameters.CloseAccountParams;
+    [WRITE_COMMANDS.REVOKE_DEVICE]: Parameters.RevokeDeviceParams;
     [WRITE_COMMANDS.REQUEST_CONTACT_METHOD_VALIDATE_CODE]: Parameters.RequestContactMethodValidateCodeParams;
     [WRITE_COMMANDS.UPDATE_NEWSLETTER_SUBSCRIPTION]: Parameters.UpdateNewsletterSubscriptionParams;
     [WRITE_COMMANDS.DELETE_CONTACT_METHOD]: Parameters.DeleteContactMethodParams;
@@ -1189,6 +1192,7 @@ type WriteCommandParameters = {
     [WRITE_COMMANDS.CHANGE_DOMAIN_SECURITY_GROUP]: Parameters.ChangeDomainSecurityGroupParams;
     [WRITE_COMMANDS.UPDATE_DOMAIN_SECURITY_GROUP]: Parameters.UpdateDomainSecurityGroupParams;
     [WRITE_COMMANDS.SET_DEFAULT_DOMAIN_SECURITY_GROUP]: Parameters.SetDefaultDomainSecurityGroupParams;
+    [WRITE_COMMANDS.DELETE_DOMAIN_SECURITY_GROUP]: Parameters.DeleteDomainSecurityGroupParams;
 };
 
 const READ_COMMANDS = {
