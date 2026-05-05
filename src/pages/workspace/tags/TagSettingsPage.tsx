@@ -94,9 +94,7 @@ function TagSettingsPage({route, navigation}: TagSettingsPageProps) {
 
     const navigateToEditTag = () => {
         Navigation.navigate(
-            isQuickSettingsFlow
-                ? ROUTES.SETTINGS_TAG_EDIT.getRoute(policyID, orderWeight, currentPolicyTag.name)
-                : ROUTES.WORKSPACE_TAG_EDIT.getRoute(policyID, orderWeight, currentPolicyTag.name),
+            isQuickSettingsFlow ? createDynamicRoute(DYNAMIC_ROUTES.SETTINGS_TAG_EDIT.path) : ROUTES.WORKSPACE_TAG_EDIT.getRoute(policyID, orderWeight, currentPolicyTag.name),
         );
     };
 

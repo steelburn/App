@@ -463,7 +463,7 @@ const SCREENS = {
         SETTINGS_TAGS_SETTINGS: 'Settings_Tags_Settings',
         DYNAMIC_SETTINGS_TAGS_EDIT: 'Dynamic_Settings_Tags_Edit',
         SETTINGS_TAG_CREATE: 'Settings_Tag_Create',
-        SETTINGS_TAG_EDIT: 'Settings_Tag_Edit',
+        DYNAMIC_SETTINGS_TAG_EDIT: 'Dynamic_Settings_Tag_Edit',
         DYNAMIC_SETTINGS_TAG_SETTINGS: 'Dynamic_Settings_Tag_Settings',
         DYNAMIC_SETTINGS_TAG_APPROVER: 'Dynamic_Settings_Tag_Approver',
         DYNAMIC_SETTINGS_TAG_LIST_VIEW: 'Dynamic_Settings_Tag_List_View',
