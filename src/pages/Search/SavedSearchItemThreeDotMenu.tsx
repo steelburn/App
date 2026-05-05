@@ -2,13 +2,11 @@ import React, {useEffect, useRef} from 'react';
 import {View} from 'react-native';
 import type {PopoverMenuItem} from '@components/PopoverMenu';
 import ThreeDotsMenu from '@components/ThreeDotsMenu';
+import {MENU_CLOSE_DELAY_MS} from '@hooks/useShareSavedSearch';
 import useThemeStyles from '@hooks/useThemeStyles';
 import CONST from '@src/CONST';
 
 type ThreeDotsMenuHandle = {hidePopoverMenu: () => void; isPopupMenuVisible: boolean};
-
-// Matches the shouldDelay close timing in hideContextMenu (ReportActionContextMenu.ts)
-const MENU_CLOSE_DELAY_MS = 800;
 
 type SavedSearchItemThreeDotMenuProps = {
     menuItems: PopoverMenuItem[];

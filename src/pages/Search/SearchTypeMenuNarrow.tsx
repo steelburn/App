@@ -2,7 +2,7 @@
 // used for fast perceived performance. If you change the UI here, verify the
 // static version still looks visually identical.
 import {useNavigation} from '@react-navigation/native';
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useRef, useState} from 'react';
 import {View} from 'react-native';
 import type BaseModalProps from '@components/Modal/types';
 import {usePersonalDetails} from '@components/OnyxListItemProvider';
@@ -20,7 +20,7 @@ import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
 import useReportAttributes from '@hooks/useReportAttributes';
 import useSearchTypeMenuSections from '@hooks/useSearchTypeMenuSections';
-import useShareSavedSearch from '@hooks/useShareSavedSearch';
+import useShareSavedSearch, {MENU_CLOSE_DELAY_MS} from '@hooks/useShareSavedSearch';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {setSearchContext} from '@libs/actions/Search';
 import {mergeCardListWithWorkspaceFeeds} from '@libs/CardUtils';
@@ -31,9 +31,6 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import {accountIDSelector} from '@src/selectors/Session';
 import todosReportCountsSelector from '@src/selectors/Todos';
 import useSavedSearchTitles from './hooks/useSavedSearchTitles';
-
-// Matches the shouldDelay close timing in hideContextMenu (ReportActionContextMenu.ts)
-const MENU_CLOSE_DELAY_MS = 800;
 
 type SearchTypeMenuNarrowProps = {
     /** Search query JSON */
@@ -115,31 +112,6 @@ function SearchTypeMenuNarrow({queryJSON, onTabPress}: SearchTypeMenuNarrowProps
     const {showDeleteModal} = useDeleteSavedSearch();
 
     const {copiedHash, handleShare} = useShareSavedSearch();
-    const closeMenuTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-    useEffect(() => {
-        return () => {
-            if (closeMenuTimeoutRef.current !== null) {
-                clearTimeout(closeMenuTimeoutRef.current);
-            }
-        };
-    }, []);
-
-    useEffect(() => {
-        if (copiedHash === null || savedSearchToModifyKey === null || copiedHash !== Number(savedSearchToModifyKey)) {
-            return;
-        }
-        closeMenuTimeoutRef.current = setTimeout(() => {
-            setSavedSearchToModifyKey(null);
-            closeMenuTimeoutRef.current = null;
-        }, MENU_CLOSE_DELAY_MS);
-        return () => {
-            if (closeMenuTimeoutRef.current !== null) {
-                clearTimeout(closeMenuTimeoutRef.current);
-                closeMenuTimeoutRef.current = null;
-            }
-        };
-    }, [copiedHash, savedSearchToModifyKey]);
 
     const expensifyIcons = useMemoizedLazyExpensifyIcons([
         'Receipt',
@@ -179,7 +151,10 @@ function SearchTypeMenuNarrow({queryJSON, onTabPress}: SearchTypeMenuNarrowProps
                   queryMap.set(key, {query: item.query ?? '', name: item.name});
                   const itemHash = Number(key);
                   savedSearchesPopoverMenuItems[key] = getOverflowMenu(expensifyIcons, title, itemHash, item.query, translate, showDeleteModal, true, () => setSavedSearchToModifyKey(null), {
-                      onShare: () => handleShare(itemHash, item.query),
+                      onShare: () => {
+                          handleShare(itemHash, item.query);
+                          setTimeout(() => setSavedSearchToModifyKey(null), MENU_CLOSE_DELAY_MS);
+                      },
                       isCopied: copiedHash === itemHash,
                   });
 

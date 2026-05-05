@@ -6,6 +6,9 @@ import useEnvironment from './useEnvironment';
 // Matches the success state duration in useThrottledButtonState used by ContextMenuItem
 const SHARE_FEEDBACK_DURATION_MS = 1800;
 
+// Matches the shouldDelay close timing in hideContextMenu (ReportActionContextMenu.ts)
+export const MENU_CLOSE_DELAY_MS = 800;
+
 function useShareSavedSearch() {
     const {environmentURL} = useEnvironment();
     const [copiedHash, setCopiedHash] = useState<number | null>(null);
