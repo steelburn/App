@@ -7029,7 +7029,6 @@ Fügen Sie weitere Ausgabelimits hinzu, um den Cashflow Ihres Unternehmens zu sc
             gusto: {
                 title: 'Gusto',
                 approvalMode: 'Genehmigungsmodus',
-                finalApprover: 'Endgültige:r Genehmiger:in',
                 notSet: 'Not set',
                 approvalModeDescription: 'Members and managers are set up to sync with Gusto.',
                 approvalModeWarningTitle: 'Change approval mode?',

@@ -78,66 +78,6 @@ function updateGustoApprovalMode(policyID: string | undefined, approvalMode: Val
     write(WRITE_COMMANDS.UPDATE_GUSTO_APPROVAL_MODE, {policyID, approvalMode}, {optimisticData, successData, failureData});
 }
 
-function updateGustoFinalApprover(policyID: string | undefined, finalApprover: string | null, currentFinalApprover?: string | null) {
-    if (!policyID) {
-        return;
-    }
-
-    const previousFinalApprover = currentFinalApprover ?? null;
-    const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.POLICY>> = [
-        {
-            onyxMethod: Onyx.METHOD.MERGE,
-            key: `${ONYXKEYS.COLLECTION.POLICY}${policyID}`,
-            value: {
-                connections: {
-                    gusto: {
-                        config: {
-                            finalApprover,
-                            pendingFields: {finalApprover: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE},
-                            errorFields: {finalApprover: null},
-                        },
-                    },
-                },
-            },
-        },
-    ];
-    const successData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.POLICY>> = [
-        {
-            onyxMethod: Onyx.METHOD.MERGE,
-            key: `${ONYXKEYS.COLLECTION.POLICY}${policyID}`,
-            value: {
-                connections: {
-                    gusto: {
-                        config: {
-                            pendingFields: {finalApprover: null},
-                            errorFields: {finalApprover: null},
-                        },
-                    },
-                },
-            },
-        },
-    ];
-    const failureData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.POLICY>> = [
-        {
-            onyxMethod: Onyx.METHOD.MERGE,
-            key: `${ONYXKEYS.COLLECTION.POLICY}${policyID}`,
-            value: {
-                connections: {
-                    gusto: {
-                        config: {
-                            finalApprover: previousFinalApprover,
-                            pendingFields: {finalApprover: null},
-                            errorFields: {finalApprover: getMicroSecondOnyxErrorWithTranslationKey('common.genericErrorMessage')},
-                        },
-                    },
-                },
-            },
-        },
-    ];
-
-    write(WRITE_COMMANDS.UPDATE_GUSTO_FINAL_APPROVER, {policyID, finalApprover}, {optimisticData, successData, failureData});
-}
-
-export {updateGustoApprovalMode, updateGustoFinalApprover};
+export {updateGustoApprovalMode};
 
 export default getGustoSetupLink;

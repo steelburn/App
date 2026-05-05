@@ -1458,9 +1458,6 @@ type SettingsNavigatorParamList = {
     [SCREENS.WORKSPACE.HR_GUSTO_APPROVAL_MODE]: {
         policyID: string;
     };
-    [SCREENS.WORKSPACE.HR_GUSTO_FINAL_APPROVER]: {
-        policyID: string;
-    };
     [SCREENS.WORKSPACE.RULES_PROHIBITED_DEFAULT]: {
         policyID: string;
     };
