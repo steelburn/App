@@ -9508,7 +9508,7 @@ ${amount} para ${merchant} - ${date}`,
             subtitle: 'Seguimiento de distancia',
             button: 'Ver progreso',
             lockScreenBadgeText: 'Distancia',
-            lockScreenTrackingText: 'Seguimiento...',
+            lockScreenTrackingText: 'Rastreando...',
         },
     },
 };
