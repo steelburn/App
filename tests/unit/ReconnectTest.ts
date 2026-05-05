@@ -27,7 +27,7 @@ const AppStateMonitor: typeof AppStateMonitorType = require('@libs/AppStateMonit
 initReconnect();
 const firstCall = jest.mocked(AppStateMonitor.addBecameActiveListener).mock.calls.at(-1);
 if (!firstCall) {
-    throw new Error('AppStateMonitor.addBecameActiveListener was not called during initReconnect()');
+    throw new Error('AppStateMonitor.addBecameActiveListener was not called during Reconnect.ts module load');
 }
 const becameActiveCallback: () => void = firstCall[0];
 
