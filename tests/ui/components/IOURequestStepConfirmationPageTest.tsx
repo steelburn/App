@@ -125,7 +125,6 @@ jest.mock('@libs/Navigation/Navigation', () => {
         getTopmostReportId: jest.fn(() => undefined),
         preInsertFullscreenUnderRHP: jest.fn(),
         removePreInsertedFullscreenIfNeeded: jest.fn(),
-        getActiveRouteWithoutParams: jest.fn(() => ''),
         navigationRef: mockRef,
     };
 });
