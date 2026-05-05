@@ -92,7 +92,7 @@ function MoneyRequestHeader({reportID: reportIDProp, onBackButtonPress}: MoneyRe
     const isFromReviewDuplicates = !!route.params.backTo?.replaceAll(/\?.*/g, '').endsWith('/duplicates/review');
     const shouldDisplayTransactionNavigation = !!(reportID && isReportInRHP);
     const shouldOpenParentReportInCurrentTab = !isSelfDM(parentReport);
-    const shouldDisplayButtonsInSeparateLine = useShouldDisplayButtonsInSeparateLine() || (wideRHPRouteKeys.length > 0 && !isSmallScreenWidth);
+    const shouldDisplayButtonsInSeparateLine = useShouldDisplayButtonsInSeparateLine() && (wideRHPRouteKeys.length === 0 || isSmallScreenWidth);
 
     const getStatusIcon: (src: IconAsset) => ReactNode = (src) => (
         <Icon
