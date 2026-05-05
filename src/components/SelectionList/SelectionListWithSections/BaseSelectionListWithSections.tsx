@@ -170,6 +170,7 @@ function BaseSelectionListWithSections<TItem extends ListItem>({
             }
         }
         if (shouldUpdateFocusedIndex && typeof indexToFocus === 'number') {
+            suppressNextFocusScrollRef.current = true;
             setFocusedIndex(indexToFocus);
         }
         onSelectRow(item);
