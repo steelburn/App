@@ -10051,7 +10051,7 @@ function getMoneyRequestOptions(
     // eslint-disable-next-line @typescript-eslint/no-deprecated
     const policyOwnerAccountID = getPolicy(report?.policyID)?.ownerAccountID;
     const isPolicyOwnedByExpensifyAccounts = policyOwnerAccountID ? CONST.EXPENSIFY_ACCOUNT_IDS.includes(policyOwnerAccountID) : false;
-    if (doParticipantsIncludeExpensifyAccounts && !isPolicyOwnedByExpensifyAccounts) {
+    if (doParticipantsIncludeExpensifyAccounts && !isPolicyOwnedByExpensifyAccounts && !isPolicyExpenseChat(report) && !isExpenseReport(report)) {
         // Allow create expense option for Manager McTest report
         if (
             canRequestMoney(report, policy, otherParticipants) &&
