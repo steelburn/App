@@ -213,6 +213,43 @@ function WorkspaceOverviewPage({policyDraft, policy: policyProp, route}: Workspa
 
     const hasRulesDocument = !!policy?.rulesDocumentURL;
     const hasCustomRulesText = !StringUtils.isEmptyString(policy?.customRules ?? '');
+
+    const handleRulesDocumentPicked = useCallback(
+        (files: FileObject[]) => {
+            const file = files.at(0);
+            if (!policyID || !file) {
+                return;
+            }
+            setPendingRulesDocumentFile(file);
+        },
+        [policyID],
+    );
+
+    const getRulesDocumentMenuItems = useCallback(
+        (openPicker: (options: {onPicked: (files: FileObject[]) => void}) => void): PopoverMenuItem[] => [
+            {
+                text: translate('common.replace'),
+                icon: expensifyIcons.Upload,
+                shouldCallAfterModalHide: true,
+                onSelected: () => {
+                    openPicker({
+                        onPicked: handleRulesDocumentPicked,
+                    });
+                },
+            },
+            {
+                text: translate('common.remove'),
+                icon: expensifyIcons.Trashcan,
+                onSelected: () => {
+                    if (!policyID || !policy?.rulesDocumentURL) {
+                        return;
+                    }
+                    deletePolicyRulesDocument(policyID, policy.rulesDocumentURL);
+                },
+            },
+        ],
+        [translate, expensifyIcons, handleRulesDocumentPicked, policyID, policy?.rulesDocumentURL],
+    );
     const shouldShowExpensePolicySection = isBetaEnabled(CONST.BETAS.CUSTOM_RULES) && (isPolicyAdmin || hasRulesDocument || hasCustomRulesText);
     const shouldShowRulesDocumentSubSection = isPolicyAdmin || hasRulesDocument;
 
@@ -455,43 +492,6 @@ function WorkspaceOverviewPage({policyDraft, policy: policyProp, route}: Workspa
 
         return translate('common.leaveWorkspaceConfirmation');
     };
-
-    const handleRulesDocumentPicked = useCallback(
-        (files: FileObject[]) => {
-            const file = files.at(0);
-            if (!policyID || !file) {
-                return;
-            }
-            setPendingRulesDocumentFile(file);
-        },
-        [policyID],
-    );
-
-    const getRulesDocumentMenuItems = useCallback(
-        (openPicker: (options: {onPicked: (files: FileObject[]) => void}) => void): PopoverMenuItem[] => [
-            {
-                text: translate('common.replace'),
-                icon: expensifyIcons.Upload,
-                shouldCallAfterModalHide: true,
-                onSelected: () => {
-                    openPicker({
-                        onPicked: handleRulesDocumentPicked,
-                    });
-                },
-            },
-            {
-                text: translate('common.remove'),
-                icon: expensifyIcons.Trashcan,
-                onSelected: () => {
-                    if (!policyID || !policy?.rulesDocumentURL) {
-                        return;
-                    }
-                    deletePolicyRulesDocument(policyID, policy.rulesDocumentURL);
-                },
-            },
-        ],
-        [translate, handleRulesDocumentPicked, policyID, policy?.rulesDocumentURL],
-    );
 
     const handleInvitePress = () => {
         if (isAccountLocked) {
