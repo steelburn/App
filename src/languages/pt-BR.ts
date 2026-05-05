@@ -9156,6 +9156,11 @@ Aqui está um *comprovante de teste* para mostrar como funciona:`,
             deleteGroupDangerConfirmationModalDescription: (defaultGroupName: string) =>
                 `Tem certeza? Isso reatribuirá todos os membros ao grupo padrão (${defaultGroupName}) e não poderá ser desfeito.`,
             deleteGroupError: 'Não foi possível excluir este grupo. Tente novamente.',
+            preferredWorkspace: 'Espaço de trabalho preferido',
+            preferredWorkspaceDescription: (enabled: boolean) =>
+                `Todos os novos relatórios e despesas serão criados ${enabled ? 'no espaço de trabalho preferido selecionado' : 'neste espaço de trabalho'}.`,
+            preferredWorkspaceSelectDescription: 'Todas as novas despesas e relatórios serão criados neste espaço de trabalho.',
+            noWorkspacesMessage: 'Não há espaços de trabalho neste domínio. Um espaço de trabalho é necessário para ativar esta restrição.',
         },
     },
     proactiveAppReview: {

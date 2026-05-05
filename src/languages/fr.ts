@@ -9206,7 +9206,7 @@ Voici un *reçu test* pour vous montrer comment ça fonctionne :`,
             forceTwoFactorAuthDescription: `<muted-text>Exiger l’authentification à deux facteurs pour tous les membres de ce domaine. Les membres du domaine seront invités à configurer l’authentification à deux facteurs sur leur compte lorsqu’ils se connectent.</muted-text>`,
             forceTwoFactorAuthError: 'L’activation forcée de l’authentification à deux facteurs n’a pas pu être modifiée. Veuillez réessayer plus tard.',
             resetTwoFactorAuth: 'Réinitialiser l’authentification à deux facteurs',
-            error: 'Impossible d’enregistrer cette modification. Veuillez réessayer.',
+            error: 'Impossible d\’enregistrer cette modification. Veuillez réessayer.',
         },
         groups: {
             title: 'Groupes',
@@ -9228,6 +9228,11 @@ Voici un *reçu test* pour vous montrer comment ça fonctionne :`,
             deleteGroupDangerConfirmationModalDescription: (defaultGroupName: string) =>
                 `Êtes-vous sûr ? Cela réaffectera tous les membres au groupe par défaut (${defaultGroupName}) et ne pourra pas être annulé.`,
             deleteGroupError: 'Impossible de supprimer ce groupe. Veuillez réessayer.',
+            preferredWorkspace: 'Espace de travail préféré',
+            preferredWorkspaceDescription: (enabled: boolean) =>
+                `Tous les nouveaux rapports et dépenses seront créés dans ${enabled ? "l'espace de travail préféré sélectionné" : 'cet espace de travail'}.`,
+            preferredWorkspaceSelectDescription: 'Toutes les nouvelles dépenses et tous les nouveaux rapports seront créés dans cet espace de travail.',
+            noWorkspacesMessage: "Il n'y a aucun espace de travail sur ce domaine. Un espace de travail est requis pour activer cette restriction.",
         },
     },
     proactiveAppReview: {

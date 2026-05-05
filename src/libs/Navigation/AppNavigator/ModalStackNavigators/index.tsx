@@ -976,6 +976,7 @@ const SettingsModalStackNavigator = createModalStackNavigator<SettingsNavigatorP
     [SCREENS.DOMAIN.MEMBER_MOVE_TO_GROUP]: () => require<ReactComponentModule>('../../../../pages/domain/Members/MoveUserBetweenGroupsPage').default,
     [SCREENS.DOMAIN.GROUP_DETAILS]: () => require<ReactComponentModule>('../../../../pages/domain/Groups/DomainGroupDetailsPage').default,
     [SCREENS.DOMAIN.GROUP_EDIT_NAME]: () => require<ReactComponentModule>('../../../../pages/domain/Groups/DomainGroupEditNamePage').default,
+    [SCREENS.DOMAIN.SECURITY_GROUPS_PREFERRED_WORKSPACE]: () => require<ReactComponentModule>('../../../../pages/domain/Groups/DomainGroupPreferredWorkspacePage').default,
 });
 
 const TwoFactorAuthenticatorStackNavigator = createModalStackNavigator<EnablePaymentsNavigatorParamList>({

@@ -9198,6 +9198,10 @@ const translations = {
             deleteGroupDangerConfirmationModalDescription: (defaultGroupName: string) =>
                 `Are you sure? This will reassign all members to the default group (${defaultGroupName}) and can't be undone.`,
             deleteGroupError: 'Unable to delete this group. Please try again.',
+            preferredWorkspace: 'Preferred Workspace',
+            preferredWorkspaceDescription: (enabled: boolean) => `All new reports and expenses will be created on ${enabled ? 'selected preferred' : 'this'} workspace.`,
+            preferredWorkspaceSelectDescription: 'All new expenses and reports will be created on this workspace.',
+            noWorkspacesMessage: 'There are no workspaces on this domain. A workspace is required to enable this restriction.',
         },
     },
 };

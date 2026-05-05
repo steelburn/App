@@ -9204,6 +9204,10 @@ Hier ist ein *Testbeleg*, um dir zu zeigen, wie es funktioniert:`,
             deleteGroupDangerConfirmationModalDescription: (defaultGroupName: string) =>
                 `Bist du sicher? Dadurch werden alle Mitglieder der Standardgruppe (${defaultGroupName}) neu zugewiesen und dies kann nicht rückgängig gemacht werden.`,
             deleteGroupError: 'Diese Gruppe konnte nicht gelöscht werden. Bitte versuche es erneut.',
+            preferredWorkspace: 'Bevorzugter Arbeitsbereich',
+            preferredWorkspaceDescription: (enabled: boolean) => `Alle neuen Berichte und Ausgaben werden im ${enabled ? 'ausgewählten bevorzugten' : 'diesem'} Arbeitsbereich erstellt.`,
+            preferredWorkspaceSelectDescription: 'Alle neuen Ausgaben und Berichte werden in diesem Arbeitsbereich erstellt.',
+            noWorkspacesMessage: 'Es gibt keine Arbeitsbereiche in dieser Domain. Ein Arbeitsbereich ist erforderlich, um diese Einschränkung zu aktivieren.',
         },
     },
     proactiveAppReview: {

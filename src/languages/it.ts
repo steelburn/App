@@ -9195,6 +9195,11 @@ Ecco una *ricevuta di prova* per mostrarti come funziona:`,
             deleteGroupDangerConfirmationModalDescription: (defaultGroupName: string) =>
                 `Sei sicuro? Questo riassegnerà tutti i membri al gruppo predefinito (${defaultGroupName}) e non potrà essere annullato.`,
             deleteGroupError: 'Impossibile eliminare questo gruppo. Riprova.',
+            preferredWorkspace: 'Spazio di lavoro preferito',
+            preferredWorkspaceDescription: (enabled: boolean) =>
+                `Tutti i nuovi report e le spese verranno creati ${enabled ? 'nello spazio di lavoro preferito selezionato' : 'in questo spazio di lavoro'}.`,
+            preferredWorkspaceSelectDescription: 'Tutte le nuove spese e i report verranno creati in questo spazio di lavoro.',
+            noWorkspacesMessage: 'Non ci sono spazi di lavoro su questo dominio. È necessario uno spazio di lavoro per abilitare questa restrizione.',
         },
     },
     proactiveAppReview: {

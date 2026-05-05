@@ -9148,6 +9148,10 @@ Oto *paragon testowy*, żeby pokazać Ci, jak to działa:`,
             deleteGroupDangerConfirmationModalDescription: (defaultGroupName: string) =>
                 `Czy na pewno? Spowoduje to ponowne przypisanie wszystkich członków do domyślnej grupy (${defaultGroupName}) i nie można tego cofnąć.`,
             deleteGroupError: 'Nie udało się usunąć tej grupy. Spróbuj ponownie.',
+            preferredWorkspace: 'Preferowany obszar roboczy',
+            preferredWorkspaceDescription: (enabled: boolean) => `Wszystkie nowe raporty i wydatki będą tworzone w ${enabled ? 'wybranym preferowanym' : 'tym'} obszarze roboczym.`,
+            preferredWorkspaceSelectDescription: 'Wszystkie nowe wydatki i raporty będą tworzone w tym obszarze roboczym.',
+            noWorkspacesMessage: 'W tej domenie nie ma żadnych obszarów roboczych. Obszar roboczy jest wymagany, aby włączyć to ograniczenie.',
         },
     },
     proactiveAppReview: {

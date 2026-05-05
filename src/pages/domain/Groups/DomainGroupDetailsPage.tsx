@@ -20,6 +20,7 @@ import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
 import DefaultGroupToggle from './DefaultGroupToggle';
 import DeleteGroupRow from './DeleteGroupRow';
+import PreferredWorkspaceToggle from './PreferredWorkspaceToggle';
 import RestrictExpenseWorkspaceCreationToggle from './RestrictExpenseWorkspaceCreationToggle';
 import StrictlyEnforceWorkspaceRulesToggle from './StrictlyEnforceWorkspaceRulesToggle';
 
@@ -74,6 +75,10 @@ function DomainGroupDetailsPage({route}: DomainGroupDetailsPageProps) {
                         groupID={groupID}
                     />
                     <RestrictExpenseWorkspaceCreationToggle
+                        domainAccountID={domainAccountID}
+                        groupID={groupID}
+                    />
+                    <PreferredWorkspaceToggle
                         domainAccountID={domainAccountID}
                         groupID={groupID}
                     />
