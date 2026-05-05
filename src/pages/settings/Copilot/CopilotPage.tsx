@@ -26,6 +26,7 @@ import useLocalize from '@hooks/useLocalize';
 import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
+import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {clearDelegateErrorsByField, clearDelegatorErrors, connect, openSecuritySettingsPage, removeDelegate} from '@libs/actions/Delegate';
 import {getLatestError} from '@libs/ErrorUtils';
@@ -36,6 +37,7 @@ import {sortAlphabetically} from '@libs/OptionsListUtils';
 import {getPersonalDetailByEmail} from '@libs/PersonalDetailsUtils';
 import type {AnchorPosition} from '@styles/index';
 import colors from '@styles/theme/colors';
+import variables from '@styles/variables';
 import {close as modalClose} from '@userActions/Modal';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -48,6 +50,7 @@ function CopilotPage() {
     const icons = useMemoizedLazyExpensifyIcons(['FallbackAvatar', 'Pencil', 'ThreeDots', 'Trashcan', 'UserPlus', 'Users']);
     const illustrations = useMemoizedLazyIllustrations(['TvScreenRobot']);
     const styles = useThemeStyles();
+    const theme = useTheme();
     const {localeCompare, translate, formatPhoneNumber} = useLocalize();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     useDocumentTitle(translate('delegate.copilot'));
@@ -174,7 +177,7 @@ function CopilotPage() {
 
     const renderTitleWithRole = useCallback(
         (titleText: string, role: DelegateRole | undefined) => (
-            <View style={[styles.flexRow, styles.alignItemsCenter, styles.flexShrink1]}>
+            <View style={[styles.flexRow, styles.alignItemsCenter, styles.flexShrink1, styles.ml3]}>
                 <Text
                     style={[styles.textStrong, styles.flexShrink1]}
                     numberOfLines={1}
@@ -378,6 +381,9 @@ function CopilotPage() {
                         shouldShowBackButton={shouldUseNarrowLayout}
                         onBackButtonPress={Navigation.goBack}
                         icon={icons.Users}
+                        iconFill={theme.iconSuccessFill}
+                        iconWidth={variables.iconSizeNormal}
+                        iconHeight={variables.iconSizeNormal}
                         shouldUseHeadlineHeader
                         shouldDisplaySearchRouter
                         shouldDisplayHelpButton
