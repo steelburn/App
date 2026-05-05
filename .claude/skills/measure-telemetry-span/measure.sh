@@ -31,10 +31,18 @@ if ! [[ "$RUNS" =~ ^[0-9]+$ ]] || [[ "$RUNS" -lt 1 ]]; then
 fi
 
 REPO="$(git rev-parse --show-toplevel)"
-FLOW=$(grep -l "^# @tag[[:space:]]\+sentry-${SPAN}\$" "$REPO"/.claude/skills/agent-device/flows/*.ad 2>/dev/null | head -1 || true)
+FLOWS_DIR="$REPO/.claude/skills/agent-device/flows"
+FLOW=""
+while IFS= read -r -d '' candidate; do
+  if grep -q "^# @tag[[:space:]]\+sentry-${SPAN}\$" "$candidate" 2>/dev/null; then
+    FLOW="$candidate"
+    break
+  fi
+done < <(find "$FLOWS_DIR" -name '*.ad' -type f -print0 2>/dev/null)
+
 if [[ -z "$FLOW" ]]; then
   echo "No flow declares '@tag sentry-$SPAN'. Available:" >&2
-  grep -h '^# @tag[[:space:]]\+sentry-' "$REPO"/.claude/skills/agent-device/flows/*.ad 2>/dev/null | sed 's/.*sentry-//' | sort -u >&2
+  find "$FLOWS_DIR" -name '*.ad' -type f -exec grep -h '^# @tag[[:space:]]\+sentry-' {} + 2>/dev/null | sed 's/.*sentry-//' | sort -u >&2
   exit 1
 fi
 
@@ -146,6 +154,7 @@ measure_current_branch() {
   kill "$LOG_PID" 2>/dev/null || true
   LOG_PID=""
 
+  # Last N numeric durations: assumes one "[Sentry][<span>] Ending span (Nms)" line per measured replay (see SKILL.md Contract).
   grep "\\[Sentry\\]\\[$SPAN\\] Ending span" "$raw" | grep -oE "Ending span \(([0-9]+)ms\)" | grep -oE '[0-9]+' | tail -n "$RUNS" || true
 }
 

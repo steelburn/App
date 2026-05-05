@@ -1,14 +1,13 @@
 ---
 name: measure-telemetry-span
-description: >
-  Use when measuring a Sentry performance span locally with an agent-device replay flow on iOS simulator or Android emulator.
+description: Use when measuring a Sentry performance span locally with an agent-device replay flow on iOS simulator or Android emulator.
 argument-hint: "<span-name> [runs] [platform] [--boot]"
-allowed-tools: Bash, Read, Grep, Glob
+allowed-tools: Bash(.claude/skills/measure-telemetry-span/measure.sh) Read Grep Glob
 ---
 
 # Measure Telemetry Span
 
-**Pattern:** from repo root, run one command with a span name and platform → stdout is a small summary table (avg / min / max + sample ms list). Measures whatever Git checkout is currently checked out; no branch switching.
+**Pattern:** from repo root, run one command with a span name and platform → stdout is a small summary table (avg / min / max + sample ms list). The script measures whatever Git checkout is currently active: it never runs `git checkout` or otherwise switches branches. To compare this branch with `main` (or any other revision), check out each commit/branch in turn—or use two worktrees/clones—and run `measure.sh` separately, then compare the two printed summaries.
 
 ## Command
 
@@ -18,7 +17,7 @@ allowed-tools: Bash, Read, Grep, Glob
 
 | Argument       | Default | Description                                                                 |
 | -------------- | ------- | --------------------------------------------------------------------------- |
-| `<span-name>`  | —       | Must match `# @tag sentry-<span-name>` on a flow in `.claude/skills/agent-device/flows/`. |
+| `<span-name>`  | —       | Must match `# @tag sentry-<span-name>` on a flow anywhere under `.claude/skills/agent-device/flows/` (recursive; e.g. `flows/macros/`, `flows/tests/`). |
 | `[runs]`       | `10`    | Measured replays after **one** warmup inside the script.                    |
 | `[platform]`   | `ios`   | `ios` or `android` — must match the simulator/emulator you use.          |
 | `--boot`       | off     | Before `open`, runs `agent-device boot --platform <platform>` so a simulator/emulator is started when nothing was connected (`adb devices` empty, etc.). |
@@ -48,6 +47,16 @@ If you see **no Android device** (`adb devices` empty): append **`--boot`** to t
 - App logs: `[Sentry][<SpanName>] Ending span (<N>ms)` via `console.debug`.
 - Flow file includes `# @tag sentry-<SpanName>` (same name, case-sensitive).
 - Optional flow headers: `@reset <path.ad>` (run by the script after warmup and each measured replay); `env` keys overridable via `AD_*`.
+- **Parsing:** stats take the **last** `RUNS` matching log lines from the capture. That matches one sample per measured replay only if each replay emits **one** such line for this span name. Extra matches (duplicate logs, nested/sub-spans with the same message pattern, noisy startup logging) can shift which samples are included—fix the app logging or tighten the grep if that happens.
+
+## `@reset` and loop stability
+
+`measure.sh` replays the **same** tagged flow every iteration. Treat `@reset` as “return to a known anchor,” not a second copy of the whole scenario:
+
+- Prefer a **short** reset flow (tabs to Inbox, dismiss sheet, etc.). When agent-device splits **macros** vs **tests**, point `@reset` at a **macro** path so one file stays the source of truth.
+- If runs are flaky locally but fine for others, walk the bring-up checklist in `.claude/skills/agent-device/SKILL.md` (Metro, dev build, device boot, iOS + DevTools for `console.debug`) before blaming selectors.
+
+Optional: keep a tiny markdown table in your team notes mapping `SpanName` → one-line intent + `@pre` anchor; the span name still drives which `.ad` is picked — no need to repeat long repro prose in every chat.
 
 ## If something fails
 
