@@ -1117,6 +1117,7 @@ const translations: TranslationDeepObject<typeof en> = {
             other: (count: number) =>
                 `Potwierdź poniższe szczegóły dotyczące ${count} nowych członków przestrzeni roboczej, którzy zostaną dodani w ramach tego przesyłania. Istniejący członkowie nie otrzymają żadnych aktualizacji ról ani wiadomości z zaproszeniem.`,
         }),
+        importCompanyCardTransactionsPendingMessage: 'Nowe karty i transakcje mogą potrzebować trochę czasu, aby się pojawić, prosimy o cierpliwość.',
     },
     receipt: {
         upload: 'Prześlij paragon',
@@ -5350,7 +5351,6 @@ _Aby uzyskać bardziej szczegółowe instrukcje, [odwiedź naszą stronę pomocy
                 monthly: 'Miesięcznie',
             },
             cardDetails: 'Dane karty',
-            cardPending: ({name}: {name: string}) => `Karta jest obecnie w oczekiwaniu i zostanie wydana po zweryfikowaniu konta ${name}.`,
             virtual: 'Wirtualna',
             physical: 'Fizyczny',
             deactivate: 'Dezaktywuj kartę',
@@ -7359,6 +7359,9 @@ Dodaj więcej zasad wydatków, żeby chronić płynność finansową firmy.`,
         setReceiptRequiredAmount: (newValue: string) => `ustaw wymaganą kwotę paragonu na „${newValue}”`,
         changedReceiptRequiredAmount: (oldValue: string, newValue: string) => `zmienił(a) wymaganą kwotę paragonu na „${newValue}” (wcześniej „${oldValue}”)`,
         removedReceiptRequiredAmount: (oldValue: string) => `usunięto wymagany limit paragonu (wcześniej „${oldValue}”)`,
+        setItemizedReceiptRequiredAmount: (newValue: string) => `ustaw wymaganą kwotę z wyszczególnionego paragonu na „${newValue}”`,
+        changedItemizedReceiptRequiredAmount: (oldValue: string, newValue: string) => `zmienił wymaganą kwotę za zindeksowany paragon na „${newValue}” (wcześniej „${oldValue}”)`,
+        removedItemizedReceiptRequiredAmount: (oldValue: string) => `usunięto wymaganą kwotę z rozbitego paragonu (wcześniej „${oldValue}”)`,
         setMaxExpenseAmount: (newValue: string) => `ustaw maksymalną kwotę wydatku na „${newValue}”`,
         changedMaxExpenseAmount: (oldValue: string, newValue: string) => `zmieniono maksymalną kwotę wydatku na „${newValue}” (wcześniej „${oldValue}”)`,
         removedMaxExpenseAmount: (oldValue: string) => `usunięto maksymalną kwotę wydatku (wcześniej „${oldValue}”)`,
@@ -9139,6 +9142,11 @@ Oto *paragon testowy*, żeby pokazać Ci, jak to działa:`,
             restrictExpenseWorkspaceCreation: 'Ogranicz tworzenie/usuwanie przestrzeni roboczej wydatków',
             restrictExpenseWorkspaceCreationDescription:
                 'Uniemożliw członkom tworzenie przestrzeni roboczej wydatków lub usuwanie siebie z przestrzeni roboczej wydatków. Jest to przydatne, aby zapobiec używaniu Expensify do przesyłania raportów przeznaczonych do użytku poza Twoją domeną, w połączeniu ze ścisłym egzekwowaniem przestrzeni roboczej.',
+            deleteGroup: 'Usuń grupę',
+            deleteGroupDangerConfirmationModal: 'Usuń grupę',
+            deleteGroupDangerConfirmationModalDescription: (defaultGroupName: string) =>
+                `Czy na pewno? Spowoduje to ponowne przypisanie wszystkich członków do domyślnej grupy (${defaultGroupName}) i nie można tego cofnąć.`,
+            deleteGroupError: 'Nie udało się usunąć tej grupy. Spróbuj ponownie.',
         },
     },
     proactiveAppReview: {

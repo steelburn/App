@@ -1119,6 +1119,7 @@ const translations: TranslationDeepObject<typeof en> = {
             other: (count: number) =>
                 `Bitte bestätige die folgenden Details für die ${count} neuen Workspace-Mitglieder, die im Rahmen dieses Uploads hinzugefügt werden. Bestehende Mitglieder erhalten keine Rollenaktualisierungen oder Einladungsnachrichten.`,
         }),
+        importCompanyCardTransactionsPendingMessage: 'Neue Karten und Transaktionen können etwas Zeit benötigen, bis sie erscheinen. Bitte haben Sie etwas Geduld.',
     },
     receipt: {
         upload: 'Beleg hochladen',
@@ -5390,7 +5391,6 @@ _Für ausführlichere Anweisungen [besuchen Sie unsere Hilfeseite](${CONST.NETSU
                 monthly: 'Monatlich',
             },
             cardDetails: 'Kartendaten',
-            cardPending: ({name}: {name: string}) => `Die Karte ist derzeit ausstehend und wird ausgestellt, sobald das Konto von ${name} verifiziert wurde.`,
             virtual: 'Virtuell',
             physical: 'Physisch',
             deactivate: 'Karte deaktivieren',
@@ -7405,7 +7405,10 @@ Fügen Sie weitere Ausgabelimits hinzu, um den Cashflow Ihres Unternehmens zu sc
         },
         setReceiptRequiredAmount: (newValue: string) => `Belegpflichtigen Betrag auf „${newValue}“ festlegen`,
         changedReceiptRequiredAmount: (oldValue: string, newValue: string) => `Belegpflichtbetrag auf „${newValue}“ geändert (zuvor „${oldValue}“)`,
-        removedReceiptRequiredAmount: (oldValue: string) => `Belegpflichtigen Betrag entfernt (zuvor „${oldValue}“)`,
+        removedReceiptRequiredAmount: (oldValue: string) => `Belegpflichtigen Betrag entfernt (zuvor „${oldValue}”)`,
+        setItemizedReceiptRequiredAmount: (newValue: string) => `Betrag für Pflicht zur Einzelauflistung auf „${newValue}” festgelegt`,
+        changedItemizedReceiptRequiredAmount: (oldValue: string, newValue: string) => `erforderlichen Betrag des aufgeschlüsselten Belegs auf „${newValue}” geändert (zuvor „${oldValue}”)`,
+        removedItemizedReceiptRequiredAmount: (oldValue: string) => `Betrag für obligatorische Einzelpostenbelege entfernt (zuvor „${oldValue}”)`,
         setMaxExpenseAmount: (newValue: string) => `maximalen Ausgabenbetrag auf „${newValue}“ festlegen`,
         changedMaxExpenseAmount: (oldValue: string, newValue: string) => `hat den maximalen Ausgabenbetrag auf „${newValue}“ geändert (zuvor „${oldValue}“)`,
         removedMaxExpenseAmount: (oldValue: string) => `maximale Ausgabenhöhe entfernt (zuvor „${oldValue}“)`,
@@ -9195,6 +9198,11 @@ Hier ist ein *Testbeleg*, um dir zu zeigen, wie es funktioniert:`,
             restrictExpenseWorkspaceCreation: 'Erstellen/Entfernen von Ausgaben-Workspaces einschränken',
             restrictExpenseWorkspaceCreationDescription:
                 'Verhindert, dass Mitglieder einen Ausgaben-Workspace erstellen oder sich selbst aus einem Ausgaben-Workspace entfernen können. Dies ist nützlich, um zu verhindern, dass Personen Expensify verwenden, um Berichte für die Nutzung außerhalb deiner Domain einzureichen, wenn es mit einer strikten Workspace-Durchsetzung kombiniert wird.',
+            deleteGroup: 'Gruppe löschen',
+            deleteGroupDangerConfirmationModal: 'Gruppe löschen',
+            deleteGroupDangerConfirmationModalDescription: (defaultGroupName: string) =>
+                `Bist du sicher? Dadurch werden alle Mitglieder der Standardgruppe (${defaultGroupName}) neu zugewiesen und dies kann nicht rückgängig gemacht werden.`,
+            deleteGroupError: 'Diese Gruppe konnte nicht gelöscht werden. Bitte versuche es erneut.',
         },
     },
     proactiveAppReview: {

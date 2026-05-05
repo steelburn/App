@@ -343,7 +343,7 @@ function mergeDuplicates({
     if (optimisticTransactionThreadReportID) {
         const iouAction = getIOUActionForReportID(params.reportID, params.transactionID);
         const optimisticCreatedAction = buildOptimisticCreatedReportAction(currentUserLogin);
-        const optimisticTransactionThreadReport = buildTransactionThread(iouAction, expenseReport, undefined, optimisticTransactionThreadReportID);
+        const optimisticTransactionThreadReport = buildTransactionThread(iouAction, expenseReport, currentUserAccountID, undefined, optimisticTransactionThreadReportID);
 
         allParams.transactionThreadReportID = optimisticTransactionThreadReportID;
         allParams.createdReportActionIDForThread = optimisticCreatedAction?.reportActionID;
@@ -629,6 +629,7 @@ function createExpenseByType({
     customUnitPolicyID,
     personalDetails,
     recentWaypoints,
+    conciergeReportID,
 }: {
     transactionType: string;
     params: RequestMoneyInformation;
@@ -641,6 +642,7 @@ function createExpenseByType({
     customUnitPolicyID?: string;
     personalDetails: OnyxEntry<OnyxTypes.PersonalDetailsList>;
     recentWaypoints: OnyxEntry<OnyxTypes.RecentWaypoint[]>;
+    conciergeReportID: string | undefined;
 }) {
     switch (transactionType) {
         case CONST.SEARCH.TRANSACTION_TYPE.DISTANCE: {
@@ -687,6 +689,7 @@ function createExpenseByType({
                 },
                 hasViolations: false,
                 customUnitPolicyID,
+                conciergeReportID,
             };
             return submitPerDiemExpense(perDiemParams);
         }
@@ -716,6 +719,7 @@ type DuplicateExpenseTransactionParams = {
     targetPolicyTags: OnyxEntry<OnyxTypes.PolicyTagLists>;
     shouldPlaySound?: boolean;
     shouldDeferAutoSubmit?: boolean;
+    conciergeReportID: string | undefined;
     existingIOUReport?: OnyxEntry<OnyxTypes.Report>;
     optimisticReportPreviewActionID?: string;
     currentUserLogin: string;
@@ -743,6 +747,7 @@ function duplicateExpenseTransaction({
     targetPolicyTags,
     shouldPlaySound = true,
     shouldDeferAutoSubmit = false,
+    conciergeReportID,
     existingIOUReport,
     optimisticReportPreviewActionID: externalReportPreviewActionID,
     currentUserAccountID,
@@ -844,6 +849,7 @@ function duplicateExpenseTransaction({
         customUnitPolicyID,
         personalDetails,
         recentWaypoints,
+        conciergeReportID,
     });
 }
 
@@ -866,6 +872,7 @@ type DuplicateReportParams = {
     transactionViolations: OnyxCollection<OnyxTypes.TransactionViolation[]>;
     translate: LocalizedTranslate;
     recentWaypoints: OnyxEntry<OnyxTypes.RecentWaypoint[]>;
+    conciergeReportID: string | undefined;
     currentUserLogin: string;
     currentUserAccountID: number;
     shouldPlaySound?: boolean;
@@ -890,6 +897,7 @@ function duplicateReport({
     transactionViolations,
     translate,
     recentWaypoints,
+    conciergeReportID,
     currentUserAccountID,
     currentUserLogin,
     shouldPlaySound = true,
@@ -990,6 +998,7 @@ function duplicateReport({
             customUnitPolicyID: targetPolicy?.id,
             personalDetails,
             recentWaypoints,
+            conciergeReportID,
         });
 
         if (result?.iouReport) {
@@ -1020,6 +1029,7 @@ type BulkDuplicateExpensesParams = {
     draftTransactionIDs: string[];
     betas: OnyxEntry<OnyxTypes.Beta[]>;
     recentWaypoints: OnyxEntry<OnyxTypes.RecentWaypoint[]>;
+    conciergeReportID: string | undefined;
     currentUserLogin: string;
     currentUserAccountID: number;
 };
@@ -1042,6 +1052,7 @@ function bulkDuplicateExpenses({
     draftTransactionIDs,
     betas,
     recentWaypoints,
+    conciergeReportID,
     currentUserAccountID,
     currentUserLogin,
 }: BulkDuplicateExpensesParams) {
@@ -1136,6 +1147,7 @@ function bulkDuplicateExpenses({
             targetPolicyTags,
             shouldPlaySound: false,
             shouldDeferAutoSubmit,
+            conciergeReportID,
             existingIOUReport: optimisticIOUReport,
             optimisticReportPreviewActionID: currentReportPreviewActionID,
             currentUserAccountID,
@@ -1174,6 +1186,7 @@ type BulkDuplicateReportsParams = {
     transactionViolations: OnyxCollection<OnyxTypes.TransactionViolation[]>;
     translate: LocalizedTranslate;
     recentWaypoints: OnyxEntry<OnyxTypes.RecentWaypoint[]>;
+    conciergeReportID: string | undefined;
     currentUserLogin: string;
     currentUserAccountID: number;
 };
@@ -1198,6 +1211,7 @@ function bulkDuplicateReports({
     transactionViolations,
     translate,
     recentWaypoints,
+    conciergeReportID,
     currentUserLogin,
     currentUserAccountID,
 }: BulkDuplicateReportsParams) {
@@ -1275,6 +1289,7 @@ function bulkDuplicateReports({
             shouldPlaySound: false,
             currentUserAccountID,
             currentUserLogin,
+            conciergeReportID,
         });
     }
 

@@ -1102,6 +1102,7 @@ const translations: TranslationDeepObject<typeof en> = {
             other: (count: number) =>
                 `このアップロードで追加される${count}人の新しいワークスペースメンバーについて、以下の内容を確認してください。既存のメンバーには、ロールの更新や招待メッセージは送信されません。`,
         }),
+        importCompanyCardTransactionsPendingMessage: '新しいカードや取引が表示されるまでに少し時間がかかる場合があります。しばらくお待ちください。',
     },
     receipt: {
         upload: '領収書をアップロード',
@@ -5320,7 +5321,6 @@ _詳しい手順については、[ヘルプサイトをご覧ください](${CO
                 monthly: '毎月',
             },
             cardDetails: 'カード情報',
-            cardPending: ({name}: {name: string}) => `カードは現在保留中で、${name} さんのアカウントが認証され次第、発行されます。`,
             virtual: 'バーチャル',
             physical: '物理',
             deactivate: 'カードを無効化',
@@ -7306,6 +7306,9 @@ ${reportName}
         setReceiptRequiredAmount: (newValue: string) => `必要な領収書金額を「${newValue}」に設定`,
         changedReceiptRequiredAmount: (oldValue: string, newValue: string) => `領収書必須金額を「${newValue}」（以前は「${oldValue}」）に変更しました`,
         removedReceiptRequiredAmount: (oldValue: string) => `必須領収書金額を削除しました（以前の値：「${oldValue}」）`,
+        setItemizedReceiptRequiredAmount: (newValue: string) => `明細付き領収書の必須金額を「${newValue}」に設定しました`,
+        changedItemizedReceiptRequiredAmount: (oldValue: string, newValue: string) => `品目別レシートの必須金額を「${newValue}」（以前は「${oldValue}」）に変更しました`,
+        removedItemizedReceiptRequiredAmount: (oldValue: string) => `品目別レシートの必須金額を削除しました（以前の値：「${oldValue}」）`,
         setMaxExpenseAmount: (newValue: string) => `最大経費金額を「${newValue}」に設定`,
         changedMaxExpenseAmount: (oldValue: string, newValue: string) => `上限経費額を「${newValue}」に変更しました（以前は「${oldValue}」）`,
         removedMaxExpenseAmount: (oldValue: string) => `最大経費金額を削除しました（以前の値: 「${oldValue}」）`,
@@ -9071,6 +9074,11 @@ ${reportName}
             restrictExpenseWorkspaceCreation: '経費ワークスペースの作成／削除を制限する',
             restrictExpenseWorkspaceCreationDescription:
                 'メンバーが経費ワークスペースを作成したり、経費ワークスペースから自分自身を削除したりできないようにします。これは、厳格なワークスペース適用と組み合わせることで、ドメイン外での使用を目的としたレポートの提出に Expensify が利用されるのを防ぐのに役立ちます。',
+            deleteGroup: 'グループを削除',
+            deleteGroupDangerConfirmationModal: 'グループを削除',
+            deleteGroupDangerConfirmationModalDescription: (defaultGroupName: string) =>
+                `本当によろしいですか？これにより、すべてのメンバーがデフォルトグループ（${defaultGroupName}）に再割り当てされ、元に戻すことはできません。`,
+            deleteGroupError: 'このグループを削除できませんでした。もう一度お試しください。',
         },
     },
     proactiveAppReview: {

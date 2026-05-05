@@ -1119,6 +1119,7 @@ const translations: TranslationDeepObject<typeof en> = {
             other: (count: number) =>
                 `Conferma i dettagli riportati di seguito per i ${count} nuovi membri dello spazio di lavoro che verranno aggiunti come parte di questo caricamento. I membri già esistenti non riceveranno aggiornamenti di ruolo o messaggi di invito.`,
         }),
+        importCompanyCardTransactionsPendingMessage: 'Le nuove carte e transazioni potrebbero impiegare un po’ di tempo per apparire, attendi per favore.',
     },
     receipt: {
         upload: 'Carica ricevuta',
@@ -5370,7 +5371,6 @@ _Per istruzioni più dettagliate, [visita il nostro sito di assistenza](${CONST.
                 monthly: 'Mensile',
             },
             cardDetails: 'Dettagli carta',
-            cardPending: ({name}: {name: string}) => `La carta è al momento in sospeso e verrà emessa non appena l'account di ${name} sarà convalidato.`,
             virtual: 'Virtuale',
             physical: 'Fisico',
             deactivate: 'Disattiva carta',
@@ -7393,6 +7393,10 @@ Aggiungi altre regole di spesa per proteggere il flusso di cassa aziendale.`,
         setReceiptRequiredAmount: (newValue: string) => `imposta l’importo richiesto per la ricevuta su "${newValue}"`,
         changedReceiptRequiredAmount: (oldValue: string, newValue: string) => `ha modificato l’importo richiesto per la ricevuta in "${newValue}" (in precedenza "${oldValue}")`,
         removedReceiptRequiredAmount: (oldValue: string) => `ha rimosso l’importo richiesto per la ricevuta (in precedenza «${oldValue}»)`,
+        setItemizedReceiptRequiredAmount: (newValue: string) => `imposta l’importo richiesto per la ricevuta con voci singole su "${newValue}"`,
+        changedItemizedReceiptRequiredAmount: (oldValue: string, newValue: string) =>
+            `ha modificato l’importo richiesto per la ricevuta con voci a "${newValue}" (in precedenza "${oldValue}")`,
+        removedItemizedReceiptRequiredAmount: (oldValue: string) => `ha rimosso l’importo richiesto per la ricevuta dettagliata (precedentemente "${oldValue}")`,
         setMaxExpenseAmount: (newValue: string) => `imposta l’importo massimo della spesa su "${newValue}"`,
         changedMaxExpenseAmount: (oldValue: string, newValue: string) => `ha modificato l'importo massimo della spesa a "${newValue}" (precedentemente "${oldValue}")`,
         removedMaxExpenseAmount: (oldValue: string) => `importo massimo spesa rimosso (precedentemente "${oldValue}")`,
@@ -9185,6 +9189,11 @@ Ecco una *ricevuta di prova* per mostrarti come funziona:`,
             restrictExpenseWorkspaceCreation: 'Limita la creazione/rimozione dell’area di lavoro spese',
             restrictExpenseWorkspaceCreationDescription:
                 'Impedisci ai membri di poter creare un’area di lavoro spese o di rimuoversi da un’area di lavoro spese. Questo è utile per impedire alle persone di utilizzare Expensify per inviare report destinati a un uso al di fuori del tuo dominio, se combinato con un’applicazione rigorosa dell’area di lavoro.',
+            deleteGroup: 'Elimina gruppo',
+            deleteGroupDangerConfirmationModal: 'Elimina gruppo',
+            deleteGroupDangerConfirmationModalDescription: (defaultGroupName: string) =>
+                `Sei sicuro? Questo riassegnerà tutti i membri al gruppo predefinito (${defaultGroupName}) e non potrà essere annullato.`,
+            deleteGroupError: 'Impossibile eliminare questo gruppo. Riprova.',
         },
     },
     proactiveAppReview: {

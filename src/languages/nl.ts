@@ -1118,6 +1118,7 @@ const translations: TranslationDeepObject<typeof en> = {
             other: (count: number) =>
                 `Bevestig hieronder de gegevens voor de ${count} nieuwe werkruimteleden die als onderdeel van deze upload worden toegevoegd. Bestaande leden ontvangen geen rolupdates of uitnodigingsberichten.`,
         }),
+        importCompanyCardTransactionsPendingMessage: 'Nieuwe kaarten en transacties kunnen even duren voordat ze verschijnen, even geduld.',
     },
     receipt: {
         upload: 'Bon uploaden',
@@ -5362,7 +5363,6 @@ _Voor meer gedetailleerde instructies, [bezoek onze help-site](${CONST.NETSUITE_
                 monthly: 'Maandelijks',
             },
             cardDetails: 'Kaartgegevens',
-            cardPending: ({name}: {name: string}) => `De kaart is momenteel in behandeling en wordt uitgegeven zodra het account van ${name} is gevalideerd.`,
             virtual: 'Virtueel',
             physical: 'Fysiek',
             deactivate: 'Kaart deactiveren',
@@ -7369,6 +7369,10 @@ er bestedingsregels toe om de kasstroom van het bedrijf te beschermen.`,
         setReceiptRequiredAmount: (newValue: string) => `stel het vereiste bonbedrag in op "${newValue}"`,
         changedReceiptRequiredAmount: (oldValue: string, newValue: string) => `heeft het vereiste bonbedrag gewijzigd naar "${newValue}" (voorheen "${oldValue}")`,
         removedReceiptRequiredAmount: (oldValue: string) => `vereiste bedrag op verwijderde bon (voorheen “${oldValue}”)`,
+        setItemizedReceiptRequiredAmount: (newValue: string) => `stel het vereiste bedrag voor de gespecificeerde bon in op "${newValue}"`,
+        changedItemizedReceiptRequiredAmount: (oldValue: string, newValue: string) =>
+            `heeft het vereiste bedrag voor gespecificeerde bonnen gewijzigd naar "${newValue}" (voorheen "${oldValue}")`,
+        removedItemizedReceiptRequiredAmount: (oldValue: string) => `vereist bedrag voor gespecificeerde bon verwijderd (voorheen "${oldValue}")`,
         setMaxExpenseAmount: (newValue: string) => `maximumbedrag voor uitgave instellen op "${newValue}"`,
         changedMaxExpenseAmount: (oldValue: string, newValue: string) => `maximale onkostensom gewijzigd naar "${newValue}" (voorheen "${oldValue}")`,
         removedMaxExpenseAmount: (oldValue: string) => `maximaal bedrag voor uitgave verwijderd (voorheen "${oldValue}")`,
@@ -9158,6 +9162,11 @@ Hier is een *proefbon* om je te laten zien hoe het werkt:`,
             restrictExpenseWorkspaceCreation: 'Aanmaken/verwijderen van onkostenwerkruimte beperken',
             restrictExpenseWorkspaceCreationDescription:
                 'Voorkom dat leden een onkostenwerkruimte kunnen aanmaken of zichzelf uit een onkostenwerkruimte kunnen verwijderen. Dit is nuttig om te voorkomen dat mensen Expensify gebruiken om rapporten in te dienen voor gebruik buiten jouw domein, wanneer dit wordt gecombineerd met strikte werkruimtehandhaving.',
+            deleteGroup: 'Groep verwijderen',
+            deleteGroupDangerConfirmationModal: 'Groep verwijderen',
+            deleteGroupDangerConfirmationModalDescription: (defaultGroupName: string) =>
+                `Weet je het zeker? Dit wijst alle leden opnieuw toe aan de standaardgroep (${defaultGroupName}) en kan niet ongedaan worden gemaakt.`,
+            deleteGroupError: 'Kan deze groep niet verwijderen. Probeer het opnieuw.',
         },
     },
     proactiveAppReview: {

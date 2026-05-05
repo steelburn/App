@@ -1117,6 +1117,7 @@ const translations: TranslationDeepObject<typeof en> = {
             other: (count: number) =>
                 `Confirme os detalhes abaixo para os ${count} novos membros do workspace que serão adicionados como parte deste upload. Membros existentes não receberão nenhuma atualização de função nem mensagens de convite.`,
         }),
+        importCompanyCardTransactionsPendingMessage: 'Novos cartões e transações podem levar algum tempo para aparecer, aguarde um momento.',
     },
     receipt: {
         upload: 'Carregar recibo',
@@ -5353,7 +5354,6 @@ _Para instruções mais detalhadas, [visite nossa central de ajuda](${CONST.NETS
                 monthly: 'Mensal',
             },
             cardDetails: 'Detalhes do cartão',
-            cardPending: ({name}: {name: string}) => `O cartão está atualmente pendente e será emitido quando a conta de ${name} for validada.`,
             virtual: 'Virtual',
             physical: 'Físico',
             deactivate: 'Desativar cartão',
@@ -7361,6 +7361,9 @@ Adicione mais regras de gasto para proteger o fluxo de caixa da empresa.`,
         setReceiptRequiredAmount: (newValue: string) => `definir valor exigido do recibo como "${newValue}"`,
         changedReceiptRequiredAmount: (oldValue: string, newValue: string) => `alterou o valor obrigatório do recibo para "${newValue}" (antes "${oldValue}")`,
         removedReceiptRequiredAmount: (oldValue: string) => `removeu o valor obrigatório do recibo (antes era "${oldValue}")`,
+        setItemizedReceiptRequiredAmount: (newValue: string) => `definir o valor obrigatório do recibo detalhado como "${newValue}"`,
+        changedItemizedReceiptRequiredAmount: (oldValue: string, newValue: string) => `alterou o valor obrigatório do recibo detalhado para "${newValue}" (antes "${oldValue}")`,
+        removedItemizedReceiptRequiredAmount: (oldValue: string) => `removeu o valor exigido de recibo detalhado (antes era "${oldValue}")`,
         setMaxExpenseAmount: (newValue: string) => `definir valor máximo da despesa como "${newValue}"`,
         changedMaxExpenseAmount: (oldValue: string, newValue: string) => `alterou o valor máximo da despesa para "${newValue}" (antes "${oldValue}")`,
         removedMaxExpenseAmount: (oldValue: string) => `removeu o valor máximo de despesa (anteriormente "${oldValue}")`,
@@ -9147,6 +9150,11 @@ Aqui está um *comprovante de teste* para mostrar como funciona:`,
             restrictExpenseWorkspaceCreation: 'Restringir a criação/remoção de espaços de trabalho de despesas',
             restrictExpenseWorkspaceCreationDescription:
                 'Impede que os membros possam criar um espaço de trabalho de despesas ou se removerem de um espaço de trabalho de despesas. Isso é útil para impedir que as pessoas usem o Expensify para enviar relatórios destinados ao uso fora do seu domínio, quando combinado com a aplicação rigorosa de espaços de trabalho.',
+            deleteGroup: 'Excluir grupo',
+            deleteGroupDangerConfirmationModal: 'Excluir grupo',
+            deleteGroupDangerConfirmationModalDescription: (defaultGroupName: string) =>
+                `Tem certeza? Isso reatribuirá todos os membros ao grupo padrão (${defaultGroupName}) e não poderá ser desfeito.`,
+            deleteGroupError: 'Não foi possível excluir este grupo. Tente novamente.',
         },
     },
     proactiveAppReview: {
