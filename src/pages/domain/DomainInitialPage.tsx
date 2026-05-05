@@ -22,7 +22,7 @@ import useSingleExecution from '@hooks/useSingleExecution';
 import useThemeStyles from '@hooks/useThemeStyles';
 import useWaitForNavigation from '@hooks/useWaitForNavigation';
 import {openDomainInitialPage} from '@libs/actions/Domain';
-import {hasDomainAdminsErrors, hasDomainMembersErrors} from '@libs/DomainUtils';
+import {hasDomainAdminsErrors, hasDomainGroupsErrors, hasDomainMembersErrors} from '@libs/DomainUtils';
 import Navigation from '@libs/Navigation/Navigation';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
 import type DOMAIN_TO_RHP from '@navigation/linkingConfig/RELATIONS/DOMAIN_TO_RHP';
@@ -92,6 +92,7 @@ function DomainInitialPage({route}: DomainInitialPageProps) {
             icon: icons.Users,
             action: singleExecution(waitForNavigate(() => Navigation.navigate(ROUTES.DOMAIN_GROUPS.getRoute(domainAccountID)))),
             screenName: SCREENS.DOMAIN.GROUPS,
+            brickRoadIndicator: hasDomainGroupsErrors(domainErrors) ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined,
         },
     ];
 
