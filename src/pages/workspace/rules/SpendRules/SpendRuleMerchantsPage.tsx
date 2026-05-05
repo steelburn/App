@@ -12,7 +12,7 @@ import {useMemoizedLazyExpensifyIcons, useMemoizedLazyIllustrations} from '@hook
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
-import {clearSpendRuleFormDraft, initDraftSpendRuleMerchants, updateDraftSpendRule} from '@libs/actions/User';
+import {clearSpendRuleFormDraft, updateDraftSpendRule} from '@libs/actions/User';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
 import type {SettingsNavigatorParamList} from '@libs/Navigation/types';
 import AccessOrNotFoundWrapper from '@pages/workspace/AccessOrNotFoundWrapper';
@@ -37,14 +37,12 @@ function SpendRuleMerchantsPage({route}: SpendRuleMerchantsPageProps) {
     const merchantNames = spendRuleFormDraft?.merchantNames ?? spendRuleForm?.merchantNames ?? [];
     const merchantMatchTypes = spendRuleFormDraft?.merchantMatchTypes ?? spendRuleForm?.merchantMatchTypes ?? [];
 
-    useEffect(() => {
-        initDraftSpendRuleMerchants(spendRuleForm?.merchantNames ?? [], spendRuleForm?.merchantMatchTypes ?? []);
-
-        return () => {
+    useEffect(
+        () => () => {
             clearSpendRuleFormDraft();
-        };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+        },
+        [],
+    );
 
     const emptyStateTitle =
         restrictionAction === CONST.SPEND_RULES.ACTION.BLOCK ? translate('workspace.rules.spendRules.noBlockedMerchants') : translate('workspace.rules.spendRules.noAllowedMerchants');

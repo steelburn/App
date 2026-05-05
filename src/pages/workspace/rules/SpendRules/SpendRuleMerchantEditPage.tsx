@@ -1,5 +1,5 @@
 import {useNavigation} from '@react-navigation/native';
-import React, {useCallback, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {View} from 'react-native';
 import type {ValueOf} from 'type-fest';
 import FormProvider from '@components/Form/FormProvider';
@@ -38,10 +38,11 @@ function SpendRuleMerchantEditPage({route}: SpendRuleMerchantEditPageProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
     const {inputCallbackRef} = useAutoFocusInput();
+    const [spendRuleForm] = useOnyx(ONYXKEYS.FORMS.SPEND_RULE_FORM);
     const [spendRuleFormDraft] = useOnyx(ONYXKEYS.FORMS.SPEND_RULE_FORM_DRAFT);
 
-    const merchantNames = spendRuleFormDraft?.merchantNames ?? [];
-    const merchantMatchTypes = spendRuleFormDraft?.merchantMatchTypes ?? [];
+    const merchantNames = spendRuleFormDraft?.merchantNames ?? spendRuleForm?.merchantNames ?? [];
+    const merchantMatchTypes = spendRuleFormDraft?.merchantMatchTypes ?? spendRuleForm?.merchantMatchTypes ?? [];
     const isNew = merchantIndex === ROUTES.NEW;
     const index = isNew ? -1 : Number(merchantIndex);
     const existingMerchantName = isNew ? undefined : merchantNames.at(index);
@@ -49,13 +50,20 @@ function SpendRuleMerchantEditPage({route}: SpendRuleMerchantEditPageProps) {
 
     const [merchantName, setMerchantName] = useState(existingMerchantName ?? '');
     const [matchType, setMatchType] = useState<ValueOf<typeof CONST.SEARCH.SYNTAX_OPERATORS>>(existingMerchantMatchType ?? CONST.SEARCH.SYNTAX_OPERATORS.CONTAINS);
-    const didSaveRef = useRef(false);
+    const [isSaved, setIsSaved] = useState(false);
 
     const goBack = useCallback(() => navigation.goBack(), [navigation]);
 
+    useEffect(() => {
+        if (!isSaved) {
+            return;
+        }
+        goBack();
+    }, [isSaved, goBack]);
+
     useDiscardChangesConfirmation({
         getHasUnsavedChanges: () => {
-            if (didSaveRef.current) {
+            if (isSaved) {
                 return false;
             }
             return merchantName !== (existingMerchantName ?? '') || matchType !== (existingMerchantMatchType ?? CONST.SEARCH.SYNTAX_OPERATORS.CONTAINS);
@@ -63,7 +71,6 @@ function SpendRuleMerchantEditPage({route}: SpendRuleMerchantEditPageProps) {
     });
 
     const submit = () => {
-        didSaveRef.current = true;
         const trimmedMerchantName = merchantName.trim();
         if (!trimmedMerchantName) {
             if (!isNew) {
@@ -71,7 +78,7 @@ function SpendRuleMerchantEditPage({route}: SpendRuleMerchantEditPageProps) {
                 const updatedMerchantMatchTypes = merchantMatchTypes.filter((_, merchantArrayIndex) => merchantArrayIndex !== index);
                 updateSpendRuleFormDraft({merchantNames: updatedMerchantNames, merchantMatchTypes: updatedMerchantMatchTypes});
             }
-            goBack();
+            setIsSaved(true);
             return;
         }
 
@@ -83,7 +90,7 @@ function SpendRuleMerchantEditPage({route}: SpendRuleMerchantEditPageProps) {
             ? [...merchantMatchTypes, matchType]
             : merchantMatchTypes.map((type, merchantArrayIndex) => (merchantArrayIndex === index ? matchType : type));
         updateSpendRuleFormDraft({merchantNames: updatedMerchantNames, merchantMatchTypes: updatedMerchantMatchTypes});
-        goBack();
+        setIsSaved(true);
     };
 
     const matchTypeItems: MatchTypeItem[] = [
