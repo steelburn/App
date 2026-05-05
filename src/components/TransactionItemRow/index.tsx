@@ -151,7 +151,6 @@ type TransactionItemRowProps = {
     policyForMovingExpenses?: Policy;
     nonPersonalAndWorkspaceCards?: CardList;
     isActionColumnWide?: boolean;
-    shouldRemoveTotalColumnFlex?: boolean;
     /** Callbacks for inline cell editing */
     onEditDate?: (newDate: string) => void;
     onEditMerchant?: (newMerchant: string) => void;
@@ -222,7 +221,6 @@ function TransactionItemRow({
     isLargeScreenWidth: isLargeScreenWidthProp,
     policyForMovingExpenses,
     isActionColumnWide: isActionColumnWideProp,
-    shouldRemoveTotalColumnFlex,
     onEditDate,
     onEditMerchant,
     onEditDescription,
@@ -593,7 +591,7 @@ function TransactionItemRow({
                 return (
                     <View
                         key={column}
-                        style={[StyleUtils.getReportTableColumnStyles(CONST.SEARCH.TABLE_COLUMNS.TOTAL_AMOUNT, {isAmountColumnWide, shouldRemoveTotalColumnFlex})]}
+                        style={[StyleUtils.getReportTableColumnStyles(CONST.SEARCH.TABLE_COLUMNS.TOTAL_AMOUNT, {isAmountColumnWide})]}
                     >
                         <TotalCell
                             transactionItem={transactionItem}
@@ -608,7 +606,7 @@ function TransactionItemRow({
                 return (
                     <View
                         key={column}
-                        style={[StyleUtils.getReportTableColumnStyles(CONST.SEARCH.TABLE_COLUMNS.TOTAL_PER_ATTENDEE, {isAmountColumnWide, shouldRemoveTotalColumnFlex})]}
+                        style={[StyleUtils.getReportTableColumnStyles(CONST.SEARCH.TABLE_COLUMNS.TOTAL_PER_ATTENDEE, {isAmountColumnWide})]}
                     >
                         {shouldShowAttendees && (
                             <AmountCell
@@ -623,7 +621,7 @@ function TransactionItemRow({
                 return (
                     <View
                         key={column}
-                        style={[StyleUtils.getReportTableColumnStyles(CONST.SEARCH.TABLE_COLUMNS.ORIGINAL_AMOUNT, {isAmountColumnWide, shouldRemoveTotalColumnFlex})]}
+                        style={[StyleUtils.getReportTableColumnStyles(CONST.SEARCH.TABLE_COLUMNS.ORIGINAL_AMOUNT, {isAmountColumnWide})]}
                     >
                         <AmountCell
                             total={getOriginalAmountForDisplay(transactionItem, isExpenseReport(transactionItem.report))}
@@ -636,7 +634,8 @@ function TransactionItemRow({
                 const hasConvertedAmount = transactionItem.convertedAmount != null;
                 // Offline expenses don't have a BE-computed convertedAmount yet — fall back to the unconverted
                 // amount in the transaction's own currency so users don't see a misleading $0.00 placeholder.
-                const totalAmount = hasConvertedAmount ? getConvertedAmount(transactionItem, isFromExpenseReport, false, true) : getAmount(transactionItem, isFromExpenseReport, false, true);
+                // Pass isFromExpenseReport so IOU reports stay positive while expense reports get NewDot's signed display.
+                const totalAmount = hasConvertedAmount ? getConvertedAmount(transactionItem, isFromExpenseReport) : getAmount(transactionItem, isFromExpenseReport);
                 // When converted, display in the report's output currency; otherwise use the transaction's own currency.
                 const totalCurrency = hasConvertedAmount ? (report?.currency ?? policy?.outputCurrency ?? getCurrency(transactionItem)) : getCurrency(transactionItem);
                 return (
@@ -841,7 +840,6 @@ function TransactionItemRow({
                                     disabled={isDisabled}
                                     onPress={() => onRadioButtonPress?.(transactionItem.transactionID)}
                                     accessibilityLabel={CONST.ROLE.RADIO}
-                                    shouldUseNewStyle
                                 />
                             </View>
                         )}
@@ -861,7 +859,7 @@ function TransactionItemRow({
                 {!!shouldShowBottomBorder && (
                     <View style={bgActiveStyles}>
                         <View style={styles.ph3}>
-                            <View style={[StyleUtils.getSelectedBorderBottomStyle(isSelected)]} />
+                            <View style={[styles.borderBottom]} />
                         </View>
                     </View>
                 )}
@@ -897,7 +895,6 @@ function TransactionItemRow({
                                 disabled={isDisabled}
                                 onPress={() => onRadioButtonPress?.(transactionItem.transactionID)}
                                 accessibilityLabel={CONST.ROLE.RADIO}
-                                shouldUseNewStyle
                             />
                         </View>
                     )}
@@ -936,7 +933,7 @@ function TransactionItemRow({
             {!!shouldShowBottomBorder && (
                 <View style={bgActiveStyles}>
                     <View style={styles.ph3}>
-                        <View style={[StyleUtils.getSelectedBorderBottomStyle(isSelected)]} />
+                        <View style={styles.borderBottom} />
                     </View>
                 </View>
             )}

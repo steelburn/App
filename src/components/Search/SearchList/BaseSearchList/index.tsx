@@ -56,7 +56,7 @@ function BaseSearchList({
         onFocusedIndexChange: (index: number) => {
             scrollToIndex?.(index);
         },
-        ...(!hasKeyBeenPressed.current && {setHasKeyBeenPressed}),
+        setHasKeyBeenPressed,
         isFocused,
         captureOnInputs: false,
     });

@@ -36,10 +36,10 @@ import type {PlatformStackRouteProp} from '@libs/Navigation/PlatformStackNavigat
 import {
     getFirstVisibleReportActionID,
     getReportActionMessage,
-    getSortedReportActions,
     isConsecutiveActionMadeByPreviousActor,
     isCurrentActionUnread,
     isDeletedParentAction,
+    isNewerReportAction,
     isReportPreviewAction,
     isReversedTransaction,
     isSentMoneyReportAction,
@@ -209,14 +209,28 @@ function ReportActionsList({
     const isMoneyRequestOrInvoiceReport = useMemo(() => isMoneyRequestReport(report) || isInvoiceReport(report), [report]);
     const shouldFocusToTopOnMount = useMemo(() => isTransactionThreadReport || isMoneyRequestOrInvoiceReport, [isMoneyRequestOrInvoiceReport, isTransactionThreadReport]);
     const renderedVisibleReportActions = useMemo(() => {
-        if (!draftReportAction || sortedVisibleReportActions.some((action) => action.reportActionID === draftReportAction.reportActionID)) {
+        if (!draftReportAction) {
             return sortedVisibleReportActions;
         }
 
-        return getSortedReportActions([...sortedVisibleReportActions, draftReportAction], true);
+        // Insert the synthetic draft into the already-descending render list without treating it as a persisted report action.
+        for (const [index, action] of sortedVisibleReportActions.entries()) {
+            if (action.reportActionID === draftReportAction.reportActionID) {
+                return sortedVisibleReportActions;
+            }
+            if (isNewerReportAction(draftReportAction, action)) {
+                const visibleReportActionsWithDraft = [...sortedVisibleReportActions];
+                visibleReportActionsWithDraft.splice(index, 0, draftReportAction);
+                return visibleReportActionsWithDraft;
+            }
+        }
+
+        const visibleReportActionsWithDraft = [...sortedVisibleReportActions];
+        visibleReportActionsWithDraft.push(draftReportAction);
+        return visibleReportActionsWithDraft;
     }, [draftReportAction, sortedVisibleReportActions]);
     const draftMessageHTML = draftReportAction ? getReportActionMessage(draftReportAction)?.html : undefined;
-    const isSyntheticDraftVisible = !!draftReportAction && !sortedVisibleReportActions.some((action) => action.reportActionID === draftReportAction.reportActionID);
+    const isSyntheticDraftVisible = !!draftReportAction && renderedVisibleReportActions !== sortedVisibleReportActions;
     const draftAutoScrollKey = isSyntheticDraftVisible ? `${draftReportAction.reportActionID}:${draftMessageHTML ?? ''}` : '';
     const previousDraftAutoScrollKey = usePrevious(draftAutoScrollKey);
     const topReportAction = renderedVisibleReportActions.at(-1);
@@ -276,12 +290,12 @@ function ReportActionsList({
     }, [reportLastReadTime]);
 
     useEffect(() => {
-        if (!draftReportAction || !sortedVisibleReportActions.some((action) => action.reportActionID === draftReportAction.reportActionID)) {
+        if (!draftReportAction || isSyntheticDraftVisible) {
             return;
         }
 
         clearDraft();
-    }, [clearDraft, draftReportAction, sortedVisibleReportActions]);
+    }, [clearDraft, draftReportAction, isSyntheticDraftVisible]);
 
     const prevUnreadMarkerReportActionID = useRef<string | null>(null);
 
@@ -721,7 +735,7 @@ function ReportActionsList({
         return isExpenseReport(report) || isIOUReport(report) || isInvoiceReport(report);
     }, [parentReportAction, renderedVisibleReportActions, report]);
 
-    // Precompute a reportActionID → index map so renderItem can resolve the real index in O(1)
+    // Precompute a reportActionID -> index map so renderItem can resolve the real index in O(1)
     // instead of scanning renderedVisibleReportActions with indexOf on every render.
     const actionIndexMap = useMemo(() => {
         const map = new Map<string, number>();

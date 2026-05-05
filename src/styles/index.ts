@@ -1747,7 +1747,7 @@ const staticStyles = (theme: ThemeColors) =>
             backgroundColor: theme.success,
             height: variables.componentSizeLarge,
             width: variables.componentSizeLarge,
-            borderRadius: 999,
+            borderRadius: variables.componentBorderRadiusCircle,
             alignItems: 'center',
             justifyContent: 'center',
             boxShadow: theme.shadow,
@@ -1757,7 +1757,7 @@ const staticStyles = (theme: ThemeColors) =>
             backgroundColor: theme.buttonDefaultBG,
             height: variables.componentSizeLarge,
             width: variables.componentSizeLarge,
-            borderRadius: 999,
+            borderRadius: variables.componentBorderRadiusCircle,
             alignItems: 'center',
             justifyContent: 'center',
         },
@@ -2931,10 +2931,6 @@ const staticStyles = (theme: ThemeColors) =>
             borderRadius: variables.componentBorderRadiusLarge,
         },
 
-        sectionSelectCircle: {
-            backgroundColor: theme.cardBG,
-        },
-
         sectionMenuItemTopDescription: {
             ...spacing.ph8,
             ...spacing.mhn8,
@@ -2959,23 +2955,6 @@ const staticStyles = (theme: ThemeColors) =>
 
         trialBannerBackgroundColor: {
             backgroundColor: theme.trialBannerBackgroundColor,
-        },
-
-        selectCircle: {
-            width: variables.componentSizeSmall,
-            height: variables.componentSizeSmall,
-            borderColor: theme.bordersBold,
-            borderWidth: 1,
-            borderRadius: variables.componentSizeSmall / 2,
-            justifyContent: 'center',
-            alignItems: 'center',
-            backgroundColor: theme.componentBG,
-            marginLeft: 8,
-        },
-
-        optionSelectCircle: {
-            borderRadius: variables.componentSizeSmall / 2 + 1,
-            padding: 1,
         },
 
         unreadIndicatorContainer: {
@@ -3126,28 +3105,6 @@ const staticStyles = (theme: ThemeColors) =>
             justifyContent: 'center',
             alignItems: 'center',
             backgroundColor: theme.appBG,
-        },
-
-        radioButtonContainer: {
-            backgroundColor: theme.componentBG,
-            borderRadius: 14,
-            height: 28,
-            width: 28,
-            borderColor: theme.bordersBold,
-            borderWidth: 1,
-            justifyContent: 'center',
-            alignItems: 'center',
-        },
-
-        newRadioButtonContainer: {
-            backgroundColor: theme.componentBG,
-            borderRadius: variables.componentBorderRadiusRounded,
-            height: variables.iconSizeNormal,
-            width: variables.iconSizeNormal,
-            borderColor: theme.bordersBold,
-            borderWidth: 2,
-            justifyContent: 'center',
-            alignItems: 'center',
         },
 
         toggleSwitchLockIcon: {
@@ -4986,13 +4943,6 @@ const staticStyles = (theme: ThemeColors) =>
             ...objectFit.oFCover,
         },
 
-        singleOptionSelectorRow: {
-            ...flex.flexRow,
-            ...flex.alignItemsCenter,
-            gap: 12,
-            marginBottom: 16,
-        },
-
         holdRequestInline: {
             ...headlineFont,
             ...whiteSpace.preWrap,
@@ -5180,10 +5130,6 @@ const staticStyles = (theme: ThemeColors) =>
 
         checkboxWithLabelCheckboxStyle: {
             marginLeft: -2,
-        },
-
-        singleOptionSelectorCircle: {
-            borderColor: theme.icon,
         },
 
         headerProgressBarContainer: {
