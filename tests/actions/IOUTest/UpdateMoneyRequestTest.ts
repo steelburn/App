@@ -924,6 +924,128 @@ describe('actions/IOU/UpdateMoneyRequest', () => {
             expect(updatedRecentWaypoints?.[0]?.keyForList).toBe('waypoint_validated');
         });
 
+        it('should preserve distance rate when editing an unreported distance expense from a non-default policy', async () => {
+            // Given an unreported distance expense whose customUnitRateID belongs to a workspace policy (not the default)
+            const transactionID = 'distance_unreported_001';
+            const transactionThreadReportID = 'threadReport_unreported';
+            const parentReportID = RORY_ACCOUNT_ID.toString();
+            const defaultPolicyID = 'default_policy_100';
+            const workspacePolicyID = 'workspace_policy_200';
+            const customUnitID = 'distance_unit_1';
+            const customUnitRateID = 'rate_abc';
+
+            const fakeWaypoints = {
+                waypoint0: {
+                    keyForList: 'Start_1735023533854',
+                    lat: 37.7886378,
+                    lng: -122.4033442,
+                    address: 'Start, San Francisco, CA',
+                    name: 'Start',
+                },
+                waypoint1: {
+                    keyForList: 'End_1735023537514',
+                    lat: 37.8077876,
+                    lng: -122.4752007,
+                    address: 'End, San Francisco, CA',
+                    name: 'End',
+                },
+            };
+
+            // The unreported transaction belongs to the workspace policy's distance rate
+            const fakeTransaction: Transaction = {
+                transactionID,
+                amount: 10000,
+                currency: CONST.CURRENCY.USD,
+                created: format(new Date(), CONST.DATE.FNS_FORMAT_STRING),
+                merchant: 'Distance',
+                reportID: CONST.REPORT.UNREPORTED_REPORT_ID,
+                comment: {
+                    type: CONST.TRANSACTION.TYPE.CUSTOM_UNIT,
+                    customUnit: {
+                        name: CONST.CUSTOM_UNITS.NAME_DISTANCE,
+                        customUnitRateID,
+                    },
+                    waypoints: fakeWaypoints,
+                },
+            };
+
+            // Default policy does NOT have the distance rate
+            const defaultPolicy: Policy = {
+                ...createRandomPolicy(Number(defaultPolicyID)),
+                id: defaultPolicyID,
+                customUnits: {},
+            };
+
+            // Workspace policy owns the distance rate
+            const workspacePolicy: Policy = {
+                ...createRandomPolicy(Number(workspacePolicyID)),
+                id: workspacePolicyID,
+                customUnits: {
+                    [customUnitID]: {
+                        customUnitID,
+                        name: CONST.CUSTOM_UNITS.NAME_DISTANCE,
+                        enabled: true,
+                        attributes: {unit: CONST.CUSTOM_UNITS.DISTANCE_UNIT_MILES},
+                        rates: {
+                            [customUnitRateID]: {
+                                customUnitRateID,
+                                rate: 6550,
+                                currency: CONST.CURRENCY.USD,
+                                enabled: true,
+                                name: 'Default Rate',
+                            },
+                        },
+                    },
+                },
+            };
+
+            const transactionThreadReport = {
+                reportID: transactionThreadReportID,
+                parentReportID,
+                type: CONST.REPORT.TYPE.EXPENSE,
+                chatType: CONST.REPORT.CHAT_TYPE.SELF_DM,
+            } as Report;
+            const parentReport = {
+                reportID: parentReportID,
+                type: CONST.REPORT.TYPE.CHAT,
+                chatType: CONST.REPORT.CHAT_TYPE.SELF_DM,
+            } as Report;
+
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`, fakeTransaction);
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}${defaultPolicyID}`, defaultPolicy);
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.POLICY}${workspacePolicyID}`, workspacePolicy);
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT}${transactionThreadReportID}`, transactionThreadReport);
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT}${parentReportID}`, parentReport);
+
+            mockFetch?.pause?.();
+
+            // When editing the distance on this unreported expense, passing the default policy
+            updateMoneyRequestDistance({
+                transaction: fakeTransaction,
+                transactionThreadReport,
+                parentReport,
+                waypoints: fakeWaypoints,
+                recentWaypoints: [],
+                distance: 8000,
+                policy: defaultPolicy,
+                policyTagList: undefined,
+                policyCategories: undefined,
+                transactionBackup: fakeTransaction,
+                currentUserAccountIDParam: RORY_ACCOUNT_ID,
+                currentUserEmailParam: RORY_EMAIL,
+                isASAPSubmitBetaEnabled: false,
+                parentReportNextStep: undefined,
+            });
+
+            mockFetch?.resume?.();
+
+            await waitForBatchedUpdates();
+
+            // Then the transaction should still reference the workspace policy's rate, not the default policy's
+            const updatedTransaction = await getOnyxValue(`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`);
+            expect(updatedTransaction?.comment?.customUnit?.customUnitRateID).toBe(customUnitRateID);
+        });
+
         it('should handle complete distance expense workflow with multiple waypoint updates', async () => {
             // Scenario: User creates a distance expense, then updates waypoints multiple times before submitting
             const transactionID = 'distance_expense_001';
