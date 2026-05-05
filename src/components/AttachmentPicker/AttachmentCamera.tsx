@@ -26,23 +26,6 @@ import CameraPermission from '@pages/iou/request/step/IOURequestStepScan/CameraP
 import variables from '@styles/variables';
 import CONST from '@src/CONST';
 
-// Module-level ref for camera focus — avoids "Cannot access refs during render" from React Compiler.
-// The ref is set via useEffect when the component mounts, and read only in event handlers.
-let activeCameraInstance: Camera | null = null;
-
-function focusCameraAtPoint(point: Point) {
-    if (!activeCameraInstance) {
-        return;
-    }
-
-    activeCameraInstance.focus(point).catch((error: Record<string, unknown>) => {
-        if (error.message === '[unknown/unknown] Cancelled by another startFocusAndMetering()') {
-            return;
-        }
-        Log.warn('Error focusing camera', error);
-    });
-}
-
 type CapturedPhoto = {
     uri: string;
     fileName: string;
@@ -100,18 +83,22 @@ function AttachmentCamera({isVisible, onCapture, onClose}: AttachmentCameraProps
         transform: [{translateX: focusIndicatorPosition.get().x}, {translateY: focusIndicatorPosition.get().y}, {scale: focusIndicatorScale.get()}],
     }));
 
-    useEffect(() => {
-        activeCameraInstance = cameraRef.current;
-        return () => {
-            activeCameraInstance = null;
-        };
-    });
+    const focusCamera = useCallback((point: Point) => {
+        if (!cameraRef.current) {
+            return;
+        }
+
+        cameraRef.current.focus(point).catch((error: Record<string, unknown>) => {
+            if (error.message === '[unknown/unknown] Cancelled by another startFocusAndMetering()') {
+                return;
+            }
+            Log.warn('Error focusing camera', error);
+        });
+    }, []);
 
     const tapGesture = Gesture.Tap()
         .enabled(device?.supportsFocus ?? false)
         .onStart((ev: {x: number; y: number}) => {
-            'worklet';
-
             const point = {x: ev.x, y: ev.y};
 
             focusIndicatorOpacity.set(withSequence(withTiming(0.8, {duration: 250}), withDelay(1000, withTiming(0, {duration: 250}))));
@@ -119,7 +106,7 @@ function AttachmentCamera({isVisible, onCapture, onClose}: AttachmentCameraProps
             focusIndicatorScale.set(withSpring(1, {damping: 10, stiffness: 200}));
             focusIndicatorPosition.set(point);
 
-            scheduleOnRN(focusCameraAtPoint, point);
+            scheduleOnRN(focusCamera, point);
         });
 
     // Permission management
@@ -230,7 +217,7 @@ function AttachmentCamera({isVisible, onCapture, onClose}: AttachmentCameraProps
             supportedOrientations={['portrait']}
             statusBarTranslucent
         >
-            <View style={[styles.flex1, {backgroundColor: theme.appBG, paddingTop: insets.top, paddingBottom: insets.bottom, paddingLeft: insets.left, paddingRight: insets.right}]}>
+            <View style={[styles.flex1, {backgroundColor: theme.appBG}, StyleUtils.getPlatformSafeAreaPadding(insets)]}>
                 {/* Close button */}
                 <View style={[styles.flexRow, styles.justifyContentEnd, styles.ph3, styles.pv2]}>
                     <PressableWithFeedback

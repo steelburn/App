@@ -54,14 +54,23 @@ type LocalCopy = {
     type: string | null;
 };
 
-type Item = {
-    /** The icon associated with the item. */
-    icon: IconAsset;
-    /** The key in the translations file to use for the title */
-    textTranslationKey: TranslationPaths;
-    /** Function to call when the user clicks the item */
-    pickAttachment: () => Promise<Asset[] | void | LocalCopy[]>;
-};
+type Item =
+    | {
+          /** The icon associated with the item. */
+          icon: IconAsset;
+          /** The key in the translations file to use for the title */
+          textTranslationKey: TranslationPaths;
+          /** Function to call when the user clicks the item */
+          pickAttachment: () => Promise<Asset[] | void | LocalCopy[]>;
+      }
+    | {
+          /** The icon associated with the item. */
+          icon: IconAsset;
+          /** The key in the translations file to use for the title */
+          textTranslationKey: TranslationPaths;
+          /** Direct action that doesn't go through the promise-based selectItem flow */
+          onPress: () => void;
+      };
 
 /**
  * Ensures asset has proper fileName and type properties
@@ -174,19 +183,18 @@ function AttachmentPicker({
 
     /**
      * Launch the in-app VisionCamera instead of the external system camera.
-     * Shows the camera modal and returns a never-resolving promise so the
-     * selectItem flow stays suspended. handleCameraCapture / handleCameraClose
-     * (defined after pickAttachment) take over from here.
+     * Opens the camera modal directly — bypasses the promise-based selectItem flow.
+     * handleCameraCapture / handleCameraClose handle completion.
      */
-    const launchInAppCamera = useCallback((): Promise<Asset[] | void> => {
+    const launchInAppCamera = useCallback(() => {
+        onOpenPicker?.();
         setShowAttachmentCamera(true);
-        return new Promise<Asset[] | void>(() => {});
-    }, []);
+    }, [onOpenPicker]);
 
     /**
      * Common image picker handling
      *
-     * @param {function} imagePickerFunc - RNImagePicker.launchCamera or RNImagePicker.launchImageLibrary
+     * @param {function} imagePickerFunc - RNImagePicker.launchImageLibrary
      */
     const showImagePicker = useCallback(
         (imagePickerFunc: (options: CameraOptions, callback: Callback) => Promise<ImagePickerResponse>): Promise<Asset[] | void> =>
@@ -349,7 +357,7 @@ function AttachmentPicker({
             data.unshift({
                 icon: icons.Camera,
                 textTranslationKey: 'attachmentPicker.takePhoto',
-                pickAttachment: launchInAppCamera,
+                onPress: launchInAppCamera,
             });
         }
 
@@ -537,6 +545,14 @@ function AttachmentPicker({
      */
     const selectItem = useCallback(
         (item: Item) => {
+            /* Items with onPress (e.g. in-app camera) handle their own flow
+             * and don't go through the promise-based pickAttachment chain. */
+            if ('onPress' in item) {
+                close();
+                item.onPress();
+                return;
+            }
+
             onOpenPicker?.();
             /* setTimeout delays execution to the frame after the modal closes
              * without this on iOS closing the modal closes the gallery/camera as well */
