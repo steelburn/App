@@ -118,7 +118,6 @@ import {
     getWorkspaceNameUpdatedMessage,
     hasActionWithErrorsForTransaction,
     hasEmptyReportsForPolicy,
-    hasPendingReportRetract,
     hasReceiptError,
     hasSmartscanError,
     hasVisibleReportFieldViolations,
@@ -5320,20 +5319,6 @@ describe('ReportUtils', () => {
 
         it('should return false when pendingFields exists but preview is not DELETE', () => {
             expect(isReportPendingDelete({pendingFields: {preview: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE}})).toBe(false);
-        });
-    });
-
-    describe('hasPendingReportRetract', () => {
-        it('should return true when pendingFields.hasReportBeenRetracted is UPDATE', () => {
-            expect(hasPendingReportRetract({pendingFields: {hasReportBeenRetracted: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE}})).toBe(true);
-        });
-
-        it('should return false when only pendingFields.nextStep is UPDATE', () => {
-            expect(hasPendingReportRetract({pendingFields: {nextStep: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE}})).toBe(false);
-        });
-
-        it('should return false for undefined report', () => {
-            expect(hasPendingReportRetract(undefined)).toBe(false);
         });
     });
 
