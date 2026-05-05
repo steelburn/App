@@ -284,6 +284,7 @@ function BaseSelectionListWithSections<TItem extends ListItem>({
         shouldUpdateFocusedIndex,
         scrollToIndex,
         setFocusedIndex,
+        focusedIndex,
         firstFocusableIndex,
         suppressNextFocusScroll,
     });

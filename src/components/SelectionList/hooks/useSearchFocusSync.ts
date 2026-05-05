@@ -27,6 +27,9 @@ type UseSearchFocusSyncParams<TItem extends ListItem, TData = TItem> = {
     /** Function to set the focused index */
     setFocusedIndex: (index: number) => void;
 
+    /** The current focused index — needed to avoid arming scroll suppression when the index won't actually change */
+    focusedIndex?: number;
+
     /** The first focusable index in the list (useful when index 0 is a header). Defaults to 0. */
     firstFocusableIndex?: number;
 
@@ -50,6 +53,7 @@ function useSearchFocusSync<TItem extends ListItem, TData = TItem>({
     shouldUpdateFocusedIndex,
     scrollToIndex,
     setFocusedIndex,
+    focusedIndex,
     firstFocusableIndex = 0,
     suppressNextFocusScroll,
 }: UseSearchFocusSyncParams<TItem, TData>) {
@@ -76,7 +80,9 @@ function useSearchFocusSync<TItem extends ListItem, TData = TItem>({
 
             if (foundSelectedItemIndex !== -1 && !canSelectMultiple) {
                 scrollToIndex(foundSelectedItemIndex, false);
-                suppressNextFocusScroll?.();
+                if (foundSelectedItemIndex !== focusedIndex) {
+                    suppressNextFocusScroll?.();
+                }
                 setFocusedIndex(foundSelectedItemIndex);
                 return;
             }
@@ -96,7 +102,9 @@ function useSearchFocusSync<TItem extends ListItem, TData = TItem>({
 
         // Scroll to top of list and focus on first focusable item (not header)
         scrollToIndex(0, false);
-        suppressNextFocusScroll?.();
+        if (firstFocusableIndex !== focusedIndex) {
+            suppressNextFocusScroll?.();
+        }
         setFocusedIndex(firstFocusableIndex);
     }, [
         canSelectMultiple,
@@ -110,6 +118,7 @@ function useSearchFocusSync<TItem extends ListItem, TData = TItem>({
         shouldUpdateFocusedIndex,
         searchValue,
         isItemSelected,
+        focusedIndex,
         firstFocusableIndex,
         suppressNextFocusScroll,
     ]);
