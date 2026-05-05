@@ -153,7 +153,7 @@ function useOdometerReadingsState({currentTransaction, isEditing, selectedTab, i
             const endValue = currentEnd !== null && currentEnd !== undefined ? currentEnd.toString() : '';
 
             if (startValue || endValue) {
-                // eslint-disable-next-line react-hooks/set-state-in-effect
+                // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional: syncing local form state from the Onyx transaction (an external source) when the user navigates back to the page
                 setStartReading(startValue);
                 setEndReading(endValue);
                 startReadingRef.current = startValue;

@@ -38,11 +38,11 @@ function useOdometerTransactionBackup({
         createBackupTransaction(transaction, isTransactionDraft, true);
 
         return () => {
-            // eslint-disable-next-line react-hooks/exhaustive-deps
+            // eslint-disable-next-line react-hooks/exhaustive-deps -- ref reads are stable; we intentionally read the latest `.current` at unmount to decide between bypass / drop / restore
             if (backupHandledManuallyRef.current) {
                 return;
             }
-            // eslint-disable-next-line react-hooks/exhaustive-deps
+            // eslint-disable-next-line react-hooks/exhaustive-deps -- ref reads are stable; we intentionally read the latest `.current` at unmount
             if (didSaveEditingConfirmationRef.current) {
                 removeBackupTransactionWithImageCleanup(transactionID, isTransactionDraft);
                 return;
@@ -50,7 +50,7 @@ function useOdometerTransactionBackup({
             restoreOriginalTransactionFromBackupWithImageCleanup(transactionID, isTransactionDraft);
         };
         // We only want to create the backup once on mount and restore/remove it on unmount
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- mount/unmount-only effect, never re-runs
     }, []);
 }
 
