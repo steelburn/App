@@ -244,6 +244,7 @@ function CopilotPage() {
                 rightComponent: (
                     <Button
                         small
+                        success
                         text={translate('delegate.switch')}
                         isDisabled={isPending || isCurrentUser}
                         onPress={() => switchToDelegator(email)}
