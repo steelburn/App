@@ -15,30 +15,6 @@ import {showContextMenu} from '@pages/inbox/report/ContextMenu/ReportActionConte
 import variables from '@styles/variables';
 import CONST from '@src/CONST';
 
-type OptionRowLHNCorePressHandler = (event: GestureResponderEvent | KeyboardEvent | undefined) => void;
-
-type UseOptionRowLHNCorePressParams = {
-    reportID: string;
-    optionItem: OptionData;
-    popoverAnchor: RefObject<View | null>;
-    onSelectRow: (optionItem: OptionData, popoverAnchor: RefObject<View | null>) => void;
-};
-
-/** LHN row press: telemetry span, composer focus, then onSelectRow. Lives next to OptionRowPressable per review. */
-function useOptionRowLHNCorePress({reportID, optionItem, popoverAnchor, onSelectRow}: UseOptionRowLHNCorePressParams): OptionRowLHNCorePressHandler {
-    return (event: GestureResponderEvent | KeyboardEvent | undefined) => {
-        startSpan(`${CONST.TELEMETRY.SPAN_OPEN_REPORT}_${reportID}`, {
-            name: 'OptionRowLHN',
-            op: CONST.TELEMETRY.SPAN_OPEN_REPORT,
-        });
-
-        event?.preventDefault();
-        // Enable Composer to focus on clicking the same chat after opening the context menu.
-        ReportActionComposeFocusManager.focus();
-        onSelectRow(optionItem, popoverAnchor);
-    };
-}
-
 type OptionRowPressableProps = {
     reportID: string;
     optionItem: OptionData;
@@ -69,10 +45,17 @@ function OptionRowPressable({
     testID,
     children,
 }: OptionRowPressableProps) {
-    const corePress = useOptionRowLHNCorePress({reportID, optionItem, popoverAnchor, onSelectRow});
     const onPress = (event: GestureResponderEvent | KeyboardEvent | undefined) => {
         onPressBefore?.();
-        corePress(event);
+        startSpan(`${CONST.TELEMETRY.SPAN_OPEN_REPORT}_${reportID}`, {
+            name: 'OptionRowLHN',
+            op: CONST.TELEMETRY.SPAN_OPEN_REPORT,
+        });
+
+        event?.preventDefault();
+        // Enable Composer to focus on clicking the same chat after opening the context menu.
+        ReportActionComposeFocusManager.focus();
+        onSelectRow(optionItem, popoverAnchor);
     };
     const theme = useTheme();
     const styles = useThemeStyles();
