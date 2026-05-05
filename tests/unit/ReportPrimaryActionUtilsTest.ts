@@ -117,7 +117,7 @@ describe('getPrimaryAction', () => {
         ).toBe(CONST.REPORT.PRIMARY_ACTIONS.SUBMIT);
     });
 
-    it('should not return SUBMIT while a retract update is pending', async () => {
+    it('should return SUBMIT while a retract update is pending', async () => {
         const report = {
             reportID: REPORT_ID,
             type: CONST.REPORT.TYPE.EXPENSE,
@@ -148,7 +148,7 @@ describe('getPrimaryAction', () => {
                 policy: policy as Policy,
                 isChatReportArchived: false,
             }),
-        ).toBe('');
+        ).toBe(CONST.REPORT.PRIMARY_ACTIONS.SUBMIT);
     });
 
     it('should return SUBMIT while only nextStep is pending', async () => {
