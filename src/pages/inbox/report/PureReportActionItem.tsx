@@ -342,6 +342,7 @@ function PureReportActionItem({
     const prevDraftMessage = usePrevious(draftMessage);
     const isReportActionLinked = linkedReportActionID && action.reportActionID && linkedReportActionID === action.reportActionID;
     const [isReportActionActive, setIsReportActionActive] = useState(!!isReportActionLinked);
+    const [hasEverHovered, setHasEverHovered] = useState(false);
     const isReportArchived = useReportIsArchived(reportID);
 
     const isHarvestCreatedExpenseReport = isHarvestCreatedExpenseReportUtils(reportNameValuePairsOrigin, reportNameValuePairsOriginalID);
@@ -1086,6 +1087,7 @@ function PureReportActionItem({
     }
 
     const hasErrors = !isEmptyValueObject(action.errors);
+    const canShowMenu = draftMessage === undefined && !hasErrors;
     const whisperedTo = getWhisperedTo(action);
 
     const iouReportID = isMoneyRequestAction(action) && getOriginalMessage(action)?.IOUReportID ? getOriginalMessage(action)?.IOUReportID?.toString() : undefined;
@@ -1129,6 +1131,7 @@ function PureReportActionItem({
                     shouldFreezeCapture={isPaymentMethodPopoverActive}
                     onHoverIn={() => {
                         setIsReportActionActive(false);
+                        setHasEverHovered(true);
                     }}
                     onHoverOut={() => {
                         setIsReportActionActive(!!isReportActionLinked);
@@ -1137,7 +1140,7 @@ function PureReportActionItem({
                     {(hovered) => (
                         <View style={highlightedBackgroundColorIfNeeded}>
                             {shouldDisplayNewMarker && (!shouldUseThreadDividerLine || !isFirstVisibleReportAction) && <UnreadActionIndicator reportActionID={action.reportActionID} />}
-                            {shouldDisplayContextMenuValue && (
+                            {shouldDisplayContextMenuValue && hasEverHovered && canShowMenu && (
                                 <MiniReportActionContextMenu
                                     reportID={reportID}
                                     reportActionID={action.reportActionID}
@@ -1146,7 +1149,7 @@ function PureReportActionItem({
                                     isArchivedRoom={isArchivedRoom}
                                     displayAsGroup={displayAsGroup}
                                     disabledActions={disabledActions}
-                                    isVisible={hovered && draftMessage === undefined && !hasErrors}
+                                    isVisible={hovered && canShowMenu}
                                     isThreadReportParentAction={isThreadReportParentAction}
                                     draftMessage={draftMessage}
                                     isChronosReport={isChronosReport}
