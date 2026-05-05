@@ -1,5 +1,5 @@
 import type {ReactNode, RefObject} from 'react';
-import React, {useCallback, useState} from 'react';
+import React, {useState} from 'react';
 import type {GestureResponderEvent, LayoutChangeEvent, View} from 'react-native';
 import Hoverable from '@components/Hoverable';
 import PressableWithSecondaryInteraction from '@components/PressableWithSecondaryInteraction';
@@ -26,19 +26,16 @@ type UseOptionRowLHNCorePressParams = {
 
 /** LHN row press: telemetry span, composer focus, then onSelectRow. Lives next to OptionRowPressable per review. */
 function useOptionRowLHNCorePress({reportID, optionItem, popoverAnchor, onSelectRow}: UseOptionRowLHNCorePressParams): OptionRowLHNCorePressHandler {
-    return useCallback(
-        (event: GestureResponderEvent | KeyboardEvent | undefined) => {
-            startSpan(`${CONST.TELEMETRY.SPAN_OPEN_REPORT}_${reportID}`, {
-                name: 'OptionRowLHN',
-                op: CONST.TELEMETRY.SPAN_OPEN_REPORT,
-            });
+    return (event: GestureResponderEvent | KeyboardEvent | undefined) => {
+        startSpan(`${CONST.TELEMETRY.SPAN_OPEN_REPORT}_${reportID}`, {
+            name: 'OptionRowLHN',
+            op: CONST.TELEMETRY.SPAN_OPEN_REPORT,
+        });
 
-            event?.preventDefault();
-            ReportActionComposeFocusManager.focus();
-            onSelectRow(optionItem, popoverAnchor);
-        },
-        [reportID, optionItem, popoverAnchor, onSelectRow],
-    );
+        event?.preventDefault();
+        ReportActionComposeFocusManager.focus();
+        onSelectRow(optionItem, popoverAnchor);
+    };
 }
 
 type OptionRowPressableProps = {
