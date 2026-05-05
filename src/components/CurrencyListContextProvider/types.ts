@@ -16,7 +16,7 @@ type CurrencyListActionsContextType = {
     convertToDisplayString: (amount: number | undefined, currencyCode: string | undefined) => string;
 
     /** Function to convert amount in cents to display string without currency symbol */
-    convertToDisplayStringWithoutCurrency: (amount: number, currencyCode: string | undefined) => string;
+    convertToDisplayStringWithoutCurrency: (amount: number, currencyCode?: string) => string;
 };
 
 export type {CurrencyListStateContextType, CurrencyListActionsContextType};

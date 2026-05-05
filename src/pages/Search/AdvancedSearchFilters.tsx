@@ -361,20 +361,16 @@ function getFilterDisplayTitle(
         const equalTo = filters[equalToKey];
 
         if (equalTo) {
-            return translate('search.filters.amount.equalTo', convertToDisplayStringWithoutCurrency(Number(equalTo), CONST.CURRENCY.USD));
+            return translate('search.filters.amount.equalTo', convertToDisplayStringWithoutCurrency(Number(equalTo)));
         }
         if (lessThan && greaterThan) {
-            return translate(
-                'search.filters.amount.between',
-                convertToDisplayStringWithoutCurrency(Number(greaterThan), CONST.CURRENCY.USD),
-                convertToDisplayStringWithoutCurrency(Number(lessThan), CONST.CURRENCY.USD),
-            );
+            return translate('search.filters.amount.between', convertToDisplayStringWithoutCurrency(Number(greaterThan)), convertToDisplayStringWithoutCurrency(Number(lessThan)));
         }
         if (lessThan) {
-            return translate('search.filters.amount.lessThan', convertToDisplayStringWithoutCurrency(Number(lessThan), CONST.CURRENCY.USD));
+            return translate('search.filters.amount.lessThan', convertToDisplayStringWithoutCurrency(Number(lessThan)));
         }
         if (greaterThan) {
-            return translate('search.filters.amount.greaterThan', convertToDisplayStringWithoutCurrency(Number(greaterThan), CONST.CURRENCY.USD));
+            return translate('search.filters.amount.greaterThan', convertToDisplayStringWithoutCurrency(Number(greaterThan)));
         }
         // Will never happen
         return;

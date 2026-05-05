@@ -4805,7 +4805,7 @@ function getAmountDisplayValue(
     const greaterThan = form[`${syntaxKey}${CONST.SEARCH.AMOUNT_MODIFIERS.GREATER_THAN}`];
     const equalTo = form[`${syntaxKey}${CONST.SEARCH.AMOUNT_MODIFIERS.EQUAL_TO}`];
 
-    const formatAmount = (val: string) => convertToDisplayStringWithoutCurrency(Number(val), CONST.CURRENCY.USD);
+    const formatAmount = (val: string) => convertToDisplayStringWithoutCurrency(Number(val));
 
     if (equalTo) {
         return translate('search.filters.amount.equalTo', formatAmount(equalTo));

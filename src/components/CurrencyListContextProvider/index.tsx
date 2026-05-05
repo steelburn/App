@@ -55,16 +55,12 @@ function CurrencyListContextProvider({children}: React.PropsWithChildren) {
     );
 
     const convertToDisplayStringWithoutCurrency = useCallback(
-        (amountInCents: number, currencyCode: string | undefined): string => {
+        (amountInCents: number, currencyCode: string = CONST.CURRENCY.USD): string => {
             const decimals = getCurrencyDecimals(currencyCode);
             const convertedAmount = convertToFrontendAmountAsInteger(amountInCents, decimals);
-            let currencyWithFallback = currencyCode;
-            if (!currencyCode) {
-                currencyWithFallback = CONST.CURRENCY.USD;
-            }
             return formatToParts(preferredLocale, convertedAmount, {
                 style: 'currency',
-                currency: currencyWithFallback,
+                currency: currencyCode,
 
                 // We are forcing the number of decimals because we override the default number of decimals in the backend for some currencies
                 // See: https://github.com/Expensify/PHP-Libs/pull/834
