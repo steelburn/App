@@ -236,10 +236,18 @@ function getPolicyByCustomUnitID(transaction: OnyxEntry<Transaction>, policies: 
 
 /**
  * Finds a policy that contains the given customUnitRateID in its distance custom unit rates.
+ * When a preferred policy is provided, it is checked first to avoid an expensive search through all policies.
  */
-function getDistanceRateOriginalPolicy(customUnitRateID: string | undefined): OnyxEntry<Policy> {
+function getDistanceRateOriginalPolicy(customUnitRateID: string | undefined, preferredPolicy?: OnyxEntry<Policy>): OnyxEntry<Policy> {
     if (!customUnitRateID || !allPolicies) {
         return undefined;
+    }
+
+    if (preferredPolicy) {
+        const distanceUnit = getDistanceRateCustomUnit(preferredPolicy);
+        if (distanceUnit?.rates && customUnitRateID in distanceUnit.rates) {
+            return preferredPolicy;
+        }
     }
 
     return Object.values(allPolicies).find((policy) => {

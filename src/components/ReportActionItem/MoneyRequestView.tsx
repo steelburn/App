@@ -212,7 +212,9 @@ function MoneyRequestView({
     const perDiemOriginalPolicy = getPolicyByCustomUnitID(transaction, policiesWithPerDiem);
 
     const distanceOriginalPolicy =
-        isDistanceRequestTransactionUtils(transaction) && isExpenseUnreported ? getDistanceRateOriginalPolicy(transaction?.comment?.customUnit?.customUnitRateID) : undefined;
+        isDistanceRequestTransactionUtils(transaction) && isExpenseUnreported
+            ? getDistanceRateOriginalPolicy(transaction?.comment?.customUnit?.customUnitRateID, policyForMovingExpenses)
+            : undefined;
 
     let policy;
     let policyID;
