@@ -180,8 +180,6 @@ function addNewCompanyCardsFeed(
     cardFeed: CompanyCardFeed,
     feedDetails: CardFeedDetails,
     cardFeeds: OnyxEntry<CombinedCardFeeds>,
-    statementPeriodEnd: StatementPeriodEnd | undefined,
-    statementPeriodEndDay: StatementPeriodEndDay | undefined,
     lastSelectedFeed?: CompanyCardFeedWithDomainID,
 ) {
     if (!policyID) {
@@ -205,7 +203,6 @@ function addNewCompanyCardsFeed(
                 settings: {
                     companyCards: {
                         [feedType]: {
-                            statementPeriodEndDay: statementPeriodEndDay ?? statementPeriodEnd ?? null,
                             errors: null,
                         },
                     },
@@ -252,8 +249,6 @@ function addNewCompanyCardsFeed(
                   .map(([key, value]) => `${key}: ${value}`)
                   .join(', ')
             : '',
-        statementPeriodEnd,
-        statementPeriodEndDay,
     };
 
     API.write(WRITE_COMMANDS.REQUEST_FEED_SETUP, parameters, {optimisticData, failureData, finallyData});
