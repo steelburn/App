@@ -4,7 +4,7 @@ import {RESULTS} from 'react-native-permissions';
 import type {CameraDevice} from 'react-native-vision-camera';
 import getReceiptsUploadFolderPath from '@libs/getReceiptsUploadFolderPath';
 import Log from '@libs/Log';
-import {cancelSpan, endSpan, startSpan} from '@libs/telemetry/activeSpans';
+import {cancelSpan, endSpan, getSpan, startSpan} from '@libs/telemetry/activeSpans';
 import CONST from '@src/CONST';
 
 type UseCameraInitTelemetryParams = {
@@ -24,6 +24,19 @@ function useCameraInitTelemetry({cameraPermissionStatus, device}: UseCameraInitT
     const cameraInitSpanStarted = useRef(false);
     const cameraInitialized = useRef(false);
 
+    // End navigation span and start ready span on mount
+    useEffect(() => {
+        endSpan(CONST.TELEMETRY.SPAN_ENTRY_TO_SCAN_NAVIGATION);
+        const entryParentSpan = getSpan(CONST.TELEMETRY.SPAN_ENTRY_TO_SCAN);
+        if (entryParentSpan) {
+            startSpan(CONST.TELEMETRY.SPAN_ENTRY_TO_SCAN_READY, {
+                name: CONST.TELEMETRY.SPAN_ENTRY_TO_SCAN_READY,
+                op: CONST.TELEMETRY.SPAN_ENTRY_TO_SCAN_READY,
+                parentSpan: entryParentSpan,
+            });
+        }
+    }, []);
+
     // Start camera init span when permission is granted and camera is ready
     useEffect(() => {
         if (cameraInitSpanStarted.current || cameraPermissionStatus !== RESULTS.GRANTED || device == null) {
@@ -42,6 +55,9 @@ function useCameraInitTelemetry({cameraPermissionStatus, device}: UseCameraInitT
             return;
         }
         cancelSpan(CONST.TELEMETRY.SPAN_OPEN_CREATE_EXPENSE);
+        cancelSpan(CONST.TELEMETRY.SPAN_ENTRY_TO_SCAN_NAVIGATION);
+        cancelSpan(CONST.TELEMETRY.SPAN_ENTRY_TO_SCAN_READY);
+        cancelSpan(CONST.TELEMETRY.SPAN_ENTRY_TO_SCAN);
     }, [cameraPermissionStatus]);
 
     // Cancel spans on unmount if camera never initialized
@@ -57,6 +73,10 @@ function useCameraInitTelemetry({cameraPermissionStatus, device}: UseCameraInitT
             }
             // Always cancel the create expense span if camera never initialized
             cancelSpan(CONST.TELEMETRY.SPAN_OPEN_CREATE_EXPENSE);
+            // Cancel entry-to-scan spans if they haven't ended naturally
+            cancelSpan(CONST.TELEMETRY.SPAN_ENTRY_TO_SCAN_NAVIGATION);
+            cancelSpan(CONST.TELEMETRY.SPAN_ENTRY_TO_SCAN_READY);
+            cancelSpan(CONST.TELEMETRY.SPAN_ENTRY_TO_SCAN);
         };
     }, []);
 
@@ -71,6 +91,8 @@ function useCameraInitTelemetry({cameraPermissionStatus, device}: UseCameraInitT
             endSpan(CONST.TELEMETRY.SPAN_CAMERA_INIT);
         }
         endSpan(CONST.TELEMETRY.SPAN_OPEN_CREATE_EXPENSE);
+        endSpan(CONST.TELEMETRY.SPAN_ENTRY_TO_SCAN_READY);
+        endSpan(CONST.TELEMETRY.SPAN_ENTRY_TO_SCAN);
 
         // Preload the confirmation screen module so its JS is parsed and ready
         // when we navigate after capture — eliminates cold-start module load cost.
