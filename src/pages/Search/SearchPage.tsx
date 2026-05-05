@@ -44,7 +44,7 @@ function SearchPage({route}: SearchPageProps) {
     useConfirmReadyToOpenApp();
     useSearchPageSetup(currentSearchQueryJSON);
 
-    if (currentSearchResults?.data && currentSearchResults !== lastNonEmptySearchResults) {
+    if (currentSearchResults?.data && !currentSearchKey && currentSearchResults !== lastNonEmptySearchResults) {
         setLastNonEmptySearchResults(currentSearchResults);
     }
 
