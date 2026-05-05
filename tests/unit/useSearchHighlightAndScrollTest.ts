@@ -332,9 +332,6 @@ describe('useSearchHighlightAndScroll', () => {
         expect(result.current.newSearchResultKeys?.size).toBe(1);
         expect([...(result.current.newSearchResultKeys ?? new Set())]).toContain('transactions_3');
 
-        // The hook now clears the consumed manual highlight flag synchronously inside the
-        // detect effect (right after `setNewSearchResultKeys`), instead of via a timer.
-        // No need to wait — the merge has already fired by the time `rerender` returns.
         expect(spyOnMergeTransactionIdsHighlightOnSearchRoute).toHaveBeenCalledWith(baseProps.queryJSON.type, {'3': false});
     });
 

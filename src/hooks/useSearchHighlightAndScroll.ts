@@ -238,11 +238,7 @@ function useSearchHighlightAndScroll({
             }
             setNewSearchResultKeys(newKeys);
 
-            // Clear consumed manual highlight flags synchronously so subsequent detect runs
-            // don't re-highlight the same IDs. A previous timer-based reset effect lost a race
-            // with the reset of `newSearchResultKeys` (its cleanup kept canceling the timer
-            // before it could fire), leaving flags stuck at `true` and causing every later add
-            // to re-animate every prior expense.
+            // Clear consumed manual highlight flags so subsequent detect runs don't re-highlight the same IDs.
             if (consumedManualIDs.length > 0) {
                 mergeTransactionIdsHighlightOnSearchRoute(queryJSON.type, Object.fromEntries(consumedManualIDs.map((id) => [id, false])));
             }
