@@ -2,7 +2,7 @@
 // used for fast perceived performance. If you change the UI here, verify the
 // static version still looks visually identical.
 import {useNavigation} from '@react-navigation/native';
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {View} from 'react-native';
 import type BaseModalProps from '@components/Modal/types';
 import {usePersonalDetails} from '@components/OnyxListItemProvider';
@@ -31,6 +31,9 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import {accountIDSelector} from '@src/selectors/Session';
 import todosReportCountsSelector from '@src/selectors/Todos';
 import useSavedSearchTitles from './hooks/useSavedSearchTitles';
+
+// Matches the shouldDelay close timing in hideContextMenu (ReportActionContextMenu.ts)
+const MENU_CLOSE_DELAY_MS = 800;
 
 type SearchTypeMenuNarrowProps = {
     /** Search query JSON */
@@ -112,6 +115,31 @@ function SearchTypeMenuNarrow({queryJSON, onTabPress}: SearchTypeMenuNarrowProps
     const {showDeleteModal} = useDeleteSavedSearch();
 
     const {copiedHash, handleShare} = useShareSavedSearch();
+    const closeMenuTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    useEffect(() => {
+        return () => {
+            if (closeMenuTimeoutRef.current !== null) {
+                clearTimeout(closeMenuTimeoutRef.current);
+            }
+        };
+    }, []);
+
+    useEffect(() => {
+        if (copiedHash === null || savedSearchToModifyKey === null || copiedHash !== Number(savedSearchToModifyKey)) {
+            return;
+        }
+        closeMenuTimeoutRef.current = setTimeout(() => {
+            setSavedSearchToModifyKey(null);
+            closeMenuTimeoutRef.current = null;
+        }, MENU_CLOSE_DELAY_MS);
+        return () => {
+            if (closeMenuTimeoutRef.current !== null) {
+                clearTimeout(closeMenuTimeoutRef.current);
+                closeMenuTimeoutRef.current = null;
+            }
+        };
+    }, [copiedHash, savedSearchToModifyKey]);
 
     const expensifyIcons = useMemoizedLazyExpensifyIcons([
         'Receipt',
