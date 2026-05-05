@@ -14,8 +14,6 @@ import useWindowDimensions from '@hooks/useWindowDimensions';
 import {isMobileSafari} from '@libs/Browser';
 import DomUtils from '@libs/DomUtils';
 import getPlatform from '@libs/getPlatform';
-// eslint-disable-next-line no-restricted-imports
-import themes from '@styles/theme';
 import variables from '@styles/variables';
 import CONST from '@src/CONST';
 import BackgroundImage from './BackgroundImage';
@@ -71,12 +69,12 @@ function SignInPageLayout({
     const backgroundImageHeight = Math.max(variables.signInContentMinHeight, containerHeight);
 
     /*
-    SignInPageLayout always has a dark theme regardless of the app theme. ThemeProvider sets auto-fill input styles globally so different ThemeProviders conflict and auto-fill input styles are incorrectly applied for this component.
+    ThemeProvider sets auto-fill input styles globally so different ThemeProviders conflict and auto-fill input styles are incorrectly applied for this component.
     Add a class to `body` when this component stays mounted and remove it when the component dismounts.
-    A new styleID is added with dark theme text with more specific css selector using this added cssClass.
+    A new styleID is added with the current theme text with more specific css selector using this added cssClass.
     */
     const cssClass = 'sign-in-page-layout';
-    DomUtils.addCSS(DomUtils.getAutofilledInputStyle(themes[CONST.THEME.DARK].text, `.${cssClass}`), 'sign-in-autofill-input');
+    DomUtils.addCSS(DomUtils.getAutofilledInputStyle(theme.text, `.${cssClass}`), 'sign-in-autofill-input');
 
     useEffect(() => {
         const isWeb = getPlatform() === CONST.PLATFORM.WEB;

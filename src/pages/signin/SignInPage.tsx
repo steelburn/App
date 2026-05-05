@@ -20,7 +20,6 @@ import Log from '@libs/Log';
 import Navigation from '@libs/Navigation/Navigation';
 import Visibility from '@libs/Visibility';
 import {clearSignInData} from '@userActions/Session';
-import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type {Account, Credentials} from '@src/types/onyx';
@@ -358,7 +357,7 @@ function SignInPageWrapper({ref}: SignInPageProps) {
 // WithTheme is a HOC that provides theme-related contexts (e.g. to the SignInPageWrapper component since these contexts are required for variable declarations).
 function WithTheme(Component: React.ComponentType<SignInPageProps>) {
     return ({ref}: SignInPageProps) => (
-        <ThemeProvider theme={CONST.THEME.DARK}>
+        <ThemeProvider>
             <ThemeStylesProvider>
                 <HTMLEngineProvider>
                     <Component ref={ref} />
