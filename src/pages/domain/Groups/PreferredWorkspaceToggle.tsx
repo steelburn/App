@@ -15,7 +15,10 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 
 type PreferredWorkspaceToggleProps = {
+    /** The account ID of the domain */
     domainAccountID: number;
+
+    /** The ID of the security group */
     groupID: string;
 };
 
