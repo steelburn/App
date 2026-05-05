@@ -11829,7 +11829,13 @@ function prepareOnboardingOnyxData({
             if (([CONST.ONBOARDING_TASK_TYPE.ADD_ACCOUNTING_INTEGRATION, CONST.ONBOARDING_TASK_TYPE.SETUP_CATEGORIES_AND_TAGS] as string[]).includes(task.type) && !userReportedIntegration) {
                 return false;
             }
-            type SkipViewTourOnboardingChoices = 'newDotSubmit' | 'newDotSplitChat' | 'newDotPersonalSpend' | 'newDotEmployer' | 'newDotTrackPersonalWorkspace';
+            type SkipViewTourOnboardingChoices =
+                | typeof CONST.ONBOARDING_CHOICES.SUBMIT
+                | typeof CONST.ONBOARDING_CHOICES.CHAT_SPLIT
+                | typeof CONST.ONBOARDING_CHOICES.PERSONAL_SPEND
+                | typeof CONST.ONBOARDING_CHOICES.EMPLOYER
+                | typeof CONST.ONBOARDING_CHOICES.TRACK_PERSONAL
+                | typeof CONST.ONBOARDING_CHOICES.MANAGE_TEAM;
             if (
                 task.type === CONST.ONBOARDING_TASK_TYPE.VIEW_TOUR &&
                 [
