@@ -4,6 +4,7 @@ import React, {useCallback, useEffect, useLayoutEffect, useRef, useState} from '
 import type {NativeEventSubscription} from 'react-native';
 import {AppState, Platform} from 'react-native';
 import Onyx from 'react-native-onyx';
+import {initReconnect} from '@libs/actions/Reconnect';
 import {useInitialURLActions} from './components/InitialURLContextProvider';
 import AppleAuthWrapper from './components/SignInButtons/AppleAuthWrapper';
 import SplashScreenHider from './components/SplashScreenHider';
@@ -248,6 +249,10 @@ function Expensify() {
             appStateChangeListener.current?.remove();
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps -- we don't want this effect to run again
+    }, []);
+
+    useEffect(() => {
+        initReconnect();
     }, []);
 
     useLayoutEffect(() => {
