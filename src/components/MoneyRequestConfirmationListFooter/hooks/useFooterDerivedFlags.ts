@@ -99,7 +99,6 @@ function useFooterDerivedFlags({
     const shouldShowBillable = policy?.disabledFields?.defaultBillable === false;
     const shouldShowReimbursable =
         (isPolicyExpenseChat || isTrackExpense) && !!policy && policy?.disabledFields?.reimbursable !== true && !isManagedCardTransaction(transaction) && !isTypeInvoice;
-
     const shouldNavigateToUpgradePath = !policyForMovingExpensesID && !shouldSelectPolicy;
     const shouldShowTimeRequestFields = isTimeRequest && action === CONST.IOU.ACTION.CREATE;
 
