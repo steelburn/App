@@ -26,7 +26,7 @@ import useOnyx from '@hooks/useOnyx';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useSearchBackPress from '@hooks/useSearchBackPress';
 import useSearchResults from '@hooks/useSearchResults';
-import useShouldShowHeaderButtonsInHeaderRow from '@hooks/useShouldShowHeaderButtonsInHeaderRow';
+import useShouldDisplayButtonsInSeparateLine from '@hooks/useShouldDisplayButtonsInSeparateLine';
 import useThemeStyles from '@hooks/useThemeStyles';
 import useWorkspaceDocumentTitle from '@hooks/useWorkspaceDocumentTitle';
 import {isConnectionInProgress, isConnectionUnverified} from '@libs/actions/connections';
@@ -67,7 +67,7 @@ function WorkspaceTaxesPage({
     useWorkspaceDocumentTitle(policy?.name, 'workspace.common.taxes');
     // eslint-disable-next-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidth
     const {shouldUseNarrowLayout, isSmallScreenWidth, isInLandscapeMode} = useResponsiveLayout();
-    const shouldShowHeaderButtonsInHeaderRow = useShouldShowHeaderButtonsInHeaderRow();
+    const shouldDisplayButtonsInSeparateLine = useShouldDisplayButtonsInSeparateLine();
     const styles = useThemeStyles();
     const {translate, localeCompare} = useLocalize();
     const [selectedTaxesIDs, setSelectedTaxesIDs] = useState<string[]>([]);
@@ -356,7 +356,7 @@ function WorkspaceTaxesPage({
     );
 
     const headerButtons = !shouldShowBulkActionsButton ? (
-        <View style={[!isInLandscapeMode && styles.w100, styles.flexRow, styles.gap2, !shouldShowHeaderButtonsInHeaderRow && styles.mb3]}>
+        <View style={[!isInLandscapeMode && styles.w100, styles.flexRow, styles.gap2, shouldDisplayButtonsInSeparateLine && styles.mb3]}>
             {!hasAccountingConnections && (
                 <Button
                     success
@@ -364,7 +364,7 @@ function WorkspaceTaxesPage({
                     sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.TAXES.ADD_BUTTON}
                     icon={icons.Plus}
                     text={translate('workspace.taxes.addRate')}
-                    style={[!shouldShowHeaderButtonsInHeaderRow && styles.flex1]}
+                    style={[shouldDisplayButtonsInSeparateLine && styles.flex1]}
                 />
             )}
             <ButtonWithDropdownMenu
@@ -386,7 +386,7 @@ function WorkspaceTaxesPage({
             customText={translate('workspace.common.selected', {count: selectedTaxesIDs.length})}
             shouldAlwaysShowDropdownMenu
             isSplitButton={false}
-            style={[!shouldShowHeaderButtonsInHeaderRow && styles.flexGrow1, !shouldShowHeaderButtonsInHeaderRow && styles.mb3]}
+            style={[shouldDisplayButtonsInSeparateLine && styles.flexGrow1, shouldDisplayButtonsInSeparateLine && styles.mb3]}
             isDisabled={!selectedTaxesIDs.length}
             sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.TAXES.BULK_ACTIONS_DROPDOWN}
         />
@@ -447,9 +447,9 @@ function WorkspaceTaxesPage({
                         Navigation.goBack();
                     }}
                 >
-                    {shouldShowHeaderButtonsInHeaderRow && headerButtons}
+                    {!shouldDisplayButtonsInSeparateLine && headerButtons}
                 </HeaderWithBackButton>
-                {!shouldShowHeaderButtonsInHeaderRow && <View style={[styles.pl5, styles.pr5]}>{headerButtons}</View>}
+                {shouldDisplayButtonsInSeparateLine && <View style={[styles.pl5, styles.pr5]}>{headerButtons}</View>}
                 {isLoading && (
                     <ActivityIndicator
                         size={CONST.ACTIVITY_INDICATOR_SIZE.LARGE}

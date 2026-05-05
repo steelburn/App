@@ -9,6 +9,7 @@ import {useMemoizedLazyExpensifyIcons, useMemoizedLazyIllustrations} from '@hook
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
+import useShouldDisplayButtonsInSeparateLine from '@hooks/useShouldDisplayButtonsInSeparateLine';
 import useStyleUtils from '@hooks/useStyleUtils';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
@@ -79,24 +80,24 @@ function EarlyDiscountBanner({isSubscriptionPage, onboardingHelpDropdownButton, 
         [theme.icon, translate, onDismissedDiscountBanner, discountInfo?.discountType, icons.Close],
     );
 
+    const shouldDisplayButtonsInSeparateLine = useShouldDisplayButtonsInSeparateLine();
+
     const rightComponent = useMemo(() => {
-        const shouldUseMobileLayout = shouldUseNarrowLayout && !isInLandscapeMode;
-        const smallScreenStyle = shouldUseMobileLayout ? [styles.flex0, styles.flexBasis100, styles.justifyContentCenter] : [];
+        const smallScreenStyle = shouldDisplayButtonsInSeparateLine ? [styles.flex0, styles.flexBasis100, styles.justifyContentCenter] : [];
         return (
             <View style={[styles.flexRow, styles.gap2, smallScreenStyle, styles.alignItemsCenter]}>
                 {onboardingHelpDropdownButton}
                 <Button
                     success={!hasActiveScheduledCall}
-                    style={shouldUseMobileLayout ? [styles.earlyDiscountButton, styles.flexGrow2] : styles.mr2}
+                    style={shouldDisplayButtonsInSeparateLine ? [styles.earlyDiscountButton, styles.flexGrow2] : styles.mr2}
                     text={translate('subscription.billingBanner.earlyDiscount.claimOffer')}
                     onPress={() => Navigation.navigate(ROUTES.SETTINGS_SUBSCRIPTION.getRoute(Navigation.getActiveRoute()))}
                 />
-                {!shouldUseMobileLayout && dismissButton}
+                {!shouldDisplayButtonsInSeparateLine && dismissButton}
             </View>
         );
     }, [
-        shouldUseNarrowLayout,
-        isInLandscapeMode,
+        shouldDisplayButtonsInSeparateLine,
         hasActiveScheduledCall,
         styles.flex0,
         styles.flexBasis100,

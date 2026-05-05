@@ -13,7 +13,7 @@ import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useSearchResults from '@hooks/useSearchResults';
-import useShouldShowHeaderButtonsInHeaderRow from '@hooks/useShouldShowHeaderButtonsInHeaderRow';
+import useShouldDisplayButtonsInSeparateLine from '@hooks/useShouldDisplayButtonsInSeparateLine';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {getLatestError} from '@libs/ErrorUtils';
 import {sortAlphabetically} from '@libs/OptionsListUtils';
@@ -129,7 +129,7 @@ function BaseDomainMembersPage({
     const icons = useMemoizedLazyExpensifyIcons(['FallbackAvatar']);
     const illustrations = useMemoizedLazyIllustrations(['EmptyShelves']);
 
-    const shouldShowHeaderButtonsInHeaderRow = useShouldShowHeaderButtonsInHeaderRow();
+    const shouldDisplayButtonsInSeparateLine = useShouldDisplayButtonsInSeparateLine();
 
     const data: MemberOption[] = accountIDs
         .filter((accountID) => {
@@ -215,7 +215,7 @@ function BaseDomainMembersPage({
     const shouldShowEmptySearchMessage = !!shouldShowSearchBar && inputValue.length !== 0 && filteredData.length === 0;
     // Show empty pre filter state only if we have data, filtered data is empty, but the search have not been used.
     const shouldShowEmptyPreFilterState = filteredData.length === 0 && data.length !== 0 && !!emptyStateTitle && inputValue.length === 0;
-    const shouldUseMobileListHeaderContentLayout = !shouldShowHeaderButtonsInHeaderRow;
+    const shouldUseMobileListHeaderContentLayout = shouldDisplayButtonsInSeparateLine;
     const listHeaderContent =
         searchBarAccessory || shouldShowSearchBar ? (
             <View style={styles.flexColumn}>
@@ -275,9 +275,9 @@ function BaseDomainMembersPage({
                     shouldShowBackButton={shouldUseNarrowLayout}
                     shouldUseHeadlineHeader={!useSelectionModeHeader}
                 >
-                    {shouldShowHeaderButtonsInHeaderRow && !!headerContent && <View style={[styles.flexRow, styles.gap2]}>{headerContent}</View>}
+                    {!shouldDisplayButtonsInSeparateLine && !!headerContent && <View style={[styles.flexRow, styles.gap2]}>{headerContent}</View>}
                 </HeaderWithBackButton>
-                {!shouldShowHeaderButtonsInHeaderRow && !!headerContent && <View style={[styles.ph5, styles.flexRow, styles.gap2]}>{headerContent}</View>}
+                {shouldDisplayButtonsInSeparateLine && !!headerContent && <View style={[styles.ph5, styles.flexRow, styles.gap2]}>{headerContent}</View>}
                 <SelectionListWithModal
                     data={filteredData}
                     shouldShowRightCaret

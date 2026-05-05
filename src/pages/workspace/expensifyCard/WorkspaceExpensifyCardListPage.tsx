@@ -28,7 +28,7 @@ import useOnyx from '@hooks/useOnyx';
 import usePolicy from '@hooks/usePolicy';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useSearchResults from '@hooks/useSearchResults';
-import useShouldShowHeaderButtonsInHeaderRow from '@hooks/useShouldShowHeaderButtonsInHeaderRow';
+import useShouldDisplayButtonsInSeparateLine from '@hooks/useShouldDisplayButtonsInSeparateLine';
 import useThemeStyles from '@hooks/useThemeStyles';
 import useWindowDimensions from '@hooks/useWindowDimensions';
 import {clearIssueNewCardFormData, exportExpensifyCardListToCSV, setIssueNewCardStepAndData} from '@libs/actions/Card';
@@ -86,8 +86,8 @@ function WorkspaceExpensifyCardListPage({route, cardsList, fundID}: WorkspaceExp
     const shouldChangeLayout = isMediumScreenWidth || shouldUseNarrowLayout;
     const isBankAccountVerified = !cardOnWaitlist;
     const {windowHeight} = useWindowDimensions();
-    const shouldShowHeaderButtonsInHeaderRow = useShouldShowHeaderButtonsInHeaderRow();
-    const headerHeight = useEmptyViewHeaderHeight(!shouldShowHeaderButtonsInHeaderRow, isBankAccountVerified);
+    const shouldDisplayButtonsInSeparateLine = useShouldDisplayButtonsInSeparateLine();
+    const headerHeight = useEmptyViewHeaderHeight(shouldDisplayButtonsInSeparateLine, isBankAccountVerified);
     const [footerHeight, setFooterHeight] = useState(0);
     const cardFeedIcon = (
         <CardFeedIcon
@@ -173,8 +173,8 @@ function WorkspaceExpensifyCardListPage({route, cardsList, fundID}: WorkspaceExp
         const headerButtonsRowStyle = [
             styles.flexRow,
             styles.gap2,
-            !shouldShowSelector && !shouldShowHeaderButtonsInHeaderRow && styles.mb3,
-            shouldShowSelector && !shouldShowHeaderButtonsInHeaderRow && styles.mt3,
+            !shouldShowSelector && shouldDisplayButtonsInSeparateLine && styles.mb3,
+            shouldShowSelector && shouldDisplayButtonsInSeparateLine && styles.mt3,
         ];
 
         if (selectedCardIDs.length > 0) {
@@ -188,7 +188,7 @@ function WorkspaceExpensifyCardListPage({route, cardsList, fundID}: WorkspaceExp
                         isSplitButton={false}
                         shouldAlwaysShowDropdownMenu
                         sentryLabel={CONST.SENTRY_LABEL.WORKSPACE_EXPENSIFY_CARD.BULK_ACTIONS_DROPDOWN}
-                        wrapperStyle={[!isInLandscapeMode && styles.flexGrow1, !shouldShowHeaderButtonsInHeaderRow && styles.flexShrink1]}
+                        wrapperStyle={[!isInLandscapeMode && styles.flexGrow1, shouldDisplayButtonsInSeparateLine && styles.flexShrink1]}
                     />
                 </View>
             );
@@ -202,7 +202,7 @@ function WorkspaceExpensifyCardListPage({route, cardsList, fundID}: WorkspaceExp
                         onPress={handleIssueCardPress}
                         icon={icons.Plus}
                         text={translate('workspace.expensifyCard.issueCard')}
-                        style={!shouldShowHeaderButtonsInHeaderRow && styles.flex1}
+                        style={shouldDisplayButtonsInSeparateLine && styles.flex1}
                         sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.EXPENSIFY_CARD.ISSUE_CARD_BUTTON}
                     />
                 )}
@@ -331,9 +331,9 @@ function WorkspaceExpensifyCardListPage({route, cardsList, fundID}: WorkspaceExp
                 shouldDisplayHelpButton
                 onBackButtonPress={handleBackButtonPress}
             >
-                {!shouldShowSelector && shouldShowHeaderButtonsInHeaderRow && isBankAccountVerified && getHeaderButtons()}
+                {!shouldShowSelector && !shouldDisplayButtonsInSeparateLine && isBankAccountVerified && getHeaderButtons()}
             </HeaderWithBackButton>
-            {!shouldShowSelector && !shouldShowHeaderButtonsInHeaderRow && isBankAccountVerified && <View style={styles.ph5}>{getHeaderButtons()}</View>}
+            {!shouldShowSelector && shouldDisplayButtonsInSeparateLine && isBankAccountVerified && <View style={styles.ph5}>{getHeaderButtons()}</View>}
             {shouldShowSelector && (
                 <View style={[styles.w100, styles.ph5, styles.pb3, (!shouldChangeLayout || isInLandscapeMode) && [styles.flexRow, styles.alignItemsCenter, styles.justifyContentBetween]]}>
                     <FeedSelector

@@ -29,7 +29,7 @@ import usePolicy from '@hooks/usePolicy';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useSearchBackPress from '@hooks/useSearchBackPress';
 import useSearchResults from '@hooks/useSearchResults';
-import useShouldShowHeaderButtonsInHeaderRow from '@hooks/useShouldShowHeaderButtonsInHeaderRow';
+import useShouldDisplayButtonsInSeparateLine from '@hooks/useShouldDisplayButtonsInSeparateLine';
 import useThemeStyles from '@hooks/useThemeStyles';
 import useWorkspaceDocumentTitle from '@hooks/useWorkspaceDocumentTitle';
 import {convertAmountToDisplayString} from '@libs/CurrencyUtils';
@@ -346,7 +346,7 @@ function WorkspacePerDiemPage({route}: WorkspacePerDiemPageProps) {
         expensifyIcons.Download,
     ]);
 
-    const shouldShowHeaderButtonsInHeaderRow = useShouldShowHeaderButtonsInHeaderRow();
+    const shouldDisplayButtonsInSeparateLine = useShouldDisplayButtonsInSeparateLine();
 
     const getHeaderButtons = () => {
         const options: Array<DropdownOption<DeepValueOf<typeof CONST.POLICY.BULK_ACTION_TYPES>>> = [];
@@ -378,7 +378,7 @@ function WorkspacePerDiemPage({route}: WorkspacePerDiemPageProps) {
                     customText={translate('workspace.common.selected', {count: selectedPerDiem.length})}
                     options={options}
                     isSplitButton={false}
-                    style={[!shouldShowHeaderButtonsInHeaderRow && styles.flexGrow1, !shouldShowHeaderButtonsInHeaderRow && styles.mb3]}
+                    style={[shouldDisplayButtonsInSeparateLine && styles.flexGrow1, shouldDisplayButtonsInSeparateLine && styles.mb3]}
                     isDisabled={!selectedPerDiem.length}
                     sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.PER_DIEM.BULK_ACTIONS_DROPDOWN}
                 />
@@ -386,7 +386,7 @@ function WorkspacePerDiemPage({route}: WorkspacePerDiemPageProps) {
         }
 
         return (
-            <View style={[styles.flexRow, styles.gap2, !shouldShowHeaderButtonsInHeaderRow && styles.mb3]}>
+            <View style={[styles.flexRow, styles.gap2, shouldDisplayButtonsInSeparateLine && styles.mb3]}>
                 <ButtonWithDropdownMenu
                     success={false}
                     onPress={() => {}}
@@ -394,7 +394,7 @@ function WorkspacePerDiemPage({route}: WorkspacePerDiemPageProps) {
                     customText={translate('common.more')}
                     options={secondaryActions}
                     isSplitButton={false}
-                    wrapperStyle={!isInLandscapeMode && styles.flexGrow1}
+                    wrapperStyle={isInLandscapeMode ? undefined : styles.flexGrow1}
                     sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.PER_DIEM.MORE_DROPDOWN}
                 />
             </View>
@@ -472,9 +472,9 @@ function WorkspacePerDiemPage({route}: WorkspacePerDiemPageProps) {
                         Navigation.goBack();
                     }}
                 >
-                    {shouldShowHeaderButtonsInHeaderRow && getHeaderButtons()}
+                    {!shouldDisplayButtonsInSeparateLine && getHeaderButtons()}
                 </HeaderWithBackButton>
-                {!shouldShowHeaderButtonsInHeaderRow && <View style={[styles.pl5, styles.pr5]}>{getHeaderButtons()}</View>}
+                {shouldDisplayButtonsInSeparateLine && <View style={[styles.pl5, styles.pr5]}>{getHeaderButtons()}</View>}
                 {(!hasVisibleSubRates || isLoading) && headerContent}
                 {isLoading && (
                     <ActivityIndicator

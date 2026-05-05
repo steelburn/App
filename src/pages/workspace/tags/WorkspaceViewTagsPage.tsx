@@ -27,7 +27,7 @@ import usePolicyData from '@hooks/usePolicyData';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useSearchBackPress from '@hooks/useSearchBackPress';
 import useSearchResults from '@hooks/useSearchResults';
-import useShouldShowHeaderButtonsInHeaderRow from '@hooks/useShouldShowHeaderButtonsInHeaderRow';
+import useShouldDisplayButtonsInSeparateLine from '@hooks/useShouldDisplayButtonsInSeparateLine';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {turnOffMobileSelectionMode} from '@libs/actions/MobileSelectionMode';
 import {
@@ -69,7 +69,7 @@ function WorkspaceViewTagsPage({route}: WorkspaceViewTagsProps) {
     // We need to use isSmallScreenWidth instead of shouldUseNarrowLayout for the small screen selection mode
     // eslint-disable-next-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidth
     const {isSmallScreenWidth} = useResponsiveLayout();
-    const shouldShowHeaderButtonsInHeaderRow = useShouldShowHeaderButtonsInHeaderRow();
+    const shouldDisplayButtonsInSeparateLine = useShouldDisplayButtonsInSeparateLine();
     const styles = useThemeStyles();
     const icons = useMemoizedLazyExpensifyIcons(['Close', 'Checkmark', 'Trashcan']);
     const {translate, localeCompare} = useLocalize();
@@ -332,7 +332,7 @@ function WorkspaceViewTagsPage({route}: WorkspaceViewTagsProps) {
                 buttonSize={CONST.DROPDOWN_BUTTON_SIZE.MEDIUM}
                 customText={translate('workspace.common.selected', {count: selectedTags.length})}
                 options={options}
-                style={[!shouldShowHeaderButtonsInHeaderRow && styles.flexGrow1, !shouldShowHeaderButtonsInHeaderRow && styles.mb3]}
+                style={[shouldDisplayButtonsInSeparateLine && styles.flexGrow1, shouldDisplayButtonsInSeparateLine && styles.mb3]}
                 isDisabled={!selectedTags.length}
             />
         );
@@ -374,9 +374,9 @@ function WorkspaceViewTagsPage({route}: WorkspaceViewTagsProps) {
                         Navigation.goBack(isQuickSettingsFlow ? backPath : undefined);
                     }}
                 >
-                    {shouldShowHeaderButtonsInHeaderRow && getHeaderButtons()}
+                    {!shouldDisplayButtonsInSeparateLine && getHeaderButtons()}
                 </HeaderWithBackButton>
-                {!shouldShowHeaderButtonsInHeaderRow && <View style={[styles.pl5, styles.pr5]}>{getHeaderButtons()}</View>}
+                {shouldDisplayButtonsInSeparateLine && <View style={[styles.pl5, styles.pr5]}>{getHeaderButtons()}</View>}
                 {!hasDependentTags && (
                     <View style={[styles.pv4, styles.ph5]}>
                         <ToggleSettingOptionRow

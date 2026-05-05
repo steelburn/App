@@ -4,7 +4,7 @@ import ButtonWithDropdownMenu from '@components/ButtonWithDropdownMenu';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
-import useShouldShowHeaderButtonsInHeaderRow from '@hooks/useShouldShowHeaderButtonsInHeaderRow';
+import useShouldDisplayButtonsInSeparateLine from '@hooks/useShouldDisplayButtonsInSeparateLine';
 import useThemeStyles from '@hooks/useThemeStyles';
 import interceptAnonymousUser from '@libs/interceptAnonymousUser';
 import Navigation from '@libs/Navigation/Navigation';
@@ -25,9 +25,9 @@ function WorkspacesListPageHeaderButton({shouldShowNewWorkspaceButton, shouldSho
     const {translate} = useLocalize();
     const {isInLandscapeMode} = useResponsiveLayout();
 
-    const shouldShowHeaderButtonsInHeaderRow = useShouldShowHeaderButtonsInHeaderRow();
+    const shouldDisplayButtonsInSeparateLine = useShouldDisplayButtonsInSeparateLine();
 
-    const buttonStyle = !shouldShowHeaderButtonsInHeaderRow && [styles.flexGrow1, styles.mb3];
+    const buttonStyle = shouldDisplayButtonsInSeparateLine && [styles.flexGrow1, styles.mb3];
 
     if (shouldShowNewWorkspaceButton && shouldShowNewDomainButton) {
         return (

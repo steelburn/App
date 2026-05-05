@@ -36,7 +36,7 @@ import usePrevious from '@hooks/usePrevious';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useSearchBackPress from '@hooks/useSearchBackPress';
 import useSearchResults from '@hooks/useSearchResults';
-import useShouldShowHeaderButtonsInHeaderRow from '@hooks/useShouldShowHeaderButtonsInHeaderRow';
+import useShouldDisplayButtonsInSeparateLine from '@hooks/useShouldDisplayButtonsInSeparateLine';
 import useStyleUtils from '@hooks/useStyleUtils';
 import useThemeStyles from '@hooks/useThemeStyles';
 import useWorkspaceDocumentTitle from '@hooks/useWorkspaceDocumentTitle';
@@ -870,7 +870,7 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
         return menuItems;
     }, [isPolicyAdmin, icons.Table, icons.Download, translate, isAccountLocked, isOffline, policyID, showLockedAccountModal, showRequiresInternetModal]);
 
-    const shouldShowHeaderButtonsInHeaderRow = useShouldShowHeaderButtonsInHeaderRow();
+    const shouldDisplayButtonsInSeparateLine = useShouldDisplayButtonsInSeparateLine();
 
     const getHeaderButtons = () => {
         if (!isPolicyAdmin) {
@@ -884,7 +884,7 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
                 onPress={() => null}
                 options={getBulkActionsButtonOptions()}
                 isSplitButton={false}
-                style={[!shouldShowHeaderButtonsInHeaderRow && styles.flexGrow1, !shouldShowHeaderButtonsInHeaderRow && styles.mb3]}
+                style={[shouldDisplayButtonsInSeparateLine && styles.flexGrow1, shouldDisplayButtonsInSeparateLine && styles.mb3]}
                 isDisabled={!selectedEmployees.length}
                 sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.MEMBERS.BULK_ACTIONS_DROPDOWN}
                 testID="WorkspaceMembersPage-header-dropdown-menu-button"
@@ -897,8 +897,8 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
                     sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.MEMBERS.INVITE_BUTTON}
                     text={translate('workspace.invite.member')}
                     icon={icons.Plus}
-                    innerStyles={[!shouldShowHeaderButtonsInHeaderRow && styles.alignItemsCenter]}
-                    style={[!shouldShowHeaderButtonsInHeaderRow && styles.flexGrow1, !shouldShowHeaderButtonsInHeaderRow && styles.mb3]}
+                    innerStyles={[shouldDisplayButtonsInSeparateLine && styles.alignItemsCenter]}
+                    style={[shouldDisplayButtonsInSeparateLine && styles.flexGrow1, shouldDisplayButtonsInSeparateLine && styles.mb3]}
                 />
                 <ButtonWithDropdownMenu
                     success={false}
@@ -966,7 +966,7 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
             headerText={selectionModeHeader ? translate('common.selectMultiple') : translate('workspace.common.members')}
             route={route}
             icon={!selectionModeHeader ? illustrations.ReceiptWrangler : undefined}
-            headerContent={shouldShowHeaderButtonsInHeaderRow && getHeaderButtons()}
+            headerContent={!shouldDisplayButtonsInSeparateLine && getHeaderButtons()}
             testID="WorkspaceMembersPage"
             shouldShowLoading={false}
             shouldUseHeadlineHeader={!selectionModeHeader}
@@ -983,7 +983,7 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
         >
             {() => (
                 <>
-                    {!shouldShowHeaderButtonsInHeaderRow && <View style={[styles.pl5, styles.pr5]}>{getHeaderButtons()}</View>}
+                    {shouldDisplayButtonsInSeparateLine && <View style={[styles.pl5, styles.pr5]}>{getHeaderButtons()}</View>}
                     <DecisionModal
                         title={translate('common.downloadFailedTitle')}
                         prompt={translate('common.downloadFailedDescription')}

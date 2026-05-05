@@ -2,6 +2,7 @@ import {useRoute} from '@react-navigation/native';
 import React from 'react';
 import {View} from 'react-native';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
+import useShouldDisplayButtonsInSeparateLine from '@hooks/useShouldDisplayButtonsInSeparateLine';
 import useThemeStyles from '@hooks/useThemeStyles';
 import type {PlatformStackRouteProp} from '@libs/Navigation/PlatformStackNavigation/types';
 import type {ReportsSplitNavigatorParamList, RightModalNavigatorParamList} from '@libs/Navigation/types';
@@ -21,7 +22,7 @@ type MoneyRequestHeaderActionsProps = {
 function MoneyRequestHeaderActions({reportID, onBackButtonPress}: MoneyRequestHeaderActionsProps) {
     const styles = useThemeStyles();
     // eslint-disable-next-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidth
-    const {shouldUseNarrowLayout, isSmallScreenWidth, isInLandscapeMode} = useResponsiveLayout();
+    const {isSmallScreenWidth} = useResponsiveLayout();
     const {wideRHPRouteKeys} = useWideRHPState();
     const route = useRoute<
         | PlatformStackRouteProp<ReportsSplitNavigatorParamList, typeof SCREENS.REPORT>
@@ -29,8 +30,8 @@ function MoneyRequestHeaderActions({reportID, onBackButtonPress}: MoneyRequestHe
         | PlatformStackRouteProp<RightModalNavigatorParamList, typeof SCREENS.RIGHT_MODAL.SEARCH_MONEY_REQUEST_REPORT>
     >();
 
-    const shouldUseDesktopLayout = !shouldUseNarrowLayout || isInLandscapeMode;
-    const shouldDisplayNarrowButtons = shouldUseDesktopLayout || (wideRHPRouteKeys.length > 0 && !isSmallScreenWidth);
+    const shouldDisplayButtonsInSeparateLine = useShouldDisplayButtonsInSeparateLine();
+    const shouldDisplayNarrowButtons = !shouldDisplayButtonsInSeparateLine || (wideRHPRouteKeys.length > 0 && !isSmallScreenWidth);
     const shouldDisplayTransactionNavigation = !!(reportID && route.name === SCREENS.RIGHT_MODAL.SEARCH_REPORT);
 
     return (

@@ -22,7 +22,7 @@ import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useSearchBackPress from '@hooks/useSearchBackPress';
-import useShouldShowHeaderButtonsInHeaderRow from '@hooks/useShouldShowHeaderButtonsInHeaderRow';
+import useShouldDisplayButtonsInSeparateLine from '@hooks/useShouldDisplayButtonsInSeparateLine';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {clearDomainMemberError, closeUserAccount, exportMembersToCSV, setDomainMembersSelectedForMove} from '@libs/actions/Domain';
 import {turnOffMobileSelectionMode} from '@libs/actions/MobileSelectionMode';
@@ -52,7 +52,7 @@ function DomainMembersPage({route}: DomainMembersPageProps) {
 
     const canSelectMultiple = shouldUseNarrowLayout ? isMobileSelectionModeEnabled : true;
     const selectionModeHeader = isMobileSelectionModeEnabled && shouldUseNarrowLayout;
-    const shouldShowHeaderButtonsInHeaderRow = useShouldShowHeaderButtonsInHeaderRow();
+    const shouldDisplayButtonsInSeparateLine = useShouldDisplayButtonsInSeparateLine();
 
     const [domainErrors] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`);
     const [domainPendingActions] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`, {selector: memberPendingActionSelector});
@@ -230,10 +230,10 @@ function DomainMembersPage({route}: DomainMembersPageProps) {
                 onPress={() => null}
                 options={getBulkActionsButtonOptions()}
                 isSplitButton={false}
-                style={!shouldShowHeaderButtonsInHeaderRow ? [styles.flexGrow1, styles.mb3] : undefined}
+                style={shouldDisplayButtonsInSeparateLine ? [styles.flexGrow1, styles.mb3] : undefined}
                 isDisabled={!selectedMembers.length}
                 testID="DomainMembersPage-header-dropdown-menu-button"
-                wrapperStyle={!shouldShowHeaderButtonsInHeaderRow && styles.flexGrow1}
+                wrapperStyle={shouldDisplayButtonsInSeparateLine && styles.flexGrow1}
             />
         ) : (
             <View style={[styles.flexRow, styles.gap2]}>
@@ -242,8 +242,8 @@ function DomainMembersPage({route}: DomainMembersPageProps) {
                     onPress={() => Navigation.navigate(ROUTES.DOMAIN_ADD_MEMBER.getRoute(domainAccountID))}
                     text={translate('domain.members.addMember')}
                     icon={icons.Plus}
-                    innerStyles={[!shouldShowHeaderButtonsInHeaderRow && styles.alignItemsCenter]}
-                    style={!shouldShowHeaderButtonsInHeaderRow ? [styles.flexGrow1, styles.mb3] : undefined}
+                    innerStyles={[shouldDisplayButtonsInSeparateLine && styles.alignItemsCenter]}
+                    style={shouldDisplayButtonsInSeparateLine ? [styles.flexGrow1, styles.mb3] : undefined}
                 />
                 <ButtonWithDropdownMenu
                     success={false}

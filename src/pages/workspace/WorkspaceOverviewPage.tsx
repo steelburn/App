@@ -29,7 +29,7 @@ import usePrevious from '@hooks/usePrevious';
 import usePrivateSubscription from '@hooks/usePrivateSubscription';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useShouldBlockCurrencyChange from '@hooks/useShouldBlockCurrencyChange';
-import useShouldShowHeaderButtonsInHeaderRow from '@hooks/useShouldShowHeaderButtonsInHeaderRow';
+import useShouldDisplayButtonsInSeparateLine from '@hooks/useShouldDisplayButtonsInSeparateLine';
 import useThemeStyles from '@hooks/useThemeStyles';
 import useTransactionViolationOfWorkspace from '@hooks/useTransactionViolationOfWorkspace';
 import useWorkspaceDocumentTitle from '@hooks/useWorkspaceDocumentTitle';
@@ -87,7 +87,7 @@ function WorkspaceOverviewPage({policyDraft, policy: policyProp, route}: Workspa
     const styles = useThemeStyles();
     const {translate, localeCompare} = useLocalize();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
-    const shouldShowHeaderButtonsInHeaderRow = useShouldShowHeaderButtonsInHeaderRow();
+    const shouldDisplayButtonsInSeparateLine = useShouldDisplayButtonsInSeparateLine();
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const {getCurrencySymbol} = useCurrencyListActions();
     const illustrationIcons = useMemoizedLazyIllustrations(['Building']);
@@ -515,8 +515,8 @@ function WorkspaceOverviewPage({policyDraft, policy: policyProp, route}: Workspa
                     icon={expensifyIcons.UserPlus}
                     onPress={handleInvitePress}
                     medium
-                    innerStyles={[!shouldShowHeaderButtonsInHeaderRow && styles.alignItemsCenter]}
-                    style={[!shouldShowHeaderButtonsInHeaderRow && styles.flexGrow1, !shouldShowHeaderButtonsInHeaderRow && styles.mb3]}
+                    innerStyles={[shouldDisplayButtonsInSeparateLine && styles.alignItemsCenter]}
+                    style={[shouldDisplayButtonsInSeparateLine && styles.flexGrow1, shouldDisplayButtonsInSeparateLine && styles.mb3]}
                 />
             )}
             {dropdownMenu}
@@ -583,11 +583,11 @@ function WorkspaceOverviewPage({policyDraft, policy: policyProp, route}: Workspa
             shouldShowNotFoundPage={policy === undefined}
             onBackButtonPress={handleBackButtonPress}
             addBottomSafeAreaPadding
-            headerContent={shouldShowHeaderButtonsInHeaderRow && headerButtons}
+            headerContent={!shouldDisplayButtonsInSeparateLine && headerButtons}
             modals={modals}
         >
             <View style={[styles.flex1, styles.mt3, shouldUseNarrowLayout ? styles.workspaceSectionMobile : styles.workspaceSection]}>
-                {!shouldShowHeaderButtonsInHeaderRow && <View style={[styles.pl5, styles.pr5, styles.pb5]}>{headerButtons}</View>}
+                {shouldDisplayButtonsInSeparateLine && <View style={[styles.pl5, styles.pr5, styles.pb5]}>{headerButtons}</View>}
                 <Section
                     isCentralPane
                     title=""
