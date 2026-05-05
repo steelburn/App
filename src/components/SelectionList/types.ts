@@ -115,6 +115,9 @@ type BaseSelectionListProps<TItem extends ListItem> = {
     /** Configuration for the confirm button */
     confirmButtonOptions?: ConfirmButtonOptions<TItem>;
 
+    /** Whether to clear the text input when a row is selected */
+    shouldClearInputOnSelect?: boolean;
+
     /** Whether hover style should be disabled */
     shouldDisableHoverStyle?: boolean;
 
@@ -182,9 +185,6 @@ type SelectionListProps<TItem extends ListItem> = Partial<ChildrenProps> &
 
         /** Whether to place customListHeader in the list so it scrolls with data */
         shouldHeaderBeInsideList?: boolean;
-
-        /** Whether to clear the text input when a row is selected */
-        shouldClearInputOnSelect?: boolean;
     };
 
 type SelectionListStyle = {

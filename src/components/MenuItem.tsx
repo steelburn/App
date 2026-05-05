@@ -253,7 +253,7 @@ type MenuItemBaseProps = ForwardedFSClassProps &
         subtitle?: string | number;
 
         /** Any additional styles to apply to the subtitle */
-        subtitleStyle?: StyleProp<TextStyle>;
+        subtitleStyle?: StyleProp<ViewStyle>;
 
         /** Should the title show with normal font weight (not bold) */
         shouldShowBasicTitle?: boolean;
@@ -1084,7 +1084,11 @@ function MenuItem({
                                                     <Badge
                                                         text={badgeText}
                                                         icon={badgeIcon}
-                                                        badgeStyles={[badgeStyle, focused && !isBadgeSuccess && styles.badgeDefaultActive]}
+                                                        badgeStyles={[
+                                                            badgeStyle,
+                                                            focused && !isBadgeSuccess && styles.badgeDefaultActive,
+                                                            (!!rightComponent || shouldShowRightIcon) && styles.mr2,
+                                                        ]}
                                                         success={isBadgeSuccess}
                                                         isStrong={isBadgeStrong}
                                                         isCondensed={isBadgeCondensed}
@@ -1095,8 +1099,8 @@ function MenuItem({
                                                 )}
                                                 {/* Since subtitle can be of type number, we should allow 0 to be shown */}
                                                 {(subtitle === 0 || !!subtitle) && (
-                                                    <View style={[styles.justifyContentCenter, styles.mr1]}>
-                                                        <Text style={[styles.textLabelSupporting, ...(combinedStyle as TextStyle[]), subtitleStyle]}>{subtitle}</Text>
+                                                    <View style={[styles.justifyContentCenter, styles.mr1, subtitleStyle]}>
+                                                        <Text style={[styles.textLabelSupporting, ...(combinedStyle as TextStyle[])]}>{subtitle}</Text>
                                                     </View>
                                                 )}
                                                 {(!!rightIconAccountID || !!rightIconReportID) && (
@@ -1135,7 +1139,7 @@ function MenuItem({
                                                                 height={variables.iconSizeSmall}
                                                             />
                                                         )}
-                                                        <Text style={styles.rightLabelMenuItem}>{rightLabel}</Text>
+                                                        <Text style={[styles.rightLabelMenuItem, (!!rightComponent || shouldShowRightIcon) && styles.mr2]}>{rightLabel}</Text>
                                                     </View>
                                                 )}
                                                 {shouldShowRightIcon && (

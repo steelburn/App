@@ -542,5 +542,4 @@ function ParticipantSearchResults({
 }
 
 export default ParticipantSearchResults;
-export {sanitizedSelectedParticipant};
 export type {ParticipantSearchResultsProps};

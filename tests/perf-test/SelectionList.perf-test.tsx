@@ -69,7 +69,6 @@ jest.mock('@react-navigation/native', () => ({
 }));
 
 jest.mock('../../src/hooks/useKeyboardState', () => ({
-    // eslint-disable-next-line @typescript-eslint/naming-convention
     __esModule: true,
     default: jest.fn(() => ({
         isKeyboardShown: false,
@@ -78,7 +77,6 @@ jest.mock('../../src/hooks/useKeyboardState', () => ({
 }));
 
 jest.mock('../../src/hooks/useScreenWrapperTransitionStatus', () => ({
-    // eslint-disable-next-line @typescript-eslint/naming-convention
     __esModule: true,
     default: jest.fn(() => ({
         didScreenTransitionEnd: true,
