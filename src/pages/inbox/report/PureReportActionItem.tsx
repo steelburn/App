@@ -9,7 +9,6 @@ import type {OnyxEntry} from 'react-native-onyx';
 import type {ValueOf} from 'type-fest';
 import * as ActionSheetAwareScrollView from '@components/ActionSheetAwareScrollView';
 import type {ComposerRef} from '@components/Composer/types';
-import DisplayNames from '@components/DisplayNames';
 import Hoverable from '@components/Hoverable';
 import InlineSystemMessage from '@components/InlineSystemMessage';
 import {ModalActions} from '@components/Modal/Global/ModalContext';

@@ -68,7 +68,6 @@ function ReportScreenProviders({children}: PropsWithChildren) {
 }
 
 const renderReportActionCompose = (props?: Partial<ReportActionComposeProps>) => {
-    // eslint-disable-next-line react/jsx-props-no-spreading
     return render(
         <ReportScreenProviders>
             <ReportActionCompose

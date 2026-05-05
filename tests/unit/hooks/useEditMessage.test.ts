@@ -36,25 +36,21 @@ jest.mock('@pages/inbox/report/ContextMenu/ReportActionContextMenu', () => {
 });
 
 jest.mock('@hooks/useAncestors', () => ({
-    // eslint-disable-next-line @typescript-eslint/naming-convention
     __esModule: true,
     default: () => [],
 }));
 
 jest.mock('@hooks/useCurrentUserPersonalDetails', () => ({
-    // eslint-disable-next-line @typescript-eslint/naming-convention
     __esModule: true,
     default: () => ({email: 'user@test.com'}),
 }));
 
 jest.mock('@hooks/useReportIsArchived', () => ({
-    // eslint-disable-next-line @typescript-eslint/naming-convention
     __esModule: true,
     default: () => false,
 }));
 
 jest.mock('@hooks/useReportScrollManager', () => ({
-    // eslint-disable-next-line @typescript-eslint/naming-convention
     __esModule: true,
     default: () => ({scrollToIndex: jest.fn()}),
 }));
