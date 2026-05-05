@@ -1058,7 +1058,7 @@ function filterAllInactiveCards(cards: CardList | undefined, includeDeactivated 
             return !!card.nameValuePairs?.frozen || (includeDeactivated && isZeroLimitExpensifyCard);
         }
         if (card.state === CONST.EXPENSIFY_CARD.STATE.STATE_DEACTIVATED) {
-            return includeDeactivated && card.bank === CONST.EXPENSIFY_CARD.BANK;
+            return includeDeactivated && card.bank === CONST.EXPENSIFY_CARD.BANK && !!card.cardName;
         }
 
         return !closedStates.has(card.state);

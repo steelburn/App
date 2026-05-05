@@ -3390,36 +3390,81 @@ describe('CardUtils', () => {
             expect(Object.keys(result)).toHaveLength(0);
         });
 
-        it('includes deactivated Expensify Cards regardless of limit and zero-limit suspended Expensify Cards when includeDeactivated is true', () => {
-            const baseFields = {bank: CONST.EXPENSIFY_CARD.BANK, cardName: '', domainName: '', fraud: 'none', lastFourPAN: '', lastScrape: '', lastUpdated: ''};
+        it('includes only actually-issued deactivated Expensify Cards and zero-limit suspended Expensify Cards when includeDeactivated is true', () => {
+            const baseFields = {bank: CONST.EXPENSIFY_CARD.BANK, domainName: '', fraud: 'none', lastFourPAN: '', lastScrape: '', lastUpdated: ''};
             const cards: CardList = {
-                active: {cardID: 1, state: CONST.EXPENSIFY_CARD.STATE.OPEN, ...baseFields, nameValuePairs: {unapprovedExpenseLimit: 1000}},
-                closed: {cardID: 2, state: CONST.EXPENSIFY_CARD.STATE.CLOSED, ...baseFields, nameValuePairs: {unapprovedExpenseLimit: 0}},
-                zeroLimitDeactivated: {cardID: 3, state: CONST.EXPENSIFY_CARD.STATE.STATE_DEACTIVATED, ...baseFields, nameValuePairs: {unapprovedExpenseLimit: 0}},
-                nonZeroDeactivated: {cardID: 4, state: CONST.EXPENSIFY_CARD.STATE.STATE_DEACTIVATED, ...baseFields, nameValuePairs: {unapprovedExpenseLimit: 5000}},
-                zeroLimitSuspended: {cardID: 5, state: CONST.EXPENSIFY_CARD.STATE.STATE_SUSPENDED, ...baseFields, nameValuePairs: {unapprovedExpenseLimit: 0}},
-                nonZeroSuspended: {cardID: 6, state: CONST.EXPENSIFY_CARD.STATE.STATE_SUSPENDED, ...baseFields, nameValuePairs: {unapprovedExpenseLimit: 5000}},
-                thirdPartyDeactivated: {cardID: 7, state: CONST.EXPENSIFY_CARD.STATE.STATE_DEACTIVATED, ...baseFields, bank: 'vcf', nameValuePairs: {unapprovedExpenseLimit: 0}},
+                active: {cardID: 1, state: CONST.EXPENSIFY_CARD.STATE.OPEN, ...baseFields, cardName: '1234', nameValuePairs: {unapprovedExpenseLimit: 1000}},
+                closed: {cardID: 2, state: CONST.EXPENSIFY_CARD.STATE.CLOSED, ...baseFields, cardName: '5678', nameValuePairs: {unapprovedExpenseLimit: 0}},
+                issuedDeactivatedZeroLimit: {cardID: 3, state: CONST.EXPENSIFY_CARD.STATE.STATE_DEACTIVATED, ...baseFields, cardName: '9012', nameValuePairs: {unapprovedExpenseLimit: 0}},
+                issuedDeactivatedNonZero: {cardID: 4, state: CONST.EXPENSIFY_CARD.STATE.STATE_DEACTIVATED, ...baseFields, cardName: '3456', nameValuePairs: {unapprovedExpenseLimit: 5000}},
+                zeroLimitSuspended: {cardID: 5, state: CONST.EXPENSIFY_CARD.STATE.STATE_SUSPENDED, ...baseFields, cardName: '', nameValuePairs: {unapprovedExpenseLimit: 0}},
+                nonZeroSuspended: {cardID: 6, state: CONST.EXPENSIFY_CARD.STATE.STATE_SUSPENDED, ...baseFields, cardName: '', nameValuePairs: {unapprovedExpenseLimit: 5000}},
+                thirdPartyDeactivated: {
+                    cardID: 7,
+                    state: CONST.EXPENSIFY_CARD.STATE.STATE_DEACTIVATED,
+                    ...baseFields,
+                    cardName: '7890',
+                    bank: 'vcf',
+                    nameValuePairs: {unapprovedExpenseLimit: 0},
+                },
+                neverIssuedDeactivated: {cardID: 8, state: CONST.EXPENSIFY_CARD.STATE.STATE_DEACTIVATED, ...baseFields, cardName: '', nameValuePairs: {unapprovedExpenseLimit: 1000}},
+                neverIssuedDeactivatedZero: {cardID: 9, state: CONST.EXPENSIFY_CARD.STATE.STATE_DEACTIVATED, ...baseFields, cardName: '', nameValuePairs: {unapprovedExpenseLimit: 0}},
             } as unknown as CardList;
 
             const ids = Object.values(filterAllInactiveCards(cards, true)).map((c) => c.cardID);
+            // Issued deactivated cards (non-empty cardName) are included
             expect(ids).toEqual(expect.arrayContaining([1, 3, 4, 5]));
+            // Closed cards, non-zero suspended, third-party deactivated are excluded
             expect(ids).not.toContain(2);
             expect(ids).not.toContain(6);
             expect(ids).not.toContain(7);
+            // Never-issued deactivated stubs (empty cardName) are excluded
+            expect(ids).not.toContain(8);
+            expect(ids).not.toContain(9);
         });
     });
 
     describe('filterInactiveCardsForWorkspace', () => {
-        it('keeps all deactivated Expensify Cards and zero-limit suspended Expensify Cards', () => {
+        it('keeps issued deactivated Expensify Cards and zero-limit suspended Expensify Cards, excludes never-issued stubs', () => {
             const cardsList = {
                 cardList: {assignable1: 'encrypted1'},
-                active: {cardID: 1, state: CONST.EXPENSIFY_CARD.STATE.OPEN, bank: CONST.EXPENSIFY_CARD.BANK, nameValuePairs: {unapprovedExpenseLimit: 1000}},
-                closed: {cardID: 2, state: CONST.EXPENSIFY_CARD.STATE.CLOSED, bank: CONST.EXPENSIFY_CARD.BANK, nameValuePairs: {unapprovedExpenseLimit: 0}},
-                zeroLimitDeactivated: {cardID: 3, state: CONST.EXPENSIFY_CARD.STATE.STATE_DEACTIVATED, bank: CONST.EXPENSIFY_CARD.BANK, nameValuePairs: {unapprovedExpenseLimit: 0}},
-                nonZeroDeactivated: {cardID: 4, state: CONST.EXPENSIFY_CARD.STATE.STATE_DEACTIVATED, bank: CONST.EXPENSIFY_CARD.BANK, nameValuePairs: {unapprovedExpenseLimit: 1000}},
-                zeroLimitSuspended: {cardID: 5, state: CONST.EXPENSIFY_CARD.STATE.STATE_SUSPENDED, bank: CONST.EXPENSIFY_CARD.BANK, nameValuePairs: {unapprovedExpenseLimit: 0}},
-                nonZeroSuspended: {cardID: 6, state: CONST.EXPENSIFY_CARD.STATE.STATE_SUSPENDED, bank: CONST.EXPENSIFY_CARD.BANK, nameValuePairs: {unapprovedExpenseLimit: 5000}},
+                active: {cardID: 1, state: CONST.EXPENSIFY_CARD.STATE.OPEN, bank: CONST.EXPENSIFY_CARD.BANK, cardName: '1234', nameValuePairs: {unapprovedExpenseLimit: 1000}},
+                closed: {cardID: 2, state: CONST.EXPENSIFY_CARD.STATE.CLOSED, bank: CONST.EXPENSIFY_CARD.BANK, cardName: '5678', nameValuePairs: {unapprovedExpenseLimit: 0}},
+                zeroLimitDeactivated: {
+                    cardID: 3,
+                    state: CONST.EXPENSIFY_CARD.STATE.STATE_DEACTIVATED,
+                    bank: CONST.EXPENSIFY_CARD.BANK,
+                    cardName: '9012',
+                    nameValuePairs: {unapprovedExpenseLimit: 0},
+                },
+                nonZeroDeactivated: {
+                    cardID: 4,
+                    state: CONST.EXPENSIFY_CARD.STATE.STATE_DEACTIVATED,
+                    bank: CONST.EXPENSIFY_CARD.BANK,
+                    cardName: '3456',
+                    nameValuePairs: {unapprovedExpenseLimit: 1000},
+                },
+                zeroLimitSuspended: {
+                    cardID: 5,
+                    state: CONST.EXPENSIFY_CARD.STATE.STATE_SUSPENDED,
+                    bank: CONST.EXPENSIFY_CARD.BANK,
+                    cardName: '',
+                    nameValuePairs: {unapprovedExpenseLimit: 0},
+                },
+                nonZeroSuspended: {
+                    cardID: 6,
+                    state: CONST.EXPENSIFY_CARD.STATE.STATE_SUSPENDED,
+                    bank: CONST.EXPENSIFY_CARD.BANK,
+                    cardName: '',
+                    nameValuePairs: {unapprovedExpenseLimit: 5000},
+                },
+                neverIssuedDeactivated: {
+                    cardID: 7,
+                    state: CONST.EXPENSIFY_CARD.STATE.STATE_DEACTIVATED,
+                    bank: CONST.EXPENSIFY_CARD.BANK,
+                    cardName: '',
+                    nameValuePairs: {unapprovedExpenseLimit: 1000},
+                },
             } as unknown as Parameters<typeof filterInactiveCardsForWorkspace>[0];
 
             const result = filterInactiveCardsForWorkspace(cardsList);
@@ -3429,6 +3474,7 @@ describe('CardUtils', () => {
             expect(result.zeroLimitSuspended).toBeDefined();
             expect(result.closed).toBeUndefined();
             expect(result.nonZeroSuspended).toBeUndefined();
+            expect(result.neverIssuedDeactivated).toBeUndefined();
             expect(result.cardList).toBeDefined();
         });
     });
