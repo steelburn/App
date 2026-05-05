@@ -24,7 +24,7 @@ function IncorporationCode({onNext, isEditing}: SubStepProps) {
     const handleSubmit = useReimbursementAccountStepFormSubmit({
         fieldIds: STEP_FIELDS,
         onNext,
-        shouldSaveDraft: isEditing,
+        shouldSaveDraft: true,
     });
 
     const validate = (values: FormOnyxValues<typeof ONYXKEYS.FORMS.REIMBURSEMENT_ACCOUNT_FORM>): FormInputErrors<typeof ONYXKEYS.FORMS.REIMBURSEMENT_ACCOUNT_FORM> => {
@@ -53,8 +53,8 @@ function IncorporationCode({onNext, isEditing}: SubStepProps) {
             <InputWrapper
                 InputComponent={IndustryCodeSelector}
                 inputID={COMPANY_INCORPORATION_CODE_KEY}
-                shouldSaveDraft={!isEditing}
-                defaultValue={reimbursementAccount?.achData?.industryCode}
+                shouldSaveDraft={false}
+                defaultValue={isEditing ? reimbursementAccount?.achData?.industryCode : ''}
             />
         </FormProvider>
     );
