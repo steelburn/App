@@ -44,10 +44,10 @@ If the resolved bundle ID is missing from the list, **STOP** and instruct the de
 ### 4. Metro
 
 ```bash
-agent-device metro prepare --public-base-url http://localhost:8081 --port 8081
+agent-device metro prepare --public-base-url http://localhost:8081 --port 8081 --kind react-native
 ```
 
-If this returns non-zero, **STOP** and surface the error verbatim. Do not fall back to raw `npm run start`.
+If `metro prepare` fails, **STOP** and surface the error verbatim.
 
 ### 5. Pick a target device
 
