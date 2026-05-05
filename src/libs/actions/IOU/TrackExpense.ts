@@ -117,9 +117,8 @@ import {
     getReportPreviewAction,
     getSearchOnyxUpdate,
     getTransactionWithPreservedLocalReceiptSource,
-    handleNavigateAfterExpenseCreate,
-    highlightTransactionOnSearchRouteIfNeeded,
 } from './index';
+import {handleNavigateAfterExpenseCreate, highlightTransactionOnSearchRouteIfNeeded} from './NavigationHelpers';
 import type BasePolicyParams from './types/BasePolicyParams';
 import type {CreateTrackExpenseParams} from './types/CreateTrackExpenseParams';
 import type {
