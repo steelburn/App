@@ -70,12 +70,8 @@ const useRestartOnOdometerImagesFailure = (
             },
         ].filter(({path}) => !!path && path.startsWith('blob:'));
 
-        if (urlsToCheck.length === 0) {
-            // No stale blobs at mount = later additions are session-fresh
-            setAsyncVerificationPassed(true);
-            return;
-        }
-
+        // Empty urlsToCheck flows through Promise.all -> [].every(Boolean) === true -> marks verification passed
+        // Later blob additions (draft hydration, fresh capture) are minted in this session and stay trusted
         Promise.all(
             urlsToCheck.map(
                 ({filename, path, type}) =>
