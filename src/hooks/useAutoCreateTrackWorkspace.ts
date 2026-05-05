@@ -112,6 +112,12 @@ function useAutoCreateTrackWorkspace() {
 
                 if (isSidePanelReportSupported) {
                     rhpVariant = extractRHPVariantFromResponse(response);
+                    // TRACK_PERSONAL should also navigate to concierge in RHP, same as TRACK_BUSINESS.
+                    // The backend only returns trackExpensesWithConcierge for TRACK_WORKSPACE (TRACK_BUSINESS),
+                    // so we fall back to it for TRACK_PERSONAL when the backend doesn't set it.
+                    if (!rhpVariant && onboardingPurposeSelected === CONST.ONBOARDING_CHOICES.TRACK_PERSONAL) {
+                        rhpVariant = CONST.ONBOARDING_RHP_VARIANT.TRACK_EXPENSES_WITH_CONCIERGE;
+                    }
                 }
             } catch (error) {
                 Log.warn('[useAutoCreateTrackWorkspace] Error completing onboarding', {error});
