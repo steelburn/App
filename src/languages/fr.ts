@@ -7794,6 +7794,7 @@ Ajoutez davantage de règles de dépenses pour protéger la trésorerie de l’e
             withdrawalType: {
                 [CONST.SEARCH.WITHDRAWAL_TYPE.EXPENSIFY_CARD]: 'Carte Expensify',
                 [CONST.SEARCH.WITHDRAWAL_TYPE.REIMBURSEMENT]: 'Remboursement',
+                [CONST.SEARCH.WITHDRAWAL_TYPE.CENTRAL_TRAVEL_INVOICING]: 'Facturation centralisée',
             },
             is: 'Est',
             action: {

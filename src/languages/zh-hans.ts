@@ -7534,6 +7534,7 @@ ${reportName}
             withdrawalType: {
                 [CONST.SEARCH.WITHDRAWAL_TYPE.EXPENSIFY_CARD]: 'Expensify 卡',
                 [CONST.SEARCH.WITHDRAWAL_TYPE.REIMBURSEMENT]: '报销',
+                [CONST.SEARCH.WITHDRAWAL_TYPE.CENTRAL_TRAVEL_INVOICING]: '集中开票',
             },
             is: '是',
             action: {
