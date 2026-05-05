@@ -68,7 +68,6 @@ function WorkspaceTagsSettingsPage({route}: WorkspaceTagsSettingsPageProps) {
         [policyData],
     );
     const isQuickSettingsFlow = route.name === SCREENS.SETTINGS_TAGS.SETTINGS_TAGS_SETTINGS;
-    console.log('****** WorkspaceTagsSettingsPage ******');
 
     const getTagsSettings = (policy: OnyxEntry<Policy>) => (
         <View style={styles.flexGrow1}>

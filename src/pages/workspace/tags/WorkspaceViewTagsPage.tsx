@@ -63,7 +63,6 @@ type WorkspaceViewTagsProps =
 
 function WorkspaceViewTagsPage({route}: WorkspaceViewTagsProps) {
     const {policyID, orderWeight: orderWeightParam} = route.params;
-    const backTo = 'backTo' in route.params ? route.params.backTo : undefined;
     const orderWeight = Number(orderWeightParam);
 
     // We need to use isSmallScreenWidth instead of shouldUseNarrowLayout for the small screen selection mode
@@ -340,8 +339,6 @@ function WorkspaceViewTagsPage({route}: WorkspaceViewTagsProps) {
     if (!!currentPolicyTag?.required && !Object.values(currentPolicyTag?.tags ?? {}).some((tag) => tag.enabled)) {
         setPolicyTagsRequired(policyData, false, orderWeight);
     }
-
-    console.log('****** WorkspaceViewTagsPage ******');
 
     const navigateToEditTag = () => {
         Navigation.navigate(
