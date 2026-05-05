@@ -26,6 +26,7 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import {convertToShortDisplayString} from '@libs/CurrencyUtils';
 import {navigateAfterOnboardingWithMicrotaskQueue} from '@libs/navigateAfterOnboarding';
 import Navigation from '@libs/Navigation/Navigation';
+import isTrackOnboardingChoice from '@libs/OnboardingUtils';
 import {isPaidGroupPolicy, isPolicyAdmin} from '@libs/PolicyUtils';
 import {getSubscriptionPrice} from '@libs/SubscriptionUtils';
 import {createWorkspace, generateDefaultWorkspaceName, generatePolicyID} from '@userActions/Policy/Policy';
@@ -282,11 +283,7 @@ function BaseOnboardingWorkspaceOptional({shouldUseNativeStyles}: BaseOnboarding
                             text={translate('onboarding.workspace.createWorkspace')}
                             onPress={() => {
                                 setOnboardingErrorMessage(null);
-                                if (
-                                    onboardingPurposeSelected === CONST.ONBOARDING_CHOICES.TRACK_BUSINESS ||
-                                    onboardingPurposeSelected === CONST.ONBOARDING_CHOICES.TRACK_PERSONAL ||
-                                    onboardingPurposeSelected === CONST.ONBOARDING_CHOICES.PERSONAL_SPEND
-                                ) {
+                                if (isTrackOnboardingChoice(onboardingPurposeSelected)) {
                                     createWorkspaceAndCompleteOnboarding();
                                     return;
                                 }

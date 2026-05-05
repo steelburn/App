@@ -17,6 +17,7 @@ import Animations from '@libs/Navigation/PlatformStackNavigation/navigationOptio
 import type {PlatformStackNavigationOptions} from '@libs/Navigation/PlatformStackNavigation/types';
 import type {OnboardingModalNavigatorParamList} from '@libs/Navigation/types';
 import OnboardingRefManager from '@libs/OnboardingRefManager';
+import isTrackOnboardingChoice from '@libs/OnboardingUtils';
 import OnboardingAccounting from '@pages/OnboardingAccounting';
 import OnboardingEmployees from '@pages/OnboardingEmployees';
 import OnboardingInterestedFeatures from '@pages/OnboardingInterestedFeatures';
@@ -60,12 +61,7 @@ function OnboardingModalNavigator() {
         initialRouteName = SCREENS.ONBOARDING.WORK_EMAIL;
     }
 
-    if (
-        (onboardingPurposeSelected === CONST.ONBOARDING_CHOICES.TRACK_BUSINESS ||
-            onboardingPurposeSelected === CONST.ONBOARDING_CHOICES.TRACK_PERSONAL ||
-            onboardingPurposeSelected === CONST.ONBOARDING_CHOICES.PERSONAL_SPEND) &&
-        !!onboardingPolicyID
-    ) {
+    if (isTrackOnboardingChoice(onboardingPurposeSelected) && !!onboardingPolicyID) {
         initialRouteName = SCREENS.ONBOARDING.WORKSPACE_INVITE;
     }
 
