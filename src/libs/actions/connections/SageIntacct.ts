@@ -623,18 +623,6 @@ function updateSageIntacctDefaultVendor(policyID: string, settingName: keyof Sag
         updateSageIntacctNonreimbursableExpensesExportVendor(policyID, vendor, oldVendor);
     }
 }
-function updateSageIntacctTravelInvoicingVendor(policyID: string, vendorID: string, oldVendorID?: string) {
-    const onyxData = prepareOnyxDataForExportUpdate(policyID, CONST.SAGE_INTACCT_CONFIG.TRAVEL_INVOICING_VENDOR, vendorID, oldVendorID);
-    const parameters: UpdateManyPolicyConnectionConfigurationsParams = {
-        policyID,
-        connectionName: CONST.POLICY.CONNECTIONS.NAME.SAGE_INTACCT,
-        configUpdate: JSON.stringify({[CONST.SAGE_INTACCT_CONFIG.EXPORT]: {[CONST.SAGE_INTACCT_CONFIG.TRAVEL_INVOICING_VENDOR]: vendorID}}),
-        idempotencyKey: CONST.SAGE_INTACCT_CONFIG.TRAVEL_INVOICING_VENDOR,
-    };
-
-    API.write(WRITE_COMMANDS.UPDATE_MANY_POLICY_CONNECTION_CONFIGS, parameters, onyxData);
-}
-
 function updateSageIntacctTravelInvoicingPayableAccount(policyID: string, accountID: string, oldAccountID?: string) {
     const onyxData = prepareOnyxDataForExportUpdate(policyID, CONST.SAGE_INTACCT_CONFIG.TRAVEL_INVOICING_PAYABLE_ACCOUNT, accountID, oldAccountID);
     const parameters: UpdateManyPolicyConnectionConfigurationsParams = {
@@ -1000,7 +988,6 @@ export {
     updateSageIntacctNonreimbursableExpensesExportDestination,
     updateSageIntacctNonreimbursableExpensesExportAccount,
     updateSageIntacctDefaultVendor,
-    updateSageIntacctTravelInvoicingVendor,
     updateSageIntacctTravelInvoicingPayableAccount,
     updateSageIntacctAutoSync,
     updateSageIntacctImportEmployees,

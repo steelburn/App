@@ -30,8 +30,6 @@ function SageIntacctExportPage({policy}: WithPolicyProps) {
     const route = useRoute<PlatformStackRouteProp<SettingsNavigatorParamList, typeof SCREENS.WORKSPACE.ACCOUNTING.SAGE_INTACCT_EXPORT>>();
     const backTo = route?.params?.backTo;
     const {export: exportConfig, pendingFields, errorFields} = policy?.connections?.intacct?.config ?? {};
-    const {bankAccounts} = policy?.connections?.intacct?.data ?? {};
-    const travelPayableAccount = bankAccounts?.find((account) => account.id === exportConfig?.travelInvoicingPayableAccountID);
     const shouldGoBackToSpecificRoute = exportConfig?.reimbursable === CONST.SAGE_INTACCT_REIMBURSABLE_EXPENSE_TYPE.EXPENSE_REPORT;
 
     const workspaceAccountID = useWorkspaceAccountID(policyID);
@@ -65,10 +63,10 @@ function SageIntacctExportPage({policy}: WithPolicyProps) {
         ...(isTravelInvoicingEnabled
             ? [
                   {
-                      title: travelPayableAccount?.name,
+                      title: translate(`workspace.sageIntacct.nonReimbursableExpenses.values.${CONST.SAGE_INTACCT_NON_REIMBURSABLE_EXPENSE_TYPE.CREDIT_CARD_CHARGE}`),
                       description: translate('workspace.common.travelInvoicing'),
                       action: !policyID ? undefined : () => Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.POLICY_ACCOUNTING_SAGE_INTACCT_TRAVEL_INVOICING_CONFIGURATION.path)),
-                      subscribedSettings: [CONST.SAGE_INTACCT_CONFIG.TRAVEL_INVOICING_VENDOR, CONST.SAGE_INTACCT_CONFIG.TRAVEL_INVOICING_PAYABLE_ACCOUNT],
+                      subscribedSettings: [CONST.SAGE_INTACCT_CONFIG.TRAVEL_INVOICING_PAYABLE_ACCOUNT],
                   },
               ]
             : []),

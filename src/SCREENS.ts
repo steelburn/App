@@ -549,7 +549,6 @@ const SCREENS = {
             NETSUITE_TRAVEL_INVOICING_CONFIGURATION: 'Workspace_Accounting_NetSuite_Travel_Invoicing_Configuration',
             NETSUITE_TRAVEL_INVOICING_PAYABLE_ACCOUNT_SELECT: 'Workspace_Accounting_NetSuite_Travel_Invoicing_Payable_Account_Select',
             DYNAMIC_SAGE_INTACCT_TRAVEL_INVOICING_CONFIGURATION: 'Dynamic_Policy_Accounting_Sage_Intacct_Travel_Invoicing_Configuration',
-            DYNAMIC_SAGE_INTACCT_TRAVEL_INVOICING_VENDOR_SELECT: 'Dynamic_Policy_Accounting_Sage_Intacct_Travel_Invoicing_Vendor_Select',
             DYNAMIC_SAGE_INTACCT_TRAVEL_INVOICING_PAYABLE_ACCOUNT_SELECT: 'Dynamic_Policy_Accounting_Sage_Intacct_Travel_Invoicing_Payable_Account_Select',
             DYNAMIC_QUICKBOOKS_ONLINE_EXPORT_OUT_OF_POCKET_EXPENSES: 'Dynamic_Workspace_Accounting_Quickbooks_Online_Export_Out_Of_Pocket_Expenses',
             DYNAMIC_QUICKBOOKS_ONLINE_EXPORT_OUT_OF_POCKET_EXPENSES_SELECT: 'Dynamic_Workspace_Accounting_Quickbooks_Online_Export_Out_Of_Pocket_Expenses_Select',

@@ -16,6 +16,7 @@ import type {ReceiptErrors} from '@src/types/onyx/Transaction';
 type TravelInvoicingPayableAccountSelectPageProps = {
     policyID: string;
     displayName: string;
+    title?: TranslationPaths;
     data: Array<SelectorType<string>>;
     connectionName: ConnectionName;
     emptyStateTitle: TranslationPaths;
@@ -30,6 +31,7 @@ type TravelInvoicingPayableAccountSelectPageProps = {
 function TravelInvoicingPayableAccountSelectPage({
     policyID,
     displayName,
+    title = 'workspace.common.travelInvoicingPayableAccount',
     data,
     connectionName,
     emptyStateTitle,
@@ -61,7 +63,7 @@ function TravelInvoicingPayableAccountSelectPage({
             accessVariants={[CONST.POLICY.ACCESS_VARIANTS.ADMIN]}
             featureName={CONST.POLICY.MORE_FEATURES.ARE_CONNECTIONS_ENABLED}
             displayName={displayName}
-            title="workspace.common.travelInvoicingPayableAccount"
+            title={title}
             data={data}
             listItem={RadioListItem}
             onSelectRow={onSelect}

@@ -1,6 +1,6 @@
 import type {OnyxKey, OnyxUpdate} from 'react-native-onyx';
 import Onyx from 'react-native-onyx';
-import {updateSageIntacctTravelInvoicingPayableAccount, updateSageIntacctTravelInvoicingVendor} from '@libs/actions/connections/SageIntacct';
+import {updateSageIntacctTravelInvoicingPayableAccount} from '@libs/actions/connections/SageIntacct';
 import * as API from '@libs/API';
 import type {WriteCommand} from '@libs/API/types';
 import {WRITE_COMMANDS} from '@libs/API/types';
@@ -57,78 +57,6 @@ describe('actions/connections/SageIntacct', () => {
         jest.clearAllMocks();
         (getMicroSecondOnyxErrorWithTranslationKey as jest.Mock).mockReturnValue(MOCK_ONYX_ERROR);
         return Onyx.clear().then(waitForBatchedUpdates);
-    });
-
-    describe('updateSageIntacctTravelInvoicingVendor', () => {
-        beforeEach(() => {
-            writeSpy.mockClear();
-        });
-
-        it('writes the UpdateManyPolicyConnectionConfigs command with travelInvoicingVendorID', () => {
-            updateSageIntacctTravelInvoicingVendor(MOCK_POLICY_ID, 'vendor-123', 'old-vendor');
-
-            const {command} = getFirstWriteCall();
-            expect(command).toBe(WRITE_COMMANDS.UPDATE_MANY_POLICY_CONNECTION_CONFIGS);
-
-            const call = writeSpy.mock.calls.at(0);
-            const params = call?.[1] as {connectionName: string; configUpdate: string; idempotencyKey: string; policyID: string};
-            expect(params.policyID).toBe(MOCK_POLICY_ID);
-            expect(params.connectionName).toBe(CONST.POLICY.CONNECTIONS.NAME.SAGE_INTACCT);
-            expect(params.idempotencyKey).toBe(CONST.SAGE_INTACCT_CONFIG.TRAVEL_INVOICING_VENDOR);
-            expect(JSON.parse(params.configUpdate)).toEqual({[CONST.SAGE_INTACCT_CONFIG.EXPORT]: {[CONST.SAGE_INTACCT_CONFIG.TRAVEL_INVOICING_VENDOR]: 'vendor-123'}});
-        });
-
-        it('updates travelInvoicingVendorID optimistically, sets pending field, and clears error field', () => {
-            updateSageIntacctTravelInvoicingVendor(MOCK_POLICY_ID, 'vendor-123', 'old-vendor');
-
-            const {onyxData} = getFirstWriteCall();
-            const optimisticUpdate = onyxData?.optimisticData?.at(0);
-            expect(optimisticUpdate?.key).toBe(`${ONYXKEYS.COLLECTION.POLICY}${MOCK_POLICY_ID}`);
-
-            const configUpdate = getRequiredSageIntacctConfig(optimisticUpdate);
-            expect(configUpdate.export?.[CONST.SAGE_INTACCT_CONFIG.TRAVEL_INVOICING_VENDOR]).toBe('vendor-123');
-            expect(configUpdate.pendingFields?.[CONST.SAGE_INTACCT_CONFIG.TRAVEL_INVOICING_VENDOR]).toBe(CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE);
-            expect(configUpdate.errorFields?.[CONST.SAGE_INTACCT_CONFIG.TRAVEL_INVOICING_VENDOR]).toBeNull();
-        });
-
-        it('reverts to the old value and sets an error in failure data', () => {
-            updateSageIntacctTravelInvoicingVendor(MOCK_POLICY_ID, 'vendor-123', 'old-vendor');
-
-            const {onyxData} = getFirstWriteCall();
-            const failureUpdate = onyxData?.failureData?.at(0);
-            const configUpdate = getRequiredSageIntacctConfig(failureUpdate);
-
-            expect(configUpdate.export?.[CONST.SAGE_INTACCT_CONFIG.TRAVEL_INVOICING_VENDOR]).toBe('old-vendor');
-            expect(configUpdate.pendingFields?.[CONST.SAGE_INTACCT_CONFIG.TRAVEL_INVOICING_VENDOR]).toBeNull();
-            expect(configUpdate.errorFields?.[CONST.SAGE_INTACCT_CONFIG.TRAVEL_INVOICING_VENDOR]).toBe(MOCK_ONYX_ERROR);
-        });
-
-        it('clears pending and error fields on success', () => {
-            updateSageIntacctTravelInvoicingVendor(MOCK_POLICY_ID, 'vendor-123', 'old-vendor');
-
-            const {onyxData} = getFirstWriteCall();
-            const successUpdate = onyxData?.successData?.at(0);
-            const configUpdate = getRequiredSageIntacctConfig(successUpdate);
-
-            expect(configUpdate.pendingFields?.[CONST.SAGE_INTACCT_CONFIG.TRAVEL_INVOICING_VENDOR]).toBeNull();
-            expect(configUpdate.errorFields?.[CONST.SAGE_INTACCT_CONFIG.TRAVEL_INVOICING_VENDOR]).toBeNull();
-        });
-
-        it('uses MERGE operations for each update stage', () => {
-            updateSageIntacctTravelInvoicingVendor(MOCK_POLICY_ID, 'vendor-123', 'old-vendor');
-
-            const {onyxData} = getFirstWriteCall();
-            const updateGroups = [onyxData?.optimisticData, onyxData?.failureData, onyxData?.successData];
-            for (const group of updateGroups) {
-                if (!group) {
-                    continue;
-                }
-                for (const update of group) {
-                    expect(update.onyxMethod).toBe(Onyx.METHOD.MERGE);
-                    expect(update.key).toBe(`${ONYXKEYS.COLLECTION.POLICY}${MOCK_POLICY_ID}`);
-                }
-            }
-        });
     });
 
     describe('updateSageIntacctTravelInvoicingPayableAccount', () => {
