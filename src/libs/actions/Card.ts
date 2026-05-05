@@ -733,6 +733,10 @@ function toggleCashbackToBill(workspaceAccountID: number, programKey: CardProgra
     API.write(WRITE_COMMANDS.TOGGLE_CARD_CASHBACK_TO_BILL, parameters, {optimisticData, successData, failureData});
 }
 
+function clearCashbackToBillError(workspaceAccountID: number) {
+    Onyx.merge(`${ONYXKEYS.COLLECTION.PRIVATE_EXPENSIFY_CARD_SETTINGS}${workspaceAccountID}`, {errors: null});
+}
+
 function updateSettlementAccount(
     domainName: string,
     workspaceAccountID: number,
@@ -1903,6 +1907,7 @@ export {
     updateAssignedCardName,
     updateAssignedCardTransactionStartDate,
     toggleCashbackToBill,
+    clearCashbackToBillError,
     toggleContinuousReconciliation,
     setCardReconciliationAccount,
     updateExpensifyCardLimitType,

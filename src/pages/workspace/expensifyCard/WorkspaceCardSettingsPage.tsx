@@ -11,7 +11,7 @@ import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import usePrivateSubscription from '@hooks/usePrivateSubscription';
 import useThemeStyles from '@hooks/useThemeStyles';
-import {toggleCashbackToBill} from '@libs/actions/Card';
+import {clearCashbackToBillError, toggleCashbackToBill} from '@libs/actions/Card';
 import {getLastFourDigits} from '@libs/BankAccountUtils';
 import {getCardProgramKey, getCardSettings} from '@libs/CardUtils';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
@@ -107,6 +107,7 @@ function WorkspaceCardSettingsPage({route}: WorkspaceCardSettingsPageProps) {
                                 wrapperStyle={[styles.mv3, styles.mh5]}
                                 pendingAction={settings?.pendingFields?.shouldApplyCashbackToBill}
                                 errors={settings?.errors}
+                                onCloseError={() => clearCashbackToBillError(defaultFundID)}
                                 onToggle={(isEnabled: boolean) => {
                                     if (!programKey) {
                                         return;
