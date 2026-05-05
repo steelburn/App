@@ -9,7 +9,7 @@ import StatusBadge from '@components/StatusBadge';
 import useLocalize from '@hooks/useLocalize';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
-import {getReportStatusColorStyle, getReportStatusTranslation} from '@libs/ReportUtils';
+import {getReportStatusColorStyle, getReportStatusTranslation, getStatusBadgeBackgroundColor} from '@libs/ReportUtils';
 import CONST from '@src/CONST';
 import type {ExpenseReportListItemType, TransactionListItemType, TransactionReportGroupListItemType} from './types';
 import UserInfoCellsWithArrow from './UserInfoCellsWithArrow';
@@ -34,8 +34,7 @@ function UserInfoAndActionButtonRow({
     const {translate} = useLocalize();
     const statusText = getReportStatusTranslation({stateNum, statusNum, translate});
     const reportStatusColorStyle = getReportStatusColorStyle(theme, stateNum, statusNum);
-    const isUnreported = stateNum === undefined || statusNum === undefined;
-    const badgeBackgroundColor = isSelected && isUnreported ? theme.buttonHoveredBG : reportStatusColorStyle?.backgroundColor;
+    const badgeBackgroundColor = getStatusBadgeBackgroundColor(theme, stateNum, statusNum, undefined, isSelected);
     const participantFromDisplayName = item.formattedFrom ?? item?.from?.displayName ?? '';
     return (
         <View style={[styles.pt0, styles.flexRow, styles.alignItemsCenter, shouldShowUserInfo ? styles.justifyContentBetween : styles.justifyContentEnd, styles.gap2, containerStyles]}>
