@@ -26,7 +26,6 @@ import useLocalize from '@hooks/useLocalize';
 import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
-import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {clearDelegateErrorsByField, clearDelegatorErrors, connect, openSecuritySettingsPage, removeDelegate} from '@libs/actions/Delegate';
 import {getLatestError} from '@libs/ErrorUtils';
@@ -37,7 +36,6 @@ import {sortAlphabetically} from '@libs/OptionsListUtils';
 import {getPersonalDetailByEmail} from '@libs/PersonalDetailsUtils';
 import type {AnchorPosition} from '@styles/index';
 import colors from '@styles/theme/colors';
-import variables from '@styles/variables';
 import {close as modalClose} from '@userActions/Modal';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -47,10 +45,9 @@ import type {Delegate, DelegateRole} from '@src/types/onyx/Account';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
 
 function CopilotPage() {
-    const icons = useMemoizedLazyExpensifyIcons(['FallbackAvatar', 'Pencil', 'ThreeDots', 'Trashcan', 'UserPlus', 'Users']);
-    const illustrations = useMemoizedLazyIllustrations(['TvScreenRobot']);
+    const icons = useMemoizedLazyExpensifyIcons(['FallbackAvatar', 'Pencil', 'ThreeDots', 'Trashcan', 'UserPlus']);
+    const illustrations = useMemoizedLazyIllustrations(['TvScreenRobot', 'Members']);
     const styles = useThemeStyles();
-    const theme = useTheme();
     const {localeCompare, translate, formatPhoneNumber} = useLocalize();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     useDocumentTitle(translate('delegate.copilot'));
@@ -380,10 +377,7 @@ function CopilotPage() {
                         title={translate('delegate.copilot')}
                         shouldShowBackButton={shouldUseNarrowLayout}
                         onBackButtonPress={Navigation.goBack}
-                        icon={icons.Users}
-                        iconFill={theme.iconSuccessFill}
-                        iconWidth={variables.iconSizeNormal}
-                        iconHeight={variables.iconSizeNormal}
+                        icon={illustrations.Members}
                         shouldUseHeadlineHeader
                         shouldDisplaySearchRouter
                         shouldDisplayHelpButton

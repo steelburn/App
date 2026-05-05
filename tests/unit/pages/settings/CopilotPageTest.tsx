@@ -57,8 +57,8 @@ jest.mock('@hooks/useDocumentTitle', () => jest.fn());
 jest.mock('@hooks/useWindowDimensions', () => jest.fn(() => ({windowWidth: 1280, windowHeight: 800})));
 
 jest.mock('@hooks/useLazyAsset', () => ({
-    useMemoizedLazyIllustrations: jest.fn(() => ({TvScreenRobot: 1})),
-    useMemoizedLazyExpensifyIcons: jest.fn(() => ({FallbackAvatar: 1, Pencil: 1, ThreeDots: 1, Trashcan: 1, UserPlus: 1, Users: 1})),
+    useMemoizedLazyIllustrations: jest.fn(() => ({TvScreenRobot: 1, Members: 1})),
+    useMemoizedLazyExpensifyIcons: jest.fn(() => ({FallbackAvatar: 1, Pencil: 1, ThreeDots: 1, Trashcan: 1, UserPlus: 1})),
 }));
 
 jest.mock('@libs/actions/Delegate', () => ({
