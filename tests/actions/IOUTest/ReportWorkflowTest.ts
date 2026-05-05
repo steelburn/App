@@ -1451,8 +1451,8 @@ describe('actions/IOU/ReportWorkflow', () => {
             expect((optimisticReportUpdate?.value as Report | undefined)?.managerID).toBe(firstApproverAccountID);
         });
 
-        it('does not allow submit while a retract state update is pending', () => {
-            // eslint-disable-next-line rulesdir/no-multiple-api-calls -- Verifying submitReport exits before writing while retract is pending.
+        it('allows submit while a retract state update is pending', () => {
+            // eslint-disable-next-line rulesdir/no-multiple-api-calls -- Verifying submitReport writes while offline retract is pending.
             const apiWriteSpy = jest.spyOn(API, 'write').mockImplementation(() => Promise.resolve());
             const policyID = '1';
             const submitterAccountID = 100;
@@ -1494,8 +1494,7 @@ describe('actions/IOU/ReportWorkflow', () => {
                 currency: CONST.CURRENCY.USD,
             };
 
-            expect(canSubmitReport(report, policy, [transaction], undefined, false, submitterEmail, submitterAccountID)).toBe(false);
-            expect(canSubmitReport({...report, pendingFields: undefined}, policy, [transaction], undefined, false, submitterEmail, submitterAccountID)).toBe(true);
+            expect(canSubmitReport(report, policy, [transaction], undefined, false, submitterEmail, submitterAccountID)).toBe(true);
 
             submitReport({
                 expenseReport: report,
@@ -1511,7 +1510,7 @@ describe('actions/IOU/ReportWorkflow', () => {
                 delegateEmail: undefined,
             });
 
-            expect(apiWriteSpy).not.toHaveBeenCalled();
+            expect(apiWriteSpy).toHaveBeenCalledTimes(1);
         });
 
         it('allows submit while only nextStep is pending', () => {
@@ -1666,8 +1665,8 @@ describe('actions/IOU/ReportWorkflow', () => {
             expect(parameters.managerAccountID).toBe(correctManagerAccountID);
         });
 
-        it('does not submit from search while a retract update is pending', () => {
-            // eslint-disable-next-line rulesdir/no-multiple-api-calls -- Verifying search submit exits before writing while retract is pending.
+        it('submits from search while a retract update is pending', () => {
+            // eslint-disable-next-line rulesdir/no-multiple-api-calls -- Verifying search submit writes while offline retract is pending.
             const apiWriteSpy = jest.spyOn(API, 'write').mockImplementation(() => Promise.resolve());
             const report: Report = {
                 ...createRandomReport(1, undefined),
@@ -1680,7 +1679,7 @@ describe('actions/IOU/ReportWorkflow', () => {
 
             submitMoneyRequestOnSearch(1, [report], [createRandomPolicy(1)]);
 
-            expect(apiWriteSpy).not.toHaveBeenCalled();
+            expect(apiWriteSpy).toHaveBeenCalledTimes(1);
         });
 
         it('submits from search while only nextStep is pending', () => {
@@ -2316,8 +2315,8 @@ describe('actions/IOU/ReportWorkflow', () => {
     });
 
     describe('retractReport', () => {
-        it('sets and clears the retract pending field', () => {
-            // eslint-disable-next-line rulesdir/no-multiple-api-calls -- Inspecting API.write calls to verify retract optimistic, success, and failure data.
+        it('does not set a retract pending field that hides resubmit', () => {
+            // eslint-disable-next-line rulesdir/no-multiple-api-calls -- Inspecting API.write calls to verify retract optimistic data does not hide resubmit.
             const apiWriteSpy = jest.spyOn(API, 'write').mockImplementation(() => Promise.resolve());
             const policy: OnyxEntry<Policy> = createRandomPolicy(1);
             const expenseReport: Report = {
@@ -2332,9 +2331,9 @@ describe('actions/IOU/ReportWorkflow', () => {
             const successReportUpdate = onyxData.successData?.find((update) => update.key === `${ONYXKEYS.COLLECTION.REPORT}${expenseReport.reportID}`);
             const failureReportUpdate = onyxData.failureData?.find((update) => update.key === `${ONYXKEYS.COLLECTION.REPORT}${expenseReport.reportID}`);
 
-            expect((optimisticReportUpdate?.value as Report | undefined)?.pendingFields?.hasReportBeenRetracted).toBe(CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE);
-            expect((successReportUpdate?.value as Report | undefined)?.pendingFields?.hasReportBeenRetracted).toBeNull();
-            expect((failureReportUpdate?.value as Report | undefined)?.pendingFields?.hasReportBeenRetracted).toBeNull();
+            expect((optimisticReportUpdate?.value as Report | undefined)?.pendingFields?.hasReportBeenRetracted).toBeUndefined();
+            expect((successReportUpdate?.value as Report | undefined)?.pendingFields?.hasReportBeenRetracted).toBeUndefined();
+            expect((failureReportUpdate?.value as Report | undefined)?.pendingFields?.hasReportBeenRetracted).toBeUndefined();
         });
 
         it('should restore the chat report iouReportID', async () => {
