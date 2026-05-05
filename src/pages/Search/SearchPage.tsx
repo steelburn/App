@@ -137,7 +137,7 @@ function SearchPage({route}: SearchPageProps) {
     }, []);
 
     const overlayContentContainerStyle = !isMobileSelectionModeEnabled ? styles.searchListContentContainerStyles(!!hasFilterBars) : undefined;
-    const {searchOverlayContent, onSearchContentReady} = useSearchOverlay({
+    const {searchOverlayContent, onSearchContentReady, isOverlayActive} = useSearchOverlay({
         searchResults,
         queryJSON: currentSearchQueryJSON,
         shouldUseNarrowLayout,
@@ -160,6 +160,7 @@ function SearchPage({route}: SearchPageProps) {
                     searchOverlayContent={searchOverlayContent}
                     onSearchContentReady={onSearchContentReady}
                     hasFilterBars={hasFilterBars}
+                    isOverlayActive={isOverlayActive}
                 />
             ) : (
                 <SearchPageWide

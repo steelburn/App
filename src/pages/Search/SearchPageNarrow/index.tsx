@@ -63,6 +63,8 @@ type SearchPageNarrowProps = {
     searchOverlayContent: React.ReactNode;
     onSearchContentReady: () => void;
     hasFilterBars: boolean;
+    /** Whether the overlay lifecycle is active (used to trigger onSearchLayout independently of overlay content). */
+    isOverlayActive: boolean;
 };
 
 const tabBarContent = <TabBarBottomContent selectedTab={NAVIGATION_TABS.SEARCH} />;
@@ -78,6 +80,7 @@ function SearchPageNarrow({
     searchOverlayContent,
     onSearchContentReady,
     hasFilterBars,
+    isOverlayActive,
 }: SearchPageNarrowProps) {
     const shouldShowLoadingSkeleton = useSearchLoadingState(queryJSON, searchResults);
     const {translate} = useLocalize();
@@ -359,6 +362,7 @@ function SearchPageNarrow({
                                             hasFilterBars={hasFilterBars}
                                         />
                                     )}
+                                    {isOverlayActive && !searchOverlayContent && <View onLayout={onSearchLayout} />}
                                     {!!searchOverlayContent && (
                                         <View
                                             style={[StyleSheet.absoluteFill, styles.appBG]}
@@ -400,6 +404,7 @@ function SearchPageNarrow({
                                             hasFilterBars={hasFilterBars}
                                         />
                                     )}
+                                    {isOverlayActive && !searchOverlayContent && <View onLayout={onSearchLayout} />}
                                     {!!searchOverlayContent && (
                                         <View
                                             style={[StyleSheet.absoluteFill, styles.appBG]}

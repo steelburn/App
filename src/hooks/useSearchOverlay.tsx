@@ -1,7 +1,6 @@
 import {useFocusEffect} from '@react-navigation/native';
 import React, {useCallback, useEffect, useState} from 'react';
 import type {StyleProp, ViewStyle} from 'react-native';
-import {View} from 'react-native';
 import {useSession} from '@components/OnyxListItemProvider';
 import SearchStaticList from '@components/Search/SearchStaticList';
 import type {SearchQueryJSON} from '@components/Search/types';
@@ -30,6 +29,8 @@ type UseSearchOverlayParams = {
 type UseSearchOverlayResult = {
     searchOverlayContent: React.ReactNode;
     onSearchContentReady: () => void;
+    /** Whether the overlay lifecycle is active (armed but not yet ready). */
+    isOverlayActive: boolean;
 };
 
 /**
@@ -80,7 +81,7 @@ function useSearchOverlay({
     // The hook subscriptions (useSession, useOnyx) must remain unconditional per
     // rules-of-hooks, but the derived work below is the expensive part.
     if (isSearchReady) {
-        return {searchOverlayContent: null, onSearchContentReady};
+        return {searchOverlayContent: null, onSearchContentReady, isOverlayActive: false};
     }
 
     const isTransaction = isTransactionSearchType(queryJSON?.type);
@@ -116,11 +117,9 @@ function useSearchOverlay({
                 columns={overlayColumns}
                 contentContainerStyle={shouldUseNarrowLayout ? contentContainerStyle : undefined}
             />
-        ) : (
-            <View />
-        );
+        ) : null;
 
-    return {searchOverlayContent, onSearchContentReady};
+    return {searchOverlayContent, onSearchContentReady, isOverlayActive: true};
 }
 
 export default useSearchOverlay;
