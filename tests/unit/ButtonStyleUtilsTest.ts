@@ -87,7 +87,7 @@ describe('getButtonStyleWithIcon', () => {
         expect(getButtonStyleWithIcon(mockStyles, CONST.DROPDOWN_BUTTON_SIZE.MEDIUM, true, true, false)).toEqual([mockStyles.buttonMedium, mockStyles.pl3]);
     });
 
-    it('returns array of undefineds when no arguments are provided', () => {
+    it('returns array of undefined values when no arguments are provided', () => {
         expect(getButtonStyleWithIcon(mockStyles)).toEqual([undefined, undefined]);
     });
 });
