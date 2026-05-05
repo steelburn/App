@@ -22,15 +22,15 @@ struct GpsTripLiveActivity: Widget {
             HStack(alignment: .center) {
                 VStack(alignment: .leading) {
                     Text(context.state.lockScreenTrackingText)
-                        .font(.system(size: 15, weight: .medium))
+                        .font(.custom("ExpensifyNeue-Regular", size: 15))
                         .foregroundColor(.brandGreen100)
                         .kerning(-0.3)
                     HStack(alignment: .bottom, spacing: 6) {
                         Text(distanceString(distance: context.state.distance))
-                            .font(.system(size: 45, weight: .bold))
+                            .font(.custom("ExpensifyNeue-Bold", size: 45))
                             .foregroundColor(.expensifyGreen)
                         Text(context.state.distanceUnit)
-                            .font(.system(size: 25, weight: .medium))
+                            .font(.custom("ExpensifyNeue-Regular", size: 25))
                             .foregroundColor(.brandGreen100)
                             .padding(.bottom, 5)
                     }
