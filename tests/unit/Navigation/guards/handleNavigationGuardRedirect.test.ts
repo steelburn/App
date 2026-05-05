@@ -7,7 +7,6 @@ import NAVIGATORS from '@src/NAVIGATORS';
 import SCREENS from '@src/SCREENS';
 
 jest.mock('@libs/Navigation/guards', () => ({
-    // eslint-disable-next-line @typescript-eslint/naming-convention
     __esModule: true,
     createGuardContext: jest.fn(() => ({
         isAuthenticated: true,
@@ -21,7 +20,6 @@ jest.mock('@libs/Navigation/guards', () => ({
 }));
 
 jest.mock('@libs/Navigation/helpers/getAdaptedStateFromPath', () => ({
-    // eslint-disable-next-line @typescript-eslint/naming-convention
     __esModule: true,
     default: jest.fn(),
 }));
