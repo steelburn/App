@@ -168,6 +168,13 @@ function OptionRowLHNData({
         return {...optionItem, icons: [senderIcon ?? optionItem.icons.at(0)].filter((icon): icon is Icon => !!icon)};
     }, [optionItem, isIOUReport, reportPreviewSenderID]);
 
+    // When the row is focused but no option data exists (e.g. submitting an expense offline),
+    // skip mounting OptionRowLHN entirely. The non-focused null case is handled inside
+    // OptionRowLHN with a placeholder View to avoid FlashList memory bloat on first render.
+    if (!finalOptionItem && isReportFocused) {
+        return null;
+    }
+
     return (
         <OptionRowLHN
             // eslint-disable-next-line react/jsx-props-no-spreading

@@ -8,13 +8,18 @@ import type {ForwardedFSClassProps} from '@libs/Fullstory/types';
 import TextWithEmojiFragment from '@pages/inbox/report/comment/TextWithEmojiFragment';
 
 type OptionRowAlternateTextProps = ForwardedFSClassProps & {
-    alternateText: string;
+    alternateText: string | undefined;
     style: StyleProp<TextStyle>;
 };
 
 function OptionRowAlternateText({alternateText, style, forwardedFSClass}: OptionRowAlternateTextProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
+
+    if (!alternateText) {
+        return null;
+    }
+
     const containsCustomEmojiWithText = containsCustomEmojiUtils(alternateText) && !containsOnlyCustomEmoji(alternateText);
 
     return (
