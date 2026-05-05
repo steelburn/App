@@ -136,7 +136,16 @@ function MultifactorAuthenticationScenarioAuthorizeTransactionPage({route}: Mult
         }
         return (
             <ScreenWrapper testID={MultifactorAuthenticationScenarioAuthorizeTransactionPage.displayName}>
-                <FullScreenLoadingIndicator reasonAttributes={{context: 'MultifactorAuthenticationScenarioAuthorizeTransactionPage'}} />
+                <HeaderWithBackButton
+                    title={translate('multifactorAuthentication.reviewTransaction.reviewTransaction')}
+                    onBackButtonPress={() => {
+                        Navigation.closeRHPFlow();
+                    }}
+                    shouldShowBackButton
+                />
+                <View style={[styles.flex1, styles.flexColumn, styles.justifyContentBetween]}>
+                    <FullScreenLoadingIndicator reasonAttributes={{context: 'MultifactorAuthenticationScenarioAuthorizeTransactionPage'}} />
+                </View>
             </ScreenWrapper>
         );
     }
