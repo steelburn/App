@@ -1,6 +1,6 @@
 import Onyx from 'react-native-onyx';
 import {openApp, reconnectApp} from '@libs/actions/App';
-import {reconnect} from '@libs/actions/Reconnect';
+import {initReconnect, reconnect} from '@libs/actions/Reconnect';
 import type AppStateMonitorType from '@libs/AppStateMonitor';
 import {flush} from '@libs/Network/SequentialQueue';
 import {getIsOffline, setHasRadio, setSustainedFailures} from '@libs/NetworkState';
@@ -24,9 +24,10 @@ jest.mock('@libs/AppStateMonitor', () => ({
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access -- extracting callback captured during module load
 const AppStateMonitor: typeof AppStateMonitorType = require('@libs/AppStateMonitor').default;
 
-const firstCall = jest.mocked(AppStateMonitor.addBecameActiveListener).mock.calls.at(0);
+initReconnect();
+const firstCall = jest.mocked(AppStateMonitor.addBecameActiveListener).mock.calls.at(-1);
 if (!firstCall) {
-    throw new Error('AppStateMonitor.addBecameActiveListener was not called during Reconnect.ts module load');
+    throw new Error('AppStateMonitor.addBecameActiveListener was not called during initReconnect()');
 }
 const becameActiveCallback: () => void = firstCall[0];
 

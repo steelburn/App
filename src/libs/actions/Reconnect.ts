@@ -64,7 +64,6 @@ let wasOffline = getIsOffline();
 const initReconnect = () => {
     subscribeNetworkState(() => {
         const offline = getIsOffline();
-        console.log('reconnect', wasOffline, offline);
         if (wasOffline && !offline) {
             Log.info('[Reconnect] Offline→online, flushing queue');
             flush();
