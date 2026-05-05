@@ -1455,6 +1455,7 @@ const translations: TranslationDeepObject<typeof en> = {
             manySplitsProvided: `O número máximo de divisões permitido é ${CONST.IOU.SPLITS_LIMIT}.`,
             dateRangeExceedsMaxDays: `O intervalo de datas não pode exceder ${CONST.IOU.SPLITS_LIMIT} dias.`,
             stitchOdometerImagesFailed: 'Falha ao combinar imagens do hodômetro. Tente novamente mais tarde.',
+            failedToSaveOdometerDraft: 'Não foi possível salvar seu rascunho do hodômetro. Tente novamente.',
         },
         dismissReceiptError: 'Dispensar erro',
         dismissReceiptErrorConfirmation: 'Atenção! Ignorar este erro removerá completamente o comprovante que você enviou. Tem certeza?',

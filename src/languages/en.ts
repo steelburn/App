@@ -1484,6 +1484,7 @@ const translations = {
             distanceAmountTooLargeReduceRate: 'The total amount is too large. Lower the rate.',
             odometerReadingTooLarge: (formattedMax: string) => `Odometer readings cannot exceed ${formattedMax}.`,
             stitchOdometerImagesFailed: 'Failed to combine odometer images. Please try again later.',
+            failedToSaveOdometerDraft: "Couldn't save your odometer draft. Please try again.",
             invalidIntegerAmount: 'Please enter a whole dollar amount before continuing',
             invalidTaxAmount: (amount: string) => `Maximum tax amount is ${amount}`,
             invalidSplit: 'The sum of splits must equal the total amount',

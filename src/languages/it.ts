@@ -1460,6 +1460,7 @@ const translations: TranslationDeepObject<typeof en> = {
             manySplitsProvided: `Il numero massimo di suddivisioni consentite è ${CONST.IOU.SPLITS_LIMIT}.`,
             dateRangeExceedsMaxDays: `L’intervallo di date non può superare ${CONST.IOU.SPLITS_LIMIT} giorni.`,
             stitchOdometerImagesFailed: 'Impossibile combinare le immagini del contachilometri. Riprova più tardi.',
+            failedToSaveOdometerDraft: 'Impossibile salvare la tua bozza del contachilometri. Riprova.',
         },
         dismissReceiptError: 'Ignora errore',
         dismissReceiptErrorConfirmation: 'Attenzione! Chiudere questo errore rimuoverà completamente la ricevuta che hai caricato. Sei sicuro?',

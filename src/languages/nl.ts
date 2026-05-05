@@ -1458,6 +1458,7 @@ const translations: TranslationDeepObject<typeof en> = {
             manySplitsProvided: `Het maximale aantal toegestane splitsingen is ${CONST.IOU.SPLITS_LIMIT}.`,
             dateRangeExceedsMaxDays: `Het datumbereik mag niet meer dan ${CONST.IOU.SPLITS_LIMIT} dagen zijn.`,
             stitchOdometerImagesFailed: 'Odometerafbeeldingen combineren mislukt. Probeer het later opnieuw.',
+            failedToSaveOdometerDraft: 'De conceptkilometerstand kon niet worden opgeslagen. Probeer het opnieuw.',
         },
         dismissReceiptError: 'Foutmelding sluiten',
         dismissReceiptErrorConfirmation: 'Let op! Dit foutbericht negeren verwijdert je geüploade bon volledig. Weet je het zeker?',
