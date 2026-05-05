@@ -9147,6 +9147,7 @@ Oto *paragon testowy*, żeby pokazać Ci, jak to działa:`,
             deleteGroupDangerConfirmationModalDescription: (defaultGroupName: string) =>
                 `Czy na pewno? Spowoduje to ponowne przypisanie wszystkich członków do domyślnej grupy (${defaultGroupName}) i nie można tego cofnąć.`,
             deleteGroupError: 'Nie udało się usunąć tej grupy. Spróbuj ponownie.',
+            findGroup: 'Znajdź grupę',
         },
     },
     proactiveAppReview: {

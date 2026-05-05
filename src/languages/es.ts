@@ -9428,6 +9428,7 @@ ${amount} para ${merchant} - ${date}`,
             deleteGroupDangerConfirmationModalDescription: (defaultGroupName: string) =>
                 `¿Estás seguro? Esto reasignará a todos los miembros al grupo predeterminado (${defaultGroupName}) y no se puede deshacer.`,
             deleteGroupError: 'No se pudo eliminar este grupo. Por favor, inténtalo de nuevo.',
+            findGroup: 'Encontrar grupo',
         },
     },
     gps: {

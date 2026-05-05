@@ -9079,6 +9079,7 @@ ${reportName}
             deleteGroupDangerConfirmationModalDescription: (defaultGroupName: string) =>
                 `本当によろしいですか？これにより、すべてのメンバーがデフォルトグループ（${defaultGroupName}）に再割り当てされ、元に戻すことはできません。`,
             deleteGroupError: 'このグループを削除できませんでした。もう一度お試しください。',
+            findGroup: 'グループを検索',
         },
     },
     proactiveAppReview: {

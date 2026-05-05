@@ -9167,6 +9167,7 @@ Hier is een *proefbon* om je te laten zien hoe het werkt:`,
             deleteGroupDangerConfirmationModalDescription: (defaultGroupName: string) =>
                 `Weet je het zeker? Dit wijst alle leden opnieuw toe aan de standaardgroep (${defaultGroupName}) en kan niet ongedaan worden gemaakt.`,
             deleteGroupError: 'Kan deze groep niet verwijderen. Probeer het opnieuw.',
+            findGroup: 'Groep zoeken',
         },
     },
     proactiveAppReview: {

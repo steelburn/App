@@ -9194,6 +9194,7 @@ Ecco una *ricevuta di prova* per mostrarti come funziona:`,
             deleteGroupDangerConfirmationModalDescription: (defaultGroupName: string) =>
                 `Sei sicuro? Questo riassegnerà tutti i membri al gruppo predefinito (${defaultGroupName}) e non potrà essere annullato.`,
             deleteGroupError: 'Impossibile eliminare questo gruppo. Riprova.',
+            findGroup: 'Trova gruppo',
         },
     },
     proactiveAppReview: {
