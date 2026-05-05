@@ -287,7 +287,7 @@ function SubmitExpenseOrchestrator({
         const rootState = navigationRef.getRootState();
 
         const report = destinationReportID ? getReportOrDraftReport(destinationReportID) : undefined;
-        const isDestinationEmpty = !isMoneyRequestReport(report) || report?.transactionCount === 0;
+        const isDestinationEmpty = !!report && isMoneyRequestReport(report) && report.transactionCount === 0;
         if (isDestinationEmpty) {
             reserveDeferredWriteChannel(CONST.DEFERRED_LAYOUT_WRITE_KEYS.DISMISS_MODAL);
         }
