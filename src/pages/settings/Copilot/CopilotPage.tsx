@@ -291,14 +291,16 @@ function CopilotPage() {
                 onPendingActionDismiss: () => clearDelegatorErrors({delegatedAccess: account?.delegatedAccess}),
                 shouldShowRightComponent: true,
                 rightComponent: (
-                    <Button
-                        small
-                        success
-                        text={translate('delegate.switch')}
-                        isDisabled={isPending || isCurrentUser}
-                        onPress={() => switchToDelegator(email)}
-                        sentryLabel={CONST.SENTRY_LABEL.ACCOUNT_SWITCHER.SHOW_ACCOUNTS}
-                    />
+                    <View style={styles.ml2}>
+                        <Button
+                            small
+                            success
+                            text={translate('delegate.switch')}
+                            isDisabled={isPending || isCurrentUser}
+                            onPress={() => switchToDelegator(email)}
+                            sentryLabel={CONST.SENTRY_LABEL.ACCOUNT_SWITCHER.SHOW_ACCOUNTS}
+                        />
+                    </View>
                 ),
             };
         });
