@@ -1,10 +1,9 @@
 /* eslint-disable rulesdir/prefer-early-return */
 import {useIsFocused, useRoute} from '@react-navigation/native';
-import {isUserValidatedSelector} from '@selectors/Account';
-import {tierNameSelector} from '@selectors/UserWallet';
 import isEmpty from 'lodash/isEmpty';
 import React, {useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react';
 import type {LayoutChangeEvent, ListRenderItemInfo, NativeScrollEvent, NativeSyntheticEvent} from 'react-native';
+// eslint-disable-next-line no-restricted-imports
 import {DeviceEventEmitter, InteractionManager, View} from 'react-native';
 import FlatListWithScrollKey from '@components/FlatList/FlatListWithScrollKey';
 import {usePersonalDetails} from '@components/OnyxListItemProvider';
@@ -27,6 +26,7 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import useWindowDimensions from '@hooks/useWindowDimensions';
 import {isConsecutiveChronosAutomaticTimerAction} from '@libs/ChronosUtils';
 import DateUtils from '@libs/DateUtils';
+import {hasDeferredWrite} from '@libs/deferredLayoutWrite';
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import {getAllNonDeletedTransactions, isActionVisibleOnMoneyRequestReport} from '@libs/MoneyRequestReportUtils';
 import Navigation from '@libs/Navigation/Navigation';
@@ -126,12 +126,6 @@ function MoneyRequestReportActionsList({onLayout}: MoneyRequestReportListProps) 
 
     const parentReportAction = useParentReportAction(report);
 
-    const [userWalletTierName] = useOnyx(ONYXKEYS.USER_WALLET, {
-        selector: tierNameSelector,
-    });
-    const [isUserValidated] = useOnyx(ONYXKEYS.ACCOUNT, {
-        selector: isUserValidatedSelector,
-    });
     const [userBillingFundID] = useOnyx(ONYXKEYS.NVP_BILLING_FUND_ID);
     const personalDetails = usePersonalDetails();
     const [tryNewDot] = useOnyx(ONYXKEYS.NVP_TRY_NEW_DOT);
@@ -585,8 +579,6 @@ function MoneyRequestReportActionsList({onLayout}: MoneyRequestReportListProps) 
                     isFirstVisibleReportAction={firstVisibleReportActionID === reportAction.reportActionID}
                     shouldHideThreadDividerLine
                     linkedReportActionID={linkedReportActionID}
-                    userWalletTierName={userWalletTierName}
-                    isUserValidated={isUserValidated}
                     personalDetails={personalDetails}
                     userBillingFundID={userBillingFundID}
                     originalReportID={originalReportID}
@@ -607,8 +599,6 @@ function MoneyRequestReportActionsList({onLayout}: MoneyRequestReportListProps) 
             unreadMarkerReportActionID,
             firstVisibleReportActionID,
             linkedReportActionID,
-            userWalletTierName,
-            isUserValidated,
             personalDetails,
             userBillingFundID,
             isTryNewDotNVPDismissed,
@@ -676,6 +666,14 @@ function MoneyRequestReportActionsList({onLayout}: MoneyRequestReportListProps) 
         return numToRender || undefined;
     }, [styles.chatItem.paddingBottom, styles.chatItem.paddingTop, windowHeight, linkedReportActionID]);
 
+    const isReportEmpty = isEmpty(visibleReportActions) && isEmpty(transactions) && !showReportActionsLoadingState;
+    // hasDeferredWrite is non-reactive (reads a module-level Map, not tracked by React).
+    // This is intentional: we only check on the initial render after the RHP dismisses.
+    // Once the deferred write flushes and createTransaction runs, Onyx updates make
+    // transactions non-empty, which drives the transition away from the skeleton.
+    const isAwaitingDeferredTransaction = isReportEmpty && hasDeferredWrite(CONST.DEFERRED_LAYOUT_WRITE_KEYS.DISMISS_MODAL);
+    const showEmptyState = isReportEmpty && !isAwaitingDeferredTransaction;
+
     if (!report) {
         return null;
     }
@@ -696,7 +694,12 @@ function MoneyRequestReportActionsList({onLayout}: MoneyRequestReportListProps) 
                     isActive={isFloatingMessageCounterVisible}
                     onClick={scrollToBottomAndMarkReportAsRead}
                 />
-                {isEmpty(visibleReportActions) && isEmpty(transactions) && !showReportActionsLoadingState ? (
+                {/* Exactly one of these three branches is active at a time:
+                    1. isAwaitingDeferredTransaction — skeleton while dismiss-first creates the transaction
+                    2. showEmptyState — genuinely empty report
+                    3. !isReportEmpty — report has data, render the FlatList */}
+                {isAwaitingDeferredTransaction && <ReportActionsListLoadingSkeleton reasonAttributes={skeletonReasonAttributes} />}
+                {showEmptyState && (
                     <ScrollView contentContainerStyle={styles.flexGrow1}>
                         <MoneyRequestViewReportFields
                             report={report}
@@ -708,7 +711,8 @@ function MoneyRequestReportActionsList({onLayout}: MoneyRequestReportListProps) 
                             policy={policy}
                         />
                     </ScrollView>
-                ) : (
+                )}
+                {!isReportEmpty && (
                     <FlatListWithScrollKey
                         initialNumToRender={initialNumToRender}
                         accessibilityLabel={translate('sidebarScreen.listOfChatMessages')}

@@ -12,6 +12,7 @@ import SearchRowSkeleton from '@components/Skeletons/SearchRowSkeleton';
 import {useWideRHPActions} from '@components/WideRHPContextProvider';
 import useActionLoadingReportIDs from '@hooks/useActionLoadingReportIDs';
 import useArchivedReportsIdSet from '@hooks/useArchivedReportsIdSet';
+import {useCurrencyListActions} from '@hooks/useCurrencyList';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useLocalize from '@hooks/useLocalize';
 import useMultipleSnapshots from '@hooks/useMultipleSnapshots';
@@ -27,10 +28,10 @@ import {turnOffMobileSelectionMode, turnOnMobileSelectionMode} from '@libs/actio
 import type {TransactionPreviewData} from '@libs/actions/Search';
 import {setOptimisticDataForTransactionThreadPreview} from '@libs/actions/Search';
 import {flushDeferredWrite, getOptimisticWatchKey, hasDeferredWrite} from '@libs/deferredLayoutWrite';
-import {canUseTouchScreen} from '@libs/DeviceCapabilities';
 import Log from '@libs/Log';
 import isSearchTopmostFullScreenRoute from '@libs/Navigation/helpers/isSearchTopmostFullScreenRoute';
 import type {PlatformStackNavigationProp} from '@libs/Navigation/PlatformStackNavigation/types';
+// eslint-disable-next-line no-restricted-imports
 import TransitionTracker from '@libs/Navigation/TransitionTracker';
 import {isCreatedTaskReportAction} from '@libs/ReportActionsUtils';
 import {isSplitAction} from '@libs/ReportSecondaryActionUtils';
@@ -53,6 +54,7 @@ import {
     isTransactionGroupListItemType,
     isTransactionListItemType,
     isTransactionReportGroupListItemType,
+    isTransactionSearchType,
     shouldShowEmptyState,
     shouldShowYear as shouldShowYearUtil,
 } from '@libs/SearchUIUtils';
@@ -79,7 +81,6 @@ import {useSearchActionsContext, useSearchStateContext} from './SearchContext';
 import SearchList from './SearchList';
 import type {ReportActionListItemType, SearchListItem, TransactionGroupListItemType, TransactionListItemType, TransactionReportGroupListItemType} from './SearchList/ListItem/types';
 import {SearchScopeProvider} from './SearchScopeProvider';
-import SearchStaticList from './SearchStaticList';
 import SearchTableHeader from './SearchTableHeader';
 import type {SearchColumnType, SearchParams, SearchQueryJSON, SelectedTransactionInfo, SelectedTransactions, SortOrder} from './types';
 
@@ -351,6 +352,8 @@ function Search({
         selector: savedSearchSelector,
     });
 
+    const {convertToDisplayString} = useCurrencyListActions();
+
     const validGroupBy = getValidGroupBy(groupBy);
     const prevValidGroupBy = usePrevious(validGroupBy);
     const isSearchResultsEmpty = !searchResults?.data || isSearchResultsEmptyUtil(searchResults, validGroupBy);
@@ -453,7 +456,6 @@ function Search({
             return;
         }
         return deferHeavySearchWork();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [hash, deferHeavySearchWork, isDataLoaded]);
 
     useFocusEffect(
@@ -544,6 +546,7 @@ function Search({
             conciergeReportID,
             onyxPersonalDetailsList,
             policyForMovingExpenses,
+            convertToDisplayString,
         });
         return {
             baseFilteredData: filteredData1,
@@ -576,6 +579,7 @@ function Search({
         conciergeReportID,
         onyxPersonalDetailsList,
         policyForMovingExpenses,
+        convertToDisplayString,
     ]);
 
     // For group-by views, each grouped item has a transactionsQueryJSON with a hash pointing to a separate snapshot
@@ -612,6 +616,7 @@ function Search({
                 cardFeeds,
                 allReportMetadata,
                 conciergeReportID,
+                convertToDisplayString,
             });
             return {
                 ...item,
@@ -635,6 +640,7 @@ function Search({
         bankAccountList,
         allReportMetadata,
         conciergeReportID,
+        convertToDisplayString,
     ]);
 
     const hasLoadedAllTransactions = useMemo(() => {
@@ -764,7 +770,7 @@ function Search({
                 // Also check if the report itself was selected (when it was empty) by checking the reportID key
                 const reportKey = transactionGroup.keyForList;
                 const wasReportSelected = reportKey && reportKey in selectedTransactions;
-                // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+
                 const hasAnySelected = isExpenseReportType && (wasReportSelected || transactionGroup.transactions.some((transaction) => transaction.transactionID in selectedTransactions));
 
                 for (const transactionItem of transactionGroup.transactions) {
@@ -808,7 +814,7 @@ function Search({
                             report: transactionItem.report,
                             policy: transactionItem.policy,
                         }),
-                        // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+
                         isSelected: areAllMatchingItemsSelected || selectedTransactions[transactionItem.transactionID]?.isSelected || isExpenseReportType,
                         canReject: canRejectRequest,
                         reportID: transactionItem.reportID,
@@ -864,7 +870,7 @@ function Search({
                         report: transactionItem.report,
                         policy: transactionItem.policy,
                     }),
-                    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+
                     isSelected: areAllMatchingItemsSelected || selectedTransactions[transactionItem.transactionID].isSelected,
                     canReject: canRejectRequest,
                     reportID: transactionItem.reportID,
@@ -1354,7 +1360,6 @@ function Search({
     }, [hasErrors, queryJSON, searchResults, shouldResetSearchQuery, setShouldResetSearchQuery]);
 
     const fetchMoreResults = useCallback(() => {
-        // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
         if (!isFocused || !searchResults?.search?.hasMoreResults || shouldShowLoadingState || shouldShowLoadingMoreItems || offset > allDataLength - CONST.SEARCH.RESULTS_PAGE_SIZE) {
             return;
         }
@@ -1419,14 +1424,21 @@ function Search({
         searchResults?.data,
     ]);
 
-    const onLayout = useCallback(() => {
+    const onLayoutBase = useCallback(() => {
         hasHadFirstLayout.current = true;
         onDestinationVisible?.(isSearchResultsEmptyRef.current, 'layout');
         endSpanWithAttributes(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS, {[CONST.TELEMETRY.ATTRIBUTE_IS_WARM]: true});
-        handleSelectionListScroll(stableSortedData, searchListRef.current);
         flushDeferredWrite(CONST.DEFERRED_LAYOUT_WRITE_KEYS.SEARCH);
+    }, [onDestinationVisible]);
+
+    // Deferred layout only needs the base work (no scroll handling, no content-ready signal).
+    const onDeferredLayout = onLayoutBase;
+
+    const onLayout = useCallback(() => {
+        onLayoutBase();
+        handleSelectionListScroll(stableSortedData, searchListRef.current);
         onContentReady?.();
-    }, [handleSelectionListScroll, stableSortedData, onContentReady, onDestinationVisible]);
+    }, [onLayoutBase, handleSelectionListScroll, stableSortedData, onContentReady]);
 
     // Must be a ref, not state: cancelNavigationSpans is called during render
     // (inside conditional returns), so using setState would trigger infinite re-renders.
@@ -1522,25 +1534,14 @@ function Search({
     );
 
     // When heavy work is deferred (e.g. during the RHP dismiss animation after
-    // submitting an expense), show a lightweight static list instead of the skeleton.
-    // This gives the user real-looking content during the animation while avoiding
-    // the expensive hooks and renders of the full Search component.
-    // Restricted to transaction-based search types (expense/invoice) because
-    // SearchStaticList only renders rows with a transactionID - non-transaction
-    // types (chat, task, report) would render empty/blank during the deferral.
-    const isTransactionSearchType = type === CONST.SEARCH.DATA_TYPES.EXPENSE || type === CONST.SEARCH.DATA_TYPES.INVOICE;
-    if (isDeferringHeavyWork && searchResults?.data && isTransactionSearchType) {
-        return (
-            <SearchStaticList
-                searchResults={searchResults}
-                queryJSON={queryJSON}
-                shouldUseNarrowLayout={shouldUseNarrowLayout}
-                canSelectMultiple={canSelectMultiple}
-                columns={currentColumns}
-                contentContainerStyle={shouldUseNarrowLayout ? styles.searchListContentContainerStyles(!!hasFilterBars) : undefined}
-                onLayout={onLayout}
-            />
-        );
+    // submitting an expense), skip the expensive render below. The ancestor
+    // SearchPage (via SearchPageNarrow / SearchPageWide) renders a SearchStaticList
+    // overlay that covers this component, so the user sees real-looking content.
+    // The minimal View fires onLayout to flush the deferred API write and set
+    // hasHadFirstLayout.
+    if (isDeferringHeavyWork && searchResults?.data && isTransactionSearchType(type)) {
+        // Zero-sized View - onLayout still fires on RN, which is all we need here.
+        return <View onLayout={onDeferredLayout} />;
     }
 
     // This is a performance optimization for the submit-expense->search path only.
@@ -1699,8 +1700,7 @@ function Search({
                         )
                     }
                     contentContainerStyle={[styles.pb3, contentContainerStyle]}
-                    containerStyle={[styles.pv0, !tableHeaderVisible && !isSmallScreenWidth && styles.pt1]}
-                    shouldPreventDefaultFocusOnSelectRow={!canUseTouchScreen()}
+                    containerStyle={[styles.pv0, !tableHeaderVisible && !isSmallScreenWidth && styles.pt3]}
                     onScroll={onSearchListScroll}
                     onEndReachedThreshold={0.75}
                     onEndReached={fetchMoreResults}
