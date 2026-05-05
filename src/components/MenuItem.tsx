@@ -1168,15 +1168,12 @@ function MenuItem({
                                                 )}
                                                 {shouldShowRightComponent && rightComponent}
                                                 {shouldShowRadioButton && (
-                                                    <View
-                                                        pointerEvents="none"
-                                                        style={[styles.alignSelfCenter, styles.ml3]}
-                                                    >
+                                                    <View style={[styles.alignSelfCenter, styles.ml3]}>
                                                         <RadioButton
                                                             isChecked={isSelected}
-                                                            onPress={() => {}}
-                                                            accessibilityLabel=""
-                                                            accessible={false}
+                                                            onPress={onPressAction}
+                                                            accessibilityLabel={title ?? ''}
+                                                            tabIndex={-1}
                                                         />
                                                     </View>
                                                 )}

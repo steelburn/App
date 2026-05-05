@@ -17,7 +17,7 @@ import PressableWithFeedback from './Pressable/PressableWithFeedback';
 type BaseSelectionButtonProps = Partial<ChildrenProps> &
     WithSentryLabel & {
         /** A function that is called when the button is pressed */
-        onPress: () => void;
+        onPress: (event?: GestureResponderEvent | KeyboardEvent) => void;
 
         /** Should the input be styled for errors  */
         hasError?: boolean;
@@ -138,7 +138,7 @@ function SelectionButton({
             return;
         }
 
-        onPress();
+        onPress(event.nativeEvent);
     };
 
     const firePressHandlerOnClick = (event?: GestureResponderEvent | KeyboardEvent) => {
@@ -146,7 +146,7 @@ function SelectionButton({
             return;
         }
 
-        onPress();
+        onPress(event);
     };
 
     return (
