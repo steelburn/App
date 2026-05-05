@@ -300,7 +300,7 @@ function Search({
     const navigation = useNavigation<PlatformStackNavigationProp<SearchFullscreenNavigatorParamList>>();
     const isFocused = useIsFocused();
     const [isHoldMenuVisible, setIsHoldMenuVisible] = useState(false);
-    const holdMenuParams = useRef<{
+    const [holdMenuParams, setHoldMenuParams] = useState<{
         chatReport: OnyxEntry<Report>;
         fullAmount: string;
         moneyRequestReport: OnyxEntry<Report>;
@@ -376,7 +376,7 @@ function Search({
             const chatReport = searchResults?.data?.[`${ONYXKEYS.COLLECTION.REPORT}${item.parentReportID}`];
             const moneyRequestReport = searchResults?.data?.[`${ONYXKEYS.COLLECTION.REPORT}${item.reportID}`];
             const {nonHeldAmount, fullAmount, hasValidNonHeldAmount} = getNonHeldAndFullAmount(moneyRequestReport, item.allActions?.includes(CONST.SEARCH.ACTION_TYPES.PAY) ?? false);
-            holdMenuParams.current = {
+            setHoldMenuParams({
                 chatReport,
                 moneyRequestReport,
                 transactionCount: item.transactionCount ?? 0,
@@ -386,7 +386,7 @@ function Search({
                 nonHeldAmount,
                 hasValidNonHeldAmount,
                 hasNoneHeldExpenses: item.transactions.some((t) => !isOnHold(t)),
-            };
+            });
             setIsHoldMenuVisible(true);
         },
         [searchResults?.data],
@@ -1773,18 +1773,18 @@ function Search({
                     nonPersonalAndWorkspaceCards={nonPersonalAndWorkspaceCards}
                     isActionColumnWide={isTask || hasDeletedTransaction}
                 />
-                {isHoldMenuVisible && !!holdMenuParams.current && (
+                {isHoldMenuVisible && !!holdMenuParams && (
                     <ProcessMoneyReportHoldMenu
                         isVisible={isHoldMenuVisible}
                         onClose={() => setIsHoldMenuVisible(false)}
-                        chatReport={holdMenuParams.current.chatReport}
-                        fullAmount={holdMenuParams.current.fullAmount}
-                        moneyRequestReport={holdMenuParams.current.moneyRequestReport}
-                        transactionCount={holdMenuParams.current.transactionCount}
-                        hasNonHeldExpenses={holdMenuParams.current?.hasNoneHeldExpenses}
-                        nonHeldAmount={holdMenuParams.current.hasNoneHeldExpenses && holdMenuParams.current.hasValidNonHeldAmount ? holdMenuParams.current.nonHeldAmount : undefined}
-                        requestType={holdMenuParams.current.requestType}
-                        paymentType={holdMenuParams.current.paymentType}
+                        chatReport={holdMenuParams.chatReport}
+                        fullAmount={holdMenuParams.fullAmount}
+                        moneyRequestReport={holdMenuParams.moneyRequestReport}
+                        transactionCount={holdMenuParams.transactionCount}
+                        hasNonHeldExpenses={holdMenuParams?.hasNoneHeldExpenses}
+                        nonHeldAmount={holdMenuParams.hasNoneHeldExpenses && holdMenuParams.hasValidNonHeldAmount ? holdMenuParams.nonHeldAmount : undefined}
+                        requestType={holdMenuParams.requestType}
+                        paymentType={holdMenuParams.paymentType}
                     />
                 )}
             </Animated.View>
