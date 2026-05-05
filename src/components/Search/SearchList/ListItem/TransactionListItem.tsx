@@ -122,7 +122,6 @@ function TransactionListItem<TItem extends ListItem>({
               }
             : {...styles.flexColumn, ...styles.alignItemsStretch},
         isLargeScreenWidth && isLastItem && [styles.searchTableBottomRadius, styles.overflowHidden],
-        !isLargeScreenWidth && !isLastItem && StyleUtils.getSelectedBorderBottomStyle(item.isSelected),
         !isLargeScreenWidth && isFirstItem && [styles.searchTableTopRadius, styles.overflowHidden],
         !isLargeScreenWidth && isLastItem && [styles.searchTableBottomRadius, styles.overflowHidden],
     ];
@@ -227,6 +226,7 @@ function TransactionListItem<TItem extends ListItem>({
                     isLargeScreenWidth && isLastItem && styles.searchTableBottomRadius,
                     !isLargeScreenWidth && isFirstItem && styles.searchTableTopRadius,
                     !isLargeScreenWidth && isLastItem && styles.searchTableBottomRadius,
+                    !isLargeScreenWidth && !isLastItem && StyleUtils.getSelectedBorderBottomStyle(item.isSelected),
                 ]}
             >
                 {({hovered}) => (
