@@ -1116,7 +1116,7 @@ describe('actions/Domain', () => {
                         }),
                         expect.objectContaining({
                             key: `${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`,
-                            value: {[SECURITY_GROUP_KEY]: {errors: null}},
+                            value: {[SECURITY_GROUP_KEY]: null},
                         }),
                     ]),
                 }),
@@ -1141,7 +1141,7 @@ describe('actions/Domain', () => {
                         }),
                         expect.objectContaining({
                             key: `${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`,
-                            value: {[SECURITY_GROUP_KEY]: {errors: null}},
+                            value: {[SECURITY_GROUP_KEY]: null},
                         }),
                     ]),
                 }),
