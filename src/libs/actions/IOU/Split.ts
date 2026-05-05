@@ -69,7 +69,6 @@ import {isEmptyObject} from '@src/types/utils/EmptyObject';
 import {
     buildMinimalTransactionForFormula,
     buildOnyxDataForMoneyRequest,
-    dismissModalAndOpenReportInInboxTab,
     getAllPersonalDetails,
     getAllReports,
     getAllTransactionDrafts,
@@ -80,12 +79,11 @@ import {
     getReceiptError,
     getReportPreviewAction,
     getUserAccountID,
-    handleNavigateAfterExpenseCreate,
-    highlightTransactionOnSearchRouteIfNeeded,
     mergePolicyRecentlyUsedCategories,
     mergePolicyRecentlyUsedCurrencies,
 } from './index';
 import type {BuildOnyxDataForMoneyRequestKeys, OneOnOneIOUReport, StartSplitBilActionParams} from './index';
+import {dismissModalAndOpenReportInInboxTab, handleNavigateAfterExpenseCreate, highlightTransactionOnSearchRouteIfNeeded} from './NavigationHelpers';
 import type BasePolicyParams from './types/BasePolicyParams';
 import type BaseTransactionParams from './types/BaseTransactionParams';
 
