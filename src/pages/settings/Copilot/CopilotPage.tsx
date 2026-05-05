@@ -46,7 +46,7 @@ import {isEmptyObject} from '@src/types/utils/EmptyObject';
 
 function CopilotPage() {
     const icons = useMemoizedLazyExpensifyIcons(['FallbackAvatar', 'Pencil', 'ThreeDots', 'Trashcan', 'UserPlus']);
-    const illustrations = useMemoizedLazyIllustrations(['TvScreenRobot', 'Members']);
+    const illustrations = useMemoizedLazyIllustrations(['Copilots', 'Members']);
     const styles = useThemeStyles();
     const {localeCompare, translate, formatPhoneNumber} = useLocalize();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
@@ -405,9 +405,9 @@ function CopilotPage() {
                                 )}
                                 isCentralPane
                                 subtitleMuted
-                                illustration={illustrations.TvScreenRobot}
+                                illustration={illustrations.Copilots}
                                 illustrationContainerStyle={styles.cardSectionIllustrationContainer}
-                                illustrationBackgroundColor={colors.blue500}
+                                illustrationBackgroundColor={colors.blue700}
                                 titleStyles={styles.accountSettingsSectionTitle}
                                 childrenStyles={styles.pt5}
                             >
