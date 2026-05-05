@@ -122,6 +122,7 @@ function OptionRowLHN({
             onLayout={onLayout}
             accessibilityLabel={accessibilityLabelWithContextMenuHint}
             accessibilityHint={accessibilityHint}
+            // reportID may be a number contrary to the type definition
             testID={typeof optionItem.reportID === 'number' ? String(optionItem.reportID) : optionItem.reportID}
         >
             {(hovered) => {
