@@ -1,6 +1,7 @@
 import {useFocusEffect} from '@react-navigation/native';
 import React, {useCallback, useEffect, useState} from 'react';
 import type {StyleProp, ViewStyle} from 'react-native';
+import {View} from 'react-native';
 import {useSession} from '@components/OnyxListItemProvider';
 import SearchStaticList from '@components/Search/SearchStaticList';
 import type {SearchQueryJSON} from '@components/Search/types';
@@ -115,7 +116,9 @@ function useSearchOverlay({
                 columns={overlayColumns}
                 contentContainerStyle={shouldUseNarrowLayout ? contentContainerStyle : undefined}
             />
-        ) : null;
+        ) : (
+            <View />
+        );
 
     return {searchOverlayContent, onSearchContentReady};
 }

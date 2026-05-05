@@ -33,7 +33,7 @@ function SearchPage({route}: SearchPageProps) {
     useDocumentTitle(translate('common.spend'));
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const styles = useThemeStyles();
-    const {selectedTransactions, lastSearchType, areAllMatchingItemsSelected, currentSearchKey, currentSearchResults, currentSearchQueryJSON} = useSearchStateContext();
+    const {selectedTransactions, lastSearchType, areAllMatchingItemsSelected, currentSearchKey, currentSearchResults, currentSearchQueryJSON, shouldUseLiveData} = useSearchStateContext();
     const {clearSelectedTransactions, setLastSearchType} = useSearchActionsContext();
 
     const isMobileSelectionModeEnabled = useMobileSelectionMode(clearSelectedTransactions);
@@ -44,7 +44,7 @@ function SearchPage({route}: SearchPageProps) {
     useConfirmReadyToOpenApp();
     useSearchPageSetup(currentSearchQueryJSON);
 
-    if (currentSearchResults?.data && !currentSearchKey && currentSearchResults !== lastNonEmptySearchResults) {
+    if (currentSearchResults?.data && !shouldUseLiveData && currentSearchResults !== lastNonEmptySearchResults) {
         setLastNonEmptySearchResults(currentSearchResults);
     }
 
