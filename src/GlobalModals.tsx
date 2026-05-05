@@ -6,10 +6,18 @@ import * as EmojiPickerAction from './libs/actions/EmojiPickerAction';
 import {growlRef} from './libs/Growl';
 import * as ReportActionContextMenu from './pages/inbox/report/ContextMenu/ReportActionContextMenu';
 
-const LazyPopoverReportActionContextMenu = React.lazy(() => import('./pages/inbox/report/ContextMenu/PopoverReportActionContextMenu'));
-const LazyUpdateAppModal = React.lazy(() => import('./components/UpdateAppModal'));
-const LazyScreenShareRequestModal = React.lazy(() => import('./components/ScreenShareRequestModal'));
-const LazyProactiveAppReviewModalManager = React.lazy(() => import('./components/ProactiveAppReviewModalManager'));
+// React.lazy with a no-op fallback if the chunk fails to load (e.g. stale cache, network blip).
+// These modals are non-critical and surface only on rare conditions, so a chunk-load failure must
+// not throw to the nearest error boundary and crash the app.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function lazyWithNullFallback<T extends React.ComponentType<any>>(factory: () => Promise<{default: T}>): React.LazyExoticComponent<T> {
+    return React.lazy(() => factory().catch(() => ({default: (() => null) as unknown as T})));
+}
+
+const LazyPopoverReportActionContextMenu = lazyWithNullFallback(() => import('./pages/inbox/report/ContextMenu/PopoverReportActionContextMenu'));
+const LazyUpdateAppModal = lazyWithNullFallback(() => import('./components/UpdateAppModal'));
+const LazyScreenShareRequestModal = lazyWithNullFallback(() => import('./components/ScreenShareRequestModal'));
+const LazyProactiveAppReviewModalManager = lazyWithNullFallback(() => import('./components/ProactiveAppReviewModalManager'));
 
 // Maximum time (ms) the context menu mount can stay deferred before requestIdleCallback forces it to run,
 // guaranteeing mount even if the main thread never becomes idle.
@@ -63,11 +71,17 @@ function GlobalModals() {
             {/* eslint-disable-next-line react-hooks/refs -- module-level createRef, safe to pass as ref prop */}
             <EmojiPicker ref={EmojiPickerAction.emojiPickerRef} />
             {shouldRenderDeferredModals && (
-                <Suspense fallback={null}>
-                    {/* Proactive app review modal shown when user has completed a trigger action */}
-                    <LazyProactiveAppReviewModalManager />
-                    <LazyScreenShareRequestModal />
-                </Suspense>
+                <>
+                    {/* Each modal lives in its own Suspense boundary so an unrelated chunk's load latency
+                        or failure cannot delay or suppress the others (e.g. an incoming screen-share request). */}
+                    <Suspense fallback={null}>
+                        {/* Proactive app review modal shown when user has completed a trigger action */}
+                        <LazyProactiveAppReviewModalManager />
+                    </Suspense>
+                    <Suspense fallback={null}>
+                        <LazyScreenShareRequestModal />
+                    </Suspense>
+                </>
             )}
         </>
     );
