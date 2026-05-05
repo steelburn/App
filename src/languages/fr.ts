@@ -4742,6 +4742,7 @@ ${amount} pour ${merchant} - ${date}`,
                     [CONST.SAGE_INTACCT_NON_REIMBURSABLE_EXPENSE_TYPE.VENDOR_BILL]: 'Factures fournisseurs',
                 },
             },
+            travelInvoicingDescription: 'Les frais de voyage seront exportés comme des débits de carte de crédit vers le compte Sage Intacct indiqué ci-dessous.',
             creditCardAccount: 'Compte de carte de crédit',
             defaultVendor: 'Fournisseur par défaut',
             defaultVendorDescription: (isReimbursable: boolean) =>

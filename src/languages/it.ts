@@ -4716,6 +4716,7 @@ ${amount} per ${merchant} - ${date}`,
                     [CONST.SAGE_INTACCT_NON_REIMBURSABLE_EXPENSE_TYPE.VENDOR_BILL]: 'Fatture fornitori',
                 },
             },
+            travelInvoicingDescription: 'Le spese di viaggio verranno esportate come addebiti su carta di credito nel conto Sage Intacct specificato di seguito.',
             creditCardAccount: 'Conto della carta di credito',
             defaultVendor: 'Fornitore predefinito',
             defaultVendorDescription: (isReimbursable: boolean) =>
