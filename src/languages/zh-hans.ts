@@ -2672,6 +2672,20 @@ ${amount}，商户：${merchant} - 日期：${date}`,
         defaultPrompt:
             '拒绝与赌博、电影或其他明显非商务原因相关的报销。\n\n提醒用户务必附上一张能清楚显示小费金额的收据图片。\n\n如果报销报告与同一用户之前的报告非常相似，则批准该报告。\n\n拒绝包含超过 500 美元差旅费用的报销报告。',
     },
+    editAgentPage: {
+        title: '编辑代理',
+        agentName: '代理名称',
+        instructions: '编写自定义说明',
+        deleteAgent: '删除代理',
+        deleteAgentTitle: '删除代理？',
+        deleteAgentMessage: '确定要删除此代理吗？此操作无法撤销。',
+    },
+    editAgentNamePage: {
+        title: '代理名称',
+    },
+    editAgentPromptPage: {
+        title: '编写自定义说明',
+    },
     expenseRulesPage: {
         title: '报销规则',
         findRule: '查找规则',

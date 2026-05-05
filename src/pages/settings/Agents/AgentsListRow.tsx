@@ -1,12 +1,15 @@
 import React from 'react';
 import {View} from 'react-native';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
+import PressableWithFeedback from '@components/Pressable/PressableWithFeedback';
 import ReportActionAvatars from '@components/ReportActionAvatars';
 import Text from '@components/Text';
 import useStyleUtils from '@hooks/useStyleUtils';
 import useThemeStyles from '@hooks/useThemeStyles';
+import Navigation from '@libs/Navigation/Navigation';
 import variables from '@styles/variables';
 import CONST from '@src/CONST';
+import ROUTES from '@src/ROUTES';
 import type {Errors, PendingAction} from '@src/types/onyx/OnyxCommon';
 
 type AgentsListRowProps = {
@@ -40,7 +43,13 @@ function AgentsListRow({accountID, displayName, login, pendingAction, errors, on
             onClose={onErrorClose}
             errorRowStyles={[styles.ph5, styles.pb5]}
         >
-            <View style={[styles.selectionListPressableItemWrapper, styles.mb2, styles.gap3]}>
+            <PressableWithFeedback
+                style={[styles.selectionListPressableItemWrapper, styles.mb2, styles.gap3]}
+                onPress={() => Navigation.navigate(ROUTES.SETTINGS_AGENTS_EDIT.getRoute(accountID))}
+                accessibilityLabel={displayName}
+                role={CONST.ROLE.BUTTON}
+                sentryLabel="AgentsListRow-Edit"
+            >
                 <ReportActionAvatars
                     accountIDs={[accountID]}
                     size={CONST.AVATAR_SIZE.LARGE_NORMAL}
@@ -61,7 +70,7 @@ function AgentsListRow({accountID, displayName, login, pendingAction, errors, on
                         {login}
                     </Text>
                 </View>
-            </View>
+            </PressableWithFeedback>
         </OfflineWithFeedback>
     );
 }
