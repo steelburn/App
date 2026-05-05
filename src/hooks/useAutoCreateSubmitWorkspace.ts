@@ -1,4 +1,3 @@
-import {hasSeenTourSelector} from '@selectors/Onboarding';
 import {useCallback, useMemo} from 'react';
 import type {OnyxCollection} from 'react-native-onyx';
 import {navigateToSubmitWorkspaceAfterOnboardingWithMicrotaskQueue} from '@libs/navigateAfterOnboarding';
@@ -9,16 +8,9 @@ import {completeOnboarding} from '@userActions/Report';
 import {setOnboardingAdminsChatReportID, setOnboardingPolicyID} from '@userActions/Welcome';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
-import {lastWorkspaceNumberSelector} from '@src/selectors/Policy';
 import type {Policy} from '@src/types/onyx';
-import useActivePolicy from './useActivePolicy';
-import useCurrentUserPersonalDetails from './useCurrentUserPersonalDetails';
-import useHasActiveAdminPolicies from './useHasActiveAdminPolicies';
-import useLocalize from './useLocalize';
-import useOnboardingMessages from './useOnboardingMessages';
+import useOnboardingWorkspaceCreationState from './useOnboardingWorkspaceCreationState';
 import useOnyx from './useOnyx';
-import usePreferredPolicy from './usePreferredPolicy';
-import useResponsiveLayout from './useResponsiveLayout';
 
 /**
  * Hook that provides a function to auto-create a Submit workspace for EMPLOYER
@@ -27,33 +19,30 @@ import useResponsiveLayout from './useResponsiveLayout';
  * Shared by BaseOnboardingPersonalDetails, BaseOnboardingPurpose, and BaseOnboardingWorkspaces.
  */
 function useAutoCreateSubmitWorkspace() {
-    const [onboardingPolicyID] = useOnyx(ONYXKEYS.ONBOARDING_POLICY_ID);
-    const [onboardingAdminsChatReportID] = useOnyx(ONYXKEYS.ONBOARDING_ADMINS_CHAT_REPORT_ID);
-    const [introSelected] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED);
-    const [isSelfTourViewed] = useOnyx(ONYXKEYS.NVP_ONBOARDING, {selector: hasSeenTourSelector});
-    const [betas] = useOnyx(ONYXKEYS.BETAS);
-    const currentUserPersonalDetails = useCurrentUserPersonalDetails();
-    const currentUserEmail = currentUserPersonalDetails.login ?? '';
-    const currentUserAccountID = currentUserPersonalDetails.accountID;
+    const {
+        onboardingPolicyID,
+        onboardingAdminsChatReportID,
+        introSelected,
+        isSelfTourViewed,
+        betas,
+        currentUserEmail,
+        currentUserAccountID,
+        localCurrencyCode,
+        activePolicy,
+        translate,
+        formatPhoneNumber,
+        isRestrictedPolicyCreation,
+        hasActiveAdminPolicies,
+        onboardingMessages,
+        lastWorkspaceNumber,
+        isSmallScreenWidth,
+    } = useOnboardingWorkspaceCreationState();
+
     const groupPolicySelector = useMemo(
         () => (policies: OnyxCollection<Policy>) => Object.values(policies ?? {}).some((policy) => isGroupPolicy(policy) && canEditWorkspaceSettings(policy)),
         [],
     );
-    const lastWorkspaceNumberWithEmailSelector = useCallback(
-        (policies: OnyxCollection<Policy>) => {
-            return lastWorkspaceNumberSelector(policies, currentUserEmail);
-        },
-        [currentUserEmail],
-    );
     const [hasEditableGroupPolicy] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {selector: groupPolicySelector});
-    const [lastWorkspaceNumber] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {selector: lastWorkspaceNumberWithEmailSelector});
-    const activePolicy = useActivePolicy();
-    const {translate, formatPhoneNumber} = useLocalize();
-    const {isRestrictedPolicyCreation} = usePreferredPolicy();
-    const hasActiveAdminPolicies = useHasActiveAdminPolicies();
-    const {onboardingMessages} = useOnboardingMessages();
-    // eslint-disable-next-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidth
-    const {isSmallScreenWidth} = useResponsiveLayout();
 
     const autoCreateSubmitWorkspace = useCallback(
         (firstName: string, lastName: string) => {
@@ -67,12 +56,12 @@ function useAutoCreateSubmitWorkspace() {
                       policyName: generateDefaultWorkspaceName(currentUserEmail, lastWorkspaceNumber, translate, displayName),
                       policyID: generatePolicyID(),
                       engagementChoice: CONST.ONBOARDING_CHOICES.EMPLOYER,
-                      currency: currentUserPersonalDetails.localCurrencyCode ?? CONST.CURRENCY.USD,
+                      currency: localCurrencyCode,
                       file: undefined,
                       shouldAddOnboardingTasks: false,
                       introSelected,
                       activePolicy,
-                      currentUserAccountIDParam: currentUserAccountID ?? CONST.DEFAULT_NUMBER_ID,
+                      currentUserAccountIDParam: currentUserAccountID,
                       currentUserEmailParam: currentUserEmail,
                       shouldAddGuideWelcomeMessage: false,
                       type: CONST.POLICY.TYPE.SUBMIT,
@@ -109,7 +98,7 @@ function useAutoCreateSubmitWorkspace() {
             onboardingPolicyID,
             hasEditableGroupPolicy,
             onboardingAdminsChatReportID,
-            currentUserPersonalDetails.localCurrencyCode,
+            localCurrencyCode,
             introSelected,
             activePolicy,
             isSelfTourViewed,
