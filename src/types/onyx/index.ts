@@ -2,6 +2,7 @@ import type {OnboardingPurpose} from '@libs/actions/Welcome/OnboardingFlow';
 import type {FileObject} from '@src/types/utils/Attachment';
 import type Account from './Account';
 import type AccountData from './AccountData';
+import type AgentPrompt from './AgentPrompt';
 import type AppReview from './AppReview';
 import type {ApprovalWorkflowOnyx} from './ApprovalWorkflow';
 import type {AssignCard, AssignCardData} from './AssignCard';
@@ -90,6 +91,8 @@ import type {PasskeyCredential, PasskeyTransport} from './LocalPasskeyCredential
 import type LockAccountDetails from './LockAccountDetails';
 import type {LoginList} from './Login';
 import type Login from './Login';
+import type {Login as NewLogin} from './Logins';
+import type Logins from './Logins';
 import type MapboxAccessToken from './MapboxAccessToken';
 import type MergeTransaction from './MergeTransaction';
 import type Modal from './Modal';
@@ -244,6 +247,8 @@ export type {
     LockAccountDetails,
     Login,
     LoginList,
+    NewLogin,
+    Logins,
     PasskeyCredential,
     PasskeyTransport,
     PendingContactAction,
@@ -399,4 +404,5 @@ export type {
     DeviceBiometrics,
     LocallyProcessed3DSChallengeReviews,
     InitiatingBankAccountUnlock,
+    AgentPrompt,
 };
