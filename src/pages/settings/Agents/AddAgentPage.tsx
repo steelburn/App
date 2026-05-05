@@ -116,7 +116,7 @@ function AddAgentPage() {
                             containerStyles={[styles.flex1]}
                             touchableInputWrapperStyle={[styles.flex1]}
                             textInputContainerStyles={[styles.flex1]}
-                            inputStyle={[styles.flex1]}
+                            inputStyle={[styles.flex1, styles.textAlignVerticalTop]}
                         />
                     </View>
                 </View>
