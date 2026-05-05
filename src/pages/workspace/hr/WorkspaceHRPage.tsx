@@ -204,7 +204,10 @@ function WorkspaceHRPage({
                                         <MenuItem
                                             title={translate('workspace.hr.gusto.approvalMode')}
                                             description={getGustoApprovalModeLabel(gustoConfig?.approvalMode)}
-                                            wrapperStyle={styles.sectionMenuItemTopDescription}
+                                            wrapperStyle={[styles.sectionMenuItemTopDescription, styles.mt2]}
+                                            shouldShowBasicTitle
+                                            titleStyle={styles.textLabelSupporting}
+                                            descriptionTextStyle={styles.popoverMenuText}
                                             shouldShowRightIcon
                                             brickRoadIndicator={gustoConfig?.errorFields?.approvalMode ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined}
                                             onPress={() => Navigation.navigate(ROUTES.WORKSPACE_HR_GUSTO_APPROVAL_MODE.getRoute(policyID))}
