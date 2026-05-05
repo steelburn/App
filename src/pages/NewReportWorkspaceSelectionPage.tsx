@@ -1,7 +1,7 @@
+import {policyIDsWithEmptyReportsSelector} from '@selectors/Report';
 import {accountIDSelector} from '@selectors/Session';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {View} from 'react-native';
-import type {OnyxCollection} from 'react-native-onyx';
 import ActivityIndicator from '@components/ActivityIndicator';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import ScreenWrapper from '@components/ScreenWrapper';
@@ -27,7 +27,7 @@ import Navigation from '@libs/Navigation/Navigation';
 import type {NewReportWorkspaceSelectionNavigatorParamList} from '@libs/Navigation/types';
 import {getHeaderMessageForNonUserList} from '@libs/OptionsListUtils';
 import {canSubmitPerDiemExpenseFromWorkspace, isPolicyAdmin, shouldShowPolicy} from '@libs/PolicyUtils';
-import {getDefaultWorkspaceAvatar, getPolicyIDsWithEmptyReportsForAccount} from '@libs/ReportUtils';
+import {getDefaultWorkspaceAvatar} from '@libs/ReportUtils';
 import {buildCannedSearchQuery} from '@libs/SearchQueryUtils';
 import {shouldRestrictUserBillableActions} from '@libs/SubscriptionUtils';
 import {isPerDiemRequest} from '@libs/TransactionUtils';
@@ -39,7 +39,6 @@ import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
-import type * as OnyxTypes from '@src/types/onyx';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
 
 type WorkspaceListItem = {
@@ -84,19 +83,8 @@ function NewReportWorkspaceSelectionPage({route}: NewReportWorkspaceSelectionPag
     const [todos] = useOnyx(ONYXKEYS.DERIVED.TODOS);
     const transactionsByReportID = todos?.transactionsByReportID;
 
-    const [policiesWithEmptyReports] = useOnyx(
-        ONYXKEYS.COLLECTION.REPORT,
-        {
-            selector: (reports: OnyxCollection<OnyxTypes.Report>) => {
-                if (!accountID) {
-                    return {};
-                }
-
-                return getPolicyIDsWithEmptyReportsForAccount(reports, accountID, transactionsByReportID ?? {});
-            },
-        },
-        [accountID, transactionsByReportID],
-    );
+    const policiesWithEmptyReportsForAccountSelector = useMemo(() => policyIDsWithEmptyReportsSelector(accountID, transactionsByReportID ?? {}), [accountID, transactionsByReportID]);
+    const [policiesWithEmptyReports] = useOnyx(ONYXKEYS.COLLECTION.REPORT, {selector: policiesWithEmptyReportsForAccountSelector});
 
     const navigateToNewReport = (optimisticReportID: string) => {
         if (isRHPOnReportInSearch) {

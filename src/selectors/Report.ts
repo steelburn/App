@@ -3,7 +3,7 @@ import type {ValueOf} from 'type-fest';
 import {getOriginalMessage, isClosedAction} from '@libs/ReportActionsUtils';
 import {getPolicyIDsWithEmptyReportsForAccount, isOpenExpenseReport} from '@libs/ReportUtils';
 import CONST from '@src/CONST';
-import type {Report, ReportActions} from '@src/types/onyx';
+import type {Report, ReportActions, Transaction} from '@src/types/onyx';
 import {getLastClosedReportAction} from './ReportAction';
 
 type OpenExpenseReportIDMap = Record<string, true>;
@@ -30,11 +30,11 @@ function getReportOwnerAccountID(report: OnyxEntry<Report>) {
     return report?.ownerAccountID;
 }
 
-const policyIDsWithEmptyReportsSelector = (accountID: number | undefined) => (reports: OnyxCollection<Report>) => {
+const policyIDsWithEmptyReportsSelector = (accountID: number | undefined, transactionsByReportID: Record<string, Transaction[]>) => (reports: OnyxCollection<Report>) => {
     if (!accountID) {
         return {};
     }
-    return getPolicyIDsWithEmptyReportsForAccount(reports, accountID);
+    return getPolicyIDsWithEmptyReportsForAccount(reports, accountID, transactionsByReportID);
 };
 
 function openExpenseReportIDsSelector(reports: OnyxCollection<Report>): OpenExpenseReportIDMap {

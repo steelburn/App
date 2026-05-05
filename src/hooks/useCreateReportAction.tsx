@@ -50,6 +50,7 @@ export default function useCreateReportAction({onCreateReport, groupPoliciesWith
     const [userBillingGracePeriodEnds] = useOnyx(ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_USER_BILLING_GRACE_PERIOD_END);
     const [amountOwed] = useOnyx(ONYXKEYS.NVP_PRIVATE_AMOUNT_OWED);
     const [hasDismissedEmptyReportsConfirmation] = useOnyx(ONYXKEYS.NVP_EMPTY_REPORTS_CONFIRMATION_DISMISSED);
+    const [accountID] = useOnyx(ONYXKEYS.SESSION, {selector: (session) => session?.accountID});
 
     const {shouldRedirectToExpensifyClassic, canUseAction, showRedirectToExpensifyClassicModal} = useRedirectToExpensifyClassic();
 
@@ -105,7 +106,7 @@ export default function useCreateReportAction({onCreateReport, groupPoliciesWith
             // No default or restricted with multiple workspaces → workspace selector
             if (
                 !workspaceIDForReportCreation ||
-                (shouldRestrictUserBillableActions(workspaceIDForReportCreation, ownerBillingGracePeriodEnd, userBillingGracePeriodEnds, amountOwed) &&
+                (shouldRestrictUserBillableActions(workspaceIDForReportCreation, ownerBillingGracePeriodEnd, userBillingGracePeriodEnds, amountOwed, accountID) &&
                     groupPoliciesWithChatEnabled.length > 1)
             ) {
                 Navigation.navigate(ROUTES.NEW_REPORT_WORKSPACE_SELECTION.getRoute());
@@ -113,7 +114,7 @@ export default function useCreateReportAction({onCreateReport, groupPoliciesWith
             }
 
             // Default workspace is not restricted → create report directly (or show empty-report confirmation)
-            if (!shouldRestrictUserBillableActions(workspaceIDForReportCreation, ownerBillingGracePeriodEnd, userBillingGracePeriodEnds, amountOwed)) {
+            if (!shouldRestrictUserBillableActions(workspaceIDForReportCreation, ownerBillingGracePeriodEnd, userBillingGracePeriodEnds, amountOwed, accountID)) {
                 if (shouldShowEmptyReportConfirmation) {
                     openCreateReportConfirmation();
                 } else {
@@ -133,6 +134,7 @@ export default function useCreateReportAction({onCreateReport, groupPoliciesWith
         ownerBillingGracePeriodEnd,
         userBillingGracePeriodEnds,
         amountOwed,
+        accountID,
         groupPoliciesWithChatEnabled.length,
         shouldShowEmptyReportConfirmation,
         openCreateReportConfirmation,
