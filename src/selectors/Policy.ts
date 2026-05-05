@@ -230,8 +230,6 @@ export {
     groupPaidPoliciesWithExpenseChatEnabledSelector,
     iouRequestPolicyCollectionSelector,
     shouldRedirectToExpensifyClassicSelector,
-    adminPoliciesConnectedToSageIntacctSelector,
-    adminPoliciesConnectedToNetSuiteSelector,
     adminPoliciesConnectedToQBDSelector,
     reusablePoliciesConnectedToSelector,
     hasPoliciesConnectedToQBDSelector,
