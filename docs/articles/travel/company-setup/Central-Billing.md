@@ -86,7 +86,7 @@ Only **Travel Admins** can enable and manage Central Billing. Once enabled, Trav
 ## How to book travel with a Central Billing card
 
 1. Select **Book** in Expensify Travel.  
-2. Choose a flight, hotel, car, or rail reservation.  
+2. Choose a flight, hotel, car, or rail reservation. Note that the central billing card can only be used as a guarantee for a hotel and car booking. A physical card must be provided to the merchant at the time of payment/pickup.  
 3. On the checkout screen, go to **Payment method**.  
 4. Select the pencil icon to view all available cards.  
 5. Choose the central billing card.  
