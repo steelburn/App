@@ -64,6 +64,16 @@ type DomainSecurityGroupErrors = {
      * Errors related to deleting the security group
      */
     errors?: OnyxCommon.Errors;
+
+    /**
+     * Errors related to toggling the preferred workspace setting
+     */
+    enableRestrictedPrimaryPolicyErrors?: OnyxCommon.Errors;
+
+    /**
+     * Errors related to changing the preferred workspace ID
+     */
+    restrictedPrimaryPolicyIDErrors?: OnyxCommon.Errors;
 };
 
 /**
