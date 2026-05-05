@@ -342,7 +342,6 @@ function PureReportActionItem({
     const prevDraftMessage = usePrevious(draftMessage);
     const isReportActionLinked = linkedReportActionID && action.reportActionID && linkedReportActionID === action.reportActionID;
     const [isReportActionActive, setIsReportActionActive] = useState(!!isReportActionLinked);
-    const [hasEverHovered, setHasEverHovered] = useState(false);
     const isReportArchived = useReportIsArchived(reportID);
 
     const isHarvestCreatedExpenseReport = isHarvestCreatedExpenseReportUtils(reportNameValuePairsOrigin, reportNameValuePairsOriginalID);
@@ -1131,7 +1130,6 @@ function PureReportActionItem({
                     shouldFreezeCapture={isPaymentMethodPopoverActive}
                     onHoverIn={() => {
                         setIsReportActionActive(false);
-                        setHasEverHovered(true);
                     }}
                     onHoverOut={() => {
                         setIsReportActionActive(!!isReportActionLinked);
@@ -1140,7 +1138,7 @@ function PureReportActionItem({
                     {(hovered) => (
                         <View style={highlightedBackgroundColorIfNeeded}>
                             {shouldDisplayNewMarker && (!shouldUseThreadDividerLine || !isFirstVisibleReportAction) && <UnreadActionIndicator reportActionID={action.reportActionID} />}
-                            {shouldDisplayContextMenuValue && hasEverHovered && canShowMenu && (
+                            {shouldDisplayContextMenuValue && hovered && canShowMenu && (
                                 <MiniReportActionContextMenu
                                     reportID={reportID}
                                     reportActionID={action.reportActionID}
