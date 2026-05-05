@@ -35,7 +35,6 @@ import {
     hasHeldExpenses as hasHeldExpensesReportUtils,
     hasOnlyNonReimbursableTransactions,
     hasOutstandingChildRequest,
-    hasPendingReportRetract,
     isArchivedReport,
     isClosedReport as isClosedReportUtil,
     isExpenseReport,
@@ -257,7 +256,6 @@ function canSubmitReport(
         !isReportArchived &&
         !hasAnySubmissionBlockingViolations &&
         !hasSmartScanFailedWithMissingFields(transactions, report) &&
-        !hasPendingReportRetract(report) &&
         transactions.length > 0
     );
 }
@@ -960,7 +958,6 @@ function retractReport(
             hasReportBeenRetracted: true,
             nextStep: optimisticNextStep,
             pendingFields: {
-                hasReportBeenRetracted: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE,
                 partial: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE,
                 nextStep: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE,
             },
@@ -1005,7 +1002,6 @@ function retractReport(
             key: `${ONYXKEYS.COLLECTION.REPORT}${expenseReport.reportID}`,
             value: {
                 pendingFields: {
-                    hasReportBeenRetracted: null,
                     partial: null,
                     nextStep: null,
                 },
@@ -1032,7 +1028,6 @@ function retractReport(
                 hasReportBeenRetracted: false,
                 nextStep: expenseReport.nextStep ?? null,
                 pendingFields: {
-                    hasReportBeenRetracted: null,
                     partial: null,
                     nextStep: null,
                 },
@@ -1256,9 +1251,6 @@ function submitReport({
     delegateEmail,
 }: SubmitReportFunctionParams) {
     if (!expenseReport) {
-        return;
-    }
-    if (hasPendingReportRetract(expenseReport)) {
         return;
     }
     if (expenseReport.policyID && shouldRestrictUserBillableActions(expenseReport.policyID, ownerBillingGracePeriodEnd, userBillingGracePeriodEnds, amountOwed)) {
