@@ -131,7 +131,6 @@ describe('actions/IOU/Receipt', () => {
         let getCurrentSearchQueryJSONSpy: jest.SpyInstance;
 
         const mockApiWrite = () => {
-            // eslint-disable-next-line rulesdir/no-multiple-api-calls
             return jest.spyOn(API, 'write').mockImplementation(jest.fn());
         };
 
@@ -572,7 +571,6 @@ describe('actions/IOU/Receipt', () => {
         });
 
         it('should call API.write with DETACH_RECEIPT command and correct params', async () => {
-            // eslint-disable-next-line rulesdir/no-multiple-api-calls
             const writeSpy = jest.spyOn(API, 'write').mockImplementation(jest.fn());
             await seedOnyx();
 
