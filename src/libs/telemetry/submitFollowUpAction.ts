@@ -12,7 +12,7 @@
 import type {SpanAttributeValue} from '@sentry/core';
 import type {ValueOf} from 'type-fest';
 import Log from '@libs/Log';
-import {navigationRef} from '@libs/Navigation/Navigation';
+import navigationRef from '@libs/Navigation/navigationRef';
 import CONST from '@src/CONST';
 import NAVIGATORS from '@src/NAVIGATORS';
 import {cancelSpan, endSpanWithAttributes, getSpan, startSpan} from './activeSpans';
@@ -60,6 +60,7 @@ const SPAN_SAFETY_TIMEOUT_MS = 60_000;
 let trackingState: TrackingState | null = null;
 let pendingSubmitFollowUpAction: PendingSubmitFollowUpAction = null;
 let safetyTimeoutId: ReturnType<typeof setTimeout> | null = null;
+let navListenerRegistered = false;
 
 // ---------------------------------------------------------------------------
 // Follow-up action state
@@ -223,6 +224,11 @@ function cancelSubmitFollowUpActionSpan() {
 // ---------------------------------------------------------------------------
 
 function startTracking(context: SubmitExpenseContext, options?: StartTrackingOptions) {
+    if (!navListenerRegistered) {
+        navListenerRegistered = true;
+        navigationRef.addListener('state', cancelIfStaleForNavState);
+    }
+
     cancelTracking();
 
     const skip = options?.skipSubmitExpenseSpan ?? false;
