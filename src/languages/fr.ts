@@ -9237,6 +9237,9 @@ Voici un *reçu test* pour vous montrer comment ça fonctionne :`,
                 `Tous les nouveaux rapports et dépenses seront créés dans ${enabled ? "l'espace de travail préféré sélectionné" : 'cet espace de travail'}.`,
             preferredWorkspaceSelectDescription: 'Toutes les nouvelles dépenses et tous les nouveaux rapports seront créés dans cet espace de travail.',
             noWorkspacesMessage: "Il n'y a aucun espace de travail sur ce domaine. Un espace de travail est requis pour activer cette restriction.",
+            restrictDefaultLoginSelection: 'Restreindre la sélection de connexion par défaut',
+            restrictDefaultLoginSelectionDescription:
+                'Empêche les membres de modifier leur e-mail de connexion en dehors du domaine de leur entreprise afin d’éviter les restrictions de politique.',
         },
     },
     proactiveAppReview: {

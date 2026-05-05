@@ -9165,6 +9165,9 @@ Aqui está um *comprovante de teste* para mostrar como funciona:`,
                 `Todos os novos relatórios e despesas serão criados ${enabled ? 'no espaço de trabalho preferido selecionado' : 'neste espaço de trabalho'}.`,
             preferredWorkspaceSelectDescription: 'Todas as novas despesas e relatórios serão criados neste espaço de trabalho.',
             noWorkspacesMessage: 'Não há espaços de trabalho neste domínio. Um espaço de trabalho é necessário para ativar esta restrição.',
+            restrictDefaultLoginSelection: 'Restringir seleção de login padrão',
+            restrictDefaultLoginSelectionDescription:
+                'Impede que os membros alterem o e-mail de login para um endereço fora do domínio da empresa, evitando que burlem restrições de políticas.',
         },
     },
     proactiveAppReview: {

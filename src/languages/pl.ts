@@ -9156,6 +9156,8 @@ Oto *paragon testowy*, żeby pokazać Ci, jak to działa:`,
             preferredWorkspaceDescription: (enabled: boolean) => `Wszystkie nowe raporty i wydatki będą tworzone w ${enabled ? 'wybranym preferowanym' : 'tym'} obszarze roboczym.`,
             preferredWorkspaceSelectDescription: 'Wszystkie nowe wydatki i raporty będą tworzone w tym obszarze roboczym.',
             noWorkspacesMessage: 'W tej domenie nie ma żadnych obszarów roboczych. Obszar roboczy jest wymagany, aby włączyć to ograniczenie.',
+            restrictDefaultLoginSelection: 'Ogranicz wybór domyślnego logowania',
+            restrictDefaultLoginSelectionDescription: 'Zapobiega zmianie adresu e-mail do logowania przez członków na adres spoza domeny firmowej, aby obejść ograniczenia zasad.',
         },
     },
     proactiveAppReview: {

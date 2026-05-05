@@ -9212,6 +9212,9 @@ Hier ist ein *Testbeleg*, um dir zu zeigen, wie es funktioniert:`,
             preferredWorkspaceDescription: (enabled: boolean) => `Alle neuen Berichte und Ausgaben werden im ${enabled ? 'ausgewählten bevorzugten' : 'diesem'} Arbeitsbereich erstellt.`,
             preferredWorkspaceSelectDescription: 'Alle neuen Ausgaben und Berichte werden in diesem Arbeitsbereich erstellt.',
             noWorkspacesMessage: 'Es gibt keine Arbeitsbereiche in dieser Domain. Ein Arbeitsbereich ist erforderlich, um diese Einschränkung zu aktivieren.',
+            restrictDefaultLoginSelection: 'Standard-Login-Auswahl einschränken',
+            restrictDefaultLoginSelectionDescription:
+                'Verhindert, dass Mitglieder ihre Login-E-Mail-Adresse außerhalb der Unternehmensdomäne ändern, um Richtlinienbeschränkungen zu umgehen.',
         },
     },
     proactiveAppReview: {

@@ -9206,6 +9206,8 @@ const translations = {
             preferredWorkspaceDescription: (enabled: boolean) => `All new reports and expenses will be created on ${enabled ? 'selected preferred' : 'this'} workspace.`,
             preferredWorkspaceSelectDescription: 'All new expenses and reports will be created on this workspace.',
             noWorkspacesMessage: 'There are no workspaces on this domain. A workspace is required to enable this restriction.',
+            restrictDefaultLoginSelection: 'Restrict default login selection',
+            restrictDefaultLoginSelectionDescription: 'Prevent members from changing their login email away from their company domain to avoid policy restrictions.',
         },
     },
 };

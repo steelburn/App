@@ -9176,6 +9176,8 @@ Hier is een *proefbon* om je te laten zien hoe het werkt:`,
             preferredWorkspaceDescription: (enabled: boolean) => `Alle nieuwe rapporten en uitgaven worden aangemaakt in ${enabled ? 'de geselecteerde voorkeurs' : 'deze'} werkruimte.`,
             preferredWorkspaceSelectDescription: 'Alle nieuwe uitgaven en rapporten worden aangemaakt in deze werkruimte.',
             noWorkspacesMessage: 'Er zijn geen werkruimtes op dit domein. Een werkruimte is vereist om deze beperking in te schakelen.',
+            restrictDefaultLoginSelection: 'Standaard login-selectie beperken',
+            restrictDefaultLoginSelectionDescription: 'Voorkomt dat leden hun login-e-mail wijzigen naar een adres buiten het bedrijfsdomein om beleidsbeperkingen te omzeilen.',
         },
     },
     proactiveAppReview: {

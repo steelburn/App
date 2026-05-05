@@ -9088,6 +9088,8 @@ ${reportName}
             preferredWorkspaceDescription: (enabled: boolean) => `すべての新しいレポートと経費は${enabled ? '選択された優先' : 'この'}ワークスペースに作成されます。`,
             preferredWorkspaceSelectDescription: 'すべての新しい経費とレポートはこのワークスペースに作成されます。',
             noWorkspacesMessage: 'このドメインにワークスペースがありません。この制限を有効にするにはワークスペースが必要です。',
+            restrictDefaultLoginSelection: 'デフォルトのログイン選択を制限する',
+            restrictDefaultLoginSelectionDescription: 'メンバーがポリシー制限を回避するために、ログイン用のメールアドレスを会社のドメイン以外に変更することを防ぎます。',
         },
     },
     proactiveAppReview: {

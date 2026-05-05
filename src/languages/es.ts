@@ -9443,6 +9443,8 @@ ${amount} para ${merchant} - ${date}`,
                 `Todos los nuevos informes y gastos se crearán en ${enabled ? 'el espacio de trabajo preferido seleccionado' : 'este espacio de trabajo'}.`,
             preferredWorkspaceSelectDescription: 'Todos los nuevos gastos e informes se crearán en este espacio de trabajo.',
             noWorkspacesMessage: 'No hay espacios de trabajo en este dominio. Se requiere un espacio de trabajo para habilitar esta restricción.',
+            restrictDefaultLoginSelection: 'Restringir el inicio de sesión predeterminado',
+            restrictDefaultLoginSelectionDescription: 'Evita que los miembros cambien su correo de inicio de sesión fuera del dominio de la empresa para eludir restricciones de políticas.',
         },
     },
     gps: {
