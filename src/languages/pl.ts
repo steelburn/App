@@ -7002,7 +7002,7 @@ Dodaj więcej zasad wydatków, żeby chronić płynność finansową firmy.`,
                     },
                     custom: {
                         label: 'Custom approval',
-                        description: "I’ll manually setup approval workflows in Expensify.",
+                        description: 'I’ll manually setup approval workflows in Expensify.',
                     },
                 },
                 connect: 'Połącz',

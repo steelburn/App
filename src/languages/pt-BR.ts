@@ -7008,7 +7008,7 @@ Adicione mais regras de gasto para proteger o fluxo de caixa da empresa.`,
                     },
                     custom: {
                         label: 'Custom approval',
-                        description: "I’ll manually setup approval workflows in Expensify.",
+                        description: 'I’ll manually setup approval workflows in Expensify.',
                     },
                 },
                 connect: 'Conectar',

@@ -7045,7 +7045,7 @@ Fügen Sie weitere Ausgabelimits hinzu, um den Cashflow Ihres Unternehmens zu sc
                     },
                     custom: {
                         label: 'Custom approval',
-                        description: "I’ll manually setup approval workflows in Expensify.",
+                        description: 'I’ll manually setup approval workflows in Expensify.',
                     },
                 },
                 connect: 'Verbinden',

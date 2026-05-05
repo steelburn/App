@@ -7009,7 +7009,7 @@ er bestedingsregels toe om de kasstroom van het bedrijf te beschermen.`,
                     },
                     custom: {
                         label: 'Custom approval',
-                        description: "I’ll manually setup approval workflows in Expensify.",
+                        description: 'I’ll manually setup approval workflows in Expensify.',
                     },
                 },
                 connect: 'Verbinden',
