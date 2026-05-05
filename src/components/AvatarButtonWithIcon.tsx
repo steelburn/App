@@ -42,9 +42,6 @@ type AvatarButtonWithIconProps = WithSentryLabel & {
     /** Additional style props for the edit icon */
     editIconStyle?: StyleProp<ViewStyle>;
 
-    /** Fill color for the edit icon */
-    editIconFill?: string;
-
     /** A default avatar component to display when there is no source */
     DefaultAvatar?: () => React.ReactNode;
 
@@ -77,7 +74,6 @@ function AvatarButtonWithIcon({
     DefaultAvatar = () => null,
     disabledStyle,
     editIconStyle,
-    editIconFill,
     pendingAction,
     text,
     onPress,
@@ -135,7 +131,7 @@ function AvatarButtonWithIcon({
                             src={editIcon ?? expensifyIcons.Pencil}
                             width={variables.iconSizeSmall}
                             height={variables.iconSizeSmall}
-                            fill={editIconFill ?? theme.icon}
+                            fill={theme.icon}
                         />
                     </View>
                 )}

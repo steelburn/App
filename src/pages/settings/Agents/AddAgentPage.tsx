@@ -80,6 +80,7 @@ function AddAgentPage() {
                 style={[styles.flex1, styles.ph5]}
                 shouldUseScrollView={false}
                 submitFlexEnabled={false}
+                shouldHideFixErrorsAlert
                 enabledWhenOffline
             >
                 <View style={[styles.flex1, styles.flexColumn, styles.gap5]}>
@@ -91,8 +92,7 @@ function AddAgentPage() {
                             size={CONST.AVATAR_SIZE.X_LARGE}
                             avatarStyle={avatarStyle}
                             editIcon={expensifyIcons.Sync}
-                            editIconStyle={styles.smallEditIconAgent}
-                            editIconFill={theme.textLight}
+                            editIconStyle={styles.profilePageAvatar}
                             sentryLabel={CONST.SENTRY_LABEL.ADD_AGENT_PAGE.AVATAR}
                         />
                     </View>
