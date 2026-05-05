@@ -118,6 +118,7 @@ function WorkspaceOverviewPage({policyDraft, policy: policyProp, route}: Workspa
     const policy = policyDraft?.id ? policyDraft : policyProp;
     useWorkspaceDocumentTitle(policy?.name, 'workspace.common.profile');
     const policyID = policy?.id;
+    const policyDraftID = policyDraft?.id;
     const defaultFundID = useDefaultFundID(policyID);
     const [cardSettings] = useOnyx(`${ONYXKEYS.COLLECTION.PRIVATE_EXPENSIFY_CARD_SETTINGS}${defaultFundID}`);
     const settings = getCardSettings(cardSettings);
@@ -225,6 +226,8 @@ function WorkspaceOverviewPage({policyDraft, policy: policyProp, route}: Workspa
         [policyID],
     );
 
+    const rulesDocumentURL = policy?.rulesDocumentURL;
+
     const getRulesDocumentMenuItems = useCallback(
         (openPicker: (options: {onPicked: (files: FileObject[]) => void}) => void): PopoverMenuItem[] => [
             {
@@ -241,14 +244,14 @@ function WorkspaceOverviewPage({policyDraft, policy: policyProp, route}: Workspa
                 text: translate('common.remove'),
                 icon: expensifyIcons.Trashcan,
                 onSelected: () => {
-                    if (!policyID || !policy?.rulesDocumentURL) {
+                    if (!policyID || !rulesDocumentURL) {
                         return;
                     }
-                    deletePolicyRulesDocument(policyID, policy.rulesDocumentURL);
+                    deletePolicyRulesDocument(policyID, rulesDocumentURL);
                 },
             },
         ],
-        [translate, expensifyIcons, handleRulesDocumentPicked, policyID, policy?.rulesDocumentURL],
+        [translate, expensifyIcons, handleRulesDocumentPicked, policyID, rulesDocumentURL],
     );
     const shouldShowExpensePolicySection = isBetaEnabled(CONST.BETAS.CUSTOM_RULES) && (isPolicyAdmin || hasRulesDocument || hasCustomRulesText);
     const shouldShowRulesDocumentSubSection = isPolicyAdmin || hasRulesDocument;
@@ -270,14 +273,14 @@ function WorkspaceOverviewPage({policyDraft, policy: policyProp, route}: Workspa
     const [isDeleteWorkspaceErrorModalOpen, setIsDeleteWorkspaceErrorModalOpen] = useState(false);
     const policyLastErrorMessage = getLatestErrorMessage(policy);
 
-    const mentionReportContextValue = {policyID: policy?.id, currentReportID: undefined, exactlyMatch: true};
+    const mentionReportContextValue = useMemo(() => ({policyID, currentReportID: undefined, exactlyMatch: true}), [policyID]);
 
-    const fetchPolicyData = () => {
-        if (policyDraft?.id || !isFocused) {
+    const fetchPolicyData = useCallback(() => {
+        if (policyDraftID || !isFocused) {
             return;
         }
-        openPolicyProfilePage(route.params.policyID);
-    };
+        openPolicyProfilePage(policyID ?? '');
+    }, [policyDraftID, isFocused, policyID]);
 
     const {isOffline} = useNetwork({onReconnect: fetchPolicyData});
 
