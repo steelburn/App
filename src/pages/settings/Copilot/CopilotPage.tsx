@@ -128,7 +128,7 @@ function CopilotPage() {
 
         const position = getClickedTargetLocation(delegateButtonRef.current);
         setAnchorPosition({
-            horizontal: position.right - position.left,
+            horizontal: position.right,
             vertical: position.y + position.height,
         });
     }, [delegateButtonRef]);
@@ -452,7 +452,7 @@ function CopilotPage() {
                                     vertical: anchorPosition.vertical,
                                 }}
                                 anchorAlignment={{
-                                    horizontal: CONST.MODAL.ANCHOR_ORIGIN_HORIZONTAL.LEFT,
+                                    horizontal: CONST.MODAL.ANCHOR_ORIGIN_HORIZONTAL.RIGHT,
                                     vertical: CONST.MODAL.ANCHOR_ORIGIN_VERTICAL.TOP,
                                 }}
                                 menuItems={delegatePopoverMenuItems}
