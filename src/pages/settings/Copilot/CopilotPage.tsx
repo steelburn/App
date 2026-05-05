@@ -3,6 +3,7 @@ import React, {useCallback, useEffect, useLayoutEffect, useMemo, useRef, useStat
 import type {RefObject} from 'react';
 import {Dimensions, View} from 'react-native';
 import type {GestureResponderEvent} from 'react-native';
+import Badge from '@components/Badge';
 import Button from '@components/Button';
 import {useDelegateNoAccessActions, useDelegateNoAccessState} from '@components/DelegateNoAccessModalProvider';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
@@ -40,7 +41,7 @@ import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import {isTrackingSelector} from '@src/selectors/GPSDraftDetails';
-import type {Delegate} from '@src/types/onyx/Account';
+import type {Delegate, DelegateRole} from '@src/types/onyx/Account';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
 
 function CopilotPage() {
@@ -171,67 +172,106 @@ function CopilotPage() {
         [account?.delegatedAccess, activePolicyID, credentials, isOffline, isTrackingGPS, session, showGpsInProgressModal, showOfflineModal],
     );
 
+    const renderTitleWithRole = useCallback(
+        (titleText: string, role: DelegateRole | undefined) => (
+            <View style={[styles.flexRow, styles.alignItemsCenter, styles.flexShrink1]}>
+                <Text
+                    style={[styles.textStrong, styles.flexShrink1]}
+                    numberOfLines={1}
+                >
+                    {titleText}
+                </Text>
+                {!!role && (
+                    <Badge
+                        text={translate('delegate.role', {role})}
+                        badgeStyles={[styles.ml2, styles.flexShrink0]}
+                    />
+                )}
+            </View>
+        ),
+        [styles, translate],
+    );
+
     const delegateMenuItems: MenuItemProps[] = useMemo(() => {
-        const menuItems = delegates
-            .filter((d) => !d.optimisticAccountID)
-            .map(({email, role, pendingAction, pendingFields}) => {
-                const personalDetail = getPersonalDetailByEmail(email);
-                const addDelegateErrors = errorFields?.addDelegate?.[email];
-                const error = getLatestError(addDelegateErrors);
+        const sortedDelegates = sortAlphabetically(
+            delegates.filter((d) => !d.optimisticAccountID).map((d) => ({...d, sortKey: getPersonalDetailByEmail(d.email)?.displayName ?? formatPhoneNumber(d.email)})),
+            'sortKey',
+            localeCompare,
+        );
+        return sortedDelegates.map(({email, role, pendingAction, pendingFields}) => {
+            const personalDetail = getPersonalDetailByEmail(email);
+            const addDelegateErrors = errorFields?.addDelegate?.[email];
+            const error = getLatestError(addDelegateErrors);
 
-                const onPress = (e: GestureResponderEvent | KeyboardEvent) => {
-                    if (isEmptyObject(pendingAction)) {
-                        showPopoverMenu(e, {email, role});
-                        return;
-                    }
-                    if (!role) {
-                        Navigation.navigate(ROUTES.SETTINGS_DELEGATE_ROLE.getRoute(email));
-                        return;
-                    }
-                    if (pendingFields?.role && !pendingFields?.email) {
-                        Navigation.navigate(ROUTES.SETTINGS_UPDATE_DELEGATE_ROLE.getRoute(email, role));
-                        return;
-                    }
+            const onPress = (e: GestureResponderEvent | KeyboardEvent) => {
+                if (isEmptyObject(pendingAction)) {
+                    showPopoverMenu(e, {email, role});
+                    return;
+                }
+                if (!role) {
+                    Navigation.navigate(ROUTES.SETTINGS_DELEGATE_ROLE.getRoute(email));
+                    return;
+                }
+                if (pendingFields?.role && !pendingFields?.email) {
+                    Navigation.navigate(ROUTES.SETTINGS_UPDATE_DELEGATE_ROLE.getRoute(email, role));
+                    return;
+                }
 
-                    Navigation.navigate(ROUTES.SETTINGS_DELEGATE_CONFIRM.getRoute(email, role));
-                };
+                Navigation.navigate(ROUTES.SETTINGS_DELEGATE_CONFIRM.getRoute(email, role));
+            };
 
-                const formattedEmail = formatPhoneNumber(email);
-                return {
-                    title: personalDetail?.displayName ?? formattedEmail,
-                    description: personalDetail?.displayName ? formattedEmail : '',
-                    badgeText: translate('delegate.role', {role}),
-                    avatarID: personalDetail?.accountID ?? CONST.DEFAULT_NUMBER_ID,
-                    icon: personalDetail?.avatar ?? icons.FallbackAvatar,
-                    iconType: CONST.ICON_TYPE_AVATAR,
-                    numberOfLinesDescription: 1,
-                    wrapperStyle: [styles.sectionMenuItemTopDescription],
-                    iconRight: icons.ThreeDots,
-                    shouldShowRightIcon: true,
-                    pendingAction,
-                    shouldForceOpacity: !!pendingAction,
-                    onPendingActionDismiss: () => clearDelegateErrorsByField({email, fieldName: 'addDelegate', delegatedAccess: account?.delegatedAccess}),
-                    error,
-                    onPress,
-                    success: selectedEmail === email,
-                    sentryLabel: CONST.SENTRY_LABEL.SETTINGS_SECURITY.DELEGATE_ITEM,
-                };
-            });
-        return sortAlphabetically(menuItems, 'title', localeCompare);
-    }, [delegates, errorFields, account?.delegatedAccess, formatPhoneNumber, translate, styles, selectedEmail, icons.FallbackAvatar, icons.ThreeDots, localeCompare, showPopoverMenu]);
+            const formattedEmail = formatPhoneNumber(email);
+            const titleText = personalDetail?.displayName ?? formattedEmail;
+            return {
+                titleComponent: renderTitleWithRole(titleText, role),
+                description: personalDetail?.displayName ? formattedEmail : '',
+                avatarID: personalDetail?.accountID ?? CONST.DEFAULT_NUMBER_ID,
+                icon: personalDetail?.avatar ?? icons.FallbackAvatar,
+                iconType: CONST.ICON_TYPE_AVATAR,
+                numberOfLinesDescription: 1,
+                wrapperStyle: [styles.sectionMenuItemTopDescription],
+                iconRight: icons.ThreeDots,
+                shouldShowRightIcon: true,
+                pendingAction,
+                shouldForceOpacity: !!pendingAction,
+                onPendingActionDismiss: () => clearDelegateErrorsByField({email, fieldName: 'addDelegate', delegatedAccess: account?.delegatedAccess}),
+                error,
+                onPress,
+                success: selectedEmail === email,
+                sentryLabel: CONST.SENTRY_LABEL.SETTINGS_SECURITY.DELEGATE_ITEM,
+            };
+        });
+    }, [
+        delegates,
+        errorFields,
+        account?.delegatedAccess,
+        formatPhoneNumber,
+        styles,
+        selectedEmail,
+        icons.FallbackAvatar,
+        icons.ThreeDots,
+        localeCompare,
+        showPopoverMenu,
+        renderTitleWithRole,
+    ]);
 
     const delegatorMenuItems: MenuItemProps[] = useMemo(() => {
-        const menuItems = delegators.map(({email, role, pendingAction}) => {
+        const sortedDelegators = sortAlphabetically(
+            delegators.map((d) => ({...d, sortKey: getPersonalDetailByEmail(d.email)?.displayName ?? formatPhoneNumber(d.email)})),
+            'sortKey',
+            localeCompare,
+        );
+        return sortedDelegators.map(({email, role, pendingAction}) => {
             const personalDetail = getPersonalDetailByEmail(email);
             const formattedEmail = formatPhoneNumber(email);
             const connectError = getLatestError(errorFields?.connect?.[email]);
             const isCurrentUser = email === session?.email;
             const isPending = !!pendingAction;
+            const titleText = personalDetail?.displayName ?? formattedEmail;
 
             return {
-                title: personalDetail?.displayName ?? formattedEmail,
+                titleComponent: renderTitleWithRole(titleText, role),
                 description: personalDetail?.displayName ? formattedEmail : '',
-                badgeText: translate('delegate.role', {role}),
                 avatarID: personalDetail?.accountID ?? CONST.DEFAULT_NUMBER_ID,
                 icon: personalDetail?.avatar ?? icons.FallbackAvatar,
                 iconType: CONST.ICON_TYPE_AVATAR,
@@ -253,8 +293,19 @@ function CopilotPage() {
                 ),
             };
         });
-        return sortAlphabetically(menuItems, 'title', localeCompare);
-    }, [delegators, styles, translate, formatPhoneNumber, account?.delegatedAccess, icons.FallbackAvatar, localeCompare, session?.email, errorFields, switchToDelegator]);
+    }, [
+        delegators,
+        styles,
+        translate,
+        formatPhoneNumber,
+        account?.delegatedAccess,
+        icons.FallbackAvatar,
+        localeCompare,
+        session?.email,
+        errorFields,
+        switchToDelegator,
+        renderTitleWithRole,
+    ]);
 
     const delegatePopoverMenuItems: PopoverMenuItem[] = [
         {
