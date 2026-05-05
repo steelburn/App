@@ -83,6 +83,7 @@ describe('actions/Policy', () => {
                 isSelfTourViewed: false,
                 betas: [CONST.BETAS.SUGGESTED_FOLLOWUPS],
                 hasActiveAdminPolicies: false,
+                activePolicy: undefined,
             });
             await waitForBatchedUpdates();
 
@@ -787,6 +788,7 @@ describe('actions/Policy', () => {
                 isSelfTourViewed: false,
                 betas: undefined,
                 hasActiveAdminPolicies: false,
+                activePolicy: undefined,
             });
             await waitForBatchedUpdates();
 
@@ -817,6 +819,7 @@ describe('actions/Policy', () => {
                 currentUserEmailParam: ESH_EMAIL,
                 isSelfTourViewed: false,
                 hasActiveAdminPolicies: false,
+                activePolicy: undefined,
                 betas: [CONST.BETAS.SUGGESTED_FOLLOWUPS],
             });
             await waitForBatchedUpdates();
@@ -851,6 +854,7 @@ describe('actions/Policy', () => {
                 isSelfTourViewed: false,
                 betas: undefined,
                 hasActiveAdminPolicies: false,
+                activePolicy: undefined,
             });
             await waitForBatchedUpdates();
 
@@ -887,6 +891,7 @@ describe('actions/Policy', () => {
                 isSelfTourViewed: false,
                 betas: undefined,
                 hasActiveAdminPolicies: false,
+                activePolicy: undefined,
             });
             await waitForBatchedUpdates();
 
@@ -919,6 +924,7 @@ describe('actions/Policy', () => {
                 isSelfTourViewed: false,
                 betas: undefined,
                 hasActiveAdminPolicies: false,
+                activePolicy: undefined,
             });
             await waitForBatchedUpdates();
 
@@ -948,6 +954,7 @@ describe('actions/Policy', () => {
                 isSelfTourViewed: false,
                 betas: undefined,
                 hasActiveAdminPolicies: false,
+                activePolicy: undefined,
             });
             await waitForBatchedUpdates();
 
@@ -978,6 +985,7 @@ describe('actions/Policy', () => {
                 isSelfTourViewed: false,
                 betas: undefined,
                 hasActiveAdminPolicies: false,
+                activePolicy: undefined,
             });
             await waitForBatchedUpdates();
 
@@ -1006,6 +1014,7 @@ describe('actions/Policy', () => {
                 isSelfTourViewed: false,
                 betas: undefined,
                 hasActiveAdminPolicies: false,
+                activePolicy: undefined,
             });
             await waitForBatchedUpdates();
 
@@ -1034,6 +1043,7 @@ describe('actions/Policy', () => {
                 isSelfTourViewed: false,
                 betas: undefined,
                 hasActiveAdminPolicies: false,
+                activePolicy: undefined,
             });
             await waitForBatchedUpdates();
 
@@ -1062,6 +1072,7 @@ describe('actions/Policy', () => {
                 isSelfTourViewed: false,
                 betas: undefined,
                 hasActiveAdminPolicies: false,
+                activePolicy: undefined,
             });
             await waitForBatchedUpdates();
 
@@ -1090,6 +1101,7 @@ describe('actions/Policy', () => {
                 isSelfTourViewed: false,
                 betas: undefined,
                 hasActiveAdminPolicies: false,
+                activePolicy: undefined,
             });
             await waitForBatchedUpdates();
 
@@ -1130,6 +1142,7 @@ describe('actions/Policy', () => {
                 isSelfTourViewed: false,
                 betas: undefined,
                 hasActiveAdminPolicies: false,
+                activePolicy: undefined,
             });
             await waitForBatchedUpdates();
 
@@ -1165,6 +1178,7 @@ describe('actions/Policy', () => {
                 isSelfTourViewed: true,
                 betas: undefined,
                 hasActiveAdminPolicies: false,
+                activePolicy: undefined,
             });
             await waitForBatchedUpdates();
 
@@ -1200,6 +1214,7 @@ describe('actions/Policy', () => {
                 isSelfTourViewed: false,
                 betas: undefined,
                 hasActiveAdminPolicies: false,
+                activePolicy: undefined,
             });
             await waitForBatchedUpdates();
 
@@ -1237,6 +1252,7 @@ describe('actions/Policy', () => {
                 isSelfTourViewed: true,
                 betas: undefined,
                 hasActiveAdminPolicies: false,
+                activePolicy: undefined,
             });
             await waitForBatchedUpdates();
 
@@ -1280,6 +1296,7 @@ describe('actions/Policy', () => {
                 isSelfTourViewed: false,
                 betas: undefined,
                 hasActiveAdminPolicies: false,
+                activePolicy: undefined,
             });
             await waitForBatchedUpdates();
 
@@ -1323,6 +1340,7 @@ describe('actions/Policy', () => {
                 isSelfTourViewed: false,
                 betas: undefined,
                 hasActiveAdminPolicies: false,
+                activePolicy: undefined,
                 adminParticipant: {login: adminEmail, accountID: adminAccountID},
             });
             await waitForBatchedUpdates();
@@ -1362,6 +1380,7 @@ describe('actions/Policy', () => {
                 isSelfTourViewed: false,
                 betas: undefined,
                 hasActiveAdminPolicies: false,
+                activePolicy: undefined,
             });
             await waitForBatchedUpdates();
 
@@ -1415,6 +1434,7 @@ describe('actions/Policy', () => {
                 isSelfTourViewed: false,
                 betas: undefined,
                 hasActiveAdminPolicies: false,
+                activePolicy: undefined,
             });
             await waitForBatchedUpdates();
 
@@ -1448,6 +1468,7 @@ describe('actions/Policy', () => {
                 isSelfTourViewed: false,
                 betas: undefined,
                 hasActiveAdminPolicies: false,
+                activePolicy: undefined,
             });
             await waitForBatchedUpdates();
 
@@ -1481,6 +1502,7 @@ describe('actions/Policy', () => {
                 isSelfTourViewed: false,
                 betas: undefined,
                 hasActiveAdminPolicies: false,
+                activePolicy: undefined,
             });
             await waitForBatchedUpdates();
 
@@ -1517,6 +1539,7 @@ describe('actions/Policy', () => {
                 isSelfTourViewed: false,
                 betas: undefined,
                 hasActiveAdminPolicies: false,
+                activePolicy: undefined,
             });
             await waitForBatchedUpdates();
 
@@ -1545,6 +1568,7 @@ describe('actions/Policy', () => {
                 isSelfTourViewed: false,
                 betas: undefined,
                 hasActiveAdminPolicies: false,
+                activePolicy: undefined,
             });
 
             expect(GoogleTagManager.publishEvent).toHaveBeenCalledTimes(1);
@@ -1564,6 +1588,7 @@ describe('actions/Policy', () => {
                 isSelfTourViewed: false,
                 betas: undefined,
                 hasActiveAdminPolicies: true,
+                activePolicy: undefined,
             });
 
             expect(GoogleTagManager.publishEvent).not.toHaveBeenCalled();
@@ -1587,6 +1612,7 @@ describe('actions/Policy', () => {
                 isSelfTourViewed: false,
                 betas: undefined,
                 hasActiveAdminPolicies: false,
+                activePolicy: undefined,
             });
             await waitForBatchedUpdates();
 
@@ -1619,6 +1645,7 @@ describe('actions/Policy', () => {
                 betas: undefined,
                 hasActiveAdminPolicies: false,
                 adminParticipant: {login: adminEmail, accountID: adminAccountID},
+                activePolicy: undefined,
             });
             await waitForBatchedUpdates();
 
@@ -1657,6 +1684,7 @@ describe('actions/Policy', () => {
                 betas: undefined,
                 hasActiveAdminPolicies: false,
                 adminParticipant: {login: adminEmail, accountID: adminAccountID},
+                activePolicy: undefined,
             });
             await waitForBatchedUpdates();
 
@@ -1671,6 +1699,7 @@ describe('actions/Policy', () => {
                 betas: undefined,
                 hasActiveAdminPolicies: false,
                 adminParticipant: {login: adminEmail, accountID: adminAccountID},
+                activePolicy: undefined,
             });
             await waitForBatchedUpdates();
 
