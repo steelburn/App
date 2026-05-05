@@ -23,8 +23,10 @@ import type {Icon} from '@src/types/onyx/OnyxCommon';
 import OptionRowLHN from './OptionRowLHNCore';
 
 /*
- * Onyx-backed props for one LHN row; renders OptionRowLHNCore (memoized; re-renders when derived data changes).
- * Colocated under OptionRowLHN/; consumers import ./OptionRowLHN for OptionRowLHNData only (see index.ts).
+ * This component gets the data from onyx for the actual
+ * OptionRowLHN component.
+ * The OptionRowLHN component is memoized, so it will only
+ * re-render if the data really changed.
  */
 function OptionRowLHNData({
     isOptionFocused = false,
@@ -53,6 +55,7 @@ function OptionRowLHNData({
     const [parentReportActions] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${getNonEmptyStringOnyxID(fullReport?.parentReportID)}`);
     const [transactionThreadReportActions] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${getNonEmptyStringOnyxID(oneTransactionThreadReportID)}`);
 
+    // Scoped VISIBLE_REPORT_ACTIONS selector
     const visibleActionsSelector = useCallback(
         (data: VisibleReportActionsDerivedValue | undefined) => {
             if (!data) {
@@ -75,6 +78,7 @@ function OptionRowLHNData({
     );
     const [visibleReportActionsData] = useOnyx(ONYXKEYS.DERIVED.VISIBLE_REPORT_ACTIONS, {selector: visibleActionsSelector});
 
+    // Per-item NVP subscription instead of collection-level subscription in parent
     const [reportNameValuePairs] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS}${reportID}`);
 
     const parentReportAction = fullReport?.parentReportActionID ? parentReportActions?.[fullReport.parentReportActionID] : undefined;
@@ -128,6 +132,10 @@ function OptionRowLHNData({
         chatReport: chatReportForIOU,
     });
 
+    // React Compiler auto-memoizes each expression in OptionRowLHN independently,
+    // so there is no need to stabilize the optionItem reference with deepEqual.
+    // When getOptionData returns a fresh object with the same content, the Compiler
+    // ensures that only expressions whose inputs actually changed recompute.
     const optionItem = SidebarUtils.getOptionData({
         report: fullReport,
         reportAttributes,
@@ -153,6 +161,9 @@ function OptionRowLHNData({
         currentUserLogin: login ?? '',
     });
 
+    // For single-sender IOUs, trim to the sender's avatar to match the header.
+    // The header uses reportPreviewSenderID as accountID for its primary avatar,
+    // so we pick the matching icon from getIconsForIOUReport to stay consistent.
     const finalOptionItem = useMemo(() => {
         if (!optionItem || !isIOUReport || reportPreviewSenderID === undefined || !optionItem.icons || optionItem.icons.length <= 1) {
             return optionItem;
@@ -169,6 +180,12 @@ function OptionRowLHNData({
             : [styles.chatLinkRowPressable, styles.flexGrow1, styles.optionItemAvatarNameWrapper, styles.optionRow, styles.justifyContentCenter],
     );
 
+    // rendering null as a render item causes the FlashList to render all
+    // its children and consume significant memory on the first render. We can avoid this by
+    // rendering a placeholder view instead. This behaviour is only observed when we
+    // first sign in to the App.
+    // For the focused-but-null case (e.g. submit an expense in offline mode and click on the
+    // generated expense report), we render null so we only see the Report Details but no item in LHN.
     if (!finalOptionItem) {
         return isReportFocused ? null : <View style={placeholderRowStyle} />;
     }
@@ -188,4 +205,11 @@ function OptionRowLHNData({
 
 OptionRowLHNData.displayName = 'OptionRowLHNData';
 
+/**
+ * This component is rendered in a list.
+ * On scroll we want to avoid that a item re-renders
+ * just because the list has to re-render when adding more items.
+ * Thats also why the React.memo is used on the outer component here, as we just
+ * use it to prevent re-renders from parent re-renders.
+ */
 export default React.memo(OptionRowLHNData);

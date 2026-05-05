@@ -33,6 +33,7 @@ function useOptionRowLHNCorePress({reportID, optionItem, popoverAnchor, onSelect
         });
 
         event?.preventDefault();
+        // Enable Composer to focus on clicking the same chat after opening the context menu.
         ReportActionComposeFocusManager.focus();
         onSelectRow(optionItem, popoverAnchor);
     };
