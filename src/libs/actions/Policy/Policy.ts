@@ -2307,7 +2307,6 @@ function createDraftInitialWorkspace(
     currency = '',
     file?: File,
     type: typeof CONST.POLICY.TYPE.TEAM | typeof CONST.POLICY.TYPE.CORPORATE = CONST.POLICY.TYPE.TEAM,
-    policyOwnerEmail = '',
     isAnnualSubscription = false,
 ) {
     const {customUnits, outputCurrency} = buildOptimisticDistanceRateCustomUnits(currency);
@@ -2322,7 +2321,7 @@ function createDraftInitialWorkspace(
                 id: policyID,
                 type: type || (isAnnualSubscription ? CONST.POLICY.TYPE.CORPORATE : CONST.POLICY.TYPE.TEAM),
                 name: workspaceName,
-                role: makeMeAdmin || !policyOwnerEmail || policyOwnerEmail === currentUserEmail ? CONST.POLICY.ROLE.ADMIN : undefined,
+                role: CONST.POLICY.ROLE.ADMIN,
                 owner: currentUserEmail,
                 ownerAccountID: currentUserAccountID,
                 isPolicyExpenseChatEnabled: true,
