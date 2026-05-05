@@ -118,8 +118,8 @@ function SearchTypeMenuAccordion({title, defaultExpanded = true, badgeText, chil
                     <Icon
                         fill={theme.icon}
                         src={icons.UpArrow}
-                        width={variables.iconSizeSemiSmall}
-                        height={variables.iconSizeSemiSmall}
+                        width={variables.iconSizeSmall}
+                        height={variables.iconSizeSmall}
                     />
                 </Animated.View>
             </PressableWithFeedback>
