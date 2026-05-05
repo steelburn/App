@@ -100,7 +100,7 @@ function SearchTypeMenuAccordion({title, defaultExpanded = true, badgeText, chil
                 role={CONST.ROLE.BUTTON}
                 accessibilityLabel={title}
                 sentryLabel={CONST.SENTRY_LABEL.ACCORDION_SECTION.TOGGLE}
-                hoverStyle={styles.activeComponentBG}
+                hoverStyle={styles.hoveredComponentBG}
             >
                 <Text
                     style={[styles.flex1, styles.textLabelSupporting]}
