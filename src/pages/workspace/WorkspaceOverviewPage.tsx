@@ -93,6 +93,9 @@ import WorkspacePageWithSections from './WorkspacePageWithSections';
 
 type WorkspaceOverviewPageProps = WithPolicyProps & PlatformStackScreenProps<WorkspaceSplitNavigatorParamList, typeof SCREENS.WORKSPACE.PROFILE>;
 
+const rulesDocumentThumbnailStyle = {maxWidth: variables.rulesDocumentThumbnailMaxWidth, height: variables.rulesDocumentThumbnailHeight};
+const rulesDocumentMenuPositionStyle = {top: variables.spacing2, right: variables.spacing2};
+
 function WorkspaceOverviewPage({policyDraft, policy: policyProp, route}: WorkspaceOverviewPageProps) {
     const styles = useThemeStyles();
     const {translate, localeCompare} = useLocalize();
@@ -199,6 +202,7 @@ function WorkspaceOverviewPage({policyDraft, policy: policyProp, route}: Workspa
     const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false);
     const [pendingRulesDocumentFile, setPendingRulesDocumentFile] = useState<FileObject | undefined>();
     const [isProtectedRulesDocumentVisible, setIsProtectedRulesDocumentVisible] = useState(false);
+    const [isCorruptedRulesDocumentVisible, setIsCorruptedRulesDocumentVisible] = useState(false);
     const [session] = useOnyx(ONYXKEYS.SESSION);
 
     const rulesDocumentSourceURL = useMemo(
@@ -210,9 +214,6 @@ function WorkspaceOverviewPage({policyDraft, policy: policyProp, route}: Workspa
     const hasCustomRulesText = !StringUtils.isEmptyString(policy?.customRules ?? '');
     const shouldShowExpensePolicySection = isBetaEnabled(CONST.BETAS.CUSTOM_RULES) && (isPolicyAdmin || hasRulesDocument || hasCustomRulesText);
     const shouldShowRulesDocumentSubSection = isPolicyAdmin || hasRulesDocument;
-
-    const rulesDocumentThumbnailStyle = useMemo(() => ({maxWidth: variables.rulesDocumentThumbnailMaxWidth, height: variables.rulesDocumentThumbnailHeight}), []);
-    const rulesDocumentMenuPositionStyle = useMemo(() => ({top: variables.spacing2, right: variables.spacing2}), []);
 
     const personalDetails = usePersonalDetails();
     const [accountIDToLogin] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST, {selector: accountIDToLoginSelector(reportsToArchive)});
@@ -454,36 +455,42 @@ function WorkspaceOverviewPage({policyDraft, policy: policyProp, route}: Workspa
         return translate('common.leaveWorkspaceConfirmation');
     };
 
-    const handleRulesDocumentPicked = (files: FileObject[]) => {
-        const file = files.at(0);
-        if (!policyID || !file) {
-            return;
-        }
-        setPendingRulesDocumentFile(file);
-    };
+    const handleRulesDocumentPicked = useCallback(
+        (files: FileObject[]) => {
+            const file = files.at(0);
+            if (!policyID || !file) {
+                return;
+            }
+            setPendingRulesDocumentFile(file);
+        },
+        [policyID],
+    );
 
-    const getRulesDocumentMenuItems = (openPicker: (options: {onPicked: (files: FileObject[]) => void}) => void): PopoverMenuItem[] => [
-        {
-            text: translate('common.replace'),
-            icon: expensifyIcons.Upload,
-            shouldCallAfterModalHide: true,
-            onSelected: () => {
-                openPicker({
-                    onPicked: handleRulesDocumentPicked,
-                });
+    const getRulesDocumentMenuItems = useCallback(
+        (openPicker: (options: {onPicked: (files: FileObject[]) => void}) => void): PopoverMenuItem[] => [
+            {
+                text: translate('common.replace'),
+                icon: expensifyIcons.Upload,
+                shouldCallAfterModalHide: true,
+                onSelected: () => {
+                    openPicker({
+                        onPicked: handleRulesDocumentPicked,
+                    });
+                },
             },
-        },
-        {
-            text: translate('common.remove'),
-            icon: expensifyIcons.Trashcan,
-            onSelected: () => {
-                if (!policyID || !policy?.rulesDocumentURL) {
-                    return;
-                }
-                deletePolicyRulesDocument(policyID, policy.rulesDocumentURL);
+            {
+                text: translate('common.remove'),
+                icon: expensifyIcons.Trashcan,
+                onSelected: () => {
+                    if (!policyID || !policy?.rulesDocumentURL) {
+                        return;
+                    }
+                    deletePolicyRulesDocument(policyID, policy.rulesDocumentURL);
+                },
             },
-        },
-    ];
+        ],
+        [translate, handleRulesDocumentPicked, policyID, policy?.rulesDocumentURL],
+    );
 
     const handleInvitePress = () => {
         if (isAccountLocked) {
@@ -640,6 +647,7 @@ function WorkspaceOverviewPage({policyDraft, policy: policyProp, route}: Workspa
                     }}
                     onLoadError={() => {
                         setPendingRulesDocumentFile(undefined);
+                        setIsCorruptedRulesDocumentVisible(true);
                     }}
                 />
             )}
@@ -649,6 +657,15 @@ function WorkspaceOverviewPage({policyDraft, policy: policyProp, route}: Workspa
                 onConfirm={() => setIsProtectedRulesDocumentVisible(false)}
                 onCancel={() => setIsProtectedRulesDocumentVisible(false)}
                 prompt={translate('attachmentPicker.protectedPDFNotSupported')}
+                confirmText={translate('common.close')}
+                shouldShowCancelButton={false}
+            />
+            <ConfirmModal
+                title={translate('attachmentPicker.attachmentError')}
+                isVisible={isCorruptedRulesDocumentVisible}
+                onConfirm={() => setIsCorruptedRulesDocumentVisible(false)}
+                onCancel={() => setIsCorruptedRulesDocumentVisible(false)}
+                prompt={translate('attachmentPicker.errorWhileSelectingCorruptedAttachment')}
                 confirmText={translate('common.close')}
                 shouldShowCancelButton={false}
             />
