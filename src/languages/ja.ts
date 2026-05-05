@@ -6938,6 +6938,25 @@ ${reportName}
                 title: 'Gusto',
                 approvalMode: '承認モード',
                 finalApprover: '最終承認者',
+                notSet: 'Not set',
+                approvalModeDescription: 'Members and managers are set up to sync with Gusto.',
+                approvalModeWarningTitle: 'Change approval mode?',
+                approvalModeWarningPrompt: 'Changing the approval mode will sync Gusto again and may reset approval chains.',
+                approvalModeWarningConfirm: 'Change mode',
+                approvalModes: {
+                    basic: {
+                        label: 'Basic approval',
+                        description: 'All users submit to a single person for processing and approval.',
+                    },
+                    manager: {
+                        label: 'Manager approval',
+                        description: 'Employees submit reports to their direct manager configured in Gusto.',
+                    },
+                    custom: {
+                        label: 'Custom approval',
+                        description: "I’ll manually setup approval workflows in Expensify.",
+                    },
+                },
                 connect: '接続',
                 connectionDescription: 'Gusto を接続して、従業員の承認をワークスペースと同期させましょう。',
                 syncNow: '今すぐ同期',

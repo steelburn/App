@@ -1,5 +1,6 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {View} from 'react-native';
+import type {ValueOf} from 'type-fest';
 import ActivityIndicator from '@components/ActivityIndicator';
 import Button from '@components/Button';
 import ConfirmModal from '@components/ConfirmModal';
@@ -26,13 +27,16 @@ import {openPolicyHRPage} from '@libs/actions/PolicyConnections';
 import Navigation from '@libs/Navigation/Navigation';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
 import type {WorkspaceSplitNavigatorParamList} from '@libs/Navigation/types';
+import {getDisplayNameOrDefault, getPersonalDetailByEmail} from '@libs/PersonalDetailsUtils';
 import {getIntegrationLastSuccessfulDate, isGustoConnected} from '@libs/PolicyUtils';
 import AccessOrNotFoundWrapper from '@pages/workspace/AccessOrNotFoundWrapper';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
+import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
 
 type WorkspaceHRPageProps = PlatformStackScreenProps<WorkspaceSplitNavigatorParamList, typeof SCREENS.WORKSPACE.HR>;
+type GustoApprovalMode = ValueOf<typeof CONST.GUSTO.APPROVAL_MODE>;
 
 function WorkspaceHRPage({
     route: {
@@ -50,6 +54,7 @@ function WorkspaceHRPage({
     const icons = useMemoizedLazyExpensifyIcons(['GustoSquare', 'Sync', 'Trashcan']);
     const illustrations = useMemoizedLazyIllustrations(['NewUser']);
     const gustoConnection = policy?.connections?.gusto;
+    const gustoConfig = gustoConnection?.config;
     const isConnected = isGustoConnected(policy);
     const isGustoSyncInProgress = connectionSyncProgress?.connectionName === CONST.POLICY.CONNECTIONS.NAME.GUSTO && isConnectionInProgress(connectionSyncProgress, policy);
     const stageInProgress = connectionSyncProgress?.stageInProgress;
@@ -101,6 +106,29 @@ function WorkspaceHRPage({
         ],
         [icons.Sync, icons.Trashcan, isOffline, policy, translate],
     );
+    const getGustoApprovalModeLabel = (approvalMode?: GustoApprovalMode | null) => {
+        if (!approvalMode) {
+            return translate('workspace.hr.gusto.notSet');
+        }
+
+        switch (approvalMode) {
+            case CONST.GUSTO.APPROVAL_MODE.BASIC:
+                return translate('workspace.hr.gusto.approvalModes.basic.label');
+            case CONST.GUSTO.APPROVAL_MODE.MANAGER:
+                return translate('workspace.hr.gusto.approvalModes.manager.label');
+            case CONST.GUSTO.APPROVAL_MODE.CUSTOM:
+                return translate('workspace.hr.gusto.approvalModes.custom.label');
+            default:
+                return translate('workspace.hr.gusto.notSet');
+        }
+    };
+    const getFinalApproverDisplayName = (finalApprover?: string | null) => {
+        if (!finalApprover) {
+            return translate('workspace.hr.gusto.notSet');
+        }
+
+        return getDisplayNameOrDefault(getPersonalDetailByEmail(finalApprover), finalApprover, false);
+    };
 
     let gustoRowRightComponent;
     if (!isConnected) {
@@ -178,6 +206,28 @@ function WorkspaceHRPage({
                                 shouldShowRightComponent
                                 rightComponent={gustoRowRightComponent}
                             />
+                            {isConnected && (
+                                <>
+                                    <MenuItem
+                                        title={translate('workspace.hr.gusto.approvalMode')}
+                                        description={getGustoApprovalModeLabel(gustoConfig?.approvalMode)}
+                                        wrapperStyle={styles.sectionMenuItemTopDescription}
+                                        shouldShowRightIcon
+                                        pendingAction={gustoConfig?.pendingFields?.approvalMode}
+                                        brickRoadIndicator={gustoConfig?.errorFields?.approvalMode ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined}
+                                        onPress={() => Navigation.navigate(ROUTES.WORKSPACE_HR_GUSTO_APPROVAL_MODE.getRoute(policyID))}
+                                    />
+                                    <MenuItem
+                                        title={translate('workspace.hr.gusto.finalApprover')}
+                                        description={getFinalApproverDisplayName(gustoConfig?.finalApprover)}
+                                        wrapperStyle={styles.sectionMenuItemTopDescription}
+                                        shouldShowRightIcon
+                                        pendingAction={gustoConfig?.pendingFields?.finalApprover}
+                                        brickRoadIndicator={gustoConfig?.errorFields?.finalApprover ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined}
+                                        onPress={() => Navigation.navigate(ROUTES.WORKSPACE_HR_GUSTO_FINAL_APPROVER.getRoute(policyID))}
+                                    />
+                                </>
+                            )}
                         </Section>
                     </View>
                 </ScrollView>

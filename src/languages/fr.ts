@@ -7052,6 +7052,25 @@ Ajoutez davantage de règles de dépenses pour protéger la trésorerie de l’e
                 title: 'Gusto',
                 approvalMode: 'Mode d’approbation',
                 finalApprover: 'Approbateur final',
+                notSet: 'Not set',
+                approvalModeDescription: 'Members and managers are set up to sync with Gusto.',
+                approvalModeWarningTitle: 'Change approval mode?',
+                approvalModeWarningPrompt: 'Changing the approval mode will sync Gusto again and may reset approval chains.',
+                approvalModeWarningConfirm: 'Change mode',
+                approvalModes: {
+                    basic: {
+                        label: 'Basic approval',
+                        description: 'All users submit to a single person for processing and approval.',
+                    },
+                    manager: {
+                        label: 'Manager approval',
+                        description: 'Employees submit reports to their direct manager configured in Gusto.',
+                    },
+                    custom: {
+                        label: 'Custom approval',
+                        description: "I’ll manually setup approval workflows in Expensify.",
+                    },
+                },
                 connect: 'Connect',
                 connectionDescription: 'Connectez Gusto pour synchroniser les validations des employé·e·s avec votre espace de travail.',
                 syncNow: 'Synchroniser maintenant',
