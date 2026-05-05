@@ -12,6 +12,8 @@
 import type {SpanAttributeValue} from '@sentry/core';
 import type {ValueOf} from 'type-fest';
 import Log from '@libs/Log';
+import getActiveTabName from '@libs/Navigation/helpers/getActiveTabName';
+import {isFullScreenName} from '@libs/Navigation/helpers/isNavigatorName';
 import navigationRef from '@libs/Navigation/navigationRef';
 import CONST from '@src/CONST';
 import NAVIGATORS from '@src/NAVIGATORS';
@@ -349,17 +351,10 @@ function cancelIfStaleForNavState() {
         return;
     }
 
-    const topmostFullScreenRoute = rootState.routes.findLast((route) => {
-        const name = route.name;
-        return (
-            name === NAVIGATORS.REPORTS_SPLIT_NAVIGATOR ||
-            name === NAVIGATORS.SEARCH_FULLSCREEN_NAVIGATOR ||
-            name === NAVIGATORS.WORKSPACE_SPLIT_NAVIGATOR ||
-            name === NAVIGATORS.DOMAIN_SPLIT_NAVIGATOR
-        );
-    });
-    const isOnSearchRoot = topmostFullScreenRoute?.name === NAVIGATORS.SEARCH_FULLSCREEN_NAVIGATOR;
-    const isOnReport = topmostFullScreenRoute?.name === NAVIGATORS.REPORTS_SPLIT_NAVIGATOR;
+    const topmostFullScreenRoute = rootState.routes.findLast((route) => isFullScreenName(route.name));
+    const activeTabName = getActiveTabName(topmostFullScreenRoute);
+    const isOnSearchRoot = activeTabName === NAVIGATORS.SEARCH_FULLSCREEN_NAVIGATOR;
+    const isOnReport = activeTabName === NAVIGATORS.REPORTS_SPLIT_NAVIGATOR;
 
     switch (pending.followUpAction) {
         case CONST.TELEMETRY.SUBMIT_FOLLOW_UP_ACTION.NAVIGATE_TO_SEARCH:
