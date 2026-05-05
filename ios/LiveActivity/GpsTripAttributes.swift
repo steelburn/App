@@ -9,7 +9,7 @@ struct GpsTripAttributes: ActivityAttributes {
         var distanceUnitLong: String
         var buttonText: String
         var subtitle: String
-        var lockScreenBadgeText: String
-        var lockScreenTrackingText: String
+        var lockScreenBadgeText: String = "Distance"
+        var lockScreenTrackingText: String = "Tracking..."
     }
 }
