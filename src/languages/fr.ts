@@ -8241,8 +8241,8 @@ Ajoutez davantage de règles de dépenses pour protéger la trésorerie de l’e
         stopped: 'Arrêté',
         start: 'Démarrer',
         stop: 'Arrêter',
-        save: 'Save',
-        resume: 'Resume',
+        save: 'Enregistrer',
+        resume: 'Reprendre',
         discard: 'Ignorer',
         discardDistanceTrackingModal: {
             title: 'Abandonner le suivi de distance',

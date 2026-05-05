@@ -8108,8 +8108,8 @@ ${reportName}
         stopped: '停止済み',
         start: '開始',
         stop: '停止',
-        save: 'Save',
-        resume: 'Resume',
+        save: '保存',
+        resume: '再開',
         discard: '破棄',
         discardDistanceTrackingModal: {
             title: '移動距離の追跡を破棄',

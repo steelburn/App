@@ -7966,8 +7966,8 @@ ${reportName}
         stopped: '已停止',
         start: '开始',
         stop: '停止',
-        save: 'Save',
-        resume: 'Resume',
+        save: '保存',
+        resume: '简历',
         discard: '丢弃',
         discardDistanceTrackingModal: {
             title: '放弃距离跟踪',
