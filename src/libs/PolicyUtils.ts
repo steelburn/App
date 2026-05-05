@@ -1,5 +1,6 @@
 import {Str} from 'expensify-common';
 import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
+import Onyx from 'react-native-onyx';
 import type {TupleToUnion, ValueOf} from 'type-fest';
 import type {LocaleContextProps, LocalizedTranslate} from '@components/LocaleContextProvider';
 import type {SelectorType} from '@components/SelectionScreen';
@@ -70,6 +71,14 @@ type ConnectionWithLastSyncData = {
     /** State of the last synchronization */
     lastSync?: ConnectionLastSync;
 };
+
+let allPolicies: OnyxCollection<Policy>;
+
+Onyx.connect({
+    key: ONYXKEYS.COLLECTION.POLICY,
+    waitForCollectionCallback: true,
+    callback: (value) => (allPolicies = value),
+});
 
 /**
  * Returns true if the policy has no fieldList or its fieldList is empty.
@@ -220,6 +229,28 @@ function getPolicyByCustomUnitID(transaction: OnyxEntry<Transaction>, policies: 
             return false;
         }
         return customUnitID in policy.customUnits;
+    });
+}
+
+/**
+ * Finds a policy that contains the given customUnitRateID in its distance custom unit rates.
+ * When a preferred policy is provided, it is checked first to avoid an expensive search through all policies.
+ */
+function getDistanceRateOriginalPolicy(customUnitRateID: string | undefined, preferredPolicy?: OnyxEntry<Policy>): OnyxEntry<Policy> {
+    if (!customUnitRateID || !allPolicies) {
+        return undefined;
+    }
+
+    if (preferredPolicy) {
+        const distanceUnit = getDistanceRateCustomUnit(preferredPolicy);
+        if (distanceUnit?.rates && customUnitRateID in distanceUnit.rates) {
+            return preferredPolicy;
+        }
+    }
+
+    return Object.values(allPolicies).find((policy) => {
+        const distanceUnit = getDistanceRateCustomUnit(policy);
+        return !!distanceUnit?.rates && customUnitRateID in distanceUnit.rates;
     });
 }
 
@@ -2247,6 +2278,7 @@ export {
     getDistanceRateCustomUnit,
     getPerDiemCustomUnit,
     getPolicyByCustomUnitID,
+    getDistanceRateOriginalPolicy,
     getDistanceRateCustomUnitRate,
     getPerDiemRateCustomUnitRate,
     sortWorkspacesBySelected,
