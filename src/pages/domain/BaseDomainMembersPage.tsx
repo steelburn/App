@@ -215,24 +215,23 @@ function BaseDomainMembersPage({
     const shouldShowEmptySearchMessage = !!shouldShowSearchBar && inputValue.length !== 0 && filteredData.length === 0;
     // Show empty pre filter state only if we have data, filtered data is empty, but the search have not been used.
     const shouldShowEmptyPreFilterState = filteredData.length === 0 && data.length !== 0 && !!emptyStateTitle && inputValue.length === 0;
-    const shouldUseMobileListHeaderContentLayout = shouldDisplayButtonsInSeparateLine;
     const listHeaderContent =
         searchBarAccessory || shouldShowSearchBar ? (
             <View style={styles.flexColumn}>
-                <View style={[styles.mh5, styles.gap3, styles.mb5, shouldUseMobileListHeaderContentLayout ? styles.flexColumn : styles.flexRow]}>
+                <View style={[styles.mh5, styles.gap3, styles.mb5, shouldDisplayButtonsInSeparateLine ? styles.flexColumn : styles.flexRow]}>
                     {!!searchBarAccessory && (
                         <View
                             style={[
-                                shouldUseMobileListHeaderContentLayout && styles.w100,
-                                shouldShowSearchBar && !shouldUseMobileListHeaderContentLayout && styles.h13,
-                                shouldShowSearchBar && !shouldUseMobileListHeaderContentLayout && styles.justifyContentCenter,
+                                shouldDisplayButtonsInSeparateLine && styles.w100,
+                                shouldShowSearchBar && !shouldDisplayButtonsInSeparateLine && styles.h13,
+                                shouldShowSearchBar && !shouldDisplayButtonsInSeparateLine && styles.justifyContentCenter,
                             ]}
                         >
                             {searchBarAccessory}
                         </View>
                     )}
                     {shouldShowSearchBar && (
-                        <View style={[shouldUseMobileListHeaderContentLayout ? styles.w100 : styles.flex1]}>
+                        <View style={[shouldDisplayButtonsInSeparateLine ? styles.w100 : styles.flex1]}>
                             <SearchBar
                                 inputValue={inputValue}
                                 onChangeText={setInputValue}
