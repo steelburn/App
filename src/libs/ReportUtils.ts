@@ -743,6 +743,7 @@ type BaseOptimisticMoneyRequestEntities = {
     linkedTrackedExpenseReportAction?: ReportAction;
     optimisticCreatedReportActionID?: string;
     reportActionID?: string;
+    currentUserAccountID: number;
 };
 
 type OptimisticMoneyRequestEntities = BaseOptimisticMoneyRequestEntities & {shouldGenerateTransactionThreadReport?: boolean};
@@ -8761,10 +8762,11 @@ function buildOptimisticExportIntegrationAction(integration: ConnectionName, mar
 function buildTransactionThread(
     reportAction: OnyxEntry<ReportAction | OptimisticIOUReportAction>,
     moneyRequestReport: OnyxEntry<Report>,
+    currentUserAccountID: number,
     existingTransactionThreadReportID?: string,
     optimisticTransactionThreadReportID?: string,
 ): OptimisticChatReport {
-    const participantAccountIDs = [...new Set([deprecatedCurrentUserAccountID, Number(reportAction?.actorAccountID)])].filter(Boolean) as number[];
+    const participantAccountIDs = [...new Set([currentUserAccountID, Number(reportAction?.actorAccountID)])].filter(Boolean);
     const existingTransactionThreadReport = getReportOrDraftReport(existingTransactionThreadReportID);
 
     if (existingTransactionThreadReportID && existingTransactionThreadReport) {
@@ -8788,6 +8790,7 @@ function buildTransactionThread(
         parentReportID: moneyRequestReport?.reportID,
         optimisticReportID: optimisticTransactionThreadReportID,
         chatReportID: moneyRequestReport?.reportID,
+        currentUserAccountID,
     });
 }
 
@@ -8825,6 +8828,7 @@ function buildOptimisticMoneyRequestEntities({
     optimisticCreatedReportActionID,
     shouldGenerateTransactionThreadReport = true,
     reportActionID,
+    currentUserAccountID,
 }: OptimisticMoneyRequestEntities): [
     OptimisticCreatedReportAction,
     OptimisticCreatedReportAction,
@@ -8857,7 +8861,7 @@ function buildOptimisticMoneyRequestEntities({
     });
 
     // Create optimistic transactionThread and the `CREATED` action for it, if existingTransactionThreadReportID is undefined
-    const transactionThread = shouldGenerateTransactionThreadReport ? buildTransactionThread(iouAction, iouReport, existingTransactionThreadReportID) : undefined;
+    const transactionThread = shouldGenerateTransactionThreadReport ? buildTransactionThread(iouAction, iouReport, currentUserAccountID, existingTransactionThreadReportID) : undefined;
     const createdActionForTransactionThread = !!existingTransactionThreadReportID || !shouldGenerateTransactionThreadReport ? null : buildOptimisticCreatedReportAction(payeeEmail);
 
     // The IOU action and the transactionThread are co-dependent as parent-child, so we need to link them together
@@ -8976,8 +8980,8 @@ function hasEmptyReportsForPolicy(
  */
 function getPolicyIDsWithEmptyReportsForAccount(
     reports: OnyxCollection<Report> | undefined,
-    accountID?: number,
-    reportsTransactionsParam: Record<string, Transaction[]> = deprecatedReportsTransactions,
+    accountID: number | undefined,
+    reportsTransactionsParam: Record<string, Transaction[]>,
 ): Record<string, boolean> {
     if (!accountID) {
         return {};
@@ -9004,9 +9008,7 @@ function getPolicyIDsWithEmptyReportsForAccount(
         }
 
         // Ignore transactions that are already pending deletion so we treat the report as empty once the removal is queued.
-        const transactions = getReportTransactions(report.reportID, reportsTransactionsParam).filter(
-            (transaction) => transaction.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE,
-        );
+        const transactions = (reportsTransactionsParam[report.reportID] ?? []).filter((transaction) => transaction.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE);
         if (transactions.length === 0) {
             policyLookup[report.policyID] = true;
         }
