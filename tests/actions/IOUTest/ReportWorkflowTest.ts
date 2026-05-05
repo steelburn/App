@@ -1383,6 +1383,88 @@ describe('actions/IOU/ReportWorkflow', () => {
             const optimisticReportUpdate = onyxData.optimisticData?.find((update) => update.key === `${ONYXKEYS.COLLECTION.REPORT}${expenseReport.reportID}`);
             expect((optimisticReportUpdate?.value as Report | undefined)?.managerID).toBe(adminAccountID);
         });
+        it('keeps the workspace chat outstanding when an admin submits after approver changes', async () => {
+            // eslint-disable-next-line rulesdir/no-multiple-api-calls -- Inspecting optimistic parent chat data after submit from workspace chat.
+            const apiWriteSpy = jest.spyOn(API, 'write').mockImplementation(() => Promise.resolve());
+            const policyID = '1';
+            const workspaceChatReportID = '2';
+            const adminAccountID = 100;
+            const submitterAccountID = 101;
+            const previousApproverAccountID = 102;
+            const adminEmail = 'admin@example.com';
+            const submitterEmail = 'submitter@example.com';
+            const previousApproverEmail = 'previous-approver@example.com';
+
+            await Onyx.set(ONYXKEYS.PERSONAL_DETAILS_LIST, {
+                [adminAccountID]: {accountID: adminAccountID, login: adminEmail},
+                [submitterAccountID]: {accountID: submitterAccountID, login: submitterEmail},
+                [previousApproverAccountID]: {accountID: previousApproverAccountID, login: previousApproverEmail},
+            });
+
+            const parentReport: Report = {
+                ...createRandomReport(Number(workspaceChatReportID), undefined),
+                reportID: workspaceChatReportID,
+                type: CONST.REPORT.TYPE.CHAT,
+                chatType: CONST.REPORT.CHAT_TYPE.POLICY_EXPENSE_CHAT,
+                policyID,
+                ownerAccountID: submitterAccountID,
+                managerID: adminAccountID,
+                iouReportID: '1',
+                hasOutstandingChildRequest: true,
+            };
+            await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT}${workspaceChatReportID}`, parentReport);
+            await waitForBatchedUpdates();
+
+            const policy: Policy = {
+                ...createRandomPolicy(Number(policyID)),
+                id: policyID,
+                role: CONST.POLICY.ROLE.ADMIN,
+                type: CONST.POLICY.TYPE.CORPORATE,
+                approvalMode: CONST.POLICY.APPROVAL_MODE.ADVANCED,
+                approver: adminEmail,
+                owner: adminEmail,
+                employeeList: {
+                    [submitterEmail]: {
+                        email: submitterEmail,
+                        submitsTo: adminEmail,
+                    },
+                },
+            };
+            const expenseReport: Report = {
+                ...createRandomReport(Number(policyID), undefined),
+                reportID: '1',
+                policyID,
+                parentReportID: workspaceChatReportID,
+                type: CONST.REPORT.TYPE.EXPENSE,
+                ownerAccountID: submitterAccountID,
+                managerID: previousApproverAccountID,
+                stateNum: CONST.REPORT.STATE_NUM.OPEN,
+                statusNum: CONST.REPORT.STATUS_NUM.OPEN,
+                total: 1000,
+                currency: CONST.CURRENCY.USD,
+            };
+
+            submitReport({
+                expenseReport,
+                policy,
+                currentUserAccountIDParam: adminAccountID,
+                currentUserEmailParam: adminEmail,
+                hasViolations: false,
+                isASAPSubmitBetaEnabled: false,
+                expenseReportCurrentNextStepDeprecated: undefined,
+                userBillingGracePeriodEnds: undefined,
+                amountOwed: 0,
+                ownerBillingGracePeriodEnd: undefined,
+                delegateEmail: undefined,
+            });
+
+            const [, parameters, onyxData] = apiWriteSpy.mock.calls.at(-1) as [unknown, {managerAccountID?: number}, OnyxData<typeof ONYXKEYS.COLLECTION.REPORT>];
+            expect(parameters.managerAccountID).toBe(adminAccountID);
+
+            const optimisticParentReportUpdate = onyxData.optimisticData?.find((update) => update.key === `${ONYXKEYS.COLLECTION.REPORT}${workspaceChatReportID}`);
+            expect((optimisticParentReportUpdate?.value as Report | undefined)?.hasOutstandingChildRequest).toBe(true);
+            expect((optimisticParentReportUpdate?.value as Report | undefined)?.iouReportID).toBeNull();
+        });
 
         it('recomputes the submit approver for a retracted forwarded report', async () => {
             // eslint-disable-next-line rulesdir/no-multiple-api-calls -- Inspecting API.write calls to verify submit payload and optimistic data.
