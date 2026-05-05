@@ -96,7 +96,7 @@ function SearchTypeMenuAccordion({title, defaultExpanded = true, badgeText, chil
         <View>
             <PressableWithFeedback
                 onPress={toggleSection}
-                style={[styles.flexRow, styles.p2, styles.gap1, styles.alignItemsCenter, styles.br2]}
+                style={[styles.flexRow, styles.p2, styles.gap2, styles.alignItemsCenter, styles.br2]}
                 role={CONST.ROLE.BUTTON}
                 accessibilityLabel={title}
                 sentryLabel={CONST.SENTRY_LABEL.ACCORDION_SECTION.TOGGLE}
