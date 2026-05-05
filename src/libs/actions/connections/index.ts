@@ -118,7 +118,7 @@ function getSyncConnectionParameters(connectionName: PolicyConnectionName) {
             return {readCommand: READ_COMMANDS.SYNC_POLICY_TO_QUICKBOOKS_DESKTOP, stageInProgress: CONST.POLICY.CONNECTIONS.SYNC_STAGE_NAME.STARTING_IMPORT_QBD};
         }
         case CONST.POLICY.CONNECTIONS.NAME.GUSTO: {
-            return {readCommand: READ_COMMANDS.SYNC_POLICY_TO_GUSTO, stageInProgress: CONST.POLICY.CONNECTIONS.SYNC_STAGE_NAME.STARTING_IMPORT_GUSTO};
+            return {readCommand: READ_COMMANDS.SYNC_POLICY_TO_GUSTO, stageInProgress: CONST.POLICY.CONNECTIONS.SYNC_STAGE_NAME.GUSTO_SYNC_TITLE};
         }
         default:
             return undefined;
