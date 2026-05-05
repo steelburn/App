@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {View} from 'react-native';
 import type {ValueOf} from 'type-fest';
 import Button from '@components/Button';
@@ -39,9 +39,10 @@ function GustoApprovalModePage({
     const {isBetaEnabled} = usePermissions();
     const policy = usePolicy(policyID);
     const currentApprovalMode = policy?.connections?.gusto?.config?.approvalMode ?? undefined;
-    const [selectedApprovalMode, setSelectedApprovalMode] = useState<ApprovalMode | undefined>(currentApprovalMode);
+    const [draftApprovalMode, setDraftApprovalMode] = useState<ApprovalMode | undefined>();
     const [isWarningModalOpen, setIsWarningModalOpen] = useState(false);
-    const isSaveDisabled = !selectedApprovalMode || selectedApprovalMode === currentApprovalMode;
+    const selectedApprovalMode = draftApprovalMode ?? currentApprovalMode;
+    const isSaveDisabled = !draftApprovalMode || draftApprovalMode === currentApprovalMode;
     const approvalModeOptions: ApprovalModeListItem[] = [
         {
             text: translate('workspace.hr.gusto.approvalModes.basic.label'),
@@ -67,20 +68,16 @@ function GustoApprovalModePage({
     ];
     const selectedApprovalModeKey = approvalModeOptions.find((approvalMode) => approvalMode.isSelected)?.keyForList;
 
-    useEffect(() => {
-        setSelectedApprovalMode(currentApprovalMode);
-    }, [currentApprovalMode]);
-
     const selectApprovalMode = (approvalMode: ApprovalMode) => {
-        setSelectedApprovalMode(approvalMode);
+        setDraftApprovalMode(approvalMode);
     };
 
     const saveApprovalMode = () => {
-        if (!selectedApprovalMode) {
+        if (!draftApprovalMode) {
             return;
         }
 
-        updateGustoApprovalMode(policyID, selectedApprovalMode, currentApprovalMode);
+        updateGustoApprovalMode(policyID, draftApprovalMode, currentApprovalMode);
         setIsWarningModalOpen(false);
         Navigation.goBack();
     };

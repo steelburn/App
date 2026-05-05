@@ -7,6 +7,7 @@ import ConfirmModal from '@components/ConfirmModal';
 import ConnectToGustoFlow from '@components/ConnectToGustoFlow';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import MenuItem from '@components/MenuItem';
+import OfflineWithFeedback from '@components/OfflineWithFeedback';
 import ScreenWrapper from '@components/ScreenWrapper';
 import ScrollView from '@components/ScrollView';
 import Section from '@components/Section';
@@ -208,24 +209,26 @@ function WorkspaceHRPage({
                             />
                             {isConnected && (
                                 <>
-                                    <MenuItem
-                                        title={translate('workspace.hr.gusto.approvalMode')}
-                                        description={getGustoApprovalModeLabel(gustoConfig?.approvalMode)}
-                                        wrapperStyle={styles.sectionMenuItemTopDescription}
-                                        shouldShowRightIcon
-                                        pendingAction={gustoConfig?.pendingFields?.approvalMode}
-                                        brickRoadIndicator={gustoConfig?.errorFields?.approvalMode ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined}
-                                        onPress={() => Navigation.navigate(ROUTES.WORKSPACE_HR_GUSTO_APPROVAL_MODE.getRoute(policyID))}
-                                    />
-                                    <MenuItem
-                                        title={translate('workspace.hr.gusto.finalApprover')}
-                                        description={getFinalApproverDisplayName(gustoConfig?.finalApprover)}
-                                        wrapperStyle={styles.sectionMenuItemTopDescription}
-                                        shouldShowRightIcon
-                                        pendingAction={gustoConfig?.pendingFields?.finalApprover}
-                                        brickRoadIndicator={gustoConfig?.errorFields?.finalApprover ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined}
-                                        onPress={() => Navigation.navigate(ROUTES.WORKSPACE_HR_GUSTO_FINAL_APPROVER.getRoute(policyID))}
-                                    />
+                                    <OfflineWithFeedback pendingAction={gustoConfig?.pendingFields?.approvalMode}>
+                                        <MenuItem
+                                            title={translate('workspace.hr.gusto.approvalMode')}
+                                            description={getGustoApprovalModeLabel(gustoConfig?.approvalMode)}
+                                            wrapperStyle={styles.sectionMenuItemTopDescription}
+                                            shouldShowRightIcon
+                                            brickRoadIndicator={gustoConfig?.errorFields?.approvalMode ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined}
+                                            onPress={() => Navigation.navigate(ROUTES.WORKSPACE_HR_GUSTO_APPROVAL_MODE.getRoute(policyID))}
+                                        />
+                                    </OfflineWithFeedback>
+                                    <OfflineWithFeedback pendingAction={gustoConfig?.pendingFields?.finalApprover}>
+                                        <MenuItem
+                                            title={translate('workspace.hr.gusto.finalApprover')}
+                                            description={getFinalApproverDisplayName(gustoConfig?.finalApprover)}
+                                            wrapperStyle={styles.sectionMenuItemTopDescription}
+                                            shouldShowRightIcon
+                                            brickRoadIndicator={gustoConfig?.errorFields?.finalApprover ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined}
+                                            onPress={() => Navigation.navigate(ROUTES.WORKSPACE_HR_GUSTO_FINAL_APPROVER.getRoute(policyID))}
+                                        />
+                                    </OfflineWithFeedback>
                                 </>
                             )}
                         </Section>

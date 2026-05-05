@@ -1,11 +1,11 @@
 import type {OnyxUpdate} from 'react-native-onyx';
 import Onyx from 'react-native-onyx';
 import type {ValueOf} from 'type-fest';
+import {write} from '@libs/API';
 import type {ConnectPolicyToGustoParams} from '@libs/API/parameters';
 import {READ_COMMANDS, WRITE_COMMANDS} from '@libs/API/types';
-import * as API from '@libs/API';
 import {getCommandURL} from '@libs/ApiUtils';
-import * as ErrorUtils from '@libs/ErrorUtils';
+import {getMicroSecondOnyxErrorWithTranslationKey} from '@libs/ErrorUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 
@@ -67,7 +67,7 @@ function updateGustoApprovalMode(policyID: string | undefined, approvalMode: Val
                         config: {
                             approvalMode: previousApprovalMode,
                             pendingFields: {approvalMode: null},
-                            errorFields: {approvalMode: ErrorUtils.getMicroSecondOnyxErrorWithTranslationKey('common.genericErrorMessage')},
+                            errorFields: {approvalMode: getMicroSecondOnyxErrorWithTranslationKey('common.genericErrorMessage')},
                         },
                     },
                 },
@@ -75,7 +75,7 @@ function updateGustoApprovalMode(policyID: string | undefined, approvalMode: Val
         },
     ];
 
-    API.write(WRITE_COMMANDS.UPDATE_GUSTO_APPROVAL_MODE, {policyID, approvalMode}, {optimisticData, successData, failureData});
+    write(WRITE_COMMANDS.UPDATE_GUSTO_APPROVAL_MODE, {policyID, approvalMode}, {optimisticData, successData, failureData});
 }
 
 function updateGustoFinalApprover(policyID: string | undefined, finalApprover: string | null, currentFinalApprover?: string | null) {
@@ -127,7 +127,7 @@ function updateGustoFinalApprover(policyID: string | undefined, finalApprover: s
                         config: {
                             finalApprover: previousFinalApprover,
                             pendingFields: {finalApprover: null},
-                            errorFields: {finalApprover: ErrorUtils.getMicroSecondOnyxErrorWithTranslationKey('common.genericErrorMessage')},
+                            errorFields: {finalApprover: getMicroSecondOnyxErrorWithTranslationKey('common.genericErrorMessage')},
                         },
                     },
                 },
@@ -135,7 +135,7 @@ function updateGustoFinalApprover(policyID: string | undefined, finalApprover: s
         },
     ];
 
-    API.write(WRITE_COMMANDS.UPDATE_GUSTO_FINAL_APPROVER, {policyID, finalApprover}, {optimisticData, successData, failureData});
+    write(WRITE_COMMANDS.UPDATE_GUSTO_FINAL_APPROVER, {policyID, finalApprover}, {optimisticData, successData, failureData});
 }
 
 export {updateGustoApprovalMode, updateGustoFinalApprover};
