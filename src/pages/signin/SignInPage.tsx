@@ -360,7 +360,8 @@ function SignInPageWrapper({ref}: SignInPageProps) {
 function WithTheme(Component: React.ComponentType<SignInPageProps>) {
     function ThemedComponent({ref}: SignInPageProps) {
         const [preferredTheme] = useOnyx(ONYXKEYS.PREFERRED_THEME);
-        const signInTheme = preferredTheme?.endsWith('-contrast') ? CONST.THEME.DARK_CONTRAST : CONST.THEME.DARK;
+        const contrastThemes: string[] = [CONST.THEME.DARK_CONTRAST, CONST.THEME.LIGHT_CONTRAST, CONST.THEME.SYSTEM_CONTRAST];
+        const signInTheme = contrastThemes.includes(preferredTheme ?? '') ? CONST.THEME.DARK_CONTRAST : CONST.THEME.DARK;
 
         return (
             <ThemeProvider theme={signInTheme}>
