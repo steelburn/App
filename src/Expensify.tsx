@@ -4,7 +4,6 @@ import React, {useCallback, useEffect, useLayoutEffect, useRef, useState} from '
 import type {NativeEventSubscription} from 'react-native';
 import {AppState, Platform} from 'react-native';
 import Onyx from 'react-native-onyx';
-import {initReconnect} from '@libs/actions/Reconnect';
 import {useInitialURLActions} from './components/InitialURLContextProvider';
 import AppleAuthWrapper from './components/SignInButtons/AppleAuthWrapper';
 import SplashScreenHider from './components/SplashScreenHider';
@@ -19,6 +18,7 @@ import useIsAuthenticated from './hooks/useIsAuthenticated';
 import useLocalize from './hooks/useLocalize';
 import useOnyx from './hooks/useOnyx';
 import {updateLastRoute} from './libs/actions/App';
+import {initReconnect} from './libs/actions/Reconnect';
 import * as ActiveClientManager from './libs/ActiveClientManager';
 import {isSafari} from './libs/Browser';
 import Log from './libs/Log';

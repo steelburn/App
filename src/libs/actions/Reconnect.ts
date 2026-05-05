@@ -82,5 +82,4 @@ const initReconnect = () => {
     });
 };
 
-// eslint-disable-next-line import/prefer-default-export -- single export is intentional; more reconnection helpers may be added here as the architecture evolves
 export {reconnect, initReconnect};
