@@ -44,7 +44,9 @@ type OptionRowPressableProps = {
     isOptionFocused: boolean;
     isScreenFocused: boolean;
     popoverAnchor: RefObject<View | null>;
-    onPress: (event: GestureResponderEvent | KeyboardEvent | undefined) => void;
+    onSelectRow: (optionItem: OptionData, popoverAnchor: RefObject<View | null>) => void;
+    /** Optional hook fired before the row press (e.g. hide product training tooltip). */
+    onPressBefore?: () => void;
     onLayout?: (event: LayoutChangeEvent) => void;
     accessibilityLabel: string;
     accessibilityHint?: string;
@@ -58,13 +60,19 @@ function OptionRowPressable({
     isOptionFocused,
     isScreenFocused,
     popoverAnchor,
-    onPress,
+    onSelectRow,
+    onPressBefore,
     onLayout,
     accessibilityLabel,
     accessibilityHint,
     testID,
     children,
 }: OptionRowPressableProps) {
+    const corePress = useOptionRowLHNCorePress({reportID, optionItem, popoverAnchor, onSelectRow});
+    const onPress = (event: GestureResponderEvent | KeyboardEvent | undefined) => {
+        onPressBefore?.();
+        corePress(event);
+    };
     const theme = useTheme();
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
@@ -148,6 +156,4 @@ function OptionRowPressable({
 
 OptionRowPressable.displayName = 'OptionRowPressable';
 
-export type {OptionRowLHNCorePressHandler};
-export {useOptionRowLHNCorePress};
 export default OptionRowPressable;

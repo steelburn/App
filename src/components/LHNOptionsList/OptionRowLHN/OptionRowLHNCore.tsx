@@ -30,7 +30,6 @@ import OptionRowAlternateText from './OptionRowAlternateText';
 import OptionRowAvatar from './OptionRowAvatar';
 import OptionRowErrorBadge from './OptionRowErrorBadge';
 import OptionRowInfoBadge from './OptionRowInfoBadge';
-import type {OptionRowLHNCorePressHandler} from './OptionRowPressable';
 import OptionRowPressable from './OptionRowPressable';
 import OptionRowTooltipLayer from './OptionRowTooltipLayer';
 
@@ -111,14 +110,15 @@ function OptionRowLHN({
         contextMenuHint,
     });
 
-    const renderPressableRow = (pressHandler: OptionRowLHNCorePressHandler) => (
+    const renderPressableRow = (onPressBefore?: () => void) => (
         <OptionRowPressable
             reportID={reportID}
             optionItem={optionItem}
             isOptionFocused={isOptionFocused}
             isScreenFocused={isScreenFocused}
             popoverAnchor={popoverAnchor}
-            onPress={pressHandler}
+            onSelectRow={onSelectRow}
+            onPressBefore={onPressBefore}
             onLayout={onLayout}
             accessibilityLabel={accessibilityLabelWithContextMenuHint}
             accessibilityHint={accessibilityHint}
@@ -244,8 +244,6 @@ function OptionRowLHN({
             reportID={reportID}
             report={report}
             optionItem={optionItem}
-            onSelectRow={onSelectRow}
-            popoverAnchor={popoverAnchor}
             renderChildren={renderPressableRow}
         />
     );

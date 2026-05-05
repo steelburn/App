@@ -1,6 +1,4 @@
-import type {RefObject} from 'react';
-import React, {useCallback, useMemo} from 'react';
-import type {GestureResponderEvent, View} from 'react-native';
+import React, {useMemo} from 'react';
 import type {OnyxEntry} from 'react-native-onyx';
 import {useLHNTooltipContext} from '@components/LHNOptionsList/LHNTooltipContext';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
@@ -16,8 +14,6 @@ import variables from '@styles/variables';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {Report} from '@src/types/onyx';
-import type {OptionRowLHNCorePressHandler} from './OptionRowPressable';
-import {useOptionRowLHNCorePress} from './OptionRowPressable';
 
 type OptionRowTooltipLayerProps = {
     /** Report ID of the row */
@@ -29,21 +25,15 @@ type OptionRowTooltipLayerProps = {
     /** Option data, used to forward pendingAction and errors to OfflineWithFeedback */
     optionItem: OptionData;
 
-    /** Selection handler forwarded into core press behavior */
-    onSelectRow: (optionItem: OptionData, popoverAnchor: RefObject<View | null>) => void;
-
-    popoverAnchor: RefObject<View | null>;
-
-    /** Renders pressable row content with the resolved press handler (tooltip hide + core press when applicable). */
-    renderChildren: (onPress: OptionRowLHNCorePressHandler) => React.ReactNode;
+    /** Renders the row content. Receives an optional `onPressBefore` callback (tooltip hide) to compose with row press. */
+    renderChildren: (onPressBefore?: () => void) => React.ReactNode;
 };
 
 type OptionRowTooltipLayerInnerProps = {
-    corePress: OptionRowLHNCorePressHandler;
-    renderChildren: (onPress: OptionRowLHNCorePressHandler) => React.ReactNode;
+    renderChildren: (onPressBefore?: () => void) => React.ReactNode;
 };
 
-function OptionRowTooltipLayerInner({corePress, renderChildren}: OptionRowTooltipLayerInnerProps) {
+function OptionRowTooltipLayerInner({renderChildren}: OptionRowTooltipLayerInnerProps) {
     const styles = useThemeStyles();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const {isFullscreenVisible, isScreenFocused, isReportsSplitNavigatorLast} = useLHNTooltipContext();
@@ -62,14 +52,6 @@ function OptionRowTooltipLayerInner({corePress, renderChildren}: OptionRowToolti
 
     const {shouldShowProductTrainingTooltip, renderProductTrainingTooltip, hideProductTrainingTooltip} = useProductTrainingContext(tooltipToRender, shouldShowTooltip);
 
-    const wrappedPress = useCallback(
-        (event: GestureResponderEvent | KeyboardEvent | undefined) => {
-            hideProductTrainingTooltip();
-            corePress(event);
-        },
-        [hideProductTrainingTooltip, corePress],
-    );
-
     return (
         <EducationalTooltip
             shouldRender={shouldShowProductTrainingTooltip}
@@ -81,17 +63,17 @@ function OptionRowTooltipLayerInner({corePress, renderChildren}: OptionRowToolti
             shiftHorizontal={variables.gbrTooltipShiftHorizontal}
             shiftVertical={variables.gbrTooltipShiftVertical}
             wrapperStyle={styles.productTrainingTooltipWrapper}
-            onTooltipPress={wrappedPress}
+            onTooltipPress={hideProductTrainingTooltip}
             shouldHideOnScroll
         >
-            {renderChildren(wrappedPress)}
+            {renderChildren(hideProductTrainingTooltip)}
         </EducationalTooltip>
     );
 }
 
 OptionRowTooltipLayerInner.displayName = 'OptionRowTooltipLayerInner';
 
-function OptionRowTooltipLayer({reportID, report, optionItem, onSelectRow, popoverAnchor, renderChildren}: OptionRowTooltipLayerProps) {
+function OptionRowTooltipLayer({reportID, report, optionItem, renderChildren}: OptionRowTooltipLayerProps) {
     const {firstReportIDWithGBRorRBR, onboardingPurpose, onboarding} = useLHNTooltipContext();
     const session = useSession();
     const [conciergeReportID] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID);
@@ -104,13 +86,6 @@ function OptionRowTooltipLayer({reportID, report, optionItem, onSelectRow, popov
     // Skip the inner component (and its heavy hooks) entirely when the row can never show a tooltip.
     const shouldEvaluateTooltip = shouldShowRBRorGBRTooltip || shouldShowGetStartedTooltip;
 
-    const corePress = useOptionRowLHNCorePress({
-        reportID,
-        optionItem,
-        popoverAnchor,
-        onSelectRow,
-    });
-
     return (
         <OfflineWithFeedback
             pendingAction={optionItem.pendingAction}
@@ -118,14 +93,7 @@ function OptionRowTooltipLayer({reportID, report, optionItem, onSelectRow, popov
             shouldShowErrorMessages={false}
             needsOffscreenAlphaCompositing
         >
-            {shouldEvaluateTooltip ? (
-                <OptionRowTooltipLayerInner
-                    corePress={corePress}
-                    renderChildren={renderChildren}
-                />
-            ) : (
-                renderChildren(corePress)
-            )}
+            {shouldEvaluateTooltip ? <OptionRowTooltipLayerInner renderChildren={renderChildren} /> : renderChildren()}
         </OfflineWithFeedback>
     );
 }
