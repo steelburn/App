@@ -17,7 +17,7 @@ import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {Report} from '@src/types/onyx';
 import LHNTooltipContextProvider from './LHNTooltipContextProvider';
-import OptionRowLHNData from './OptionRowLHNData';
+import OptionRowLHNData from './OptionRowLHN';
 import OptionRowRendererComponent from './OptionRowRendererComponent';
 import type {LHNOptionsListProps, RenderItemProps} from './types';
 

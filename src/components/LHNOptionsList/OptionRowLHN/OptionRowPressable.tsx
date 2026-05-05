@@ -1,5 +1,5 @@
 import type {ReactNode, RefObject} from 'react';
-import React, {useState} from 'react';
+import React, {useCallback, useState} from 'react';
 import type {GestureResponderEvent, LayoutChangeEvent, View} from 'react-native';
 import Hoverable from '@components/Hoverable';
 import PressableWithSecondaryInteraction from '@components/PressableWithSecondaryInteraction';
@@ -8,10 +8,38 @@ import useStyleUtils from '@hooks/useStyleUtils';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import DomUtils from '@libs/DomUtils';
+import ReportActionComposeFocusManager from '@libs/ReportActionComposeFocusManager';
+import type {OptionData} from '@libs/ReportUtils';
+import {startSpan} from '@libs/telemetry/activeSpans';
 import {showContextMenu} from '@pages/inbox/report/ContextMenu/ReportActionContextMenu';
 import variables from '@styles/variables';
 import CONST from '@src/CONST';
-import type {OptionData} from '@src/libs/ReportUtils';
+
+type OptionRowLHNPCorePressHandler = (event: GestureResponderEvent | KeyboardEvent | undefined) => void;
+
+type UseOptionRowLHNPCorePressParams = {
+    reportID: string;
+    optionItem: OptionData;
+    popoverAnchor: RefObject<View | null>;
+    onSelectRow: (optionItem: OptionData, popoverAnchor: RefObject<View | null>) => void;
+};
+
+/** Core LHN row press behavior (telemetry, composer focus, selection). Used by OptionRowTooltipLayer and kept next to OptionRowPressable per review feedback. */
+function useOptionRowLHNPCorePress({reportID, optionItem, popoverAnchor, onSelectRow}: UseOptionRowLHNPCorePressParams): OptionRowLHNPCorePressHandler {
+    return useCallback(
+        (event: GestureResponderEvent | KeyboardEvent | undefined) => {
+            startSpan(`${CONST.TELEMETRY.SPAN_OPEN_REPORT}_${reportID}`, {
+                name: 'OptionRowLHN',
+                op: CONST.TELEMETRY.SPAN_OPEN_REPORT,
+            });
+
+            event?.preventDefault();
+            ReportActionComposeFocusManager.focus();
+            onSelectRow(optionItem, popoverAnchor);
+        },
+        [reportID, optionItem, popoverAnchor, onSelectRow],
+    );
+}
 
 type OptionRowPressableProps = {
     reportID: string;
@@ -123,4 +151,6 @@ function OptionRowPressable({
 
 OptionRowPressable.displayName = 'OptionRowPressable';
 
+export type {OptionRowLHNPCorePressHandler};
+export {useOptionRowLHNPCorePress};
 export default OptionRowPressable;

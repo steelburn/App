@@ -98,7 +98,7 @@ type OptionRowLHNProps = {
     style?: StyleProp<TextStyle>;
 
     /** The item that should be rendered */
-    optionItem?: OptionData;
+    optionItem: OptionData;
 
     /** Whether a report contains a draft */
     hasDraftComment: boolean;

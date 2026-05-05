@@ -1,18 +1,26 @@
 import React from 'react';
 import type {StyleProp, TextStyle} from 'react-native';
+import type {ValueOf} from 'type-fest';
 import Text from '@components/Text';
 import useLocalize from '@hooks/useLocalize';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {containsCustomEmoji as containsCustomEmojiUtils, containsOnlyCustomEmoji} from '@libs/EmojiUtils';
-import type {ForwardedFSClassProps} from '@libs/Fullstory/types';
+import FS from '@libs/Fullstory';
 import TextWithEmojiFragment from '@pages/inbox/report/comment/TextWithEmojiFragment';
+import CONST from '@src/CONST';
+import type {Report} from '@src/types/onyx';
 
-type OptionRowAlternateTextProps = ForwardedFSClassProps & {
+type OptionMode = ValueOf<typeof CONST.OPTION_MODE>;
+
+type OptionRowAlternateTextProps = {
     alternateText: string | undefined;
-    style: StyleProp<TextStyle>;
+    report?: Report;
+    viewMode: OptionMode;
+    isOptionFocused: boolean;
+    style?: StyleProp<TextStyle>;
 };
 
-function OptionRowAlternateText({alternateText, style, forwardedFSClass}: OptionRowAlternateTextProps) {
+function OptionRowAlternateText({alternateText, report, viewMode, isOptionFocused, style}: OptionRowAlternateTextProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
 
@@ -20,19 +28,26 @@ function OptionRowAlternateText({alternateText, style, forwardedFSClass}: Option
         return null;
     }
 
+    const isInFocusMode = viewMode === CONST.OPTION_MODE.COMPACT;
+    const textStyle = isOptionFocused ? styles.sidebarLinkActiveText : styles.sidebarLinkText;
+    const alternateTextStyle = isInFocusMode
+        ? [textStyle, styles.textLabelSupporting, styles.optionAlternateTextCompact, styles.ml2, style]
+        : [textStyle, styles.optionAlternateText, styles.textLabelSupporting, style];
+    const alternateTextFSClass = FS.getChatFSClass(report);
+
     const containsCustomEmojiWithText = containsCustomEmojiUtils(alternateText) && !containsOnlyCustomEmoji(alternateText);
 
     return (
         <Text
-            style={style}
+            style={alternateTextStyle}
             numberOfLines={1}
             accessibilityLabel={translate('accessibilityHints.lastChatMessagePreview')}
-            fsClass={forwardedFSClass}
+            fsClass={alternateTextFSClass}
         >
             {containsCustomEmojiWithText ? (
                 <TextWithEmojiFragment
                     message={alternateText}
-                    style={[style, styles.mh0]}
+                    style={[alternateTextStyle, styles.mh0]}
                     alignCustomEmoji
                 />
             ) : (

@@ -1,42 +1,49 @@
-import React, {useMemo} from 'react';
-import type {GestureResponderEvent} from 'react-native';
+import type {RefObject} from 'react';
+import React, {useCallback, useMemo} from 'react';
+import type {GestureResponderEvent, View} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';
 import {useLHNTooltipContext} from '@components/LHNOptionsList/LHNTooltipContext';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
 import {useSession} from '@components/OnyxListItemProvider';
 import {useProductTrainingContext} from '@components/ProductTrainingContext';
 import EducationalTooltip from '@components/Tooltip/EducationalTooltip';
+import useOnyx from '@hooks/useOnyx';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {isAdminRoom, isChatUsedForOnboarding as isChatUsedForOnboardingReportUtils, isConciergeChatReport} from '@libs/ReportUtils';
 import type {OptionData} from '@libs/ReportUtils';
 import variables from '@styles/variables';
 import CONST from '@src/CONST';
+import ONYXKEYS from '@src/ONYXKEYS';
 import type {Report} from '@src/types/onyx';
+import type {OptionRowLHNPCorePressHandler} from './OptionRowPressable';
+import {useOptionRowLHNPCorePress} from './OptionRowPressable';
 
 type OptionRowTooltipLayerProps = {
     /** Report ID of the row */
-    reportID: string | undefined;
+    reportID: string;
 
     /** Report data of the row, used to determine onboarding eligibility */
     report: OnyxEntry<Report>;
 
-    /** Concierge report ID, used to determine onboarding eligibility */
-    conciergeReportID: string | undefined;
-
     /** Option data, used to forward pendingAction and errors to OfflineWithFeedback */
     optionItem: OptionData;
 
-    /** Press handler forwarded to EducationalTooltip's onTooltipPress and exposed to children via renderChildren */
-    onOptionPress: (event: GestureResponderEvent | KeyboardEvent | undefined) => void;
+    /** Selection handler forwarded into core press behavior */
+    onSelectRow: (optionItem: OptionData, popoverAnchor: RefObject<View | null>) => void;
 
-    /** Renders the row content. Receives a press handler that hides the product training tooltip before invoking onOptionPress. */
-    renderChildren: (onPress: (event: GestureResponderEvent | KeyboardEvent | undefined) => void) => React.ReactNode;
+    popoverAnchor: RefObject<View | null>;
+
+    /** Renders pressable row content with the resolved press handler (tooltip hide + core press when applicable). */
+    renderChildren: (onPress: OptionRowLHNPCorePressHandler) => React.ReactNode;
 };
 
-type OptionRowTooltipLayerInnerProps = Pick<OptionRowTooltipLayerProps, 'onOptionPress' | 'renderChildren'>;
+type OptionRowTooltipLayerInnerProps = {
+    corePress: OptionRowLHNPCorePressHandler;
+    renderChildren: (onPress: OptionRowLHNPCorePressHandler) => React.ReactNode;
+};
 
-function OptionRowTooltipLayerInner({onOptionPress, renderChildren}: OptionRowTooltipLayerInnerProps) {
+function OptionRowTooltipLayerInner({corePress, renderChildren}: OptionRowTooltipLayerInnerProps) {
     const styles = useThemeStyles();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     const {isFullscreenVisible, isScreenFocused, isReportsSplitNavigatorLast} = useLHNTooltipContext();
@@ -55,10 +62,13 @@ function OptionRowTooltipLayerInner({onOptionPress, renderChildren}: OptionRowTo
 
     const {shouldShowProductTrainingTooltip, renderProductTrainingTooltip, hideProductTrainingTooltip} = useProductTrainingContext(tooltipToRender, shouldShowTooltip);
 
-    const onPress = (event: GestureResponderEvent | KeyboardEvent | undefined) => {
-        hideProductTrainingTooltip();
-        onOptionPress(event);
-    };
+    const wrappedPress = useCallback(
+        (event: GestureResponderEvent | KeyboardEvent | undefined) => {
+            hideProductTrainingTooltip();
+            corePress(event);
+        },
+        [hideProductTrainingTooltip, corePress],
+    );
 
     return (
         <EducationalTooltip
@@ -71,19 +81,20 @@ function OptionRowTooltipLayerInner({onOptionPress, renderChildren}: OptionRowTo
             shiftHorizontal={variables.gbrTooltipShiftHorizontal}
             shiftVertical={variables.gbrTooltipShiftVertical}
             wrapperStyle={styles.productTrainingTooltipWrapper}
-            onTooltipPress={onPress}
+            onTooltipPress={wrappedPress}
             shouldHideOnScroll
         >
-            {renderChildren(onPress)}
+            {renderChildren(wrappedPress)}
         </EducationalTooltip>
     );
 }
 
 OptionRowTooltipLayerInner.displayName = 'OptionRowTooltipLayerInner';
 
-function OptionRowTooltipLayer({reportID, report, conciergeReportID, optionItem, onOptionPress, renderChildren}: OptionRowTooltipLayerProps) {
+function OptionRowTooltipLayer({reportID, report, optionItem, onSelectRow, popoverAnchor, renderChildren}: OptionRowTooltipLayerProps) {
     const {firstReportIDWithGBRorRBR, onboardingPurpose, onboarding} = useLHNTooltipContext();
     const session = useSession();
+    const [conciergeReportID] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID);
 
     const shouldShowRBRorGBRTooltip = firstReportIDWithGBRorRBR === reportID;
     const isOnboardingGuideAssigned = onboardingPurpose === CONST.ONBOARDING_CHOICES.MANAGE_TEAM && !session?.email?.includes('+');
@@ -92,6 +103,13 @@ function OptionRowTooltipLayer({reportID, report, conciergeReportID, optionItem,
 
     // Skip the inner component (and its heavy hooks) entirely when the row can never show a tooltip.
     const shouldEvaluateTooltip = shouldShowRBRorGBRTooltip || shouldShowGetStartedTooltip;
+
+    const corePress = useOptionRowLHNPCorePress({
+        reportID,
+        optionItem,
+        popoverAnchor,
+        onSelectRow,
+    });
 
     return (
         <OfflineWithFeedback
@@ -102,11 +120,11 @@ function OptionRowTooltipLayer({reportID, report, conciergeReportID, optionItem,
         >
             {shouldEvaluateTooltip ? (
                 <OptionRowTooltipLayerInner
-                    onOptionPress={onOptionPress}
+                    corePress={corePress}
                     renderChildren={renderChildren}
                 />
             ) : (
-                renderChildren(onOptionPress)
+                renderChildren(corePress)
             )}
         </OfflineWithFeedback>
     );

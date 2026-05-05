@@ -1,5 +1,5 @@
 import React, {useRef} from 'react';
-import type {GestureResponderEvent, ViewStyle} from 'react-native';
+import type {ViewStyle} from 'react-native';
 import {StyleSheet, View} from 'react-native';
 import DisplayNames from '@components/DisplayNames';
 import Icon from '@components/Icon';
@@ -19,9 +19,7 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import DateUtils from '@libs/DateUtils';
 import FS from '@libs/Fullstory';
 import {shouldUseBoldText} from '@libs/OptionsListUtils';
-import ReportActionComposeFocusManager from '@libs/ReportActionComposeFocusManager';
 import {isChatUsedForOnboarding as isChatUsedForOnboardingReportUtils, isGroupChat, isOneOnOneChat, isSystemChat} from '@libs/ReportUtils';
-import {startSpan} from '@libs/telemetry/activeSpans';
 import FreeTrial from '@pages/settings/Subscription/FreeTrial';
 import variables from '@styles/variables';
 import CONST from '@src/CONST';
@@ -30,6 +28,7 @@ import OptionRowAlternateText from './OptionRowAlternateText';
 import OptionRowAvatar from './OptionRowAvatar';
 import OptionRowErrorBadge from './OptionRowErrorBadge';
 import OptionRowInfoBadge from './OptionRowInfoBadge';
+import type {OptionRowLHNPCorePressHandler} from './OptionRowPressable';
 import OptionRowPressable from './OptionRowPressable';
 import OptionRowTooltipLayer from './OptionRowTooltipLayer';
 
@@ -67,14 +66,6 @@ function OptionRowLHN({
 
     const singleAvatarContainerStyle = [styles.actionAvatar, styles.mr3];
 
-    if (!optionItem) {
-        // The focused-with-null case is filtered upstream by OptionRowLHNData.
-        // For non-focused rows we render a placeholder View instead of null because returning
-        // null causes FlashList to render all of its children and consume significant memory
-        // on the first render (only observed on first sign-in).
-        return <View style={sidebarInnerRowStyle} />;
-    }
-
     const brickRoadIndicator = optionItem.brickRoadIndicator;
     const actionBadgeText = !isProduction && optionItem.actionBadge ? translate(`common.actionBadge.${optionItem.actionBadge}`) : '';
     let accessibilityLabelForBadge = '';
@@ -86,9 +77,6 @@ function OptionRowLHN({
     const textStyle = isOptionFocused ? styles.sidebarLinkActiveText : styles.sidebarLinkText;
     const textUnreadStyle = shouldUseBoldText(optionItem) ? [textStyle, styles.sidebarLinkTextBold] : [textStyle];
     const displayNameStyle = [styles.optionDisplayName, styles.optionDisplayNameCompact, styles.pre, textUnreadStyle, styles.flexShrink0, style];
-    const alternateTextStyle = isInFocusMode
-        ? [textStyle, styles.textLabelSupporting, styles.optionAlternateTextCompact, styles.ml2, style]
-        : [textStyle, styles.optionAlternateText, styles.textLabelSupporting, style];
 
     const contentContainerStyles = isInFocusMode ? [styles.flex1, styles.flexRow, styles.overflowHidden, StyleUtils.getCompactContentContainerStyles()] : [styles.flex1];
     const hoveredBackgroundColor = !!styles.sidebarLinkHover && 'backgroundColor' in styles.sidebarLinkHover ? styles.sidebarLinkHover.backgroundColor : theme.sidebar;
@@ -104,21 +92,8 @@ function OptionRowLHN({
 
     const subscriptAvatarBorderColor = isOptionFocused ? focusedBackgroundColor : theme.sidebar;
 
-    // This is used to ensure that we display the text exactly as the user entered it when displaying LHN title, instead of parsing their text to HTML.
     const shouldParseFullTitle = optionItem?.parentReportAction?.actionName !== CONST.REPORT.ACTIONS.TYPE.ADD_COMMENT && !isGroupChat(report);
-    const alternateTextFSClass = FS.getChatFSClass(report);
 
-    const onOptionPress = (event: GestureResponderEvent | KeyboardEvent | undefined) => {
-        startSpan(`${CONST.TELEMETRY.SPAN_OPEN_REPORT}_${reportID}`, {
-            name: 'OptionRowLHN',
-            op: CONST.TELEMETRY.SPAN_OPEN_REPORT,
-        });
-
-        event?.preventDefault();
-        // Enable Composer to focus on clicking the same chat after opening the context menu.
-        ReportActionComposeFocusManager.focus();
-        onSelectRow(optionItem, popoverAnchor);
-    };
     const accessibilityLabel = [
         `${translate('accessibilityHints.navigatesToChat')} ${optionItem.text}`,
         optionItem.isUnread ? translate('common.unread') : '',
@@ -134,18 +109,17 @@ function OptionRowLHN({
         contextMenuHint,
     });
 
-    const renderRow = (onPress: typeof onOptionPress) => (
+    const renderPressableRow = (pressHandler: OptionRowLHNPCorePressHandler) => (
         <OptionRowPressable
             reportID={reportID}
             optionItem={optionItem}
             isOptionFocused={isOptionFocused}
             isScreenFocused={isScreenFocused}
             popoverAnchor={popoverAnchor}
-            onPress={onPress}
+            onPress={pressHandler}
             onLayout={onLayout}
             accessibilityLabel={accessibilityLabelWithContextMenuHint}
             accessibilityHint={accessibilityHint}
-            // reportID may be a number contrary to the type definition
             testID={typeof optionItem.reportID === 'number' ? String(optionItem.reportID) : optionItem.reportID}
         >
             {(hovered) => {
@@ -202,14 +176,16 @@ function OptionRowLHN({
                                     </View>
                                     <OptionRowAlternateText
                                         alternateText={optionItem.alternateText}
-                                        style={alternateTextStyle}
-                                        forwardedFSClass={alternateTextFSClass}
+                                        report={report}
+                                        viewMode={viewMode}
+                                        isOptionFocused={isOptionFocused}
+                                        style={style}
                                     />
                                 </View>
                                 {optionItem?.descriptiveText ? (
                                     <View
                                         style={[styles.flexWrap]}
-                                        fsClass={alternateTextFSClass}
+                                        fsClass={FS.getChatFSClass(report)}
                                     >
                                         <Text style={[styles.textLabel]}>{optionItem.descriptiveText}</Text>
                                     </View>
@@ -264,10 +240,10 @@ function OptionRowLHN({
         <OptionRowTooltipLayer
             reportID={reportID}
             report={report}
-            conciergeReportID={conciergeReportID}
             optionItem={optionItem}
-            onOptionPress={onOptionPress}
-            renderChildren={renderRow}
+            onSelectRow={onSelectRow}
+            popoverAnchor={popoverAnchor}
+            renderChildren={renderPressableRow}
         />
     );
 }
