@@ -31,7 +31,6 @@ import {
     hasExportError as hasExportErrorUtil,
     hasOnlyHeldExpenses,
     hasOnlyNonReimbursableTransactions,
-    hasPendingReportRetract,
     isArchivedReport,
     isClosedReport as isClosedReportUtils,
     isCurrentUserSubmitter,
@@ -121,10 +120,6 @@ function isSubmitAction(
     const isOpenReport = isOpenReportUtils(report);
 
     if (hasPendingDEWSubmit(reportMetadata, hasDynamicExternalWorkflow(policy))) {
-        return false;
-    }
-
-    if (hasPendingReportRetract(report)) {
         return false;
     }
 
