@@ -38,12 +38,12 @@ import {isEmptyObject} from '@src/types/utils/EmptyObject';
 import {
     getAllPersonalDetails,
     getReceiptError,
-    getSearchOnyxUpdate,
     handleNavigateAfterExpenseCreate,
     highlightTransactionOnSearchRouteIfNeeded,
     mergePolicyRecentlyUsedCategories,
     mergePolicyRecentlyUsedCurrencies,
 } from '.';
+import {getSearchOnyxUpdate} from './SearchUpdate';
 import type BasePolicyParams from './types/BasePolicyParams';
 
 type SendInvoiceInformation = {

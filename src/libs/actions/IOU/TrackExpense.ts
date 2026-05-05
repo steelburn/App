@@ -115,11 +115,11 @@ import {
     getMoneyRequestPolicyTags,
     getReceiptError,
     getReportPreviewAction,
-    getSearchOnyxUpdate,
     getTransactionWithPreservedLocalReceiptSource,
     handleNavigateAfterExpenseCreate,
     highlightTransactionOnSearchRouteIfNeeded,
 } from './index';
+import {getSearchOnyxUpdate} from './SearchUpdate';
 import type BasePolicyParams from './types/BasePolicyParams';
 import type {CreateTrackExpenseParams} from './types/CreateTrackExpenseParams';
 import type {
