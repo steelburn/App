@@ -333,7 +333,7 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
                     chatReport,
                     selectedPolicy,
                     bankAccountList,
-                    currentUserPersonalDetails?.email ?? '',
+                    currentUserPersonalDetails?.login ?? '',
                     currentUserPersonalDetails.accountID,
                     undefined,
                     false,
@@ -345,7 +345,7 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
                     chatReport,
                     selectedPolicy,
                     bankAccountList,
-                    currentUserPersonalDetails?.email ?? '',
+                    currentUserPersonalDetails?.login ?? '',
                     currentUserPersonalDetails.accountID,
                     undefined,
                     true,
@@ -360,7 +360,7 @@ function useSearchBulkActions({queryJSON}: UseSearchBulkActionsParams) {
         selectedTransactionReportIDs,
         selectedReportIDs,
         bankAccountList,
-        currentUserPersonalDetails?.email,
+        currentUserPersonalDetails?.login,
         currentUserPersonalDetails.accountID,
     ]);
 

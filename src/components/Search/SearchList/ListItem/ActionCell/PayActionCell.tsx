@@ -40,11 +40,11 @@ function PayActionCell({isLoading, policyID, reportID, hash, amount, extraSmall,
     const [chatReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${iouReport?.chatReportID}`);
     const invoiceReceiverPolicyID = chatReport?.invoiceReceiver && 'policyID' in chatReport.invoiceReceiver ? chatReport.invoiceReceiver.policyID : undefined;
     const invoiceReceiverPolicy = usePolicy(invoiceReceiverPolicyID);
-    const {email: currentUserLogin = '', accountID: currentUserAccountID} = useCurrentUserPersonalDetails();
+    const {login: currentUserLogin, accountID: currentUserAccountID} = useCurrentUserPersonalDetails();
 
-    const canBePaid = canIOUBePaid(iouReport, chatReport, policy, bankAccountList, currentUserLogin, currentUserAccountID, transactions, false, undefined, invoiceReceiverPolicy);
+    const canBePaid = canIOUBePaid(iouReport, chatReport, policy, bankAccountList, currentUserLogin ?? '', currentUserAccountID, transactions, false, undefined, invoiceReceiverPolicy);
     const shouldOnlyShowElsewhere =
-        !canBePaid && canIOUBePaid(iouReport, chatReport, policy, bankAccountList, currentUserLogin, currentUserAccountID, transactions, true, undefined, invoiceReceiverPolicy);
+        !canBePaid && canIOUBePaid(iouReport, chatReport, policy, bankAccountList, currentUserLogin ?? '', currentUserAccountID, transactions, true, undefined, invoiceReceiverPolicy);
 
     const {currency} = iouReport ?? {};
 
