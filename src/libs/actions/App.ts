@@ -16,6 +16,7 @@ import {isPublicRoom, isValidReport} from '@libs/ReportUtils';
 import {isLoggingInAsNewUser as isLoggingInAsNewUserSessionUtils} from '@libs/SessionUtils';
 import {clearSoundAssetsCache} from '@libs/Sound';
 import {cancelAllSpans, endSpan, getSpan, startSpan} from '@libs/telemetry/activeSpans';
+import {cancelIfStaleForNavState} from '@libs/telemetry/submitFollowUpAction';
 import CONST from '@src/CONST';
 import getPathFromState from '@src/libs/Navigation/helpers/getPathFromState';
 import type {OnyxKey} from '@src/ONYXKEYS';
@@ -273,6 +274,8 @@ AppState.addEventListener('change', (nextAppState) => {
     }
     appState = nextAppState;
 });
+
+navigationRef.addListener('state', cancelIfStaleForNavState);
 
 /**
  * Gets the policy params that are passed to the server in the OpenApp and ReconnectApp API commands. This includes a full list of policy IDs the client knows about as well as when they were last modified.
