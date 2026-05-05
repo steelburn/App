@@ -52,7 +52,6 @@ import {
     canRejectReportAction,
     canUserPerformWriteAction as canUserPerformWriteActionReportUtils,
     doesReportContainRequestsFromMultipleUsers,
-    getMoneyRequestSpendBreakdown,
     getTransactionDetails,
     hasExportError as hasExportErrorUtils,
     hasOnlyHeldExpenses,

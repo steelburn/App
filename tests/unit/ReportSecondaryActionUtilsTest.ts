@@ -1363,16 +1363,12 @@ describe('getSecondaryAction', () => {
             ownerAccountID: EMPLOYEE_ACCOUNT_ID,
             stateNum: CONST.REPORT.STATE_NUM.APPROVED,
             statusNum: CONST.REPORT.STATUS_NUM.APPROVED,
+            total: -100,
+            nonReimbursableTotal: 0,
         } as unknown as Report;
         const policy = {
             role: CONST.POLICY.ROLE.USER,
         } as unknown as Policy;
-
-        jest.spyOn(ReportUtils, 'getMoneyRequestSpendBreakdown').mockReturnValue({
-            totalDisplaySpend: 100,
-            reimbursableSpend: 100,
-            nonReimbursableSpend: 0,
-        });
 
         const result = getSecondaryReportActions({
             currentUserLogin: EMPLOYEE_EMAIL,
@@ -1389,23 +1385,19 @@ describe('getSecondaryAction', () => {
         expect(result.includes(CONST.REPORT.SECONDARY_ACTIONS.RECEIVED_PAYMENT)).toBe(true);
     });
 
-    it('does not include RECEIVED_PAYMENT option for fully non-reimbursable expense report', () => {
+    it('includes RECEIVED_PAYMENT option for negative expense report even when non-reimbursable total matches total', () => {
         const report = {
             reportID: REPORT_ID,
             type: CONST.REPORT.TYPE.EXPENSE,
             ownerAccountID: EMPLOYEE_ACCOUNT_ID,
             stateNum: CONST.REPORT.STATE_NUM.APPROVED,
             statusNum: CONST.REPORT.STATUS_NUM.APPROVED,
+            total: -100,
+            nonReimbursableTotal: -100,
         } as unknown as Report;
         const policy = {
             role: CONST.POLICY.ROLE.USER,
         } as unknown as Policy;
-
-        jest.spyOn(ReportUtils, 'getMoneyRequestSpendBreakdown').mockReturnValue({
-            totalDisplaySpend: 100,
-            reimbursableSpend: 0,
-            nonReimbursableSpend: 100,
-        });
 
         const result = getSecondaryReportActions({
             currentUserLogin: EMPLOYEE_EMAIL,
@@ -1419,7 +1411,7 @@ describe('getSecondaryAction', () => {
             policy,
             reportActions: [],
         });
-        expect(result.includes(CONST.REPORT.SECONDARY_ACTIONS.RECEIVED_PAYMENT)).toBe(false);
+        expect(result.includes(CONST.REPORT.SECONDARY_ACTIONS.RECEIVED_PAYMENT)).toBe(true);
     });
 
     it('does not include RECEIVED_PAYMENT option for admin', () => {
@@ -1429,16 +1421,12 @@ describe('getSecondaryAction', () => {
             ownerAccountID: EMPLOYEE_ACCOUNT_ID,
             stateNum: CONST.REPORT.STATE_NUM.APPROVED,
             statusNum: CONST.REPORT.STATUS_NUM.APPROVED,
+            total: -100,
+            nonReimbursableTotal: 0,
         } as unknown as Report;
         const policy = {
             role: CONST.POLICY.ROLE.ADMIN,
         } as unknown as Policy;
-
-        jest.spyOn(ReportUtils, 'getMoneyRequestSpendBreakdown').mockReturnValue({
-            totalDisplaySpend: 100,
-            reimbursableSpend: 100,
-            nonReimbursableSpend: 0,
-        });
 
         const result = getSecondaryReportActions({
             currentUserLogin: EMPLOYEE_EMAIL,
@@ -1462,6 +1450,8 @@ describe('getSecondaryAction', () => {
             ownerAccountID: EMPLOYEE_ACCOUNT_ID,
             stateNum: CONST.REPORT.STATE_NUM.APPROVED,
             statusNum: CONST.REPORT.STATUS_NUM.APPROVED,
+            total: -100,
+            nonReimbursableTotal: 0,
         } as unknown as Report;
         const policy = {
             role: CONST.POLICY.ROLE.USER,
@@ -1473,12 +1463,6 @@ describe('getSecondaryAction', () => {
                 paymentType: CONST.IOU.PAYMENT_TYPE.VBBA,
             },
         } as unknown as ReportAction;
-
-        jest.spyOn(ReportUtils, 'getMoneyRequestSpendBreakdown').mockReturnValue({
-            totalDisplaySpend: 100,
-            reimbursableSpend: 100,
-            nonReimbursableSpend: 0,
-        });
 
         const result = getSecondaryReportActions({
             currentUserLogin: EMPLOYEE_EMAIL,
@@ -1502,6 +1486,8 @@ describe('getSecondaryAction', () => {
             ownerAccountID: EMPLOYEE_ACCOUNT_ID,
             stateNum: CONST.REPORT.STATE_NUM.APPROVED,
             statusNum: CONST.REPORT.STATUS_NUM.REIMBURSED,
+            total: -100,
+            nonReimbursableTotal: 0,
         } as unknown as Report;
         const policy = {
             role: CONST.POLICY.ROLE.USER,
@@ -1513,12 +1499,6 @@ describe('getSecondaryAction', () => {
                 paymentType: CONST.IOU.PAYMENT_TYPE.ELSEWHERE,
             },
         } as unknown as ReportAction;
-
-        jest.spyOn(ReportUtils, 'getMoneyRequestSpendBreakdown').mockReturnValue({
-            totalDisplaySpend: 100,
-            reimbursableSpend: 100,
-            nonReimbursableSpend: 0,
-        });
 
         const result = getSecondaryReportActions({
             currentUserLogin: EMPLOYEE_EMAIL,
