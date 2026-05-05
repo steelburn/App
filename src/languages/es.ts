@@ -2617,6 +2617,9 @@ ${amount} para ${merchant} - ${date}`,
             title: 'No se han creado agentes.',
             subtitle: 'Deja de hacer las cosas manualmente. En su lugar, instruye a un agente y ahorra mucho tiempo.',
         },
+        error: {
+            genericAdd: 'Hubo un problema al agregar este agente',
+        },
     },
     addAgentPage: {
         title: 'Nuevo agente',

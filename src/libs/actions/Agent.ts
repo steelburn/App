@@ -2,6 +2,7 @@ import Onyx from 'react-native-onyx';
 import {read, write} from '@libs/API';
 import {READ_COMMANDS, WRITE_COMMANDS} from '@libs/API/types';
 import {getMicroSecondOnyxErrorWithTranslationKey} from '@libs/ErrorUtils';
+import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {AnyOnyxUpdate} from '@src/types/onyx/Request';
 
@@ -9,15 +10,10 @@ function openAgentsPage() {
     read(READ_COMMANDS.OPEN_AGENTS_PAGE, null);
 }
 
-function createAgent(firstName: string | undefined, prompt: string) {
+function createAgent(firstName: string | undefined, prompt: string, customExpensifyAvatarID?: string) {
     const optimisticAccountID = -Math.round(Math.random() * 1000000);
 
     const optimisticData: AnyOnyxUpdate[] = [
-        {
-            onyxMethod: Onyx.METHOD.MERGE,
-            key: ONYXKEYS.FORMS.ADD_AGENT_FORM,
-            value: {isLoading: true, errors: null},
-        },
         {
             onyxMethod: Onyx.METHOD.MERGE,
             key: ONYXKEYS.PERSONAL_DETAILS_LIST,
@@ -30,18 +26,13 @@ function createAgent(firstName: string | undefined, prompt: string) {
             },
         },
         {
-            onyxMethod: Onyx.METHOD.SET,
+            onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT}${optimisticAccountID}`,
-            value: {prompt},
+            value: {prompt, pendingAction: CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD},
         },
     ];
 
     const successData: AnyOnyxUpdate[] = [
-        {
-            onyxMethod: Onyx.METHOD.MERGE,
-            key: ONYXKEYS.FORMS.ADD_AGENT_FORM,
-            value: {isLoading: false},
-        },
         {
             onyxMethod: Onyx.METHOD.MERGE,
             key: ONYXKEYS.PERSONAL_DETAILS_LIST,
@@ -50,7 +41,7 @@ function createAgent(firstName: string | undefined, prompt: string) {
             },
         },
         {
-            onyxMethod: Onyx.METHOD.SET,
+            onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT}${optimisticAccountID}`,
             value: null,
         },
@@ -59,24 +50,32 @@ function createAgent(firstName: string | undefined, prompt: string) {
     const failureData: AnyOnyxUpdate[] = [
         {
             onyxMethod: Onyx.METHOD.MERGE,
-            key: ONYXKEYS.FORMS.ADD_AGENT_FORM,
-            value: {isLoading: false, errors: getMicroSecondOnyxErrorWithTranslationKey('common.genericErrorMessage')},
-        },
-        {
-            onyxMethod: Onyx.METHOD.MERGE,
             key: ONYXKEYS.PERSONAL_DETAILS_LIST,
             value: {
-                [optimisticAccountID]: null,
+                [optimisticAccountID]: {
+                    accountID: optimisticAccountID,
+                    displayName: firstName,
+                    isOptimisticPersonalDetail: true,
+                },
             },
         },
         {
-            onyxMethod: Onyx.METHOD.SET,
+            onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT}${optimisticAccountID}`,
-            value: null,
+            value: {
+                prompt,
+                pendingAction: CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD,
+                errors: getMicroSecondOnyxErrorWithTranslationKey('agentsPage.error.genericAdd'),
+            },
         },
     ];
 
-    write(WRITE_COMMANDS.CREATE_AGENT, {firstName, prompt}, {optimisticData, successData, failureData});
+    write(WRITE_COMMANDS.CREATE_AGENT, {firstName, prompt, customExpensifyAvatarID}, {optimisticData, successData, failureData});
 }
 
-export {openAgentsPage, createAgent};
+function clearAgentError(optimisticAccountID: number) {
+    Onyx.merge(ONYXKEYS.PERSONAL_DETAILS_LIST, {[optimisticAccountID]: null});
+    Onyx.set(`${ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT}${optimisticAccountID}`, null);
+}
+
+export {openAgentsPage, createAgent, clearAgentError};

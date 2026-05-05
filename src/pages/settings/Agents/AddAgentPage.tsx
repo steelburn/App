@@ -1,17 +1,16 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {View} from 'react-native';
 import AvatarButtonWithIcon from '@components/AvatarButtonWithIcon';
 import FormProvider from '@components/Form/FormProvider';
 import InputWrapper from '@components/Form/InputWrapper';
 import type {FormOnyxValues} from '@components/Form/types';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
-import {botAvatars} from '@components/Icon/DefaultBotAvatars';
+import {botAvatarIDs, botAvatars} from '@components/Icon/DefaultBotAvatars';
 import ScreenWrapper from '@components/ScreenWrapper';
 import TextInput from '@components/TextInput';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
-import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
 import Navigation from '@libs/Navigation/Navigation';
 import {createAgent} from '@userActions/Agent';
@@ -30,21 +29,9 @@ function AddAgentPage() {
     const expensifyIcons = useMemoizedLazyExpensifyIcons(['Sync']);
     const avatarStyle = [styles.avatarXLarge, styles.alignSelfCenter];
     const [avatarSource] = useState(() => botAvatars[Math.floor(Math.random() * botAvatars.length)]);
-    const [formIsLoading] = useOnyx(ONYXKEYS.FORMS.ADD_AGENT_FORM, {selector: (form) => form?.isLoading});
-    const [formErrors] = useOnyx(ONYXKEYS.FORMS.ADD_AGENT_FORM, {selector: (form) => form?.errors});
-    const hasSubmittedRef = useRef(false);
-
     useEffect(() => {
         clearErrors(ONYXKEYS.FORMS.ADD_AGENT_FORM);
     }, []);
-
-    useEffect(() => {
-        if (!hasSubmittedRef.current || formIsLoading || formErrors) {
-            return;
-        }
-        Navigation.goBack();
-        hasSubmittedRef.current = false;
-    }, [formIsLoading, formErrors]);
 
     const validate = (values: FormOnyxValues<typeof ONYXKEYS.FORMS.ADD_AGENT_FORM>): Errors => {
         const errors: Errors = {};
@@ -55,9 +42,10 @@ function AddAgentPage() {
     };
 
     const handleSubmit = (values: FormOnyxValues<typeof ONYXKEYS.FORMS.ADD_AGENT_FORM>) => {
-        hasSubmittedRef.current = true;
         const firstName = values[INPUT_IDS.FIRST_NAME].trim() || undefined;
-        createAgent(firstName, values[INPUT_IDS.PROMPT].trim());
+        const customExpensifyAvatarID = botAvatarIDs.get(avatarSource);
+        createAgent(firstName, values[INPUT_IDS.PROMPT].trim(), customExpensifyAvatarID);
+        Navigation.goBack();
     };
 
     return (

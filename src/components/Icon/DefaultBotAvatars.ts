@@ -7,4 +7,16 @@ import BotAvatarYellow from '@assets/images/avatars/bots/bot-avatar--yellow.svg'
 
 const botAvatars = [BotAvatarBlue, BotAvatarGreen, BotAvatarIce, BotAvatarPink, BotAvatarTangerine, BotAvatarYellow] as const;
 
-export {BotAvatarBlue, BotAvatarGreen, BotAvatarIce, BotAvatarPink, BotAvatarTangerine, BotAvatarYellow, botAvatars};
+type BotAvatar = (typeof botAvatars)[number];
+
+const botAvatarIDs = new Map<BotAvatar, string>([
+    [BotAvatarBlue, 'bot-avatar--blue'],
+    [BotAvatarGreen, 'bot-avatar--green'],
+    [BotAvatarIce, 'bot-avatar--ice'],
+    [BotAvatarPink, 'bot-avatar--pink'],
+    [BotAvatarTangerine, 'bot-avatar--tangerine'],
+    [BotAvatarYellow, 'bot-avatar--yellow'],
+]);
+
+export {BotAvatarBlue, BotAvatarGreen, BotAvatarIce, BotAvatarPink, BotAvatarTangerine, BotAvatarYellow, botAvatars, botAvatarIDs};
+export type {BotAvatar};
