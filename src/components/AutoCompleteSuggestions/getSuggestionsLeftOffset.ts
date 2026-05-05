@@ -10,8 +10,9 @@ function getLeftOffset(
     isInLandscapeMode: boolean,
 ): number {
     if (isInLandscapeMode) {
-        // Some Android devices have issue where they add insets.left to x value, so we need to subtract it to get the correct left offset.
-        if (x + insets.left + insets.right + menuWidth > windowWidth) {
+        // On Android devices, sometimes x takes into consideration the insets.left value, sometimes not
+        // so in case it does we want to subtract it to get the correct left offset.
+        if (x - insets.left >= 0) {
             return x - insets.left;
         }
 
