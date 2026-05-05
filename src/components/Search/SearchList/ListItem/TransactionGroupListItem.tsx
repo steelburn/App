@@ -198,15 +198,14 @@ function TransactionGroupListItem<TItem extends ListItem>({
     };
 
     const StyleUtils = useStyleUtils();
+    const isItemSelected = isSelectAllChecked || item?.isSelected;
 
     const animatedHighlightStyle = useAnimatedHighlightStyle({
         shouldHighlight: item?.shouldAnimateInHighlight ?? false,
         highlightColor: theme.messageHighlightBG,
-        backgroundColor: theme.highlightBG,
+        backgroundColor: isItemSelected ? theme.activeComponentBG : theme.highlightBG,
         shouldApplyOtherStyles: false,
     });
-
-    const isItemSelected = isSelectAllChecked || item?.isSelected;
 
     const pressableStyle = [
         styles.transactionGroupListItemStyle,
