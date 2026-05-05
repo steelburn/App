@@ -1183,10 +1183,11 @@ describe('DebugUtils', () => {
                 },
                 [ONYXKEYS.SESSION]: {
                     accountID: 12345,
+                    email: RORY_EMAIL,
                 },
             });
             // eslint-disable-next-line @typescript-eslint/non-nullable-type-assertion-style
-            const {reportAction} = DebugUtils.getReasonAndReportActionForGBRInLHNRow(MOCK_REPORTS[`${ONYXKEYS.COLLECTION.REPORT}1`] as Report, RORY_EMAIL, RORY_ACCOUNT_ID) ?? {};
+            const {reportAction} = DebugUtils.getReasonAndReportActionForGBRInLHNRow(MOCK_REPORTS[`${ONYXKEYS.COLLECTION.REPORT}1`] as Report, RORY_EMAIL, 12345) ?? {};
             expect(reportAction).toMatchObject(MOCK_REPORT_ACTIONS['1']);
         });
         it('returns undefined report action when report has no GBR', () => {
