@@ -6224,16 +6224,12 @@ ${amount} para ${merchant} - ${date}`,
             settingsTitle: 'Configuración de Gusto',
             syncStageName: ({stage}) => {
                 switch (stage) {
-                    case 'startingImportGusto':
-                        return 'Importando datos desde Gusto';
-                    case 'gustoSyncLoadCompany':
-                        return 'Cargando datos de la empresa desde Gusto';
-                    case 'gustoSyncImportEmployees':
-                        return 'Importando empleados';
-                    case 'gustoSyncBuildApprovalChains':
-                        return 'Creando cadenas de aprobación';
-                    case 'gustoSyncFinalize':
-                        return 'Finalizando la sincronización';
+                    case 'gustoSyncTitle':
+                        return 'Synchronizing Gusto Employees';
+                    case 'gustoSyncLoadData':
+                        return 'Loading data from Gusto';
+                    case 'gustoSyncProvisioning':
+                        return 'Provisioning employees in policy';
                     case 'jobDone':
                         return 'Esperando a que se carguen los datos importados';
                     default: {
@@ -6244,6 +6240,12 @@ ${amount} para ${merchant} - ${date}`,
             gusto: {
                 title: 'Gusto',
                 connect: 'Conectar',
+                syncNow: 'Sincronizar ahora',
+                disconnect: 'Desconectar',
+                lastSync: (relativeDate) => `Última sincronización ${relativeDate}`,
+                syncError: 'No se puede conectar con Gusto',
+                disconnectTitle: 'Desconectar Gusto',
+                disconnectPrompt: '¿Seguro que quieres desconectar Gusto?',
                 connectionDescription: 'Conecta Gusto para mantener sincronizadas las aprobaciones de empleados con tu espacio de trabajo.',
                 approvalMode: 'Modo de aprobación',
                 finalApprover: 'Aprobador final',

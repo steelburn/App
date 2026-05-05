@@ -6970,16 +6970,12 @@ Dodaj więcej zasad wydatków, żeby chronić płynność finansową firmy.`,
             settingsTitle: 'Ustawienia Gusto',
             syncStageName: ({stage}: SyncStageNameConnectionsParams) => {
                 switch (stage) {
-                    case 'startingImportGusto':
-                        return 'Importowanie danych Gusto';
-                    case 'gustoSyncLoadCompany':
-                        return 'Wczytywanie danych firmy Gusto';
-                    case 'gustoSyncImportEmployees':
-                        return 'Importowanie pracowników';
-                    case 'gustoSyncBuildApprovalChains':
-                        return 'Tworzenie łańcuchów zatwierdzania';
-                    case 'gustoSyncFinalize':
-                        return 'Finalizowanie synchronizacji';
+                    case 'gustoSyncTitle':
+                        return 'Synchronizing Gusto Employees';
+                    case 'gustoSyncLoadData':
+                        return 'Loading data from Gusto';
+                    case 'gustoSyncProvisioning':
+                        return 'Provisioning employees in policy';
                     case 'jobDone':
                         return 'Oczekiwanie na załadowanie zaimportowanych danych';
                     default: {
@@ -6993,6 +6989,12 @@ Dodaj więcej zasad wydatków, żeby chronić płynność finansową firmy.`,
                 finalApprover: 'Ostateczny zatwierdzający',
                 connect: 'Połącz',
                 connectionDescription: 'Połącz Gusto, aby synchronizować akceptacje pracowników z Twoim miejscem pracy.',
+                syncNow: 'Synchronizuj teraz',
+                disconnect: 'Odłącz',
+                lastSync: (relativeDate: string) => `Ostatnia synchronizacja: ${relativeDate}`,
+                syncError: 'Nie można połączyć się z Gusto',
+                disconnectTitle: 'Odłącz Gusto',
+                disconnectPrompt: 'Czy na pewno chcesz odłączyć Gusto?',
             },
         },
     },
