@@ -1,6 +1,5 @@
 import React from 'react';
 import BlockingView from '@components/BlockingViews/BlockingView';
-import RadioListItem from '@components/SelectionList/ListItem/RadioListItem';
 import type {SelectorType} from '@components/SelectionScreen';
 import SelectionScreen from '@components/SelectionScreen';
 import {useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
@@ -65,7 +64,6 @@ function TravelInvoicingPayableAccountSelectPage({
             displayName={displayName}
             title={title}
             data={data}
-            listItem={RadioListItem}
             onSelectRow={onSelect}
             shouldSingleExecuteRowSelect
             initiallyFocusedOptionKey={data.find((option) => option.isSelected)?.keyForList}
