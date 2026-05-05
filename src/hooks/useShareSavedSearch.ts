@@ -7,7 +7,7 @@ import useEnvironment from './useEnvironment';
 const SHARE_FEEDBACK_DURATION_MS = 1800;
 
 // Matches the shouldDelay close timing in hideContextMenu (ReportActionContextMenu.ts)
-export const MENU_CLOSE_DELAY_MS = 800;
+const MENU_CLOSE_DELAY_MS = 800;
 
 function useShareSavedSearch() {
     const {environmentURL} = useEnvironment();
@@ -37,4 +37,5 @@ function useShareSavedSearch() {
     return {copiedHash, handleShare};
 }
 
+export {MENU_CLOSE_DELAY_MS};
 export default useShareSavedSearch;
