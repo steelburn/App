@@ -114,7 +114,7 @@ const useRestartOnOdometerImagesFailure = (
         });
     }, [draftTransactionsMetadata, transaction, iouType, reportID, backToReport, onBackupHandled, odometerDraft, odometerDraftStatus]);
 
-    const isOnyxLoading = isLoadingOnyxValue(draftTransactionsMetadata);
+    const isOnyxLoading = isLoadingOnyxValue(draftTransactionsMetadata, odometerDraftStatus);
     const hasVerifiedBlobs = !!transaction && !isOnyxLoading && (!hasBlobUrls || asyncVerificationPassed);
 
     return {hasVerifiedBlobs};
