@@ -606,7 +606,6 @@ const ROUTES = {
     },
     BANK_ACCOUNT_USD_SETUP: {
         route: 'bank-account/new/us/:page?/:subPage?/:action?',
-        // eslint-disable-next-line no-restricted-syntax -- Legacy route generation
         getRoute: ({policyID, page, subPage, action, backTo}: {policyID?: string; page?: string; subPage?: string; action?: 'edit'; backTo?: string}) => {
             const base = 'bank-account/new/us';
             const pagePart = page ? `/${page}` : '';
