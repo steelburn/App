@@ -59,6 +59,7 @@ async function updateStartAddress(gpsPoints: GPSPoint[][], isOffline: boolean) {
         } else {
             setStartWaypointAddress({value: coordinatesToString({lat: startPoint.lat, long: startPoint.long}), type: 'coordinates'}, tripSegmentIndex, updatedGpsPoints);
         }
+        return;
     }
 
     setStartWaypointAddress({value: coordinatesToString({lat: startPoint.lat, long: startPoint.long}), type: 'coordinates'}, tripSegmentIndex, gpsPoints);
