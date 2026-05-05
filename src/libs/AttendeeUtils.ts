@@ -58,7 +58,7 @@ function formatRequiredFieldsTitle(translate: LocaleContextProps['translate'], p
  * Converts raw attendees value to an array.
  * Onyx may deserialize arrays as plain objects, so both shapes are handled.
  */
-function convertAttendeesToArray(rawAttendees: Attendee[] | undefined): Attendee[] {
+function convertAttendeesToArray(rawAttendees: unknown): Attendee[] {
     if (Array.isArray(rawAttendees)) {
         return rawAttendees;
     }
@@ -90,7 +90,7 @@ function getIsMissingAttendeesViolation(
 
     const creatorLogin = userPersonalDetails.login ?? '';
     const creatorEmail = userPersonalDetails.email ?? '';
-    const attendees = convertAttendeesToArray(iouAttendees as Attendee[] | undefined);
+    const attendees = convertAttendeesToArray(iouAttendees);
     // Check both login and email since attendee objects may have identifier in either property
     const attendeesMinusCreatorCount = attendees.filter((a) => {
         const attendeeIdentifier = a?.login ?? a?.email;

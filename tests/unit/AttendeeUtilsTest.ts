@@ -15,7 +15,7 @@ describe('AttendeeUtils', () => {
             });
 
             it('returns [] for null (unexpected runtime value)', () => {
-                expect(convertAttendeesToArray(null as unknown as Attendee[])).toEqual([]);
+                expect(convertAttendeesToArray(null)).toEqual([]);
             });
         });
 
@@ -38,12 +38,12 @@ describe('AttendeeUtils', () => {
 
         describe('plain-object inputs (Onyx-deserialized arrays)', () => {
             it('returns [] for an empty object {}', () => {
-                expect(convertAttendeesToArray({} as unknown as Attendee[])).toEqual([]);
+                expect(convertAttendeesToArray({})).toEqual([]);
             });
 
             it('converts a single-entry object to a one-element array', () => {
                 const attendee = makeAttendee({email: 'a@test.com'});
-                const result = convertAttendeesToArray({first: attendee} as unknown as Attendee[]);
+                const result = convertAttendeesToArray({first: attendee});
                 expect(result).toHaveLength(1);
                 expect(result.at(0)).toBe(attendee);
             });
@@ -52,7 +52,7 @@ describe('AttendeeUtils', () => {
                 const a1 = makeAttendee({email: 'a@test.com'});
                 const a2 = makeAttendee({email: 'b@test.com'});
                 const a3 = makeAttendee({email: 'c@test.com'});
-                const result = convertAttendeesToArray({first: a1, second: a2, third: a3} as unknown as Attendee[]);
+                const result = convertAttendeesToArray({first: a1, second: a2, third: a3});
                 expect(result).toHaveLength(3);
                 expect(result).toContain(a1);
                 expect(result).toContain(a2);
@@ -61,22 +61,22 @@ describe('AttendeeUtils', () => {
 
             it('preserves all attendee fields when converting from an object', () => {
                 const attendee = makeAttendee({email: 'user@test.com', displayName: 'Alice', login: 'alice', accountID: 42, selected: true});
-                const result = convertAttendeesToArray({first: attendee} as unknown as Attendee[]);
+                const result = convertAttendeesToArray({first: attendee});
                 expect(result.at(0)).toMatchObject({email: 'user@test.com', displayName: 'Alice', login: 'alice', accountID: 42, selected: true});
             });
         });
 
         describe('non-object primitives (unexpected runtime values)', () => {
             it('returns [] for a string', () => {
-                expect(convertAttendeesToArray('invalid' as unknown as Attendee[])).toEqual([]);
+                expect(convertAttendeesToArray('invalid')).toEqual([]);
             });
 
             it('returns [] for a number', () => {
-                expect(convertAttendeesToArray(42 as unknown as Attendee[])).toEqual([]);
+                expect(convertAttendeesToArray(42)).toEqual([]);
             });
 
             it('returns [] for a boolean', () => {
-                expect(convertAttendeesToArray(true as unknown as Attendee[])).toEqual([]);
+                expect(convertAttendeesToArray(true)).toEqual([]);
             });
         });
     });
