@@ -344,7 +344,7 @@ const DYNAMIC_ROUTES = {
     },
     SETTINGS_TAG_APPROVER: {
         path: 'tag-approver',
-        entryScreens: [SCREENS.SETTINGS_TAGS.SETTINGS_TAG_SETTINGS],
+        entryScreens: [SCREENS.SETTINGS_TAGS.DYNAMIC_SETTINGS_TAG_SETTINGS],
     },
     SETTINGS_TAG_LIST_VIEW: {
         path: 'tag-list/:orderWeight',
@@ -355,6 +355,11 @@ const DYNAMIC_ROUTES = {
         path: 'tag-list-edit/:orderWeight',
         entryScreens: [SCREENS.SETTINGS_TAGS.SETTINGS_TAGS_SETTINGS, SCREENS.SETTINGS_TAGS.DYNAMIC_SETTINGS_TAG_LIST_VIEW],
         getRoute: (orderWeight: number) => `tag-list-edit/${orderWeight}`,
+    },
+    SETTINGS_TAG_SETTINGS: {
+        path: 'tag-settings/:orderWeight/:tagName',
+        entryScreens: [SCREENS.SETTINGS_TAGS.SETTINGS_TAGS_ROOT, SCREENS.SETTINGS_TAGS.DYNAMIC_SETTINGS_TAG_LIST_VIEW],
+        getRoute: (orderWeight: number, tagName: string) => `tag-settings/${orderWeight}/${encodeURIComponent(tagName)}`,
     },
     DETAILS_CONSTANT_PICKER: {
         path: 'constant-picker',
@@ -1543,12 +1548,6 @@ const ROUTES = {
         getRoute: (policyID: string, orderWeight: number, tagName: string, backTo = '') =>
             // eslint-disable-next-line no-restricted-syntax -- Legacy route generation
             getUrlWithBackToParam(`settings/${policyID}/tag/${orderWeight}/${encodeURIComponent(tagName)}/edit` as const, backTo),
-    },
-    SETTINGS_TAG_SETTINGS: {
-        route: 'settings/:policyID/tag/:orderWeight/:tagName',
-        getRoute: (policyID: string, orderWeight: number, tagName: string, backTo = '') =>
-            // eslint-disable-next-line no-restricted-syntax -- Legacy route generation
-            getUrlWithBackToParam(`settings/${policyID}/tag/${orderWeight}/${encodeURIComponent(tagName)}` as const, backTo),
     },
     SETTINGS_TAG_GL_CODE: {
         route: 'settings/:policyID/tag/:orderWeight/:tagName/gl-code',

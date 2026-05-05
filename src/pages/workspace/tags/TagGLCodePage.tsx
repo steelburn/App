@@ -32,7 +32,6 @@ function TagGLCodePage({route}: EditTagGLCodePageProps) {
     const {inputCallbackRef} = useAutoFocusInput();
     const policyID = route.params.policyID;
     const policy = usePolicy(policyID);
-    const backTo = route.params.backTo;
     const [policyTags] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_TAGS}${policyID}`);
 
     const tagName = route.params.tagName;
@@ -42,10 +41,8 @@ function TagGLCodePage({route}: EditTagGLCodePageProps) {
     const isQuickSettingsFlow = route.name === SCREENS.SETTINGS_TAGS.SETTINGS_TAG_GL_CODE;
 
     const goBack = useCallback(() => {
-        Navigation.goBack(
-            isQuickSettingsFlow ? ROUTES.SETTINGS_TAG_SETTINGS.getRoute(policyID, orderWeight, tagName, backTo) : ROUTES.WORKSPACE_TAG_SETTINGS.getRoute(policyID, orderWeight, tagName),
-        );
-    }, [orderWeight, policyID, tagName, isQuickSettingsFlow, backTo]);
+        Navigation.goBack(isQuickSettingsFlow ? undefined : ROUTES.WORKSPACE_TAG_SETTINGS.getRoute(policyID, orderWeight, tagName));
+    }, [orderWeight, policyID, tagName, isQuickSettingsFlow]);
 
     const validate = useCallback(
         (values: FormOnyxValues<typeof ONYXKEYS.FORMS.WORKSPACE_TAG_FORM>) => {

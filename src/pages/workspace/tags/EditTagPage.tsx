@@ -28,7 +28,7 @@ type EditTagPageProps =
     | PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.SETTINGS_TAGS.SETTINGS_TAG_EDIT>;
 
 function EditTagPage({route}: EditTagPageProps) {
-    const {backTo, policyID} = route.params;
+    const {policyID} = route.params;
     const policyData = usePolicyData(policyID);
     const {tags: policyTags} = policyData;
     const styles = useThemeStyles();
@@ -67,13 +67,9 @@ function EditTagPage({route}: EditTagPageProps) {
                 renamePolicyTag(policyData, {oldName: route.params.tagName, newName: values.tagName.trim()}, route.params.orderWeight);
             }
             Keyboard.dismiss();
-            Navigation.goBack(
-                isQuickSettingsFlow
-                    ? ROUTES.SETTINGS_TAG_SETTINGS.getRoute(policyID, route.params.orderWeight, route.params.tagName, backTo)
-                    : ROUTES.WORKSPACE_TAG_SETTINGS.getRoute(policyID, route.params.orderWeight, route.params.tagName),
-            );
+            Navigation.goBack(isQuickSettingsFlow ? undefined : ROUTES.WORKSPACE_TAG_SETTINGS.getRoute(policyID, route.params.orderWeight, route.params.tagName));
         },
-        [policyData, currentTagName, policyID, route.params.tagName, route.params.orderWeight, isQuickSettingsFlow, backTo],
+        [policyData, currentTagName, policyID, route.params.tagName, route.params.orderWeight, isQuickSettingsFlow],
     );
 
     return (
@@ -91,11 +87,7 @@ function EditTagPage({route}: EditTagPageProps) {
                 <HeaderWithBackButton
                     title={translate('workspace.tags.editTag')}
                     onBackButtonPress={() =>
-                        Navigation.goBack(
-                            isQuickSettingsFlow
-                                ? ROUTES.SETTINGS_TAG_SETTINGS.getRoute(route?.params?.policyID, route.params.orderWeight, route.params.tagName, backTo)
-                                : ROUTES.WORKSPACE_TAG_SETTINGS.getRoute(route?.params?.policyID, route.params.orderWeight, route.params.tagName),
-                        )
+                        Navigation.goBack(isQuickSettingsFlow ? undefined : ROUTES.WORKSPACE_TAG_SETTINGS.getRoute(route?.params?.policyID, route.params.orderWeight, route.params.tagName))
                     }
                 />
                 <FormProvider

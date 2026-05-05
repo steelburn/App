@@ -555,12 +555,10 @@ type SettingsNavigatorParamList = {
         backTo?: Routes;
         parentTagsFilter?: string;
     };
-    [SCREENS.SETTINGS_TAGS.SETTINGS_TAG_SETTINGS]: {
+    [SCREENS.SETTINGS_TAGS.DYNAMIC_SETTINGS_TAG_SETTINGS]: {
         policyID: string;
-        orderWeight: number;
+        orderWeight: number | string;
         tagName: string;
-        // eslint-disable-next-line no-restricted-syntax -- `backTo` usages in this file are legacy. Do not add new `backTo` params to screens. See contributingGuides/NAVIGATION.md
-        backTo?: Routes;
         parentTagsFilter?: string;
     };
     [SCREENS.WORKSPACE.TAG_LIST_VIEW]: {
