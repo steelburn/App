@@ -40,7 +40,7 @@ function MoneyReportHeaderModals({reportID, children}: MoneyReportHeaderModalsPr
 
     const {transactions: reportTransactions} = useTransactionsAndViolationsForReport(moneyRequestReport?.reportID);
     const transactions = Object.values(reportTransactions);
-    const {accountID, email, login: currentUserLogin} = useCurrentUserPersonalDetails();
+    const {accountID, login: currentUserLogin} = useCurrentUserPersonalDetails();
 
     // Derive data for hold menu
     const canIOUBePaid = canIOUBePaidAction(moneyRequestReport, chatReport, policy, bankAccountList, currentUserLogin ?? '', accountID);
