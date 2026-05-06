@@ -1,4 +1,4 @@
-import React, {Suspense, useEffect, useState} from 'react';
+import React, {startTransition, Suspense, useEffect, useState} from 'react';
 import DelegateNoAccessModalProvider from './components/DelegateNoAccessModalProvider';
 import EmojiPicker from './components/EmojiPicker/EmojiPicker';
 import GrowlNotification from './components/GrowlNotification';
@@ -30,25 +30,26 @@ function GlobalModals() {
     const [shouldRenderContextMenu, setShouldRenderContextMenu] = useState(false);
     const [shouldRenderDeferredModals, setShouldRenderDeferredModals] = useState(false);
 
+    // Defer loading the context menu and rare-condition modals until after startup to avoid
+    // pulling in their dependencies (ContextMenuActions, ReportUtils, ModifiedExpenseMessage,
+    // ProactiveAppReviewModal, etc.) and their useOnyx subscriptions during the ManualAppStartup span.
     useEffect(() => {
-        // Defer loading the context menu and rare-condition modals until after startup to avoid
-        // pulling in their dependencies (ContextMenuActions, ReportUtils, ModifiedExpenseMessage,
-        // ProactiveAppReviewModal, etc.) and their useOnyx subscriptions during the ManualAppStartup span.
         const id = requestIdleCallback(
             () => {
-                setShouldRenderContextMenu(true);
-                setShouldRenderDeferredModals(true);
+                startTransition(() => {
+                    setShouldRenderContextMenu(true);
+                    setShouldRenderDeferredModals(true);
+                });
             },
             {timeout: IDLE_CALLBACK_TIMEOUT_MS},
         );
+        return () => cancelIdleCallback(id);
+    }, []);
 
-        // Allow showContextMenu() to force eager mount if the user interacts before the idle callback fires.
+    // Allow showContextMenu() to force eager mount if the user interacts before the idle callback fires.
+    useEffect(() => {
         ReportActionContextMenu.registerEnsureContextMenuMounted(() => setShouldRenderContextMenu(true));
-
-        return () => {
-            cancelIdleCallback(id);
-            ReportActionContextMenu.registerEnsureContextMenuMounted(null);
-        };
+        return () => ReportActionContextMenu.registerEnsureContextMenuMounted(null);
     }, []);
 
     return (
