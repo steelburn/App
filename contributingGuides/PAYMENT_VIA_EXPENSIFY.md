@@ -11,7 +11,7 @@ Contributors are eligible to be paid via Expensify 18 months after they were ass
 After approval it can take between 1 business day and a week, depending on the country and service you use.  
 
 ## Requesting Payments
-Request payment, by submitting your reports. in the same month the payment summary is posted. If that is not possible, request it as soon as possible after month-end. This is a hard requirement. If we were to have several contributors submitting high volumes of payments outside of the reporting quarter our financial statements will not be accurate.
+Request payment, by submitting your reports, in the same month the payment summary is posted. If that is not possible, request it as soon as possible after month-end. This is a hard requirement.
 
 Include in the Description field a link to the payment confirmation posted by the BZ team member on the issue for which payment is due. Please do not add any additional details.  
 **Do not ever request payment before an employee has posted a payment summary.** 
