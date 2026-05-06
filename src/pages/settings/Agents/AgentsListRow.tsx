@@ -1,16 +1,16 @@
 import React from 'react';
 import {View} from 'react-native';
+import Button from '@components/Button';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
 import PressableWithFeedback from '@components/Pressable/PressableWithFeedback';
-import ReportActionAvatars from '@components/ReportActionAvatars';
-import Text from '@components/Text';
-import useStyleUtils from '@hooks/useStyleUtils';
+import useLocalize from '@hooks/useLocalize';
+import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
 import Navigation from '@libs/Navigation/Navigation';
-import variables from '@styles/variables';
 import CONST from '@src/CONST';
 import ROUTES from '@src/ROUTES';
 import type {Errors, PendingAction} from '@src/types/onyx/OnyxCommon';
+import AgentInfoRow from './AgentInfoRow';
 
 type AgentsListRowProps = {
     /** Account ID of the agent */
@@ -34,7 +34,10 @@ type AgentsListRowProps = {
 
 function AgentsListRow({accountID, displayName, login, pendingAction, errors, onErrorClose}: AgentsListRowProps) {
     const styles = useThemeStyles();
-    const StyleUtils = useStyleUtils();
+    const {translate} = useLocalize();
+    const {shouldUseNarrowLayout} = useResponsiveLayout();
+
+    const navigateToEdit = () => Navigation.navigate(ROUTES.SETTINGS_AGENTS_EDIT.getRoute(accountID));
 
     return (
         <OfflineWithFeedback
@@ -43,34 +46,34 @@ function AgentsListRow({accountID, displayName, login, pendingAction, errors, on
             onClose={onErrorClose}
             errorRowStyles={[styles.ph5, styles.pb5]}
         >
-            <PressableWithFeedback
-                style={[styles.selectionListPressableItemWrapper, styles.mb2, styles.gap3]}
-                onPress={() => Navigation.navigate(ROUTES.SETTINGS_AGENTS_EDIT.getRoute(accountID))}
-                accessibilityLabel={displayName}
-                role={CONST.ROLE.BUTTON}
-                sentryLabel="AgentsListRow-Edit"
-            >
-                <ReportActionAvatars
-                    accountIDs={[accountID]}
-                    size={CONST.AVATAR_SIZE.LARGE_NORMAL}
-                    shouldShowTooltip={false}
-                    singleAvatarContainerStyle={[StyleUtils.getWidthAndHeightStyle(variables.avatarSizeLargeNormal)]}
-                />
-                <View style={[styles.flex1, styles.gap1]}>
-                    <Text
-                        numberOfLines={1}
-                        style={styles.textStrong}
-                    >
-                        {displayName}
-                    </Text>
-                    <Text
-                        numberOfLines={1}
-                        style={styles.mutedNormalTextLabel}
-                    >
-                        {login}
-                    </Text>
+            {shouldUseNarrowLayout ? (
+                <PressableWithFeedback
+                    style={[styles.selectionListPressableItemWrapper, styles.mb2, styles.gap3]}
+                    onPress={navigateToEdit}
+                    accessibilityLabel={displayName}
+                    role={CONST.ROLE.BUTTON}
+                    sentryLabel="AgentsListRow-Edit"
+                >
+                    <AgentInfoRow
+                        accountID={accountID}
+                        displayName={displayName}
+                        login={login}
+                    />
+                </PressableWithFeedback>
+            ) : (
+                <View style={[styles.selectionListPressableItemWrapper, styles.mb2, styles.gap3]}>
+                    <AgentInfoRow
+                        accountID={accountID}
+                        displayName={displayName}
+                        login={login}
+                    />
+                    <Button
+                        small
+                        text={translate('common.edit')}
+                        onPress={navigateToEdit}
+                    />
                 </View>
-            </PressableWithFeedback>
+            )}
         </OfflineWithFeedback>
     );
 }
