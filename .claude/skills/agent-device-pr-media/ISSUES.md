@@ -1,18 +1,54 @@
 # agent-device-pr-media issues
 
-- Skill pre-flight didn't inline Metro check - linked to agent-device skill instead, easy to skip
-- App opened before Metro was running - got stuck on "No script URL provided" even after Metro started
-- action point: base `/agent-device` prereq guidance ("run `npm run start` + installed dev build before `open`") is not reliable for this workflow; update skill docs/flow to require `agent-device metro prepare --public-base-url http://localhost:8081` immediately before `agent-device open`, with an explicit readiness check in the same skill
-- Opened wrong bundle ID (`com.expensify.chat.dev`) - HybridApp build uses `org.me.mobiexpensifyg.dev`
-- Skill didn't check `agent-device devices` for already-booted simulators - hardcoded device model instead; fix: check `booted=true` first and prefer that device
-- `agent-device apps --device X` silently fails when a session is bound to a different device - must close existing session first; caused false "no apps installed" conclusion
-- iOS HybridApp dev bundle ID is `com.expensify.expensifylite` (same as production, Debug config) - NOT `org.me.mobiexpensifyg.dev`; that ID is Android-only from `run-build.sh`; skill had wrong ID for iOS HybridApp
-- recording should only start for the testing steps (skip setup if not needed)
-- recording too long: screenshot verification between every step added 3-4s dead time per action; wrong coordinate taps required retries (PLN button miss, back button miss x2); actual test content should be ~10s; fix: two-phase approach - (1) warm-up run: navigate to starting state, discover selectors/coordinates per step, generate a `.ad` script from what worked; (2) recording run: `record start` → `replay <generated.ad>` → `record stop` - deterministic, no verification overhead, reusable across platforms and future runs
-- simulator snapshots: use `xcrun simctl io booted saveState` after first sign-in + onboarding to avoid repeating preamble on subsequent runs
-- PR handoff table snippet is unnecessary - users drag-and-drop the MP4 into GitHub's input field which auto-uploads and generates the URL; just report the file path
-- sign-in flow `@desc` was skipped - used base email without `-e EMAIL=...+<9digits>` randomization, hitting suspended account; fix via `@param` contract scanning: prompt user (or auto-randomize with confirmation) before replaying `@tag auth` flows
-- accessibility tree returns 0 nodes on two screens: (1) native camera view - expected, AVCaptureSession doesn't expose a11y nodes; (2) BigNumberPad/amount screen - NOT expected, this is a custom RN component that should expose a11y nodes but doesn't; missing `accessible`/`accessibilityLabel` props; this is an app-level accessibility bug, not a skill/agent-device limitation - screen readers also can't describe this screen to users; should be filed as a separate a11y issue
-- skill fell back to coordinate-based taps when a11y was dead - defeats the main advantage of agent-device; fix: detect 0-node snapshot early, surface as a hard blocker with message "a11y tree empty on this screen - check component accessibility props before proceeding" (no accessibility exposure); `agent-device back` also fails in this state; fix: `xcrun simctl terminate + launch` to force-relaunch the app cleanly
-- new account flow has intermediate "Join" button screen before onboarding - `complete-onboarding.ad` `@pre` doesn't cover it; skill needs to detect and tap "Join" before replaying onboarding
-- iOS notification permission prompt appears after "Join" tap - blocks onboarding flow; skill must handle `alert` nodes (tap "Don't Allow" to dismiss) before continuing
+## Resolved by v1 design (SKILL.md)
+
+- ~~Skill pre-flight didn't inline Metro check - linked to agent-device skill instead, easy to skip~~ **RESOLVED**: pre-flight now runs `agent-device --version` inline. Metro start is the first step of shared setup, before `agent-device open`, with `agent-device metro prepare --public-base-url http://localhost:8081`.
+- ~~App opened before Metro was running - got stuck on "No script URL provided"~~ **RESOLVED**: shared-setup ordering enforced (`metro prepare` before `open`).
+- ~~Opened wrong bundle ID (`com.expensify.chat.dev`) - HybridApp build uses `org.me.mobiexpensifyg.dev`~~ **RESOLVED**: bundle-ID resolution wraps `scripts/is-hybrid-app.sh` and picks per-platform: HybridApp iOS `com.expensify.expensifylite`, HybridApp Android `org.me.mobiexpensifyg.dev`, standalone both `com.expensify.chat.dev`.
+- ~~Skill didn't check `agent-device devices` for already-booted simulators - hardcoded device model~~ **RESOLVED**: device picker prefers `booted=true`, falls back to default. No hardcoded models.
+- ~~iOS HybridApp dev bundle ID mistaken for Android-only `org.me.mobiexpensifyg.dev`~~ **RESOLVED**: explicit per-platform mapping documented in shared setup.
+- ~~Recording too long: screenshot verification between every step added 3-4s dead time per action; coordinate-tap retries~~ **RESOLVED**: two-phase architecture (Phase 1 warm-up emits clean `.ad`; Phase 2 replays deterministically with no verification overhead, no retries on camera).
+- ~~Recording should only start for the testing steps (skip setup if not needed)~~ **RESOLVED**: Phase 1 emits a marker between setup and test-flow portions; Phase 2 replays setup silently before `record start`, records only the post-marker portion.
+- ~~PR handoff table snippet is unnecessary - users drag-and-drop the MP4 into GitHub's input field which auto-uploads and generates the URL~~ **RESOLVED**: skill prints local paths only. No table generation. PR mutation is explicitly out of scope (deferred to Melvin).
+- ~~Sign-in flow `@desc` was skipped - used base email without `-e EMAIL=...+<9digits>` randomization, hitting suspended account~~ **RESOLVED (v1 scope)**: per-step explicit values pass through verbatim; otherwise the LLM context-guesses and logs the chosen value in `params:`. Preamble auth (sign-in credentials) is delegated to the underlying `agent-device` skill's preamble resolution, not this skill's responsibility.
+- ~~Skill fell back to coordinate-based taps when a11y was dead - defeats the main advantage of agent-device~~ **PARTIALLY RESOLVED**: coordinate fallback is still permitted in Phase 1 (the two-phase architecture absorbs the brittleness - Phase 2 just replays what Phase 1 found), but each occurrence is logged as a manifest warning (`a11y_fallback:<screen>`). The "hard-block all coordinate fallbacks" purist option was rejected because it would render the skill unusable on hot paths like BigNumberPad until app a11y is fixed.
+
+## Resolved by scope reduction
+
+- ~~Mode B (free-form custom flow) muddied the contract~~ **RESOLVED**: Mode B dropped per @Julesssss review feedback. PR-driven only.
+- ~~"Pause and ask the user" branches scattered through SKILL.md~~ **RESOLVED**: skill is autonomous and non-interactive by contract. All inputs are provided at invocation time; failures surface as structured exit codes.
+
+## Known platform limitations (intentionally not addressed)
+
+- **Native camera view returns 0 a11y nodes** - `AVCaptureSession` does not expose accessibility nodes. Platform limitation, not an app bug. Coordinate fallback path is the only option; behavior is logged as a manifest warning.
+- **Custom RN screens with missing a11y props** (e.g. `BigNumberPad` / amount entry, possibly maps) - app-level a11y bugs that screen readers also can't describe. Skill encounters these via coordinate fallback and surfaces them as warnings, but does not auto-file issues. Manual triage stays a human responsibility.
+- **Android `adb screenrecord` 3-minute hard cap** - per-flow MP4s rarely hit this in practice; flows that exceed it are marked `phase2_failed` rather than silently truncated.
+- **Mobile-web and Desktop coverage** - explicitly out of scope. `agent-device` is native-only (iOS Simulator a11y + Android `uiautomator`); web in a real browser needs Playwright. Skill exits `4 PLATFORM_UNSUPPORTED` on those requests and points to `playwright-app-testing`.
+
+## Known v1 limitations (deferred work)
+
+- **Snapshot restore for faster intermediate prep**: v1 always replays setup silently before `record start` (always-fresh, slower). `xcrun simctl io booted saveState` (iOS) and Android emulator quicksave could speed up reruns dramatically but add staleness risk if backend evolves. Tracked as a follow-up.
+- **CI runner provisioning**: skill is non-interactive *by contract* in v1, but actual CI hosting requires (a) a Mac runner with iOS Simulator, (b) Android emulator with KVM (Linux runner), (c) test-account credentials in a secret store, (d) Melvin wrapping. Belongs to the parent `integrate-agent-device-for-melvin` task, not this skill.
+- **S3 / R2 upload + PR-body mutation**: deferred entirely to Melvin per @Julesssss review direction. Skill outputs local paths and a manifest; Melvin reads the manifest and uploads as it sees fit.
+- **`agent-device` preamble auth contract**: skill assumes the underlying `agent-device` skill has a reliable way to resolve sign-in credentials in autonomous mode. If that contract weakens, Phase 1 setup gets flakier. Cross-skill coordination needed.
+- **Concurrent runs / locking**: single-user assumption. Latest run wins. Two simultaneous runs against the same PR cache dir = undefined behavior.
+- **Idempotency**: two runs on the same PR may produce different videos (LLM-driven Phase 1 may take different paths). Acceptable for PR evidence - demonstrates the flow works, byte-identity not required.
+- **Test data accumulation**: accounts/expenses/workspaces created during runs accumulate in the test backend; rely on periodic test-account reset.
+- **Self-demo paradox**: the skill's own PR (`#89475`) is `.claude/`-only and would correctly hit the `SKIP: no runtime code changed` gate. First real demo target should be a PR with `#### Test case N:` headers (e.g. PR #89743 - 5 explicit flows).
+
+## Convention adopted (v1)
+
+- **Flow boundaries are declared explicitly** via `#### Test case N:` h4 headers within `### Tests`. 0 headers = whole section is one flow. Reference: PR #89743. The skill does not LLM-cluster numbered items into flows.
+- **Platform restriction is opt-in** via PR title or Tests prose ("iOS only", "Android only", "On iOS:"). Default is both. No file-path heuristics, no PR-checklist parsing.
+- **Per-flow artifact**: one MP4 per flow per platform (or one PNG for verify-only single-step flows). Not one big MP4.
+- **Persistent cache**: `~/.cache/agent-device-pr-media/<pr-num>/<run-ts>/`. Survives reboots; latest-run-wins.
+
+## Composition refactor (Option A, applied 2026-05-06)
+
+- **Device lifecycle delegated to parent skill's bring-up.** This skill no longer documents bundle-ID resolution, Metro prepare, device pick, session reuse, or the initial `agent-device open`. It calls [`agent-device` §Bring-up](../agent-device/SKILL.md#bring-up) once per platform and reuses the resolved `$APP_ID` / `$DEVICE_NAME` for Phase 1 / Phase 2 re-opens. Selector discipline references the parent skill's `flows/README.md` rather than re-stating it.
+- **Standalone (non-HybridApp) builds dropped.** Parent skill is HybridApp-only; this specialization inherits the gate. Production mobile evidence runs against HybridApp, so the standalone fallback was variance for an unused path. Bringing this skill back to non-HybridApp would require loosening the parent's pre-flight gate first.
+- **Inline pre-flight version check removed.** Parent skill's auto-pre-flight covers it. If the parent gate fails, this skill exits `7 NO_BUILD`.
+- **Allowed-tools list reduced.** Dropped `Bash(scripts/is-hybrid-app.sh)`, `Bash(grep *)`, `Bash(echo *)`, `Bash(cat *)`. The parent skill owns the HybridApp probe; macro-listing via grep is gone with the macro registry.
+- **Net change**: SKILL.md shrinks ~40 lines and documents *only* the PR-media-specific work (Tests parsing, two-phase capture, manifest). Drift risk vs parent reduced to one cross-link.
+
+Reference: [`reference/agent-device-skill-composition.md`](../../../../../../projects/self/tasks/integrate-agent-device-for-melvin/reference/agent-device-skill-composition.md) in the orchestration vault for the full duplication trace and the Option A vs B vs C analysis.

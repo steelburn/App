@@ -1,160 +1,254 @@
 ---
 name: agent-device-pr-media
-description: Record iOS/Android flows via agent-device for Expensify App PR evidence. Drives the app through verification steps, captures MP4 recordings per platform, saves them locally, and presents the user with file paths and a pre-filled Screenshots/Videos table snippet to paste into the PR. Mobile-native only - does not handle mWeb or Desktop.
-allowed-tools: Bash(agent-device *) Bash(gh pr view *) Bash(mkdir -p *) Bash(ls *) Bash(file *) Bash(test -s *) Bash(scripts/is-hybrid-app.sh) Bash(mktemp *) Bash(grep *) Read
+description: Records iOS/Android native MP4 evidence for an Expensify PR's `### Tests` section flows. Use when the user asks to "record the flow for PR #X", "capture mobile evidence for PR X", or "produce screenshots/videos for PR X". Mobile-native only - declines mWeb and Desktop.
+allowed-tools: Bash(agent-device *) Bash(gh pr view *) Bash(gh pr diff *) Bash(mkdir -p *) Bash(rm -rf *) Bash(ls *) Bash(file *) Bash(test *) Bash(date *) Read Write
 ---
 
 # agent-device-pr-media
 
-Records the **iOS: Native** and **Android: Native** flows for the Expensify App PR template's `### Screenshots/Videos` section. Drives the app via [`agent-device`](../agent-device/SKILL.md), captures MP4 recordings per platform, and hands the files off to the user.
+Records `iOS: Native` and `Android: Native` MP4 evidence for an Expensify PR's `### Tests` section. Specializes the [`agent-device`](../agent-device/SKILL.md) skill: delegates device lifecycle (bundle ID, Metro, device pick, session, open) to its [Bring-up](../agent-device/SKILL.md#bring-up), then captures one artifact per declared test flow per platform, writes a JSON manifest, and surfaces local file paths.
 
-## Pre-flight
+The skill is **autonomous and non-interactive**. It never pauses for user input mid-run. All inputs are provided at invocation time; all failures surface as structured errors with exit codes.
 
-`agent-device` version check: !`R=0.13.0; V=$(agent-device --version 2>/dev/null); [ -n "$V" ] && [ "$(printf '%s\n%s\n' "$R" "$V" | sort -V | head -1)" = "$R" ] && echo "OK ($V)" || echo "FAIL (need v$R+, got: ${V:-not installed})"`
-
-> If the check fails, **STOP** and surface the install instructions: `npm install -g agent-device@latest`.
-
-Everything else (Metro, device boot, app state) is handled by `agent-device` commands in the capture loop.
+HybridApp-only (the parent skill's pre-flight enforces this). Standalone (non-HybridApp) builds are out of scope - production mobile evidence runs against HybridApp.
 
 ## Scope
 
-**In scope:** `iOS: Native` (iOS Simulator), `Android: Native` (Android Emulator)
+**In scope:** `iOS: Native` (iOS Simulator), `Android: Native` (Android Emulator), HybridApp dev build only.
 
-**Out of scope:** `Android: mWeb Chrome`, `iOS: mWeb Safari`, `MacOS: Chrome / Safari` - decline and point to a browser-driver skill.
+**Out of scope:** `Android: mWeb Chrome`, `iOS: mWeb Safari`, `MacOS: Chrome / Safari`. Decline with `EXIT 4` and point to a browser-driver skill (`playwright-app-testing`). Standalone (non-HybridApp) builds. Decline with `EXIT 7 NO_BUILD` per the parent skill's gate.
 
-## Modes
+## Inputs
 
-### Mode A - PR-driven
+| Input | Source | Required |
+| --- | --- | --- |
+| PR number or URL | First positional arg | Yes |
+| `--platforms ios,android` | Flag | No (default: derived) |
+| `-e KEY=VALUE` step-param overrides | Repeatable | No |
 
-Trigger: user provides a PR URL or number ("record the flow for PR #12345").
+No interactive prompts. Missing inputs that cannot be defaulted hard-fail.
 
-1. **Fetch PR body**:
+## Triage gates (run in order, before any device work)
+
+1. **Fetch PR** - `gh pr view <num> --json title,body` and `gh pr diff <num> --name-only`.
+2. **Runtime-code gate** - if every changed path matches `^(\.claude/|docs/|.*\.md$|\.github/)`, **exit `2 SKIP: no runtime code changed`**. The skill does not record docs/skill-only PRs.
+3. **Platform resolution** - in priority order:
+   1. `--platforms` arg (CSV, wins all).
+   2. Explicit prose markers in PR title or `### Tests` body: `iOS only`, `Android only`, `On iOS:`, `On Android:`. Restrict to that platform if found.
+   3. Default: both `ios` and `android`.
+
+   If the resolved set requests an out-of-scope platform (e.g. `mweb`), **exit `4 PLATFORM_UNSUPPORTED`**.
+4. **Tests parsing** - extract `### Tests` content; produce a flow list (see below). If the flow list is empty after stripping, **exit `3 NO_FLOWS`**.
+
+## Tests parsing rules
+
+Operating on the `### Tests` block of the PR body:
+
+1. **Strip prose intro** before the first numbered item or `####` header (still used as triage signal - already consumed by step 3 above).
+2. **Strip trailing checklist metadata** - lines like `- [x] Verify that no errors appear in the JS console`.
+3. **Strip the boilerplate** "Verify that no errors appear in the JS console" line wherever it appears inside the section.
+4. **Flow boundary detection** - split content on `^####\s` (h4) headers:
+   - **N headers** → N flows, titled by header text.
+   - **0 headers** → whole content is one flow titled "Test".
+5. **Per flow**:
+   - Extract optional `Precondition:` block (free-form metadata for the LLM driver).
+   - Collect numbered items (`1.`, `2.`, ...) as sequential steps.
+   - Flatten nested `a/b/c` sub-items into the parent's step list.
+6. **Single-step verify-only classification**: if a flow has exactly one numbered item whose leading verb is `Verify|Confirm|Check`, set `kind: still`. Otherwise `kind: video`.
+7. **LLM interpretation, no static parsing**: the skill does **not** classify steps by verb at parse time. Each step's text is passed verbatim to the agent-device LLM driver, which decides per-step whether it's a tap, fill, navigation, or assertion. If the driver cannot interpret a step, that step (and the rest of the flow) hard-fails - no fallback to coordinates, no skipping.
+
+## Capture loop (per flow per platform)
+
+Two phases per flow. Lifecycle delegated to the parent skill's bring-up.
+
+### Shared setup (run once per platform, before the first flow)
+
+1. **Run the [agent-device bring-up](../agent-device/SKILL.md#bring-up)** for the target platform. The parent skill resolves bundle ID, starts Metro, picks/confirms the device, manages session, and opens the app for sanity verification. Capture the resolved `$APP_ID` (bundle ID) and `$DEVICE_NAME` for re-opens in Phases 1 and 2.
+   - If the bring-up's HybridApp gate fails or the dev build is not installed, **exit `7 NO_BUILD`** with the parent skill's install instructions.
+   - Selector discipline (id > role+label, no coordinate fallback unless 0 a11y nodes) follows the parent skill's [`flows/README.md`](../agent-device/flows/README.md). This skill does not redocument it.
+
+2. **Close the bring-up session** so each phase starts cold:
    ```bash
-   gh pr view <num> --json body,number,url -q '.'
+   agent-device close
    ```
 
-2. **Extract the Tests section** - content between `### Tests` and the next `###`. Keep numbered list lines verbatim. If the section only contains the boilerplate `Verify that no errors appear in the JS console`, **stop and ask** for the actual flow.
-
-3. **Present parsed steps + target platforms + required flow params for confirmation.** Parse any selected flow `@param` headers and ask for values before driving. Default platform: both iOS and Android.
-
-4. Run the **Capture loop** for each approved platform.
-
-5. **Report** - see [Handoff](#handoff).
-
-### Mode B - Custom flow
-
-Trigger: user describes a flow inline ("record signing in and creating an expense").
-
-1. Treat the user message as the intent prompt.
-2. Ask which platforms (default: ask, do not assume both).
-3. Run the **Capture loop** per platform.
-4. **Report** - see [Handoff](#handoff).
-
-## Capture loop (per platform)
-
-Run once per requested platform. Lifecycle (`open`/`close`, Metro, boot) is fully delegated to `agent-device`.
-
-1. **Detect bundle ID** - Expensify-specific, platform-aware:
+3. **Set up run directory** - persistent cache, latest-run-wins:
    ```bash
-   IS_HYBRID=$(scripts/is-hybrid-app.sh)
-   # iOS: HybridApp dev build uses same bundle ID as production (Debug config, no .dev suffix)
-   # Android: HybridApp dev build appends .dev suffix
-   if [[ "$IS_HYBRID" == "true" ]]; then
-     IOS_APP_ID="com.expensify.expensifylite"
-     ANDROID_APP_ID="org.me.mobiexpensifyg.dev"
-   else
-     IOS_APP_ID="com.expensify.chat.dev"
-     ANDROID_APP_ID="com.expensify.chat.dev"
-   fi
-   APP_ID=$([[ "$PLATFORM" == "ios" ]] && echo "$IOS_APP_ID" || echo "$ANDROID_APP_ID")
+   PR_NUM=<num>; RUN_TS=$(date -u +%Y%m%dT%H%M%SZ)
+   RUN_DIR="$HOME/.cache/agent-device-pr-media/$PR_NUM/$RUN_TS"
+   mkdir -p "$RUN_DIR/ios" "$RUN_DIR/android"
+   # Optional: rm -rf prior runs for this PR before mkdir to keep disk lean
    ```
 
-2. **Start Metro** via `agent-device` (starts or reuses - no manual `npm run start`):
+### Phase 1 - Warm-up (per flow, no camera)
+
+Goal: produce a deterministic `.ad` script of the successful command sequence, plus per-step still candidates. Drives autonomously from cold start. No recording.
+
+1. **Open the app** with the bring-up's resolved values:
    ```bash
-   agent-device metro prepare --public-base-url http://localhost:8081
+   agent-device open "$APP_ID" --device "$DEVICE_NAME"
    ```
 
-3. **Compose preamble flows** - list available macro flow metadata (`@pre`, `@param`):
+2. **Drive setup actions** based on the flow's `Precondition:` block (if any) and what the steps imply. The LLM autonomously figures out preamble - **no macro library lookup, no `@provides` graph, no fixed registry**. Setup actions go into the `.ad` script up to the marker; everything after the marker is what Phase 2 records.
+
+3. **Drive the test flow** - one numbered step at a time. For each step:
+   - Send the step text verbatim to the agent-device LLM driver.
+   - On success, append the **final, successful** action to `$TEST_FLOW.ad`. Do not append actions that needed retries on different selectors.
+   - **If a value is explicit in the step** (e.g. "Enter $42.50"), pass it through verbatim. **If not**, the LLM picks a context-appropriate value and the chosen value is recorded in `params:` in the manifest.
+   - The post-action `agent-device snapshot` (taken for selector matching) is **saved as a candidate still** - `flow-<id>-step-<n>-<label>.png`. Free side-effect.
+
+4. **Verify final state** - `agent-device is exists "<selector>"` on the post-condition implied by the last step.
+
+5. **Close session** - `agent-device close`.
+
+6. **Sanity-check** the script is non-empty:
    ```bash
-   grep -H '^# @\(pre\|param\)' .claude/skills/agent-device/flows/macros/*.ad
-   ```
-   Preamble is replayed silently before recording starts and does **not** appear in the output MP4. Use macro flows from `flows/macros/` for preamble setup unless the user explicitly asks to run a critical test flow first.
-
-4. **Set up artifact path:**
-   ```bash
-   ARTIFACT_DIR="$(mktemp -d -t agent-device-pr-media.XXXX)"
-   PLATFORM=ios   # or android
-   OUT="$ARTIFACT_DIR/${PLATFORM}-native.mp4"
-   ```
-
-5. **Pick target device** - prefer already-booted to avoid boot wait:
-   ```bash
-   agent-device devices
-   ```
-   Use the first `booted=true` simulator for the target platform. If none are booted, let `agent-device open` boot the default.
-
-6. **Open the app** (`agent-device open` handles simulator boot + app launch):
-   ```bash
-   agent-device open "$APP_ID" --device "<booted-device-name>"
-   ```
-   If `open` fails because the app isn't installed, **STOP** - surface: "Dev build not installed. Run `npm run ios` (HybridApp) or `npm run ios-standalone` (standalone) first."
-
-7. **Resolve preamble parameters** - before replaying each preamble flow, parse its `@param` headers and ask the user for missing values. Build explicit `-e KEY=VALUE` args per flow.
-
-8. **Replay preamble flows** identified in step 3 using explicit `-e` args from step 7. These run **before** recording starts and must not appear in the output MP4.
-
-9. **Start recording** - only after preamble completes and app is in the test starting state:
-   ```bash
-   agent-device record start "$OUT" --fps 24
+   test -s "$TEST_FLOW.ad" || { record per-flow status "phase1_failed: empty script"; continue }
    ```
 
-10. **Drive the test flow** using the agent-device autonomous loop (snapshot -> match selector -> tap/fill). For each step from the Tests section: navigate to the expected state, verify the outcome, then continue. If a step is ambiguous, **pause and ask** - do not improvise.
+### Phase 2 - Recording (per flow, deterministic replay)
 
-   > Android note: `adb screenrecord` has a 3-minute hard cap. If the flow is expected to exceed that, warn the user before starting.
+Goal: clean MP4 of only the test-flow steps. No snapshots on camera, no retries, no LLM thinking time.
 
-11. **Stop recording:**
+1. **Open the app fresh** with the bring-up's resolved values:
+   ```bash
+   agent-device open "$APP_ID" --device "$DEVICE_NAME"
+   ```
+
+2. **Replay setup silently** - everything in the `.ad` script up to the marker. Off-camera. The app reaches the test starting state.
+
+3. **Start recording**:
+   ```bash
+   agent-device record start "$RUN_DIR/$PLATFORM/flow-$ID.mp4" --fps 24
+   ```
+
+   > Android: `adb screenrecord` has a 3-min hard cap. Per-flow MP4s rarely hit this; if a flow exceeds, mark `status: phase2_failed` and continue.
+
+4. **Replay test-flow portion**:
+   ```bash
+   agent-device replay "$TEST_FLOW.ad" --from-marker
+   ```
+
+5. **Stop recording**:
    ```bash
    agent-device record stop
    ```
 
-12. **Close the session:** `agent-device close`
+6. **Close session** - `agent-device close`.
 
-13. **Verify artifact:**
-    ```bash
-    test -s "$OUT" && file "$OUT" || echo "MISSING or empty: $OUT"
-    ```
-    If 0-byte or missing, retry once. If still failing, stop and report the error.
+7. **Verify artifact**:
+   ```bash
+   test -s "$RUN_DIR/$PLATFORM/flow-$ID.mp4" && file "$RUN_DIR/$PLATFORM/flow-$ID.mp4" \
+     || { mark phase2_failed; continue }
+   ```
 
-14. Repeat for the next platform.
+### Multi-flow chunking
 
-## Handoff
+Multiple flows in one PR share a single Phase 2 session (one `agent-device open` + replay-to-marker), with `record start` / `record stop` per flow. State carries between flows unless Phase 1 flagged `requires_cold_start: true` for a flow, in which case Phase 2 closes and re-opens before that flow.
 
-After all platforms are recorded, report the local file paths:
+### Single-step verify-only flows
+
+For flows classified `kind: still`:
+- Phase 1 still drives autonomously to the verification screen.
+- Phase 2 opens fresh, replays setup, takes one screenshot at the verification screen via `agent-device screenshot`, and writes `flow-<id>.png`. No `record start`/`stop`.
+
+## Output
+
+### Cache layout
 
 ```
-iOS:     /tmp/agent-device-pr-media.XXXX/ios-native.mp4
-Android: /tmp/agent-device-pr-media.XXXX/android-native.mp4
+~/.cache/agent-device-pr-media/<pr-num>/<run-ts>/
+├── manifest.json
+├── ios/
+│   ├── flow-1.mp4
+│   ├── flow-1-step-2-tap-signin.png
+│   ├── flow-2.png   (still-only flow)
+│   └── ...
+└── android/
+    └── ...
 ```
 
-Drag and drop each file into the PR's Screenshots/Videos section on GitHub - it auto-uploads and generates the embed URL.
+Cache is persistent across reboots. The skill purges prior runs for the same PR at the start of each new run (latest-run-wins; no concurrent locking; single-user assumption).
+
+### Manifest schema
+
+`manifest.json` at the run root:
+
+```json
+{
+  "pr": 89475,
+  "title": "<PR title>",
+  "platforms_requested": ["ios", "android"],
+  "platforms_run": ["ios", "android"],
+  "skipped": null,
+  "flows": {
+    "ios": [
+      {
+        "id": 1,
+        "title": "Test case 1: ...",
+        "kind": "video",
+        "path": "ios/flow-1.mp4",
+        "stills": ["ios/flow-1-step-2-tap-signin.png"],
+        "status": "ok",
+        "warnings": [],
+        "params": {"email": "test+ci-89475-1@expensify.com"}
+      }
+    ],
+    "android": [...]
+  }
+}
+```
+
+`status` is one of: `ok`, `phase1_failed`, `phase2_failed`, `skipped_after_failure`.
+
+### Handoff
+
+After all platforms, the skill prints the run directory and lists per-flow paths. The user drags each artifact into the PR's `### Screenshots/Videos` section. The skill never edits the PR.
+
+## Exit codes
+
+| Code | Meaning |
+| --- | --- |
+| `0` | All applicable flows produced an artifact (or the run was best-effort with at least one usable artifact; per-flow status reflects reality). |
+| `2` | `SKIP: no runtime code changed` - PR diff is entirely docs/skills/CI metadata. |
+| `3` | `NO_FLOWS` - Tests section unparseable or empty after stripping. |
+| `4` | `PLATFORM_UNSUPPORTED` - mWeb / Desktop requested. |
+| `5` | `PHASE1_TOTAL_FAILURE` - every flow failed Phase 1. |
+| `6` | `PHASE2_TOTAL_FAILURE` - every flow failed Phase 2 despite Phase 1 success. |
+| `7` | `NO_BUILD` - `agent-device open` failed because the dev build is not installed. |
+
+## Cost guards
+
+| Cap | Value |
+| --- | --- |
+| Phase 1 timeout | 5 min per flow |
+| Phase 2 timeout | 3 min per flow (Android cap) |
+| Max driver actions | 50 per flow |
+
+Hitting any cap marks the flow `phase1_failed` / `phase2_failed` and proceeds to the next flow.
 
 ## Error handling
 
 | Situation | Action |
 | --- | --- |
-| Tests section is empty/boilerplate | Stop. Ask for explicit flow (Mode B). |
-| Step ambiguous mid-flow | Pause, snapshot, ask to disambiguate. Do not guess. |
-| `agent-device open` fails - app not installed | Stop. Tell user to run `npm run ios` or `npm run ios-standalone` first. |
-| `record stop` produces 0-byte file | Retry once. If still empty, report error. |
-| Android flow expected > 3 min | Warn user before starting - recording will be silently truncated at 3 min. |
-| User asks for mWeb or Desktop | Decline; suggest browser-driver skill. |
+| `### Tests` section missing or empty | Exit `3 NO_FLOWS` |
+| Only docs/skill paths changed | Exit `2 SKIP` |
+| mWeb / Desktop requested | Exit `4 PLATFORM_UNSUPPORTED` |
+| Bring-up fails (HybridApp gate, missing dev build, Metro start, etc.) | Surface parent skill's error verbatim; exit `7 NO_BUILD` |
+| Phase 1 step uninterpretable by LLM | Mark flow `phase1_failed`, log the step that failed, continue to next flow |
+| Phase 1 a11y empty (0 nodes) on a screen | Use coordinate fallback; log `warnings: ["a11y_fallback:<screen>"]` |
+| Phase 1 `$TEST_FLOW.ad` empty after warm-up | Mark flow `phase1_failed`, continue |
+| Phase 2 `replay` fails on a step | Selector drift between Phase 1 and Phase 2; mark flow `phase2_failed`, continue |
+| `record stop` produces 0-byte file | Retry Phase 2 once for that flow; if still empty, mark `phase2_failed` |
+| Android flow exceeds 3-min cap | Mark `phase2_failed`, continue (per-flow MP4s should rarely hit this; if they do, the Tests section is too coarse-grained) |
 
 ## Non-goals
 
-- Starting Metro via `npm run start` or any raw shell command - use `agent-device metro prepare`
-- Booting simulators via `xcrun simctl` - `agent-device open` handles this
-- Installing the dev build - out of scope; user must have it installed before invoking this skill
-- Uploading media anywhere (GitHub releases, user-attachments, Loom, etc.)
-- Editing the PR body
-- Capturing preamble flows in the output MP4
-- Mechanical translation of ambiguous Tests prose - agent pauses and asks
+- Mobile web (`iOS: mWeb Safari`, `Android: mWeb Chrome`) and Desktop (`MacOS: Chrome / Safari`) - belong in `playwright-app-testing` or a future browser-driver skill.
+- Standalone (non-HybridApp) builds - parent skill is HybridApp-only and this specialization inherits the gate. Production mobile evidence runs against HybridApp.
+- Device lifecycle (Metro, simulator boot, bundle ID resolution, session reuse, app install verification) - fully delegated to the parent skill's [Bring-up](../agent-device/SKILL.md#bring-up). This skill does not call `agent-device metro prepare`, `xcrun simctl`, or `is-hybrid-app.sh` directly.
+- S3 / R2 / GitHub artifact upload - deferred to Melvin (the eventual CI caller).
+- Editing the PR body or posting PR comments - the skill only writes local files.
+- Macro composition from `flows/macros/*.ad` - Phase 1 drives setup autonomously; no `@provides`/`@pre` graph, no fixed registry.
+- Interactive prompts of any kind. CI is the eventual host; the skill must run end-to-end without human input.
+- Test data cleanup. Accounts/expenses/workspaces created during runs accumulate; rely on periodic test-account reset.
