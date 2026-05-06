@@ -28,7 +28,8 @@ function VerifyAccountPage({route}: VerifyAccountPageProps) {
     const isTravelVerifiedBetaEnabled = isBetaEnabled(CONST.BETAS.IS_TRAVEL_VERIFIED);
 
     // Determine where to navigate after successful OTP validation
-    const navigateForwardTo = isTravelVerifiedBetaEnabled ? (travelProvisioning?.nextStepRoute ?? createDynamicRoute(DYNAMIC_ROUTES.TRAVEL_TCS.getRoute(domain ?? '', policyID))) : undefined;
+    const defaultForwardRoute = domain ? createDynamicRoute(DYNAMIC_ROUTES.TRAVEL_TCS.getRoute(domain, policyID)) : undefined;
+    const navigateForwardTo = isTravelVerifiedBetaEnabled ? (travelProvisioning?.nextStepRoute ?? defaultForwardRoute) : undefined;
 
     const handleValidationSuccess = useCallback(() => {
         requestTravelAccess();
