@@ -348,8 +348,6 @@ function deleteWorkspaceCompanyCardFeed(
     ];
 
     // Card collections only: API onyxData provides SHARED_NVP on success (avoid merge-after-set on that key).
-    // Use SET null to fully clear the feed's card data, including cardList (unassigned cards) which
-    // MERGE with individual card IDs would leave behind.
     const successCardUpdates = Object.fromEntries(cardIDs.map((cardID) => [cardID, null]));
     const successData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.WORKSPACE_CARDS_LIST | typeof ONYXKEYS.CARD_LIST>> = [
         {
