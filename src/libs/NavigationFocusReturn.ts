@@ -169,7 +169,7 @@ let returnHoldTimerId: ReturnType<typeof setTimeout> | undefined;
 // Set on successful RETURN; consulted at hold-release time to decide whether to eagerly reset the cycle or defer.
 let lastRestoreTarget: HTMLElement | null = null;
 
-/** Skip AUTO only when activeElement IS (or descends from) the most recent RETURN-restored target. Broader "any focused element" checks would also skip benign forward-navs (e.g. LHN item still focused). */
+/** Skip AUTO only when activeElement IS (or descends from) the most recent RETURN-restored target. Broader "any focused element" checks would also skip benign forward navigations (e.g. LHN item still focused). */
 function shouldSkipAutoFocusDueToExistingFocus(): boolean {
     if (typeof document === 'undefined' || !lastRestoreTarget || !document.activeElement || document.activeElement === document.body) {
         return false;
