@@ -307,7 +307,6 @@ function getMoneyRequestPolicyTags({
         (moneyRequestReportID ? allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${moneyRequestReportID}`]?.policyID : undefined) ??
         parentChatReport?.policyID ??
         allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${participant.reportID}`]?.policyID;
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
     return getPolicyTagsData(iouReportPolicyID) ?? {};
 }
 
@@ -1106,11 +1105,9 @@ export {
     getCurrentUserPersonalDetails,
     getRecentAttendees,
     // TODO: Replace getPolicyTagsData (https://github.com/Expensify/App/issues/72721) and getPolicyRecentlyUsedTagsData (https://github.com/Expensify/App/issues/71491) with useOnyx hook
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
     getPolicyTagsData,
     getSearchOnyxUpdate,
     getPolicyTags,
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
     getMoneyRequestPolicyTags,
     setMoneyRequestTimeRate,
     setMoneyRequestTimeCount,

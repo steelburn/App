@@ -333,7 +333,6 @@ function buildOnyxDataForTestDriveIOU(
         transactionID: testDriveIOUParams.transaction.transactionID,
         reportActionID: testDriveIOUParams.iouOptimisticParams.action.reportActionID,
     });
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
     const text = translateLocal('testDrive.employeeInviteMessage', getAllPersonalDetails()?.[deprecatedUserAccountID]?.firstName ?? '');
     // delegateAccountIDParam: will be threaded in PR 15; buildOptimisticAddCommentReportAction falls back to module-level Onyx.connect value (https://github.com/Expensify/App/issues/66425)
     const textComment = buildOptimisticAddCommentReportAction({
@@ -1018,7 +1017,6 @@ function buildOnyxDataForMoneyRequest(moneyRequestParams: BuildOnyxDataForMoneyR
             key: `${ONYXKEYS.COLLECTION.NEXT_STEP}${iou.report.reportID}`,
             onyxMethod: Onyx.METHOD.SET,
             // buildOptimisticNextStep is used in parallel
-            // eslint-disable-next-line @typescript-eslint/no-deprecated
             value: buildNextStepNew({
                 report: iou.report,
                 predictedNextStatus: iou.report.statusNum ?? CONST.REPORT.STATE_NUM.OPEN,
@@ -1431,7 +1429,6 @@ function getMoneyRequestInformation(moneyRequestInformation: MoneyRequestInforma
         iouReport.statusNum ?? (policy?.reimbursementChoice === CONST.POLICY.REIMBURSEMENT_CHOICES.REIMBURSEMENT_NO ? CONST.REPORT.STATUS_NUM.CLOSED : CONST.REPORT.STATUS_NUM.OPEN);
     const hasViolations = hasViolationsReportUtils(iouReport.reportID, transactionViolations, currentUserAccountIDParam, currentUserEmailParam);
     // buildOptimisticNextStep is used in parallel
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
     const optimisticNextStepDeprecated = buildNextStepNew({
         report: iouReport,
         predictedNextStatus,
