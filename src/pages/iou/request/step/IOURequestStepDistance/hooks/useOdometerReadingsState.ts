@@ -1,7 +1,8 @@
 import {useEffect, useRef, useState} from 'react';
 import type {OnyxEntry} from 'react-native-onyx';
+import {isOdometerDraftPendingHydration} from '@libs/actions/OdometerTransactionUtils';
 import CONST from '@src/CONST';
-import type {Transaction} from '@src/types/onyx';
+import type {OdometerDraft, Transaction} from '@src/types/onyx';
 import type {FileObject} from '@src/types/utils/Attachment';
 
 type UseOdometerReadingsStateParams = {
@@ -16,6 +17,12 @@ type UseOdometerReadingsStateParams = {
 
     /** True while the selected-tab Onyx key is still loading — suppresses the tab-reset effect. */
     isLoadingSelectedTab: boolean;
+
+    /** True once `useRestartOnOdometerImagesFailure` has finished verifying any blob URIs in the transaction (gates the initial-refs snapshot). */
+    hasVerifiedBlobs: boolean;
+
+    /** Save-for-later draft, if any — used to defer the initial-refs snapshot until the draft has hydrated into the transaction. */
+    odometerDraft: OnyxEntry<OdometerDraft>;
 };
 
 type UseOdometerReadingsStateResult = {
@@ -60,9 +67,19 @@ type UseOdometerReadingsStateResult = {
 
     /** Resets local form state and the initial refs back to their defaults. */
     resetOdometerLocalState: () => void;
+
+    /** True once the initial baseline has been captured — gates discard-changes detection. */
+    hasInitializedRefs: React.RefObject<boolean>;
 };
 
-function useOdometerReadingsState({currentTransaction, isEditing, selectedTab, isLoadingSelectedTab}: UseOdometerReadingsStateParams): UseOdometerReadingsStateResult {
+function useOdometerReadingsState({
+    currentTransaction,
+    isEditing,
+    selectedTab,
+    isLoadingSelectedTab,
+    hasVerifiedBlobs,
+    odometerDraft,
+}: UseOdometerReadingsStateParams): UseOdometerReadingsStateResult {
     const [startReading, setStartReading] = useState<string>('');
     const [endReading, setEndReading] = useState<string>('');
     const [formError, setFormError] = useState<string>('');
@@ -89,6 +106,7 @@ function useOdometerReadingsState({currentTransaction, isEditing, selectedTab, i
         initialEndReadingRef.current = '';
         initialStartImageRef.current = undefined;
         initialEndImageRef.current = undefined;
+        hasInitializedRefs.current = false;
     };
 
     // Reset component state when switching away from the odometer tab
@@ -114,6 +132,21 @@ function useOdometerReadingsState({currentTransaction, isEditing, selectedTab, i
         if (hasInitializedRefs.current) {
             return;
         }
+        // Skip until we have meaningful odometer data to snapshot.
+        const isOdometerTransaction = currentTransaction?.iouRequestType === CONST.IOU.REQUEST_TYPE.DISTANCE_ODOMETER;
+        if (!isEditing && !isOdometerTransaction) {
+            return;
+        }
+        // Wait for blob verification — otherwise Cmd+R would snapshot a stale blob URI before
+        // useRestartOnOdometerImagesFailure swaps in a fresh one, and the diff would look like an edit.
+        if (!hasVerifiedBlobs) {
+            return;
+        }
+        // Wait for the save-for-later draft to land in the transaction; otherwise post-hydration
+        // values would later look like unsaved changes against this baseline.
+        if (isOdometerDraftPendingHydration(odometerDraft, currentTransaction?.comment)) {
+            return;
+        }
         const currentStart = currentTransaction?.comment?.odometerStart;
         const currentEnd = currentTransaction?.comment?.odometerEnd;
         const startValue = currentStart !== null && currentStart !== undefined ? currentStart.toString() : '';
@@ -124,10 +157,15 @@ function useOdometerReadingsState({currentTransaction, isEditing, selectedTab, i
         initialEndImageRef.current = currentTransaction?.comment?.odometerEndImage;
         hasInitializedRefs.current = true;
     }, [
+        currentTransaction?.iouRequestType,
+        currentTransaction?.comment,
         currentTransaction?.comment?.odometerStart,
         currentTransaction?.comment?.odometerEnd,
         currentTransaction?.comment?.odometerStartImage,
         currentTransaction?.comment?.odometerEndImage,
+        isEditing,
+        hasVerifiedBlobs,
+        odometerDraft,
     ]);
 
     // Initialize values from transaction when editing or when transaction has data (but not when switching tabs)
@@ -177,6 +215,7 @@ function useOdometerReadingsState({currentTransaction, isEditing, selectedTab, i
         initialStartImageRef,
         initialEndImageRef,
         resetOdometerLocalState,
+        hasInitializedRefs,
     };
 }
 

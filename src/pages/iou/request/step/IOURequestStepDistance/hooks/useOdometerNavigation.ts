@@ -7,7 +7,7 @@ import {handleMoneyRequestStepDistanceNavigation} from '@libs/actions/IOU/MoneyR
 import type {IOUType} from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {Route} from '@src/ROUTES';
-import type {Beta, IntroSelected, PersonalDetailsList, Policy, RecentWaypoint, Report, Transaction} from '@src/types/onyx';
+import type {Beta, IntroSelected, OdometerDraft, PersonalDetailsList, Policy, RecentWaypoint, Report, Transaction} from '@src/types/onyx';
 import type {ReportAttributesDerivedValue} from '@src/types/onyx/DerivedValues';
 import type {Unit} from '@src/types/onyx/Policy';
 
@@ -94,6 +94,9 @@ type NavigateOptions = {
 
     /** Display unit chosen for the policy's mileage rate (mi or km). */
     unit: Unit | undefined;
+
+    /** Save-for-later draft (if any) — passed through so the navigation utility can clear it once the expense submits successfully. */
+    previousOdometerDraft: OnyxEntry<OdometerDraft>;
 };
 
 function useOdometerNavigation({
@@ -132,7 +135,7 @@ function useOdometerNavigation({
     const [ownerBillingGracePeriodEnd] = useOnyx(ONYXKEYS.NVP_PRIVATE_OWNER_BILLING_GRACE_PERIOD_END);
     const [transactionViolations] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS);
 
-    return ({odometerStart, odometerEnd, odometerDistance, unit}: NavigateOptions) => {
+    return ({odometerStart, odometerEnd, odometerDistance, unit, previousOdometerDraft}: NavigateOptions) => {
         handleMoneyRequestStepDistanceNavigation({
             iouType,
             report,
@@ -163,6 +166,7 @@ function useOdometerNavigation({
             odometerStart,
             odometerEnd,
             odometerDistance,
+            previousOdometerDraft,
             betas,
             recentWaypoints,
             unit,

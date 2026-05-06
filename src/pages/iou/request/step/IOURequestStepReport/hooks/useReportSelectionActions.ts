@@ -162,7 +162,6 @@ function useReportSelectionActions({
         }
 
         handleGoBack();
-        // eslint-disable-next-line @typescript-eslint/no-deprecated
         InteractionManager.runAfterInteractions(() => {
             Navigation.setNavigationActionToMicrotaskQueue(() => {
                 setTransactionReport(
@@ -198,7 +197,6 @@ function useReportSelectionActions({
             return;
         }
         Navigation.dismissToSuperWideRHP();
-        // eslint-disable-next-line @typescript-eslint/no-deprecated
         InteractionManager.runAfterInteractions(() => {
             const policyTagList = personalPolicyID ? allPolicyTags?.[`${ONYXKEYS.COLLECTION.POLICY_TAGS}${personalPolicyID}`] : {};
             changeTransactionsReport({
