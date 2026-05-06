@@ -236,6 +236,7 @@ function CopilotPage() {
             const titleText = personalDetail?.displayName ?? formattedEmail;
             const descriptionText = personalDetail?.displayName ? formattedEmail : '';
             return {
+                key: email,
                 titleComponent: renderTitleWithRole(titleText, descriptionText, role),
                 avatarID: personalDetail?.accountID ?? CONST.DEFAULT_NUMBER_ID,
                 icon: personalDetail?.avatar ?? getDefaultAvatarURL({accountID: personalDetail?.accountID, accountEmail: email}),
@@ -270,6 +271,7 @@ function CopilotPage() {
             const descriptionText = personalDetail?.displayName ? formattedEmail : '';
 
             return {
+                key: email,
                 titleComponent: renderTitleWithRole(titleText, descriptionText, role),
                 avatarID: personalDetail?.accountID ?? CONST.DEFAULT_NUMBER_ID,
                 icon: personalDetail?.avatar ?? getDefaultAvatarURL({accountID: personalDetail?.accountID, accountEmail: email}),
