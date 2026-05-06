@@ -50,7 +50,7 @@ function ExpensifyCardPreferredWorkspaceToggle({domainAccountID, groupID}: Expen
                     subtitle={translate('domain.groups.expensifyCardPreferredWorkspaceDescription')}
                     switchAccessibilityLabel={translate('domain.groups.expensifyCardPreferredWorkspace')}
                     shouldPlaceSubtitleBelowSwitch
-                    // disabled={isDisabled}
+                    disabled={isDisabled}
                     disabledAction={() => setIsDisabledModalVisible(true)}
                     isActive={isActive}
                     onToggle={(enabled) => {
