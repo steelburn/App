@@ -623,7 +623,7 @@ function updateSageIntacctDefaultVendor(policyID: string, settingName: keyof Sag
         updateSageIntacctNonreimbursableExpensesExportVendor(policyID, vendor, oldVendor);
     }
 }
-function updateSageIntacctTravelInvoicingPayableAccount(policyID: string, accountID: string, oldAccountID?: string) {
+function updateSageIntacctTravelInvoicingPayableAccount(policyID: string, payableAccountName: string, oldpayableAccountName?: string) {
     const onyxData = prepareOnyxDataForExportUpdate(policyID, CONST.SAGE_INTACCT_CONFIG.TRAVEL_INVOICING_PAYABLE_ACCOUNT, accountID, oldAccountID);
     const parameters: UpdateManyPolicyConnectionConfigurationsParams = {
         policyID,
