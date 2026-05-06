@@ -17,17 +17,24 @@ import useOnyx from './useOnyx';
 const OVERLAY_SAFETY_TIMEOUT_MS = 5000;
 
 type UseSearchOverlayParams = {
+    /** Current search results snapshot used to build the static overlay list. */
     searchResults: SearchResults | undefined;
+    /** Parsed query for the active search tab (determines columns, grouping, sort). */
     queryJSON: SearchQueryJSON | undefined;
+    /** Whether the device is in narrow (mobile) layout mode. */
     shouldUseNarrowLayout: boolean;
+    /** Whether multi-select (long-press) mode is active on mobile. */
     isMobileSelectionModeEnabled: boolean;
+    /** Onyx key of the current search snapshot; undefined for live-data "todo" searches. */
     currentSearchKey: string | undefined;
     /** FlatList content padding for narrow layout (accounts for filter bars). */
     contentContainerStyle?: StyleProp<ViewStyle>;
 };
 
 type UseSearchOverlayResult = {
+    /** Static list overlay content to render above Search, or null when not needed. */
     searchOverlayContent: React.ReactNode;
+    /** Callback for Search to signal that real content is ready and the overlay can be dismissed. */
     onSearchContentReady: () => void;
     /** Whether the overlay lifecycle is active (armed but not yet ready). */
     isOverlayActive: boolean;

@@ -61,7 +61,9 @@ type SearchPageNarrowProps = {
     onSortPressedCallback: () => void;
     /** Overlay rendered above Search content during expense-creation flows (SearchStaticList or null). */
     searchOverlayContent: React.ReactNode;
+    /** Callback for Search to signal that real content is ready and the overlay can be dismissed. */
     onSearchContentReady: () => void;
+    /** Whether any search filter bars are active (affects content container padding). */
     hasFilterBars: boolean;
     /** Whether the overlay lifecycle is active (used to trigger onSearchLayout independently of overlay content). */
     isOverlayActive: boolean;
