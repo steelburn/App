@@ -1,7 +1,7 @@
 ---
 title: Add Approvals
 description: Require report approvals in your Expensify workspace, including setting approval thresholds and over-limit approvers.
-keywords: [New Expensify, approvals, report approvals, approving reports, approval workflow, workspace workflows, approver, final approver, approval chain, approval threshold, approval limit, over-limit approval, report amount limit, dollar limit approver]
+keywords: [New Expensify, approvals, report approvals, approving reports, approval workflow, workspace workflows, approver, final approver, approval chain, approval threshold, approval limit, over-limit approval, report amount limit, dollar limit approver, reassign approver, automatic approver reassignment, change approver workflow]
 ---
 
 Each Expensify workspace can be configured to require additional approvals for reports before payments are authorized. When approvals are enabled, admins can set a default approval workflow for all members or create custom workflows for individual members.
@@ -71,6 +71,8 @@ You can update or remove approval workflows at any time as your team or process 
 3. Select a new member or deselect one to remove them.
 4. Click **Save**.
 
+**Note:** When you change an approver in a workflow, any reports currently pending approval with the previous approver are automatically reassigned to the new approver. A system message will appear in the report confirming the reassignment.
+
 ## Delete a Workflow
 
 1. On the **Workflows** page, click the workflow you want to delete.
@@ -88,6 +90,10 @@ No. Each employee can only be assigned one approval workflow per workspace.
 ## How can I assign custom approval workflows to specific members?
 
 You’ll need to be on the Control plan, as this feature isn’t available on Collect.
+
+## What happens to pending reports when I change an approver?
+
+Any reports currently awaiting approval from the previous approver are automatically reassigned to the new approver. A system message appears in the report indicating the approver was reassigned via a workflow update.
 
 ## What happens when a report exceeds the over-limit threshold?
 
