@@ -254,7 +254,6 @@ jobs:
               }]
             }
         env:
-          GITHUB_TOKEN: ${{ github.token }}
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
 
       - name: Find deploy workflow run
