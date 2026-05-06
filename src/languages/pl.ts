@@ -6986,6 +6986,7 @@ Dodaj więcej zasad wydatków, żeby chronić płynność finansową firmy.`,
             gusto: {
                 title: 'Gusto',
                 approvalMode: 'Tryb zatwierdzania',
+                finalApprover: 'Ostateczny zatwierdzający',
                 notSet: 'Nie ustawiono',
                 approvalModeDescription: 'Członkowie i menedżerowie są skonfigurowani do synchronizacji z Gusto.',
                 approvalModeWarningTitle: 'Zmienić tryb zatwierdzania?',

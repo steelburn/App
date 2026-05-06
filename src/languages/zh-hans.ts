@@ -6819,6 +6819,7 @@ ${reportName}
             gusto: {
                 title: 'Gusto',
                 approvalMode: '审批模式',
+                finalApprover: '最终审批人',
                 notSet: '未设置',
                 approvalModeDescription: '成员和经理已设置为与 Gusto 同步。',
                 approvalModeWarningTitle: '更改审批模式？',

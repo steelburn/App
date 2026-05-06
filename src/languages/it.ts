@@ -7014,6 +7014,7 @@ Aggiungi altre regole di spesa per proteggere il flusso di cassa aziendale.`,
             gusto: {
                 title: 'Gusto',
                 approvalMode: 'Modalità approvazione',
+                finalApprover: 'Approvazione finale',
                 notSet: 'Non impostato',
                 approvalModeDescription: 'Membri e responsabili sono configurati per sincronizzarsi con Gusto.',
                 approvalModeWarningTitle: 'Cambiare modalità di approvazione?',

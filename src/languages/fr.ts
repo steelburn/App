@@ -7051,6 +7051,7 @@ Ajoutez davantage de règles de dépenses pour protéger la trésorerie de l’e
             gusto: {
                 title: 'Gusto',
                 approvalMode: 'Mode d’approbation',
+                finalApprover: 'Approbateur final',
                 notSet: 'Non défini',
                 approvalModeDescription: 'Les membres et les responsables sont configurés pour se synchroniser avec Gusto.',
                 approvalModeWarningTitle: 'Modifier le mode d’approbation ?',

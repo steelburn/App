@@ -6937,6 +6937,7 @@ ${reportName}
             gusto: {
                 title: 'Gusto',
                 approvalMode: '承認モード',
+                finalApprover: '最終承認者',
                 notSet: '未設定',
                 approvalModeDescription: 'メンバーとマネージャーは Gusto と同期するように設定されています。',
                 approvalModeWarningTitle: '承認モードを変更しますか？',

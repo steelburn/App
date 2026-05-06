@@ -6992,6 +6992,7 @@ Adicione mais regras de gasto para proteger o fluxo de caixa da empresa.`,
             gusto: {
                 title: 'Gusto',
                 approvalMode: 'Modo de aprovação',
+                finalApprover: 'Aprovador final',
                 notSet: 'Não definido',
                 approvalModeDescription: 'Membros e gerentes estão configurados para sincronizar com o Gusto.',
                 approvalModeWarningTitle: 'Alterar modo de aprovação?',

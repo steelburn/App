@@ -6383,6 +6383,7 @@ const translations = {
                 disconnectPrompt: 'Are you sure you want to disconnect Gusto?',
                 connectionDescription: 'Connect Gusto to keep employee approvals in sync with your workspace.',
                 approvalMode: 'Approval mode',
+                finalApprover: 'Final approver',
                 notSet: 'Not set',
                 approvalModeDescription: 'Members and managers are set up to sync with Gusto.',
                 approvalModeWarningTitle: 'Change approval mode?',
