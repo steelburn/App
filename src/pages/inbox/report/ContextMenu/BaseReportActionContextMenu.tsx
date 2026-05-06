@@ -95,9 +95,6 @@ type BaseReportActionContextMenuProps = {
     /** Whether the provided report is an archived room */
     isArchivedRoom?: boolean;
 
-    /** Flag to check if the chat is unread in the LHN. Used for the Mark as Read/Unread action */
-    isUnreadChat?: boolean;
-
     /**
      * Is the action a thread's parent reportAction viewed from within the thread report?
      * It will be false if we're viewing the same parent report action from the report it belongs to rather than the thread.
@@ -124,7 +121,6 @@ function BaseReportActionContextMenu({
     isArchivedRoom = false,
     isMini = false,
     isVisible = false,
-    isUnreadChat = false,
     isThreadReportParentAction = false,
     selection = '',
     draftMessage = '',
@@ -268,6 +264,7 @@ function BaseReportActionContextMenu({
 
     const isChronosReport = chatIncludesChronosWithID(originalReportID);
     const isPinnedChat = !!report?.isPinned;
+    const isUnreadChat = !report?.lastReadTime || report.lastReadTime < (report.lastVisibleActionCreated ?? '');
     const shouldEnableArrowNavigation = !isMini && (isVisible || shouldKeepOpen);
     const isHarvestReport = isHarvestCreatedExpenseReport(reportNameValuePairs?.origin, reportNameValuePairs?.originalID);
 
