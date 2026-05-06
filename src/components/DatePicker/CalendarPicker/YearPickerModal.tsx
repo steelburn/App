@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import {Keyboard} from 'react-native';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import Modal from '@components/Modal';
@@ -42,12 +42,16 @@ function YearPickerModal({isVisible, years, currentYear = new Date().getFullYear
         };
     }, [years, searchText, translate]);
 
-    useEffect(() => {
-        if (isVisible) {
-            return;
-        }
+    const handleClose = () => {
         setSearchText('');
-    }, [isVisible]);
+        onClose?.();
+    };
+
+    const handleYearChange = (year: number) => {
+        Keyboard.dismiss();
+        setSearchText('');
+        onYearChange?.(year);
+    };
 
     const textInputOptions = useMemo(
         () => ({
@@ -65,12 +69,12 @@ function YearPickerModal({isVisible, years, currentYear = new Date().getFullYear
         <Modal
             type={CONST.MODAL.MODAL_TYPE.RIGHT_DOCKED}
             isVisible={isVisible}
-            onClose={() => onClose?.()}
+            onClose={handleClose}
             onModalHide={onClose}
             shouldHandleNavigationBack
             shouldUseCustomBackdrop
-            onBackdropPress={onClose}
-            shouldEnableBackdropInNarrowPane={shouldEnableBackdropInNarrowPane}
+            onBackdropPress={handleClose}
+            shouldKeepRightDockedBackdropInNarrowPane={shouldEnableBackdropInNarrowPane}
             enableEdgeToEdgeBottomSafeAreaPadding
         >
             <ScreenWrapper
@@ -81,15 +85,12 @@ function YearPickerModal({isVisible, years, currentYear = new Date().getFullYear
             >
                 <HeaderWithBackButton
                     title={translate('yearPickerPage.year')}
-                    onBackButtonPress={onClose}
+                    onBackButtonPress={handleClose}
                 />
                 <SelectionList
                     data={data}
                     ListItem={SingleSelectListItem}
-                    onSelectRow={(option) => {
-                        Keyboard.dismiss();
-                        onYearChange?.(option.value);
-                    }}
+                    onSelectRow={(option) => handleYearChange(option.value)}
                     textInputOptions={textInputOptions}
                     initiallyFocusedItemKey={currentYear.toString()}
                     disableMaintainingScrollPosition

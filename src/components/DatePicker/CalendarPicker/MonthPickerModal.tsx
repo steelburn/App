@@ -87,7 +87,7 @@ function MonthPickerModal({
             shouldHandleNavigationBack
             shouldUseCustomBackdrop
             onBackdropPress={onClose}
-            shouldEnableBackdropInNarrowPane={shouldEnableBackdropInNarrowPane}
+            shouldKeepRightDockedBackdropInNarrowPane={shouldEnableBackdropInNarrowPane}
             enableEdgeToEdgeBottomSafeAreaPadding
         >
             <ScreenWrapper

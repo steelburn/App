@@ -127,9 +127,9 @@ type BaseModalProps = Partial<ReanimatedModalProps> &
 
         /**
          * Whether a RIGHT_DOCKED modal should keep its backdrop when rendered in a narrow pane context.
-         * Use this only for nested flows that still require visual dimming.
+         * See https://github.com/Expensify/App/issues/88645 for more details.
          */
-        shouldEnableBackdropInNarrowPane?: boolean;
+        shouldKeepRightDockedBackdropInNarrowPane?: boolean;
 
         /**
          * Whether the modal should wrap the children in a scroll view if it is a bottom docked modal in landscape mode.
