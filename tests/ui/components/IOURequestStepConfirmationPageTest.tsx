@@ -122,7 +122,6 @@ jest.mock('@libs/Navigation/Navigation', () => {
         revealRouteBeforeDismissingModal: jest.fn((_route: unknown, options?: {afterTransition?: () => void}) => {
             options?.afterTransition?.();
         }),
-        getActiveRouteWithoutParams: jest.fn(() => ''),
         getTopmostReportId: jest.fn(() => undefined),
         preInsertFullscreenUnderRHP: jest.fn(),
         removePreInsertedFullscreenIfNeeded: jest.fn(),
