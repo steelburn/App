@@ -107,6 +107,7 @@ function IOURequestStepDistanceOdometer({
     const didSaveEditingConfirmationRef = useRef(false);
     const shouldBypassDiscardConfirmationRef = useRef(false);
     const backupHandledManually = useRef(false);
+    const userHasUnsavedTypingRef = useRef(false);
 
     const isArchived = useReportIsArchived(report?.reportID);
     const [lastSelectedDistanceRates] = useOnyx(ONYXKEYS.NVP_LAST_SELECTED_DISTANCE_RATES);
@@ -170,6 +171,7 @@ function IOURequestStepDistanceOdometer({
         initialStartImageRef.current = undefined;
         initialEndImageRef.current = undefined;
         hasInitializedRefs.current = false;
+        userHasUnsavedTypingRef.current = false;
     };
 
     const {hasVerifiedBlobs} = useRestartOnOdometerImagesFailure(transaction, reportID, iouType, backToReport, ({shouldResetLocalState}) => {
@@ -213,14 +215,15 @@ function IOURequestStepDistanceOdometer({
         if (!isEditing && !isOdometerTransaction) {
             return;
         }
-        // Wait for blob verification — otherwise Cmd+R would snapshot a stale blob URI before
+        // Wait for blob verification - otherwise Cmd+R would snapshot a stale blob URI before
         // useRestartOnOdometerImagesFailure swaps in a fresh one, and the diff would look like an edit.
         if (!hasVerifiedBlobs) {
             return;
         }
-        // Wait for the save-for-later draft to land in the transaction; otherwise post-hydration
-        // values would later look like unsaved changes against this baseline.
-        if (isOdometerDraftPendingHydration(odometerDraft, currentTransaction?.comment)) {
+        // Wait for the save-for-later draft to hydrate into the transaction so post-hydration values
+        // don't look like unsaved changes. Skip on the edit-from-confirmation screen, where the
+        // comment is already the latest value and a stale draft would otherwise block initialization.
+        if (!isEditingConfirmation && isOdometerDraftPendingHydration(odometerDraft, currentTransaction?.comment)) {
             return;
         }
         const currentStart = currentTransaction?.comment?.odometerStart;
@@ -240,6 +243,7 @@ function IOURequestStepDistanceOdometer({
         currentTransaction?.comment?.odometerStartImage,
         currentTransaction?.comment?.odometerEndImage,
         isEditing,
+        isEditingConfirmation,
         hasVerifiedBlobs,
         odometerDraft,
     ]);
@@ -250,22 +254,24 @@ function IOURequestStepDistanceOdometer({
         const currentStart = currentTransaction?.comment?.odometerStart;
         const currentEnd = currentTransaction?.comment?.odometerEnd;
 
+        const hasTransactionData = (currentStart !== null && currentStart !== undefined) || (currentEnd !== null && currentEnd !== undefined);
+        const hasLocalState = startReadingRef.current || endReadingRef.current;
+        const startValue = currentStart !== null && currentStart !== undefined ? currentStart.toString() : '';
+        const endValue = currentEnd !== null && currentEnd !== undefined ? currentEnd.toString() : '';
+
         // Only initialize if:
         // 1. We haven't initialized yet AND transaction has data, OR
         // 2. We're editing and transaction has data (to load existing values), OR
-        // 3. Transaction has data but local state is empty (user navigated back from another page)
-        const hasTransactionData = (currentStart !== null && currentStart !== undefined) || (currentEnd !== null && currentEnd !== undefined);
-        const hasLocalState = startReadingRef.current || endReadingRef.current;
-
+        // 3. Transaction has data but local state is empty (user navigated back from another page), OR
+        // 4. An external update arrived (e.g. the user edited readings via the confirmation page's
+        //    distance edit) - the typing-flag guard avoids clobbering in-progress keystrokes here.
         const shouldInitialize =
             (!hasInitializedRefs.current && hasTransactionData) ||
             (isEditing && hasTransactionData && !hasLocalState) ||
-            (hasTransactionData && !hasLocalState && hasInitializedRefs.current);
+            (hasTransactionData && !hasLocalState && hasInitializedRefs.current) ||
+            (hasTransactionData && hasInitializedRefs.current && !userHasUnsavedTypingRef.current && (startValue !== startReadingRef.current || endValue !== endReadingRef.current));
 
         if (shouldInitialize) {
-            const startValue = currentStart !== null && currentStart !== undefined ? currentStart.toString() : '';
-            const endValue = currentEnd !== null && currentEnd !== undefined ? currentEnd.toString() : '';
-
             if (startValue || endValue) {
                 setStartReading(startValue);
                 setEndReading(endValue);
@@ -376,6 +382,7 @@ function IOURequestStepDistanceOdometer({
         const textForDisplay = DistanceRequestUtils.prepareTextForDisplay(text);
         setStartReading(textForDisplay);
         startReadingRef.current = textForDisplay;
+        userHasUnsavedTypingRef.current = true;
         if (formError) {
             setFormError('');
         }
@@ -388,6 +395,7 @@ function IOURequestStepDistanceOdometer({
         const textForDisplay = DistanceRequestUtils.prepareTextForDisplay(text);
         setEndReading(textForDisplay);
         endReadingRef.current = textForDisplay;
+        userHasUnsavedTypingRef.current = true;
         if (formError) {
             setFormError('');
         }
@@ -444,6 +452,8 @@ function IOURequestStepDistanceOdometer({
         const distance = end - start;
         const calculatedDistance = roundToTwoDecimalPlaces(distance);
         setMoneyRequestDistance(transactionID, calculatedDistance, isTransactionDraft, unit);
+        // Local state has just been persisted to the transaction thus the resync guard can be lowered
+        userHasUnsavedTypingRef.current = false;
 
         if (isEditing) {
             // In the split flow, when editing we use SPLIT_TRANSACTION_DRAFT to save draft value
@@ -495,6 +505,16 @@ function IOURequestStepDistanceOdometer({
 
         if (isEditingConfirmation) {
             didSaveEditingConfirmationRef.current = true;
+            // Sync the existing save-for-later draft with the just-edited values
+            // Gated so we don't promote a non-save-for-later flow into one
+            if (odometerDraft) {
+                saveOdometerDraft({
+                    startReading: Number.isNaN(start) ? undefined : start,
+                    endReading: Number.isNaN(end) ? undefined : end,
+                    startImage: transaction?.comment?.odometerStartImage,
+                    endImage: transaction?.comment?.odometerEndImage,
+                }).catch((error: unknown) => Log.warn('Failed to update odometer draft after edit-from-confirmation', {error}));
+            }
             Navigation.goBack(confirmationRoute);
             return;
         }
