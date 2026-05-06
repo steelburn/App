@@ -100,7 +100,7 @@ describe('Reconnect', () => {
     test('sustained failure recovery notifies reachability listeners', () => {
         const {onReachabilityConfirmed} = require<typeof NetworkStateType>('@libs/NetworkState');
         const listener = jest.fn();
-        const unsub = onReachabilityConfirmed(listener);
+        const unSub = onReachabilityConfirmed(listener);
 
         setSustainedFailures(true);
         listener.mockClear();
@@ -113,7 +113,7 @@ describe('Reconnect', () => {
         jest.useRealTimers();
 
         expect(listener).toHaveBeenCalledTimes(1);
-        unsub();
+        unSub();
     });
 
     test('reachability confirmed triggers reconnect when sustained failures clear', async () => {
