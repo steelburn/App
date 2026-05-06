@@ -66,7 +66,6 @@ export default function useAutoFocusInput(isMultiline = false): UseAutoFocusInpu
         ) {
             return;
         }
-        // eslint-disable-next-line @typescript-eslint/no-deprecated -- idiomatic defer primitive despite type-def deprecation.
         const focusTaskHandle = InteractionManager.runAfterInteractions(() => {
             if (inputRef.current && isMultiline) {
                 moveSelectionToEnd(inputRef.current);
