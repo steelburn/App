@@ -60,8 +60,9 @@ onNetworkReachabilityConfirmed(() => {
 });
 
 // Any offline→online transition — flush the sequential queue
-let wasOffline = getIsOffline();
+let wasOffline: boolean;
 const initReconnect = () => {
+    wasOffline = getIsOffline();
     subscribeNetworkState(() => {
         const offline = getIsOffline();
         if (wasOffline && !offline) {
