@@ -5,6 +5,7 @@ import Button from '@components/Button';
 import ConfirmModal from '@components/ConfirmModal';
 import FixedFooter from '@components/FixedFooter';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
+import RenderHTML from '@components/RenderHTML';
 import ScreenWrapper from '@components/ScreenWrapper';
 import SelectionList from '@components/SelectionList';
 import SingleSelectListItem from '@components/SelectionList/ListItem/SingleSelectListItem';
@@ -124,7 +125,7 @@ function GustoApprovalModePage({
                     isVisible={isWarningModalOpen}
                     onConfirm={saveApprovalMode}
                     onCancel={() => setIsWarningModalOpen(false)}
-                    prompt={translate('workspace.hr.gusto.approvalModeWarningPrompt')}
+                    prompt={<RenderHTML html={translate('workspace.hr.gusto.approvalModeWarningPrompt', CONST.CONFIGURE_APPROVAL_WORKFLOWS_HELP_URL)} />}
                     confirmText={translate('workspace.hr.gusto.approvalModeWarningConfirm')}
                     cancelText={translate('common.cancel')}
                 />
