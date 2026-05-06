@@ -979,7 +979,7 @@ function getUpdateMoneyRequestParams(params: GetUpdateMoneyRequestParamsType): U
         >
     > = [];
 
-    // Step 2: Get all the collections being updated
+    // Step 1: Get the transaction being updated
     const transaction = getAllTransactions()?.[`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`];
 
     // The manual-distance submit path always sends waypoints to keep the BE in sync, even when the user
@@ -989,7 +989,7 @@ function getUpdateMoneyRequestParams(params: GetUpdateMoneyRequestParamsType): U
     const hasWaypointAddressesChanged = 'waypoints' in transactionChanges && haveWaypointAddressesChanged(transaction?.comment?.waypoints, transactionChanges.waypoints);
     const shouldSuppressWaypointsAsPending = 'waypoints' in transactionChanges && !hasWaypointAddressesChanged;
 
-    // Step 1: Set any "pending fields" (ones updated while the user was offline) to have error messages in the failureData
+    // Step 2: Set any "pending fields" (ones updated while the user was offline) to have error messages in the failureData
     const pendingFields: OnyxTypes.Transaction['pendingFields'] = Object.fromEntries(
         Object.keys(transactionChanges)
             .filter((key) => !(shouldSuppressWaypointsAsPending && key === 'waypoints'))

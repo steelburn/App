@@ -99,7 +99,6 @@ jest.mock('@libs/Navigation/OnyxTabNavigator', () => {
     };
     const TabScreenWithFocusTrapWrapper = ({children}: {children: React.ReactNode}) => React2.createElement(React2.Fragment, null, children);
     return {
-        // eslint-disable-next-line @typescript-eslint/naming-convention
         __esModule: true,
         default: OnyxTabNavigator,
         TopTab,

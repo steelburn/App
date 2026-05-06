@@ -61,7 +61,6 @@ jest.mock('@components/ProductTrainingContext', () => ({
 jest.mock('@libs/Navigation/OnyxTabNavigator', () => {
     const ReactMock = require('react');
     return {
-        // eslint-disable-next-line @typescript-eslint/naming-convention
         __esModule: true,
         default: ({children}: {children: React.ReactNode}) => ReactMock.createElement(ReactMock.Fragment, null, children),
         TopTab: {
