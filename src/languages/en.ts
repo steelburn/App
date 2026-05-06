@@ -946,10 +946,6 @@ const translations = {
         listOfChats: 'List of chats',
         saveTheWorld: 'Save the world',
         tooltip: 'Get started here!',
-        redirectToExpensifyClassicModal: {
-            title: 'Coming soon',
-            description: "We're fine-tuning a few more bits and pieces of New Expensify to accommodate your specific setup. In the meantime, head over to Expensify Classic.",
-        },
     },
     homePage: {
         forYou: 'For you',
@@ -1074,6 +1070,7 @@ const translations = {
             connectAccounting: ({integrationName}: {integrationName: string}) => `Connect to ${integrationName}`,
             connectAccountingDefault: 'Connect to accounting',
             customizeCategories: 'Customize accounting categories',
+            inviteAccountant: 'Invite your accountant',
             linkCompanyCards: 'Link company cards',
             setupRules: 'Set up spend rules',
         },
@@ -2786,6 +2783,19 @@ const translations = {
             title: 'No agents created',
             subtitle: 'Stop manually doing stuff. Instruct an agent instead and save yourself lots of time.',
         },
+        error: {
+            genericAdd: 'There was a problem adding this agent',
+        },
+    },
+    addAgentPage: {
+        title: 'New agent',
+        agentName: 'Agent name',
+        instructions: 'Write custom instructions',
+        createAgent: 'Create agent',
+        switchAvatar: 'Switch avatar',
+        defaultAgentName: (displayName: string) => `${displayName}'s Agent`,
+        defaultPrompt:
+            "Reject expenses that are for gambling, movies, or other obvious non-business reasons.\n\nRemind the user to always include a receipt image that makes the tip clear.\n\nApprove the report if it's very similar to previous reports from the same user.\n\nReject reports with more than $500 in travel expenses.",
     },
     expenseRulesPage: {
         title: 'Expense rules',
@@ -4387,6 +4397,10 @@ const translations = {
             travelInvoicing: 'Export Expensify Travel Payable To',
             travelInvoicingVendor: 'Travel vendor',
             travelInvoicingPayableAccount: 'Travel payable account',
+        },
+        createdForClient: {
+            title: "You've created a workspace for your client!",
+            description: 'Great news 🎉. Reach out to us if they need any help with the setup.',
         },
         receiptPartners: {
             uber: {
@@ -6499,7 +6513,7 @@ const translations = {
             updateToUSD: 'Update to USD',
             updateWorkspaceCurrency: 'Update workspace currency',
             workspaceCurrencyNotSupported: 'Workspace currency not supported',
-            yourWorkspace: `Your workspace is set to an unsupported currency. View the <a href="${CONST.CONNECT_A_BUSINESS_BANK_ACCOUNT_HELP_URL}">list of supported currencies</a>.`,
+            yourWorkspace: `Your workspace is set to an unsupported currency. View the <a href="${CONST.ENABLE_GLOBAL_REIMBURSEMENT_HELP_URL}">list of supported currencies</a>.`,
             chooseAnExisting: 'Choose an existing bank account to pay expenses or add a new one.',
         },
         changeOwner: {
@@ -7788,6 +7802,7 @@ const translations = {
             withdrawalType: {
                 [CONST.SEARCH.WITHDRAWAL_TYPE.EXPENSIFY_CARD]: 'Expensify Card',
                 [CONST.SEARCH.WITHDRAWAL_TYPE.REIMBURSEMENT]: 'Reimbursement',
+                [CONST.SEARCH.WITHDRAWAL_TYPE.CENTRAL_TRAVEL_INVOICING]: 'Central invoicing',
             },
             is: 'Is',
             action: {
@@ -8284,6 +8299,8 @@ const translations = {
         gpsFloatingPillText: 'GPS tracking in progress...',
         liveActivity: {
             subtitle: 'Tracking distance',
+            lockScreenBadgeText: 'Distance',
+            lockScreenTrackingText: 'Tracking...',
             button: 'View progress',
         },
     },
