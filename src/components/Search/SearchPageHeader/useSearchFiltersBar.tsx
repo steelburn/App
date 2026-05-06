@@ -26,7 +26,15 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import {close} from '@libs/actions/Modal';
 import Navigation from '@libs/Navigation/Navigation';
 import {buildFilterQueryWithSortDefaults, isAmountFilterKey} from '@libs/SearchQueryUtils';
-import {FILTER_GROUP_MAP, FILTER_LABEL_MAP, filterValidHasValues, getMultiSelectFilterOptions, getSingleSelectFilterOptions, mapFiltersFormToLabelValueList} from '@libs/SearchUIUtils';
+import {
+    FILTER_GROUP_MAP,
+    FILTER_LABEL_MAP,
+    filterValidHasValues,
+    getMultiSelectFilterOptions,
+    getSingleSelectFilterOptions,
+    mapFiltersFormToLabelValueList,
+    SKIPPED_SEARCH_FILTERS,
+} from '@libs/SearchUIUtils';
 import type {SearchFilter} from '@libs/SearchUIUtils';
 import CONST from '@src/CONST';
 import type {TranslationPaths} from '@src/languages/types';
@@ -53,18 +61,6 @@ type UseSearchFiltersBarResult = {
     styles: ReturnType<typeof useThemeStyles>;
     translate: ReturnType<typeof useLocalize>['translate'];
 };
-
-const SKIPPED_FILTERS = new Set<SearchAdvancedFiltersKey>([
-    FILTER_KEYS.GROUP_BY,
-    FILTER_KEYS.GROUP_CURRENCY,
-    FILTER_KEYS.LIMIT,
-    FILTER_KEYS.TYPE,
-    FILTER_KEYS.VIEW,
-    FILTER_KEYS.PAYER,
-    FILTER_KEYS.ACTION,
-    FILTER_KEYS.COLUMNS,
-    FILTER_KEYS.KEYWORD,
-]);
 
 function getFilterSentryLabel(filterKey: SearchAdvancedFiltersKey | SearchFilterKey | ReportFieldKey) {
     return `Search-Filter-${filterKey}`;
@@ -211,7 +207,7 @@ function useSearchFiltersBar(queryJSON: SearchQueryJSON): UseSearchFiltersBarRes
     const filters = mapFiltersFormToLabelValueList<FilterItem>(
         searchAdvancedFiltersForm,
         queryJSON.policyID,
-        SKIPPED_FILTERS,
+        SKIPPED_SEARCH_FILTERS,
         translate,
         localeCompare,
         convertToDisplayStringWithoutCurrency,
@@ -440,4 +436,4 @@ function useSearchFiltersBar(queryJSON: SearchQueryJSON): UseSearchFiltersBarRes
 
 export default useSearchFiltersBar;
 export type {FilterItem};
-export {typeOptionsPoliciesSelector, SKIPPED_FILTERS};
+export {typeOptionsPoliciesSelector};
