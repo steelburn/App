@@ -116,7 +116,6 @@ function TransactionItemRow({
 
     if (shouldUseNarrowLayout) {
         const description = getDescription(transactionItem);
-        // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
         const merchantOrDescription = merchant || description;
         const categoryForDisplay = isCategoryMissing(transactionItem?.category) ? '' : getDecodedCategoryName(transactionItem?.category ?? '');
         const shouldRenderChatBubbleCell = columns?.includes(CONST.SEARCH.TABLE_COLUMNS.COMMENTS) ?? false;
@@ -196,7 +195,7 @@ function TransactionItemRow({
     };
 
     const description = getDescription(transactionItem);
-    const exchangeRateMessage = getExchangeRate(transactionItem, report?.currency);
+    const exchangeRateMessage = getExchangeRate(transactionItem, report?.currency ?? policy?.outputCurrency);
     const cardName = getCompanyCardDescription(translate, transactionItem?.cardName, transactionItem?.cardID, nonPersonalAndWorkspaceCards);
     const transactionAttendees = getAttendees(transactionItem, currentUserPersonalDetails);
     const isUnreported = transactionItem.reportID === CONST.REPORT.UNREPORTED_REPORT_ID;
