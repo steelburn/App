@@ -99,7 +99,6 @@ type TransactionItemRowNarrowComputedData = {
     missingFieldError: string;
     categoryForDisplay: string;
     createdAt: string;
-    isDeletedTransaction: boolean;
     transactionThreadReportID: string | undefined;
     shouldRenderChatBubbleCell: boolean;
 };

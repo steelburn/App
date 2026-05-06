@@ -23,7 +23,16 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import getBase62ReportID from '@libs/getBase62ReportID';
 import {getReportName} from '@libs/ReportNameUtils';
 import {isExpenseReport} from '@libs/ReportUtils';
-import {getCurrency, getOriginalAmountForDisplay, getOriginalCurrencyForDisplay, getReimbursable, getTaxName, isScanning, isTimeRequest} from '@libs/TransactionUtils';
+import {
+    getCurrency,
+    getOriginalAmountForDisplay,
+    getOriginalCurrencyForDisplay,
+    getReimbursable,
+    getTaxName,
+    isDeletedTransaction as isDeletedTransactionUtil,
+    isScanning,
+    isTimeRequest,
+} from '@libs/TransactionUtils';
 import variables from '@styles/variables';
 import CONST from '@src/CONST';
 import CategoryCell from './DataCells/CategoryCell';
@@ -79,7 +88,6 @@ function TransactionItemRowWide({
     transactionAttendees,
     shouldShowAttendees,
     totalPerAttendee,
-    isDeletedTransaction,
     transactionThreadReportID,
     createdAt,
 }: TransactionItemRowWideProps) {
@@ -88,6 +96,7 @@ function TransactionItemRowWide({
     const StyleUtils = useStyleUtils();
     const theme = useTheme();
     const expensicons = useMemoizedLazyExpensifyIcons(['ArrowRight']);
+    const isDeletedTransaction = isDeletedTransactionUtil(transactionItem);
 
     const isDateColumnWide = dateColumnSize === CONST.SEARCH.TABLE_COLUMN_SIZES.WIDE;
     const isSubmittedColumnWide = submittedColumnSize === CONST.SEARCH.TABLE_COLUMN_SIZES.WIDE;

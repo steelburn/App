@@ -17,7 +17,27 @@ import TypeCell from './DataCells/TypeCell';
 import DeferredTransactionItemRowRBR from './DeferredTransactionItemRowRBR';
 import type {TransactionItemRowNarrowComputedData, TransactionItemRowProps} from './types';
 
-type TransactionItemRowNarrowProps = Omit<TransactionItemRowProps, 'shouldUseNarrowLayout' | 'policyForMovingExpenses'> & TransactionItemRowNarrowComputedData;
+type TransactionItemRowNarrowProps = Pick<
+    TransactionItemRowProps,
+    | 'transactionItem'
+    | 'report'
+    | 'isSelected'
+    | 'shouldShowTooltip'
+    | 'onCheckboxPress'
+    | 'shouldShowCheckbox'
+    | 'style'
+    | 'isInSingleTransactionReport'
+    | 'shouldShowRadioButton'
+    | 'onRadioButtonPress'
+    | 'shouldShowErrors'
+    | 'isDisabled'
+    | 'violations'
+    | 'shouldShowBottomBorder'
+    | 'onArrowRightPress'
+    | 'shouldShowArrowRightOnNarrowLayout'
+    | 'checkboxSentryLabel'
+> &
+    TransactionItemRowNarrowComputedData;
 
 function TransactionItemRowNarrow({
     transactionItem,

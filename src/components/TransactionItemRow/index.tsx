@@ -17,7 +17,6 @@ import {
     getCreated as getTransactionCreated,
     hasMissingSmartscanFields,
     isAmountMissing,
-    isDeletedTransaction as isDeletedTransactionUtil,
     isMerchantMissing,
     isScanning,
     shouldShowAttendees as shouldShowAttendeesUtils,
@@ -86,7 +85,6 @@ function TransactionItemRow({
     const createdAt = getTransactionCreated(transactionItem);
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const transactionThreadReportID = reportActions ? getIOUActionForTransactionID(reportActions, transactionItem.transactionID)?.childReportID : undefined;
-    const isDeletedTransaction = isDeletedTransactionUtil(transactionItem);
 
     const bgActiveStyles = isSelected && shouldHighlightItemWhenSelected ? styles.activeComponentBG : EMPTY_ACTIVE_STYLE;
     const merchant = getMerchantName(transactionItem, translate);
@@ -116,7 +114,51 @@ function TransactionItemRow({
     };
     const missingFieldError = getMissingFieldError();
 
-    const sharedProps = {
+    if (shouldUseNarrowLayout) {
+        const description = getDescription(transactionItem);
+        // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+        const merchantOrDescription = merchant || description;
+        const categoryForDisplay = isCategoryMissing(transactionItem?.category) ? '' : getDecodedCategoryName(transactionItem?.category ?? '');
+        const shouldRenderChatBubbleCell = columns?.includes(CONST.SEARCH.TABLE_COLUMNS.COMMENTS) ?? false;
+
+        // TransactionItemRowNarrow intentionally omits column sizing, hover, action button, and related table-only props that only the wide layout consumes
+        const narrowForwardedProps = {
+            transactionItem,
+            report,
+            isSelected,
+            shouldShowTooltip,
+            onCheckboxPress,
+            shouldShowCheckbox,
+            style,
+            isInSingleTransactionReport,
+            shouldShowRadioButton,
+            onRadioButtonPress,
+            shouldShowErrors,
+            isDisabled,
+            violations,
+            shouldShowBottomBorder,
+            onArrowRightPress,
+            shouldShowArrowRightOnNarrowLayout,
+            checkboxSentryLabel,
+        };
+
+        return (
+            <TransactionItemRowNarrow
+                // eslint-disable-next-line react/jsx-props-no-spreading
+                {...narrowForwardedProps}
+                bgActiveStyles={bgActiveStyles}
+                merchant={merchant}
+                merchantOrDescription={merchantOrDescription}
+                missingFieldError={missingFieldError}
+                categoryForDisplay={categoryForDisplay}
+                createdAt={createdAt}
+                transactionThreadReportID={transactionThreadReportID}
+                shouldRenderChatBubbleCell={shouldRenderChatBubbleCell}
+            />
+        );
+    }
+
+    const wideForwardedProps = {
         transactionItem,
         report,
         policy,
@@ -153,30 +195,6 @@ function TransactionItemRow({
         isActionColumnWide: isActionColumnWideProp,
     };
 
-    if (shouldUseNarrowLayout) {
-        const description = getDescription(transactionItem);
-        // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-        const merchantOrDescription = merchant || description;
-        const categoryForDisplay = isCategoryMissing(transactionItem?.category) ? '' : getDecodedCategoryName(transactionItem?.category ?? '');
-        const shouldRenderChatBubbleCell = columns?.includes(CONST.SEARCH.TABLE_COLUMNS.COMMENTS) ?? false;
-
-        return (
-            <TransactionItemRowNarrow
-                // eslint-disable-next-line react/jsx-props-no-spreading
-                {...sharedProps}
-                bgActiveStyles={bgActiveStyles}
-                merchant={merchant}
-                merchantOrDescription={merchantOrDescription}
-                missingFieldError={missingFieldError}
-                categoryForDisplay={categoryForDisplay}
-                createdAt={createdAt}
-                isDeletedTransaction={isDeletedTransaction}
-                transactionThreadReportID={transactionThreadReportID}
-                shouldRenderChatBubbleCell={shouldRenderChatBubbleCell}
-            />
-        );
-    }
-
     const description = getDescription(transactionItem);
     const exchangeRateMessage = getExchangeRate(transactionItem, report?.currency);
     const cardName = getCompanyCardDescription(translate, transactionItem?.cardName, transactionItem?.cardID, nonPersonalAndWorkspaceCards);
@@ -190,7 +208,7 @@ function TransactionItemRow({
     return (
         <TransactionItemRowWide
             // eslint-disable-next-line react/jsx-props-no-spreading
-            {...sharedProps}
+            {...wideForwardedProps}
             bgActiveStyles={bgActiveStyles}
             merchant={merchant}
             description={description}
@@ -201,7 +219,6 @@ function TransactionItemRow({
             shouldShowAttendees={shouldShowAttendees}
             totalPerAttendee={!attendeesCount || totalAmount === undefined ? undefined : totalAmount / attendeesCount}
             createdAt={createdAt}
-            isDeletedTransaction={isDeletedTransaction}
             transactionThreadReportID={transactionThreadReportID}
         />
     );
