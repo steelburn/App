@@ -8,8 +8,13 @@ import variables from '@styles/variables';
 import CONST from '@src/CONST';
 
 type AgentInfoRowProps = {
+    /** Account ID of the agent */
     accountID: number;
+
+    /** Display name of the agent */
     displayName: string;
+
+    /** Login (email) of the agent */
     login: string;
 };
 
