@@ -58,7 +58,10 @@ function DomainGroupsPage({route}: DomainGroupsPageProps) {
             groupID: group.id,
             text: group.details.name ?? '',
             errors: getLatestError(domainErrors?.[`${CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX}${group.id}`]?.errors),
-            brickRoadIndicator: hasDomainGroupDetailsErrors(domainErrors?.[`${CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX}${group.id}`]) ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined,
+            brickRoadIndicator:
+                hasDomainGroupDetailsErrors(domainErrors?.[`${CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX}${group.id}`]) && !isSecurityGroupPendingDeleteSelector(group.id)(pendingActions)
+                    ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR
+                    : undefined,
             rightElement: (
                 <View style={[styles.flex1, styles.flexRow, styles.alignItemsCenter, styles.justifyContentBetween]}>
                     <Text numberOfLines={1}>{translate('domain.groups.memberCount', {count: Object.keys(group.details.shared).length})}</Text>
