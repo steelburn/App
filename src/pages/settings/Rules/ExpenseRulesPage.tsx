@@ -301,7 +301,7 @@ function ExpenseRulesPage() {
                     customListHeaderContent={headerContent}
                     data={filteredRuleList}
                     ListItem={TableListItem}
-                    onCheckboxPress={toggleRule}
+                    onSelectionButtonPress={toggleRule}
                     onSelectAll={filteredRuleList.length > 0 ? toggleAllRules : undefined}
                     onSelectRow={onSelectRow}
                     onTurnOnSelectionMode={(item) => item && toggleRule(item)}
@@ -309,7 +309,6 @@ function ExpenseRulesPage() {
                     shouldHeaderBeInsideList
                     shouldPreventDefaultFocusOnSelectRow={!canUseTouchScreen()}
                     shouldShowRightCaret
-                    shouldUseDefaultRightHandSideCheckmark={false}
                     shouldShowListEmptyContent={false}
                     showScrollIndicator={false}
                     turnOnSelectionModeOnLongPress={shouldUseNarrowLayout}

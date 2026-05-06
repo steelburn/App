@@ -298,7 +298,7 @@ function BaseDomainMembersPage({
                     canSelectMultiple={canSelectMultiple}
                     customListHeaderContent={listHeaderContent}
                     onSelectAll={toggleAllUsers}
-                    onCheckboxPress={toggleUser}
+                    onSelectionButtonPress={toggleUser}
                     selectedItems={selectedMembers}
                     turnOnSelectionModeOnLongPress={turnOnSelectionModeOnLongPress}
                     onTurnOnSelectionMode={(item) => item && toggleUser?.(item)}

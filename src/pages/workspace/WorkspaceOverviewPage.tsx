@@ -54,6 +54,7 @@ import Navigation from '@libs/Navigation/Navigation';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
 import type {WorkspaceSplitNavigatorParamList} from '@libs/Navigation/types';
 import {
+    canEditWorkspaceSettings,
     getConnectionExporters,
     getUserFriendlyWorkspaceType,
     goBackFromInvalidPolicy,
@@ -111,7 +112,7 @@ function WorkspaceOverviewPage({policyDraft, policy: policyProp, route}: Workspa
     const isBankAccountVerified = !!settings?.paymentBankAccountID;
     const shouldBlockCurrencyChange = useShouldBlockCurrencyChange(policyID);
 
-    const isPolicyAdmin = isPolicyAdminPolicyUtils(policy);
+    const isPolicyAdmin = canEditWorkspaceSettings(policy);
     const outputCurrency = policy?.outputCurrency ?? '';
     const currencySymbol = getCurrencySymbol(outputCurrency) ?? '';
     const formattedCurrency = !isEmptyObject(policy) ? `${outputCurrency} - ${currencySymbol}` : '';
@@ -179,7 +180,7 @@ function WorkspaceOverviewPage({policyDraft, policy: policyProp, route}: Workspa
     const policyName = policy?.name ?? '';
     const policyDescription = policy?.description ?? translate('workspace.common.defaultDescription');
     const policyCurrency = policy?.outputCurrency ?? '';
-    const readOnly = !isPolicyAdminPolicyUtils(policy);
+    const readOnly = !canEditWorkspaceSettings(policy);
     const currencyReadOnly = readOnly || isBankAccountVerified;
     const isOwner = isPolicyOwner(policy, currentUserPersonalDetails.accountID);
     const shouldShowAddress = !readOnly || !!formattedAddress;
