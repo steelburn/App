@@ -2,7 +2,7 @@ import {useEffect} from 'react';
 // eslint-disable-next-line no-restricted-imports -- idiomatic defer primitive past navigation transitions.
 import {InteractionManager} from 'react-native';
 import FOCUSABLE_SELECTOR from '@libs/focusableSelector';
-import {hasFocusableAttributes} from '@libs/focusGuards';
+import hasFocusableAttributes from '@libs/focusGuards';
 import getHadTabNavigation from '@libs/hadTabNavigation';
 import {Priorities, tryClaim} from '@libs/ScreenFocusArbiter';
 import type UseDialogContainerFocus from './types';

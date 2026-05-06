@@ -21,6 +21,7 @@ const {
     notifyPushParamsForward,
     notifyPushParamsBackward,
     compoundParamsKey,
+    shouldSkipAutoFocusDueToExistingFocus,
     setupNavigationFocusReturn,
     teardownNavigationFocusReturn,
 } = require<{
@@ -35,6 +36,7 @@ const {
     notifyPushParamsForward: (routeKey: string, prevParams: unknown) => void;
     notifyPushParamsBackward: (routeKey: string, targetParams: unknown) => void;
     compoundParamsKey: (routeKey: string, params: unknown) => string;
+    shouldSkipAutoFocusDueToExistingFocus: () => boolean;
     setupNavigationFocusReturn: () => void;
     teardownNavigationFocusReturn: () => void;
 }>('../../src/libs/NavigationFocusReturn.ts');
@@ -42,9 +44,8 @@ const {setActivePopoverLauncher, scheduleClearActivePopoverLauncher} = require<{
     setActivePopoverLauncher: (element: HTMLElement) => void;
     scheduleClearActivePopoverLauncher: (element?: HTMLElement) => void;
 }>('../../src/libs/LauncherStack.ts');
-const {shouldSkipAutoFocusDueToExistingFocus, hasFocusableAttributes} = require<{
-    shouldSkipAutoFocusDueToExistingFocus: () => boolean;
-    hasFocusableAttributes: (el: Element) => boolean;
+const {default: hasFocusableAttributes} = require<{
+    default: (el: Element) => boolean;
 }>('../../src/libs/focusGuards.ts');
 /* eslint-enable import/extensions */
 
@@ -1103,47 +1104,79 @@ describe('restoreTriggerForRoute', () => {
 });
 
 describe('shouldSkipAutoFocusDueToExistingFocus', () => {
+    function performRestore(): HTMLButtonElement {
+        const trigger = appendButton();
+        simulateTab();
+        trigger.focus();
+        setLastInteractiveElementForTests(trigger);
+        captureTriggerForRoute('route-a');
+        trigger.blur();
+        expect(restoreTriggerForRoute('route-a')).toBe(true);
+        // Reset arbiter so subsequent AUTO claims aren't blocked by the RETURN cycle.
+        resetArbiter();
+        return trigger;
+    }
+
     it('returns false when body holds focus (nothing else claimed)', () => {
         (document.activeElement as HTMLElement | null)?.blur();
         expect(shouldSkipAutoFocusDueToExistingFocus()).toBe(false);
     });
 
-    it('returns true when a non-body element holds focus (e.g. a restored RETURN target)', () => {
-        const btn = document.createElement('button');
-        document.body.appendChild(btn);
-        btn.focus();
-        expect(shouldSkipAutoFocusDueToExistingFocus()).toBe(true);
-    });
-
-    it('returns false when active element is stale focus inside an [aria-hidden] ancestor (transitioning-out previous screen)', () => {
-        const hiddenScreen = document.createElement('div');
-        hiddenScreen.setAttribute('aria-hidden', 'true');
-        const staleInput = document.createElement('input');
-        hiddenScreen.appendChild(staleInput);
-        document.body.appendChild(hiddenScreen);
-        staleInput.focus();
-        expect(document.activeElement).toBe(staleInput);
+    it('returns false when activeElement is NOT the restored target (e.g. LHN item still focused on forward nav)', () => {
+        // Reviewer scenario: clicking a sidebar item to open a screen leaves the sidebar item focused. AUTO must NOT skip — the focus is benign, not a RETURN-restored target.
+        const lhnItem = appendButton();
+        lhnItem.focus();
         expect(shouldSkipAutoFocusDueToExistingFocus()).toBe(false);
     });
 
-    it('returns false when active element is inside an [inert] ancestor', () => {
-        const inertScreen = document.createElement('div');
-        inertScreen.setAttribute('inert', '');
-        const staleInput = document.createElement('input');
-        inertScreen.appendChild(staleInput);
-        document.body.appendChild(inertScreen);
-        staleInput.focus();
+    it('returns true when activeElement IS the most recent RETURN-restored target', () => {
+        const trigger = performRestore();
+        expect(document.activeElement).toBe(trigger);
+        expect(shouldSkipAutoFocusDueToExistingFocus()).toBe(true);
+    });
+
+    it('returns true when activeElement is a descendant of the RETURN-restored target (e.g. composite widget redirected focus inward)', () => {
+        const trigger = performRestore();
+        const child = document.createElement('input');
+        trigger.appendChild(child);
+        child.focus();
+        expect(shouldSkipAutoFocusDueToExistingFocus()).toBe(true);
+    });
+
+    it('returns false when restored target was wiped by a subsequent navigation (handleStateChange clears lastRestoreTarget)', () => {
+        const trigger = performRestore();
+        handleStateChange(stackState(0, [{key: 'next', name: 'Next'}]));
+        // Simulate the trigger still happening to be focused after handleStateChange (focus didn't naturally move yet).
+        trigger.focus();
+        expect(shouldSkipAutoFocusDueToExistingFocus()).toBe(false);
+    });
+
+    it('returns false when restored target is inside an [aria-hidden] ancestor (transitioning-out screen)', () => {
+        const hiddenScreen = document.createElement('div');
+        hiddenScreen.setAttribute('aria-hidden', 'true');
+        const trigger = document.createElement('button');
+        hiddenScreen.appendChild(trigger);
+        document.body.appendChild(hiddenScreen);
+        simulateTab();
+        trigger.focus();
+        setLastInteractiveElementForTests(trigger);
+        captureTriggerForRoute('route-a');
+        trigger.blur();
+        // pickRestoreTarget returns 'retry' for aria-hidden — restore returns false. Force lastRestoreTarget by removing the wrapper temporarily, restoring, then re-attaching.
+        hiddenScreen.removeAttribute('aria-hidden');
+        expect(restoreTriggerForRoute('route-a')).toBe(true);
+        resetArbiter();
+        hiddenScreen.setAttribute('aria-hidden', 'true');
+        trigger.focus();
         expect(shouldSkipAutoFocusDueToExistingFocus()).toBe(false);
     });
 
     it.each<[label: string, prop: 'display' | 'visibility', value: string]>([
         ['display:none', 'display', 'none'],
         ['visibility:hidden', 'visibility', 'hidden'],
-    ])('returns false when active element is %s', (_label, prop, value) => {
-        const input = document.createElement('input');
-        document.body.appendChild(input);
-        input.style[prop] = value;
-        input.focus();
+    ])('returns false when restored target became %s after restore (transition-out straggler)', (_label, prop, value) => {
+        const trigger = performRestore();
+        trigger.style[prop] = value;
         expect(shouldSkipAutoFocusDueToExistingFocus()).toBe(false);
     });
 });

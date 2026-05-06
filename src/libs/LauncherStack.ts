@@ -87,10 +87,14 @@ function scheduleClearActivePopoverLauncher(element?: HTMLElement): void {
     if (typeof document === 'undefined') {
         return;
     }
-    const entry = element ? launcherStack.find((e) => e.element === element) : launcherStack.at(-1);
-    if (entry) {
-        entry.deactivatedAt = performance.now();
+    const index = element ? launcherStack.findIndex((e) => e.element === element) : launcherStack.length - 1;
+    if (index < 0) {
+        return;
     }
+    // Splice-then-push so deactivation order matches stack order — pickLauncher's end-first scan returns the most-recently-deactivated entry, which is correct for nested-trap close (outer closes after inner).
+    const [entry] = launcherStack.splice(index, 1);
+    entry.deactivatedAt = performance.now();
+    launcherStack.push(entry);
 }
 
 function resetLauncherStackForTests(): void {

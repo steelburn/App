@@ -4,7 +4,7 @@ import type {NavigationState, PartialState} from '@react-navigation/native';
 import {InteractionManager} from 'react-native';
 import compoundParamsKey, {COMPOUND_KEY_DELIMITER} from './compoundParamsKey';
 import FOCUSABLE_SELECTOR from './focusableSelector';
-import {hasFocusableAttributes} from './focusGuards';
+import hasFocusableAttributes from './focusGuards';
 import getHadTabNavigation from './hadTabNavigation';
 import {consumeLauncher, pickLauncher, resetLauncherStackForTests} from './LauncherStack';
 import navigationRef from './Navigation/navigationRef';
@@ -168,6 +168,26 @@ const RETURN_HOLD_MS = 500;
 let returnHoldTimerId: ReturnType<typeof setTimeout> | undefined;
 // Set on successful RETURN; consulted at hold-release time to decide whether to eagerly reset the cycle or defer.
 let lastRestoreTarget: HTMLElement | null = null;
+
+/** Skip AUTO when the element it would override IS the most recent RETURN-restored target — broader "any focused element" checks would also skip on benign forward-navs from a sidebar/LHN item still holding focus. */
+function shouldSkipAutoFocusDueToExistingFocus(): boolean {
+    if (typeof document === 'undefined' || !lastRestoreTarget || !document.activeElement || document.activeElement === document.body) {
+        return false;
+    }
+    if (document.activeElement !== lastRestoreTarget && !lastRestoreTarget.contains(document.activeElement)) {
+        return false;
+    }
+    if (!hasFocusableAttributes(document.activeElement)) {
+        return false;
+    }
+    if (typeof window !== 'undefined' && document.activeElement instanceof HTMLElement) {
+        const style = window.getComputedStyle(document.activeElement);
+        if (style.display === 'none' || style.visibility === 'hidden') {
+            return false;
+        }
+    }
+    return true;
+}
 
 function scheduleReturnHoldRelease(): void {
     if (returnHoldTimerId !== undefined) {
@@ -460,6 +480,7 @@ export {
     notifyPushParamsBackward,
     cancelPendingFocusRestore,
     compoundParamsKey,
+    shouldSkipAutoFocusDueToExistingFocus,
     resetForTests,
     setLastInteractiveElementForTests,
     setLastMouseTriggerForTests,

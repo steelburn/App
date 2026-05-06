@@ -150,6 +150,17 @@ describe('LauncherStack', () => {
                 expect(pickLauncher()).toBe(b);
             });
         });
+
+        it('moves the deactivated entry to the stack tail so nested-close order matches recency (outer closes AFTER inner → outer wins)', () => {
+            // Outer A opens, inner B opens, B deactivates first, A deactivates second. A is the most recently-deactivated and should be picked.
+            const outer = appendButton();
+            const inner = appendButton();
+            setActivePopoverLauncher(outer);
+            setActivePopoverLauncher(inner);
+            scheduleClearActivePopoverLauncher(inner);
+            scheduleClearActivePopoverLauncher(outer);
+            expect(pickLauncher()).toBe(outer);
+        });
     });
 
     describe('consumeLauncher', () => {
