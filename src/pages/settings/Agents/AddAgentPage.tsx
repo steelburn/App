@@ -30,6 +30,10 @@ function AddAgentPage() {
     const avatarStyle = [styles.avatarXLarge, styles.alignSelfCenter];
     const [avatarSource, setAvatarSource] = useState(() => botAvatars[Math.floor(Math.random() * botAvatars.length)]);
 
+    const handleSwitchAvatar = () => {
+        setAvatarSource((prev: BotAvatar) => botAvatars[(botAvatars.indexOf(prev) + 1) % botAvatars.length]);
+    };
+
     const validate = (values: FormOnyxValues<typeof ONYXKEYS.FORMS.ADD_AGENT_FORM>): Errors => {
         const errors: Errors = {};
         if (!values[INPUT_IDS.PROMPT].trim()) {
@@ -71,7 +75,7 @@ function AddAgentPage() {
                         <AvatarButtonWithIcon
                             text={translate('addAgentPage.switchAvatar')}
                             source={avatarSource}
-                            onPress={() => setAvatarSource((prev: BotAvatar) => botAvatars[(botAvatars.indexOf(prev) + 1) % botAvatars.length])}
+                            onPress={handleSwitchAvatar}
                             size={CONST.AVATAR_SIZE.X_LARGE}
                             avatarStyle={avatarStyle}
                             editIcon={expensifyIcons.Sync}
