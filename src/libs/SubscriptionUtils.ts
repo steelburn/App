@@ -531,12 +531,8 @@ function getSubscriptionPrice(
     privateSubscriptionType: SubscriptionType | undefined,
     hasTeam2025Pricing: boolean,
 ): number {
-    if (!privateSubscriptionType || !plan || plan === CONST.POLICY.TYPE.SUBMIT) {
-        return 0;
-    }
-
     // Submit is a free plan — no subscription price to look up.
-    if (plan === CONST.POLICY.TYPE.SUBMIT) {
+    if (!privateSubscriptionType || !plan || plan === CONST.POLICY.TYPE.SUBMIT) {
         return 0;
     }
 
