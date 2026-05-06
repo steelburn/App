@@ -10,7 +10,7 @@ import {TNodeChildrenRenderer} from 'react-native-render-html';
  */
 function ULRenderer({tnode, style}: CustomRendererProps<TBlock>) {
     return (
-        <View style={style}>
+        <View style={[style, {gap: 8}]}>
             <TNodeChildrenRenderer tnode={tnode} />
         </View>
     );
