@@ -17,9 +17,9 @@ To enable approvals on a workspace you manage:
 1. In the **navigation tabs** (on the left on web, and at the bottom on mobile), click **Workspaces**.
 2. Click your workspace name to access the settings for that workspace.
 3. In the left menu, click **Workflows**.
-4. Toggle on **Add approvals**.
+4. Toggle on **Approvals**.
 
-Enabling **Add approvals** will reveal an option to set a default approval workflow for the workspace.
+Enabling **Approvals** will reveal an option to set a default approval workflow for the workspace.
 
 ---
 
@@ -45,7 +45,7 @@ Set up default or custom approval workflows to route expenses through one or mor
 ## Set a Custom Workflow for Specific Members
 
 1. Navigate to **Workspaces > [Workspace Name] > Workflows**.
-2. Under **Add approvals**, click **Add approval workflow**.
+2. Under **Approvals**, click **Add approval workflow**.
 3. Choose the member whose expenses should have a custom workflow.
 4. Click **Next**.
 5. Select the first approver for their expenses.
