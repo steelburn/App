@@ -48,6 +48,7 @@ import type {Routes, TransactionChanges, WaypointCollection} from '@src/types/on
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
 import type {UpdateMoneyRequestData} from '.';
 import {
+    getAllPolicies,
     getAllReports,
     getAllTransactions,
     getAllTransactionViolations,
@@ -1515,7 +1516,8 @@ function getUpdateTrackExpenseParams(
     const chatReport = getAllReports()?.[`${ONYXKEYS.COLLECTION.REPORT}${transactionThread?.parentReportID}`] ?? null;
     const isDistanceTransaction = transaction && isDistanceRequestTransactionUtils(transaction);
     const isUnreported = transaction && isExpenseUnreported(transaction);
-    const distanceOriginalPolicy = isDistanceTransaction && isUnreported ? getDistanceRateOriginalPolicy(transaction?.comment?.customUnit?.customUnitRateID, policy) : undefined;
+    const distanceOriginalPolicy =
+        isDistanceTransaction && isUnreported ? getDistanceRateOriginalPolicy(transaction?.comment?.customUnit?.customUnitRateID, getAllPolicies(), policy) : undefined;
     const policyForTransaction = distanceOriginalPolicy ?? policy;
     const updatedTransaction = transaction
         ? getUpdatedTransaction({

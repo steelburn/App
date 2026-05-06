@@ -208,12 +208,13 @@ function MoneyRequestView({
     const [policiesWithPerDiem] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {
         selector: perDiemPoliciesSelector,
     });
+    const [allPolicies] = useOnyx(ONYXKEYS.COLLECTION.POLICY);
     const isPerDiemRequest = isPerDiemRequestTransactionUtils(transaction);
     const perDiemOriginalPolicy = getPolicyByCustomUnitID(transaction, policiesWithPerDiem);
 
     const distanceOriginalPolicy =
         isDistanceRequestTransactionUtils(transaction) && isExpenseUnreported
-            ? getDistanceRateOriginalPolicy(transaction?.comment?.customUnit?.customUnitRateID, policyForMovingExpenses)
+            ? getDistanceRateOriginalPolicy(transaction?.comment?.customUnit?.customUnitRateID, allPolicies, policyForMovingExpenses)
             : undefined;
 
     let policy;
