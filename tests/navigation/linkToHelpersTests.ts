@@ -1,5 +1,5 @@
 import type {NavigationState, PartialState} from '@react-navigation/native';
-import {getActiveScreenInRoute, isSwitchingTabsWithinTabNavigator, shouldChangeToMatchingFullScreen} from '@libs/Navigation/helpers/linkTo';
+import {getActiveScreenInRoute, isNavigatingToReportActionWithinSameReport, isSwitchingTabsWithinTabNavigator, shouldChangeToMatchingFullScreen} from '@libs/Navigation/helpers/linkTo';
 import type {NavigationPartialRoute, RootNavigatorParamList} from '@libs/Navigation/types';
 import NAVIGATORS from '@src/NAVIGATORS';
 import SCREENS from '@src/SCREENS';
@@ -173,5 +173,26 @@ describe('shouldChangeToMatchingFullScreen', () => {
     it('returns false when both TAB_NAVIGATOR without state (both active screens undefined)', () => {
         const result = shouldChangeToMatchingFullScreen({name: 'SomeRHPScreen', key: 'k1'}, {name: NAVIGATORS.TAB_NAVIGATOR}, {name: NAVIGATORS.TAB_NAVIGATOR});
         expect(result).toBe(false);
+    });
+});
+
+describe('isNavigatingToReportActionWithinSameReport', () => {
+    it('returns true when the reportIDs match and the reportActionID changed', () => {
+        const currentRoute: NavigationPartialRoute = {
+            name: SCREENS.REPORT,
+            params: {
+                reportID: 111,
+                reportActionID: 222,
+            },
+        };
+        const nextRoute: NavigationPartialRoute = {
+            name: SCREENS.REPORT,
+            params: {
+                reportID: 111,
+                reportActionID: 333,
+            },
+        };
+
+        expect(isNavigatingToReportActionWithinSameReport(currentRoute, nextRoute)).toBe(true);
     });
 });
