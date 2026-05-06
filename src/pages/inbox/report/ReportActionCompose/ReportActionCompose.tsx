@@ -25,7 +25,8 @@ type ReportActionComposeProps = {
 
 function ComposerInner({reportID}: ReportActionComposeProps) {
     const styles = useThemeStyles();
-    const {shouldUseNarrowLayout} = useResponsiveLayout();
+    // eslint-disable-next-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidth
+    const {isSmallScreenWidth} = useResponsiveLayout();
     const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportID}`);
     const [isComposerFullSize = false] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_IS_COMPOSER_FULL_SIZE}${reportID}`);
     const {reportPendingAction: pendingAction} = getReportOfflinePendingActionAndErrors(report);
@@ -50,7 +51,7 @@ function ComposerInner({reportID}: ReportActionComposeProps) {
                     </Composer.DropZone>
                     <Composer.Footer reportID={reportID} />
                 </OfflineWithFeedback>
-                {!shouldUseNarrowLayout && (
+                {!isSmallScreenWidth && (
                     <View style={[styles.mln5, styles.mrn5]}>
                         <ImportedStateIndicator />
                     </View>
