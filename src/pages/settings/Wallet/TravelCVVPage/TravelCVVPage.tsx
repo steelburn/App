@@ -1,23 +1,23 @@
 import {useNavigationState} from '@react-navigation/native';
-import React, {useCallback, useEffect, useRef} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef} from 'react';
 import {View} from 'react-native';
 import FullPageOfflineBlockingView from '@components/BlockingViews/FullPageOfflineBlockingView';
 import Button from '@components/Button';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
-import RESIZE_MODES from '@components/Image/resizeModes';
-import ImageSVG from '@components/ImageSVG';
 import {useLockedAccountActions, useLockedAccountState} from '@components/LockedAccountModalProvider';
-import MenuItemWithTopDescription from '@components/MenuItemWithTopDescription';
+import PressableWithDelayToggle from '@components/Pressable/PressableWithDelayToggle';
 import ScreenWrapper from '@components/ScreenWrapper';
 import ScrollView from '@components/ScrollView';
 import Text from '@components/Text';
-import {useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
+import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {resetValidateActionCodeSent} from '@libs/actions/User';
+import Clipboard from '@libs/Clipboard';
 import Navigation from '@libs/Navigation/Navigation';
+import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import SCREENS from '@src/SCREENS';
@@ -33,7 +33,7 @@ function TravelCVVPage() {
     const styles = useThemeStyles();
     const {isOffline} = useNetwork();
     const {translate} = useLocalize();
-    const illustrations = useMemoizedLazyIllustrations(['TravelCVV']);
+    const icons = useMemoizedLazyExpensifyIcons(['Copy']);
 
     const [account, accountMetadata] = useOnyx(ONYXKEYS.ACCOUNT);
     const [, lockAccountDetailsMetadata] = useOnyx(ONYXKEYS.NVP_PRIVATE_LOCK_ACCOUNT_DETAILS);
@@ -43,6 +43,8 @@ function TravelCVVPage() {
     // Get CVV from context - shared with TravelCVVVerifyAccountPage
     const {cvv} = useTravelCVVState();
     const {setCvv} = useTravelCVVActions();
+    const cvvCharacters = useMemo(() => Array.from(cvv ?? '•••'), [cvv]);
+    const copyCVVLabel = `${translate('common.copy')} ${translate('cardPage.cardDetails.cvv')}`;
 
     // Clear CVV when the page unmounts (e.g. backdrop close) so it doesn't
     // remain visible the next time the page is opened
@@ -107,6 +109,13 @@ function TravelCVVPage() {
         Navigation.navigate(ROUTES.SETTINGS_WALLET_TRAVEL_CVV_VERIFY_ACCOUNT);
     }, [isAccountLocked, showLockedAccountModal]);
 
+    const handleCopyCVVPress = useCallback(() => {
+        if (!cvv) {
+            return;
+        }
+        Clipboard.setString(cvv);
+    }, [cvv]);
+
     return (
         <ScreenWrapper
             testID="TravelCVVPage"
@@ -118,36 +127,52 @@ function TravelCVVPage() {
             />
             <FullPageOfflineBlockingView>
                 <ScrollView contentContainerStyle={[styles.flexGrow1, styles.ph5]}>
-                    <View style={[styles.justifyContentCenter, styles.alignItemsCenter, styles.pt3, styles.pb5]}>
-                        <ImageSVG
-                            src={illustrations.TravelCVV}
-                            contentFit={RESIZE_MODES.contain}
-                            style={styles.travelCCVIllustration}
-                        />
-                    </View>
-
-                    <View style={[styles.mt5, styles.mb12]}>
+                    <View style={[styles.mt5, styles.mb8]}>
                         <Text style={[styles.textNormal, styles.textSupporting]}>{translate('walletPage.travelCVV.description')}</Text>
                     </View>
 
-                    <MenuItemWithTopDescription
-                        description={translate('cardPage.cardDetails.cvv')}
-                        title={cvv ?? '•••'}
-                        interactive={false}
-                        wrapperStyle={[styles.pt0, styles.ph0]}
-                        titleStyle={styles.walletCardNumber}
-                        copyable={!!cvv}
-                        shouldShowRightComponent
-                        rightComponent={
-                            !isSignedInAsDelegate && !cvv ? (
-                                <Button
-                                    text={translate('cardPage.cardDetails.revealDetails')}
-                                    onPress={handleRevealDetailsPress}
-                                    isDisabled={isOffline}
-                                />
-                            ) : undefined
-                        }
-                    />
+                    <View style={[styles.flexRow, styles.justifyContentCenter, styles.gap3, styles.mb12]}>
+                        {cvvCharacters.map((character, index) => (
+                            <View
+                                // eslint-disable-next-line react/no-array-index-key
+                                key={`${character}-${index}`}
+                                style={styles.travelCVVDigitBox}
+                            >
+                                <Text
+                                    fsClass={CONST.FULLSTORY.CLASS.MASK}
+                                    style={styles.travelCVVDigit}
+                                >
+                                    {character}
+                                </Text>
+                            </View>
+                        ))}
+                    </View>
+
+                    {!isSignedInAsDelegate && !cvv && (
+                        <Button
+                            text={translate('cardPage.cardDetails.revealDetails')}
+                            onPress={handleRevealDetailsPress}
+                            isDisabled={isOffline}
+                            style={styles.w100}
+                        />
+                    )}
+
+                    {!!cvv && (
+                        <PressableWithDelayToggle
+                            text={copyCVVLabel}
+                            textChecked={translate('common.copied')}
+                            tooltipText={copyCVVLabel}
+                            tooltipTextChecked={translate('common.copied')}
+                            accessibilityLabel={copyCVVLabel}
+                            accessibilityLabelChecked={translate('common.copied')}
+                            icon={icons.Copy}
+                            inline={false}
+                            onPress={handleCopyCVVPress}
+                            styles={[styles.button, styles.buttonLarge, styles.w100, styles.travelCVVCopyButton]}
+                            textStyles={styles.buttonLargeText}
+                            sentryLabel={CONST.SENTRY_LABEL.COPY_TEXT_TO_CLIPBOARD.COPY_BUTTON}
+                        />
+                    )}
                 </ScrollView>
             </FullPageOfflineBlockingView>
         </ScreenWrapper>

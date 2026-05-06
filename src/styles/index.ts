@@ -5364,9 +5364,26 @@ const staticStyles = (theme: ThemeColors) =>
             height: 170,
         },
 
-        travelCCVIllustration: {
-            width: 240,
-            height: 100,
+        travelCVVDigitBox: {
+            width: 64,
+            height: 64,
+            borderWidth: 1,
+            borderColor: theme.border,
+            borderRadius: variables.componentBorderRadiusNormal,
+            backgroundColor: theme.appBG,
+            alignItems: 'center',
+            justifyContent: 'center',
+        },
+
+        travelCVVDigit: {
+            ...headlineFont,
+            color: theme.text,
+            fontSize: variables.fontSizeXXXLarge,
+            lineHeight: variables.lineHeightXXXLarge,
+        },
+
+        travelCVVCopyButton: {
+            backgroundColor: theme.buttonHoveredBG,
         },
 
         travelInvoicingIcon: {
