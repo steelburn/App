@@ -16,7 +16,7 @@ import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
 import Navigation from '@libs/Navigation/Navigation';
 import NotFoundPage from '@pages/ErrorPage/NotFoundPage';
-import {clearAgentError, openAgentsPage} from '@userActions/Agent';
+import {clearAgentError, clearAgentUpdateError, openAgentsPage} from '@userActions/Agent';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
@@ -68,14 +68,24 @@ function AgentsPage() {
         })
         .filter(Boolean) as AgentItem[];
 
+    const handleErrorClose = (pendingAction: PendingAction | null | undefined, accountID: number) => {
+        if (pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD) {
+            clearAgentError(accountID);
+        } else {
+            clearAgentUpdateError(accountID);
+        }
+    };
+
+    const isAddPending = (pendingAction: PendingAction | null | undefined) => pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD;
+
     const renderItem = ({item}: {item: AgentItem}) => (
         <AgentsListRow
             accountID={item.accountID}
             displayName={item.displayName}
             login={item.login}
             pendingAction={item.pendingAction}
-            errors={item.errors}
-            onErrorClose={() => clearAgentError(item.accountID)}
+            errors={isAddPending(item.pendingAction) ? item.errors : null}
+            onErrorClose={() => handleErrorClose(item.pendingAction, item.accountID)}
         />
     );
 

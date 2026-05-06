@@ -2710,6 +2710,7 @@ ${date} の ${merchant} への ${amount}`,
         emptyAgents: {title: 'エージェントは作成されていません', subtitle: '手作業はやめて、代わりにエージェントに指示を出して、時間を大幅に節約しましょう。'},
         error: {
             genericAdd: 'このエージェントの追加中に問題が発生しました',
+            genericUpdate: 'このエージェントの更新中に問題が発生しました',
         },
     },
     addAgentPage: {

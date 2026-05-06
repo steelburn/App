@@ -2748,6 +2748,7 @@ ${amount} pour ${merchant} - ${date}`,
         emptyAgents: {title: 'Aucun agent créé', subtitle: 'Arrêtez de faire les choses manuellement. Donnez plutôt des instructions à un agent et gagnez beaucoup de temps.'},
         error: {
             genericAdd: "Un problème est survenu lors de l'ajout de cet agent",
+            genericUpdate: 'Un problème est survenu lors de la mise à jour de cet agent',
         },
     },
     addAgentPage: {
@@ -2766,7 +2767,7 @@ ${amount} pour ${merchant} - ${date}`,
         instructions: 'Rédiger des instructions personnalisées',
         deleteAgent: "Supprimer l'agent",
         deleteAgentTitle: "Supprimer l'agent ?",
-        deleteAgentMessage: "Êtes-vous sûr de vouloir supprimer cet agent ? Cette action est irréversible.",
+        deleteAgentMessage: 'Êtes-vous sûr de vouloir supprimer cet agent ? Cette action est irréversible.',
     },
     editAgentNamePage: {
         title: "Nom de l'agent",

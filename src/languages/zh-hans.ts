@@ -2660,6 +2660,7 @@ ${amount}，商户：${merchant} - 日期：${date}`,
         emptyAgents: {title: '尚未创建代理', subtitle: '别再手动处理这些事情了。交给智能代理去执行，为自己节省大量时间。'},
         error: {
             genericAdd: '添加此智能体时出现了问题',
+            genericUpdate: '更新此智能体时出现了问题',
         },
     },
     addAgentPage: {

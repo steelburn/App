@@ -80,42 +80,42 @@ function clearAgentError(optimisticAccountID: number) {
     Onyx.set(`${ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT}${optimisticAccountID}`, null);
 }
 
+function clearAgentUpdateError(accountID: number) {
+    Onyx.merge(`${ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT}${accountID}`, {errors: null});
+}
+
 function updateAgentName(accountID: number, firstName: string, originalFirstName: string) {
     const optimisticData: AnyOnyxUpdate[] = [
         {
             onyxMethod: Onyx.METHOD.MERGE,
-            key: ONYXKEYS.FORMS.EDIT_AGENT_NAME_FORM,
-            value: {isLoading: true, errors: null},
+            key: ONYXKEYS.PERSONAL_DETAILS_LIST,
+            value: {[accountID]: {displayName: firstName}},
         },
         {
             onyxMethod: Onyx.METHOD.MERGE,
-            key: ONYXKEYS.PERSONAL_DETAILS_LIST,
-            value: {
-                [accountID]: {displayName: firstName},
-            },
+            key: `${ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT}${accountID}`,
+            value: {pendingAction: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE, errors: null},
         },
     ];
 
     const successData: AnyOnyxUpdate[] = [
         {
             onyxMethod: Onyx.METHOD.MERGE,
-            key: ONYXKEYS.FORMS.EDIT_AGENT_NAME_FORM,
-            value: {isLoading: false},
+            key: `${ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT}${accountID}`,
+            value: {pendingAction: null},
         },
     ];
 
     const failureData: AnyOnyxUpdate[] = [
         {
             onyxMethod: Onyx.METHOD.MERGE,
-            key: ONYXKEYS.FORMS.EDIT_AGENT_NAME_FORM,
-            value: {isLoading: false, errors: getMicroSecondOnyxErrorWithTranslationKey('common.genericErrorMessage')},
+            key: ONYXKEYS.PERSONAL_DETAILS_LIST,
+            value: {[accountID]: {displayName: originalFirstName}},
         },
         {
             onyxMethod: Onyx.METHOD.MERGE,
-            key: ONYXKEYS.PERSONAL_DETAILS_LIST,
-            value: {
-                [accountID]: {displayName: originalFirstName},
-            },
+            key: `${ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT}${accountID}`,
+            value: {pendingAction: null, errors: getMicroSecondOnyxErrorWithTranslationKey('agentsPage.error.genericUpdate')},
         },
     ];
 
@@ -126,34 +126,24 @@ function updateAgentPrompt(accountID: number, prompt: string, originalPrompt: st
     const optimisticData: AnyOnyxUpdate[] = [
         {
             onyxMethod: Onyx.METHOD.MERGE,
-            key: ONYXKEYS.FORMS.EDIT_AGENT_PROMPT_FORM,
-            value: {isLoading: true, errors: null},
-        },
-        {
-            onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT}${accountID}`,
-            value: {prompt},
+            value: {prompt, pendingAction: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE, errors: null},
         },
     ];
 
     const successData: AnyOnyxUpdate[] = [
         {
             onyxMethod: Onyx.METHOD.MERGE,
-            key: ONYXKEYS.FORMS.EDIT_AGENT_PROMPT_FORM,
-            value: {isLoading: false},
+            key: `${ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT}${accountID}`,
+            value: {pendingAction: null},
         },
     ];
 
     const failureData: AnyOnyxUpdate[] = [
         {
             onyxMethod: Onyx.METHOD.MERGE,
-            key: ONYXKEYS.FORMS.EDIT_AGENT_PROMPT_FORM,
-            value: {isLoading: false, errors: getMicroSecondOnyxErrorWithTranslationKey('common.genericErrorMessage')},
-        },
-        {
-            onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT}${accountID}`,
-            value: {prompt: originalPrompt},
+            value: {prompt: originalPrompt, pendingAction: null, errors: getMicroSecondOnyxErrorWithTranslationKey('agentsPage.error.genericUpdate')},
         },
     ];
 
@@ -188,4 +178,4 @@ function deleteAgent(accountID: number) {
     Navigation.navigate(ROUTES.SETTINGS_AGENTS);
 }
 
-export {openAgentsPage, createAgent, clearAgentError, updateAgentName, updateAgentPrompt, deleteAgent};
+export {openAgentsPage, createAgent, clearAgentError, clearAgentUpdateError, updateAgentName, updateAgentPrompt, deleteAgent};

@@ -2734,6 +2734,7 @@ ${amount} voor ${merchant} - ${date}`,
         emptyAgents: {title: 'Geen agents aangemaakt', subtitle: 'Stop met dingen handmatig doen. Geef in plaats daarvan een opdracht aan een agent en bespaar jezelf veel tijd.'},
         error: {
             genericAdd: 'Er was een probleem bij het toevoegen van deze agent',
+            genericUpdate: 'Er was een probleem bij het bijwerken van deze agent',
         },
     },
     addAgentPage: {

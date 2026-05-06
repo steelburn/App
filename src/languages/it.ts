@@ -2738,6 +2738,7 @@ ${amount} per ${merchant} - ${date}`,
         emptyAgents: {title: 'Nessun agente creato', subtitle: 'Smetti di fare le cose manualmente. Dai istruzioni a un agente e risparmia un sacco di tempo.'},
         error: {
             genericAdd: "Si è verificato un problema durante l'aggiunta di questo agente",
+            genericUpdate: "Si è verificato un problema durante l'aggiornamento di questo agente",
         },
     },
     addAgentPage: {

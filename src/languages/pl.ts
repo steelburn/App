@@ -2729,6 +2729,7 @@ ${amount} dla ${merchant} - ${date}`,
         emptyAgents: {title: 'Nie utworzono agentów', subtitle: 'Przestań robić wszystko ręcznie. Zamiast tego wydaj polecenia agentowi i zaoszczędź mnóstwo czasu.'},
         error: {
             genericAdd: 'Wystąpił problem podczas dodawania tego agenta',
+            genericUpdate: 'Wystąpił problem podczas aktualizowania tego agenta',
         },
     },
     addAgentPage: {

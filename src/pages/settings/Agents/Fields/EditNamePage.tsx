@@ -1,4 +1,4 @@
-import React, {useEffect, useRef} from 'react';
+import React from 'react';
 import FormProvider from '@components/Form/FormProvider';
 import InputWrapper from '@components/Form/InputWrapper';
 import type {FormOnyxValues} from '@components/Form/types';
@@ -12,7 +12,6 @@ import {updateAgentName} from '@libs/actions/Agent';
 import Navigation from '@libs/Navigation/Navigation';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
 import type {SettingsNavigatorParamList} from '@libs/Navigation/types';
-import {clearErrors} from '@userActions/FormActions';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
@@ -26,25 +25,10 @@ function EditNamePage({route}: EditNamePageProps) {
     const styles = useThemeStyles();
     const accountID = route.params.accountID;
     const [personalDetails] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST, {selector: (list) => list?.[accountID]});
-    const [formIsLoading] = useOnyx(ONYXKEYS.FORMS.EDIT_AGENT_NAME_FORM, {selector: (form) => form?.isLoading});
-    const [formErrors] = useOnyx(ONYXKEYS.FORMS.EDIT_AGENT_NAME_FORM, {selector: (form) => form?.errors});
-    const hasSubmittedRef = useRef(false);
-
-    useEffect(() => {
-        clearErrors(ONYXKEYS.FORMS.EDIT_AGENT_NAME_FORM);
-    }, []);
-
-    useEffect(() => {
-        if (!hasSubmittedRef.current || formIsLoading || formErrors) {
-            return;
-        }
-        Navigation.goBack(ROUTES.SETTINGS_AGENTS_EDIT.getRoute(accountID));
-        hasSubmittedRef.current = false;
-    }, [formIsLoading, formErrors, accountID]);
 
     const handleSubmit = (values: FormOnyxValues<typeof ONYXKEYS.FORMS.EDIT_AGENT_NAME_FORM>) => {
-        hasSubmittedRef.current = true;
         updateAgentName(accountID, values[INPUT_IDS.FIRST_NAME].trim(), personalDetails?.displayName ?? '');
+        Navigation.goBack(ROUTES.SETTINGS_AGENTS_EDIT.getRoute(accountID));
     };
 
     return (
