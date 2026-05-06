@@ -1046,6 +1046,12 @@ function checkIfNewFeedConnected(prevFeedsData: CombinedCardFeeds, currentFeedsD
     };
 }
 
+/**
+ * Filters cards by state. Closed and deactivated cards are excluded by default; suspended cards are
+ * only kept when frozen. When `includeDeactivated` is true (workspace card management views), zero-limit
+ * suspended Expensify Cards and issued deactivated Expensify Cards are also kept so admins can manage
+ * cards that the backend deactivates after their limit is set to $0.
+ */
 function filterAllInactiveCards(cards: CardList | undefined, includeDeactivated = false) {
     if (!cards) {
         return {};
@@ -1053,12 +1059,13 @@ function filterAllInactiveCards(cards: CardList | undefined, includeDeactivated 
 
     const closedStates = new Set<number>([CONST.EXPENSIFY_CARD.STATE.CLOSED, CONST.EXPENSIFY_CARD.STATE.STATE_DEACTIVATED]);
     const filteredCards = filterObject(cards, (_key, card) => {
-        const isZeroLimitExpensifyCard = card.bank === CONST.EXPENSIFY_CARD.BANK && (card.nameValuePairs?.unapprovedExpenseLimit ?? 0) === 0;
+        const isZeroLimitExpensifyCard = isExpensifyCard(card) && (card.nameValuePairs?.unapprovedExpenseLimit ?? 0) === 0;
         if (card.state === CONST.EXPENSIFY_CARD.STATE.STATE_SUSPENDED) {
             return !!card.nameValuePairs?.frozen || (includeDeactivated && isZeroLimitExpensifyCard);
         }
         if (card.state === CONST.EXPENSIFY_CARD.STATE.STATE_DEACTIVATED) {
-            return includeDeactivated && card.bank === CONST.EXPENSIFY_CARD.BANK && !!card.cardName;
+            // An empty cardName means the card was created but never issued, so it should not appear in admin views.
+            return includeDeactivated && isExpensifyCard(card) && !!card.cardName;
         }
 
         return !closedStates.has(card.state);
@@ -1077,6 +1084,10 @@ function filterInactiveCards(cardsList: WorkspaceCardsList | undefined) {
     } as WorkspaceCardsList;
 }
 
+/**
+ * Onyx selector for workspace Expensify Card management pages. Same as `filterInactiveCards`, but also
+ * keeps issued deactivated cards and zero-limit suspended cards so admins can view and edit them.
+ */
 function filterInactiveCardsForWorkspace(cardsList: WorkspaceCardsList | undefined) {
     const {cardList, ...assignedCards} = cardsList ?? {};
     const filteredAssignedCards = filterAllInactiveCards(assignedCards, true);
