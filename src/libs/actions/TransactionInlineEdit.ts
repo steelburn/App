@@ -7,6 +7,7 @@
 import Onyx from 'react-native-onyx';
 import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
 import type {ValueOf} from 'type-fest';
+import {isCategoryMissing} from '@libs/CategoryUtils';
 import {convertToBackendAmount, getCurrencyDecimals} from '@libs/CurrencyUtils';
 import {isValidMerchant, isValidMoneyRequestAmount} from '@libs/MoneyRequestUtils';
 import {hasEnabledOptions} from '@libs/OptionsListUtils';
@@ -205,7 +206,7 @@ function editTransactionDateInline(params: TransactionInlineEditParams, newDate:
 function editTransactionMerchantInline(params: TransactionInlineEditParams, newMerchant: string) {
     const transaction = allTransactions[`${ONYXKEYS.COLLECTION.TRANSACTION}${params.transactionID}`];
 
-    if (!isValidMerchant(newMerchant, transaction)) {
+    if (!isValidMerchant(newMerchant, transaction, params.parentReport)) {
         return;
     }
 
@@ -360,7 +361,7 @@ function getTransactionEditPermissions({
         }
 
         if (field === CONST.EDIT_REQUEST_FIELD.CATEGORY) {
-            if (!policy?.areCategoriesEnabled) {
+            if (!policy?.areCategoriesEnabled && isCategoryMissing(transaction?.category)) {
                 return false;
             }
             // Matches MoneyRequestView's shouldShowCategory logic

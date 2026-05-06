@@ -1,6 +1,7 @@
 import {isValidPerDiemExpenseAmount} from '@libs/actions/IOU/PerDiem';
 import {handleNegativeAmountFlipping, isValidMerchant, isValidMoneyRequestAmount, validateAmount, validatePercentage} from '@libs/MoneyRequestUtils';
 import CONST from '@src/CONST';
+import type Report from '@src/types/onyx/Report';
 import type Transaction from '@src/types/onyx/Transaction';
 import type {TransactionCustomUnit} from '@src/types/onyx/Transaction';
 
@@ -251,6 +252,16 @@ describe('ReportActionsUtils', () => {
     });
 
     describe('isValidMerchant', () => {
+        const iouReport = {
+            reportID: '1',
+            type: CONST.REPORT.TYPE.IOU,
+        } as Report;
+
+        const expenseReport = {
+            reportID: '123',
+            type: CONST.REPORT.TYPE.EXPENSE,
+        } as Report;
+
         const unreportedTransaction = {
             reportID: CONST.REPORT.UNREPORTED_REPORT_ID,
             amount: 0,
@@ -262,16 +273,21 @@ describe('ReportActionsUtils', () => {
         } as Transaction;
 
         describe('empty merchants', () => {
-            it('should return true for empty/undefined merchant when transaction is unreported', () => {
+            it('should return true for empty/undefined merchant when transaction is unreported or IOU', () => {
                 expect(isValidMerchant('', unreportedTransaction)).toBe(true);
                 expect(isValidMerchant('   ', unreportedTransaction)).toBe(true);
                 expect(isValidMerchant(undefined, unreportedTransaction)).toBe(true);
+
+                expect(isValidMerchant('', reportedTransaction, iouReport)).toBe(true);
+                expect(isValidMerchant('   ', reportedTransaction, iouReport)).toBe(true);
+                expect(isValidMerchant(undefined, reportedTransaction, iouReport)).toBe(true);
             });
 
             it('should return false for empty/undefined merchant when transaction is reported or missing', () => {
                 expect(isValidMerchant('', reportedTransaction)).toBe(false);
-                expect(isValidMerchant('   ', reportedTransaction)).toBe(false);
-                expect(isValidMerchant(undefined, reportedTransaction)).toBe(false);
+                expect(isValidMerchant('', reportedTransaction, expenseReport)).toBe(false);
+                expect(isValidMerchant('   ', reportedTransaction, expenseReport)).toBe(false);
+                expect(isValidMerchant(undefined, reportedTransaction, expenseReport)).toBe(false);
                 expect(isValidMerchant('')).toBe(false);
             });
         });

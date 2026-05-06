@@ -1,7 +1,8 @@
 import type {OnyxEntry} from 'react-native-onyx';
 import type {ValueOf} from 'type-fest';
 import CONST from '@src/CONST';
-import type {Transaction} from '@src/types/onyx';
+import type {Report, Transaction} from '@src/types/onyx';
+import {isIOUReport} from './ReportUtils';
 import StringUtils from './StringUtils';
 import {isExpenseUnreported} from './TransactionUtils';
 import {isInvalidMerchantValue} from './ValidationUtils';
@@ -163,15 +164,17 @@ function isValidMoneyRequestAmount(amount: number | undefined, iouType: ValueOf<
  *
  * @param merchant - The merchant name to validate
  * @param transaction - The transaction to validate merchant for (used to determine if clearing is allowed)
+ * @param report - The parent report for the transaction (used to determine if IOU clearing is allowed)
  * @returns Whether the merchant value is valid
  */
-function isValidMerchant(merchant: string | undefined, transaction?: OnyxEntry<Transaction>): boolean {
+function isValidMerchant(merchant: string | undefined, transaction?: OnyxEntry<Transaction>, report?: OnyxEntry<Report>): boolean {
     const trimmedMerchant = merchant?.trim() ?? '';
     const isEmpty = !trimmedMerchant;
 
-    // Unreported transactions can have empty merchants (allows clearing)
+    // Unreported expenses and IOU requests can have empty merchants (allows clearing)
     const isUnreported = transaction ? isExpenseUnreported(transaction) : false;
-    if (isEmpty && isUnreported) {
+    const isIOU = !!report && isIOUReport(report);
+    if (isEmpty && (isUnreported || isIOU)) {
         return true;
     }
 
