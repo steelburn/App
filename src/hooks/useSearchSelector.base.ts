@@ -352,17 +352,18 @@ function useSearchSelectorBase({
             : null,
     };
 
-    const unselectedRecentReports = searchOptions.recentReports.filter((option) => !option.isSelected);
+    const isSingleSelect = selectionMode === CONST.SEARCH_SELECTOR.SELECTION_MODE_SINGLE;
+    const filteredRecentReports = isSingleSelect ? searchOptions.recentReports : searchOptions.recentReports.filter((option) => !option.isSelected);
 
     // Filter out people who appear in recent reports from personal details (recents take priority)
-    const recentReportLogins = new Set(unselectedRecentReports.map((option) => option.login).filter(Boolean));
-    const unselectedPersonalDetails = searchOptions.personalDetails.filter((option) => !option.isSelected && !recentReportLogins.has(option.login));
+    const recentReportLogins = new Set(filteredRecentReports.map((option) => option.login).filter(Boolean));
+    const filteredPersonalDetails = searchOptions.personalDetails.filter((option) => (isSingleSelect || !option.isSelected) && !recentReportLogins.has(option.login));
 
     const availableOptions = {
         ...searchOptions,
-        personalDetails: unselectedPersonalDetails,
-        recentReports: unselectedRecentReports,
-        userToInvite: searchOptions.userToInvite?.isSelected ? null : searchOptions.userToInvite,
+        personalDetails: filteredPersonalDetails,
+        recentReports: filteredRecentReports,
+        userToInvite: !isSingleSelect && searchOptions.userToInvite?.isSelected ? null : searchOptions.userToInvite,
     };
 
     /**
