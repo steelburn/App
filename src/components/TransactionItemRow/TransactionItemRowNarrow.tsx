@@ -87,7 +87,7 @@ function TransactionItemRowNarrow({
                                     isDescription={!merchant}
                                 />
                             ) : null}
-                            <View style={[styles.flexRow, styles.alignItemsCenter, styles.gap2]}>
+                            <View style={[styles.flexRow, styles.alignItemsCenter, styles.gap2, !merchantOrDescription && styles.mlAuto]}>
                                 {shouldRenderChatBubbleCell && (
                                     <DeferredChatBubbleCell
                                         transaction={transactionItem}
