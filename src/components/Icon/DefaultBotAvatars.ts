@@ -1,3 +1,4 @@
+import type {TupleToUnion} from 'type-fest';
 import BotAvatarBlue from '@assets/images/avatars/bots/bot-avatar--blue.svg';
 import BotAvatarGreen from '@assets/images/avatars/bots/bot-avatar--green.svg';
 import BotAvatarIce from '@assets/images/avatars/bots/bot-avatar--ice.svg';
@@ -7,7 +8,7 @@ import BotAvatarYellow from '@assets/images/avatars/bots/bot-avatar--yellow.svg'
 
 const botAvatars = [BotAvatarBlue, BotAvatarGreen, BotAvatarIce, BotAvatarPink, BotAvatarTangerine, BotAvatarYellow] as const;
 
-type BotAvatar = (typeof botAvatars)[number];
+type BotAvatar = TupleToUnion<typeof botAvatars>;
 
 const botAvatarIDs = new Map<BotAvatar, string>([
     [BotAvatarBlue, 'bot-avatar--blue'],
