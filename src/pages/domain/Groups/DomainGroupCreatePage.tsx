@@ -139,27 +139,27 @@ function DomainGroupCreatePage({route}: DomainGroupCreatePageProps) {
                     <View style={[styles.sectionDividerLine, styles.mh5, styles.mv6]} />
                     <Text style={[styles.textNormal, styles.textStrong, styles.ph5]}>{translate('domain.groups.permissions')}</Text>
                     <ToggleSettingOptionRow
-                        title={translate('domain.groups.StrictlyEnforceWorkspaceRules')}
-                        subtitle={translate('domain.groups.StrictlyEnforceWorkspaceRulesDescription')}
-                        switchAccessibilityLabel={translate('domain.groups.StrictlyEnforceWorkspaceRules')}
+                        title={translate('domain.groups.strictlyEnforceWorkspaceRules')}
+                        subtitle={translate('domain.groups.strictlyEnforceWorkspaceRulesDescription')}
+                        switchAccessibilityLabel={translate('domain.groups.strictlyEnforceWorkspaceRules')}
                         isActive={strictlyEnforceWorkspaceRules}
                         onToggle={setStrictlyEnforceWorkspaceRules}
                         wrapperStyle={[styles.ph5, styles.mv3]}
                         shouldPlaceSubtitleBelowSwitch
                     />
                     <ToggleSettingOptionRow
-                        title={translate('domain.groups.RestrictDefaultLoginSelection')}
-                        subtitle={translate('domain.groups.RestrictDefaultLoginSelectionDescription')}
-                        switchAccessibilityLabel={translate('domain.groups.RestrictDefaultLoginSelection')}
+                        title={translate('domain.groups.restrictDefaultLoginSelection')}
+                        subtitle={translate('domain.groups.restrictDefaultLoginSelectionDescription')}
+                        switchAccessibilityLabel={translate('domain.groups.restrictDefaultLoginSelection')}
                         isActive={restrictDefaultLoginSelection}
                         onToggle={setRestrictDefaultLoginSelection}
                         wrapperStyle={[styles.ph5, styles.mv3]}
                         shouldPlaceSubtitleBelowSwitch
                     />
                     <ToggleSettingOptionRow
-                        title={translate('domain.groups.RestrictExpenseWorkspaceCreation')}
-                        subtitle={translate('domain.groups.RestrictExpenseWorkspaceCreationDescription')}
-                        switchAccessibilityLabel={translate('domain.groups.RestrictExpenseWorkspaceCreation')}
+                        title={translate('domain.groups.restrictExpenseWorkspaceCreation')}
+                        subtitle={translate('domain.groups.restrictExpenseWorkspaceCreationDescription')}
+                        switchAccessibilityLabel={translate('domain.groups.restrictExpenseWorkspaceCreation')}
                         isActive={restrictExpenseWorkspaceCreation}
                         onToggle={setRestrictExpenseWorkspaceCreation}
                         wrapperStyle={[styles.ph5, styles.mv3]}
@@ -204,9 +204,9 @@ function DomainGroupCreatePage({route}: DomainGroupCreatePageProps) {
                         />
                     )}
                     <ToggleSettingOptionRow
-                        title={translate('domain.groups.ExpensifyCardPreferredWorkspace')}
-                        subtitle={translate('domain.groups.ExpensifyCardPreferredWorkspaceDescription')}
-                        switchAccessibilityLabel={translate('domain.groups.ExpensifyCardPreferredWorkspace')}
+                        title={translate('domain.groups.expensifyCardPreferredWorkspace')}
+                        subtitle={translate('domain.groups.expensifyCardPreferredWorkspaceDescription')}
+                        switchAccessibilityLabel={translate('domain.groups.expensifyCardPreferredWorkspace')}
                         isActive={expensifyCardPreferredWorkspace}
                         onToggle={setExpensifyCardPreferredWorkspace}
                         wrapperStyle={[styles.ph5, styles.mv3]}
