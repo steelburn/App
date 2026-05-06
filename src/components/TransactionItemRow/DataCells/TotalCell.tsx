@@ -16,7 +16,7 @@ import {getCurrency as getTransactionCurrency, isDeletedTransaction, isExpenseUn
 import CONST from '@src/CONST';
 import type TransactionDataCellProps from './TransactionDataCellProps';
 
-type TotalCellProps = TransactionDataCellProps & EditableProps<number | undefined>;
+type TotalCellProps = TransactionDataCellProps & EditableProps<number>;
 type TransactionItem = TransactionDataCellProps['transactionItem'];
 
 function getTransactionItemIouType(transactionItem: TransactionItem) {
@@ -65,7 +65,15 @@ function TotalCell({shouldShowTooltip, transactionItem, canEdit, onSave}: TotalC
     const {isEditing, setLocalValue, startEditing, save, cancelEditing} = useInlineEditState(
         canEdit,
         convertToFrontendAmountAsString(absoluteAmount, getCurrencyDecimals(currency)),
-        (value) => onSave?.(getNormalizedValue(value, isNegative)),
+        onSave
+            ? (value) => {
+                  const normalizedValue = getNormalizedValue(value, isNegative);
+                  if (normalizedValue === undefined) {
+                      return;
+                  }
+                  onSave(normalizedValue);
+              }
+            : undefined,
         (value, originalValue) => getNormalizedValue(value, isNegative) === getNormalizedValue(originalValue, isOriginalAmountNegative),
     );
 

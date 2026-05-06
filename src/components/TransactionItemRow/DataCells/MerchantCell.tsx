@@ -38,7 +38,7 @@ function MerchantOrDescriptionCell({merchantOrDescription, shouldShowTooltip, sh
     const {isEditing, localValue, setLocalValue, startEditing, save, cancelEditing} = useInlineEditState(
         canEdit,
         text,
-        (value) => onSave?.(getNormalizedValue(value)),
+        onSave ? (value) => onSave(getNormalizedValue(value)) : undefined,
         (value, originalValue) => getNormalizedValue(value) === getNormalizedValue(originalValue),
     );
 

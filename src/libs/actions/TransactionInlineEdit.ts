@@ -10,6 +10,7 @@ import type {ValueOf} from 'type-fest';
 import {isCategoryMissing} from '@libs/CategoryUtils';
 import {convertToBackendAmount, getCurrencyDecimals} from '@libs/CurrencyUtils';
 import {isValidMerchant, isValidMoneyRequestAmount} from '@libs/MoneyRequestUtils';
+import {getIsOffline} from '@libs/NetworkState';
 import {hasEnabledOptions} from '@libs/OptionsListUtils';
 import Permissions from '@libs/Permissions';
 import {getTagLists, isMultiLevelTags} from '@libs/PolicyUtils';
@@ -198,6 +199,7 @@ function editTransactionDateInline(params: TransactionInlineEditParams, newDate:
         value: newDate,
         transactions: allTransactions,
         transactionViolations: allTransactionViolations,
+        isOffline: getIsOffline(),
         hash: params.hash,
     });
 }
