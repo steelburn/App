@@ -1049,9 +1049,9 @@ function checkIfNewFeedConnected(prevFeedsData: CombinedCardFeeds, currentFeedsD
 
 /**
  * Filters cards by state. Closed and deactivated cards are excluded by default; suspended cards are
- * only kept when frozen. When `includeDeactivated` is true (workspace card management views), zero-limit
- * suspended Expensify Cards and issued deactivated Expensify Cards are also kept so admins can manage
- * cards that the backend deactivates after their limit is set to $0.
+ * only kept when frozen. When `includeDeactivated` is true (workspace card management views), admin-zeroed
+ * Expensify Cards are also kept — these are cards an admin set to a $0 limit, which the backend then
+ * transitions to deactivated/suspended. Admins still need to be able to find and manage them.
  */
 function filterAllInactiveCards(cards: CardList | undefined, includeDeactivated = false) {
     if (!cards) {
@@ -1059,20 +1059,16 @@ function filterAllInactiveCards(cards: CardList | undefined, includeDeactivated 
     }
 
     const closedStates = new Set<number>([CONST.EXPENSIFY_CARD.STATE.CLOSED, CONST.EXPENSIFY_CARD.STATE.STATE_DEACTIVATED]);
-    const filteredCards = filterObject(cards, (_key, card) => {
-        const isZeroLimitExpensifyCard = isExpensifyCard(card) && (card.nameValuePairs?.unapprovedExpenseLimit ?? 0) === 0;
+    return filterObject(cards, (_key, card) => {
+        const isAdminZeroedExpensifyCard = isExpensifyCard(card) && isCardWithCustomZeroLimit(card);
         if (card.state === CONST.EXPENSIFY_CARD.STATE.STATE_SUSPENDED) {
-            return !!card.nameValuePairs?.frozen || (includeDeactivated && isZeroLimitExpensifyCard);
+            return !!card.nameValuePairs?.frozen || (includeDeactivated && isAdminZeroedExpensifyCard);
         }
         if (card.state === CONST.EXPENSIFY_CARD.STATE.STATE_DEACTIVATED) {
-            // An empty cardName means the card was created but never issued, so it should not appear in admin views.
-            return includeDeactivated && isExpensifyCard(card) && !!card.cardName;
+            return includeDeactivated && isAdminZeroedExpensifyCard;
         }
-
         return !closedStates.has(card.state);
     });
-
-    return filteredCards;
 }
 
 function filterInactiveCards(cardsList: WorkspaceCardsList | undefined) {
