@@ -82,6 +82,7 @@ function BaseSelectionList<TItem extends ListItem>({
     shouldShowRightCaret = false,
     shouldStopPropagation = false,
     shouldHeaderBeInsideList = false,
+    selectAllAccessibilityLabel,
     shouldScrollToFocusedIndex = true,
     shouldScrollToFocusedIndexOnMount = true,
     shouldHighlightInitiallyFocusedItem = false,
@@ -567,6 +568,7 @@ function BaseSelectionList<TItem extends ListItem>({
             selectAllTextStyle={style?.listHeaderSelectAllTextStyle}
             shouldShowSelectAllButton={!!onSelectAll}
             shouldPreventDefaultFocusOnSelectRow={shouldPreventDefaultFocusOnSelectRow}
+            selectAllAccessibilityLabel={selectAllAccessibilityLabel}
         />
     );
 

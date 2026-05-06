@@ -539,6 +539,7 @@ function PolicyDistanceRatesPage({
                         shouldPreventDefaultFocusOnSelectRow={!canUseTouchScreen()}
                         customListHeaderContent={headerContent}
                         canSelectMultiple={canSelectMultiple}
+                        selectAllAccessibilityLabel={translate('accessibilityHints.selectAllDistanceRates')}
                         onDismissError={dismissError}
                         shouldShowListEmptyContent={false}
                         showScrollIndicator={false}

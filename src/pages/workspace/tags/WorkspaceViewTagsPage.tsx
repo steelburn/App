@@ -442,6 +442,7 @@ function WorkspaceViewTagsPage({route}: WorkspaceViewTagsProps) {
                         turnOnSelectionModeOnLongPress={!hasDependentTags}
                         customListHeaderContent={listHeaderContent}
                         canSelectMultiple={canSelectMultiple}
+                        selectAllAccessibilityLabel={translate('accessibilityHints.selectAllTags')}
                         onSelectRow={navigateToTagSettings}
                         shouldShowListEmptyContent={false}
                         onSelectionButtonPress={toggleTag}
