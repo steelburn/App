@@ -75,6 +75,7 @@ function EditAgentPage({route}: EditAgentPageProps) {
                         title={agent?.prompt ?? ''}
                         shouldShowRightIcon
                         onPress={() => Navigation.navigate(ROUTES.SETTINGS_AGENTS_EDIT_PROMPT.getRoute(accountID))}
+                        numberOfLinesTitle={10}
                     />
                 </OfflineWithFeedback>
                 <MenuItem
