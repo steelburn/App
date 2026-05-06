@@ -299,6 +299,7 @@ export default createOnyxDerivedValueConfig({
                 // if report has errors or violations, show red dot
                 if (reasonAndReportAction) {
                     needsParentChatErrorPropagation = true;
+
                     // RBR/Fix mirrors GBR's access rule: only show on the child when the user can't already
                     // see it on the parent workspace chat. The parent still gets ERROR/FIX through the
                     // propagation loop below, so the actionable indicator surfaces on the workspace chat row
