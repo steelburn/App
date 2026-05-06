@@ -40,6 +40,7 @@ function AddDelegatePage() {
         excludeLogins: {...CONST.EXPENSIFY_EMAILS_OBJECT, ...existingDelegates},
         includeRecentReports: true,
         maxRecentReportsToShow: CONST.IOU.MAX_RECENT_REPORTS_TO_SHOW,
+        shouldKeepSelectedInAvailableOptions: true,
     });
 
     const handleSelectRow = (option: OptionData) => {
