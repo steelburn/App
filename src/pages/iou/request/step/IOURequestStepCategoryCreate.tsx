@@ -1,4 +1,4 @@
-import React, {useCallback} from 'react';
+import React from 'react';
 import type {FormOnyxValues} from '@components/Form/types';
 import {useSearchStateContext} from '@components/Search/SearchContext';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
@@ -34,7 +34,7 @@ function IOURequestStepCategoryCreate({
     report: reportReal,
     reportDraft,
     route: {
-        params: {transactionID, action, iouType, reportID, backTo},
+        params: {transactionID, action, iouType, reportID, reportActionID, backTo},
     },
     transaction,
 }: IOURequestStepCategoryCreateProps) {
@@ -87,8 +87,7 @@ function IOURequestStepCategoryCreate({
         parentReportAction: setupCategoriesAndTagsParentReportAction,
     } = useOnboardingTaskInformation(CONST.ONBOARDING_TASK_TYPE.SETUP_CATEGORIES_AND_TAGS);
 
-    const createCategory = useCallback(
-        (values: FormOnyxValues<typeof ONYXKEYS.FORMS.WORKSPACE_CATEGORY_FORM>) => {
+    const createCategory = (values: FormOnyxValues<typeof ONYXKEYS.FORMS.WORKSPACE_CATEGORY_FORM>) => {
             const categoryName = values.categoryName.trim();
 
             if (!policyID) {
@@ -151,42 +150,7 @@ function IOURequestStepCategoryCreate({
                 return;
             }
             Navigation.goBack(backTo);
-        },
-        [
-            action,
-            backTo,
-            currentSearchHash,
-            currentUserPersonalDetails.accountID,
-            currentUserPersonalDetails.login,
-            hasOutstandingChildTask,
-            isASAPSubmitBetaEnabled,
-            isEditing,
-            isEditingSplit,
-            isSetupCategoriesAndTagsTaskParentReportArchived,
-            isSetupCategoryTaskParentReportArchived,
-            iouType,
-            parentReport,
-            parentReportAction,
-            parentReportNextStep,
-            policy,
-            policyCategories,
-            policyHasTags,
-            policyID,
-            policyRecentlyUsedCategories,
-            policyTags,
-            report,
-            reportID,
-            setupCategoriesAndTagsHasOutstandingChildTask,
-            setupCategoriesAndTagsParentReportAction,
-            setupCategoriesAndTagsTaskParentReport,
-            setupCategoriesAndTagsTaskReport,
-            setupCategoryTaskParentReport,
-            setupCategoryTaskReport,
-            splitDraftTransaction,
-            transaction,
-            transactionID,
-        ],
-    );
+    };
 
     return (
         <AccessOrNotFoundWrapper
@@ -196,7 +160,7 @@ function IOURequestStepCategoryCreate({
         >
             <StepScreenWrapper
                 headerTitle={translate('workspace.categories.addCategory')}
-                onBackButtonPress={() => Navigation.goBack(ROUTES.MONEY_REQUEST_STEP_CATEGORY.getRoute(action, iouType, transactionID, reportID, backTo))}
+                onBackButtonPress={() => Navigation.goBack(ROUTES.MONEY_REQUEST_STEP_CATEGORY.getRoute(action, iouType, transactionID, reportID, backTo, reportActionID))}
                 shouldShowWrapper
                 testID="IOURequestStepCategoryCreate"
             >
