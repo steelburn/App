@@ -14,13 +14,14 @@ import useOnyx from '@hooks/useOnyx';
 import usePolicy from '@hooks/usePolicy';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {cleanupTravelProvisioningSession, setTravelProvisioningNextStep} from '@libs/actions/Travel';
+import createDynamicRoute from '@libs/Navigation/helpers/dynamicRoutesUtils/createDynamicRoute';
 import Navigation from '@libs/Navigation/Navigation';
 import type {TravelNavigatorParamList} from '@libs/Navigation/types';
 import {getAdminsPrivateEmailDomains, getMostFrequentEmailDomain} from '@libs/PolicyUtils';
 import AccessOrNotFoundWrapper from '@pages/workspace/AccessOrNotFoundWrapper';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
-import ROUTES from '@src/ROUTES';
+import ROUTES, {DYNAMIC_ROUTES} from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
 
@@ -63,7 +64,7 @@ function DomainSelectorPage({route}: DomainSelectorPageProps) {
             // Determine where to redirect after OTP validation
             const nextStep = isEmptyObject(policy?.address)
                 ? ROUTES.TRAVEL_WORKSPACE_ADDRESS.getRoute(domain, policyID, Navigation.getActiveRoute())
-                : ROUTES.TRAVEL_TCS.getRoute(domain, policyID);
+                : createDynamicRoute(DYNAMIC_ROUTES.TRAVEL_TCS.getRoute(domain, policyID));
             setTravelProvisioningNextStep(nextStep);
             Navigation.navigate(ROUTES.TRAVEL_VERIFY_ACCOUNT.getRoute(domain, policyID));
             return;
@@ -73,7 +74,7 @@ function DomainSelectorPage({route}: DomainSelectorPageProps) {
             Navigation.navigate(ROUTES.TRAVEL_WORKSPACE_ADDRESS.getRoute(domain, policyID, Navigation.getActiveRoute()));
         } else {
             cleanupTravelProvisioningSession();
-            Navigation.navigate(ROUTES.TRAVEL_TCS.getRoute(domain, policyID));
+            Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.TRAVEL_TCS.getRoute(domain, policyID)));
         }
     };
 
