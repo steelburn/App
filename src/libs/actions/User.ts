@@ -1175,13 +1175,13 @@ function updateTheme(theme: ValueOf<typeof CONST.THEME>, shouldGoBack = true) {
 /**
  * Sets a custom status
  */
-function updateCustomStatus(status: Status) {
+function updateCustomStatus(currentUserAccountIDParam: number, status: Status) {
     const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.PERSONAL_DETAILS_LIST>> = [
         {
             onyxMethod: Onyx.METHOD.MERGE,
             key: ONYXKEYS.PERSONAL_DETAILS_LIST,
             value: {
-                [currentUserAccountID]: {
+                [currentUserAccountIDParam]: {
                     status,
                 },
             },
