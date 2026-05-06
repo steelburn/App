@@ -52,6 +52,7 @@ function SearchBulkActionsButton({queryJSON}: SearchBulkActionsButtonProps) {
     const [amountOwed] = useOnyx(ONYXKEYS.NVP_PRIVATE_AMOUNT_OWED);
     const [ownerBillingGracePeriodEnd] = useOnyx(ONYXKEYS.NVP_PRIVATE_OWNER_BILLING_GRACE_PERIOD_END);
 
+    const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const {
         headerButtonsOptions,
         selectedPolicyIDs,
@@ -168,6 +169,7 @@ function SearchBulkActionsButton({queryJSON}: SearchBulkActionsButtonProps) {
                                         setPendingPaymentAdditionalData: (data) => {
                                             pendingPaymentAdditionalDataRef.current = data;
                                         },
+                                        currentUserAccountID: currentUserPersonalDetails?.accountID,
                                     })
                                 }
                                 success
@@ -208,6 +210,7 @@ function SearchBulkActionsButton({queryJSON}: SearchBulkActionsButtonProps) {
                                         setPendingPaymentAdditionalData: (data) => {
                                             pendingPaymentAdditionalDataRef.current = data;
                                         },
+                                        currentUserAccountID: currentUserPersonalDetails?.accountID,
                                     })
                                 }
                                 isSplitButton={false}

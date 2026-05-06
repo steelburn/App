@@ -101,7 +101,7 @@ function getRestrictedPolicyID(
     ownerBillingGracePeriodEnd: OnyxEntry<number>,
     amountOwed: OnyxEntry<number>,
     allPolicies: OnyxCollection<Policy>,
-    currentUserAccountID?: number,
+    currentUserAccountID: number,
 ): string | undefined {
     return items
         .map((item) => item.policyID)

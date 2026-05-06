@@ -1375,7 +1375,7 @@ function handleBulkPayItemSelected(params: {
     ownerBillingGracePeriodEnd: OnyxEntry<number>;
     confirmPayment?: (paymentType: PaymentMethodType | undefined, additionalData?: BulkPaySelectionData) => void;
     setPendingPaymentAdditionalData?: (data: BulkPaySelectionData | undefined) => void;
-    currentUserAccountID?: number;
+    currentUserAccountID: number;
 }) {
     const {
         item,
