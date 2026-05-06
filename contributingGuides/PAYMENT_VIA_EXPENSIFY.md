@@ -18,7 +18,6 @@ Include in the Description field a link to the payment confirmation posted by th
 
 **Important!:** If you’re new to NewDot payments, please double check your eligibility date against the date you were assigned to a GH issue.  If you were assigned to a GH issue before your eligibility date, you must be paid via Upwork.
 
-Once a PR has been deployed to production, those paid via NewDot can request payment, they add ⏸️ emoji in their payment request to denote the payment isn't due now but when the payment summary is posted after the 7-day regression period.
 
 ## For issues with deposits
 If you're having an issue with the deposit, ie. a report gets _stuck_ in a state like Approved, start a chat with Concierge to ask for help. Provide as many details below as possible
