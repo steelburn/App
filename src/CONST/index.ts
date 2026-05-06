@@ -9540,6 +9540,9 @@ const CONST = {
             SIGN_OUT: 'SettingsGeneral-SignOut',
             GO_TO_CLASSIC: 'SettingsGeneral-GoToExpensifyClassic',
         },
+        ADD_AGENT_PAGE: {
+            AVATAR: 'AddAgentPage-Avatar',
+        },
         SETTINGS_PROFILE: {
             AVATAR: 'SettingsProfile-Avatar',
             DISPLAY_NAME: 'SettingsProfile-DisplayName',
