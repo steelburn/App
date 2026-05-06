@@ -177,15 +177,20 @@ function DynamicCategorySettingsPage({route, navigation}: DynamicCategorySetting
         });
     }, [showConfirmModal, translate]);
 
+    const policyCategoryName = policyCategory?.name;
+
     const updateWorkspaceCategoryEnabled = useCallback(
         (value: boolean) => {
+            if (!policyCategoryName) {
+                return;
+            }
             if (shouldPreventDisableOrDelete) {
                 showCannotDeleteOrDisableLastCategoryModal();
                 return;
             }
             setWorkspaceCategoryEnabled({
                 policyData,
-                categoriesToUpdate: {[policyCategory.name]: {name: policyCategory.name, enabled: value}},
+                categoriesToUpdate: {[policyCategoryName]: {name: policyCategoryName, enabled: value}},
                 isSetupCategoriesTaskParentReportArchived: isSetupCategoryTaskParentReportArchived,
                 setupCategoryTaskReport,
                 setupCategoryTaskParentReport,
@@ -204,7 +209,7 @@ function DynamicCategorySettingsPage({route, navigation}: DynamicCategorySetting
             showCannotDeleteOrDisableLastCategoryModal,
             shouldPreventDisableOrDelete,
             policyData,
-            policyCategory,
+            policyCategoryName,
             isSetupCategoryTaskParentReportArchived,
             setupCategoryTaskReport,
             setupCategoryTaskParentReport,
