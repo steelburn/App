@@ -204,7 +204,7 @@ function DynamicCategorySettingsPage({route, navigation}: DynamicCategorySetting
             showCannotDeleteOrDisableLastCategoryModal,
             shouldPreventDisableOrDelete,
             policyData,
-            policyCategory?.name,
+            policyCategory,
             isSetupCategoryTaskParentReportArchived,
             setupCategoryTaskReport,
             setupCategoryTaskParentReport,
