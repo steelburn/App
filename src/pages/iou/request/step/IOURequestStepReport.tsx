@@ -166,7 +166,6 @@ function IOURequestStepReport({route, transaction}: IOURequestStepReportProps) {
         }
 
         handleGoBack();
-        // eslint-disable-next-line @typescript-eslint/no-deprecated
         InteractionManager.runAfterInteractions(() => {
             Navigation.setNavigationActionToMicrotaskQueue(() => {
                 setTransactionReport(
@@ -225,7 +224,6 @@ function IOURequestStepReport({route, transaction}: IOURequestStepReportProps) {
             return;
         }
         Navigation.dismissToSuperWideRHP();
-        // eslint-disable-next-line @typescript-eslint/no-deprecated
         InteractionManager.runAfterInteractions(() => {
             const policyTagList = personalPolicyID ? allPolicyTags?.[`${ONYXKEYS.COLLECTION.POLICY_TAGS}${personalPolicyID}`] : {};
             changeTransactionsReport({
@@ -241,7 +239,6 @@ function IOURequestStepReport({route, transaction}: IOURequestStepReportProps) {
         });
     };
 
-    // eslint-disable-next-line rulesdir/no-negated-variables
     const shouldShowNotFoundPage = useShowNotFoundPageInIOUStep(action, iouType, reportActionID, reportOrDraftReport, transaction);
 
     const createReportForPolicy = (shouldDismissEmptyReportsConfirmation?: boolean) => {
@@ -262,9 +259,9 @@ function IOURequestStepReport({route, transaction}: IOURequestStepReportProps) {
     });
 
     const createReport = () => {
-        const restrictionPolicyID = isPerDiemTransaction ? perDiemOriginalPolicy?.id : policyForMovingExpensesID;
-        if (restrictionPolicyID && shouldRestrictUserBillableActions(restrictionPolicyID, ownerBillingGracePeriodEnd, userBillingGracePeriodEnds, amountOwed)) {
-            Navigation.navigate(ROUTES.RESTRICTED_ACTION.getRoute(restrictionPolicyID));
+        const restrictionPolicy = isPerDiemTransaction ? perDiemOriginalPolicy : policyForMovingExpenses;
+        if (restrictionPolicy && shouldRestrictUserBillableActions(restrictionPolicy, ownerBillingGracePeriodEnd, userBillingGracePeriodEnds, amountOwed, session?.accountID)) {
+            Navigation.navigate(ROUTES.RESTRICTED_ACTION.getRoute(restrictionPolicy.id));
             return;
         }
         if (isPerDiemTransaction) {

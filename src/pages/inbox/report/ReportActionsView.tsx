@@ -149,7 +149,7 @@ function ReportActionsView({reportID, onLayout}: ReportActionsViewProps) {
 
     const lastAction = allReportActions?.at(-1);
     const isInitiallyLoadingTransactionThread = isReportTransactionThread && (!!isLoadingInitialReportActions || (allReportActions ?? [])?.length <= 1);
-    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+
     const shouldAddCreatedAction = !isCreatedAction(lastAction) && (isMoneyRequestReport(report) || isInvoiceReport(report) || isInitiallyLoadingTransactionThread || isConciergeSidePanel);
 
     useEffect(() => {
@@ -183,7 +183,10 @@ function ReportActionsView({reportID, onLayout}: ReportActionsViewProps) {
 
         if (shouldAddCreatedAction) {
             const createdTime = lastAction?.created && DateUtils.subtractMillisecondsFromDateTime(lastAction.created, 1);
-            const optimisticCreatedAction = buildOptimisticCreatedReportAction(String(report?.ownerAccountID), createdTime);
+            const optimisticCreatedAction = buildOptimisticCreatedReportAction({
+                emailCreatingAction: String(report?.ownerAccountID),
+                created: createdTime,
+            });
             optimisticCreatedAction.pendingAction = null;
             actions.push(optimisticCreatedAction);
         }
@@ -365,7 +368,6 @@ function ReportActionsView({reportID, onLayout}: ReportActionsViewProps) {
                 loadNewerChats={loadNewerChats}
                 listID={listID}
                 hasCreatedActionAdded={shouldAddCreatedAction}
-                isConciergeSidePanel={isConciergeSidePanel}
                 showHiddenHistory={!showFullHistory}
                 hasPreviousMessages={hasPreviousMessages}
                 onShowPreviousMessages={handleShowPreviousMessages}
