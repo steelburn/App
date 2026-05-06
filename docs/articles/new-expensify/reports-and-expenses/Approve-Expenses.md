@@ -7,7 +7,7 @@ internalScope: Audience is Workspace approvers and admins. Covers approving and 
 
 # Approve Expenses
 
-When an expense report is submitted on a Workspace with an approval workflow configured, it must be approved before it can be paid. To set an approval workflow on your Workspace, [learn how to add approvals](/articles/new-expensify/workspaces/Add-Approvals). 
+When an expense report is submitted on a Workspace with an approval workflow configured, it must be approved before it can be paid. To set an approval workflow on your Workspace, [learn how to enable Approvals](/articles/new-expensify/workspaces/Add-Approvals). 
 
 When an expense report is submitted to an individual (rather than on a workspace), it won't go through an approval process. It only needs to be paid. [Learn how to pay an expense](/articles/new-expensify/expenses-and-payments/Pay-an-expense).
 
