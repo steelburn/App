@@ -8269,7 +8269,7 @@ Adicione mais regras de gasto para proteger o fluxo de caixa da empresa.`,
             prompt: 'Permita o acesso à localização nas configurações do seu dispositivo para iniciar o rastreamento de distância por GPS.',
         },
         gpsFloatingPillText: 'Rastreamento por GPS em andamento...',
-        liveActivity: {subtitle: 'Rastreamento de distância', button: 'Ver progresso'},
+        liveActivity: {subtitle: 'Rastreamento de distância', button: 'Ver progresso', lockScreenBadgeText: 'Distância', lockScreenTrackingText: 'Rastreando...'},
     },
     reportCardLostOrDamaged: {
         screenTitle: 'Boletim perdido ou danificado',
