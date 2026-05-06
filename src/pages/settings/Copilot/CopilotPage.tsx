@@ -12,6 +12,7 @@ import MenuItem from '@components/MenuItem';
 import type {MenuItemProps} from '@components/MenuItem';
 import MenuItemList from '@components/MenuItemList';
 import {ModalActions} from '@components/Modal/Global/ModalContext';
+import {usePersonalDetails} from '@components/OnyxListItemProvider';
 import PopoverMenu from '@components/PopoverMenu';
 import type {PopoverMenuItem} from '@components/PopoverMenu';
 import ScreenWrapper from '@components/ScreenWrapper';
@@ -42,8 +43,14 @@ import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import {isTrackingSelector} from '@src/selectors/GPSDraftDetails';
+import type Account from '@src/types/onyx/Account';
 import type {Delegate, DelegateRole} from '@src/types/onyx/Account';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
+
+const accountDelegationSelector = (accountValue: Account | undefined) => ({
+    delegatedAccess: accountValue?.delegatedAccess,
+    validated: accountValue?.validated,
+});
 
 function CopilotPage() {
     const icons = useMemoizedLazyExpensifyIcons(['Pencil', 'ThreeDots', 'Trashcan', 'UserPlus']);
@@ -52,7 +59,8 @@ function CopilotPage() {
     const {localeCompare, translate, formatPhoneNumber} = useLocalize();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     useDocumentTitle(translate('delegate.copilot'));
-    const [account] = useOnyx(ONYXKEYS.ACCOUNT);
+    const personalDetails = usePersonalDetails();
+    const [account] = useOnyx(ONYXKEYS.ACCOUNT, {selector: accountDelegationSelector});
     const [credentials] = useOnyx(ONYXKEYS.CREDENTIALS);
     const [session] = useOnyx(ONYXKEYS.SESSION);
     const [activePolicyID] = useOnyx(ONYXKEYS.NVP_ACTIVE_POLICY_ID);
@@ -121,6 +129,17 @@ function CopilotPage() {
 
     const hasDelegators = delegators.length > 0;
     const hasDelegates = delegates.length > 0;
+
+    const getDetailByEmail = useMemo(() => {
+        const map = new Map<string, ReturnType<typeof getPersonalDetailByEmail>>();
+        for (const detail of Object.values(personalDetails ?? {})) {
+            if (!detail?.login) {
+                continue;
+            }
+            map.set(detail.login.toLowerCase(), detail);
+        }
+        return (email: string) => map.get(email.toLowerCase()) ?? getPersonalDetailByEmail(email);
+    }, [personalDetails]);
 
     const setMenuPosition = useCallback(() => {
         if (!delegateButtonRef.current) {
@@ -206,12 +225,12 @@ function CopilotPage() {
 
     const delegateMenuItems: MenuItemProps[] = useMemo(() => {
         const sortedDelegates = sortAlphabetically(
-            delegates.filter((d) => !d.optimisticAccountID).map((d) => ({...d, sortKey: getPersonalDetailByEmail(d.email)?.displayName ?? formatPhoneNumber(d.email)})),
+            delegates.filter((d) => !d.optimisticAccountID).map((d) => ({...d, sortKey: getDetailByEmail(d.email)?.displayName ?? formatPhoneNumber(d.email)})),
             'sortKey',
             localeCompare,
         );
         return sortedDelegates.map(({email, role, pendingAction, pendingFields}) => {
-            const personalDetail = getPersonalDetailByEmail(email);
+            const personalDetail = getDetailByEmail(email);
             const addDelegateErrors = errorFields?.addDelegate?.[email];
             const error = getLatestError(addDelegateErrors);
 
@@ -253,16 +272,16 @@ function CopilotPage() {
                 sentryLabel: CONST.SENTRY_LABEL.SETTINGS_SECURITY.DELEGATE_ITEM,
             };
         });
-    }, [delegates, errorFields, account?.delegatedAccess, formatPhoneNumber, styles, selectedEmail, icons.ThreeDots, localeCompare, showPopoverMenu, renderTitleWithRole]);
+    }, [delegates, errorFields, account?.delegatedAccess, formatPhoneNumber, getDetailByEmail, styles, selectedEmail, icons.ThreeDots, localeCompare, showPopoverMenu, renderTitleWithRole]);
 
     const delegatorMenuItems: MenuItemProps[] = useMemo(() => {
         const sortedDelegators = sortAlphabetically(
-            delegators.map((d) => ({...d, sortKey: getPersonalDetailByEmail(d.email)?.displayName ?? formatPhoneNumber(d.email)})),
+            delegators.map((d) => ({...d, sortKey: getDetailByEmail(d.email)?.displayName ?? formatPhoneNumber(d.email)})),
             'sortKey',
             localeCompare,
         );
         return sortedDelegators.map(({email, role, pendingAction}) => {
-            const personalDetail = getPersonalDetailByEmail(email);
+            const personalDetail = getDetailByEmail(email);
             const formattedEmail = formatPhoneNumber(email);
             const connectError = getLatestError(errorFields?.connect?.[email]);
             const isCurrentUser = email === session?.email;
@@ -295,7 +314,7 @@ function CopilotPage() {
                 ),
             };
         });
-    }, [delegators, styles, translate, formatPhoneNumber, account?.delegatedAccess, localeCompare, session?.email, errorFields, switchToDelegator, renderTitleWithRole]);
+    }, [delegators, styles, translate, formatPhoneNumber, account?.delegatedAccess, getDetailByEmail, localeCompare, session?.email, errorFields, switchToDelegator, renderTitleWithRole]);
 
     const delegatePopoverMenuItems: PopoverMenuItem[] = [
         {

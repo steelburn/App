@@ -79,9 +79,9 @@ jest.mock('@libs/PersonalDetailsUtils', () => ({
 }));
 
 jest.mock('@react-navigation/native', () => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- jest.requireActual returns `any`
     const actual = jest.requireActual('@react-navigation/native');
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return -- spreading `any` from jest.requireActual
     return {
         ...actual,
         useIsFocused: () => true,
