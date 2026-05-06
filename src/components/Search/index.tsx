@@ -281,9 +281,14 @@ function Search({
     // Flush (not cancel) on unmount so the API.write() still executes if the
     // user navigates away before onLayout fires. This also clears the channel,
     // preventing a stale hasDeferredWrite() on the next mount.
+    // Skip when navigate_to_search is pending: the old Search instance is being
+    // replaced by a new one (route swap), and the new instance will handle the
+    // flush via its own layout/focus callbacks.
     useEffect(
         () => () => {
-            flushDeferredWrite(CONST.DEFERRED_LAYOUT_WRITE_KEYS.SEARCH);
+            if (getPendingSubmitFollowUpAction()?.followUpAction !== CONST.TELEMETRY.SUBMIT_FOLLOW_UP_ACTION.NAVIGATE_TO_SEARCH) {
+                flushDeferredWrite(CONST.DEFERRED_LAYOUT_WRITE_KEYS.SEARCH);
+            }
             if (rollbackTimeoutRef.current) {
                 clearTimeout(rollbackTimeoutRef.current);
             }
@@ -1466,7 +1471,10 @@ function Search({
         hasHadFirstLayout.current = true;
         onDestinationVisible?.(isSearchResultsEmptyRef.current, 'layout');
         endSpanWithAttributes(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS, {[CONST.TELEMETRY.ATTRIBUTE_IS_WARM]: true});
-        flushDeferredWrite(CONST.DEFERRED_LAYOUT_WRITE_KEYS.SEARCH);
+        TransitionTracker.runAfterTransitions({
+            callback: () => flushDeferredWrite(CONST.DEFERRED_LAYOUT_WRITE_KEYS.SEARCH),
+            waitForUpcomingTransition: true,
+        });
     }, [onDestinationVisible]);
 
     // Deferred layout only needs the base work (no scroll handling, no content-ready signal).
@@ -1509,6 +1517,12 @@ function Search({
         endSpanWithAttributes(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS, {[CONST.TELEMETRY.ATTRIBUTE_IS_WARM]: true});
     }, []);
 
+    // Tracks whether the pending-expense tracking was re-armed on re-focus
+    // (subsequent expense creation while Search stays mounted). Used by the
+    // effect below to dismiss the overlay once the deferred write completes,
+    // since onLayout won't re-fire for already-mounted content.
+    const wasRearmedRef = useRef(false);
+
     // On re-visits, react-freeze serves the cached layout — onLayout/onLayoutSkeleton never fire.
     // useFocusEffect fires on unfreeze, which is when the screen becomes visible.
     useFocusEffect(
@@ -1516,14 +1530,51 @@ function Search({
             if (!hasHadFirstLayout.current) {
                 return;
             }
+
+            // Re-arm pending expense skeleton for subsequent creations while Search
+            // stays mounted (the original hasPendingWriteOnMountRef only covers the first).
+            if (hasDeferredWrite(CONST.DEFERRED_LAYOUT_WRITE_KEYS.SEARCH) && !showPendingExpensePlaceholder) {
+                wasRearmedRef.current = true;
+
+                // Let the optimistic tracking effect know it should watch for the new item.
+                hasPendingWriteOnMountRef.current = true;
+                optimisticTrackingCleanedUpRef.current = false;
+                setIsOptimisticTrackingCleared(false);
+
+                setShowPendingExpensePlaceholder(true);
+                // Prevent the full-page SearchRowSkeleton from rendering (shouldShowRowSkeleton),
+                // which would cause a blink as SelectionList unmounts/remounts.
+                setSkeletonWasDisplayed(true);
+
+                // Clear stale cached item so the new optimistic row is picked up fresh.
+                cachedOptimisticItemRef.current = null;
+                const latestKey = getOptimisticWatchKey(CONST.DEFERRED_LAYOUT_WRITE_KEYS.SEARCH);
+                if (latestKey) {
+                    optimisticWatchKeyRef.current = latestKey;
+                }
+            }
+
             onDestinationVisible?.(isSearchResultsEmptyRef.current, 'focus');
             endSpanWithAttributes(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS, {
                 [CONST.TELEMETRY.ATTRIBUTE_IS_WARM]: !shouldShowLoadingState,
             });
             // On re-focus (e.g. DISMISS_MODAL_ONLY) onLayout won't re-fire — flush here.
             flushDeferredWrite(CONST.DEFERRED_LAYOUT_WRITE_KEYS.SEARCH);
-        }, [shouldShowLoadingState, onDestinationVisible]),
+        }, [shouldShowLoadingState, onDestinationVisible, showPendingExpensePlaceholder]),
     );
+
+    // Dismiss the overlay after a re-armed deferred write completes. On re-focus,
+    // onLayout doesn't re-fire (content already mounted), so onContentReady is
+    // never called via the normal path. This effect detects when the deferred
+    // write channel is gone (write executed) and sortedData has updated, then
+    // signals overlay readiness.
+    useEffect(() => {
+        if (!wasRearmedRef.current || hasDeferredWrite(CONST.DEFERRED_LAYOUT_WRITE_KEYS.SEARCH)) {
+            return;
+        }
+        wasRearmedRef.current = false;
+        onContentReady?.();
+    }, [sortedData, onContentReady]);
 
     // Reset before conditional returns. Only cancelNavigationSpans (error/empty paths)
     // sets it to true. Must happen during render since it coordinates with the
@@ -1750,7 +1801,7 @@ function Search({
                                 shouldAnimate
                                 fixedNumItems={shouldShowLoadingMoreItems ? 5 : 1}
                                 reasonAttributes={showPendingExpensePlaceholder ? pendingExpenseReasonAttributes : loadMoreSkeletonReasonAttributes}
-                                isLoadMore={shouldShowLoadingMoreItems}
+                                isLoadMore
                             />
                         ) : undefined
                     }

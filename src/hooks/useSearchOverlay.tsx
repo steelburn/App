@@ -29,6 +29,8 @@ type UseSearchOverlayParams = {
     currentSearchKey: string | undefined;
     /** FlatList content padding for narrow layout (accounts for filter bars). */
     contentContainerStyle?: StyleProp<ViewStyle>;
+    /** Callback to signal that the destination is visible (for span ending). */
+    onDestinationVisible?: (wasListEmpty: boolean, source: 'focus' | 'layout') => void;
 };
 
 type UseSearchOverlayResult = {
@@ -54,6 +56,7 @@ function useSearchOverlay({
     isMobileSelectionModeEnabled,
     currentSearchKey,
     contentContainerStyle,
+    onDestinationVisible,
 }: UseSearchOverlayParams): UseSearchOverlayResult {
     const session = useSession();
     const accountID = session?.accountID ?? CONST.DEFAULT_NUMBER_ID;
@@ -69,7 +72,9 @@ function useSearchOverlay({
     // (e.g. a subsequent submit flow while Search stays mounted).
     useFocusEffect(
         useCallback(() => {
-            if (!hasDeferredWrite(CONST.DEFERRED_LAYOUT_WRITE_KEYS.SEARCH) && !Navigation.getIsFullscreenPreInsertedUnderRHP()) {
+            const hasPending = hasDeferredWrite(CONST.DEFERRED_LAYOUT_WRITE_KEYS.SEARCH);
+            const hasPreInserted = Navigation.getIsFullscreenPreInsertedUnderRHP();
+            if (!hasPending && !hasPreInserted) {
                 return;
             }
             setIsSearchReady(false);
@@ -123,6 +128,7 @@ function useSearchOverlay({
                 canSelectMultiple={canSelectMultiple}
                 columns={overlayColumns}
                 contentContainerStyle={shouldUseNarrowLayout ? contentContainerStyle : undefined}
+                onDestinationVisible={onDestinationVisible}
             />
         ) : null;
 
