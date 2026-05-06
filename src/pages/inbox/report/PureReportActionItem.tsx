@@ -210,9 +210,6 @@ type PureReportActionItemProps = {
     /** Whether the room is archived */
     isArchivedRoom?: boolean;
 
-    /** Whether the room is a chronos report */
-    isChronosReport?: boolean;
-
     /** Whether the provided report is a closed expense report with no expenses */
     isClosedExpenseReportWithNoExpenses?: boolean;
 
@@ -264,7 +261,6 @@ function PureReportActionItem({
     originalReportID = '-1',
     originalReport,
     isArchivedRoom,
-    isChronosReport,
     isClosedExpenseReportWithNoExpenses,
     userBillingFundID,
     shouldShowBorder,
@@ -487,7 +483,6 @@ function PureReportActionItem({
                     reportAction: {
                         reportActionID: action.reportActionID,
                         draftMessage,
-                        isThreadReportParentAction,
                     },
                     callbacks: {
                         onShow: toggleContextMenuFromActiveReportAction,
@@ -509,7 +504,6 @@ function PureReportActionItem({
             disabledActions,
             isArchivedRoom,
             handleShowContextMenu,
-            isThreadReportParentAction,
         ],
     );
 
@@ -1072,7 +1066,6 @@ function PureReportActionItem({
                                     displayAsGroup={displayAsGroup}
                                     disabledActions={disabledActions}
                                     isVisible={hovered && draftMessage === undefined && !hasErrors}
-                                    isThreadReportParentAction={isThreadReportParentAction}
                                     draftMessage={draftMessage}
                                     checkIfContextMenuActive={toggleContextMenuFromActiveReportAction}
                                     setIsEmojiPickerActive={setIsEmojiPickerActive}
@@ -1159,7 +1152,6 @@ export default memo(PureReportActionItem, (prevProps, nextProps) => {
         prevProps.originalReportID === nextProps.originalReportID &&
         deepEqual(prevProps.originalReport?.participants, nextProps.originalReport?.participants) &&
         prevProps.isArchivedRoom === nextProps.isArchivedRoom &&
-        prevProps.isChronosReport === nextProps.isChronosReport &&
         prevProps.isClosedExpenseReportWithNoExpenses === nextProps.isClosedExpenseReportWithNoExpenses &&
         prevProps.userBillingFundID === nextProps.userBillingFundID &&
         prevProps.shouldHighlight === nextProps.shouldHighlight &&

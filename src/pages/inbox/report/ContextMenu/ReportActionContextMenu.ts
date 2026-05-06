@@ -30,7 +30,6 @@ type ShowContextMenuParams = {
     reportAction?: {
         reportActionID?: string;
         draftMessage?: string;
-        isThreadReportParentAction?: boolean;
     };
     callbacks?: {
         onShow?: () => void;
