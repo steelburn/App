@@ -2446,7 +2446,6 @@ function getTaskSections(
             if (parentReport && personalDetails) {
                 const policy = data[`${ONYXKEYS.COLLECTION.POLICY}${parentReport.policyID}`];
                 const isParentReportArchived = archivedReportsIDList?.has(`${ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS}${parentReport?.reportID}`);
-                // eslint-disable-next-line @typescript-eslint/no-deprecated
                 const parentReportName = getReportName({report: parentReport, policy, isReportArchived: isParentReportArchived, conciergeReportID});
                 const icons = getIcons(parentReport, formatPhoneNumber, personalDetails, null, '', -1, policy, undefined, isParentReportArchived);
                 const parentReportIcon = icons?.at(0);
@@ -2587,7 +2586,6 @@ function getReportActionsSections(data: OnyxTypes.SearchResults['data'], visible
                     ...reportAction,
                     reportID,
                     from,
-                    // eslint-disable-next-line @typescript-eslint/no-deprecated
                     reportName: getSearchReportName({report, policy, personalDetails: data.personalDetailsList, transactions, invoiceReceiverPolicy, reports, isReportArchived}),
                     formattedFrom: from?.displayName ?? from?.login ?? '',
                     date: reportAction.created,
