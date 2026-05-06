@@ -6,14 +6,18 @@ import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import ScreenWrapper from '@components/ScreenWrapper';
 import useAndroidBackButtonHandler from '@hooks/useAndroidBackButtonHandler';
 import useLocalize from '@hooks/useLocalize';
+import useRootNavigationState from '@hooks/useRootNavigationState';
 import useSubPage from '@hooks/useSubPage';
 import {clearCorpayBankAccountFields} from '@libs/actions/BankAccounts';
 import {clearDraftValues} from '@libs/actions/FormActions';
+import getActiveTabName from '@libs/Navigation/helpers/getActiveTabName';
+import {isFullScreenName} from '@libs/Navigation/helpers/isNavigatorName';
 import Navigation from '@libs/Navigation/Navigation';
 import type {PlatformStackRouteProp} from '@libs/Navigation/PlatformStackNavigation/types';
 import type {SettingsNavigatorParamList} from '@libs/Navigation/types';
 import type {SkeletonSpanReasonAttributes} from '@libs/telemetry/useSkeletonSpan';
 import CONST from '@src/CONST';
+import NAVIGATORS from '@src/NAVIGATORS';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {Route} from '@src/ROUTES';
 import ROUTES from '@src/ROUTES';
@@ -88,12 +92,24 @@ function InternationalDepositAccountContent({
     const skippedPages = getSkippedPages(skipAccountTypeStep, skipAccountHolderInformationStep);
 
     const route = useRoute<PlatformStackRouteProp<SettingsNavigatorParamList, typeof SCREENS.SETTINGS.ADD_BANK_ACCOUNT>>();
+    const topmostFullScreenRoute = useRootNavigationState((state) => state?.routes.findLast((r) => isFullScreenName(r.name)));
+    const activeTab = getActiveTabName(topmostFullScreenRoute);
 
     const goBack = (shouldIgnoreBackToParam = false) => {
-        if (shouldIgnoreBackToParam) {
-            Navigation.goBack(ROUTES.SETTINGS_WALLET);
-        } else {
+        if (backTo && !shouldIgnoreBackToParam) {
             Navigation.goBack(backTo);
+            return;
+        }
+        switch (activeTab) {
+            case NAVIGATORS.SETTINGS_SPLIT_NAVIGATOR:
+                Navigation.goBack(ROUTES.SETTINGS_WALLET);
+                break;
+            case NAVIGATORS.REPORTS_SPLIT_NAVIGATOR:
+                Navigation.closeRHPFlow();
+                break;
+            default:
+                Navigation.goBack();
+                break;
         }
     };
 
