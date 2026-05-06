@@ -88,4 +88,3 @@ export default dedent(`
 
     ${spanishGlossary.toXML()}
 `);
-
