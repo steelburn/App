@@ -54,12 +54,6 @@ function GlobalModals() {
 
     return (
         <>
-            {shouldRenderDeferredModals && (
-                <Suspense fallback={null}>
-                    <LazyUpdateAppModal />
-                </Suspense>
-            )}
-            {/* Those below are only available to the authenticated user. */}
             <GrowlNotification ref={growlRef} />
             <DelegateNoAccessModalProvider>
                 {shouldRenderContextMenu && (
@@ -74,13 +68,19 @@ function GlobalModals() {
             {shouldRenderDeferredModals && (
                 <>
                     {/* Each modal lives in its own Suspense boundary so an unrelated chunk's load latency
-                        or failure cannot delay or suppress the others (e.g. an incoming screen-share request). */}
+                        or failure cannot delay or suppress the others (e.g. an incoming screen-share request).
+                        Order matters: BaseModal hardcodes zIndex: 1 on every modal, so DOM source order
+                        determines stacking when modals coincide. UpdateAppModal is last so the forced-update
+                        prompt sits on top if it ever overlaps with the others. */}
                     <Suspense fallback={null}>
                         {/* Proactive app review modal shown when user has completed a trigger action */}
                         <LazyProactiveAppReviewModalManager />
                     </Suspense>
                     <Suspense fallback={null}>
                         <LazyScreenShareRequestModal />
+                    </Suspense>
+                    <Suspense fallback={null}>
+                        <LazyUpdateAppModal />
                     </Suspense>
                 </>
             )}
