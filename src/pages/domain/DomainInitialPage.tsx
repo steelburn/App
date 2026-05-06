@@ -82,17 +82,17 @@ function DomainInitialPage({route}: DomainInitialPageProps) {
             brickRoadIndicator: hasDomainAdminsErrors(domainErrors) ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined,
         },
         {
-            translationKey: 'domain.saml',
-            icon: icons.UserLock,
-            action: singleExecution(waitForNavigate(() => Navigation.navigate(ROUTES.DOMAIN_SAML.getRoute(domainAccountID)))),
-            screenName: SCREENS.DOMAIN.SAML,
-        },
-        {
             translationKey: 'domain.groups.title',
             icon: icons.Users,
             action: singleExecution(waitForNavigate(() => Navigation.navigate(ROUTES.DOMAIN_GROUPS.getRoute(domainAccountID)))),
             screenName: SCREENS.DOMAIN.GROUPS,
             brickRoadIndicator: hasDomainGroupsErrors(domainErrors) ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined,
+        },
+        {
+            translationKey: 'domain.saml',
+            icon: icons.UserLock,
+            action: singleExecution(waitForNavigate(() => Navigation.navigate(ROUTES.DOMAIN_SAML.getRoute(domainAccountID)))),
+            screenName: SCREENS.DOMAIN.SAML,
         },
     ];
 
