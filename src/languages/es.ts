@@ -6251,7 +6251,8 @@ ${amount} para ${merchant} - ${date}`,
                 notSet: 'Not set',
                 approvalModeDescription: 'Members and managers are set up to sync with Gusto.',
                 approvalModeWarningTitle: 'Change approval mode?',
-                approvalModeWarningPrompt: (helpSiteURL: string) => `Are you sure you would like to change the approval mode for this workspace? Learn more about the different Gusto-enabled workflow modes in our <a href="${helpSiteURL}">help site</a>.`,
+                approvalModeWarningPrompt: (helpSiteURL: string) =>
+                    `Are you sure you would like to change the approval mode for this workspace? Learn more about the different Gusto-enabled workflow modes in our <a href="${helpSiteURL}">help site</a>.`,
                 approvalModeWarningConfirm: 'Change approval mode',
                 approvalModes: {
                     basic: {
