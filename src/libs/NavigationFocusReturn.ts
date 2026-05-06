@@ -8,7 +8,7 @@ import {hasFocusableAttributes} from './focusGuards';
 import getHadTabNavigation from './hadTabNavigation';
 import {consumeLauncher, pickLauncher, resetLauncherStackForTests} from './LauncherStack';
 import navigationRef from './Navigation/navigationRef';
-import {Priorities, resetCycle, tryClaim} from './ScreenFocusArbiter';
+import {isCycleIdle, Priorities, resetCycle, tryClaim} from './ScreenFocusArbiter';
 
 /** focusin tracks the last keyboard-focused element; a nav state listener captures it against the outgoing route and restores it on backward nav. */
 
@@ -206,6 +206,12 @@ function restoreTriggerForRoute(routeKey: string): boolean {
         return false;
     }
     if (pick === 'gone') {
+        triggerMap.delete(routeKey);
+        return false;
+    }
+
+    // User manually focused something during the deferred restore window — respect it. Only when the arbiter is idle: a held cycle (AUTO claimed mid-defer) means the existing focus is system-driven and RETURN should still preempt per priority contract (Status → Clear after race relies on this).
+    if (isCycleIdle() && document.activeElement && document.activeElement !== document.body && hasFocusableAttributes(document.activeElement)) {
         triggerMap.delete(routeKey);
         return false;
     }

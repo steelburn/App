@@ -36,5 +36,13 @@ function resetCycle(): void {
     lastClaimTimestamp = 0;
 }
 
-export {tryClaim, resetCycle, Priorities, CYCLE_TIMEOUT_MS};
+// True when no system has claimed the cycle (or the cycle has lazily expired). Lets callers distinguish "system in flight" (cycle held by AUTO/INITIAL) from "no active claim" (likely a manual user focus event).
+function isCycleIdle(): boolean {
+    if (currentPriority === 0) {
+        return true;
+    }
+    return performance.now() - lastClaimTimestamp > CYCLE_TIMEOUT_MS;
+}
+
+export {tryClaim, resetCycle, isCycleIdle, Priorities, CYCLE_TIMEOUT_MS};
 export type {Priority};

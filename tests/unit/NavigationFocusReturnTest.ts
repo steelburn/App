@@ -802,6 +802,8 @@ describe('restoreTriggerForRoute', () => {
         setLastInteractiveElementForTests(trigger);
         trigger.focus();
         captureTriggerForRoute('route-a');
+        // AUTO claims and focuses — RETURN must preempt because cycle is held (system-driven, not user-driven).
+        expect(tryClaim(Priorities.AUTO)).toBe(true);
         other.focus();
 
         const spy = jest.spyOn(trigger, 'focus');
@@ -844,6 +846,41 @@ describe('restoreTriggerForRoute', () => {
         const secondSpy = jest.spyOn(trigger, 'focus');
         expect(restoreTriggerForRoute('route-a')).toBe(true);
         expect(secondSpy).toHaveBeenCalled();
+    });
+
+    it('should NOT steal focus when the user manually focused something during the deferred restore window', () => {
+        // Forward capture establishes a trigger; backward nav schedules a restore. Between defer and execute, the user clicks/Tabs to a different element. Restore must respect that.
+        const trigger = appendButton();
+        const userTarget = appendInput();
+        trigger.focus();
+        setLastInteractiveElementForTests(trigger);
+        captureTriggerForRoute('route-a');
+
+        // Simulate the deferred-restore window — cycle was reset by handleStateChange (idle), then user manually focuses the input.
+        userTarget.focus();
+        expect(document.activeElement).toBe(userTarget);
+
+        const triggerSpy = jest.spyOn(trigger, 'focus');
+        expect(restoreTriggerForRoute('route-a')).toBe(false);
+        expect(triggerSpy).not.toHaveBeenCalled();
+        expect(document.activeElement).toBe(userTarget);
+    });
+
+    it('should still preempt AUTO when the cycle was claimed mid-defer (Status → Clear after race; user-respect must NOT regress this)', () => {
+        // AUTO claim during the deferred window means the focus is system-driven, not user-driven. RETURN must still preempt per priority contract.
+        const trigger = appendButton();
+        const messageInput = appendInput();
+        trigger.focus();
+        setLastInteractiveElementForTests(trigger);
+        captureTriggerForRoute('route-a');
+
+        // Simulate AUTO claiming and focusing during the deferred window (cycle held, not idle).
+        expect(tryClaim(Priorities.AUTO)).toBe(true);
+        messageInput.focus();
+
+        const triggerSpy = jest.spyOn(trigger, 'focus');
+        expect(restoreTriggerForRoute('route-a')).toBe(true);
+        expect(triggerSpy).toHaveBeenCalled();
     });
 
     it('releases the cycle at RETURN_HOLD_MS when the user has moved focus elsewhere so unrelated later AUTO claims are not blocked for 2s', () => {
@@ -939,7 +976,8 @@ describe('restoreTriggerForRoute', () => {
         captureTriggerForRoute('route-a');
         primary.blur();
 
-        // Simulate AUTO having already focused an input on the destination screen before RETURN fires.
+        // Simulate AUTO having already claimed and focused an input on the destination screen before RETURN fires.
+        expect(tryClaim(Priorities.AUTO)).toBe(true);
         preExistingInput.focus();
 
         // Primary's .focus() is a silent no-op (simulates display:none / visibility:hidden).
@@ -1632,6 +1670,7 @@ describe('teardown / setup lifecycle', () => {
             stale.focus();
             setLastInteractiveElementForTests(stale);
             captureTriggerForRoute('old-home');
+            stale.blur();
             expect(restoreTriggerForRoute('old-home')).toBe(true);
 
             // Re-capture so triggerMap has an entry going into teardown.

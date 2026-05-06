@@ -26,11 +26,11 @@ function resolveCursorForReset(history: CustomHistoryEntry[], currentCursor: num
     const cursor = inRange ? currentCursor : history.length - 1;
     const newCompound = compoundParamsKey(newFocused.key, newFocused.params);
 
-    const matchAt = (idx: number): boolean => {
-        if (idx < 0 || idx >= history.length) {
+    const matchAt = (index: number): boolean => {
+        if (index < 0 || index >= history.length) {
             return false;
         }
-        const entry = history.at(idx);
+        const entry = history.at(index);
         if (typeof entry === 'string' || !entry || entry.key !== newFocused.key) {
             return false;
         }
@@ -56,22 +56,22 @@ function resolveCursorForReset(history: CustomHistoryEntry[], currentCursor: num
         }
     }
     // Non-adjacent jump or out-of-range cursor: scan for the NEAREST match to cursor. Forward wins on distance ties.
-    let bestIdx = -1;
-    let bestDist = Infinity;
-    for (let i = 0; i < history.length; i += 1) {
-        if (!matchAt(i)) {
+    let bestIndex = -1;
+    let bestDistance = Infinity;
+    for (let index = 0; index < history.length; index += 1) {
+        if (!matchAt(index)) {
             continue;
         }
-        const dist = Math.abs(i - cursor);
-        if (dist < bestDist || (dist === bestDist && i > cursor)) {
-            bestIdx = i;
-            bestDist = dist;
+        const distance = Math.abs(index - cursor);
+        if (distance < bestDistance || (distance === bestDistance && index > cursor)) {
+            bestIndex = index;
+            bestDistance = distance;
         }
     }
-    if (bestIdx === -1) {
+    if (bestIndex === -1) {
         return {type: 'unknown'};
     }
-    return bestIdx < cursor ? {type: 'backward', cursor: bestIdx} : {type: 'forward', cursor: bestIdx};
+    return bestIndex < cursor ? {type: 'backward', cursor: bestIndex} : {type: 'forward', cursor: bestIndex};
 }
 
 function isSetParamsAction(action: PushParamsRouterAction): action is SetParamsAction {
