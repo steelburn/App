@@ -85,7 +85,6 @@ function PopoverReportActionContextMenu({ref}: PopoverReportActionContextMenuPro
     const [shouldSetModalVisibilityForDeleteConfirmation, setShouldSetModalVisibilityForDeleteConfirmation] = useState(true);
 
     const [isRoomArchived, setIsRoomArchived] = useState(false);
-    const [isChatPinned, setIsChatPinned] = useState(false);
     const [hasUnreadMessages, setHasUnreadMessages] = useState(false);
     const [isThreadReportParentAction, setIsThreadReportParentAction] = useState(false);
     const [disabledActions, setDisabledActions] = useState<ContextMenuAction[]>([]);
@@ -206,7 +205,7 @@ function PopoverReportActionContextMenu({ref}: PopoverReportActionContextMenuPro
             setComposerToRefocusOnClose('edit');
         }
 
-        const {reportID, originalReportID, isArchivedRoom = false, isPinnedChat = false, isUnreadChat = false} = currentReport;
+        const {reportID, originalReportID, isArchivedRoom = false, isUnreadChat = false} = currentReport;
         const {reportActionID, draftMessage, isThreadReportParentAction: isThreadReportParentActionParam = false} = reportAction;
         const {onShow = () => {}, onHide = () => {}, setIsEmojiPickerActive = () => {}} = callbacks;
         setIsContextMenuOpening(true);
@@ -255,7 +254,6 @@ function PopoverReportActionContextMenu({ref}: PopoverReportActionContextMenuPro
             setIsPopoverVisible(true);
             reportActionDraftMessageRef.current = draftMessage;
             setIsRoomArchived(isArchivedRoom);
-            setIsChatPinned(isPinnedChat);
             setHasUnreadMessages(isUnreadChat);
             setIsThreadReportParentAction(isThreadReportParentActionParam);
             setShouldSwitchPositionIfOverflow(isOverflowMenu);
@@ -508,7 +506,6 @@ function PopoverReportActionContextMenu({ref}: PopoverReportActionContextMenuPro
                     draftMessage={reportActionDraftMessageRef.current}
                     selection={selectionRef.current}
                     isArchivedRoom={isRoomArchived}
-                    isPinnedChat={isChatPinned}
                     isUnreadChat={hasUnreadMessages}
                     isThreadReportParentAction={isThreadReportParentAction}
                     anchor={contextMenuTargetNode}

@@ -95,9 +95,6 @@ type BaseReportActionContextMenuProps = {
     /** Whether the provided report is an archived room */
     isArchivedRoom?: boolean;
 
-    /** Flag to check if the chat is pinned in the LHN. Used for the Pin/Unpin action */
-    isPinnedChat?: boolean;
-
     /** Flag to check if the chat is unread in the LHN. Used for the Mark as Read/Unread action */
     isUnreadChat?: boolean;
 
@@ -127,7 +124,6 @@ function BaseReportActionContextMenu({
     isArchivedRoom = false,
     isMini = false,
     isVisible = false,
-    isPinnedChat = false,
     isUnreadChat = false,
     isThreadReportParentAction = false,
     selection = '',
@@ -271,6 +267,7 @@ function BaseReportActionContextMenu({
         !isArchivedNonExpenseReport(transactionThreadReportID ? childReport : parentReport, transactionThreadReportID ? isChildReportArchived : isParentReportArchived);
 
     const isChronosReport = chatIncludesChronosWithID(originalReportID);
+    const isPinnedChat = !!report?.isPinned;
     const shouldEnableArrowNavigation = !isMini && (isVisible || shouldKeepOpen);
     const isHarvestReport = isHarvestCreatedExpenseReport(reportNameValuePairs?.origin, reportNameValuePairs?.originalID);
 
