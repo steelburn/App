@@ -23,9 +23,6 @@ type UsePopoverEditStateOptions = {
      * Which horizontal edge of the anchor to use as the popover's x-origin.
      */
     anchorEdge?: ValueOf<typeof CONST.MODAL.ANCHOR_ORIGIN_HORIZONTAL>;
-
-    /** Minimum height for the popover when space is limited. */
-    minPopoverHeight?: number;
 };
 
 /**
@@ -45,7 +42,6 @@ function usePopoverEditState({
     popoverHeight = CONST.POPOVER_DROPDOWN_MAX_HEIGHT,
     padding = CONST.MODAL.POPOVER_MENU_PADDING,
     anchorEdge = CONST.MODAL.ANCHOR_ORIGIN_HORIZONTAL.LEFT,
-    minPopoverHeight = CONST.POPOVER_MIN_ADJUSTED_HEIGHT,
 }: UsePopoverEditStateOptions) {
     const {windowHeight} = useWindowDimensions();
     const anchorRef = useRef<View>(null);
@@ -53,30 +49,14 @@ function usePopoverEditState({
     const [isPopoverVisible, setIsPopoverVisible] = useState(false);
     const [popoverPosition, setPopoverPosition] = useState<PopoverPosition>({horizontal: 0, vertical: 0});
     const [isInverted, setIsInverted] = useState(false);
-    const [adjustedPopoverHeight, setAdjustedPopoverHeight] = useState(popoverHeight);
 
     const openPopover = () => {
         anchorRef.current?.measureInWindow((x, y, width, height) => {
-            const availableSpaceBelow = windowHeight - (y + height + padding);
-            const availableSpaceAbove = y - padding;
-
-            const largerSpaceIsBelow = availableSpaceBelow >= availableSpaceAbove;
-            const shouldInvert = !largerSpaceIsBelow;
-            const availableSpace = largerSpaceIsBelow ? availableSpaceBelow : availableSpaceAbove;
-            let finalHeight = popoverHeight;
-
-            if (availableSpace >= popoverHeight) {
-                finalHeight = popoverHeight;
-            } else {
-                // Not enough space — shrink to fit with buffer
-                finalHeight = Math.max(Math.min(popoverHeight, availableSpace * CONST.POPOVER_ADAPTIVE_HEIGHT_BUFFER), minPopoverHeight);
-            }
-
-            setIsInverted(shouldInvert);
-            setAdjustedPopoverHeight(finalHeight);
+            const wouldExceedBottom = y + popoverHeight + padding > windowHeight;
+            setIsInverted(wouldExceedBottom);
             setPopoverPosition({
                 horizontal: anchorEdge === CONST.MODAL.ANCHOR_ORIGIN_HORIZONTAL.LEFT ? x : x + width,
-                vertical: y + (shouldInvert ? 0 : height + padding),
+                vertical: y + (wouldExceedBottom ? 0 : height + padding),
             });
             setIsPopoverVisible(true);
         });
@@ -111,7 +91,6 @@ function usePopoverEditState({
         isPopoverVisible,
         popoverPosition,
         isInverted,
-        adjustedPopoverHeight,
         startEditing,
         cancelEditing,
     };

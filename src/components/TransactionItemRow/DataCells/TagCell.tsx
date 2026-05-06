@@ -1,4 +1,4 @@
-import React, {useMemo} from 'react';
+import React from 'react';
 import TextWithIconCell from '@components/Search/SearchList/ListItem/TextWithIconCell';
 import type {EditableProps} from '@components/Table/EditableCell';
 import {EditableCell, usePopoverEditState} from '@components/Table/EditableCell';
@@ -20,12 +20,12 @@ type TagCellProps = TransactionDataCellProps &
 function TagCell({canEdit, onSave, shouldUseNarrowLayout, shouldShowTooltip, transactionItem, policyID}: TagCellProps) {
     const icons = useMemoizedLazyExpensifyIcons(['Tag']);
     const styles = useThemeStyles();
-    const {isEditing, anchorRef, isPopoverVisible, popoverPosition, isInverted, adjustedPopoverHeight, startEditing, cancelEditing} = usePopoverEditState({canEdit});
+    const {isEditing, anchorRef, isPopoverVisible, popoverPosition, isInverted, startEditing, cancelEditing} = usePopoverEditState({canEdit});
 
     const [policy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`);
     const [policyTags] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_TAGS}${policyID}`);
 
-    const policyHasDependentTags = useMemo(() => hasDependentTags(policy, policyTags), [policy, policyTags]);
+    const policyHasDependentTags = hasDependentTags(policy, policyTags);
 
     const handleTagSelected = (tag: string) => {
         onSave?.(tag);
@@ -67,7 +67,6 @@ function TagCell({canEdit, onSave, shouldUseNarrowLayout, shouldShowTooltip, tra
                     anchorPosition={popoverPosition}
                     shouldMeasureAnchorPositionFromTop={!isInverted}
                     onSelected={handleTagSelected}
-                    popoverHeight={adjustedPopoverHeight}
                 />
             }
         >
