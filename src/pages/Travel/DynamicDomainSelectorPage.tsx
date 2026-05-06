@@ -9,6 +9,7 @@ import SelectionList from '@components/SelectionList';
 import TravelDomainListItem from '@components/SelectionList/ListItem/TravelDomainListItem';
 import type {ListItem} from '@components/SelectionList/types';
 import Text from '@components/Text';
+import useDynamicBackPath from '@hooks/useDynamicBackPath';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import usePolicy from '@hooks/usePolicy';
@@ -30,9 +31,10 @@ type DomainItem = ListItem & {
     isRecommended: boolean;
 };
 
-type DomainSelectorPageProps = StackScreenProps<TravelNavigatorParamList, typeof SCREENS.TRAVEL.DOMAIN_SELECTOR>;
+type DomainSelectorPageProps = StackScreenProps<TravelNavigatorParamList, typeof SCREENS.TRAVEL.DYNAMIC_DOMAIN_SELECTOR>;
 
-function DomainSelectorPage({route}: DomainSelectorPageProps) {
+function DynamicDomainSelectorPage({route}: DomainSelectorPageProps) {
+    const backPath = useDynamicBackPath(DYNAMIC_ROUTES.TRAVEL_DOMAIN_SELECTOR.path);
     const styles = useThemeStyles();
     const {translate} = useLocalize();
 
@@ -82,11 +84,11 @@ function DomainSelectorPage({route}: DomainSelectorPageProps) {
         <AccessOrNotFoundWrapper policyID={policyID}>
             <ScreenWrapper
                 shouldEnableMaxHeight
-                testID="DomainSelectorPage"
+                testID="DynamicDomainSelectorPage"
             >
                 <HeaderWithBackButton
                     title={translate('travel.domainSelector.title')}
-                    onBackButtonPress={() => Navigation.goBack(route.params.backTo)}
+                    onBackButtonPress={() => Navigation.goBack(backPath)}
                 />
                 <Text style={[styles.mt3, styles.mr5, styles.mb5, styles.ml5]}>{translate('travel.domainSelector.subtitle')}</Text>
                 <View style={[styles.optionsListSectionHeader]}>
@@ -113,4 +115,4 @@ function DomainSelectorPage({route}: DomainSelectorPageProps) {
     );
 }
 
-export default DomainSelectorPage;
+export default DynamicDomainSelectorPage;

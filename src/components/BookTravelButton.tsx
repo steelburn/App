@@ -189,7 +189,9 @@ function BookTravelButton({
                 navigateToAcceptTerms(domain, !!isUserValidated, activePolicyID ?? undefined);
             }
         } else {
-            Navigation.navigate(ROUTES.TRAVEL_DOMAIN_SELECTOR.getRoute(activePolicyID, Navigation.getActiveRoute()));
+            const activeRoute = Navigation.getActiveRoute();
+            const dynamicSuffix = activeRoute.includes('policyID=') ? DYNAMIC_ROUTES.TRAVEL_DOMAIN_SELECTOR.path : DYNAMIC_ROUTES.TRAVEL_DOMAIN_SELECTOR.getRoute(activePolicyID);
+            Navigation.navigate(createDynamicRoute(dynamicSuffix));
         }
     };
 

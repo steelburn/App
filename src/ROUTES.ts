@@ -394,7 +394,7 @@ const DYNAMIC_ROUTES = {
             SCREENS.TRAVEL.MY_TRIPS,
             SCREENS.WORKSPACE.TRAVEL,
             SCREENS.SEARCH.ROOT,
-            SCREENS.TRAVEL.DOMAIN_SELECTOR,
+            SCREENS.TRAVEL.DYNAMIC_DOMAIN_SELECTOR,
             SCREENS.TRAVEL.WORKSPACE_ADDRESS,
             SCREENS.TRAVEL.VERIFY_ACCOUNT,
         ],
@@ -403,6 +403,12 @@ const DYNAMIC_ROUTES = {
     TRAVEL_DOMAIN_PERMISSION_INFO: {
         path: 'domain-permission-info',
         entryScreens: [SCREENS.TRAVEL.DYNAMIC_TCS],
+    },
+    TRAVEL_DOMAIN_SELECTOR: {
+        path: 'domain-selector',
+        entryScreens: [SCREENS.TRAVEL.MY_TRIPS, SCREENS.WORKSPACE.TRAVEL, SCREENS.SEARCH.ROOT],
+        getRoute: (policyID?: string) => getUrlWithParams('domain-selector', {policyID}),
+        queryParams: ['policyID'],
     },
     REPORT_CHANGE_APPROVER: {
         path: 'change-approver',
@@ -3274,12 +3280,6 @@ const ROUTES = {
             // eslint-disable-next-line no-restricted-syntax -- Legacy route generation
             return getUrlWithBackToParam(`r/${reportID}/trip/${transactionID}/${pnr}/${sequenceIndex}`, backTo);
         },
-    },
-    TRAVEL_DOMAIN_SELECTOR: {
-        route: 'travel/domain-selector',
-
-        // eslint-disable-next-line no-restricted-syntax -- Legacy route generation
-        getRoute: (policyID?: string, backTo?: string) => getUrlWithBackToParam(`travel/domain-selector?${policyID ? `policyID=${policyID}` : ''}`, backTo),
     },
     TRAVEL_WORKSPACE_CONFIRMATION: {
         route: 'travel/upgrade/workspace/confirmation',
