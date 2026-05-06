@@ -1,5 +1,5 @@
 import {PortalHost} from '@gorhom/portal';
-import React, {useCallback, useEffect, useMemo} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 // We use Animated for all functionality related to wide RHP to make it easier
 // to interact with react-navigation components (e.g., CardContainer, interpolator), which also use Animated.
 // eslint-disable-next-line no-restricted-imports
@@ -155,12 +155,36 @@ function MoneyRequestReportView({report, reportLoadingState, shouldDisplayReport
     // We need to wait for both the selector to finish AND ensure we're not in a loading state where transactions could still populate
     const shouldWaitForTransactions = shouldWaitForTransactionsUtil(report, transactions, reportLoadingState, isOffline);
 
-    const shouldShowOpenReportLoadingSkeleton = !!(isLoadingInitialReportActions && reportActions.length === 0 && !isOffline) || shouldWaitForTransactions;
+    const [transactionThreadReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${transactionThreadReportID}`);
+
+    // After the first expense is created optimistically, `transactionThreadReportID` is derived
+    // from report actions immediately, but `useOnyx` for the thread report needs one more render
+    // cycle to re-subscribe. Keep the skeleton visible during that gap to prevent the header from
+    // flashing "Total 0.00" before the single-expense view finishes mounting.
+    const isTransactionThreadPending =
+        visibleTransactions.length === 1 && !!transactionThreadReportID && transactionThreadReportID !== CONST.FAKE_REPORT_ID && !transactionThreadReport?.reportID && !isOffline;
+
+    const [transactionThreadTimedOutID, setTransactionThreadTimedOutID] = useState<string | undefined>();
+
+    useEffect(() => {
+        if (!isTransactionThreadPending || !transactionThreadReportID) {
+            return;
+        }
+
+        const timeoutID = setTimeout(() => {
+            setTransactionThreadTimedOutID(transactionThreadReportID);
+        }, CONST.SKELETON_LOADING_TIMEOUT_MS);
+
+        return () => clearTimeout(timeoutID);
+    }, [isTransactionThreadPending, transactionThreadReportID]);
+
+    const shouldShowSkeletonForTransactionThread = isTransactionThreadPending && transactionThreadTimedOutID !== transactionThreadReportID;
+
+    const shouldShowOpenReportLoadingSkeleton =
+        !!(isLoadingInitialReportActions && reportActions.length === 0 && !isOffline) || shouldWaitForTransactions || shouldShowSkeletonForTransactionThread;
 
     const isEmptyTransactionReport = visibleTransactions?.length === 0 && transactionThreadReportID === undefined;
     const shouldDisplayMoneyRequestActionsList = !!isEmptyTransactionReport || shouldDisplayReportTableView(report, visibleTransactions ?? []);
-
-    const [transactionThreadReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${transactionThreadReportID}`);
     const shouldShowWideRHPReceipt = visibleTransactions.length === 1 && !isSmallScreenWidth && !!transactionThreadReport;
 
     const reportHeaderView = useMemo(
@@ -211,6 +235,7 @@ function MoneyRequestReportView({report, reportLoadingState, shouldDisplayReport
             context: 'MoneyRequestReportView.InitialLoadingSkeleton',
             isLoadingInitialReportActions: !!isLoadingInitialReportActions,
             shouldWaitForTransactions,
+            shouldShowSkeletonForTransactionThread,
         };
         return (
             <InitialLoadingSkeleton
