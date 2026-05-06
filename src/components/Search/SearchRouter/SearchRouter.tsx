@@ -201,7 +201,7 @@ function SearchRouter({onRouterClose, shouldHideInputCaret, isSearchRouterDispla
         ],
     );
 
-    const searchQueryItems = textInputValue
+    const searchQueryItems = textInputValue?.trim()
         ? [
               {
                   text: textInputValue,
