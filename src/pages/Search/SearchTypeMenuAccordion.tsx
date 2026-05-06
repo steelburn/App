@@ -5,7 +5,7 @@ import type {SharedValue} from 'react-native-reanimated';
 import Accordion from '@components/Accordion';
 import Badge from '@components/Badge';
 import Icon from '@components/Icon';
-import PressableWithFeedback from '@components/Pressable/PressableWithFeedback';
+import PressableWithoutFeedback from '@components/Pressable/PressableWithoutFeedback';
 import Text from '@components/Text';
 import useAccordionAnimation from '@hooks/useAccordionAnimation';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
@@ -94,7 +94,7 @@ function SearchTypeMenuAccordion({title, defaultExpanded = true, badgeText, chil
 
     return (
         <View>
-            <PressableWithFeedback
+            <PressableWithoutFeedback
                 onPress={toggleSection}
                 style={[styles.flexRow, styles.p2, styles.gap2, styles.alignItemsCenter, styles.br2]}
                 role={CONST.ROLE.BUTTON}
@@ -122,7 +122,7 @@ function SearchTypeMenuAccordion({title, defaultExpanded = true, badgeText, chil
                         height={variables.iconSizeSmall}
                     />
                 </Animated.View>
-            </PressableWithFeedback>
+            </PressableWithoutFeedback>
             <Accordion
                 isExpanded={isAccordionExpanded}
                 isToggleTriggered={shouldAnimateAccordionSection}
