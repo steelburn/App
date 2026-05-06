@@ -135,8 +135,6 @@ function ComposerDropZone({reportID, children}: ComposerDropZoneProps) {
                 <SimpleDropZone onAttachmentDrop={onAttachmentDrop}>{children}</SimpleDropZone>
                 {AttachmentPDFValidation}
                 {AttachmentErrorModal}
-                {ReceiptPDFValidation}
-                {ReceiptErrorModal}
             </>
         );
     }
