@@ -1,17 +1,20 @@
 import React from 'react';
 import {View} from 'react-native';
 import ImportedStateIndicator from '@components/ImportedStateIndicator';
+import OfflineIndicator from '@components/OfflineIndicator';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
 import useOnyx from '@hooks/useOnyx';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {getReportOfflinePendingActionAndErrors} from '@libs/ReportUtils';
 import ONYXKEYS from '@src/ONYXKEYS';
+import AgentZeroAwareTypingIndicator from './AgentZeroAwareTypingIndicator';
 import ComposerActionMenu from './ComposerActionMenu';
 import ComposerBox from './ComposerBox';
 import type {SuggestionsRef} from './ComposerContext';
 import ComposerDropZone from './ComposerDropZone';
 import ComposerEmojiPicker from './ComposerEmojiPicker';
+import ComposerExceededLength from './ComposerExceededLength';
 import ComposerFooter from './ComposerFooter';
 import ComposerInput from './ComposerInput';
 import ComposerLocalTime from './ComposerLocalTime';
@@ -26,7 +29,7 @@ type ReportActionComposeProps = {
 function ComposerInner({reportID}: ReportActionComposeProps) {
     const styles = useThemeStyles();
     // eslint-disable-next-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidth
-    const {isSmallScreenWidth} = useResponsiveLayout();
+    const {isSmallScreenWidth, shouldUseNarrowLayout} = useResponsiveLayout();
     const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportID}`);
     const [isComposerFullSize = false] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_IS_COMPOSER_FULL_SIZE}${reportID}`);
     const {reportPendingAction: pendingAction} = getReportOfflinePendingActionAndErrors(report);
@@ -49,7 +52,11 @@ function ComposerInner({reportID}: ReportActionComposeProps) {
                             <Composer.SendButton />
                         </Composer.Box>
                     </Composer.DropZone>
-                    <Composer.Footer reportID={reportID} />
+                    <Composer.Footer>
+                        {!shouldUseNarrowLayout && <OfflineIndicator containerStyles={[styles.chatItemComposeSecondaryRow]} />}
+                        <Composer.TypingIndicator reportID={reportID} />
+                        <Composer.ExceededLength />
+                    </Composer.Footer>
                 </OfflineWithFeedback>
                 {!isSmallScreenWidth && (
                     <View style={[styles.mln5, styles.mrn5]}>
@@ -77,6 +84,8 @@ Composer.Input = ComposerInput;
 Composer.EmojiPicker = ComposerEmojiPicker;
 Composer.SendButton = ComposerSendButton;
 Composer.Footer = ComposerFooter;
+Composer.TypingIndicator = AgentZeroAwareTypingIndicator;
+Composer.ExceededLength = ComposerExceededLength;
 
 export default Composer;
 export type {SuggestionsRef, ComposerRef, ReportActionComposeProps};
