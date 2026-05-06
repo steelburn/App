@@ -251,12 +251,12 @@ function Expensify() {
         // eslint-disable-next-line react-hooks/exhaustive-deps -- we don't want this effect to run again
     }, []);
 
-    let didInit = false;
+    const didInitReconnectRef = useRef(false);
     useEffect(() => {
-        if (didInit) {
+        if (didInitReconnectRef.current) {
             return;
         }
-        didInit = true;
+        didInitReconnectRef.current = true;
         initReconnect();
     }, []);
 
