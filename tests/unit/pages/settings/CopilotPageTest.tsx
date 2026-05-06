@@ -58,7 +58,7 @@ jest.mock('@hooks/useWindowDimensions', () => jest.fn(() => ({windowWidth: 1280,
 
 jest.mock('@hooks/useLazyAsset', () => ({
     useMemoizedLazyIllustrations: jest.fn(() => ({Copilots: 1, Members: 1})),
-    useMemoizedLazyExpensifyIcons: jest.fn(() => ({FallbackAvatar: 1, Pencil: 1, ThreeDots: 1, Trashcan: 1, UserPlus: 1})),
+    useMemoizedLazyExpensifyIcons: jest.fn(() => ({Pencil: 1, ThreeDots: 1, Trashcan: 1, UserPlus: 1})),
 }));
 
 jest.mock('@libs/actions/Delegate', () => ({

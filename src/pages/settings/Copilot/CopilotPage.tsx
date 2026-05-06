@@ -34,6 +34,7 @@ import {stopGpsTrip} from '@libs/GPSDraftDetailsUtils';
 import Navigation from '@libs/Navigation/Navigation';
 import {sortAlphabetically} from '@libs/OptionsListUtils';
 import {getPersonalDetailByEmail} from '@libs/PersonalDetailsUtils';
+import {getDefaultAvatarURL} from '@libs/UserAvatarUtils';
 import type {AnchorPosition} from '@styles/index';
 import colors from '@styles/theme/colors';
 import {close as modalClose} from '@userActions/Modal';
@@ -45,7 +46,7 @@ import type {Delegate, DelegateRole} from '@src/types/onyx/Account';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
 
 function CopilotPage() {
-    const icons = useMemoizedLazyExpensifyIcons(['FallbackAvatar', 'Pencil', 'ThreeDots', 'Trashcan', 'UserPlus']);
+    const icons = useMemoizedLazyExpensifyIcons(['Pencil', 'ThreeDots', 'Trashcan', 'UserPlus']);
     const illustrations = useMemoizedLazyIllustrations(['Copilots', 'Members']);
     const styles = useThemeStyles();
     const {localeCompare, translate, formatPhoneNumber} = useLocalize();
@@ -237,7 +238,7 @@ function CopilotPage() {
             return {
                 titleComponent: renderTitleWithRole(titleText, descriptionText, role),
                 avatarID: personalDetail?.accountID ?? CONST.DEFAULT_NUMBER_ID,
-                icon: personalDetail?.avatar ?? icons.FallbackAvatar,
+                icon: personalDetail?.avatar ?? getDefaultAvatarURL({accountID: personalDetail?.accountID, accountEmail: email}),
                 iconType: CONST.ICON_TYPE_AVATAR,
                 wrapperStyle: [styles.sectionMenuItemTopDescription],
                 iconRight: icons.ThreeDots,
@@ -251,19 +252,7 @@ function CopilotPage() {
                 sentryLabel: CONST.SENTRY_LABEL.SETTINGS_SECURITY.DELEGATE_ITEM,
             };
         });
-    }, [
-        delegates,
-        errorFields,
-        account?.delegatedAccess,
-        formatPhoneNumber,
-        styles,
-        selectedEmail,
-        icons.FallbackAvatar,
-        icons.ThreeDots,
-        localeCompare,
-        showPopoverMenu,
-        renderTitleWithRole,
-    ]);
+    }, [delegates, errorFields, account?.delegatedAccess, formatPhoneNumber, styles, selectedEmail, icons.ThreeDots, localeCompare, showPopoverMenu, renderTitleWithRole]);
 
     const delegatorMenuItems: MenuItemProps[] = useMemo(() => {
         const sortedDelegators = sortAlphabetically(
@@ -283,7 +272,7 @@ function CopilotPage() {
             return {
                 titleComponent: renderTitleWithRole(titleText, descriptionText, role),
                 avatarID: personalDetail?.accountID ?? CONST.DEFAULT_NUMBER_ID,
-                icon: personalDetail?.avatar ?? icons.FallbackAvatar,
+                icon: personalDetail?.avatar ?? getDefaultAvatarURL({accountID: personalDetail?.accountID, accountEmail: email}),
                 iconType: CONST.ICON_TYPE_AVATAR,
                 wrapperStyle: [styles.sectionMenuItemTopDescription],
                 interactive: false,
@@ -304,19 +293,7 @@ function CopilotPage() {
                 ),
             };
         });
-    }, [
-        delegators,
-        styles,
-        translate,
-        formatPhoneNumber,
-        account?.delegatedAccess,
-        icons.FallbackAvatar,
-        localeCompare,
-        session?.email,
-        errorFields,
-        switchToDelegator,
-        renderTitleWithRole,
-    ]);
+    }, [delegators, styles, translate, formatPhoneNumber, account?.delegatedAccess, localeCompare, session?.email, errorFields, switchToDelegator, renderTitleWithRole]);
 
     const delegatePopoverMenuItems: PopoverMenuItem[] = [
         {
