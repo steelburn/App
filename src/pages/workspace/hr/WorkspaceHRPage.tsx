@@ -200,18 +200,16 @@ function WorkspaceHRPage({
                                 rightComponent={gustoRowRightComponent}
                             />
                             {isConnected && (
-                                <>
-                                    <OfflineWithFeedback pendingAction={gustoConfig?.pendingFields?.approvalMode}>
-                                        <MenuItemWithTopDescription
-                                            description={translate('workspace.hr.gusto.approvalMode')}
-                                            title={getGustoApprovalModeLabel(gustoConfig?.approvalMode)}
-                                            style={[styles.sectionMenuItemTopDescription, styles.mt2]}
-                                            shouldShowRightIcon
-                                            brickRoadIndicator={gustoConfig?.errorFields?.approvalMode ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined}
-                                            onPress={() => Navigation.navigate(ROUTES.WORKSPACE_HR_GUSTO_APPROVAL_MODE.getRoute(policyID))}
-                                        />
-                                    </OfflineWithFeedback>
-                                </>
+                                <OfflineWithFeedback pendingAction={gustoConfig?.pendingFields?.approvalMode}>
+                                    <MenuItemWithTopDescription
+                                        description={translate('workspace.hr.gusto.approvalMode')}
+                                        title={getGustoApprovalModeLabel(gustoConfig?.approvalMode)}
+                                        style={[styles.sectionMenuItemTopDescription, styles.mt2]}
+                                        shouldShowRightIcon
+                                        brickRoadIndicator={gustoConfig?.errorFields?.approvalMode ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined}
+                                        onPress={() => Navigation.navigate(ROUTES.WORKSPACE_HR_GUSTO_APPROVAL_MODE.getRoute(policyID))}
+                                    />
+                                </OfflineWithFeedback>
                             )}
                         </Section>
                     </View>
