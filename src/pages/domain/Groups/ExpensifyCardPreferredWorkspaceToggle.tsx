@@ -39,8 +39,8 @@ function ExpensifyCardPreferredWorkspaceToggle({domainAccountID, groupID}: Expen
     const [domainCardSettings] = useOnyx(`${ONYXKEYS.COLLECTION.PRIVATE_EXPENSIFY_CARD_SETTINGS}${domainAccountID}`);
     const isDomainUsingExpensifyCard = !!domainCardSettings;
 
-    const isDisabled = !isPreferredPolicyEnabled || !isDomainUsingExpensifyCard;
     const isActive = !!group?.overridePreferredPolicyWithCardPolicy;
+    const isDisabled = (!isPreferredPolicyEnabled || !isDomainUsingExpensifyCard) && !isActive;
 
     return (
         <>
@@ -50,7 +50,7 @@ function ExpensifyCardPreferredWorkspaceToggle({domainAccountID, groupID}: Expen
                     subtitle={translate('domain.groups.expensifyCardPreferredWorkspaceDescription')}
                     switchAccessibilityLabel={translate('domain.groups.expensifyCardPreferredWorkspace')}
                     shouldPlaceSubtitleBelowSwitch
-                    disabled={isDisabled}
+                    // disabled={isDisabled}
                     disabledAction={() => setIsDisabledModalVisible(true)}
                     isActive={isActive}
                     onToggle={(enabled) => {
