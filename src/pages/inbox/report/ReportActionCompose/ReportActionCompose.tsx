@@ -1,6 +1,5 @@
 import React from 'react';
 import {View} from 'react-native';
-import ImportedStateIndicator from '@components/ImportedStateIndicator';
 import OfflineIndicator from '@components/OfflineIndicator';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
 import useOnyx from '@hooks/useOnyx';
@@ -16,6 +15,7 @@ import ComposerDropZone from './ComposerDropZone';
 import ComposerEmojiPicker from './ComposerEmojiPicker';
 import ComposerExceededLength from './ComposerExceededLength';
 import ComposerFooter from './ComposerFooter';
+import ComposerImportedState from './ComposerImportedState';
 import ComposerInput from './ComposerInput';
 import ComposerLocalTime from './ComposerLocalTime';
 import ComposerProvider from './ComposerProvider';
@@ -28,8 +28,7 @@ type ReportActionComposeProps = {
 
 function ComposerInner({reportID}: ReportActionComposeProps) {
     const styles = useThemeStyles();
-    // eslint-disable-next-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidth
-    const {isSmallScreenWidth, shouldUseNarrowLayout} = useResponsiveLayout();
+    const {shouldUseNarrowLayout} = useResponsiveLayout();
     const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportID}`);
     const [isComposerFullSize = false] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_IS_COMPOSER_FULL_SIZE}${reportID}`);
     const {reportPendingAction: pendingAction} = getReportOfflinePendingActionAndErrors(report);
@@ -58,11 +57,7 @@ function ComposerInner({reportID}: ReportActionComposeProps) {
                         <Composer.ExceededLength />
                     </Composer.Footer>
                 </OfflineWithFeedback>
-                {!isSmallScreenWidth && (
-                    <View style={[styles.mln5, styles.mrn5]}>
-                        <ImportedStateIndicator />
-                    </View>
-                )}
+                <Composer.ImportedState />
             </View>
         </View>
     );
@@ -86,6 +81,7 @@ Composer.SendButton = ComposerSendButton;
 Composer.Footer = ComposerFooter;
 Composer.TypingIndicator = AgentZeroAwareTypingIndicator;
 Composer.ExceededLength = ComposerExceededLength;
+Composer.ImportedState = ComposerImportedState;
 
 export default Composer;
 export type {SuggestionsRef, ComposerRef, ReportActionComposeProps};
