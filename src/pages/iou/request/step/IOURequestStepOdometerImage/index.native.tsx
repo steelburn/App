@@ -115,8 +115,30 @@ function IOURequestStepOdometerImage({
         if (!file) {
             return;
         }
-        setMoneyRequestOdometerImage(transaction, imageType, getOdometerImageUri(file), isTransactionDraft, false);
-        navigateBack();
+
+        const sourceUri = getOdometerImageUri(file);
+        const filename = file.name ?? `odometer-${imageType}.jpg`;
+
+        if (!sourceUri) {
+            navigateBack();
+            return;
+        }
+
+        moveReceiptToDurableStorage(sourceUri, filename).then((durableUri) => {
+            setMoneyRequestOdometerImage(
+                transaction,
+                imageType,
+                {
+                    uri: durableUri,
+                    name: filename,
+                    type: file.type ?? getMimeTypeFromUri(durableUri) ?? 'image/jpeg',
+                    size: file.size,
+                },
+                isTransactionDraft,
+                false,
+            );
+            navigateBack();
+        });
     };
 
     const {validateFiles, ErrorModal} = useFilesValidation(handleImageSelected);
