@@ -16,7 +16,7 @@ import useReportActionsPagination from '@hooks/useReportActionsPagination';
 import useReportIsArchived from '@hooks/useReportIsArchived';
 import useSidePanelState from '@hooks/useSidePanelState';
 import useTransactionsAndViolationsForReport from '@hooks/useTransactionsAndViolationsForReport';
-import {getReportPreviewAction} from '@libs/actions/IOU';
+import {getReportPreviewAction} from '@libs/actions/IOU/MoneyRequestBuilder';
 import {updateLoadingInitialReportAction} from '@libs/actions/Report';
 import {getAllNonDeletedTransactions} from '@libs/MoneyRequestReportUtils';
 import {generateNewRandomInt} from '@libs/NumberUtils';
