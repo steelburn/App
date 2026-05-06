@@ -10,12 +10,10 @@ import ScrollView from '@components/ScrollView';
 import useConfirmReadyToOpenApp from '@hooks/useConfirmReadyToOpenApp';
 import useDocumentTitle from '@hooks/useDocumentTitle';
 import useLocalize from '@hooks/useLocalize';
-import useOnboardingIntent from '@hooks/useOnboardingIntent';
 import useOnyx from '@hooks/useOnyx';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
 import variables from '@styles/variables';
-import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import AnnouncementSection from './AnnouncementSection';
 import AssignedCardsSection from './AssignedCardsSection';
@@ -34,8 +32,6 @@ function HomePage() {
     useDocumentTitle(translate('common.home'));
     const [isLoadingApp = true] = useOnyx(ONYXKEYS.IS_LOADING_APP);
     const [isLoadingReportData = false] = useOnyx(ONYXKEYS.IS_LOADING_REPORT_DATA);
-    const intent = useOnboardingIntent();
-    const shouldSwapForYouAndGettingStarted = intent === CONST.ONBOARDING_CHOICES.TRACK_WORKSPACE;
     const isForYouLoading = !!(isLoadingApp || isLoadingReportData);
     const receiptDropTargetRef = useRef<View>(null);
 
@@ -73,17 +69,8 @@ function HomePage() {
                                 <>
                                     <FreeTrialSection />
                                     <TimeSensitiveSection />
-                                    {shouldSwapForYouAndGettingStarted ? (
-                                        <>
-                                            <ForYouSection />
-                                            <GettingStartedSection />
-                                        </>
-                                    ) : (
-                                        <>
-                                            <GettingStartedSection />
-                                            <ForYouSection />
-                                        </>
-                                    )}
+                                    <GettingStartedSection />
+                                    <ForYouSection />
                                     <UpcomingTravelSection />
                                     <AssignedCardsSection />
                                     <SpendOverTimeSection />

@@ -141,6 +141,8 @@ function getSectionOrder() {
     };
 }
 
+// Locks in the canonical mobile ordering from https://github.com/Expensify/App/issues/85075:
+// Getting started must always sit above For you on narrow layouts, regardless of the onboarding intent.
 describe('HomePage mobile ordering', () => {
     beforeAll(() => {
         Onyx.init({keys: ONYXKEYS});
@@ -152,36 +154,14 @@ describe('HomePage mobile ordering', () => {
         await waitForBatchedUpdates();
     });
 
-    it('renders ForYouSection before GettingStartedSection when introSelected.choice is TRACK_WORKSPACE on narrow layout', async () => {
-        await Onyx.set(ONYXKEYS.NVP_INTRO_SELECTED, {
-            choice: CONST.ONBOARDING_CHOICES.TRACK_WORKSPACE,
-        });
-        await waitForBatchedUpdates();
-
-        renderHomePage();
-
-        const {forYouIndex, gettingStartedIndex} = getSectionOrder();
-        expect(forYouIndex).toBeGreaterThanOrEqual(0);
-        expect(gettingStartedIndex).toBeGreaterThanOrEqual(0);
-        expect(forYouIndex).toBeLessThan(gettingStartedIndex);
-    });
-
-    it('renders ForYouSection before GettingStartedSection when introSelected.choice is undefined but onboardingPurpose is TRACK_WORKSPACE on narrow layout', async () => {
-        await Onyx.set(ONYXKEYS.ONBOARDING_PURPOSE_SELECTED, CONST.ONBOARDING_CHOICES.TRACK_WORKSPACE as never);
-        await waitForBatchedUpdates();
-
-        renderHomePage();
-
-        const {forYouIndex, gettingStartedIndex} = getSectionOrder();
-        expect(forYouIndex).toBeGreaterThanOrEqual(0);
-        expect(gettingStartedIndex).toBeGreaterThanOrEqual(0);
-        expect(forYouIndex).toBeLessThan(gettingStartedIndex);
-    });
-
-    it('keeps GettingStartedSection before ForYouSection when intent is MANAGE_TEAM on narrow layout', async () => {
-        await Onyx.set(ONYXKEYS.NVP_INTRO_SELECTED, {
-            choice: CONST.ONBOARDING_CHOICES.MANAGE_TEAM,
-        });
+    it.each([
+        ['no onboarding intent set', undefined],
+        ['MANAGE_TEAM intent', CONST.ONBOARDING_CHOICES.MANAGE_TEAM],
+        ['TRACK_WORKSPACE intent', CONST.ONBOARDING_CHOICES.TRACK_WORKSPACE],
+    ])('renders GettingStartedSection before ForYouSection on narrow layout with %s', async (_label, choice) => {
+        if (choice) {
+            await Onyx.set(ONYXKEYS.NVP_INTRO_SELECTED, {choice});
+        }
         await waitForBatchedUpdates();
 
         renderHomePage();
