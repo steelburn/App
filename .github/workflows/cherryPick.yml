@@ -58,7 +58,7 @@ jobs:
               channel: '#deployer',
               attachments: [{
                 color: 'warning',
-                text: `⚠️ ${{ inputs.TARGET == 'production' && 'Production' || 'Staging' }} <${{ steps.checkInProgressDeploy.outputs.DEPLOY_RUN_URL }}|deploy> cancelled`
+                text: `⚠️ ${{ inputs.TARGET == 'production' && 'Production' || 'Staging' }} <${{ steps.checkInProgressDeploy.outputs.DEPLOY_RUN_URL }}|deploy> cancelled by new cherry-pick`
               }]
             }
         env:
