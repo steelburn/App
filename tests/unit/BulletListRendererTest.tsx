@@ -86,5 +86,10 @@ describe('Bullet list rendering', () => {
             render(<RenderHTML html="<p>line1<br/>line2</p>" />);
             expect(capturedSource.html).toBe('<p>line1<br/>line2</p>');
         });
+
+        it('preserves <br/> that lives inside <li> as an in-bullet line break', () => {
+            render(<RenderHTML html="<ul><li>One<br/>still one</li><li>Two</li></ul>" />);
+            expect(capturedSource.html).toBe('<ul><li>One<br/>still one</li><li>Two</li></ul>');
+        });
     });
 });
