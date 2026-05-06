@@ -9448,6 +9448,8 @@ ${amount} para ${merchant} - ${date}`,
             ExpensifyCardPreferredWorkspace: 'Espacio de trabajo preferido para Expensify Card',
             ExpensifyCardPreferredWorkspaceDescription:
                 'Todas las transacciones de Expensify Card se crearán en el espacio de trabajo preferido de Expensify Card en lugar del espacio de trabajo preferido. Al habilitar esta función, la configuración de espacio de trabajo preferido se aplicará solo a las transacciones de Expensify Card.',
+            ExpensifyCardPreferredWorkspaceDisabledMessage:
+                'Para usar esta configuración, el espacio de trabajo preferido debe estar habilitado y el dominio debe tener Expensify Card configurada.',
         },
     },
     gps: {

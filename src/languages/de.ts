@@ -9218,6 +9218,8 @@ Hier ist ein *Testbeleg*, um dir zu zeigen, wie es funktioniert:`,
             ExpensifyCardPreferredWorkspace: 'Bevorzugter Workspace für die Expensify Card',
             ExpensifyCardPreferredWorkspaceDescription:
                 'Alle Expensify-Card-Transaktionen werden im bevorzugten Workspace für die Expensify Card statt im bevorzugten Workspace erstellt. Die Aktivierung dieser Funktion überschreibt die Einstellung des bevorzugten Workspace ausschließlich für Expensify-Card-Transaktionen.',
+            ExpensifyCardPreferredWorkspaceDisabledMessage:
+                'Um diese Einstellung zu verwenden, muss der bevorzugte Workspace aktiviert und für die Domain die Expensify Card eingerichtet sein.',
         },
     },
     proactiveAppReview: {

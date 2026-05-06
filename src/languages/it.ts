@@ -9209,6 +9209,8 @@ Ecco una *ricevuta di prova* per mostrarti come funziona:`,
             ExpensifyCardPreferredWorkspace: 'Area di lavoro preferita per Expensify Card',
             ExpensifyCardPreferredWorkspaceDescription:
                 'Tutte le transazioni Expensify Card verranno create nell’area di lavoro preferita per Expensify Card anziché nell’area di lavoro preferita. L’attivazione di questa funzione sostituirà l’impostazione dell’area di lavoro preferita solo per le transazioni Expensify Card.',
+            ExpensifyCardPreferredWorkspaceDisabledMessage:
+                'Per utilizzare questa impostazione, l’area di lavoro preferita deve essere abilitata e la Expensify Card deve essere configurata per il dominio.',
         },
     },
     proactiveAppReview: {

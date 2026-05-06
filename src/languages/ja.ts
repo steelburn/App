@@ -9093,6 +9093,7 @@ ${reportName}
             ExpensifyCardPreferredWorkspace: 'Expensify Card 優先ワークスペース',
             ExpensifyCardPreferredWorkspaceDescription:
                 'すべての Expensify Card トランザクションは、優先ワークスペースではなく Expensify Card 優先ワークスペースで作成されます。この機能を有効にすると、Expensify Card トランザクションに対してのみ優先ワークスペースの設定が上書きされます。',
+            ExpensifyCardPreferredWorkspaceDisabledMessage: 'この設定を使用するには、優先ワークスペースを有効にし、ドメインに Expensify Card が設定されている必要があります。',
         },
     },
     proactiveAppReview: {

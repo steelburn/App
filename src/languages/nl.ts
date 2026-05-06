@@ -9181,6 +9181,8 @@ Hier is een *proefbon* om je te laten zien hoe het werkt:`,
             ExpensifyCardPreferredWorkspace: 'Voorkeurswerkruimte voor Expensify Card',
             ExpensifyCardPreferredWorkspaceDescription:
                 'Alle Expensify Card-transacties worden aangemaakt in de voorkeurswerkruimte voor Expensify Card in plaats van de voorkeurswerkruimte. Door deze functie in te schakelen, wordt de instelling voor de voorkeurswerkruimte alleen voor Expensify Card-transacties overschreven.',
+            ExpensifyCardPreferredWorkspaceDisabledMessage:
+                'Om deze instelling te gebruiken, moet de voorkeurswerkruimte zijn ingeschakeld en moet voor het domein een Expensify Card zijn ingesteld.',
         },
     },
     proactiveAppReview: {

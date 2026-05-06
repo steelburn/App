@@ -9161,6 +9161,8 @@ Oto *paragon testowy*, żeby pokazać Ci, jak to działa:`,
             ExpensifyCardPreferredWorkspace: 'Preferowana przestrzeń robocza dla Expensify Card',
             ExpensifyCardPreferredWorkspaceDescription:
                 'Wszystkie transakcje Expensify Card będą tworzone w preferowanej przestrzeni roboczej dla Expensify Card zamiast w preferowanej przestrzeni roboczej. Włączenie tej funkcji zastąpi ustawienie preferowanej przestrzeni roboczej wyłącznie dla transakcji Expensify Card.',
+            ExpensifyCardPreferredWorkspaceDisabledMessage:
+                'Aby korzystać z tego ustawienia, preferowana przestrzeń robocza musi być włączona, a domena musi mieć skonfigurowaną Expensify Card.',
         },
     },
     proactiveAppReview: {

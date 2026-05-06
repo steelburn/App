@@ -9211,6 +9211,7 @@ const translations = {
             ExpensifyCardPreferredWorkspace: 'Expensify Card Preferred Workspace',
             ExpensifyCardPreferredWorkspaceDescription:
                 'All Expensify Card transactions will be created on the Expensify Card Preferred Workspace instead of the Preferred Workspace. Enabling this feature will override the Preferred Workspace setting for Expensify Card transactions only.',
+            ExpensifyCardPreferredWorkspaceDisabledMessage: 'To use this setting, Preferred Workspace must be enabled and the domain must have Expensify Card set up.',
         },
     },
 };
