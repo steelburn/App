@@ -36,7 +36,7 @@ function resetCycle(): void {
     lastClaimTimestamp = 0;
 }
 
-// True when no system has claimed the cycle (or the cycle has lazily expired). Lets callers distinguish "system in flight" (cycle held by AUTO/INITIAL) from "no active claim" (likely a manual user focus event).
+// True when no system holds the cycle (or it lazily expired). Distinguishes system-in-flight from a likely manual user focus.
 function isCycleIdle(): boolean {
     if (currentPriority === 0) {
         return true;

@@ -169,7 +169,7 @@ let returnHoldTimerId: ReturnType<typeof setTimeout> | undefined;
 // Set on successful RETURN; consulted at hold-release time to decide whether to eagerly reset the cycle or defer.
 let lastRestoreTarget: HTMLElement | null = null;
 
-/** Skip AUTO when the element it would override IS the most recent RETURN-restored target — broader "any focused element" checks would also skip on benign forward-navs from a sidebar/LHN item still holding focus. */
+/** Skip AUTO only when activeElement IS (or descends from) the most recent RETURN-restored target. Broader "any focused element" checks would also skip benign forward-navs (e.g. LHN item still focused). */
 function shouldSkipAutoFocusDueToExistingFocus(): boolean {
     if (typeof document === 'undefined' || !lastRestoreTarget || !document.activeElement || document.activeElement === document.body) {
         return false;
@@ -230,7 +230,7 @@ function restoreTriggerForRoute(routeKey: string): boolean {
         return false;
     }
 
-    // User manually focused something during the deferred restore window — respect it. Only when the arbiter is idle: a held cycle (AUTO claimed mid-defer) means the existing focus is system-driven and RETURN should still preempt per priority contract (Status → Clear after race relies on this).
+    // Idle cycle + non-body focus = user manually focused during the defer; respect it. Held cycle (AUTO mid-defer) = system-driven; preempt per priority (Status → Clear after race).
     if (isCycleIdle() && document.activeElement && document.activeElement !== document.body && hasFocusableAttributes(document.activeElement)) {
         triggerMap.delete(routeKey);
         return false;

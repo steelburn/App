@@ -256,7 +256,7 @@ function addPushParamsRouterExtension<RouterOptions extends PlatformStackRouterO
                 if (newFocused?.key) {
                     const outcome = resolveCursorForReset(history, pushParamsHistoryPosition, {key: newFocused.key, params: newFocused.params});
                     if (outcome.type === 'backward' || outcome.type === 'ambiguous') {
-                        // Ambiguous: cursor advances forward (per resolver) but we still fire backward notify — WCAG 2.4.3 prefers attempting focus restoration on direction-uncertain RESETs.
+                        // Ambiguous: cursor goes forward (per resolver) but we fire backward notify (WCAG 2.4.3 priority on direction-uncertain RESETs).
                         notifyPushParamsBackward(newFocused.key, newFocused.params);
                         pushParamsHistoryPosition = outcome.cursor;
                     } else if (outcome.type === 'forward') {
@@ -278,7 +278,7 @@ function addPushParamsRouterExtension<RouterOptions extends PlatformStackRouterO
 
                 const preservedHistory = preserveHistoryForRoutes(history, rehydratedState.routes);
                 if (preservedHistory.length > 0) {
-                    // Remap cursor when preservation removed entries so the numeric index still points at the same logical entry. indexOf relies on reference equality — preserveHistoryForRoutes filters without cloning; if it ever clones, the remap silently falls back to length-1.
+                    // Remap cursor when preservation removed entries — same logical entry, new index. `indexOf` reference-equality assumes `preserveHistoryForRoutes` doesn't clone; if it ever does, remap falls back to length-1.
                     if (preservedHistory.length !== history.length) {
                         const cursorEntry = pushParamsHistoryPosition >= 0 && pushParamsHistoryPosition < history.length ? history.at(pushParamsHistoryPosition) : null;
                         if (cursorEntry) {

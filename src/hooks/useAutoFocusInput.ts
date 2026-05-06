@@ -82,7 +82,7 @@ export default function useAutoFocusInput(isMultiline = false): UseAutoFocusInpu
                 if (!tryClaim(Priorities.AUTO)) {
                     return;
                 }
-                // Verify focus actually moved — RN-Web TextInput on a hidden/disabled element can silently no-op. Release the AUTO claim so INITIAL/RETURN aren't blocked for the cycle's 2s timeout.
+                // Silent no-op (RN-Web TextInput hidden/disabled) leaves AUTO claimed; release so INITIAL/RETURN aren't blocked for 2s.
                 const beforeActive = typeof document !== 'undefined' ? document.activeElement : null;
                 input.focus();
                 if (beforeActive !== null && document.activeElement === beforeActive) {
