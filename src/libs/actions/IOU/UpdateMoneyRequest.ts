@@ -733,7 +733,6 @@ function updateMoneyRequestDistanceRate({
     parentReport,
     rateID,
     policy,
-    allPolicies,
     policyTagList,
     policyCategories,
     currentUserAccountIDParam,
@@ -749,7 +748,6 @@ function updateMoneyRequestDistanceRate({
     parentReport: OnyxEntry<OnyxTypes.Report>;
     rateID: string;
     policy: OnyxEntry<OnyxTypes.Policy>;
-    allPolicies: OnyxCollection<OnyxTypes.Policy>;
     policyTagList: OnyxEntry<OnyxTypes.PolicyTagLists>;
     policyCategories: OnyxEntry<OnyxTypes.PolicyCategories>;
     currentUserAccountIDParam: number;
@@ -783,7 +781,7 @@ function updateMoneyRequestDistanceRate({
     let data: UpdateMoneyRequestData<UpdateMoneyRequestDataKeys>;
 
     if (isTrackExpenseReport(transactionThreadReport) && isSelfDM(parentReport)) {
-        data = getUpdateTrackExpenseParams(transaction?.transactionID, transactionThreadReport?.reportID, transactionChanges, policy, true, allPolicies);
+        data = getUpdateTrackExpenseParams(transaction?.transactionID, transactionThreadReport?.reportID, transactionChanges, policy);
     } else {
         data = getUpdateMoneyRequestParams({
             transactionID: transaction?.transactionID,
