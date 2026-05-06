@@ -6942,21 +6942,12 @@ ${reportName}
                 approvalModeDescription: 'メンバーとマネージャーは Gusto と同期するように設定されています。',
                 approvalModeWarningTitle: '承認モードを変更しますか？',
                 approvalModeWarningPrompt: (helpSiteURL: string) =>
-                    `このワークスペースの承認モードを変更してもよろしいですか？ Gusto 対応の各ワークフローモードについて詳しくは、<a href="${helpSiteURL}">ヘルプサイト</a>をご覧ください。`,
+                    `このワークスペースの承認モードを変更してもよろしいですか？Gusto 対応の各ワークフローモードについては、<a href="${helpSiteURL}">ヘルプサイト</a>で詳しくご覧いただけます。`,
                 approvalModeWarningConfirm: '承認モードを変更',
                 approvalModes: {
-                    basic: {
-                        label: '基本承認',
-                        description: 'すべてのユーザーは、処理と承認のために1人の担当者に提出します。',
-                    },
-                    manager: {
-                        label: 'マネージャー承認',
-                        description: '従業員は、Gusto で設定された直属のマネージャーにレポートを提出します。',
-                    },
-                    custom: {
-                        label: 'カスタム承認',
-                        description: 'Expensify で承認ワークフローを手動で設定します。',
-                    },
+                    basic: {label: '基本承認', description: 'すべてのユーザーは、処理と承認のために 1 人の担当者に提出します。'},
+                    manager: {label: 'マネージャー承認', description: '従業員は、Gusto で設定された直属のマネージャーにレポートを提出します。'},
+                    custom: {label: 'カスタム承認', description: 'Expensify で承認ワークフローを手動で設定します。'},
                 },
                 connect: '接続',
                 connectionDescription: 'Gusto を接続して、従業員の承認をワークスペースと同期させましょう。',

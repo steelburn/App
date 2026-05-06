@@ -6991,21 +6991,12 @@ Dodaj więcej zasad wydatków, żeby chronić płynność finansową firmy.`,
                 approvalModeDescription: 'Członkowie i menedżerowie są skonfigurowani do synchronizacji z Gusto.',
                 approvalModeWarningTitle: 'Zmienić tryb zatwierdzania?',
                 approvalModeWarningPrompt: (helpSiteURL: string) =>
-                    `Czy na pewno chcesz zmienić tryb zatwierdzania dla tej przestrzeni roboczej? Dowiedz się więcej o różnych trybach przepływu pracy obsługiwanych przez Gusto w naszej <a href="${helpSiteURL}">witrynie pomocy</a>.`,
+                    `Czy na pewno chcesz zmienić tryb zatwierdzania dla tego obszaru roboczego? Dowiedz się więcej o różnych trybach przepływu pracy obsługiwanych przez Gusto w naszej <a href="${helpSiteURL}">witrynie pomocy</a>.`,
                 approvalModeWarningConfirm: 'Zmień tryb zatwierdzania',
                 approvalModes: {
-                    basic: {
-                        label: 'Podstawowe zatwierdzanie',
-                        description: 'Wszyscy użytkownicy przesyłają do jednej osoby do przetworzenia i zatwierdzenia.',
-                    },
-                    manager: {
-                        label: 'Zatwierdzanie przez menedżera',
-                        description: 'Pracownicy przesyłają raporty do swojego bezpośredniego menedżera skonfigurowanego w Gusto.',
-                    },
-                    custom: {
-                        label: 'Niestandardowe zatwierdzanie',
-                        description: 'Ręcznie skonfiguruję procesy zatwierdzania w Expensify.',
-                    },
+                    basic: {label: 'Podstawowa akceptacja', description: 'Wszyscy użytkownicy przesyłają wydatki do jednej osoby w celu ich przetworzenia i zatwierdzenia.'},
+                    manager: {label: 'Zatwierdzenie przez menedżera', description: 'Pracownicy przesyłają raporty do swojego bezpośredniego menedżera skonfigurowanego w Gusto.'},
+                    custom: {label: 'Niestandardowa akceptacja', description: 'Ręcznie skonfiguruję procesy zatwierdzania w Expensify.'},
                 },
                 connect: 'Połącz',
                 connectionDescription: 'Połącz Gusto, aby synchronizować akceptacje pracowników z Twoim miejscem pracy.',

@@ -7031,24 +7031,15 @@ Fügen Sie weitere Ausgabelimits hinzu, um den Cashflow Ihres Unternehmens zu sc
                 approvalMode: 'Genehmigungsmodus',
                 finalApprover: 'Endgültige:r Genehmiger:in',
                 notSet: 'Nicht festgelegt',
-                approvalModeDescription: 'Mitglieder und Vorgesetzte sind für die Synchronisierung mit Gusto eingerichtet.',
+                approvalModeDescription: 'Mitglieder und Manager sind für die Synchronisation mit Gusto eingerichtet.',
                 approvalModeWarningTitle: 'Genehmigungsmodus ändern?',
                 approvalModeWarningPrompt: (helpSiteURL: string) =>
-                    `Möchtest du den Genehmigungsmodus für diesen Arbeitsbereich wirklich ändern? Weitere Informationen zu den verschiedenen Gusto-gestützten Arbeitsablaufmodi findest du auf unserer <a href="${helpSiteURL}">Hilfeseite</a>.`,
+                    `Möchten Sie den Genehmigungsmodus für diesen Workspace wirklich ändern? Erfahren Sie mehr über die verschiedenen Gusto-aktivierten Workflow-Modi auf unserer <a href="${helpSiteURL}">Hilfeseite</a>.`,
                 approvalModeWarningConfirm: 'Genehmigungsmodus ändern',
                 approvalModes: {
-                    basic: {
-                        label: 'Einfache Genehmigung',
-                        description: 'Alle Benutzer reichen bei einer einzelnen Person zur Bearbeitung und Genehmigung ein.',
-                    },
-                    manager: {
-                        label: 'Genehmigung durch Vorgesetzte',
-                        description: 'Mitarbeitende reichen Berichte bei ihrem in Gusto konfigurierten direkten Vorgesetzten ein.',
-                    },
-                    custom: {
-                        label: 'Benutzerdefinierte Genehmigung',
-                        description: 'Ich richte Genehmigungsworkflows manuell in Expensify ein.',
-                    },
+                    basic: {label: 'Einfache Genehmigung', description: 'Alle Benutzer reichen zur Bearbeitung und Genehmigung bei einer einzigen Person ein.'},
+                    manager: {label: 'Managergenehmigung', description: 'Mitarbeitende reichen Berichte bei ihrer in Gusto hinterlegten direkten Führungskraft ein.'},
+                    custom: {label: 'Benutzerdefinierte Genehmigung', description: 'Ich richte Genehmigungs-Workflows in Expensify manuell ein.'},
                 },
                 connect: 'Verbinden',
                 connectionDescription: 'Verbinde Gusto, um Mitarbeitergenehmigungen mit deinem Workspace zu synchronisieren.',

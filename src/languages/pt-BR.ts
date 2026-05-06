@@ -6997,21 +6997,12 @@ Adicione mais regras de gasto para proteger o fluxo de caixa da empresa.`,
                 approvalModeDescription: 'Membros e gerentes estão configurados para sincronizar com o Gusto.',
                 approvalModeWarningTitle: 'Alterar modo de aprovação?',
                 approvalModeWarningPrompt: (helpSiteURL: string) =>
-                    `Tem certeza de que deseja alterar o modo de aprovação deste espaço de trabalho? Saiba mais sobre os diferentes modos de fluxo de trabalho habilitados pelo Gusto em nosso <a href="${helpSiteURL}">site de ajuda</a>.`,
+                    `Tem certeza de que deseja alterar o modo de aprovação deste workspace? Saiba mais sobre os diferentes modos de fluxo de trabalho com Gusto em nosso <a href="${helpSiteURL}">site de ajuda</a>.`,
                 approvalModeWarningConfirm: 'Alterar modo de aprovação',
                 approvalModes: {
-                    basic: {
-                        label: 'Aprovação básica',
-                        description: 'Todos os usuários enviam para uma única pessoa para processamento e aprovação.',
-                    },
-                    manager: {
-                        label: 'Aprovação do gerente',
-                        description: 'Os funcionários enviam relatórios para o gerente direto configurado no Gusto.',
-                    },
-                    custom: {
-                        label: 'Aprovação personalizada',
-                        description: 'Vou configurar manualmente os fluxos de trabalho de aprovação no Expensify.',
-                    },
+                    basic: {label: 'Aprovação básica', description: 'Todos os usuários enviam para uma única pessoa para processamento e aprovação.'},
+                    manager: {label: 'Aprovação do gerente', description: 'Os funcionários enviam relatórios ao gestor direto configurado no Gusto.'},
+                    custom: {label: 'Aprovação personalizada', description: 'Vou configurar manualmente os fluxos de aprovação no Expensify.'},
                 },
                 connect: 'Conectar',
                 connectionDescription: 'Conecte o Gusto para manter as aprovações de funcionários sincronizadas com seu workspace.',

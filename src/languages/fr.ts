@@ -7054,23 +7054,14 @@ Ajoutez davantage de règles de dépenses pour protéger la trésorerie de l’e
                 finalApprover: 'Approbateur final',
                 notSet: 'Non défini',
                 approvalModeDescription: 'Les membres et les responsables sont configurés pour se synchroniser avec Gusto.',
-                approvalModeWarningTitle: 'Modifier le mode d’approbation ?',
+                approvalModeWarningTitle: 'Changer le mode d’approbation ?',
                 approvalModeWarningPrompt: (helpSiteURL: string) =>
-                    `Voulez-vous vraiment modifier le mode d’approbation de cet espace de travail ? En savoir plus sur les différents modes de flux de travail compatibles avec Gusto sur notre <a href="${helpSiteURL}">site d’aide</a>.`,
+                    `Êtes-vous sûr·e de vouloir modifier le mode d’approbation de cet espace de travail ? En savoir plus sur les différents modes de workflow compatibles avec Gusto sur notre <a href="${helpSiteURL}">site d’aide</a>.`,
                 approvalModeWarningConfirm: 'Modifier le mode d’approbation',
                 approvalModes: {
-                    basic: {
-                        label: 'Approbation simple',
-                        description: 'Tous les utilisateurs soumettent leurs rapports à une seule personne pour traitement et approbation.',
-                    },
-                    manager: {
-                        label: 'Approbation par responsable',
-                        description: 'Les employés soumettent leurs rapports à leur responsable direct configuré dans Gusto.',
-                    },
-                    custom: {
-                        label: 'Approbation personnalisée',
-                        description: 'Je configurerai manuellement les flux de travail d’approbation dans Expensify.',
-                    },
+                    basic: {label: 'Approbation simple', description: 'Tous les utilisateurs soumettent à une seule personne pour traitement et approbation.'},
+                    manager: {label: 'Approbation du responsable', description: 'Les employé·e·s soumettent leurs rapports à leur responsable direct configuré dans Gusto.'},
+                    custom: {label: 'Approbation personnalisée', description: 'Je configurerai manuellement les circuits de validation dans Expensify.'},
                 },
                 connect: 'Connect',
                 connectionDescription: 'Connectez Gusto pour synchroniser les validations des employé·e·s avec votre espace de travail.',
