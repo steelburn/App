@@ -6937,24 +6937,24 @@ ${reportName}
             gusto: {
                 title: 'Gusto',
                 approvalMode: '承認モード',
-                notSet: 'Not set',
-                approvalModeDescription: 'Members and managers are set up to sync with Gusto.',
-                approvalModeWarningTitle: 'Change approval mode?',
+                notSet: '未設定',
+                approvalModeDescription: 'メンバーとマネージャーは Gusto と同期するように設定されています。',
+                approvalModeWarningTitle: '承認モードを変更しますか？',
                 approvalModeWarningPrompt: (helpSiteURL: string) =>
-                    `Are you sure you would like to change the approval mode for this workspace? Learn more about the different Gusto-enabled workflow modes in our <a href="${helpSiteURL}">help site</a>.`,
-                approvalModeWarningConfirm: 'Change approval mode',
+                    `このワークスペースの承認モードを変更してもよろしいですか？ Gusto 対応の各ワークフローモードについて詳しくは、<a href="${helpSiteURL}">ヘルプサイト</a>をご覧ください。`,
+                approvalModeWarningConfirm: '承認モードを変更',
                 approvalModes: {
                     basic: {
-                        label: 'Basic approval',
-                        description: 'All users submit to a single person for processing and approval.',
+                        label: '基本承認',
+                        description: 'すべてのユーザーは、処理と承認のために1人の担当者に提出します。',
                     },
                     manager: {
-                        label: 'Manager approval',
-                        description: 'Employees submit reports to their direct manager configured in Gusto.',
+                        label: 'マネージャー承認',
+                        description: '従業員は、Gusto で設定された直属のマネージャーにレポートを提出します。',
                     },
                     custom: {
-                        label: 'Custom approval',
-                        description: 'I’ll manually setup approval workflows in Expensify.',
+                        label: 'カスタム承認',
+                        description: 'Expensify で承認ワークフローを手動で設定します。',
                     },
                 },
                 connect: '接続',

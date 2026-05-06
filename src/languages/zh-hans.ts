@@ -6819,24 +6819,24 @@ ${reportName}
             gusto: {
                 title: 'Gusto',
                 approvalMode: '审批模式',
-                notSet: 'Not set',
-                approvalModeDescription: 'Members and managers are set up to sync with Gusto.',
-                approvalModeWarningTitle: 'Change approval mode?',
+                notSet: '未设置',
+                approvalModeDescription: '成员和经理已设置为与 Gusto 同步。',
+                approvalModeWarningTitle: '更改审批模式？',
                 approvalModeWarningPrompt: (helpSiteURL: string) =>
-                    `Are you sure you would like to change the approval mode for this workspace? Learn more about the different Gusto-enabled workflow modes in our <a href="${helpSiteURL}">help site</a>.`,
-                approvalModeWarningConfirm: 'Change approval mode',
+                    `你确定要更改此工作区的审批模式吗？请在我们的<a href="${helpSiteURL}">帮助网站</a>中了解更多关于不同 Gusto 启用工作流模式的信息。`,
+                approvalModeWarningConfirm: '更改审批模式',
                 approvalModes: {
                     basic: {
-                        label: 'Basic approval',
-                        description: 'All users submit to a single person for processing and approval.',
+                        label: '基本审批',
+                        description: '所有用户都提交给同一个人进行处理和审批。',
                     },
                     manager: {
-                        label: 'Manager approval',
-                        description: 'Employees submit reports to their direct manager configured in Gusto.',
+                        label: '经理审批',
+                        description: '员工将报告提交给 Gusto 中配置的直属经理。',
                     },
                     custom: {
-                        label: 'Custom approval',
-                        description: 'I’ll manually setup approval workflows in Expensify.',
+                        label: '自定义审批',
+                        description: '我将在 Expensify 中手动设置审批工作流。',
                     },
                 },
                 connect: '连接',

@@ -7029,24 +7029,24 @@ Fügen Sie weitere Ausgabelimits hinzu, um den Cashflow Ihres Unternehmens zu sc
             gusto: {
                 title: 'Gusto',
                 approvalMode: 'Genehmigungsmodus',
-                notSet: 'Not set',
-                approvalModeDescription: 'Members and managers are set up to sync with Gusto.',
-                approvalModeWarningTitle: 'Change approval mode?',
+                notSet: 'Nicht festgelegt',
+                approvalModeDescription: 'Mitglieder und Vorgesetzte sind für die Synchronisierung mit Gusto eingerichtet.',
+                approvalModeWarningTitle: 'Genehmigungsmodus ändern?',
                 approvalModeWarningPrompt: (helpSiteURL: string) =>
-                    `Are you sure you would like to change the approval mode for this workspace? Learn more about the different Gusto-enabled workflow modes in our <a href="${helpSiteURL}">help site</a>.`,
-                approvalModeWarningConfirm: 'Change approval mode',
+                    `Möchtest du den Genehmigungsmodus für diesen Arbeitsbereich wirklich ändern? Weitere Informationen zu den verschiedenen Gusto-gestützten Arbeitsablaufmodi findest du auf unserer <a href="${helpSiteURL}">Hilfeseite</a>.`,
+                approvalModeWarningConfirm: 'Genehmigungsmodus ändern',
                 approvalModes: {
                     basic: {
-                        label: 'Basic approval',
-                        description: 'All users submit to a single person for processing and approval.',
+                        label: 'Einfache Genehmigung',
+                        description: 'Alle Benutzer reichen bei einer einzelnen Person zur Bearbeitung und Genehmigung ein.',
                     },
                     manager: {
-                        label: 'Manager approval',
-                        description: 'Employees submit reports to their direct manager configured in Gusto.',
+                        label: 'Genehmigung durch Vorgesetzte',
+                        description: 'Mitarbeitende reichen Berichte bei ihrem in Gusto konfigurierten direkten Vorgesetzten ein.',
                     },
                     custom: {
-                        label: 'Custom approval',
-                        description: 'I’ll manually setup approval workflows in Expensify.',
+                        label: 'Benutzerdefinierte Genehmigung',
+                        description: 'Ich richte Genehmigungsworkflows manuell in Expensify ein.',
                     },
                 },
                 connect: 'Verbinden',

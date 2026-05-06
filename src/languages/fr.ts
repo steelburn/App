@@ -7051,24 +7051,24 @@ Ajoutez davantage de règles de dépenses pour protéger la trésorerie de l’e
             gusto: {
                 title: 'Gusto',
                 approvalMode: 'Mode d’approbation',
-                notSet: 'Not set',
-                approvalModeDescription: 'Members and managers are set up to sync with Gusto.',
-                approvalModeWarningTitle: 'Change approval mode?',
+                notSet: 'Non défini',
+                approvalModeDescription: 'Les membres et les responsables sont configurés pour se synchroniser avec Gusto.',
+                approvalModeWarningTitle: 'Modifier le mode d’approbation ?',
                 approvalModeWarningPrompt: (helpSiteURL: string) =>
-                    `Are you sure you would like to change the approval mode for this workspace? Learn more about the different Gusto-enabled workflow modes in our <a href="${helpSiteURL}">help site</a>.`,
-                approvalModeWarningConfirm: 'Change approval mode',
+                    `Voulez-vous vraiment modifier le mode d’approbation de cet espace de travail ? En savoir plus sur les différents modes de flux de travail compatibles avec Gusto sur notre <a href="${helpSiteURL}">site d’aide</a>.`,
+                approvalModeWarningConfirm: 'Modifier le mode d’approbation',
                 approvalModes: {
                     basic: {
-                        label: 'Basic approval',
-                        description: 'All users submit to a single person for processing and approval.',
+                        label: 'Approbation simple',
+                        description: 'Tous les utilisateurs soumettent leurs rapports à une seule personne pour traitement et approbation.',
                     },
                     manager: {
-                        label: 'Manager approval',
-                        description: 'Employees submit reports to their direct manager configured in Gusto.',
+                        label: 'Approbation par responsable',
+                        description: 'Les employés soumettent leurs rapports à leur responsable direct configuré dans Gusto.',
                     },
                     custom: {
-                        label: 'Custom approval',
-                        description: 'I’ll manually setup approval workflows in Expensify.',
+                        label: 'Approbation personnalisée',
+                        description: 'Je configurerai manuellement les flux de travail d’approbation dans Expensify.',
                     },
                 },
                 connect: 'Connect',
