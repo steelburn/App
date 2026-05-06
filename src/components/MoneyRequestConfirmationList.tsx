@@ -573,6 +573,7 @@ function MoneyRequestConfirmationList({
                 isDescriptionRequired={isDescriptionRequired}
                 showMoreFields={showMoreFields}
                 setShowMoreFields={setShowMoreFields}
+                onSubmitForm={confirm}
             />
         </View>
     );

@@ -220,6 +220,9 @@ type MoneyRequestConfirmationListFooterProps = {
 
     /** Toggles compact mode by showing all fields */
     setShowMoreFields?: (showMoreFields: boolean) => void;
+
+    /** Trigger form submission from inline inputs */
+    onSubmitForm?: () => void;
 };
 
 type ConfirmationField = {
@@ -283,6 +286,7 @@ function MoneyRequestConfirmationListFooter({
     isDescriptionRequired = false,
     showMoreFields = false,
     setShowMoreFields = () => {},
+    onSubmitForm,
 }: MoneyRequestConfirmationListFooterProps) {
     const icons = useMemoizedLazyExpensifyIcons(['Sparkles', 'DownArrow']);
     const styles = useThemeStyles();
@@ -434,6 +438,7 @@ function MoneyRequestConfirmationListFooter({
                     policy={policy}
                     transaction={transaction}
                     isEditingSplitBill={isEditingSplitBill}
+                    onSubmitForm={onSubmitForm}
                 />
             ),
             shouldShow: true,
