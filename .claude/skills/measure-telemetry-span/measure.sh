@@ -71,23 +71,22 @@ cleanup() {
 }
 trap cleanup EXIT
 
-# Flow `env KEY=default` lines: only AD_<KEY> overrides are applied (see measure-telemetry-span SKILL.md).
+# Flow `# @param KEY description` headers: only AD_<KEY> overrides are passed via `-e KEY=VALUE`.
 append_flow_env_from_ad_vars() {
-  local env_lines line assignment key env_key
-  env_lines=$(grep -E '^env [A-Za-z_][A-Za-z0-9_]*=' "$FLOW" || true)
-  if [[ -z "$env_lines" ]]; then
+  local param_lines line key env_key
+  param_lines=$(grep -E '^# @param[[:space:]]+[A-Za-z_][A-Za-z0-9_]*' "$FLOW" || true)
+  if [[ -z "$param_lines" ]]; then
     return
   fi
 
   while IFS= read -r line; do
-    assignment="${line#env }"
-    key="${assignment%%=*}"
+    key=$(echo "$line" | sed -E 's/^# @param[[:space:]]+([A-Za-z_][A-Za-z0-9_]*).*/\1/')
     env_key="AD_${key}"
     if [[ -n "${!env_key:-}" ]]; then
       FLOW_ENV_ARGS+=("-e" "$key=${!env_key}")
-      echo "Replay env: $key from $env_key" >&2
+      echo "Replay param: $key from $env_key" >&2
     fi
-  done <<< "$env_lines"
+  done <<< "$param_lines"
 }
 
 start_log() {
@@ -103,12 +102,19 @@ start_log() {
 }
 
 reset_if_needed() {
-  if [[ -z "$RESET_FLOW" ]]; then
+  if [[ -n "$RESET_FLOW" ]]; then
+    echo "Resetting with: $RESET_FLOW" >&2
+    agent-device replay "$RESET_FLOW" >&2
     return
   fi
 
-  echo "Resetting with: $RESET_FLOW" >&2
-  agent-device replay "$RESET_FLOW" >&2
+  # No @reset declared: relaunch the app so the next replay starts from the flow's @pre state
+  # instead of the previous run's @post state (Codex review r3191676565).
+  agent-device open "$APP_ID" --platform "$PLATFORM" --relaunch >&2
+  sleep 5
+  if [[ "$PLATFORM" == "android" ]]; then
+    wait_until_android_ui_ready
+  fi
 }
 
 # After --relaunch on Android, UIAutomator often returns Snapshot: 0 nodes briefly; warmup replay then fails @pre.
