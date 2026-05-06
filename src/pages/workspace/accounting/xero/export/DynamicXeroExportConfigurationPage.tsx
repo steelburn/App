@@ -1,4 +1,4 @@
-import React, {useCallback, useMemo} from 'react';
+import React, {useMemo} from 'react';
 import ConnectionLayout from '@components/ConnectionLayout';
 import MenuItemWithTopDescription from '@components/MenuItemWithTopDescription';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
@@ -6,9 +6,9 @@ import useDynamicBackPath from '@hooks/useDynamicBackPath';
 import useLocalize from '@hooks/useLocalize';
 import useThemeStyles from '@hooks/useThemeStyles';
 import createDynamicRoute from '@libs/Navigation/helpers/dynamicRoutesUtils/createDynamicRoute';
+import replaceCompanyCardsRoute from '@libs/Navigation/helpers/replaceCompanyCardsRoute';
 import Navigation from '@libs/Navigation/Navigation';
 import {areSettingsInErrorFields, getCurrentXeroOrganizationName, settingsPendingAction} from '@libs/PolicyUtils';
-import goBackFromExportConnection from '@navigation/helpers/goBackFromExportConnection';
 import type {WithPolicyConnectionsProps} from '@pages/workspace/withPolicyConnections';
 import withPolicyConnections from '@pages/workspace/withPolicyConnections';
 import CONST from '@src/CONST';
@@ -22,9 +22,6 @@ function DynamicXeroExportConfigurationPage({policy}: WithPolicyConnectionsProps
     const dynamicBackPath = useDynamicBackPath(DYNAMIC_ROUTES.POLICY_ACCOUNTING_XERO_EXPORT.path);
 
     const {export: exportConfiguration, errorFields, pendingFields} = policy?.connections?.xero?.config ?? {};
-    const shouldGoBackToSpecificRoute = !exportConfiguration?.nonReimbursableAccount;
-
-    const goBack = useCallback(() => goBackFromExportConnection(shouldGoBackToSpecificRoute, undefined, dynamicBackPath), [dynamicBackPath, shouldGoBackToSpecificRoute]);
 
     const {bankAccounts} = policy?.connections?.xero?.data ?? {};
     const selectedBankAccountName = useMemo(() => {
@@ -90,7 +87,7 @@ function DynamicXeroExportConfigurationPage({policy}: WithPolicyConnectionsProps
             title="workspace.xero.exportDescription"
             accessVariants={[CONST.POLICY.ACCESS_VARIANTS.ADMIN]}
             policyID={policyID}
-            onBackButtonPress={goBack}
+            onBackButtonPress={() => Navigation.goBack(replaceCompanyCardsRoute(dynamicBackPath))}
             featureName={CONST.POLICY.MORE_FEATURES.ARE_CONNECTIONS_ENABLED}
             contentContainerStyle={styles.pb2}
             titleStyle={styles.ph5}
