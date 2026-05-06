@@ -146,11 +146,11 @@ function IOURequestStepCategoryCreate({
                 setMoneyRequestCategory(transactionID, categoryName, policy);
             }
 
-            if (isEditing) {
-                Navigation.goBack(backTo);
-            } else {
-                Navigation.goBack(ROUTES.MONEY_REQUEST_STEP_CONFIRMATION.getRoute(action, iouType, transactionID, reportID));
+            if (!isEditing && action === CONST.IOU.ACTION.CATEGORIZE && !backTo) {
+                Navigation.navigate(ROUTES.MONEY_REQUEST_STEP_CONFIRMATION.getRoute(action, iouType, transactionID, report?.reportID ?? reportID));
+                return;
             }
+            Navigation.goBack(backTo);
         },
         [
             action,
