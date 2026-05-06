@@ -8,6 +8,7 @@ import useOnyx from '@hooks/useOnyx';
 import useOptimisticDraftTransactions from '@hooks/useOptimisticDraftTransactions';
 import usePermissions from '@hooks/usePermissions';
 import usePolicyForMovingExpenses from '@hooks/usePolicyForMovingExpenses';
+import useReportOrReportDraft from '@hooks/useReportOrReportDraft';
 import useRestartOnReceiptFailure from '@hooks/useRestartOnReceiptFailure';
 import useShowNotFoundPageInIOUStep from '@hooks/useShowNotFoundPageInIOUStep';
 import {createNewReport} from '@libs/actions/Report';
@@ -53,7 +54,7 @@ function IOURequestStepReport({route, transaction}: IOURequestStepReportProps) {
     const {allPolicies, perDiemOriginalPolicy} = usePerDiemPolicyData(transaction);
     const [personalPolicyID] = useOnyx(ONYXKEYS.PERSONAL_POLICY_ID);
     const {setSelectedTransactions} = useSearchActionsContext();
-    const reportOrDraftReport = getReportOrDraftReport(reportIDFromRoute);
+    const reportOrDraftReport = useReportOrReportDraft(reportIDFromRoute);
     const [iouActions] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${reportOrDraftReport?.parentReportID}`, {selector: getIOUActionsSelector});
     const isEditing = action === CONST.IOU.ACTION.EDIT;
     const isCreateReport = action === CONST.IOU.ACTION.CREATE;

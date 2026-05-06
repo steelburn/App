@@ -121,9 +121,8 @@ describe('useOdometerReadingsState', () => {
     });
 
     it('does not run the tab-reset effect while the selected-tab Onyx key is still loading', () => {
-        const {result, rerender} = renderHook((params: Params) => useOdometerReadingsState(params), {
-            initialProps: {...baseParams, isLoadingSelectedTab: true, selectedTab: undefined},
-        });
+        const initialProps: Params = {...baseParams, isLoadingSelectedTab: true, selectedTab: undefined};
+        const {result, rerender} = renderHook((params: Params) => useOdometerReadingsState(params), {initialProps});
 
         const initialKey = result.current.inputKey;
         rerender({...baseParams, isLoadingSelectedTab: true, selectedTab: CONST.TAB_REQUEST.DISTANCE});
