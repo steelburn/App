@@ -189,6 +189,24 @@ function TransactionDetailsFields({
                 />
             )}
 
+            {!isCompactMode && fieldVisibility.merchant && (
+                <MerchantField
+                    isMerchantRequired={isMerchantRequired}
+                    isNewManualExpenseFlowEnabled={isNewManualExpenseFlowEnabled}
+                    isReadOnly={isReadOnly}
+                    didConfirm={didConfirm}
+                    shouldDisplayFieldError={shouldDisplayFieldError}
+                    formError={formError}
+                    transactionID={transactionID}
+                    action={action}
+                    iouType={iouType}
+                    reportID={reportID}
+                    reportActionID={reportActionID}
+                    transaction={transaction}
+                    isEditingSplitBill={isEditingSplitBill}
+                />
+            )}
+
             <DescriptionField
                 isNewManualExpenseFlowEnabled={isNewManualExpenseFlowEnabled}
                 isReadOnly={isReadOnly}
@@ -242,24 +260,6 @@ function TransactionDetailsFields({
                     formError={formError}
                     shouldNavigateToUpgradePath={shouldNavigateToUpgradePath}
                     shouldSelectPolicy={shouldSelectPolicy}
-                />
-            )}
-
-            {!isCompactMode && fieldVisibility.merchant && (
-                <MerchantField
-                    isMerchantRequired={isMerchantRequired}
-                    isNewManualExpenseFlowEnabled={isNewManualExpenseFlowEnabled}
-                    isReadOnly={isReadOnly}
-                    didConfirm={didConfirm}
-                    shouldDisplayFieldError={shouldDisplayFieldError}
-                    formError={formError}
-                    transactionID={transactionID}
-                    action={action}
-                    iouType={iouType}
-                    reportID={reportID}
-                    reportActionID={reportActionID}
-                    transaction={transaction}
-                    isEditingSplitBill={isEditingSplitBill}
                 />
             )}
 
