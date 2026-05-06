@@ -53,8 +53,7 @@ import type {AppReview, BlockedFromConcierge, CustomStatusDraft, ExpenseRule, Re
 import type Login from '@src/types/onyx/Login';
 import type {Errors} from '@src/types/onyx/OnyxCommon';
 import type {AnyOnyxServerUpdate, OnyxServerUpdate, OnyxUpdateEvent} from '@src/types/onyx/OnyxUpdatesFromServer';
-import type OnyxPersonalDetails from '@src/types/onyx/PersonalDetails';
-import type {Status} from '@src/types/onyx/PersonalDetails';
+import type {CurrentUserPersonalDetails, Status} from '@src/types/onyx/PersonalDetails';
 import type ReportAction from '@src/types/onyx/ReportAction';
 import type {AnyOnyxUpdate} from '@src/types/onyx/Request';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
@@ -1057,7 +1056,7 @@ function generateStatementPDF(period: string) {
  * @param skipNavigation - When true, do not navigate (caller handles navigation, e.g. via useEffect when primaryContactMethod updates).
  */
 function setContactMethodAsDefault(
-    currentUserPersonalDetails: OnyxEntry<OnyxPersonalDetails>,
+    currentUserPersonalDetails: CurrentUserPersonalDetails,
     newDefaultContactMethod: string,
     formatPhoneNumber: LocaleContextProps['formatPhoneNumber'],
     backTo: string | undefined,
@@ -1113,7 +1112,7 @@ function setContactMethodAsDefault(
             onyxMethod: Onyx.METHOD.MERGE,
             key: ONYXKEYS.PERSONAL_DETAILS_LIST,
             value: {
-                [currentUserAccountID]: {
+                [currentUserPersonalDetails.accountID]: {
                     login: newDefaultContactMethod,
                     displayName: PersonalDetailsUtils.createDisplayName(newDefaultContactMethod, currentUserPersonalDetails, formatPhoneNumber),
                 },
