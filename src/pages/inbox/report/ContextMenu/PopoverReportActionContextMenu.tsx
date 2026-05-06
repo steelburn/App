@@ -85,6 +85,7 @@ function PopoverReportActionContextMenu({ref}: PopoverReportActionContextMenuPro
     const [shouldSetModalVisibilityForDeleteConfirmation, setShouldSetModalVisibilityForDeleteConfirmation] = useState(true);
 
     const [isRoomArchived, setIsRoomArchived] = useState(false);
+    const [isThreadReportParentAction, setIsThreadReportParentAction] = useState(false);
     const [disabledActions, setDisabledActions] = useState<ContextMenuAction[]>([]);
     const [shouldSwitchPositionIfOverflow, setShouldSwitchPositionIfOverflow] = useState(false);
     const [isWithoutOverlay, setIsWithoutOverlay] = useState<boolean>(true);
@@ -201,7 +202,7 @@ function PopoverReportActionContextMenu({ref}: PopoverReportActionContextMenuPro
         }
 
         const {reportID, originalReportID, isArchivedRoom = false} = currentReport;
-        const {reportActionID, draftMessage} = reportAction;
+        const {reportActionID, draftMessage, isThreadReportParentAction: isThreadReportParentActionParam = false} = reportAction;
         const {onShow = () => {}, onHide = () => {}, setIsEmojiPickerActive = () => {}} = callbacks;
         setIsContextMenuOpening(true);
         setIsWithoutOverlay(withoutOverlay);
@@ -249,6 +250,7 @@ function PopoverReportActionContextMenu({ref}: PopoverReportActionContextMenuPro
             setIsPopoverVisible(true);
             reportActionDraftMessageRef.current = draftMessage;
             setIsRoomArchived(isArchivedRoom);
+            setIsThreadReportParentAction(isThreadReportParentActionParam);
             setShouldSwitchPositionIfOverflow(isOverflowMenu);
         });
     };
@@ -496,6 +498,7 @@ function PopoverReportActionContextMenu({ref}: PopoverReportActionContextMenuPro
                     draftMessage={reportActionDraftMessageRef.current}
                     selection={selectionRef.current}
                     isArchivedRoom={isRoomArchived}
+                    isThreadReportParentAction={isThreadReportParentAction}
                     anchor={contextMenuTargetNode}
                     contentRef={contentRef}
                     originalReportID={originalReportIDRef.current}

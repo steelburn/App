@@ -95,6 +95,12 @@ type BaseReportActionContextMenuProps = {
     /** Whether the provided report is an archived room */
     isArchivedRoom?: boolean;
 
+    /**
+     * Is the action a thread's parent reportAction viewed from within the thread report?
+     * It will be false if we're viewing the same parent report action from the report it belongs to rather than the thread.
+     */
+    isThreadReportParentAction?: boolean;
+
     /** Content Ref */
     contentRef?: RefObject<View | null>;
 
@@ -115,6 +121,7 @@ function BaseReportActionContextMenu({
     isArchivedRoom = false,
     isMini = false,
     isVisible = false,
+    isThreadReportParentAction = false,
     selection = '',
     draftMessage = '',
     reportActionID,
@@ -258,8 +265,6 @@ function BaseReportActionContextMenu({
     const isChronosReport = chatIncludesChronosWithID(originalReportID);
     const isPinnedChat = !!report?.isPinned;
     const isUnreadChat = !report?.lastReadTime || report.lastReadTime < (report.lastVisibleActionCreated ?? '');
-    // True when this action is the parent of a thread and we're viewing from within that thread
-    const isThreadReportParentAction = !!reportAction?.childReportID && String(reportAction.childReportID) === reportID;
     const shouldEnableArrowNavigation = !isMini && (isVisible || shouldKeepOpen);
     const isHarvestReport = isHarvestCreatedExpenseReport(reportNameValuePairs?.origin, reportNameValuePairs?.originalID);
 
@@ -349,6 +354,7 @@ function BaseReportActionContextMenu({
             reportAction: {
                 reportActionID: reportAction?.reportActionID,
                 draftMessage,
+                isThreadReportParentAction,
             },
             callbacks: {
                 onShow: checkIfContextMenuActive,
