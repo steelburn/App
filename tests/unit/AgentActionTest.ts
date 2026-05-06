@@ -127,10 +127,12 @@ describe('createAgent', () => {
             displayName: 'Bot',
             isOptimisticPersonalDetail: true,
         });
-        expect(promptRollback?.value).toMatchObject({
+        const promptValue = promptRollback?.value as Record<string, unknown> | undefined;
+
+        expect(promptValue).toMatchObject({
             prompt: 'My prompt',
             pendingAction: CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD,
-            errors: expect.any(Object),
         });
+        expect(promptValue?.errors).toBeTruthy();
     });
 });
