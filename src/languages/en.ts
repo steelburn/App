@@ -1070,6 +1070,7 @@ const translations = {
             connectAccounting: ({integrationName}: {integrationName: string}) => `Connect to ${integrationName}`,
             connectAccountingDefault: 'Connect to accounting',
             customizeCategories: 'Customize accounting categories',
+            inviteAccountant: 'Invite your accountant',
             linkCompanyCards: 'Link company cards',
             setupRules: 'Set up spend rules',
         },

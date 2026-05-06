@@ -1019,6 +1019,7 @@ const translations: TranslationDeepObject<typeof en> = {
             customizeCategories: '会計カテゴリをカスタマイズする',
             linkCompanyCards: '会社カードを連携',
             setupRules: '支出ルールを設定',
+            inviteAccountant: '会計士を招待',
         },
     },
     allSettingsScreen: {
