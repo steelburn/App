@@ -891,6 +891,7 @@ describe('actions/Policy', () => {
                 isSelfTourViewed: false,
                 betas: undefined,
                 hasActiveAdminPolicies: true,
+                activePolicy: undefined,
             });
             await waitForBatchedUpdates();
 
