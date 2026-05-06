@@ -386,6 +386,7 @@ function CopilotPage() {
                                 subtitleMuted
                                 illustration={illustrations.Copilots}
                                 illustrationContainerStyle={styles.cardSectionIllustrationContainer}
+                                illustrationStyle={styles.copilotsIllustration}
                                 illustrationBackgroundColor={colors.blue700}
                                 titleStyles={styles.accountSettingsSectionTitle}
                                 childrenStyles={styles.pt5}
