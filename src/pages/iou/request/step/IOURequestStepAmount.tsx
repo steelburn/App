@@ -97,6 +97,7 @@ function IOURequestStepAmount({
     const isReportArchived = useReportIsArchived(report?.reportID);
     const reportTransactions = useReportTransactions(report?.reportID);
     const [policy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${policyID}`);
+    const [allPolicies] = useOnyx(ONYXKEYS.COLLECTION.POLICY);
     const [policyCategories] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${policyID}`);
     const [parentReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(report?.parentReportID)}`);
     const [parentReportNextStep] = useOnyx(`${ONYXKEYS.COLLECTION.NEXT_STEP}${getNonEmptyStringOnyxID(report?.parentReportID)}`);
@@ -433,6 +434,7 @@ function IOURequestStepAmount({
             amount: newAmount,
             taxAmount,
             policy,
+            allPolicies,
             taxCode,
             taxValue: taxPercentage,
             policyCategories,

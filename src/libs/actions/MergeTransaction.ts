@@ -217,6 +217,7 @@ function getOnyxTargetTransactionData({
     targetTransactionThreadParentReport,
     targetTransactionThreadParentReportNextStep,
     policy,
+    allPolicies,
     policyTags,
     policyCategories,
     currentUserAccountIDParam,
@@ -230,6 +231,7 @@ function getOnyxTargetTransactionData({
     targetTransactionThreadParentReport: OnyxEntry<Report>;
     targetTransactionThreadParentReportNextStep: OnyxEntry<ReportNextStepDeprecated>;
     policy: OnyxEntry<Policy>;
+    allPolicies: OnyxCollection<Policy>;
     policyTags: OnyxEntry<PolicyTagLists>;
     policyCategories: OnyxEntry<PolicyCategories>;
     currentUserAccountIDParam: number;
@@ -261,6 +263,7 @@ function getOnyxTargetTransactionData({
             targetTransactionThreadReport?.reportID,
             filteredTransactionChanges,
             policy,
+            allPolicies,
             shouldBuildOptimisticModifiedExpenseReportAction,
         );
     } else {
@@ -328,6 +331,7 @@ type MergeTransactionRequestParams = {
     targetTransactionThreadParentReport: OnyxEntry<Report>;
     targetTransactionThreadParentReportNextStep: OnyxEntry<ReportNextStepDeprecated>;
     policy: OnyxEntry<Policy>;
+    allPolicies: OnyxCollection<Policy>;
     policyTags: OnyxEntry<PolicyTagLists>;
     policyCategories: OnyxEntry<PolicyCategories>;
     currentUserAccountIDParam: number;
@@ -348,6 +352,7 @@ function mergeTransactionRequest({
     targetTransactionThreadParentReportNextStep,
     allTransactionViolations,
     policy,
+    allPolicies,
     policyTags,
     policyCategories,
     currentUserAccountIDParam,
@@ -397,6 +402,7 @@ function mergeTransactionRequest({
         targetTransactionThreadParentReport,
         targetTransactionThreadParentReportNextStep,
         policy,
+        allPolicies,
         policyTags,
         policyCategories,
         currentUserAccountIDParam,

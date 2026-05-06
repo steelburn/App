@@ -72,6 +72,7 @@ function IOURequestStepDistanceManual({
     const reportAttributesDerived = useReportAttributes();
 
     const [selectedTab] = useOnyx(`${ONYXKEYS.COLLECTION.SELECTED_TAB}${CONST.TAB.DISTANCE_REQUEST_TYPE}`);
+    const [allPolicies] = useOnyx(ONYXKEYS.COLLECTION.POLICY);
     const [policyCategories] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${policy?.id}`);
     const [policyTags] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_TAGS}${policy?.id}`);
     const [personalDetails] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST);
@@ -183,6 +184,7 @@ function IOURequestStepDistanceManual({
                     // Not required for manual distance request
                     transactionBackup: undefined,
                     policy,
+                    allPolicies,
                     policyTagList: policyTags,
                     policyCategories,
                     currentUserAccountIDParam,

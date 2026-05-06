@@ -45,6 +45,7 @@ function ConfirmationPage({route}: ConfirmationPageProps) {
     const {targetTransaction, sourceTransaction, targetTransactionReport, targetTransactionPolicy} = useMergeTransactions({mergeTransaction});
     const [allTransactionViolations] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS);
 
+    const [allPolicies] = useOnyx(ONYXKEYS.COLLECTION.POLICY);
     const [policyTags] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_TAGS}${targetTransactionPolicy?.id}`);
     const [policyCategories] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${targetTransactionPolicy?.id}`);
 
@@ -81,6 +82,7 @@ function ConfirmationPage({route}: ConfirmationPageProps) {
             targetTransactionThreadParentReportNextStep,
             allTransactionViolations,
             policy: targetTransactionPolicy,
+            allPolicies,
             policyTags,
             policyCategories,
             currentUserAccountIDParam,

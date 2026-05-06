@@ -48,7 +48,6 @@ import type {Routes, TransactionChanges, WaypointCollection} from '@src/types/on
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
 import type {UpdateMoneyRequestData} from '.';
 import {
-    getAllPolicies,
     getAllReports,
     getAllTransactions,
     getAllTransactionViolations,
@@ -67,6 +66,7 @@ type UpdateMoneyRequestDateParams = {
     transactionViolations: OnyxCollection<OnyxTypes.TransactionViolations>;
     value: string;
     policy: OnyxEntry<OnyxTypes.Policy>;
+    allPolicies: OnyxCollection<OnyxTypes.Policy>;
     policyTags: OnyxEntry<OnyxTypes.PolicyTagLists>;
     policyCategories: OnyxEntry<OnyxTypes.PolicyCategories>;
     currentUserAccountIDParam: number;
@@ -84,6 +84,7 @@ function updateMoneyRequestDate({
     transactionViolations,
     value,
     policy,
+    allPolicies,
     policyTags,
     policyCategories,
     currentUserAccountIDParam,
@@ -97,7 +98,7 @@ function updateMoneyRequestDate({
     let data: UpdateMoneyRequestData<UpdateMoneyRequestDataKeys>;
 
     if (isTrackExpenseReport(transactionThreadReport) && isSelfDM(parentReport)) {
-        data = getUpdateTrackExpenseParams(transactionID, transactionThreadReport?.reportID, transactionChanges, policy);
+        data = getUpdateTrackExpenseParams(transactionID, transactionThreadReport?.reportID, transactionChanges, policy, allPolicies);
     } else {
         data = getUpdateMoneyRequestParams({
             transactionID,
@@ -229,6 +230,7 @@ function updateMoneyRequestMerchant({
     parentReport,
     value,
     policy,
+    allPolicies,
     policyTagList,
     policyCategories,
     currentUserAccountIDParam,
@@ -241,6 +243,7 @@ function updateMoneyRequestMerchant({
     parentReport: OnyxEntry<OnyxTypes.Report>;
     value: string;
     policy: OnyxEntry<OnyxTypes.Policy>;
+    allPolicies: OnyxCollection<OnyxTypes.Policy>;
     policyTagList: OnyxEntry<OnyxTypes.PolicyTagLists>;
     policyCategories: OnyxEntry<OnyxTypes.PolicyCategories>;
     currentUserAccountIDParam: number;
@@ -254,7 +257,7 @@ function updateMoneyRequestMerchant({
     let data: UpdateMoneyRequestData<UpdateMoneyRequestDataKeys>;
 
     if (isTrackExpenseReport(transactionThreadReport) && isSelfDM(parentReport)) {
-        data = getUpdateTrackExpenseParams(transactionID, transactionThreadReport?.reportID, transactionChanges, policy);
+        data = getUpdateTrackExpenseParams(transactionID, transactionThreadReport?.reportID, transactionChanges, policy, allPolicies);
     } else {
         data = getUpdateMoneyRequestParams({
             transactionID,
@@ -499,6 +502,7 @@ type UpdateMoneyRequestDistanceParams = {
     distance?: number;
     routes?: Routes;
     policy: OnyxEntry<OnyxTypes.Policy>;
+    allPolicies: OnyxCollection<OnyxTypes.Policy>;
     policyTagList: OnyxEntry<OnyxTypes.PolicyTagLists>;
     policyCategories: OnyxEntry<OnyxTypes.PolicyCategories>;
     transactionBackup: OnyxEntry<OnyxTypes.Transaction>;
@@ -520,6 +524,7 @@ function updateMoneyRequestDistance({
     distance,
     routes = undefined,
     policy,
+    allPolicies,
     policyTagList,
     policyCategories,
     transactionBackup,
@@ -542,7 +547,7 @@ function updateMoneyRequestDistance({
     let data: UpdateMoneyRequestData<UpdateMoneyRequestDataKeys | typeof ONYXKEYS.NVP_RECENT_WAYPOINTS>;
 
     if (isTrackExpenseReport(transactionThreadReport) && isSelfDM(parentReport)) {
-        data = getUpdateTrackExpenseParams(transaction?.transactionID, transactionThreadReport?.reportID, transactionChanges, policy);
+        data = getUpdateTrackExpenseParams(transaction?.transactionID, transactionThreadReport?.reportID, transactionChanges, policy, allPolicies);
     } else {
         data = getUpdateMoneyRequestParams({
             transactionID: transaction?.transactionID,
@@ -675,6 +680,7 @@ function updateMoneyRequestDescription({
     parentReport,
     comment,
     policy,
+    allPolicies,
     policyTagList,
     policyCategories,
     currentUserAccountIDParam,
@@ -687,6 +693,7 @@ function updateMoneyRequestDescription({
     parentReport: OnyxEntry<OnyxTypes.Report>;
     comment: string;
     policy: OnyxEntry<OnyxTypes.Policy>;
+    allPolicies: OnyxCollection<OnyxTypes.Policy>;
     policyTagList: OnyxEntry<OnyxTypes.PolicyTagLists>;
     policyCategories: OnyxEntry<OnyxTypes.PolicyCategories>;
     currentUserAccountIDParam: number;
@@ -701,7 +708,7 @@ function updateMoneyRequestDescription({
     let data: UpdateMoneyRequestData<UpdateMoneyRequestDataKeys>;
 
     if (isTrackExpenseReport(transactionThreadReport) && isSelfDM(parentReport)) {
-        data = getUpdateTrackExpenseParams(transactionID, transactionThreadReport?.reportID, transactionChanges, policy);
+        data = getUpdateTrackExpenseParams(transactionID, transactionThreadReport?.reportID, transactionChanges, policy, allPolicies);
     } else {
         data = getUpdateMoneyRequestParams({
             transactionID,
@@ -732,6 +739,7 @@ function updateMoneyRequestDistanceRate({
     parentReport,
     rateID,
     policy,
+    allPolicies,
     policyTagList,
     policyCategories,
     currentUserAccountIDParam,
@@ -747,6 +755,7 @@ function updateMoneyRequestDistanceRate({
     parentReport: OnyxEntry<OnyxTypes.Report>;
     rateID: string;
     policy: OnyxEntry<OnyxTypes.Policy>;
+    allPolicies: OnyxCollection<OnyxTypes.Policy>;
     policyTagList: OnyxEntry<OnyxTypes.PolicyTagLists>;
     policyCategories: OnyxEntry<OnyxTypes.PolicyCategories>;
     currentUserAccountIDParam: number;
@@ -780,7 +789,7 @@ function updateMoneyRequestDistanceRate({
     let data: UpdateMoneyRequestData<UpdateMoneyRequestDataKeys>;
 
     if (isTrackExpenseReport(transactionThreadReport) && isSelfDM(parentReport)) {
-        data = getUpdateTrackExpenseParams(transaction?.transactionID, transactionThreadReport?.reportID, transactionChanges, policy);
+        data = getUpdateTrackExpenseParams(transaction?.transactionID, transactionThreadReport?.reportID, transactionChanges, policy, allPolicies);
     } else {
         data = getUpdateMoneyRequestParams({
             transactionID: transaction?.transactionID,
@@ -813,6 +822,7 @@ type UpdateMoneyRequestAmountAndCurrencyParams = {
     amount: number;
     taxAmount: number;
     policy?: OnyxEntry<OnyxTypes.Policy>;
+    allPolicies: OnyxCollection<OnyxTypes.Policy>;
     policyTagList?: OnyxEntry<OnyxTypes.PolicyTagLists>;
     policyCategories?: OnyxEntry<OnyxTypes.PolicyCategories>;
     taxCode: string;
@@ -836,6 +846,7 @@ function updateMoneyRequestAmountAndCurrency({
     amount,
     taxAmount,
     policy,
+    allPolicies,
     policyTagList,
     policyCategories,
     taxCode,
@@ -860,7 +871,7 @@ function updateMoneyRequestAmountAndCurrency({
     let data: UpdateMoneyRequestData<UpdateMoneyRequestDataKeys>;
 
     if (isTrackExpenseReport(transactionThreadReport) && isSelfDM(parentReport)) {
-        data = getUpdateTrackExpenseParams(transactionID, transactionThreadReport?.reportID, transactionChanges, policy);
+        data = getUpdateTrackExpenseParams(transactionID, transactionThreadReport?.reportID, transactionChanges, policy, allPolicies);
     } else {
         data = getUpdateMoneyRequestParams({
             transactionID,
@@ -1497,6 +1508,7 @@ function getUpdateTrackExpenseParams(
     transactionThreadReportID: string | undefined,
     transactionChanges: TransactionChanges,
     policy: OnyxEntry<OnyxTypes.Policy>,
+    allPolicies: OnyxCollection<OnyxTypes.Policy>,
     shouldBuildOptimisticModifiedExpenseReportAction = true,
 ): UpdateMoneyRequestData<
     typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS | typeof ONYXKEYS.COLLECTION.TRANSACTION | typeof ONYXKEYS.COLLECTION.REPORT | typeof ONYXKEYS.COLLECTION.TRANSACTION_DRAFT
@@ -1516,8 +1528,7 @@ function getUpdateTrackExpenseParams(
     const chatReport = getAllReports()?.[`${ONYXKEYS.COLLECTION.REPORT}${transactionThread?.parentReportID}`] ?? null;
     const isDistanceTransaction = transaction && isDistanceRequestTransactionUtils(transaction);
     const isUnreported = transaction && isExpenseUnreported(transaction);
-    const distanceOriginalPolicy =
-        isDistanceTransaction && isUnreported ? getDistanceRateOriginalPolicy(transaction?.comment?.customUnit?.customUnitRateID, getAllPolicies(), policy) : undefined;
+    const distanceOriginalPolicy = isDistanceTransaction && isUnreported ? getDistanceRateOriginalPolicy(transaction?.comment?.customUnit?.customUnitRateID, allPolicies, policy) : undefined;
     const policyForTransaction = distanceOriginalPolicy ?? policy;
     const updatedTransaction = transaction
         ? getUpdatedTransaction({
