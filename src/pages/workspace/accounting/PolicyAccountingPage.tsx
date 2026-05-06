@@ -564,7 +564,6 @@ function PolicyAccountingPage({policy}: PolicyAccountingPageProps) {
             })
             .filter(Boolean) as MenuItemWithLink[];
     }, [
-        policy?.connections,
         hasAccountingConnection,
         isSyncInProgress,
         accountingIntegrations,
