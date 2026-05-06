@@ -4,11 +4,10 @@
  * than being duplicated across every surface that renders a transaction.
  */
 import {useCallback, useRef} from 'react';
-// eslint-disable-next-line no-restricted-imports
+// eslint-disable-next-line no-restricted-imports -- Need original useOnyx to avoid reading partial Search snapshot policy data.
 import {useOnyx as originalUseOnyx} from 'react-native-onyx';
 import type {OnyxEntry} from 'react-native-onyx';
 import {useSearchStateContext} from '@components/Search/SearchContext';
-import type {SearchQueryJSON} from '@components/Search/types';
 import type {TransactionInlineEditParams} from '@libs/actions/TransactionInlineEdit';
 import {
     editTransactionAmountInline,
@@ -53,14 +52,6 @@ type UseTransactionInlineEditParams = {
      * Omit (or pass undefined) when editing from outside the Search table.
      */
     hash?: number;
-
-    /**
-     * Search query context.
-     * When provided the editable-tab guard is applied — only tab types/statuses
-     * that support inline editing will return canEdit=true.
-     * Omit when editing from the Expense Report page (always editable by permissions alone).
-     */
-    queryJSON?: SearchQueryJSON;
 
     /**
      * Fallback report from the search snapshot.

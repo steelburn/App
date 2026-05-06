@@ -71,7 +71,7 @@ function TransactionListItem<TItem extends ListItem>({
     const StyleUtils = useStyleUtils();
 
     const {isLargeScreenWidth, shouldUseNarrowLayout} = useResponsiveLayout();
-    const {currentSearchHash, currentSearchKey, currentSearchResults, currentSearchQueryJSON} = useSearchStateContext();
+    const {currentSearchHash, currentSearchKey, currentSearchResults} = useSearchStateContext();
     const snapshotReport = (currentSearchResults?.data?.[`${ONYXKEYS.COLLECTION.REPORT}${transactionItem.reportID}`] ?? {}) as Report;
 
     const [isActionLoading] = useOnyx(`${ONYXKEYS.COLLECTION.RAM_ONLY_REPORT_LOADING_STATE}${transactionItem.reportID}`, {selector: isActionLoadingSelector});
@@ -210,7 +210,6 @@ function TransactionListItem<TItem extends ListItem>({
         reportActionID: transactionItem.reportAction?.reportActionID,
         parentReportAction,
         hash: currentSearchHash,
-        queryJSON: currentSearchQueryJSON,
         fallbackReport: snapshotReport,
     });
 
