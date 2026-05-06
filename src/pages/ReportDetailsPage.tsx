@@ -866,13 +866,23 @@ function ReportDetailsPage({policy, report, route, reportMetadata, reportLoading
     const shouldShowEditableTitleField = caseID !== CASES.MONEY_REQUEST && canEditReportTitle(report, policy, currentUserPersonalDetails?.accountID);
 
     const nameSectionFurtherDetailsContent = (
-        <ParentNavigationSubtitle
-            parentNavigationSubtitleData={parentNavigationSubtitleData}
-            reportID={report?.reportID}
-            parentReportID={report?.parentReportID}
-            parentReportActionID={report?.parentReportActionID}
-            pressableStyles={[styles.mt1, styles.mw100]}
-            subtitleNumberOfLines={2}
+        <MenuItemWithTopDescription
+            shouldShowRightIcon={false}
+            interactive={false}
+            titleComponent={
+                <ParentNavigationSubtitle
+                    parentNavigationSubtitleData={parentNavigationSubtitleData}
+                    reportID={report?.reportID}
+                    parentReportID={report?.parentReportID}
+                    parentReportActionID={report?.parentReportActionID}
+                    pressableStyles={[styles.mt1, styles.mw100]}
+                    textStyles={[styles.popoverMenuText, styles.flexShrink1, styles.preWrap, styles.mw100]}
+                    subtitleNumberOfLines={2}
+                    shouldShowFromPrefix={false}
+                />
+            }
+            description={translate('threads.from')}
+            shouldCheckActionAllowedOnPress={false}
         />
     );
 
@@ -901,7 +911,6 @@ function ReportDetailsPage({policy, report, route, reportMetadata, reportLoading
 
                         Navigation.navigate(ROUTES.EDIT_REPORT_FIELD_REQUEST.getRoute(report.reportID, policyID, CONST.REPORT_FIELD_TITLE_FIELD_ID, backTo));
                     }}
-                    furtherDetailsComponent={nameSectionFurtherDetailsContent}
                 />
             </View>
         </OfflineWithFeedback>
@@ -1082,7 +1091,12 @@ function ReportDetailsPage({policy, report, route, reportMetadata, reportLoading
                         {renderedAvatar}
                         {isExpenseReport && !shouldShowEditableTitleField && nameSectionExpenseIOU}
                     </View>
-                    {isExpenseReport && shouldShowEditableTitleField && nameSectionTitleField}
+                    {isExpenseReport && shouldShowEditableTitleField && (
+                        <>
+                            {nameSectionTitleField}
+                            {nameSectionFurtherDetailsContent}
+                        </>
+                    )}
 
                     {!isExpenseReport && nameSectionGroupWorkspace}
 
