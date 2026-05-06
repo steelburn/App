@@ -177,7 +177,25 @@ describe('shouldChangeToMatchingFullScreen', () => {
 });
 
 describe('isNavigatingToReportActionWithinSameReport', () => {
-    it('returns true when the reportIDs match and the reportActionID changed', () => {
+    it('returns true when linking from a report to one of its report actions', () => {
+        const currentRoute: NavigationPartialRoute = {
+            name: SCREENS.REPORT,
+            params: {
+                reportID: 111,
+            },
+        };
+        const newRoute: NavigationPartialRoute = {
+            name: SCREENS.REPORT,
+            params: {
+                reportID: 111,
+                reportActionID: 222,
+            },
+        };
+
+        expect(isNavigatingToReportActionWithinSameReport(currentRoute, newRoute)).toBe(true);
+    });
+
+    it('returns true when linking between report actions in the same report', () => {
         const currentRoute: NavigationPartialRoute = {
             name: SCREENS.REPORT,
             params: {
@@ -185,7 +203,7 @@ describe('isNavigatingToReportActionWithinSameReport', () => {
                 reportActionID: 222,
             },
         };
-        const nextRoute: NavigationPartialRoute = {
+        const newRoute: NavigationPartialRoute = {
             name: SCREENS.REPORT,
             params: {
                 reportID: 111,
@@ -193,6 +211,44 @@ describe('isNavigatingToReportActionWithinSameReport', () => {
             },
         };
 
-        expect(isNavigatingToReportActionWithinSameReport(currentRoute, nextRoute)).toBe(true);
+        expect(isNavigatingToReportActionWithinSameReport(currentRoute, newRoute)).toBe(true);
+    });
+
+    it('returns false when linking to the same report action', () => {
+        const currentRoute: NavigationPartialRoute = {
+            name: SCREENS.REPORT,
+            params: {
+                reportID: 111,
+                reportActionID: 333,
+            },
+        };
+        const newRoute: NavigationPartialRoute = {
+            name: SCREENS.REPORT,
+            params: {
+                reportID: 111,
+                reportActionID: 333,
+            },
+        };
+
+        expect(isNavigatingToReportActionWithinSameReport(currentRoute, newRoute)).toBe(false);
+    });
+
+    it('returns false when screens change', () => {
+        const currentRoute: NavigationPartialRoute = {
+            name: SCREENS.REPORT,
+            params: {
+                reportID: 111,
+                reportActionID: 333,
+            },
+        };
+        const newRoute: NavigationPartialRoute = {
+            name: SCREENS.HOME,
+            params: {
+                reportID: 111,
+                reportActionID: 444,
+            },
+        };
+
+        expect(isNavigatingToReportActionWithinSameReport(currentRoute, newRoute)).toBe(false);
     });
 });
