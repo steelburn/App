@@ -2748,7 +2748,7 @@ ${amount} dla ${merchant} - ${date}`,
         deleteAgentMessage: 'Czy na pewno chcesz usunąć tego agenta? Tej operacji nie można cofnąć.',
     },
     editAgentNamePage: {title: 'Nazwa agenta'},
-    editAgentPromptPage: {title: 'Napisz własne instrukcje'},
+    editAgentPromptPage: {title: 'Napisz własne instrukcje', error: {emptyPrompt: 'Proszę wprowadzić instrukcje dla swojego agenta.'}},
     expenseRulesPage: {
         title: 'Reguły wydatków',
         findRule: 'Znajdź regułę',

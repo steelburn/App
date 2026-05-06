@@ -2,7 +2,7 @@ import React from 'react';
 import {View} from 'react-native';
 import FormProvider from '@components/Form/FormProvider';
 import InputWrapper from '@components/Form/InputWrapper';
-import type {FormOnyxValues} from '@components/Form/types';
+import type {FormInputErrors, FormOnyxValues} from '@components/Form/types';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import ScreenWrapper from '@components/ScreenWrapper';
 import TextInput from '@components/TextInput';
@@ -27,6 +27,14 @@ function EditPromptPage({route}: EditPromptPageProps) {
     const accountID = route.params.accountID;
     const [agentPrompt] = useOnyx(`${ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT}${accountID}`);
 
+    const validate = (values: FormOnyxValues<typeof ONYXKEYS.FORMS.EDIT_AGENT_PROMPT_FORM>): FormInputErrors<typeof ONYXKEYS.FORMS.EDIT_AGENT_PROMPT_FORM> => {
+        const errors: FormInputErrors<typeof ONYXKEYS.FORMS.EDIT_AGENT_PROMPT_FORM> = {};
+        if (!values[INPUT_IDS.PROMPT].trim()) {
+            errors[INPUT_IDS.PROMPT] = translate('editAgentPromptPage.error.emptyPrompt');
+        }
+        return errors;
+    };
+
     const handleSubmit = (values: FormOnyxValues<typeof ONYXKEYS.FORMS.EDIT_AGENT_PROMPT_FORM>) => {
         updateAgentPrompt(accountID, values[INPUT_IDS.PROMPT].trim(), agentPrompt?.prompt ?? '');
         Navigation.goBack(ROUTES.SETTINGS_AGENTS_EDIT.getRoute(accountID));
@@ -44,6 +52,7 @@ function EditPromptPage({route}: EditPromptPageProps) {
             />
             <FormProvider
                 formID={ONYXKEYS.FORMS.EDIT_AGENT_PROMPT_FORM}
+                validate={validate}
                 onSubmit={handleSubmit}
                 submitButtonText={translate('common.save')}
                 style={[styles.flex1, styles.ph5]}

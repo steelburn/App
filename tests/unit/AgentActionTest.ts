@@ -151,7 +151,7 @@ describe('updateAgentName', () => {
     it('calls write with UPDATE_AGENT_NAME command and correct params', () => {
         updateAgentName(TEST_ACCOUNT_ID, 'New Name', 'Old Name');
 
-        expect(mockWrite).toHaveBeenCalledWith(WRITE_COMMANDS.UPDATE_AGENT_NAME, {accountID: TEST_ACCOUNT_ID, firstName: 'New Name'}, expect.any(Object));
+        expect(mockWrite).toHaveBeenCalledWith(WRITE_COMMANDS.UPDATE_AGENT_NAME, {agentAccountID: TEST_ACCOUNT_ID, firstName: 'New Name'}, expect.any(Object));
     });
 
     it('optimistic data updates displayName in PERSONAL_DETAILS_LIST for the given accountID', () => {
@@ -220,7 +220,7 @@ describe('updateAgentPrompt', () => {
     it('calls write with UPDATE_AGENT_PROMPT command and correct params', () => {
         updateAgentPrompt(TEST_ACCOUNT_ID, 'New prompt', 'Old prompt');
 
-        expect(mockWrite).toHaveBeenCalledWith(WRITE_COMMANDS.UPDATE_AGENT_PROMPT, {accountID: TEST_ACCOUNT_ID, prompt: 'New prompt'}, expect.any(Object));
+        expect(mockWrite).toHaveBeenCalledWith(WRITE_COMMANDS.UPDATE_AGENT_PROMPT, {agentAccountID: TEST_ACCOUNT_ID, prompt: 'New prompt'}, expect.any(Object));
     });
 
     it('optimistic data sets prompt, pendingAction UPDATE, and errors null on the prompt key', () => {

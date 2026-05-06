@@ -2753,7 +2753,7 @@ ${amount} voor ${merchant} - ${date}`,
         deleteAgentMessage: 'Weet je zeker dat je deze agent wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.',
     },
     editAgentNamePage: {title: 'Naam agent'},
-    editAgentPromptPage: {title: 'Aangepaste instructies schrijven'},
+    editAgentPromptPage: {title: 'Aangepaste instructies schrijven', error: {emptyPrompt: 'Voer instructies in voor uw agent.'}},
     expenseRulesPage: {
         title: 'Declaratieregels',
         findRule: 'Regel zoeken',

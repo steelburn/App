@@ -2653,6 +2653,9 @@ ${amount} para ${merchant} - ${date}`,
     },
     editAgentPromptPage: {
         title: 'Escribe instrucciones personalizadas',
+        error: {
+            emptyPrompt: 'Por favor, introduce instrucciones para tu agente.',
+        },
     },
     expenseRulesPage: {
         title: 'Reglas de gastos',

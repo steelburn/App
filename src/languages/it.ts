@@ -2757,7 +2757,7 @@ ${amount} per ${merchant} - ${date}`,
         deleteAgentMessage: 'Sei sicuro di voler eliminare questo agente? Questa azione non può essere annullata.',
     },
     editAgentNamePage: {title: 'Nome agente'},
-    editAgentPromptPage: {title: 'Scrivi istruzioni personalizzate'},
+    editAgentPromptPage: {title: 'Scrivi istruzioni personalizzate', error: {emptyPrompt: 'Inserisci le istruzioni per il tuo agente.'}},
     expenseRulesPage: {
         title: 'Regole spese',
         findRule: 'Trova regola',

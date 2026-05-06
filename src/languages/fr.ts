@@ -2767,7 +2767,7 @@ ${amount} pour ${merchant} - ${date}`,
         deleteAgentMessage: 'Êtes-vous sûr de vouloir supprimer cet agent ? Cette action est irréversible.',
     },
     editAgentNamePage: {title: "Nom de l'agent"},
-    editAgentPromptPage: {title: 'Rédiger des instructions personnalisées'},
+    editAgentPromptPage: {title: 'Rédiger des instructions personnalisées', error: {emptyPrompt: 'Veuillez saisir des instructions pour votre agent.'}},
     expenseRulesPage: {
         title: 'Règles de dépenses',
         findRule: 'Rechercher une règle',

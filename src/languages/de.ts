@@ -2761,7 +2761,7 @@ ${amount} für ${merchant} – ${date}`,
         deleteAgentMessage: 'Sind Sie sicher, dass Sie diese Person löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.',
     },
     editAgentNamePage: {title: 'Agentenname'},
-    editAgentPromptPage: {title: 'Eigene Anweisungen schreiben'},
+    editAgentPromptPage: {title: 'Eigene Anweisungen schreiben', error: {emptyPrompt: 'Bitte geben Sie Anweisungen für Ihren Agenten ein.'}},
     expenseRulesPage: {
         title: 'Ausgabenregeln',
         findRule: 'Regel finden',

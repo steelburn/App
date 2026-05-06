@@ -2679,7 +2679,7 @@ ${amount}，商户：${merchant} - 日期：${date}`,
         deleteAgentMessage: '确定要删除此代理人吗？此操作无法撤销。',
     },
     editAgentNamePage: {title: '代理姓名'},
-    editAgentPromptPage: {title: '编写自定义说明'},
+    editAgentPromptPage: {title: '编写自定义说明', error: {emptyPrompt: '请为您的代理输入说明。'}},
     expenseRulesPage: {
         title: '报销规则',
         findRule: '查找规则',

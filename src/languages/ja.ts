@@ -2729,7 +2729,7 @@ ${date} の ${merchant} への ${amount}`,
         deleteAgentMessage: 'このエージェントを削除してもよろしいですか？この操作は元に戻せません。',
     },
     editAgentNamePage: {title: '担当者名'},
-    editAgentPromptPage: {title: 'カスタム手順を作成'},
+    editAgentPromptPage: {title: 'カスタム手順を作成', error: {emptyPrompt: 'エージェントの指示を入力してください。'}},
     expenseRulesPage: {
         title: '経費ルール',
         findRule: 'ルールを検索',
