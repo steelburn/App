@@ -1,5 +1,5 @@
 type UpdateAgentNameParams = {
-    accountID: number;
+    agentAccountID: number;
     firstName: string;
 };
 

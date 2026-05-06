@@ -119,7 +119,7 @@ function updateAgentName(accountID: number, firstName: string, originalFirstName
         },
     ];
 
-    write(WRITE_COMMANDS.UPDATE_AGENT_NAME, {accountID, firstName}, {optimisticData, successData, failureData});
+    write(WRITE_COMMANDS.UPDATE_AGENT_NAME, {agentAccountID: accountID, firstName}, {optimisticData, successData, failureData});
 }
 
 function updateAgentPrompt(accountID: number, prompt: string, originalPrompt: string) {
@@ -147,7 +147,7 @@ function updateAgentPrompt(accountID: number, prompt: string, originalPrompt: st
         },
     ];
 
-    write(WRITE_COMMANDS.UPDATE_AGENT_PROMPT, {accountID, prompt}, {optimisticData, successData, failureData});
+    write(WRITE_COMMANDS.UPDATE_AGENT_PROMPT, {agentAccountID: accountID, prompt}, {optimisticData, successData, failureData});
 }
 
 function deleteAgent(accountID: number) {

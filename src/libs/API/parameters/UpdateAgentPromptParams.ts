@@ -1,5 +1,5 @@
 type UpdateAgentPromptParams = {
-    accountID: number;
+    agentAccountID: number;
     prompt: string;
 };
 
