@@ -56,9 +56,7 @@ function DomainGroupsPage({route}: DomainGroupsPageProps) {
         const isDefault = group.id === defaultGroupID;
         const groupPendingActions = pendingActions?.[`${CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX}${group.id}`];
         const groupErrorMessage = getLatestError(domainErrors?.[`${CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX}${group.id}`]?.errors);
-        const isPendingAdd = groupPendingActions?.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD;
-        const isFailedCreate = isPendingAdd && !isEmptyValueObject(groupErrorMessage);
-        const visiblePendingAction = isPendingAdd ? undefined : Object.values(groupPendingActions ?? {}).find(Boolean);
+        const isFailedCreate = groupPendingActions?.createGroup === CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD && !isEmptyValueObject(groupErrorMessage);
         return {
             keyForList: group.id,
             groupID: group.id,
@@ -70,7 +68,7 @@ function DomainGroupsPage({route}: DomainGroupsPageProps) {
                     {isDefault && <Badge text={translate('common.default')} />}
                 </View>
             ),
-            pendingAction: visiblePendingAction,
+            pendingAction: Object.values(groupPendingActions ?? {}).find(Boolean),
             isDisabled: isSecurityGroupPendingDeleteSelector(group.id)(pendingActions) || isFailedCreate,
         };
     });
@@ -128,8 +126,7 @@ function DomainGroupsPage({route}: DomainGroupsPageProps) {
                     ListItem={TableListItem}
                     onSelectRow={(item: GroupOption) => Navigation.navigate(ROUTES.DOMAIN_GROUP_DETAILS.getRoute(domainAccountID, item.groupID))}
                     onDismissError={(item: GroupOption) => {
-                        const groupPendingAction = pendingActions?.[`${CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX}${item.groupID}`]?.pendingAction;
-                        if (groupPendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD) {
+                        if (pendingActions?.[`${CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX}${item.groupID}`]?.createGroup) {
                             clearGroupCreateError(domainAccountID, item.groupID);
                             return;
                         }

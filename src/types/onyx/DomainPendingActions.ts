@@ -41,9 +41,14 @@ type DomainMemberPendingActions = {
  */
 type DomainSecurityGroupPendingActions = {
     /**
-     * Base pending action for group-level operations (create, delete)
+     * Pending action for creating a new security group
      */
-    pendingAction?: OnyxCommon.PendingAction;
+    createGroup?: OnyxCommon.PendingAction;
+
+    /**
+     * Pending action for deleting a security group
+     */
+    deleteGroup?: OnyxCommon.PendingAction;
 
     /**
      * Pending action for the security group name
