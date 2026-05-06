@@ -111,7 +111,7 @@ function OptionRowLHN({
         contextMenuHint,
     });
 
-    const renderPressableRow = (onPressBefore?: () => void) => (
+    const renderPressableRow = () => (
         <OptionRowPressable
             reportID={reportID}
             optionItem={optionItem}
@@ -119,7 +119,6 @@ function OptionRowLHN({
             isScreenFocused={isScreenFocused}
             popoverAnchor={popoverAnchor}
             onSelectRow={onSelectRow}
-            onPressBefore={onPressBefore}
             onLayout={onLayout}
             accessibilityLabel={accessibilityLabelWithContextMenuHint}
             accessibilityHint={accessibilityHint}

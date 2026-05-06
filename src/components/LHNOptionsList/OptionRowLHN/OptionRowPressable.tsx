@@ -14,6 +14,7 @@ import {startSpan} from '@libs/telemetry/activeSpans';
 import {showContextMenu} from '@pages/inbox/report/ContextMenu/ReportActionContextMenu';
 import variables from '@styles/variables';
 import CONST from '@src/CONST';
+import useLHNRowProductTrainingTooltip from './useLHNRowProductTrainingTooltip';
 
 type OptionRowPressableProps = {
     reportID: string;
@@ -22,8 +23,6 @@ type OptionRowPressableProps = {
     isScreenFocused: boolean;
     popoverAnchor: RefObject<View | null>;
     onSelectRow: (optionItem: OptionData, popoverAnchor: RefObject<View | null>) => void;
-    /** Optional hook fired before the row press (e.g. hide product training tooltip). */
-    onPressBefore?: () => void;
     onLayout?: (event: LayoutChangeEvent) => void;
     accessibilityLabel: string;
     accessibilityHint?: string;
@@ -38,15 +37,15 @@ function OptionRowPressable({
     isScreenFocused,
     popoverAnchor,
     onSelectRow,
-    onPressBefore,
     onLayout,
     accessibilityLabel,
     accessibilityHint,
     testID,
     children,
 }: OptionRowPressableProps) {
+    const {hideProductTrainingTooltip} = useLHNRowProductTrainingTooltip();
     const onPress = (event: GestureResponderEvent | KeyboardEvent | undefined) => {
-        onPressBefore?.();
+        hideProductTrainingTooltip();
         startSpan(`${CONST.TELEMETRY.SPAN_OPEN_REPORT}_${reportID}`, {
             name: 'OptionRowLHN',
             op: CONST.TELEMETRY.SPAN_OPEN_REPORT,
