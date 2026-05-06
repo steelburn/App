@@ -9687,7 +9687,6 @@ const CONST = {
 
     CACHE_NAME: {
         AUTH_IMAGES: 'auth-images',
-        USER_MEDIA: 'user-media',
     },
 
     MODAL_MAX_HEIGHT_TO_WINDOW_HEIGHT_RATIO: 0.9,
