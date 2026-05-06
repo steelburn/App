@@ -11,7 +11,7 @@ import isWindowReadyToFocus from '@libs/isWindowReadyToFocus';
 import type {PlatformStackNavigationProp} from '@libs/Navigation/PlatformStackNavigation/types';
 import type {RootNavigatorParamList} from '@libs/Navigation/types';
 import {shouldSkipAutoFocusDueToExistingFocus} from '@libs/NavigationFocusReturn';
-import {Priorities, tryClaim} from '@libs/ScreenFocusArbiter';
+import {Priorities, resetCycle, tryClaim} from '@libs/ScreenFocusArbiter';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import {useSplashScreenState} from '@src/SplashScreenStateContext';
@@ -82,7 +82,12 @@ export default function useAutoFocusInput(isMultiline = false): UseAutoFocusInpu
                 if (!tryClaim(Priorities.AUTO)) {
                     return;
                 }
+                // Verify focus actually moved — RN-Web TextInput on a hidden/disabled element can silently no-op. Release the AUTO claim so INITIAL/RETURN aren't blocked for the cycle's 2s timeout.
+                const beforeActive = typeof document !== 'undefined' ? document.activeElement : null;
                 input.focus();
+                if (beforeActive !== null && document.activeElement === beforeActive) {
+                    resetCycle();
+                }
             });
             setIsScreenTransitionEnded(false);
         });
