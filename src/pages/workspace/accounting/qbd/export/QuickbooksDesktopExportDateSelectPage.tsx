@@ -8,6 +8,7 @@ import useLocalize from '@hooks/useLocalize';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {updateQuickbooksDesktopExportDate} from '@libs/actions/connections/QuickbooksDesktop';
 import {getLatestErrorField} from '@libs/ErrorUtils';
+import createDynamicRoute from '@libs/Navigation/helpers/dynamicRoutesUtils/createDynamicRoute';
 import {settingsPendingAction} from '@libs/PolicyUtils';
 import Navigation from '@navigation/Navigation';
 import type {PlatformStackRouteProp} from '@navigation/PlatformStackNavigation/types';
@@ -28,8 +29,6 @@ function QuickbooksDesktopExportDateSelectPage({policy}: WithPolicyConnectionsPr
     const policyID = policy?.id;
     const qbdConfig = policy?.connections?.quickbooksDesktop?.config;
     const exportDate = qbdConfig?.export?.exportDate;
-    const route = useRoute<PlatformStackRouteProp<SettingsNavigatorParamList, typeof SCREENS.WORKSPACE.ACCOUNTING.QUICKBOOKS_DESKTOP_EXPORT_DATE_SELECT>>();
-    const backTo = route.params.backTo;
 
     const data: CardListItem[] = useMemo(
         () =>
@@ -44,8 +43,8 @@ function QuickbooksDesktopExportDateSelectPage({policy}: WithPolicyConnectionsPr
     );
 
     const goBack = useCallback(() => {
-        Navigation.goBack(backTo ?? `${ROUTES.POLICY_ACCOUNTING.getRoute(policyID)}/${DYNAMIC_ROUTES.POLICY_ACCOUNTING_QUICKBOOKS_DESKTOP_EXPORT.path}`);
-    }, [policyID, backTo]);
+        Navigation.goBack(policyID ? createDynamicRoute(DYNAMIC_ROUTES.POLICY_ACCOUNTING_QUICKBOOKS_DESKTOP_EXPORT.path, ROUTES.POLICY_ACCOUNTING.getRoute(policyID)) : undefined);
+    }, [policyID]);
 
     const selectExportDate = useCallback(
         (row: CardListItem) => {
