@@ -37,6 +37,7 @@ import type {TransactionPreviewData} from '@userActions/Search';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {CardList, Policy, Transaction, TransactionViolations} from '@src/types/onyx';
+import type {HoldMenuCallback} from '..';
 import BaseSearchList from './BaseSearchList';
 import type ChatListItem from './ListItem/ChatListItem';
 import type ExpenseReportListItem from './ListItem/ExpenseReportListItem';
@@ -120,6 +121,9 @@ type SearchListProps = Pick<FlashListProps<SearchListItem>, 'onScroll' | 'conten
 
     /** Violations indexed by transaction ID */
     violations?: Record<string, TransactionViolations | undefined> | undefined;
+
+    /** Callback to fire when hold menu should be opened */
+    onHoldMenuOpen?: HoldMenuCallback;
 
     /** Selected transactions for determining isSelected state */
     selectedTransactions: SelectedTransactions;
@@ -215,6 +219,7 @@ function SearchList({
     isMobileSelectionModeEnabled,
     newTransactions = [],
     violations,
+    onHoldMenuOpen,
     nonPersonalAndWorkspaceCards,
     selectedTransactions,
     hasLoadedAllTransactions,
@@ -467,6 +472,7 @@ function SearchList({
                         nonPersonalAndWorkspaceCards={nonPersonalAndWorkspaceCards}
                         onFocus={onFocus}
                         newTransactionID={newTransactionID}
+                        onHoldMenuOpen={onHoldMenuOpen}
                         onUndelete={handleUndelete}
                         keyForList={item.keyForList}
                         isFirstItem={index === firstVisibleIndex}
@@ -497,6 +503,7 @@ function SearchList({
             violations,
             lastPaymentMethod,
             personalPolicyID,
+            onHoldMenuOpen,
             userBillingGracePeriodEnds,
             ownerBillingGracePeriodEnd,
             nonPersonalAndWorkspaceCards,

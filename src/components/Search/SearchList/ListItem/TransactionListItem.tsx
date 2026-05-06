@@ -303,6 +303,7 @@ function TransactionListItem<TItem extends ListItem>({
                                 shouldShowUserInfo={!isDeletedTransaction && !!transactionItem?.from}
                                 stateNum={transactionItem.report?.stateNum}
                                 statusNum={transactionItem.report?.statusNum}
+                                isSelected={!!transactionItem.isSelected}
                             />
                         )}
                         <TransactionItemRow

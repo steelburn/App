@@ -725,6 +725,7 @@ function TransactionItemRow({
                             stateNum={transactionItem.report?.stateNum}
                             statusNum={transactionItem.report?.statusNum}
                             isDeleted={isDeletedTransaction}
+                            isSelected={isSelected}
                         />
                     </View>
                 );
