@@ -7,6 +7,7 @@ import ConfirmModal from '@components/ConfirmModal';
 import ConnectToGustoFlow from '@components/ConnectToGustoFlow';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import MenuItem from '@components/MenuItem';
+import MenuItemWithTopDescription from '@components/MenuItemWithTopDescription';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
 import ScreenWrapper from '@components/ScreenWrapper';
 import ScrollView from '@components/ScrollView';
@@ -201,13 +202,10 @@ function WorkspaceHRPage({
                             {isConnected && (
                                 <>
                                     <OfflineWithFeedback pendingAction={gustoConfig?.pendingFields?.approvalMode}>
-                                        <MenuItem
-                                            title={translate('workspace.hr.gusto.approvalMode')}
-                                            description={getGustoApprovalModeLabel(gustoConfig?.approvalMode)}
-                                            wrapperStyle={[styles.sectionMenuItemTopDescription, styles.mt2]}
-                                            shouldShowBasicTitle
-                                            titleStyle={styles.textLabelSupporting}
-                                            descriptionTextStyle={styles.popoverMenuText}
+                                        <MenuItemWithTopDescription
+                                            description={translate('workspace.hr.gusto.approvalMode')}
+                                            title={getGustoApprovalModeLabel(gustoConfig?.approvalMode)}
+                                            style={[styles.sectionMenuItemTopDescription, styles.mt2]}
                                             shouldShowRightIcon
                                             brickRoadIndicator={gustoConfig?.errorFields?.approvalMode ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined}
                                             onPress={() => Navigation.navigate(ROUTES.WORKSPACE_HR_GUSTO_APPROVAL_MODE.getRoute(policyID))}
