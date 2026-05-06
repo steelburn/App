@@ -7,11 +7,15 @@ const mockSetMoneyRequestAmount = jest.fn();
 const mockSetSplitShares = jest.fn();
 
 jest.mock('@libs/actions/IOU', () => ({
-    setMoneyRequestAmount: (...args: unknown[]) => mockSetMoneyRequestAmount(...args),
+    setMoneyRequestAmount: (...args: unknown[]) => {
+        mockSetMoneyRequestAmount(...args);
+    },
 }));
 
 jest.mock('@libs/actions/IOU/Split', () => ({
-    setSplitShares: (...args: unknown[]) => mockSetSplitShares(...args),
+    setSplitShares: (...args: unknown[]) => {
+        mockSetSplitShares(...args);
+    },
 }));
 
 jest.mock('@libs/DistanceRequestUtils', () => ({

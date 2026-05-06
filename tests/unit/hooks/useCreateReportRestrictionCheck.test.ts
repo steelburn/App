@@ -2,10 +2,10 @@ import {renderHook} from '@testing-library/react-native';
 import useCreateReportRestrictionCheck from '@pages/iou/request/step/IOURequestStepReport/hooks/useCreateReportRestrictionCheck';
 import type * as OnyxTypes from '@src/types/onyx';
 
-const mockShouldRestrict = jest.fn();
+const mockShouldRestrict = jest.fn<boolean, unknown[]>();
 
 jest.mock('@libs/SubscriptionUtils', () => ({
-    shouldRestrictUserBillableActions: (...args: unknown[]) => mockShouldRestrict(...args),
+    shouldRestrictUserBillableActions: (...args: unknown[]): boolean => mockShouldRestrict(...args),
 }));
 
 jest.mock('@hooks/useOnyx', () => ({

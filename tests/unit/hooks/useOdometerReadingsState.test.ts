@@ -3,13 +3,11 @@ import useOdometerReadingsState from '@pages/iou/request/step/IOURequestStepDist
 import CONST from '@src/CONST';
 import type * as OnyxTypes from '@src/types/onyx';
 
-jest.mock('@libs/actions/OdometerTransactionUtils', () => ({
-    isOdometerDraftPendingHydration: jest.fn(() => false),
-}));
+const mockIsOdometerDraftPendingHydration = jest.fn(() => false);
 
-const {isOdometerDraftPendingHydration} = jest.requireMock('@libs/actions/OdometerTransactionUtils') as {
-    isOdometerDraftPendingHydration: jest.Mock;
-};
+jest.mock('@libs/actions/OdometerTransactionUtils', () => ({
+    isOdometerDraftPendingHydration: (...args: unknown[]) => mockIsOdometerDraftPendingHydration(...(args as Parameters<typeof mockIsOdometerDraftPendingHydration>)),
+}));
 
 type Params = Parameters<typeof useOdometerReadingsState>[0];
 
@@ -35,7 +33,7 @@ const baseParams: Params = {
 
 describe('useOdometerReadingsState', () => {
     beforeEach(() => {
-        isOdometerDraftPendingHydration.mockReturnValue(false);
+        mockIsOdometerDraftPendingHydration.mockReturnValue(false);
     });
 
     it('starts with empty form state, then hydrates startReading/endReading from the transaction', () => {
@@ -65,7 +63,7 @@ describe('useOdometerReadingsState', () => {
     });
 
     it('does not snapshot the baseline while a save-for-later draft is still pending hydration', () => {
-        isOdometerDraftPendingHydration.mockReturnValue(true);
+        mockIsOdometerDraftPendingHydration.mockReturnValue(true);
         const {result} = renderHook(() =>
             useOdometerReadingsState({
                 ...baseParams,
