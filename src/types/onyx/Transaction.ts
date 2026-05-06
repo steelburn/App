@@ -647,6 +647,9 @@ type Transaction = OnyxCommon.OnyxValueWithOfflineFeedback<
         /** The card transaction's posted date */
         posted?: string;
 
+        /** The withdrawal ID associated with the transaction */
+        withdrawalID?: string;
+
         /** The inserted time of the transaction */
         inserted?: string;
 

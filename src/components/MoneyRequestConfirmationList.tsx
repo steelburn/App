@@ -58,7 +58,7 @@ import useTransactionReportForConfirmation from './MoneyRequestConfirmationList/
 import SplitBillController from './MoneyRequestConfirmationList/SplitBillController';
 import TaxController from './MoneyRequestConfirmationList/TaxController';
 import MoneyRequestConfirmationListFooter from './MoneyRequestConfirmationListFooter';
-import UserListItem from './SelectionList/ListItem/UserListItem';
+import BareUserListItem from './SelectionList/ListItem/BareUserListItem';
 import SelectionListWithSections from './SelectionList/SelectionListWithSections';
 
 type MoneyRequestConfirmationListProps = {
@@ -482,7 +482,6 @@ function MoneyRequestConfirmationList({
                 return undefined;
             }
             focusTimeoutRef.current = setTimeout(() => {
-                // eslint-disable-next-line @typescript-eslint/no-deprecated
                 InteractionManager.runAfterInteractions(() => {
                     blurActiveElement();
                 });
@@ -643,7 +642,7 @@ function MoneyRequestConfirmationList({
             <MouseProvider>
                 <SelectionListWithSections<MoneyRequestConfirmationListItem>
                     sections={sections}
-                    ListItem={UserListItem}
+                    ListItem={BareUserListItem}
                     onSelectRow={navigateToParticipantPage}
                     onDismissError={dismissParticipantRowError}
                     shouldSingleExecuteRowSelect
