@@ -5,6 +5,7 @@ import type {ListItem, SelectionListStyle} from '@components/SelectionList/types
 import useDebouncedState from '@hooks/useDebouncedState';
 import useLocalize from '@hooks/useLocalize';
 import useThemeStyles from '@hooks/useThemeStyles';
+import variables from '@styles/variables';
 import ListFilterWrapper from './ListFilterViewWrapper';
 
 type SingleSelectItem<T> = {
@@ -98,6 +99,7 @@ function SingleSelect<T extends string>({value, items, isSearchable, searchPlace
             hasHeader={hasHeader}
             hasTitle={hasTitle}
             isSearchable={isSearchable}
+            itemHeight={variables.optionRowHeight}
         >
             <Activity mode={shouldShowList ? 'visible' : 'hidden'}>
                 <SelectionList
