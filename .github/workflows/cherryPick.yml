@@ -37,6 +37,34 @@ jobs:
   validate:
     runs-on: blacksmith-2vcpu-ubuntu-2404
     steps:
+      - name: Check for in-progress deploy on target branch
+        id: checkInProgressDeploy
+        run: |
+          # Is a deploy currently running on the target branch? If so, this CP will supersede it.
+          DEPLOY_RUN_URL=$(gh api \
+            "repos/${{ github.repository }}/actions/workflows/deploy.yml/runs?branch=${{ inputs.TARGET }}&per_page=5" \
+            --jq '.workflow_runs[] | select(.status != "completed") | .html_url' | head -n 1)
+          echo "DEPLOY_RUN_URL=$DEPLOY_RUN_URL" >> "$GITHUB_OUTPUT"
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+      - name: Warn that previous deploy will be superseded
+        if: ${{ steps.checkInProgressDeploy.outputs.DEPLOY_RUN_URL != '' }}
+        uses: 8398a7/action-slack@1750b5085f3ec60384090fb7c52965ef822e869e
+        with:
+          status: custom
+          custom_payload: |
+            {
+              channel: '#deployer',
+              attachments: [{
+                color: 'warning',
+                text: `⚠️ Current ${{ inputs.TARGET == 'production' && 'Production' || 'Staging' }} deploy <${{ steps.checkInProgressDeploy.outputs.DEPLOY_RUN_URL }}|workflow> will be replaced by new cherry pick`
+              }]
+            }
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+
       - name: Validate pull request URL
         if: ${{ inputs.PULL_REQUEST_URL != '' }}
         run: |
