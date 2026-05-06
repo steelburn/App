@@ -7,7 +7,7 @@ internalScope: Audience is Workspace approvers and admins. Covers approving and 
 
 # Approve Expenses
 
-When an expense report is submitted on a Workspace with an approval workflow configured, it must be approved before it can be paid. To set an approval workflow on your Workspace, [learn how to add approvals](/articles/new-expensify/workspaces/Add-Approvals). 
+When an expense report is submitted on a Workspace with an approval workflow configured, it must be approved before it can be paid. To set an approval workflow on your Workspace, [learn how to enable Approvals](/articles/new-expensify/workspaces/Add-Approvals). 
 
 When an expense report is submitted to an individual (rather than on a workspace), it won't go through an approval process. It only needs to be paid. [Learn how to pay an expense](/articles/new-expensify/expenses-and-payments/Pay-an-expense).
 
@@ -81,7 +81,7 @@ Workspace admins can bypass the approval workflow on a report to final approve i
 
 ## How to hold an expense
 
-1. In the navigation tabs (on the left on web, and at the bottom on mobile), go to **Spend > All expenses**.
+1. In the navigation tabs (on the left on web, and at the bottom on mobile), go to **Spend > Expenses**.
 2. Locate the expense you want to hold. 
 3. Click the expense to open it. 
 4. Click **More** at the top of the expense.
@@ -93,7 +93,7 @@ To take an expense off hold, follow the same steps but select **Unhold**.
 
 ## How to unapprove a report 
 
-1. In the navigation tabs (on the left on web, and at the bottom on mobile), go to **Spend > All reports**.
+1. In the navigation tabs (on the left on web, and at the bottom on mobile), go to **Spend > Reports**.
 2. Locate the Approved report you want to unapprove. 
 3. Click the report to open it. 
 4. Click **More** at the top of the report. 
@@ -127,7 +127,7 @@ As the assigned approver, you can reject an entire expense report to return it t
 
 ## How to reject an expense 
 
-1. In the navigation tabs (on the left on web, and at the bottom on mobile), head to **Spend > All expenses**.
+1. In the navigation tabs (on the left on web, and at the bottom on mobile), head to **Spend > Expenses**.
 2. Locate the expense you want to reject using the search bar or filters.
 3. Click **View**.
 4. Open the **More** dropdown at the top of the expense.
