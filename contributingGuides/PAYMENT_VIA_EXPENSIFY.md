@@ -13,7 +13,7 @@ After approval it can take between 1 business day and a week, depending on the c
 ## Requesting Payments
 Request payment, by submitting your reports, in the same month the payment summary is posted. If that is not possible, request it as soon as possible after month-end. This is a hard requirement.
 
-Include in the Description field a link to the payment confirmation posted by the BZ team member on the issue for which payment is due. Please do not add any additional details.  
+Include in the Description field a link to the payment confirmation posted by the Expensify employee for which payment is due. Please do not add any additional details.  
 **Do not ever request payment before an employee has posted a payment summary.** 
 
 **Important!:** If you’re new to NewDot payments, please double check your eligibility date against the date you were assigned to a GH issue.  If you were assigned to a GH issue before your eligibility date, you must be paid via Upwork.
