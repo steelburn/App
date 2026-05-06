@@ -7,6 +7,7 @@ import type {
     AddAdminToDomainParams,
     AddMemberToDomainParams,
     ChangeDomainSecurityGroupParams,
+    CreateDomainSecurityGroupParams,
     DeleteDomainMemberParams,
     DeleteDomainParams,
     DeleteDomainSecurityGroupParams,
@@ -2173,8 +2174,9 @@ function clearDomainGroupCreatePreferredPolicyID() {
  * Creates a new domain security group with the given configuration
  * @param domainAccountID - The account ID of the domain
  * @param newSecurityGroup - The security group data to create
+ * @param shouldSetAsDefaultGroup - Whether we want to set newly created security group as the default
  */
-function createDomainSecurityGroup(domainAccountID: number, newSecurityGroup: DomainSecurityGroup) {
+function createDomainSecurityGroup(domainAccountID: number, newSecurityGroup: DomainSecurityGroup, shouldSetAsDefaultGroup = false) {
     const groupID = String(Num.generateRandom6DigitID());
     const SECURITY_GROUP_KEY = `${CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX}${groupID}`;
 
@@ -2223,7 +2225,7 @@ function createDomainSecurityGroup(domainAccountID: number, newSecurityGroup: Do
             key: `${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`,
             value: {
                 [SECURITY_GROUP_KEY]: {
-                    pendingAction: null,
+                    pendingAction: CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD,
                 },
             },
         },
@@ -2259,17 +2261,14 @@ function createDomainSecurityGroup(domainAccountID: number, newSecurityGroup: Do
         },
     ];
 
-    // using the same interface as UpdateDomainSecurityGroup to correctly handle errors
-    const params: UpdateDomainSecurityGroupParams = {
+    const params: CreateDomainSecurityGroupParams = {
         domainAccountID,
         name: SECURITY_GROUP_KEY,
         value: JSON.stringify(newSecurityGroup),
-        settingsName: 'createGroup',
+        shouldSetAsDefaultGroup,
     };
 
-    API.write(WRITE_COMMANDS.UPDATE_DOMAIN_SECURITY_GROUP, params, {optimisticData, failureData, successData});
-
-    return groupID;
+    API.write(WRITE_COMMANDS.CREATE_DOMAIN_SECURITY_GROUP, params, {optimisticData, failureData, successData});
 }
 
 /**
@@ -2280,6 +2279,9 @@ function clearGroupCreateError(domainAccountID: number, groupID: string) {
         [`${CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX}${groupID}`]: null,
     });
     Onyx.merge(`${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`, {
+        [`${CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX}${groupID}`]: null,
+    });
+    Onyx.merge(`${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`, {
         [`${CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX}${groupID}`]: null,
     });
 }

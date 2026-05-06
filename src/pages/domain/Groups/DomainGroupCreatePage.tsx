@@ -95,19 +95,20 @@ function DomainGroupCreatePage({route}: DomainGroupCreatePageProps) {
                         return errors;
                     }}
                     onSubmit={(values: FormOnyxValues<typeof ONYXKEYS.FORMS.CREATE_DOMAIN_GROUP_FORM>) => {
-                        const groupID = createDomainSecurityGroup(domainAccountID, {
-                            name: values[INPUT_IDS.NAME],
-                            shared: {},
-                            enableRestrictedPolicyCreation: restrictExpenseWorkspaceCreation,
-                            enableRestrictedPrimaryLogin: restrictDefaultLoginSelection,
-                            enableStrictPolicyRules: strictlyEnforceWorkspaceRules,
-                            enableRestrictedPrimaryPolicy: preferredWorkspace,
-                            restrictedPrimaryPolicyID: preferredWorkspace ? preferredPolicyID : undefined,
-                            overridePreferredPolicyWithCardPolicy: expensifyCardPreferredWorkspace,
-                        });
-                        if (defaultGroupForNewMembers && domainName) {
-                            setDefaultSecurityGroup(domainAccountID, groupID, defaultSecurityGroupID);
-                        }
+                        createDomainSecurityGroup(
+                            domainAccountID,
+                            {
+                                name: values[INPUT_IDS.NAME],
+                                shared: {},
+                                enableRestrictedPolicyCreation: restrictExpenseWorkspaceCreation,
+                                enableRestrictedPrimaryLogin: restrictDefaultLoginSelection,
+                                enableStrictPolicyRules: strictlyEnforceWorkspaceRules,
+                                enableRestrictedPrimaryPolicy: preferredWorkspace,
+                                restrictedPrimaryPolicyID: preferredWorkspace ? preferredPolicyID : undefined,
+                                overridePreferredPolicyWithCardPolicy: expensifyCardPreferredWorkspace,
+                            },
+                            defaultGroupForNewMembers,
+                        );
                         clearDomainGroupCreatePreferredPolicyID();
                         Navigation.goBack(ROUTES.DOMAIN_GROUPS.getRoute(domainAccountID));
                     }}

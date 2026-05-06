@@ -22,11 +22,12 @@ import Navigation from '@navigation/Navigation';
 import type {PlatformStackScreenProps} from '@navigation/PlatformStackNavigation/types';
 import type {DomainSplitNavigatorParamList} from '@navigation/types';
 import DomainNotFoundPageWrapper from '@pages/domain/DomainNotFoundPageWrapper';
-import {clearGroupDeleteError} from '@userActions/Domain';
+import {clearGroupCreateError, clearGroupDeleteError} from '@userActions/Domain';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
+import {isEmptyValueObject} from '@src/types/utils/EmptyObject';
 import getEmptyArray from '@src/types/utils/getEmptyArray';
 
 type GroupOption = Omit<ListItem, 'groupID'> & {
@@ -54,19 +55,23 @@ function DomainGroupsPage({route}: DomainGroupsPageProps) {
     const data = groups.map((group) => {
         const isDefault = group.id === defaultGroupID;
         const groupPendingActions = pendingActions?.[`${CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX}${group.id}`];
+        const groupErrorMessage = getLatestError(domainErrors?.[`${CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX}${group.id}`]?.errors);
+        const isPendingAdd = groupPendingActions?.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD;
+        const isFailedCreate = isPendingAdd && !isEmptyValueObject(groupErrorMessage);
+        const visiblePendingAction = isPendingAdd ? undefined : Object.values(groupPendingActions ?? {}).find(Boolean);
         return {
             keyForList: group.id,
             groupID: group.id,
             text: group.details.name ?? '',
-            errors: getLatestError(domainErrors?.[`${CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX}${group.id}`]?.errors),
+            errors: groupErrorMessage,
             rightElement: (
                 <View style={[styles.flex1, styles.flexRow, styles.alignItemsCenter, styles.justifyContentBetween]}>
                     <Text numberOfLines={1}>{translate('domain.groups.memberCount', {count: Object.keys(group.details.shared).length})}</Text>
                     {isDefault && <Badge text={translate('common.default')} />}
                 </View>
             ),
-            pendingAction: Object.values(pendingActions?.[`${CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX}${group.id}`] ?? {}).find(Boolean),
-            isDisabled: isSecurityGroupPendingDeleteSelector(group.id)(pendingActions),
+            pendingAction: visiblePendingAction,
+            isDisabled: isSecurityGroupPendingDeleteSelector(group.id)(pendingActions) || isFailedCreate,
         };
     });
 
@@ -122,7 +127,14 @@ function DomainGroupsPage({route}: DomainGroupsPageProps) {
                     data={data}
                     ListItem={TableListItem}
                     onSelectRow={(item: GroupOption) => Navigation.navigate(ROUTES.DOMAIN_GROUP_DETAILS.getRoute(domainAccountID, item.groupID))}
-                    onDismissError={(item: GroupOption) => clearGroupDeleteError(domainAccountID, item.groupID)}
+                    onDismissError={(item: GroupOption) => {
+                        const groupPendingAction = pendingActions?.[`${CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX}${item.groupID}`]?.pendingAction;
+                        if (groupPendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD) {
+                            clearGroupCreateError(domainAccountID, item.groupID);
+                            return;
+                        }
+                        clearGroupDeleteError(domainAccountID, item.groupID);
+                    }}
                     customListHeader={getCustomListHeader()}
                     shouldShowRightCaret
                     addBottomSafeAreaPadding
