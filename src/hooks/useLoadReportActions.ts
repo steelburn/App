@@ -45,7 +45,7 @@ function useLoadReportActions({
     const newestReportAction = reportActions?.at(0);
     const oldestReportAction = reportActions?.at(-1);
 
-    const isTransactionThreadReport = !!transactionThreadReportID;
+    const isTransactionThreadReport = !!transactionThreadReportID && transactionThreadReportID !== CONST.FAKE_REPORT_ID;
 
     let currentReportNewestAction = null;
     let currentReportOldestAction = null;
