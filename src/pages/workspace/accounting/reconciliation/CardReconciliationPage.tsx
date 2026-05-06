@@ -157,7 +157,7 @@ function CardReconciliationPage({policy, route}: CardReconciliationPageProps) {
                         isActive={!!continuousReconciliation}
                         onToggle={handleToggleContinuousReconciliation}
                         wrapperStyle={styles.ph5}
-                        pendingAction={continuousReconciliationPendingAction?.pendingAction}
+                        pendingAction={continuousReconciliationPendingAction}
                     />
                     {!autoSync && (
                         <View style={[styles.renderHTML, styles.ph5, styles.mt2]}>
@@ -170,7 +170,7 @@ function CardReconciliationPage({policy, route}: CardReconciliationPageProps) {
                             />
                         </View>
                     )}
-                    <OfflineWithFeedback pendingAction={continuousReconciliationPendingAction?.pendingAction}>
+                    <OfflineWithFeedback pendingAction={continuousReconciliationPendingAction}>
                         {!!paymentBankAccountID && !!continuousReconciliation && (
                             <MenuItemWithTopDescription
                                 style={styles.mt5}

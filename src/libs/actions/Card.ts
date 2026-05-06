@@ -1526,9 +1526,7 @@ function toggleContinuousReconciliation(workspaceAccountID: number, shouldUseCon
         {
             onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.EXPENSIFY_CARD_USE_CONTINUOUS_RECONCILIATION_PENDING_ACTION}${workspaceAccountID}`,
-            value: {
-                pendingAction: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE,
-            },
+            value: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE,
         },
         {
             onyxMethod: Onyx.METHOD.MERGE,

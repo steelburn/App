@@ -1,9 +1,6 @@
 import type {PendingAction} from './OnyxCommon';
 
-/** Represents the continuous reconciliation status for a card. */
-type CardContinuousReconciliation = {
-    /** Pending action for optimistic UI updates */
-    pendingAction?: PendingAction;
-};
+/** Pending action of continuous reconciliation status for a card. */
+type CardContinuousReconciliation = PendingAction | null;
 
 export default CardContinuousReconciliation;
