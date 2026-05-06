@@ -154,12 +154,7 @@ function AccountSwitcher({isScreenFocused}: AccountSwitcherProps) {
     };
 
     const menuItems = (): PopoverMenuItem[] => {
-        const currentUserMenuItem = createBaseMenuItem(currentUserPersonalDetails, undefined, {
-            shouldShowRightIcon: true,
-            iconRight: icons.Checkmark,
-            success: true,
-            isSelected: true,
-        });
+        const currentUserMenuItem = createBaseMenuItem(currentUserPersonalDetails, undefined, {isSelected: true});
 
         if (isActingAsDelegate) {
             const delegateEmail = account?.delegatedAccess?.delegate ?? '';
@@ -314,6 +309,7 @@ function AccountSwitcher({isScreenFocused}: AccountSwitcherProps) {
                     scrollContainerStyle={styles.pb4}
                     shouldUseScrollView
                     shouldUpdateFocusedIndex={false}
+                    shouldShowRadioButton
                 />
             )}
         </>
