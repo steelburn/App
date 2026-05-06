@@ -1013,7 +1013,7 @@ function ReportDetailsPage({policy, report, route, reportMetadata, reportLoading
     const mentionReportContextValue = useMemo(() => ({currentReportID: report.reportID, exactlyMatch: true}), [report.reportID]);
 
     const shouldShowFurtherDetailsContent =
-        shouldShowEditableTitleField || (!isEmptyObject(parentNavigationSubtitleData) && (isMoneyRequestReport || isInvoiceReport || isMoneyRequest || isTaskReport));
+        !isEmptyObject(parentNavigationSubtitleData) && (shouldShowEditableTitleField || isMoneyRequestReport || isInvoiceReport || isMoneyRequest || isTaskReport);
 
     return (
         <ScreenWrapper testID="ReportDetailsPage">
