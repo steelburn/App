@@ -76,6 +76,11 @@ const PromotedActions = {
         icon: 'CommentBubbles',
         translationKey: 'common.message',
         onSelected: () => {
+            if (reportID && accountID === currentUserAccountID) {
+                Navigation.navigate(ROUTES.REPORT_WITH_ID.getRoute(reportID));
+                return;
+            }
+
             if (login) {
                 navigateToAndOpenReport([login], personalDetails, currentUserAccountID, introSelected, isSelfTourViewed, betas, false, true);
                 return;

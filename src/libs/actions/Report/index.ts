@@ -399,6 +399,53 @@ type AddAttachmentWithCommentParams = {
 const addNewMessageWithText = new Set<string>([WRITE_COMMANDS.ADD_COMMENT, WRITE_COMMANDS.ADD_TEXT_AND_ATTACHMENT]);
 // map of reportID to all reportActions for that report
 const allReportActions: OnyxCollection<ReportActions> = {};
+const STALE_DM_RECOVERY_TARGET_TTL_MS = 30000;
+const staleDMRecoveryTargetBySourceReportID: Record<string, string> = {};
+const staleDMRecoverySourceByTargetReportID: Record<string, string> = {};
+const staleDMRecoveryCleanupTimersBySourceReportID: Record<string, ReturnType<typeof setTimeout>> = {};
+
+function clearStaleDMRecoveryTargetBySourceReportID(sourceReportID: string) {
+    const targetReportID = staleDMRecoveryTargetBySourceReportID[sourceReportID];
+    if (!targetReportID) {
+        return;
+    }
+
+    delete staleDMRecoveryTargetBySourceReportID[sourceReportID];
+    delete staleDMRecoverySourceByTargetReportID[targetReportID];
+
+    const timeoutID = staleDMRecoveryCleanupTimersBySourceReportID[sourceReportID];
+    if (timeoutID) {
+        clearTimeout(timeoutID);
+    }
+    delete staleDMRecoveryCleanupTimersBySourceReportID[sourceReportID];
+}
+
+function setStaleDMRecoveryTarget(sourceReportID: string, targetReportID: string) {
+    clearStaleDMRecoveryTargetBySourceReportID(sourceReportID);
+    const existingSourceReportID = staleDMRecoverySourceByTargetReportID[targetReportID];
+    if (existingSourceReportID) {
+        clearStaleDMRecoveryTargetBySourceReportID(existingSourceReportID);
+    }
+
+    staleDMRecoveryTargetBySourceReportID[sourceReportID] = targetReportID;
+    staleDMRecoverySourceByTargetReportID[targetReportID] = sourceReportID;
+    staleDMRecoveryCleanupTimersBySourceReportID[sourceReportID] = setTimeout(() => {
+        clearStaleDMRecoveryTargetBySourceReportID(sourceReportID);
+    }, STALE_DM_RECOVERY_TARGET_TTL_MS);
+}
+
+function getStaleDMRecoveryTarget(reportID: string) {
+    return staleDMRecoveryTargetBySourceReportID[reportID];
+}
+
+function clearStaleDMRecoveryTargetByTargetReportID(targetReportID: string) {
+    const sourceReportID = staleDMRecoverySourceByTargetReportID[targetReportID];
+    if (!sourceReportID) {
+        return;
+    }
+
+    clearStaleDMRecoveryTargetBySourceReportID(sourceReportID);
+}
 
 Onyx.connect({
     key: ONYXKEYS.COLLECTION.REPORT_ACTIONS,
@@ -699,7 +746,18 @@ function addActions({
     if (!report?.reportID) {
         return;
     }
-    const reportID = report.reportID;
+    const sourceReportID = report.reportID;
+    const reportID = getStaleDMRecoveryTarget(sourceReportID) ?? sourceReportID;
+    const reportForAction = reportID === sourceReportID ? report : (allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${reportID}`] ?? report);
+
+    let resolvedNotifyReportID: AddActionsParams['notifyReportID'];
+    if (typeof notifyReportID === 'string') {
+        resolvedNotifyReportID = getStaleDMRecoveryTarget(notifyReportID) ?? notifyReportID;
+    } else if (Array.isArray(notifyReportID)) {
+        resolvedNotifyReportID = notifyReportID.map((id) => getStaleDMRecoveryTarget(id) ?? id);
+    } else {
+        resolvedNotifyReportID = notifyReportID;
+    }
     let reportCommentText = '';
     let reportCommentAction: OptimisticAddCommentReportAction | undefined;
     let attachmentAction: OptimisticAddCommentReportAction | undefined;
@@ -769,10 +827,10 @@ function addActions({
         lastActionType: CONST.REPORT.ACTIONS.TYPE.ADD_COMMENT,
     };
 
-    const shouldUpdateNotificationPreference = !isEmptyObject(report) && isHiddenForCurrentUser(report);
+    const shouldUpdateNotificationPreference = !isEmptyObject(reportForAction) && isHiddenForCurrentUser(reportForAction);
     if (shouldUpdateNotificationPreference) {
         optimisticReport.participants = {
-            [currentUserAccountID]: {notificationPreference: getDefaultNotificationPreferenceForReport(report)},
+            [currentUserAccountID]: {notificationPreference: getDefaultNotificationPreferenceForReport(reportForAction)},
         };
     }
 
@@ -807,7 +865,7 @@ function addActions({
         idempotencyKey: Str.guid(),
     };
 
-    const isConciergeChat = isConciergeChatReport(report);
+    const isConciergeChat = isConciergeChatReport(reportForAction);
     if (reportIDDeeplinkedFromOldDot === reportID && isConciergeChat) {
         parameters.isOldDotConciergeChat = true;
     }
@@ -816,7 +874,7 @@ function addActions({
         parameters.attachmentID = attachmentID;
     }
 
-    if (isInSidePanel && (isConciergeChat || isAdminRoom(report))) {
+    if (isInSidePanel && (isConciergeChat || isAdminRoom(reportForAction))) {
         const pageHTML = capturePageHTML();
         if (pageHTML) {
             parameters.pageHTML = pageHTML;
@@ -937,7 +995,7 @@ function addActions({
         successData,
         failureData,
     });
-    notifyNewAction(notifyReportID, lastAction, lastAction?.actorAccountID === currentUserAccountID);
+    notifyNewAction(resolvedNotifyReportID, lastAction, lastAction?.actorAccountID === currentUserAccountID);
 }
 
 /** Add an attachment with an optional comment to a report */
@@ -1334,7 +1392,6 @@ function openReport(params: OpenReportActionParams) {
     const participantLoginList = participants.map((p) => p.login).filter((login) => !!login);
     // TODO: allPersonalDetails fallback should be removed in follow-up PRs https://github.com/Expensify/App/issues/73656
     const participantAccountIDList = participants.map((p) => p.accountID).filter((id): id is number => id !== undefined);
-
     const optimisticReport = reportActionsExist(reportID)
         ? {}
         : {
@@ -2069,12 +2126,15 @@ function navigateToAndOpenReport(
 ) {
     const participantAccountIDs = PersonalDetailsUtils.getAccountIDsByLogins(userLogins);
     const chat = getChatByParticipants([...participantAccountIDs, currentUserAccountID]);
-    const createAndOpenNewOptimisticChat = () => {
+    const createAndOpenNewOptimisticChat = (sourceCachedReportID?: string) => {
         const fallbackChat = buildOptimisticChatReport({
             participantList: [...participantAccountIDs, currentUserAccountID],
             notificationPreference: CONST.REPORT.NOTIFICATION_PREFERENCE.HIDDEN,
             currentUserAccountID,
         });
+        if (sourceCachedReportID) {
+            setStaleDMRecoveryTarget(sourceCachedReportID, fallbackChat.reportID);
+        }
 
         // We pass newReportObject to force chat creation on the server.
         openReport({
@@ -2092,7 +2152,7 @@ function navigateToAndOpenReport(
     };
 
     if (isEmptyObject(chat) || isReportNotFound(chat)) {
-        createAndOpenNewOptimisticChat();
+        createAndOpenNewOptimisticChat(chat?.reportID);
         return;
     }
 
@@ -2115,7 +2175,7 @@ function navigateToAndOpenReport(
             }
             hasAttemptedFallback = true;
             Onyx.disconnect(reportConnection);
-            createAndOpenNewOptimisticChat();
+            createAndOpenNewOptimisticChat(chat.reportID);
         },
     });
 
@@ -2171,11 +2231,14 @@ function navigateToAndOpenReportWithAccountIDs(
         };
     });
     const chat = getChatByParticipants([...participantAccountIDs, currentUserAccountID]);
-    const createAndOpenNewOptimisticChat = () => {
+    const createAndOpenNewOptimisticChat = (sourceCachedReportID?: string) => {
         const fallbackChat = buildOptimisticChatReport({
             participantList: [...participantAccountIDs, currentUserAccountID],
             currentUserAccountID,
         });
+        if (sourceCachedReportID) {
+            setStaleDMRecoveryTarget(sourceCachedReportID, fallbackChat.reportID);
+        }
 
         // We pass newReportObject to force chat creation on the server.
         openReport({
@@ -2194,7 +2257,7 @@ function navigateToAndOpenReportWithAccountIDs(
     };
 
     if (!chat || isReportNotFound(chat)) {
-        createAndOpenNewOptimisticChat();
+        createAndOpenNewOptimisticChat(chat?.reportID);
         return;
     }
 
@@ -2217,7 +2280,7 @@ function navigateToAndOpenReportWithAccountIDs(
             }
             hasAttemptedFallback = true;
             Onyx.disconnect(reportConnection);
-            createAndOpenNewOptimisticChat();
+            createAndOpenNewOptimisticChat(chat.reportID);
         },
     });
 
@@ -7677,6 +7740,7 @@ export {
     setNewRoomFormLoading,
     clearPolicyRoomNameErrors,
     clearPrivateNotesError,
+    clearStaleDMRecoveryTargetByTargetReportID,
     clearReportFieldKeyErrors,
     completeOnboarding,
     extractRHPVariantFromResponse,

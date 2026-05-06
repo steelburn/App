@@ -159,4 +159,22 @@ describe('PromotedActions.message', () => {
 
         expect(mockNavigateToAndOpenReport).toHaveBeenCalledWith(['test@example.com'], {}, 1, introSelected, false, betas, false, true);
     });
+
+    it('should prefer reportID for self profile message action', () => {
+        const action = PromotedActions.message({
+            reportID: 'selfReport123',
+            accountID: 1,
+            currentUserAccountID: 1,
+            personalDetails: {},
+            introSelected: undefined,
+            isSelfTourViewed: undefined,
+            betas: undefined,
+        });
+
+        action.onSelected();
+
+        expect(mockNavigation.navigate).toHaveBeenCalledWith(ROUTES.REPORT_WITH_ID.getRoute('selfReport123'));
+        expect(mockNavigateToAndOpenReport).not.toHaveBeenCalled();
+        expect(mockNavigateToAndOpenReportWithAccountIDs).not.toHaveBeenCalled();
+    });
 });
