@@ -203,6 +203,7 @@ function IOURequestStepCategoryCreate({
                 <CategoryForm
                     onSubmit={createCategory}
                     policyCategories={policyCategories}
+                    addBottomSafeAreaPadding={false}
                 />
             </StepScreenWrapper>
         </AccessOrNotFoundWrapper>
