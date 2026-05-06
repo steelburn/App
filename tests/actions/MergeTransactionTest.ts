@@ -165,7 +165,7 @@ describe('mergeTransactionRequest', () => {
             targetTransactionThreadParentReportNextStep: undefined,
             allTransactionViolations: createAllTransactionViolations(targetTransaction.transactionID, sourceTransaction.transactionID, targetViolations, sourceViolations),
             policy: undefined,
-            allPolicies: {},
+
             policyTags: undefined,
             policyCategories: undefined,
             currentUserAccountIDParam: 123,
@@ -310,7 +310,7 @@ describe('mergeTransactionRequest', () => {
             targetTransactionThreadParentReportNextStep: undefined,
             allTransactionViolations: createAllTransactionViolations(targetTransaction.transactionID, sourceTransaction.transactionID, targetViolations, sourceViolations),
             policy: undefined,
-            allPolicies: {},
+
             policyTags: undefined,
             policyCategories: undefined,
             currentUserAccountIDParam: 123,
@@ -472,7 +472,7 @@ describe('mergeTransactionRequest', () => {
             targetTransactionThreadParentReportNextStep: undefined,
             allTransactionViolations: createAllTransactionViolations(targetTransaction.transactionID, sourceTransaction.transactionID, mockViolations, mockViolations),
             policy: undefined,
-            allPolicies: {},
+
             policyTags: undefined,
             policyCategories: undefined,
             currentUserAccountIDParam: 123,
@@ -575,7 +575,7 @@ describe('mergeTransactionRequest', () => {
             targetTransactionThreadParentReportNextStep: undefined,
             allTransactionViolations: createAllTransactionViolations(targetTransaction.transactionID, sourceTransaction.transactionID, mockViolations, mockViolations),
             policy: undefined,
-            allPolicies: {},
+
             policyTags: undefined,
             policyCategories: undefined,
             currentUserAccountIDParam: 123,
@@ -691,7 +691,7 @@ describe('mergeTransactionRequest', () => {
             targetTransaction,
             sourceTransaction,
             policy: undefined,
-            allPolicies: {},
+
             policyTags: undefined,
             policyCategories: undefined,
             allTransactionViolations: createAllTransactionViolations(targetTransaction.transactionID, sourceTransaction.transactionID, mockViolations, mockViolations),
@@ -851,7 +851,7 @@ describe('mergeTransactionRequest', () => {
                 targetTransactionThreadParentReportNextStep: undefined,
                 allTransactionViolations: createAllTransactionViolations(targetTransaction.transactionID, sourceTransaction.transactionID, targetViolations, sourceViolations),
                 policy: undefined,
-                allPolicies: {},
+
                 policyTags: undefined,
                 policyCategories: undefined,
                 currentUserAccountIDParam: 123,
@@ -1048,7 +1048,7 @@ describe('mergeTransactionRequest', () => {
                 targetTransactionThreadParentReportNextStep: undefined,
                 allTransactionViolations: createAllTransactionViolations(targetTransaction.transactionID, sourceTransaction.transactionID, targetViolations, sourceViolations),
                 policy: undefined,
-                allPolicies: {},
+
                 policyTags: undefined,
                 policyCategories: undefined,
                 currentUserAccountIDParam: 123,
@@ -1197,7 +1197,7 @@ describe('mergeTransactionRequest', () => {
                 targetTransactionThreadParentReportNextStep: undefined,
                 allTransactionViolations: createAllTransactionViolations(targetTransaction.transactionID, sourceTransaction.transactionID, targetViolations, sourceViolations),
                 policy: undefined,
-                allPolicies: {},
+
                 policyTags: undefined,
                 policyCategories: undefined,
                 currentUserAccountIDParam: 123,

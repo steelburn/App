@@ -54,7 +54,6 @@ function IOURequestStepDescription({
 }: IOURequestStepDescriptionProps) {
     const policy = usePolicy(report?.policyID);
     const [splitDraftTransaction] = useOnyx(`${ONYXKEYS.COLLECTION.SPLIT_TRANSACTION_DRAFT}${transactionID}`);
-    const [allPolicies] = useOnyx(ONYXKEYS.COLLECTION.POLICY);
     const [policyCategories] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${report?.policyID}`);
     const [parentReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(report?.parentReportID)}`);
     const [parentReportNextStep] = useOnyx(`${ONYXKEYS.COLLECTION.NEXT_STEP}${getNonEmptyStringOnyxID(report?.parentReportID)}`);
@@ -168,7 +167,6 @@ function IOURequestStepDescription({
                 parentReport,
                 comment: newComment,
                 policy,
-                allPolicies,
                 policyTagList: policyTags,
                 policyCategories,
                 currentUserAccountIDParam,

@@ -50,7 +50,6 @@ function IOURequestStepDate({
     const {translate} = useLocalize();
     const policy = usePolicy(report?.policyID);
     const {duplicateTransactions, duplicateTransactionViolations} = useDuplicateTransactionsAndViolations(transactionID ? [transactionID] : []);
-    const [allPolicies] = useOnyx(ONYXKEYS.COLLECTION.POLICY);
     const [policyCategories] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${report?.policyID}`);
     const [policyTags] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_TAGS}${report?.policyID}`);
     const [parentReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(report?.parentReportID)}`);
@@ -103,7 +102,6 @@ function IOURequestStepDate({
                 transactionViolations: duplicateTransactionViolations,
                 value: newCreated,
                 policy,
-                allPolicies,
                 policyTags,
                 policyCategories,
                 currentUserAccountIDParam: currentUserPersonalDetails.accountID,
