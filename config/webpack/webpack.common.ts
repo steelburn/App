@@ -15,6 +15,7 @@ import webpack from 'webpack';
 import type {Configuration, WebpackPluginInstance} from 'webpack';
 import {BundleAnalyzerPlugin} from 'webpack-bundle-analyzer';
 import {GenerateSW} from 'workbox-webpack-plugin';
+import CONST from '@src/CONST';
 // Storybook 10 loads TS files directly and requires .ts extension for ESM imports
 // @ts-expect-error -- Can't use .ts extensions without allowImportingTsExtensions in tsconfig
 // eslint-disable-next-line import/extensions
@@ -153,7 +154,7 @@ const getCommonConfiguration = ({file = '.env', platform = 'web'}: Environment):
                                   urlPattern: ({sameOrigin, url, request}) => sameOrigin && (request.destination === 'image' || /\/(receipts|chat-attachments)\//.test(url.pathname)),
                                   handler: 'StaleWhileRevalidate',
                                   options: {
-                                      cacheName: 'user-media',
+                                      cacheName: CONST.CACHE_NAME.USER_MEDIA,
                                       expiration: {maxEntries: 200, maxAgeSeconds: 7 * 24 * 60 * 60},
                                   },
                               },
