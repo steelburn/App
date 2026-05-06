@@ -1028,15 +1028,6 @@ const config: LinkingOptions<RootNavigatorParamList>['config'] = {
                         [SCREENS.WORKSPACE.DYNAMIC_CATEGORY_PAYROLL_CODE]: DYNAMIC_ROUTES.WORKSPACE_CATEGORY_PAYROLL_CODE.path,
                         [SCREENS.WORKSPACE.DYNAMIC_CATEGORY_GL_CODE]: DYNAMIC_ROUTES.WORKSPACE_CATEGORY_GL_CODE.path,
                         [SCREENS.WORKSPACE.DYNAMIC_CATEGORY_CREATE]: DYNAMIC_ROUTES.WORKSPACE_CATEGORY_CREATE.path,
-                        [SCREENS.WORKSPACE.CATEGORY_EDIT]: {
-                            path: ROUTES.WORKSPACE_CATEGORY_EDIT.route,
-                        },
-                        [SCREENS.WORKSPACE.CATEGORY_PAYROLL_CODE]: {
-                            path: ROUTES.WORKSPACE_CATEGORY_PAYROLL_CODE.route,
-                        },
-                        [SCREENS.WORKSPACE.CATEGORY_GL_CODE]: {
-                            path: ROUTES.WORKSPACE_CATEGORY_GL_CODE.route,
-                        },
                         [SCREENS.WORKSPACE.CATEGORY_DEFAULT_TAX_RATE]: {
                             path: ROUTES.WORKSPACE_CATEGORY_DEFAULT_TAX_RATE.route,
                         },
