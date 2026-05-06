@@ -277,7 +277,7 @@ function ReportFetchHandler() {
     }, [isFocused, prevIsFocused]);
 
     useEffect(() => {
-        if (!isValidReportIDFromPath(reportIDFromRoute)) {
+        if (!reportIDFromRoute || !isValidReportIDFromPath(reportIDFromRoute)) {
             return;
         }
         // Ensures the optimistic report is created successfully
