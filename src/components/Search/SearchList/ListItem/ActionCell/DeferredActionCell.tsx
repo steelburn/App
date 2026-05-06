@@ -23,6 +23,7 @@ function DeferredActionCell(actionCellProps: ActionCellProps) {
         );
     }
 
+    // Deferred wrapper intentionally forwards all props to the underlying component
     // eslint-disable-next-line react/jsx-props-no-spreading
     return <ActionCell {...actionCellProps} />;
 }

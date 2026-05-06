@@ -13,6 +13,7 @@ function DeferredTransactionItemRowRBR(props: DeferredTransactionItemRowRBRProps
         return <View style={props.containerStyles ?? [styles.minHeight4]} />;
     }
 
+    // Deferred wrapper intentionally forwards all props to the underlying component
     // eslint-disable-next-line react/jsx-props-no-spreading
     return <TransactionItemRowRBR {...props} />;
 }
