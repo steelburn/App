@@ -5,7 +5,7 @@ import FormHelpMessage from '@components/FormHelpMessage';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import ScreenWrapper from '@components/ScreenWrapper';
 import SelectionList from '@components/SelectionList';
-import RadioListItem from '@components/SelectionList/ListItem/RadioListItem';
+import SingleSelectListItem from '@components/SelectionList/ListItem/SingleSelectListItem';
 import Text from '@components/Text';
 import {useCurrencyListState} from '@hooks/useCurrencyList';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
@@ -108,7 +108,7 @@ function SelectCountryStep({disableAutoFocus}: {disableAutoFocus?: boolean}) {
             </CollapsibleHeaderOnKeyboard>
             <SelectionList
                 data={searchResults}
-                ListItem={RadioListItem}
+                ListItem={SingleSelectListItem}
                 onSelectRow={onSelectionChange}
                 textInputOptions={{
                     headerMessage,
