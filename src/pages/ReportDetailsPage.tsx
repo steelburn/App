@@ -9,7 +9,6 @@ import type {OnyxEntry} from 'react-native-onyx';
 import type {ValueOf} from 'type-fest';
 import AvatarWithImagePicker from '@components/AvatarWithImagePicker';
 import FullPageNotFoundView from '@components/BlockingViews/FullPageNotFoundView';
-import DisplayNames from '@components/DisplayNames';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import MentionReportContext from '@components/HTMLEngineProvider/HTMLRenderers/MentionReportRenderer/MentionReportContext';
 import MenuItem from '@components/MenuItem';
@@ -17,7 +16,6 @@ import MenuItemWithTopDescription from '@components/MenuItemWithTopDescription';
 import {ModalActions} from '@components/Modal/Global/ModalContext';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
 import ParentNavigationSubtitle from '@components/ParentNavigationSubtitle';
-import PressableWithoutFeedback from '@components/Pressable/PressableWithoutFeedback';
 import type {PromotedAction} from '@components/PromotedActionsBar';
 import PromotedActionsBar, {PromotedActions} from '@components/PromotedActionsBar';
 import ReportActionAvatars from '@components/ReportActionAvatars';
@@ -72,6 +70,7 @@ import {
     getParentNavigationSubtitle,
     getParticipantsAccountIDsForDisplay,
     getParticipantsList,
+    getPolicyName,
     getReportDescription,
     getReportFieldKey,
     getReportForHeader,
@@ -362,10 +361,7 @@ function ReportDetailsPage({policy, report, route, reportMetadata, reportLoading
     const shouldParseFullTitle = parentReportAction?.actionName !== CONST.REPORT.ACTIONS.TYPE.ADD_COMMENT && !isGroupChat;
     const rawReportName = getReportNameFromReportNameUtils(reportForHeader, reportAttributes);
     const reportName = shouldParseFullTitle ? Parser.htmlToText(rawReportName) : rawReportName;
-    const additionalRoomDetails =
-        (isPolicyExpenseChat && !!report?.isOwnPolicyExpenseChat) || isExpenseReportUtil(report) || isPolicyExpenseChat || isInvoiceRoom
-            ? chatRoomSubtitle
-            : `${translate('threads.in')} ${chatRoomSubtitle}`;
+    const additionalRoomDetails = isExpenseReportUtil(report) || isPolicyExpenseChat || isInvoiceRoom ? chatRoomSubtitle : `${translate('threads.in')} ${chatRoomSubtitle}`;
 
     let roomDescription: string | undefined;
     if (caseID === CASES.MONEY_REQUEST) {
@@ -750,6 +746,7 @@ function ReportDetailsPage({policy, report, route, reportMetadata, reportLoading
         return result;
     }, [canJoin, report, backTo, currentUserPersonalDetails.accountID]);
 
+    const shouldDisplayGroupWorkspaceAsPushRow = !isThread && (isGroupChat || isUserCreatedPolicyRoom || isDefaultRoom);
     const nameSectionGroupWorkspace = (
         <OfflineWithFeedback
             pendingAction={report?.pendingFields?.reportName}
@@ -763,10 +760,10 @@ function ReportDetailsPage({policy, report, route, reportMetadata, reportLoading
                     interactive={!shouldDisableRename}
                     title={StringUtils.lineBreaksToSpaces(reportName)}
                     titleStyle={styles.newKansasLarge}
-                    titleContainerStyle={shouldDisableRename && styles.alignItemsCenter}
+                    titleContainerStyle={!shouldDisplayGroupWorkspaceAsPushRow && styles.alignItemsCenter}
                     shouldCheckActionAllowedOnPress={false}
-                    description={!shouldDisableRename ? roomDescription : ''}
-                    furtherDetails={chatRoomSubtitle && !isGroupChat ? additionalRoomDetails : ''}
+                    description={shouldDisplayGroupWorkspaceAsPushRow ? roomDescription : ''}
+                    furtherDetails={chatRoomSubtitle && !isGroupChat && !shouldDisplayGroupWorkspaceAsPushRow ? additionalRoomDetails : ''}
                     furtherDetailsNumberOfLines={isWorkspaceChat ? 0 : undefined}
                     furtherDetailsStyle={isWorkspaceChat ? [styles.textAlignCenter, styles.breakWord] : undefined}
                     onPress={() => {
@@ -775,6 +772,14 @@ function ReportDetailsPage({policy, report, route, reportMetadata, reportLoading
                     numberOfLinesTitle={isThread ? 2 : 0}
                     shouldBreakWord
                 />
+                {shouldDisplayGroupWorkspaceAsPushRow && !isGroupChat && (
+                    <MenuItemWithTopDescription
+                        shouldShowRightIcon={false}
+                        interactive={false}
+                        description={translate('workspace.common.workspace')}
+                        title={getPolicyName({report})}
+                    />
+                )}
             </View>
         </OfflineWithFeedback>
     );
