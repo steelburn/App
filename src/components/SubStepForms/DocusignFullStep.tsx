@@ -155,6 +155,7 @@ function DocusignFullStep<TFormID extends keyof OnyxFormValuesMapping>({
                         setUploadError(error);
                     }}
                     fileLimit={1}
+                    maxFileSize={CONST.NON_USD_BANK_ACCOUNT.MAX_FILE_SIZE}
                 />
             </FormProvider>
         </InteractiveStepWrapper>
