@@ -47,8 +47,11 @@ function AddDelegatePage() {
         Navigation.navigate(ROUTES.SETTINGS_DELEGATE_ROLE.getRoute(option.login ?? ''));
     };
 
+    const recentReportLogins = new Set(searchOptions.recentReports.map((option) => option.login).filter(Boolean));
+    const dedupedPersonalDetails = searchOptions.personalDetails.filter((option) => !recentReportLogins.has(option.login));
+
     const headerMessage = getHeaderMessage(
-        (searchOptions.recentReports?.length || 0) + (searchOptions.personalDetails?.length || 0) !== 0,
+        (searchOptions.recentReports?.length || 0) + (dedupedPersonalDetails?.length || 0) !== 0,
         !!searchOptions.userToInvite,
         debouncedSearchTerm,
         countryCode,
@@ -62,7 +65,7 @@ function AddDelegatePage() {
         {
             title: translate('common.contacts'),
             sectionIndex: 1,
-            data: searchOptions.personalDetails,
+            data: dedupedPersonalDetails,
         },
     ];
 
