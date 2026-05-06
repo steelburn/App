@@ -33,7 +33,7 @@ const mockedFeeds = {
         customFeedName: 'Custom feed name 1',
         feed: CONST.COMPANY_CARD.FEED_BANK_NAME.VISA,
     },
-    // eslint-disable-next-line @typescript-eslint/naming-convention
+    // eslint-disable-next-line @typescript-eslint/naming-convention -- Feed keys use the `vcf#<id>` format from the backend
     'vcf#22222222': {
         liabilityType: 'personal',
         pending: false,
