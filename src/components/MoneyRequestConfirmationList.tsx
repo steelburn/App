@@ -454,6 +454,7 @@ function MoneyRequestConfirmationList({
         isPerDiemRequest,
         isTimeRequest,
         routeError,
+        isNewManualExpenseFlowEnabled,
     });
 
     const confirm = buildConfirmAction({

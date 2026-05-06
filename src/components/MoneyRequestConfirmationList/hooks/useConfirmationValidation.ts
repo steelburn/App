@@ -97,6 +97,9 @@ type UseConfirmationValidationParams = {
 
     /** Truthy when the route to the confirmation page has a known error */
     routeError: string | null | undefined;
+
+    /** Whether the new manual expense flow is enabled */
+    isNewManualExpenseFlowEnabled: boolean;
 };
 
 /**
@@ -140,6 +143,7 @@ function useConfirmationValidation({
     isPerDiemRequest,
     isTimeRequest,
     routeError,
+    isNewManualExpenseFlowEnabled,
 }: UseConfirmationValidationParams): {validate: (paymentType?: PaymentMethodType) => ValidationResult | null} {
     const {getCurrencyDecimals} = useCurrencyListActions();
     const selectedParticipantsCount = selectedParticipants.length;
@@ -159,7 +163,9 @@ function useConfirmationValidation({
         if (iouType !== CONST.IOU.TYPE.PAY && !isScanRequestUtil(transaction) && !isTimeRequest && !isDistanceRequest && iouAmount === 0 && isP2P) {
             return {errorKey: 'common.error.invalidAmount'};
         }
-
+        if (isNewManualExpenseFlowEnabled && !transaction?.isAmountSet) {
+            return {errorKey: 'common.error.fieldRequired'};
+        }
         const merchantValue = iouMerchant ?? '';
         const {isValid: isMerchantLengthValid} = isValidInputLength(merchantValue, CONST.MERCHANT_NAME_MAX_BYTES);
 

@@ -243,7 +243,7 @@ function AmountField({
         if (isInlineAmountInvalid && shouldDisplayFieldError) {
             setFormError('common.error.invalidAmount');
         } else if (!isInlineAmountInvalid) {
-            clearFormErrors(['common.error.invalidAmount']);
+            clearFormErrors(['common.error.invalidAmount', 'common.error.fieldRequired']);
         }
 
         buildAndSaveSplitShares(parsedAmount, effectiveCurrency);
