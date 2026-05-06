@@ -1,4 +1,4 @@
-import React, {useMemo, useRef, useState} from 'react';
+import React, {useRef, useState} from 'react';
 import MoneyRequestAmountInput from '@components/MoneyRequestAmountInput';
 import {EditableCell, useInlineEditState} from '@components/Table/EditableCell';
 import type {EditableProps} from '@components/Table/EditableCell';
@@ -11,12 +11,22 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import {convertToBackendAmount, convertToFrontendAmountAsString, getCurrencyDecimals} from '@libs/CurrencyUtils';
 import {formatToParts} from '@libs/NumberFormatUtils';
 import {parseFloatAnyLocale, roundToTwoDecimalPlaces} from '@libs/NumberUtils';
-import {getTransactionDetails} from '@libs/ReportUtils';
-import {getCurrency as getTransactionCurrency, isDeletedTransaction, isScanning} from '@libs/TransactionUtils';
+import {getTransactionDetails, isInvoiceReport, shouldEnableNegative} from '@libs/ReportUtils';
+import {getCurrency as getTransactionCurrency, isDeletedTransaction, isExpenseUnreported, isScanning} from '@libs/TransactionUtils';
 import CONST from '@src/CONST';
 import type TransactionDataCellProps from './TransactionDataCellProps';
 
-type TotalCellProps = TransactionDataCellProps & EditableProps<number>;
+type TotalCellProps = TransactionDataCellProps & EditableProps<number | undefined>;
+type TransactionItem = TransactionDataCellProps['transactionItem'];
+
+function getTransactionItemIouType(transactionItem: TransactionItem) {
+    if (isInvoiceReport(transactionItem.report)) {
+        return CONST.IOU.TYPE.INVOICE;
+    }
+
+    const isSplitTransaction = transactionItem.comment?.source === CONST.IOU.TYPE.SPLIT || !!transactionItem.comment?.splits;
+    return isSplitTransaction ? CONST.IOU.TYPE.SPLIT : CONST.IOU.TYPE.SUBMIT;
+}
 
 function TotalCell({shouldShowTooltip, transactionItem, canEdit, onSave}: TotalCellProps) {
     const styles = useThemeStyles();
@@ -31,28 +41,32 @@ function TotalCell({shouldShowTooltip, transactionItem, canEdit, onSave}: TotalC
         amountToDisplay = translate('iou.receiptStatusTitle');
     }
 
+    const iouType = getTransactionItemIouType(transactionItem);
+    const isSplitBill = iouType === CONST.IOU.TYPE.SPLIT;
+    const isUnreportedExpense = isExpenseUnreported(transactionItem);
+    const allowNegative = isUnreportedExpense || shouldEnableNegative(transactionItem.report, transactionItem.policy, iouType, transactionItem.participants);
+
     const absoluteAmount = Math.abs(amount ?? 0);
-    const [isNegative, setIsNegative] = useState((amount ?? 0) < 0);
+    const isOriginalAmountNegative = (amount ?? 0) < 0;
+    const [isNegative, setIsNegative] = useState(isOriginalAmountNegative);
 
-    const handleAmountSave = (amountString: string) => {
+    const getNormalizedValue = (amountString: string, isAmountNegative: boolean) => {
         const parsedValue = parseFloatAnyLocale(amountString);
-        if (!Number.isNaN(parsedValue) && parsedValue >= 0) {
-            const normalizedValue = roundToTwoDecimalPlaces(parsedValue);
-            const finalAmount = isNegative ? -normalizedValue : normalizedValue;
-            const convertedAmount = convertToBackendAmount(finalAmount);
-            if (convertedAmount === amount) {
-                return;
-            }
-
-            onSave?.(convertedAmount);
+        if (Number.isNaN(parsedValue) || parsedValue < 0) {
+            return undefined;
         }
+
+        const normalizedValue = roundToTwoDecimalPlaces(parsedValue);
+        const finalAmount = isAmountNegative ? -normalizedValue : normalizedValue;
+        return convertToBackendAmount(finalAmount);
     };
 
     // localValue tracks the frontend-format amount string (e.g. "12.34") while editing
     const {isEditing, setLocalValue, startEditing, save, cancelEditing} = useInlineEditState(
         canEdit,
         convertToFrontendAmountAsString(absoluteAmount, getCurrencyDecimals(currency)),
-        handleAmountSave,
+        (value) => onSave?.(getNormalizedValue(value, isNegative)),
+        (value, originalValue) => getNormalizedValue(value, isNegative) === getNormalizedValue(originalValue, isOriginalAmountNegative),
     );
 
     // Ref used to programmatically focus the input when edit mode starts
@@ -64,7 +78,7 @@ function TotalCell({shouldShowTooltip, transactionItem, canEdit, onSave}: TotalC
     };
 
     const handleStartEditing = () => {
-        setIsNegative((amount ?? 0) < 0);
+        setIsNegative(isOriginalAmountNegative);
         startEditing();
     };
 
@@ -89,17 +103,12 @@ function TotalCell({shouldShowTooltip, transactionItem, canEdit, onSave}: TotalC
     // Some currencies display with a space between symbol and amount (e.g., "CZK 100.00") in convertToDisplayString (in preview).
     // We detect this spacing and apply matching padding to the input to prevent visual flicker when entering edit mode.
     // See: https://github.com/Expensify/App/pull/83127#issuecomment-4240055145
-    const hasSymbolSpaceInPreview = useMemo(() => {
-        const decimals = getCurrencyDecimals(currency);
-        const parts = formatToParts(preferredLocale, 0, {
-            style: 'currency',
-            currency,
-            minimumFractionDigits: decimals,
-            maximumFractionDigits: CONST.DEFAULT_CURRENCY_DECIMALS,
-        });
-
-        return parts.some((part) => part.type === 'literal' && part.value.trim() === '');
-    }, [preferredLocale, currency]);
+    const hasSymbolSpaceInPreview = formatToParts(preferredLocale, 0, {
+        style: 'currency',
+        currency,
+        minimumFractionDigits: getCurrencyDecimals(currency),
+        maximumFractionDigits: CONST.DEFAULT_CURRENCY_DECIMALS,
+    }).some((part) => part.type === 'literal' && part.value.trim() === '');
 
     useKeyboardShortcut(CONST.KEYBOARD_SHORTCUTS.ESCAPE, handleEscape, {captureOnInputs: true, isActive: isEditing});
 
@@ -131,7 +140,7 @@ function TotalCell({shouldShowTooltip, transactionItem, canEdit, onSave}: TotalC
                     onAmountChange={handleAmountChange}
                     onFormatAmount={onFormatAmount}
                     onBlur={save}
-                    allowFlippingAmount
+                    allowFlippingAmount={!isSplitBill && allowNegative}
                     isNegative={isNegative}
                     toggleNegative={toggleNegative}
                     clearNegative={clearNegative}

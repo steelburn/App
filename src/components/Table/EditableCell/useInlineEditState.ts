@@ -10,7 +10,7 @@ import {useCallback, useEffect, useRef, useState} from 'react';
  *   - isEditing toggle
  *   - Auto-cancel when canEdit becomes false
  */
-function useInlineEditState<T>(canEdit: boolean | undefined, value: T, onSave?: (value: T) => void) {
+function useInlineEditState<T>(canEdit: boolean | undefined, value: T, onSave?: (value: T) => void, isEqual?: (newValue: T, originalValue: T) => boolean) {
     const [isEditing, setIsEditing] = useState(false);
     const [localValue, setLocalValue] = useState(value);
     const [prevValue, setPrevValue] = useState(value);
@@ -31,12 +31,15 @@ function useInlineEditState<T>(canEdit: boolean | undefined, value: T, onSave?: 
             return;
         }
         hasEndedRef.current = true;
-        onSave?.(localValue);
+        const shouldSave = isEqual ? !isEqual(localValue, value) : !Object.is(localValue, value);
+        if (shouldSave) {
+            onSave?.(localValue);
+        }
         // Always reset to the source-of-truth so a rejected save (e.g. empty merchant)
         // doesn't leave stale localValue displayed after edit mode closes.
         setLocalValue(value);
         setIsEditing(false);
-    }, [localValue, value, onSave]);
+    }, [localValue, value, onSave, isEqual]);
 
     const cancelEditing = useCallback(() => {
         if (hasEndedRef.current) {

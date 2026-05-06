@@ -6,6 +6,7 @@ import TextInput from '@components/TextInput';
 import type {BaseTextInputRef} from '@components/TextInput/BaseTextInput/types';
 import TextWithTooltip from '@components/TextWithTooltip';
 import useKeyboardShortcut from '@hooks/useKeyboardShortcut';
+import useLocalize from '@hooks/useLocalize';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {moveSelectionToEnd, scrollToBottom} from '@libs/InputUtils';
 import Parser from '@libs/Parser';
@@ -21,6 +22,7 @@ type MerchantOrDescriptionCellProps = {
 
 function MerchantOrDescriptionCell({merchantOrDescription, shouldShowTooltip, shouldUseNarrowLayout, isDescription, canEdit, onSave}: MerchantOrDescriptionCellProps) {
     const styles = useThemeStyles();
+    const {translate} = useLocalize();
     const inputRef = useRef<RNTextInput | null>(null);
 
     const text = useMemo(() => {
@@ -30,13 +32,15 @@ function MerchantOrDescriptionCell({merchantOrDescription, shouldShowTooltip, sh
         return StringUtils.lineBreaksToSpaces(Parser.htmlToText(merchantOrDescription));
     }, [merchantOrDescription, isDescription]);
 
-    const handleSave = (value: string) => {
-        // Trim merchant values before saving (descriptions can keep whitespace)
-        const valueToSave = !isDescription ? value.trim() : value;
-        onSave?.(valueToSave);
-    };
+    // Normalize merchant values for save/equality checks (descriptions can keep whitespace)
+    const getNormalizedValue = (value: string) => (isDescription ? value : value.trim());
 
-    const {isEditing, localValue, setLocalValue, startEditing, save, cancelEditing} = useInlineEditState(canEdit, text, handleSave);
+    const {isEditing, localValue, setLocalValue, startEditing, save, cancelEditing} = useInlineEditState(
+        canEdit,
+        text,
+        (value) => onSave?.(getNormalizedValue(value)),
+        (value, originalValue) => getNormalizedValue(value) === getNormalizedValue(originalValue),
+    );
 
     const isMultilineInput = isDescription;
 
@@ -81,7 +85,7 @@ function MerchantOrDescriptionCell({merchantOrDescription, shouldShowTooltip, sh
             editContent={
                 <TextInput
                     ref={handleRef}
-                    accessibilityLabel={isDescription ? 'Description input' : 'Merchant input'}
+                    accessibilityLabel={translate(isDescription ? 'common.description' : 'common.merchant')}
                     value={localValue}
                     onChangeText={handleChangeText}
                     onBlur={save}
