@@ -104,7 +104,6 @@ function IOURequestStepDistance({
     const [optimisticWaypoints, setOptimisticWaypoints] = useState<WaypointCollection | null>(null);
     const [policyRecentlyUsedCurrencies] = useOnyx(ONYXKEYS.RECENTLY_USED_CURRENCIES);
     const [introSelected] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED);
-    const [activePolicyID] = useOnyx(ONYXKEYS.NVP_ACTIVE_POLICY_ID);
     const {policyForMovingExpenses} = usePolicyForMovingExpenses();
     const [betas] = useOnyx(ONYXKEYS.BETAS);
     const [draftTransactionIDs] = useOnyx(ONYXKEYS.COLLECTION.TRANSACTION_DRAFT, {selector: validTransactionDraftIDsSelector});
@@ -382,7 +381,6 @@ function IOURequestStepDistance({
             quickAction,
             policyRecentlyUsedCurrencies,
             introSelected,
-            activePolicyID,
             privateIsArchived: isArchived,
             selfDMReport,
             policyForMovingExpenses,
@@ -421,7 +419,6 @@ function IOURequestStepDistance({
         quickAction,
         policyRecentlyUsedCurrencies,
         introSelected,
-        activePolicyID,
         policyForMovingExpenses,
         selfDMReport,
         betas,
