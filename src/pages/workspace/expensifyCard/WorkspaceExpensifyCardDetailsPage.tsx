@@ -210,7 +210,7 @@ function WorkspaceExpensifyCardDetailsPage({route}: WorkspaceExpensifyCardDetail
         </>
     );
 
-    if (!card && !isLoadingOnyxValue(allFeedsCardsResult)) {
+    if (!card && !cardFromCardList && !isLoadingOnyxValue(allFeedsCardsResult)) {
         return <NotFoundPage />;
     }
 
