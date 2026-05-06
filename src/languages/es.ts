@@ -9033,7 +9033,7 @@ ${amount} para ${merchant} - ${date}`,
     delegate: {
         switchAccount: 'Cambiar de cuenta:',
         switch: 'Cambiar',
-        copilot: 'Copilot',
+        copilot: 'Copiloto',
         copilotDelegatedAccess: 'Copilot: Acceso delegado',
         copilotDelegatedAccessDescription: 'Permitir que otros miembros accedan a tu cuenta.',
         learnMoreAboutDelegatedAccess: 'Más información sobre acceso delegado',
