@@ -196,7 +196,7 @@ function IOURequestStepCategoryCreate({
         >
             <StepScreenWrapper
                 headerTitle={translate('workspace.categories.addCategory')}
-                onBackButtonPress={() => Navigation.goBack()}
+                onBackButtonPress={() => Navigation.goBack(ROUTES.MONEY_REQUEST_STEP_CATEGORY.getRoute(action, iouType, transactionID, reportID, backTo))}
                 shouldShowWrapper
                 testID="IOURequestStepCategoryCreate"
             >
