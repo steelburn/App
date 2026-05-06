@@ -10,7 +10,10 @@ import {clearDomainSecurityGroupSettingError, updateDomainSecurityGroup} from '@
 import ONYXKEYS from '@src/ONYXKEYS';
 
 type ExpensifyCardPreferredWorkspaceToggleProps = {
+    /** The account ID of the domain */
     domainAccountID: number;
+
+    /** The ID of the security group */
     groupID: string;
 };
 
