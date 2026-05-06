@@ -100,10 +100,11 @@ function IOURequestStepCategory({
                   icon: expensifyIcons.Plus,
                   text: translate('workspace.categories.addCategory'),
                   onSelected: () => {
-                      if (!policyID || !report?.reportID) {
+                      const reportID = report?.reportID ?? routeReportID;
+                      if (!policyID || !reportID) {
                           return;
                       }
-                      Navigation.navigate(ROUTES.MONEY_REQUEST_STEP_CATEGORY_CREATE.getRoute(action, iouType, transactionID, report.reportID, reportActionID, backTo));
+                      Navigation.navigate(ROUTES.MONEY_REQUEST_STEP_CATEGORY_CREATE.getRoute(action, iouType, transactionID, reportID, reportActionID, backTo));
                   },
               },
           ]
