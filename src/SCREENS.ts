@@ -30,10 +30,10 @@ const SCREENS = {
     TRAVEL: {
         MY_TRIPS: 'Travel_MyTrips',
         DYNAMIC_TCS: 'Dynamic_Travel_TCS',
+        DYNAMIC_UPGRADE: 'Dynamic_Travel_Upgrade',
         DYNAMIC_DOMAIN_PERMISSION_INFO: 'Dynamic_Travel_DomainPermissionInfo',
         TRIP_SUMMARY: 'Travel_TripSummary',
         TRIP_DETAILS: 'Travel_TripDetails',
-        UPGRADE: 'Travel_Upgrade',
         DYNAMIC_DOMAIN_SELECTOR: 'Dynamic_Travel_DomainSelector',
         DYNAMIC_PUBLIC_DOMAIN_ERROR: 'Dynamic_Travel_PublicDomainError',
         WORKSPACE_CONFIRMATION: 'Travel_WorkspaceConfirmation',

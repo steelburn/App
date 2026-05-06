@@ -410,6 +410,10 @@ const DYNAMIC_ROUTES = {
         getRoute: (policyID?: string) => getUrlWithParams('domain-selector', {policyID}),
         queryParams: ['policyID'],
     },
+    TRAVEL_UPGRADE: {
+        path: 'travel-upgrade',
+        entryScreens: [SCREENS.TRAVEL.MY_TRIPS, SCREENS.WORKSPACE.TRAVEL, SCREENS.SEARCH.ROOT],
+    },
     REPORT_CHANGE_APPROVER: {
         path: 'change-approver',
         entryScreens: [SCREENS.REPORT, SCREENS.RIGHT_MODAL.SEARCH_REPORT, SCREENS.RIGHT_MODAL.EXPENSE_REPORT, SCREENS.RIGHT_MODAL.SEARCH_MONEY_REQUEST_REPORT],
@@ -3251,12 +3255,6 @@ const ROUTES = {
             const redirectURL = postLoginPath ? `&redirectUrl=${encodeURIComponent(postLoginPath)}` : '';
             return `travel-dot-link?token=${token}&isTestAccount=${isTestAccount}${redirectURL}` as const;
         },
-    },
-    TRAVEL_UPGRADE: {
-        route: 'travel/upgrade',
-
-        // eslint-disable-next-line no-restricted-syntax -- Legacy route generation
-        getRoute: (backTo?: string) => getUrlWithBackToParam('travel/upgrade', backTo),
     },
     TRACK_TRAINING_MODAL: 'track-training',
     TRAVEL_TRIP_SUMMARY: {

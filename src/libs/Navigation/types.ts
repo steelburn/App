@@ -2618,10 +2618,7 @@ type TravelNavigatorParamList = {
         policyID?: string;
         travelPolicyID?: string;
     };
-    [SCREENS.TRAVEL.UPGRADE]: {
-        // eslint-disable-next-line no-restricted-syntax -- `backTo` usages in this file are legacy. Do not add new `backTo` params to screens. See contributingGuides/NAVIGATION.md
-        backTo?: Routes;
-    };
+    [SCREENS.TRAVEL.DYNAMIC_UPGRADE]: undefined;
     [SCREENS.TRAVEL.DYNAMIC_DOMAIN_SELECTOR]: {
         policyID?: string;
     };
