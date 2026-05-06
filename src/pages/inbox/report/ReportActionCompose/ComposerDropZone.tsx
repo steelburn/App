@@ -5,6 +5,7 @@ import DualDropZone from '@components/DropZone/DualDropZone';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
+import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
 import usePreferredPolicy from '@hooks/usePreferredPolicy';
 import useReportIsArchived from '@hooks/useReportIsArchived';
@@ -111,8 +112,9 @@ function RichDropZone({reportID, shouldAddOrReplaceReceipt, transactionID, onAtt
 }
 
 function ComposerDropZone({reportID, children}: ComposerDropZoneProps) {
+    const {isOffline} = useNetwork();
     const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportID}`);
-    const {shouldAddOrReplaceReceipt, transactionID} = useShouldAddOrReplaceReceipt(reportID);
+    const {shouldAddOrReplaceReceipt, transactionID} = useShouldAddOrReplaceReceipt(reportID, isOffline);
     const {pickAttachments, PDFValidationComponent: AttachmentPDFValidation, ErrorModal: AttachmentErrorModal} = useAttachmentPicker(reportID);
     const {
         onReceiptDropped,
@@ -133,6 +135,8 @@ function ComposerDropZone({reportID, children}: ComposerDropZoneProps) {
                 <SimpleDropZone onAttachmentDrop={onAttachmentDrop}>{children}</SimpleDropZone>
                 {AttachmentPDFValidation}
                 {AttachmentErrorModal}
+                {ReceiptPDFValidation}
+                {ReceiptErrorModal}
             </>
         );
     }
