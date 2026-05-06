@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import ScreenWrapper from '@components/ScreenWrapper';
 import ScrollView from '@components/ScrollView';
@@ -26,14 +26,7 @@ function DynamicTravelUpgrade() {
     const {login: currentUserLogin} = useCurrentUserPersonalDetails();
     const groupPaidPolicies = getActivePolicies(policies, currentUserLogin).filter(isPaidGroupPolicy);
 
-    const [isUpgraded, setIsUpgraded] = useState(false);
-
-    useEffect(() => {
-        if (groupPaidPolicies.length < 1) {
-            return;
-        }
-        setIsUpgraded(true);
-    }, [groupPaidPolicies.length]);
+    const isUpgraded = groupPaidPolicies.length > 0;
 
     const openWorkspaceConfirmation = () => {
         Navigation.navigate(ROUTES.TRAVEL_WORKSPACE_CONFIRMATION.getRoute(Navigation.getActiveRoute()));

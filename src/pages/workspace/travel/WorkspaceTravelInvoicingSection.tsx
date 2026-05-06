@@ -41,6 +41,7 @@ import {
     hasOutstandingTravelBalance,
     hasTravelInvoicingSettlementAccount,
 } from '@libs/TravelInvoicingUtils';
+import {getSearchParamFromPath} from '@libs/Url';
 import ToggleSettingOptionRow from '@pages/workspace/workflows/ToggleSettingsOptionRow';
 import {updateGeneralSettings as updatePolicyGeneralSettings} from '@userActions/Policy/Policy';
 import CONST from '@src/CONST';
@@ -222,8 +223,8 @@ function WorkspaceTravelInvoicingSection({policyID}: WorkspaceTravelInvoicingSec
     const handleToggle = (isEnabled: boolean) => {
         // Check if user is on a public domain - Travel Invoicing requires a private domain
         if (account?.isFromPublicDomain) {
-            const activeRoute = Navigation.getActiveRoute();
-            const dynamicSuffix = activeRoute.includes('policyID=') ? DYNAMIC_ROUTES.TRAVEL_PUBLIC_DOMAIN_ERROR.path : DYNAMIC_ROUTES.TRAVEL_PUBLIC_DOMAIN_ERROR.getRoute(policyID);
+            const hasPolicyIDInActiveRoute = getSearchParamFromPath(Navigation.getActiveRoute(), CONST.SEARCH.SYNTAX_FILTER_KEYS.POLICY_ID) !== null;
+            const dynamicSuffix = hasPolicyIDInActiveRoute ? DYNAMIC_ROUTES.TRAVEL_PUBLIC_DOMAIN_ERROR.path : DYNAMIC_ROUTES.TRAVEL_PUBLIC_DOMAIN_ERROR.getRoute(policyID);
             Navigation.navigate(createDynamicRoute(dynamicSuffix));
             return;
         }
