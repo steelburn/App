@@ -2746,10 +2746,7 @@ ${amount} pour ${merchant} - ${date}`,
         subtitle: 'Créez des agents pour gérer votre flux de travail. Évitez le travail manuel et gagnez des heures dans votre journée.',
         newAgent: 'Nouvel agent',
         emptyAgents: {title: 'Aucun agent créé', subtitle: 'Arrêtez de faire les choses manuellement. Donnez plutôt des instructions à un agent et gagnez beaucoup de temps.'},
-        error: {
-            genericAdd: "Un problème est survenu lors de l'ajout de cet agent",
-            genericUpdate: 'Un problème est survenu lors de la mise à jour de cet agent',
-        },
+        error: {genericAdd: "Un problème est survenu lors de l'ajout de cet agent", genericUpdate: 'Un problème est survenu lors de la mise à jour de cet agent'},
     },
     addAgentPage: {
         title: 'Nouvel agent',
@@ -2769,12 +2766,8 @@ ${amount} pour ${merchant} - ${date}`,
         deleteAgentTitle: "Supprimer l'agent ?",
         deleteAgentMessage: 'Êtes-vous sûr de vouloir supprimer cet agent ? Cette action est irréversible.',
     },
-    editAgentNamePage: {
-        title: "Nom de l'agent",
-    },
-    editAgentPromptPage: {
-        title: 'Rédiger des instructions personnalisées',
-    },
+    editAgentNamePage: {title: "Nom de l'agent"},
+    editAgentPromptPage: {title: 'Rédiger des instructions personnalisées'},
     expenseRulesPage: {
         title: 'Règles de dépenses',
         findRule: 'Rechercher une règle',
