@@ -1,6 +1,7 @@
 import {write} from '@libs/API';
 import {WRITE_COMMANDS} from '@libs/API/types';
 import {createAgent} from '@userActions/Agent';
+import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {AnyOnyxUpdate} from '@src/types/onyx/Request';
 
@@ -83,36 +84,20 @@ describe('createAgent', () => {
         const accountID = getOptimisticAccountID(optimisticData);
         const promptUpdate = optimisticData.find((u) => u.key === `${ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT}${accountID}`);
 
-        expect(promptUpdate?.value).toEqual({prompt: 'My prompt'});
+        expect(promptUpdate?.value).toEqual({
+            prompt: 'My prompt',
+            pendingAction: CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD,
+        });
     });
 
-    it('optimistic data sets form isLoading and clears errors', () => {
+    it('does not merge ADD_AGENT_FORM (navigation handles UX after submit)', () => {
         createAgent('Bot', 'My prompt');
 
-        const {optimisticData} = getWriteOptions();
-        const formUpdate = optimisticData.find((u) => u.key === ONYXKEYS.FORMS.ADD_AGENT_FORM);
+        const {optimisticData, successData, failureData} = getWriteOptions();
 
-        expect(formUpdate?.value).toMatchObject({isLoading: true, errors: null});
-    });
-
-    it('success data clears form isLoading', () => {
-        createAgent('Bot', 'My prompt');
-
-        const {successData} = getWriteOptions();
-        const formUpdate = successData.find((u) => u.key === ONYXKEYS.FORMS.ADD_AGENT_FORM);
-
-        expect(formUpdate?.value).toMatchObject({isLoading: false});
-    });
-
-    it('failure data sets form error and clears isLoading', () => {
-        createAgent('Bot', 'My prompt');
-
-        const {failureData} = getWriteOptions();
-        const formUpdate = failureData.find((u) => u.key === ONYXKEYS.FORMS.ADD_AGENT_FORM);
-        const value = formUpdate?.value as Record<string, unknown> | undefined;
-
-        expect(value?.isLoading).toBe(false);
-        expect(value?.errors).toBeTruthy();
+        expect(optimisticData.some((u) => u.key === ONYXKEYS.FORMS.ADD_AGENT_FORM)).toBe(false);
+        expect(successData.some((u) => u.key === ONYXKEYS.FORMS.ADD_AGENT_FORM)).toBe(false);
+        expect(failureData.some((u) => u.key === ONYXKEYS.FORMS.ADD_AGENT_FORM)).toBe(false);
     });
 
     it('success data nulls out both optimistic entries', () => {
@@ -128,7 +113,7 @@ describe('createAgent', () => {
         expect(promptRollback?.value).toBeNull();
     });
 
-    it('failure data nulls out both optimistic entries', () => {
+    it('failure data preserves optimistic personal detail and merges errors onto the prompt entry', () => {
         createAgent('Bot', 'My prompt');
 
         const {optimisticData, failureData} = getWriteOptions();
@@ -137,7 +122,15 @@ describe('createAgent', () => {
         const personalDetailRollback = failureData.find((u) => u.key === ONYXKEYS.PERSONAL_DETAILS_LIST);
         const promptRollback = failureData.find((u) => u.key === `${ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT}${accountID}`);
 
-        expect((personalDetailRollback?.value as Record<string, unknown>)[accountID]).toBeNull();
-        expect(promptRollback?.value).toBeNull();
+        expect((personalDetailRollback?.value as Record<string, unknown>)[accountID]).toMatchObject({
+            accountID: Number(accountID),
+            displayName: 'Bot',
+            isOptimisticPersonalDetail: true,
+        });
+        expect(promptRollback?.value).toMatchObject({
+            prompt: 'My prompt',
+            pendingAction: CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD,
+            errors: expect.any(Object),
+        });
     });
 });
