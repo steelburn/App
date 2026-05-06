@@ -80,14 +80,16 @@ function DomainGroupsPage({route}: DomainGroupsPageProps) {
 
     const listHeaderContent = shouldShowSearchBar ? (
         <View style={styles.flexColumn}>
-            <View style={[styles.mh5, styles.gap3, styles.mb5, styles.flexRow, styles.alignItemsCenter]}>
-                <SearchBar
-                    inputValue={inputValue}
-                    onChangeText={setInputValue}
-                    label={translate('domain.groups.findGroup')}
-                    shouldShowEmptyState={false}
-                    style={[styles.flex1, styles.mh0, styles.mb0]}
-                />
+            <View style={[styles.mh5, styles.gap3, styles.mb5, shouldUseNarrowLayout ? styles.flexColumn : styles.flexRow]}>
+                <View style={[shouldUseNarrowLayout && styles.w100]}>
+                    <SearchBar
+                        inputValue={inputValue}
+                        onChangeText={setInputValue}
+                        label={translate('domain.groups.findGroup')}
+                        shouldShowEmptyState={false}
+                        style={[styles.flex1, styles.mh0, styles.mb0]}
+                    />
+                </View>
             </View>
             {shouldShowEmptySearchMessage && (
                 <View style={[styles.ph5, styles.pb5]}>
