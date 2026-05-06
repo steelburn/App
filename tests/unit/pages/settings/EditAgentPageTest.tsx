@@ -1,8 +1,11 @@
 import {render} from '@testing-library/react-native';
 import React from 'react';
 import useOnyx from '@hooks/useOnyx';
+import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
+import type {SettingsNavigatorParamList} from '@libs/Navigation/types';
 import EditAgentPage from '@pages/settings/Agents/EditAgentPage';
 import ONYXKEYS from '@src/ONYXKEYS';
+import type SCREENS from '@src/SCREENS';
 
 jest.mock('@userActions/Agent', () => ({
     deleteAgent: jest.fn(),
@@ -120,6 +123,12 @@ const mockUseOnyx = jest.mocked(useOnyx);
 
 const TEST_ACCOUNT_ID = 12345;
 
+type EditAgentPageRoute = PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.SETTINGS.AGENTS.EDIT>['route'];
+type EditAgentPageNavigation = PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.SETTINGS.AGENTS.EDIT>['navigation'];
+
+const mockRoute = {params: {accountID: TEST_ACCOUNT_ID}} as EditAgentPageRoute;
+const mockNavigation = {} as EditAgentPageNavigation;
+
 describe('EditAgentPage', () => {
     beforeEach(() => {
         jest.clearAllMocks();
@@ -134,7 +143,12 @@ describe('EditAgentPage', () => {
             return [undefined, {status: 'loaded'}];
         });
 
-        const {toJSON} = render(<EditAgentPage {...({route: {params: {accountID: TEST_ACCOUNT_ID}}} as any)} />);
+        const {toJSON} = render(
+            <EditAgentPage
+                route={mockRoute}
+                navigation={mockNavigation}
+            />,
+        );
 
         expect(JSON.stringify(toJSON())).toContain('Test Agent');
     });
@@ -147,13 +161,23 @@ describe('EditAgentPage', () => {
             return [undefined, {status: 'loaded'}];
         });
 
-        const {toJSON} = render(<EditAgentPage {...({route: {params: {accountID: TEST_ACCOUNT_ID}}} as any)} />);
+        const {toJSON} = render(
+            <EditAgentPage
+                route={mockRoute}
+                navigation={mockNavigation}
+            />,
+        );
 
         expect(JSON.stringify(toJSON())).toContain('Reject all gambling expenses.');
     });
 
     it('renders delete agent menu item', () => {
-        const {toJSON} = render(<EditAgentPage {...({route: {params: {accountID: TEST_ACCOUNT_ID}}} as any)} />);
+        const {toJSON} = render(
+            <EditAgentPage
+                route={mockRoute}
+                navigation={mockNavigation}
+            />,
+        );
 
         expect(JSON.stringify(toJSON())).toContain('editAgentPage.deleteAgent');
     });
@@ -166,7 +190,12 @@ describe('EditAgentPage', () => {
             return [undefined, {status: 'loaded'}];
         });
 
-        const {toJSON} = render(<EditAgentPage {...({route: {params: {accountID: TEST_ACCOUNT_ID}}} as any)} />);
+        const {toJSON} = render(
+            <EditAgentPage
+                route={mockRoute}
+                navigation={mockNavigation}
+            />,
+        );
 
         expect(JSON.stringify(toJSON())).toContain('agentsPage.error.genericUpdate');
     });

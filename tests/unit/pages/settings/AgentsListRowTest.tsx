@@ -1,5 +1,6 @@
-import {fireEvent, render} from '@testing-library/react-native';
+import {fireEvent, render, screen} from '@testing-library/react-native';
 import React from 'react';
+import type ReactNative from 'react-native';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import Navigation from '@libs/Navigation/Navigation';
 import AgentsListRow from '@pages/settings/Agents/AgentsListRow';
@@ -57,10 +58,13 @@ jest.mock('@components/OfflineWithFeedback', () => {
 });
 
 jest.mock('@components/Button', () => {
-    const {TouchableOpacity, Text} = jest.requireActual('react-native') as typeof import('react-native');
+    const {TouchableOpacity, Text} = jest.requireActual<typeof ReactNative>('react-native');
     function MockButton({text, onPress}: {text: string; onPress: () => void}) {
         return (
-            <TouchableOpacity onPress={onPress}>
+            <TouchableOpacity
+                accessibilityRole="button"
+                onPress={onPress}
+            >
                 <Text>{text}</Text>
             </TouchableOpacity>
         );
@@ -69,7 +73,7 @@ jest.mock('@components/Button', () => {
 });
 
 jest.mock('@components/Pressable/PressableWithFeedback', () => {
-    const {TouchableOpacity} = jest.requireActual('react-native') as typeof import('react-native');
+    const {TouchableOpacity} = jest.requireActual<typeof ReactNative>('react-native');
     function MockPressableWithFeedback({children, onPress, role}: {children: React.ReactNode; onPress: () => void; role?: string}) {
         return (
             <TouchableOpacity
@@ -87,11 +91,6 @@ const mockUseResponsiveLayout = jest.mocked(useResponsiveLayout);
 const mockNavigate = jest.mocked(Navigation.navigate);
 
 const TEST_ACCOUNT_ID = 12345;
-const DEFAULT_PROPS = {
-    accountID: TEST_ACCOUNT_ID,
-    displayName: 'Test Agent',
-    login: 'agent@example.com',
-};
 
 const BASE_LAYOUT = {
     shouldUseNarrowLayout: false,
@@ -116,7 +115,13 @@ describe('AgentsListRow', () => {
     it('narrow layout: does not show Edit button', () => {
         mockUseResponsiveLayout.mockReturnValue({...BASE_LAYOUT, shouldUseNarrowLayout: true});
 
-        const {toJSON} = render(<AgentsListRow {...DEFAULT_PROPS} />);
+        const {toJSON} = render(
+            <AgentsListRow
+                accountID={TEST_ACCOUNT_ID}
+                displayName="Test Agent"
+                login="agent@example.com"
+            />,
+        );
 
         expect(JSON.stringify(toJSON())).not.toContain('common.edit');
     });
@@ -124,7 +129,13 @@ describe('AgentsListRow', () => {
     it('wide layout: shows Edit button', () => {
         mockUseResponsiveLayout.mockReturnValue({...BASE_LAYOUT, shouldUseNarrowLayout: false});
 
-        const {toJSON} = render(<AgentsListRow {...DEFAULT_PROPS} />);
+        const {toJSON} = render(
+            <AgentsListRow
+                accountID={TEST_ACCOUNT_ID}
+                displayName="Test Agent"
+                login="agent@example.com"
+            />,
+        );
 
         expect(JSON.stringify(toJSON())).toContain('common.edit');
     });
@@ -132,7 +143,13 @@ describe('AgentsListRow', () => {
     it('narrow layout: entire row is pressable', () => {
         mockUseResponsiveLayout.mockReturnValue({...BASE_LAYOUT, shouldUseNarrowLayout: true});
 
-        const {toJSON} = render(<AgentsListRow {...DEFAULT_PROPS} />);
+        const {toJSON} = render(
+            <AgentsListRow
+                accountID={TEST_ACCOUNT_ID}
+                displayName="Test Agent"
+                login="agent@example.com"
+            />,
+        );
         const output = JSON.stringify(toJSON());
 
         expect(output).toContain('button');
@@ -141,9 +158,15 @@ describe('AgentsListRow', () => {
     it('wide layout: pressing Edit button calls Navigation.navigate with correct route', () => {
         mockUseResponsiveLayout.mockReturnValue({...BASE_LAYOUT, shouldUseNarrowLayout: false});
 
-        const {getByText} = render(<AgentsListRow {...DEFAULT_PROPS} />);
+        render(
+            <AgentsListRow
+                accountID={TEST_ACCOUNT_ID}
+                displayName="Test Agent"
+                login="agent@example.com"
+            />,
+        );
 
-        fireEvent.press(getByText('common.edit'));
+        fireEvent.press(screen.getByText('common.edit'));
 
         expect(mockNavigate).toHaveBeenCalledWith(ROUTES.SETTINGS_AGENTS_EDIT.getRoute(TEST_ACCOUNT_ID));
     });

@@ -1,8 +1,11 @@
 import {render} from '@testing-library/react-native';
 import React from 'react';
 import useOnyx from '@hooks/useOnyx';
+import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
+import type {SettingsNavigatorParamList} from '@libs/Navigation/types';
 import EditNamePage from '@pages/settings/Agents/Fields/EditNamePage';
 import ONYXKEYS from '@src/ONYXKEYS';
+import type SCREENS from '@src/SCREENS';
 
 jest.mock('@userActions/Agent', () => ({
     updateAgentName: jest.fn(),
@@ -76,6 +79,12 @@ const mockUseOnyx = jest.mocked(useOnyx);
 
 const TEST_ACCOUNT_ID = 12345;
 
+type EditNamePageRoute = PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.SETTINGS.AGENTS.EDIT_NAME>['route'];
+type EditNamePageNavigation = PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.SETTINGS.AGENTS.EDIT_NAME>['navigation'];
+
+const mockRoute = {params: {accountID: TEST_ACCOUNT_ID}} as EditNamePageRoute;
+const mockNavigation = {} as EditNamePageNavigation;
+
 describe('EditNamePage', () => {
     beforeEach(() => {
         jest.clearAllMocks();
@@ -83,7 +92,12 @@ describe('EditNamePage', () => {
     });
 
     it('renders page title', () => {
-        const {toJSON} = render(<EditNamePage {...({route: {params: {accountID: TEST_ACCOUNT_ID}}} as any)} />);
+        const {toJSON} = render(
+            <EditNamePage
+                route={mockRoute}
+                navigation={mockNavigation}
+            />,
+        );
 
         expect(JSON.stringify(toJSON())).toContain('editAgentNamePage.title');
     });
@@ -96,7 +110,12 @@ describe('EditNamePage', () => {
             return [undefined, {status: 'loaded'}];
         });
 
-        const {toJSON} = render(<EditNamePage {...({route: {params: {accountID: TEST_ACCOUNT_ID}}} as any)} />);
+        const {toJSON} = render(
+            <EditNamePage
+                route={mockRoute}
+                navigation={mockNavigation}
+            />,
+        );
 
         expect(JSON.stringify(toJSON())).toContain('firstName::Old Name');
     });

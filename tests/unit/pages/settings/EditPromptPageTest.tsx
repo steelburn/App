@@ -1,8 +1,11 @@
 import {render} from '@testing-library/react-native';
 import React from 'react';
 import useOnyx from '@hooks/useOnyx';
+import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
+import type {SettingsNavigatorParamList} from '@libs/Navigation/types';
 import EditPromptPage from '@pages/settings/Agents/Fields/EditPromptPage';
 import ONYXKEYS from '@src/ONYXKEYS';
+import type SCREENS from '@src/SCREENS';
 
 jest.mock('@userActions/Agent', () => ({
     updateAgentPrompt: jest.fn(),
@@ -76,6 +79,12 @@ const mockUseOnyx = jest.mocked(useOnyx);
 
 const TEST_ACCOUNT_ID = 12345;
 
+type EditPromptPageRoute = PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.SETTINGS.AGENTS.EDIT_PROMPT>['route'];
+type EditPromptPageNavigation = PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.SETTINGS.AGENTS.EDIT_PROMPT>['navigation'];
+
+const mockRoute = {params: {accountID: TEST_ACCOUNT_ID}} as EditPromptPageRoute;
+const mockNavigation = {} as EditPromptPageNavigation;
+
 describe('EditPromptPage', () => {
     beforeEach(() => {
         jest.clearAllMocks();
@@ -83,7 +92,12 @@ describe('EditPromptPage', () => {
     });
 
     it('renders page title', () => {
-        const {toJSON} = render(<EditPromptPage {...({route: {params: {accountID: TEST_ACCOUNT_ID}}} as any)} />);
+        const {toJSON} = render(
+            <EditPromptPage
+                route={mockRoute}
+                navigation={mockNavigation}
+            />,
+        );
 
         expect(JSON.stringify(toJSON())).toContain('editAgentPromptPage.title');
     });
@@ -96,7 +110,12 @@ describe('EditPromptPage', () => {
             return [undefined, {status: 'loaded'}];
         });
 
-        const {toJSON} = render(<EditPromptPage {...({route: {params: {accountID: TEST_ACCOUNT_ID}}} as any)} />);
+        const {toJSON} = render(
+            <EditPromptPage
+                route={mockRoute}
+                navigation={mockNavigation}
+            />,
+        );
 
         expect(JSON.stringify(toJSON())).toContain('prompt::Old prompt');
     });
