@@ -1,4 +1,4 @@
-import {format, parseISO, subDays} from 'date-fns';
+import {format, parseISO} from 'date-fns';
 import React, {useState} from 'react';
 import {View} from 'react-native';
 import type {ValueOf} from 'type-fest';
@@ -76,8 +76,7 @@ function WorkspaceCompanyCardEditTransactionStartDatePage({route}: WorkspaceComp
             return;
         }
 
-        const date90DaysBack = format(subDays(new Date(), 90), CONST.DATE.FNS_FORMAT_STRING);
-        const newStartDate = dateOptionSelected === CONST.COMPANY_CARD.TRANSACTION_START_DATE_OPTIONS.FROM_BEGINNING ? date90DaysBack : startDate;
+        const newStartDate = dateOptionSelected === CONST.COMPANY_CARD.TRANSACTION_START_DATE_OPTIONS.FROM_BEGINNING ? '' : startDate;
 
         updateCardTransactionStartDate(domainOrWorkspaceAccountID, cardID, newStartDate, bank, currentStartDate);
         Navigation.goBack(ROUTES.WORKSPACE_COMPANY_CARD_DETAILS.getRoute(policyID, feedName, cardID), {compareParams: false});
