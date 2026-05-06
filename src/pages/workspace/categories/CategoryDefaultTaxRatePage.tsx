@@ -29,7 +29,7 @@ function CategoryDefaultTaxRatePage({
     const styles = useThemeStyles();
     const {translate, localeCompare} = useLocalize();
     const policy = usePolicy(policyID);
-    const backPath = createDynamicRoute(DYNAMIC_ROUTES.WORKSPACE_CATEGORY_SETTINGS.getRoute(categoryName), ROUTES.WORKSPACE_CATEGORIES.getRoute(policyID));
+    const backPath = createDynamicRoute(DYNAMIC_ROUTES.WORKSPACE_CATEGORY_SETTINGS.getRoute(categoryName), ROUTES.WORKSPACE_INITIAL.getRoute(policyID));
 
     const selectedTaxRate = getCategoryDefaultTaxRate(policy?.rules?.expenseRules ?? [], categoryName, policy?.taxRates?.defaultExternalID);
 

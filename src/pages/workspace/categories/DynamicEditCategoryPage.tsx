@@ -30,7 +30,7 @@ function DynamicEditCategoryPage({route}: DynamicEditCategoryPageProps) {
     const {translate} = useLocalize();
     const isQuickSettingsFlow = route.name === SCREENS.SETTINGS_CATEGORIES.DYNAMIC_SETTINGS_CATEGORY_EDIT;
     const backPath = useDynamicBackPath(DYNAMIC_ROUTES.SETTINGS_CATEGORY_EDIT.path);
-    const workspaceCategorySettingsPath = createDynamicRoute(DYNAMIC_ROUTES.WORKSPACE_CATEGORY_SETTINGS.getRoute(currentCategoryName), ROUTES.WORKSPACE_CATEGORIES.getRoute(policyID));
+    const workspaceCategorySettingsPath = createDynamicRoute(DYNAMIC_ROUTES.WORKSPACE_CATEGORY_SETTINGS.getRoute(currentCategoryName), ROUTES.WORKSPACE_INITIAL.getRoute(policyID));
 
     const validate = useCallback(
         (values: FormOnyxValues<typeof ONYXKEYS.FORMS.WORKSPACE_CATEGORY_FORM>) => {

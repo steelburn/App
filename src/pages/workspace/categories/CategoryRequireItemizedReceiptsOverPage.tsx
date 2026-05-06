@@ -45,7 +45,7 @@ function CategoryRequireItemizedReceiptsOverPage({
     const isAlwaysSelected = policyCategories?.[categoryName]?.maxAmountNoItemizedReceipt === 0;
     const isNeverSelected = policyCategories?.[categoryName]?.maxAmountNoItemizedReceipt === CONST.DISABLED_MAX_EXPENSE_VALUE;
     const isPolicyItemizedReceiptDisabled = policy?.maxExpenseAmountNoItemizedReceipt === CONST.DISABLED_MAX_EXPENSE_VALUE || policy?.maxExpenseAmountNoItemizedReceipt === undefined;
-    const backPath = createDynamicRoute(DYNAMIC_ROUTES.WORKSPACE_CATEGORY_SETTINGS.getRoute(categoryName), ROUTES.WORKSPACE_CATEGORIES.getRoute(policyID));
+    const backPath = createDynamicRoute(DYNAMIC_ROUTES.WORKSPACE_CATEGORY_SETTINGS.getRoute(categoryName), ROUTES.WORKSPACE_INITIAL.getRoute(policyID));
 
     const requireItemizedReceiptsOverListData = [
         ...(!isPolicyItemizedReceiptDisabled

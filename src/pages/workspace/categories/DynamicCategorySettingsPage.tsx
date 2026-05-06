@@ -379,7 +379,7 @@ function DynamicCategorySettingsPage({route, navigation}: DynamicCategorySetting
                                 title={approverText}
                                 description={translate('workspace.rules.categoryRules.approver')}
                                 onPress={() => {
-                                    Navigation.navigate(ROUTES.WORKSPACE_CATEGORY_APPROVER.getRoute(policyID, policyCategory.name));
+                                    Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.WORKSPACE_CATEGORY_APPROVER.path));
                                 }}
                                 shouldShowRightIcon
                                 disabled={approverDisabled}
@@ -395,7 +395,7 @@ function DynamicCategorySettingsPage({route, navigation}: DynamicCategorySetting
                                     title={defaultTaxRateText}
                                     description={translate('workspace.rules.categoryRules.defaultTaxRate')}
                                     onPress={() => {
-                                        Navigation.navigate(ROUTES.WORKSPACE_CATEGORY_DEFAULT_TAX_RATE.getRoute(policyID, policyCategory.name));
+                                        Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.WORKSPACE_CATEGORY_DEFAULT_TAX_RATE.path));
                                     }}
                                     shouldShowRightIcon
                                 />
@@ -406,7 +406,7 @@ function DynamicCategorySettingsPage({route, navigation}: DynamicCategorySetting
                                     title={flagAmountsOverText}
                                     description={translate('workspace.rules.categoryRules.flagAmountsOver')}
                                     onPress={() => {
-                                        Navigation.navigate(ROUTES.WORKSPACE_CATEGORY_FLAG_AMOUNTS_OVER.getRoute(policyID, policyCategory.name));
+                                        Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.WORKSPACE_CATEGORY_FLAG_AMOUNTS_OVER.path));
                                     }}
                                     shouldShowRightIcon
                                 />
@@ -416,7 +416,7 @@ function DynamicCategorySettingsPage({route, navigation}: DynamicCategorySetting
                                     title={requireReceiptsOverText}
                                     description={translate(`workspace.rules.categoryRules.requireReceiptsOver`)}
                                     onPress={() => {
-                                        Navigation.navigate(ROUTES.WORKSPACE_CATEGORY_REQUIRE_RECEIPTS_OVER.getRoute(policyID, policyCategory.name));
+                                        Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.WORKSPACE_CATEGORY_REQUIRE_RECEIPTS_OVER.path));
                                     }}
                                     shouldShowRightIcon
                                 />
@@ -426,7 +426,7 @@ function DynamicCategorySettingsPage({route, navigation}: DynamicCategorySetting
                                     title={requireItemizedReceiptsOverText}
                                     description={translate(`workspace.rules.categoryRules.requireItemizedReceiptsOver`)}
                                     onPress={() => {
-                                        Navigation.navigate(ROUTES.WORKSPACE_CATEGORY_REQUIRE_ITEMIZED_RECEIPTS_OVER.getRoute(policyID, policyCategory.name));
+                                        Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.WORKSPACE_CATEGORY_REQUIRE_ITEMIZED_RECEIPTS_OVER.path));
                                     }}
                                     shouldShowRightIcon
                                 />
@@ -436,7 +436,7 @@ function DynamicCategorySettingsPage({route, navigation}: DynamicCategorySetting
                                     title={requiredFieldsTitle}
                                     description={translate('workspace.rules.categoryRules.requireFields')}
                                     onPress={() => {
-                                        Navigation.navigate(ROUTES.WORKSPACE_CATEGORY_REQUIRED_FIELDS.getRoute(policyID, policyCategory.name));
+                                        Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.WORKSPACE_CATEGORY_REQUIRED_FIELDS.path));
                                     }}
                                     shouldShowRightIcon
                                 />
@@ -446,7 +446,7 @@ function DynamicCategorySettingsPage({route, navigation}: DynamicCategorySetting
                                     title={policyCategory?.commentHint}
                                     description={translate('workspace.rules.categoryRules.descriptionHint')}
                                     onPress={() => {
-                                        Navigation.navigate(ROUTES.WORKSPACE_CATEGORY_DESCRIPTION_HINT.getRoute(policyID, policyCategory.name));
+                                        Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.WORKSPACE_CATEGORY_DESCRIPTION_HINT.path));
                                     }}
                                     shouldShowRightIcon
                                 />
