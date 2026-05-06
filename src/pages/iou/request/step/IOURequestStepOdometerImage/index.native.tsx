@@ -124,21 +124,27 @@ function IOURequestStepOdometerImage({
             return;
         }
 
-        moveReceiptToDurableStorage(sourceUri, filename).then((durableUri) => {
-            setMoneyRequestOdometerImage(
-                transaction,
-                imageType,
-                {
-                    uri: durableUri,
-                    name: filename,
-                    type: file.type ?? getMimeTypeFromUri(durableUri) ?? 'image/jpeg',
-                    size: file.size,
-                },
-                isTransactionDraft,
-                false,
-            );
-            navigateBack();
-        });
+        moveReceiptToDurableStorage(sourceUri, filename)
+            .then((durableUri) => {
+                setMoneyRequestOdometerImage(
+                    transaction,
+                    imageType,
+                    {
+                        uri: durableUri,
+                        name: filename,
+                        type: file.type ?? getMimeTypeFromUri(durableUri) ?? 'image/jpeg',
+                        size: file.size,
+                    },
+                    isTransactionDraft,
+                    false,
+                );
+            })
+            .catch((error: unknown) => {
+                Log.warn('Failed to move odometer receipt to durable storage', error instanceof Error ? error.message : String(error));
+            })
+            .finally(() => {
+                navigateBack();
+            });
     };
 
     const {validateFiles, ErrorModal} = useFilesValidation(handleImageSelected);
