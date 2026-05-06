@@ -46,9 +46,9 @@ function ExpensifyCardPreferredWorkspaceToggle({domainAccountID, groupID}: Expen
         <>
             <View style={styles.mv3}>
                 <ToggleSettingOptionRow
-                    title={translate('domain.groups.ExpensifyCardPreferredWorkspace')}
-                    subtitle={translate('domain.groups.ExpensifyCardPreferredWorkspaceDescription')}
-                    switchAccessibilityLabel={translate('domain.groups.ExpensifyCardPreferredWorkspace')}
+                    title={translate('domain.groups.expensifyCardPreferredWorkspace')}
+                    subtitle={translate('domain.groups.expensifyCardPreferredWorkspaceDescription')}
+                    switchAccessibilityLabel={translate('domain.groups.expensifyCardPreferredWorkspace')}
                     shouldPlaceSubtitleBelowSwitch
                     disabled={isDisabled}
                     disabledAction={() => setIsDisabledModalVisible(true)}
@@ -70,7 +70,7 @@ function ExpensifyCardPreferredWorkspaceToggle({domainAccountID, groupID}: Expen
                 onCancel={() => setIsDisabledModalVisible(false)}
                 isVisible={isDisabledModalVisible}
                 title={translate('workspace.distanceRates.oopsNotSoFast')}
-                prompt={translate('domain.groups.ExpensifyCardPreferredWorkspaceDisabledMessage')}
+                prompt={translate('domain.groups.expensifyCardPreferredWorkspaceDisabledMessage')}
                 confirmText={translate('common.buttonConfirm')}
                 shouldShowCancelButton={false}
             />
