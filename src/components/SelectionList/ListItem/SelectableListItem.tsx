@@ -25,8 +25,6 @@ function SelectableListItem<TItem extends ListItem>({
 }: SelectableListItemProps<TItem>) {
     const styles = useThemeStyles();
     const ButtonComponent = canSelectMultiple ? ListCheckbox : ListRadioButton;
-    const isButtonDisabled = (!!isDisabled && !item.isSelected) || item.isDisabledCheckbox;
-    const shouldDimButton = !!isDisabled && !!item.isSelected && !item.isDisabledCheckbox;
 
     return (
         <BaseListItem
@@ -43,8 +41,8 @@ function SelectableListItem<TItem extends ListItem>({
                         <ButtonComponent
                             item={item}
                             onSelectRow={onSelectionButtonPress ?? onSelectRow}
-                            disabled={isButtonDisabled}
-                            style={[styles.ml3, shouldDimButton && styles.buttonOpacityDisabled]}
+                            disabled={!!isDisabled || !!item.isDisabledCheckbox}
+                            style={styles.ml3}
                         />
                         {typeof rightHandSideComponent === 'function' ? rightHandSideComponent(item, isFocused) : rightHandSideComponent}
                     </>
@@ -59,8 +57,8 @@ function SelectableListItem<TItem extends ListItem>({
                           <ButtonComponent
                               item={item}
                               onSelectRow={onSelectionButtonPress ?? onSelectRow}
-                              disabled={isButtonDisabled}
-                              style={[styles.mr3, shouldDimButton && styles.buttonOpacityDisabled]}
+                              disabled={!!isDisabled || item.isDisabledCheckbox}
+                              style={styles.mr3}
                           />
                           {typeof children === 'function' ? children(hovered) : children}
                       </>
