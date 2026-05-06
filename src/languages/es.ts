@@ -849,10 +849,6 @@ const translations: TranslationDeepObject<typeof en> = {
         listOfChats: 'lista de chats',
         saveTheWorld: 'Salvar el mundo',
         tooltip: '¡Comienza aquí!',
-        redirectToExpensifyClassicModal: {
-            title: 'Próximamente',
-            description: 'Estamos ajustando algunos detalles de New Expensify para adaptarla a tu configuración específica. Mientras tanto, dirígete a Expensify Classic.',
-        },
     },
     homePage: {
         forYou: 'Para ti',
@@ -6366,7 +6362,7 @@ ${amount} para ${merchant} - ${date}`,
             updateToUSD: 'Actualizar a USD',
             updateWorkspaceCurrency: 'Actualizar la moneda del espacio de trabajo',
             workspaceCurrencyNotSupported: 'Moneda del espacio de trabajo no soportada',
-            yourWorkspace: `Tu espacio de trabajo está configurado en una moneda no soportada. Consulta la <a href="${CONST.CONNECT_A_BUSINESS_BANK_ACCOUNT_HELP_URL}">lista de monedas soportadas</a>.`,
+            yourWorkspace: `Tu espacio de trabajo está configurado en una moneda no soportada. Consulta la <a href="${CONST.ENABLE_GLOBAL_REIMBURSEMENT_HELP_URL}">lista de monedas soportadas</a>.`,
             chooseAnExisting: 'Elige una cuenta bancaria existente para pagar gastos o añade una nueva.',
         },
         changeOwner: {
@@ -7652,6 +7648,7 @@ ${amount} para ${merchant} - ${date}`,
             withdrawalType: {
                 [CONST.SEARCH.WITHDRAWAL_TYPE.EXPENSIFY_CARD]: 'Expensify Card',
                 [CONST.SEARCH.WITHDRAWAL_TYPE.REIMBURSEMENT]: 'Reembolso',
+                [CONST.SEARCH.WITHDRAWAL_TYPE.CENTRAL_TRAVEL_INVOICING]: 'Facturación centralizada',
             },
             is: 'Es',
             action: {
