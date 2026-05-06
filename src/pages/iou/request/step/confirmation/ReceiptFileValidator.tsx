@@ -59,12 +59,6 @@ function ReceiptFileValidator({
                 const itemReceiptFilename = item.receipt?.filename;
                 const itemReceiptPath = item.receipt?.source;
                 const itemReceiptType = item.receipt?.type;
-
-                // No receipt at all (e.g. distance requests) — nothing to validate
-                if (!itemReceiptPath && !itemReceiptFilename) {
-                    return Promise.resolve();
-                }
-
                 const isLocalFile = isLocalFileFileUtils(itemReceiptPath);
 
                 if (!isLocalFile && itemReceiptPath) {
