@@ -74,12 +74,12 @@ function OnboardingModalNavigator() {
     // Publish a sign_up event when we start the onboarding flow. This should track basic sign ups
     // as well as Google and Apple SSO.
     useEffect(() => {
-        if (!accountID || signUpEventPublishedForAccountID === accountID) {
+        if (!accountID || !email || signUpEventPublishedForAccountID === accountID) {
             return;
         }
 
         signUpEventPublishedForAccountID = accountID;
-        GoogleTagManager.publishEvent(CONST.ANALYTICS.EVENT.SIGN_UP.NAME, accountID, email ?? '');
+        GoogleTagManager.publishEvent(CONST.ANALYTICS.EVENT.SIGN_UP.NAME, accountID, email);
     }, [accountID, email]);
 
     const handleOuterClick = useCallback(() => {
