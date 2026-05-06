@@ -421,10 +421,8 @@ function isCardBrokenConnectionAction(reportAction: OnyxInputOrEntry<ReportActio
 
 function getOriginalMessage<T extends ReportActionName>(reportAction: OnyxInputOrEntry<ReportAction<T>>): OriginalMessage<T> | undefined {
     if (!Array.isArray(reportAction?.message)) {
-        // eslint-disable-next-line @typescript-eslint/no-deprecated
         return reportAction?.message ?? reportAction?.originalMessage;
     }
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
     return reportAction?.originalMessage;
 }
 
@@ -1068,7 +1066,6 @@ function isReportActionDeprecated(reportAction: OnyxEntry<ReportAction>, key: st
 
     // HACK ALERT: We're temporarily filtering out any reportActions keyed by sequenceNumber
     // to prevent bugs during the migration from sequenceNumber -> reportActionID
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
     if (String(reportAction.sequenceNumber) === key) {
         Log.info('Front-end filtered out reportAction keyed by sequenceNumber!', false, reportAction);
         return true;
@@ -1634,41 +1631,6 @@ function isNewerReportAction(a: ReportAction, b: ReportAction): boolean {
 }
 
 /**
- * Finds the newest report action matching each of two filter criteria in a single pass.
- * Returns:
- * - lastVisibleAction: newest visible action
- * - lastActionForDisplay: newest displayable action (not CREATED)
- */
-function findLastReportActions(reportActions: OnyxEntry<ReportActions>, canUserPerformWriteAction?: boolean) {
-    if (!reportActions) {
-        return {lastVisibleAction: undefined, lastActionForDisplay: undefined};
-    }
-
-    let lastVisibleAction: ReportAction | undefined;
-    let lastActionForDisplay: ReportAction | undefined;
-
-    for (const [key, action] of Object.entries(reportActions)) {
-        if (!action) {
-            continue;
-        }
-
-        if (shouldReportActionBeVisible(action, key, canUserPerformWriteAction)) {
-            if (!lastVisibleAction || isNewerReportAction(action, lastVisibleAction)) {
-                lastVisibleAction = action;
-            }
-        }
-
-        if (isReportActionVisibleAsLastAction(action, canUserPerformWriteAction) && action.actionName !== CONST.REPORT.ACTIONS.TYPE.CREATED) {
-            if (!lastActionForDisplay || isNewerReportAction(action, lastActionForDisplay)) {
-                lastActionForDisplay = action;
-            }
-        }
-    }
-
-    return {lastVisibleAction, lastActionForDisplay};
-}
-
-/**
  * The first visible action is the second last action in sortedReportActions which satisfy following conditions:
  * 1. That is not pending deletion as pending deletion actions are kept in sortedReportActions in memory.
  * 2. That has at least one visible child action.
@@ -2001,7 +1963,6 @@ function isReportActionAttachment(reportAction: OnyxInputOrEntry<ReportAction>):
 function getMemberChangeMessageElements(
     translate: LocalizedTranslate,
     reportAction: OnyxEntry<ReportAction>,
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
     getReportNameCallback: typeof getReportName,
 ): readonly MemberChangeMessageElement[] {
     const isInviteAction = isInviteMemberAction(reportAction);
@@ -2038,7 +1999,6 @@ function getMemberChangeMessageElements(
     });
 
     const buildRoomElements = (): readonly MemberChangeMessageElement[] => {
-        // eslint-disable-next-line @typescript-eslint/no-deprecated
         const roomName = getReportNameCallback({report: allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${originalMessage?.reportID}`]}) || originalMessage?.roomName;
         if (roomName && originalMessage) {
             const preposition = isInviteAction ? ` ${translate('workspace.invite.to')} ` : ` ${translate('workspace.invite.from')} `;
@@ -2344,7 +2304,6 @@ function getDynamicExternalWorkflowApproveFailedActionMessage(translate: Localiz
     return failedApproveReason;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-deprecated
 function getMemberChangeMessageFragment(translate: LocalizedTranslate, reportAction: OnyxEntry<ReportAction>, getReportNameCallback: typeof getReportName): Message {
     const messageElements: readonly MemberChangeMessageElement[] = getMemberChangeMessageElements(translate, reportAction, getReportNameCallback);
     const html = messageElements
@@ -2688,6 +2647,7 @@ function getExportIntegrationActionFragments(translate: LocalizedTranslate, repo
     const {label, markedManually, automaticAction} = originalMessage;
     const reimbursableUrls = originalMessage.reimbursableUrls ?? [];
     const nonReimbursableUrls = originalMessage.nonReimbursableUrls ?? [];
+    const travelInvoicingUrls = originalMessage.travelInvoicingUrls ?? [];
     const reportID = reportAction?.reportID;
     const wasExportedAfterBase62 = (reportAction?.created ?? '') > '2022-11-14';
     const base62ReportID = getBase62ReportID(Number(reportID));
@@ -2719,29 +2679,40 @@ function getExportIntegrationActionFragments(translate: LocalizedTranslate, repo
             url: '',
         });
     }
-    if (reimbursableUrls.length || nonReimbursableUrls.length) {
+    if (reimbursableUrls.length || nonReimbursableUrls.length || travelInvoicingUrls.length) {
         result.push({
             text: translate('report.actions.type.exportedToIntegration.automaticActionThree'),
             url: '',
         });
     }
 
+    const hasReimbursable = reimbursableUrls.length > 0;
+    const hasNonReimbursable = nonReimbursableUrls.length > 0;
+    const hasTravelInvoicing = travelInvoicingUrls.length > 0;
+    const linkItemCount = (hasReimbursable ? 1 : 0) + (hasNonReimbursable ? 1 : 0) + (hasTravelInvoicing ? 1 : 0);
+
     if (reimbursableUrls.length === 1) {
-        const shouldAddPeriod = nonReimbursableUrls.length === 0;
         const reimbursableUrl = reimbursableUrls.at(0) ?? '';
+        let suffix = '';
+        if (linkItemCount === 1) {
+            suffix = '.';
+        } else if (linkItemCount === 3) {
+            suffix = ',';
+        }
         result.push({
-            text: translate('report.actions.type.exportedToIntegration.reimburseableLink') + (shouldAddPeriod ? '.' : ''),
+            text: translate('report.actions.type.exportedToIntegration.reimburseableLink') + suffix,
             url: reimbursableUrl.startsWith('https://') ? reimbursableUrl : '',
         });
     }
-    if (reimbursableUrls.length === 1 && nonReimbursableUrls.length) {
+    if (hasReimbursable && (hasNonReimbursable || hasTravelInvoicing) && linkItemCount === 2) {
         result.push({
             text: translate('common.and'),
             url: '',
         });
     }
     if (nonReimbursableUrls.length) {
-        const text = translate('report.actions.type.exportedToIntegration.nonReimbursableLink');
+        const baseText = translate('report.actions.type.exportedToIntegration.nonReimbursableLink');
+        const text = linkItemCount === 3 ? `${baseText},` : baseText;
         let url = '';
 
         if (nonReimbursableUrls.length === 1) {
@@ -2763,6 +2734,27 @@ function getExportIntegrationActionFragments(translate: LocalizedTranslate, repo
                 default:
                     url = QBO_EXPENSES_URL;
             }
+        }
+
+        result.push({text, url});
+    }
+
+    if (nonReimbursableUrls.length && travelInvoicingUrls.length) {
+        result.push({
+            text: translate('common.and'),
+            url: '',
+        });
+    }
+    if (travelInvoicingUrls.length) {
+        const text = translate('report.actions.type.exportedToIntegration.travelCardLink');
+        let url = '';
+
+        if (travelInvoicingUrls.length === 1) {
+            const travelInvoicingUrl = travelInvoicingUrls.at(0) ?? '';
+            url = travelInvoicingUrl.startsWith('https://') ? travelInvoicingUrl : '';
+        } else if (label === CONST.POLICY.CONNECTIONS.NAME_USER_FRIENDLY.netsuite) {
+            url = NETSUITE_NON_REIMBURSABLE_EXPENSES_URL_PREFIX;
+            url += wasExportedAfterBase62 ? base62ReportID : reportID;
         }
 
         result.push({text, url});
@@ -3412,6 +3404,12 @@ function getWorkspaceAttendeeTrackingUpdateMessage(translate: LocalizedTranslate
     return translate('workspaceActions.updatedAttendeeTracking', {enabled: !!enabled});
 }
 
+function getRequireCompanyCardsEnabledMessage(translate: LocalizedTranslate, action: ReportAction): string {
+    const {enabled} = getOriginalMessage(action as ReportAction<typeof CONST.REPORT.ACTIONS.TYPE.POLICY_CHANGE_LOG.UPDATE_REQUIRE_COMPANY_CARDS_ENABLED>) ?? {};
+
+    return translate('workspaceActions.updatedRequireCompanyCards', {enabled: !!enabled});
+}
+
 function getAutoPayApprovedReportsEnabledMessage(translate: LocalizedTranslate, action: ReportAction): string {
     const {enabled} = getOriginalMessage(action as ReportAction<typeof CONST.REPORT.ACTIONS.TYPE.POLICY_CHANGE_LOG.UPDATE_AUTO_PAY_APPROVED_REPORTS_ENABLED>) ?? {};
 
@@ -3626,6 +3624,30 @@ function getPolicyChangeLogMaxExpenseAmountNoReceiptMessage(translate: Localized
         }
 
         return translate('workspaceActions.changedReceiptRequiredAmount', oldValue, newValue);
+    }
+
+    return getReportActionText(action);
+}
+
+function getPolicyChangeLogMaxExpenseAmountNoItemizedReceiptMessage(translate: LocalizedTranslate, action: ReportAction): string {
+    const {oldMaxExpenseAmountNoItemizedReceipt, newMaxExpenseAmountNoItemizedReceipt, currency} =
+        getOriginalMessage(action as ReportAction<typeof CONST.REPORT.ACTIONS.TYPE.POLICY_CHANGE_LOG.UPDATE_MAX_EXPENSE_AMOUNT_NO_ITEMIZED_RECEIPT>) ?? {};
+
+    if (typeof oldMaxExpenseAmountNoItemizedReceipt === 'number' && typeof newMaxExpenseAmountNoItemizedReceipt === 'number') {
+        const isOldLimitDisabled = oldMaxExpenseAmountNoItemizedReceipt === CONST.DISABLED_MAX_EXPENSE_VALUE;
+        const isNewLimitDisabled = newMaxExpenseAmountNoItemizedReceipt === CONST.DISABLED_MAX_EXPENSE_VALUE;
+        const oldValue = isOldLimitDisabled ? '' : convertToDisplayString(oldMaxExpenseAmountNoItemizedReceipt, currency);
+        const newValue = isNewLimitDisabled ? '' : convertToDisplayString(newMaxExpenseAmountNoItemizedReceipt, currency);
+
+        if (isOldLimitDisabled && !isNewLimitDisabled) {
+            return translate('workspaceActions.setItemizedReceiptRequiredAmount', newValue);
+        }
+
+        if (!isOldLimitDisabled && isNewLimitDisabled) {
+            return translate('workspaceActions.removedItemizedReceiptRequiredAmount', oldValue);
+        }
+
+        return translate('workspaceActions.changedItemizedReceiptRequiredAmount', oldValue, newValue);
     }
 
     return getReportActionText(action);
@@ -3939,7 +3961,7 @@ function getUpdatedManualApprovalThresholdMessage(translate: LocalizedTranslate,
         currency = CONST.CURRENCY.USD,
     } = getOriginalMessage(reportAction as ReportAction<typeof CONST.REPORT.ACTIONS.TYPE.POLICY_CHANGE_LOG.UPDATE_MANUAL_APPROVAL_THRESHOLD>) ?? {};
 
-    if (typeof oldLimit !== 'number' || typeof oldLimit !== 'number') {
+    if (typeof oldLimit !== 'number' || typeof newLimit !== 'number') {
         return getReportActionText(reportAction);
     }
     return translate('workspaceActions.updatedManualApprovalThreshold', convertToDisplayString(oldLimit, currency), convertToDisplayString(newLimit, currency));
@@ -4268,7 +4290,7 @@ function getCreatedReportForUnapprovedTransactionsMessage(reportID: string | und
         return '';
     }
     const reportUrl = getReportURLForCurrentContext(reportID);
-    return translate('reportAction.createdReportForUnapprovedTransactions', {reportUrl, reportName, reportID, isReportDeleted});
+    return translate('reportAction.createdReportForUnapprovedTransactions', reportUrl, reportName, reportID, isReportDeleted);
 }
 
 function getDynamicExternalWorkflowRoutedMessage(
@@ -4671,7 +4693,6 @@ export {
     isCardIssuedAction,
     getCardIssuedMessage,
     getRemovedConnectionMessage,
-    findLastReportActions,
     getFilteredReportActionsForReportView,
     wasMessageReceivedWhileOffline,
     shouldShowAddMissingDetails,
@@ -4682,6 +4703,7 @@ export {
     getWorkspaceUpdateFieldMessage,
     getWorkspaceFeatureEnabledMessage,
     getWorkspaceAttendeeTrackingUpdateMessage,
+    getRequireCompanyCardsEnabledMessage,
     getAutoPayApprovedReportsEnabledMessage,
     getAutoReimbursementMessage,
     formatAddressToString,
@@ -4701,6 +4723,7 @@ export {
     getForeignCurrencyDefaultTaxUpdateMessage,
     getWorkspaceFrequencyUpdateMessage,
     getPolicyChangeLogMaxExpenseAmountNoReceiptMessage,
+    getPolicyChangeLogMaxExpenseAmountNoItemizedReceiptMessage,
     getPolicyChangeLogMaxExpenseAmountMessage,
     getPolicyChangeLogMaxExpenseAgeMessage,
     getPolicyChangeLogDefaultBillableMessage,
