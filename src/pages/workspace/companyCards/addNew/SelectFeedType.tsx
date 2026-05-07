@@ -89,11 +89,11 @@ function SelectFeedType() {
     const getFinalData = () => {
         if (doesCountrySupportPlaid) {
             // Show Direct first, then Commercial, then Import from file
-            return [data[1], data[0], data[2]];
+            return [data.at(1), data.at(0), data.at(2)];
         }
 
         // Non-Plaid countries: Commercial feed and Import from file (no Direct feed)
-        return [data[0], data[2]];
+        return [data.at(0), data.at(2)];
     };
 
     const finalData = getFinalData();
