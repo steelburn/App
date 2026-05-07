@@ -316,12 +316,14 @@ function getDefaultDistanceRate(rates: Record<string, Rate> | undefined): Rate |
 
 function cloneCustomUnitWithNewIDs(unit: CustomUnit, newCustomUnitID: string, newDefaultRateID?: string): CustomUnit {
     if (newDefaultRateID) {
-        // The server-side DUPLICATE_POLICY assigns newDefaultRateID to the source's default rate.
-        // Non-default rates keep their source IDs so they remain visible offline; successData clears
-        // them after the API succeeds so the server response can repopulate with fresh server IDs
-        // without leaving duplicates. Iteration order is preserved from the source (default's key
-        // swapped in place) so getDefaultMileageRate's stable sort still picks the original default
-        // when other rates have a missing index (which would otherwise tie at CONST.DEFAULT_NUMBER_ID).
+        // The server-side DUPLICATE_POLICY assigns newDefaultRateID to the source's default rate
+        // and preserves the source's rate IDs for non-default rates in the duplicated workspace.
+        // Mirror that here: rebind the default to newDefaultRateID, and keep non-default rates with
+        // their source IDs so they remain visible offline and merge cleanly with the server response
+        // (same keys, no optimistic-vs-server duplicates). Iteration order is preserved from the
+        // source (default's key swapped in place) so getDefaultMileageRate's stable sort still picks
+        // the original default when other rates have a missing index (which would otherwise tie at
+        // CONST.DEFAULT_NUMBER_ID).
         const defaultRate = getDefaultDistanceRate(unit.rates);
         const rates: Record<string, Rate> = {};
         for (const rate of Object.values(unit.rates)) {
