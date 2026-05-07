@@ -229,6 +229,7 @@ function PrivatePersonalDetailsPage() {
                     onSubmit={onSubmit}
                     submitButtonText={translate('common.save')}
                     enabledWhenOffline
+                    shouldSubmitButtonStickToBottom
                 >
                     <Text style={[styles.textStrong, styles.mb2]}>{translate('privatePersonalDetails.basicDetails')}</Text>
                     <View style={styles.mb4}>
