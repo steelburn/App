@@ -5,6 +5,7 @@ import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import useSkeletonSpan, {SkeletonSpanReasonAttributes} from '@libs/telemetry/useSkeletonSpan';
+import variables from '@styles/variables';
 
 type TableSkeletonProps = {
     /** The number of skeleton rows to render */
@@ -30,7 +31,7 @@ export default function TableSkeleton({renderSkeletonItem, reasonAttributes, row
         styles.flexRow,
         styles.overflowHidden,
         styles.alignItemsCenter,
-        isSmallView ? styles.pv4 : styles.pv2,
+        styles.highlightBG,
         isSmallView ? styles.ph4 : styles.ph3,
         isSmallView ? styles.tableRowHeightCompact : styles.tableRowHeight,
     ];
@@ -38,16 +39,17 @@ export default function TableSkeleton({renderSkeletonItem, reasonAttributes, row
     const rows = new Array(rowCount).fill(null).map((_, index) => (
         <View
             key={index}
-            style={tableSkeletonRowStyles}
+            style={[tableSkeletonRowStyles, index !== rowCount - 1 && styles.borderBottom]}
         >
             <SkeletonViewContentLoader
                 backgroundColor={theme.skeletonLHNIn}
                 foregroundColor={theme.skeletonLHNOut}
+                height={isSmallView ? variables.tableRowHeightCompact : variables.tableRowHeight}
             >
                 {renderSkeletonItem()}
             </SkeletonViewContentLoader>
         </View>
     ));
 
-    return <View style={[styles.flex1, styles.m5, styles.highlightBG, styles.tableBottomRadius, styles.tableTopRadius]}>{rows}</View>;
+    return <View style={[styles.flex1, styles.m5, styles.tableBottomRadius, styles.overflowHidden, styles.tableTopRadius]}>{rows}</View>;
 }

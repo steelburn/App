@@ -13,25 +13,25 @@ export default function WorkspaceCompanyCardsTableSkeleton({reasonAttributes}: W
         <TableSkeleton
             rowCount={5}
             reasonAttributes={reasonAttributes}
-            renderSkeletonItem={() => {
+            renderSkeletonItem={() => (
                 <>
                     <Circle
-                        cx={36}
-                        cy={36}
-                        r="20"
+                        cx={28}
+                        cy={28}
+                        r="14"
                     />
                     <SkeletonRect
-                        transform={[{translateX: 68}, {translateY: 20}]}
+                        transform={[{translateX: 58}, {translateY: 16}]}
                         width={124}
                         height={8}
                     />
                     <SkeletonRect
-                        transform={[{translateX: 68}, {translateY: 362}]}
+                        transform={[{translateX: 58}, {translateY: 32}]}
                         width={60}
                         height={8}
                     />
-                </>;
-            }}
+                </>
+            )}
         />
     );
 }

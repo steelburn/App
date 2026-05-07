@@ -345,6 +345,8 @@ function WorkspaceCompanyCardsTable({
         isLoadingCards,
     };
 
+    return <WorkspaceCompanyCardsTableSkeleton reasonAttributes={reasonAttributes} />;
+
     return (
         <Table
             ref={tableRef}
