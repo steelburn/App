@@ -57,7 +57,10 @@ jest.mock('@libs/PolicyUtils', () => ({
 const fakePolicyID = 'ABCD1234';
 const mockPolicy = {...createRandomPolicy(0), id: fakePolicyID};
 const mockedGetPathFromState = getPathFromState as jest.MockedFunction<typeof getPathFromState>;
-const mockedGetRootState = navigationRef.getRootState as jest.Mock;
+/* eslint-disable @typescript-eslint/unbound-method -- jest.fn() mocks don't rely on `this` binding */
+const mockedGetRootState = navigationRef.getRootState as unknown as jest.Mock<{routes: unknown[]} | undefined>;
+const mockedDispatch = jest.mocked(navigationRef.dispatch);
+/* eslint-enable @typescript-eslint/unbound-method */
 
 const useRestoreWorkspacesTabOnNavigate = (require('@hooks/useRestoreWorkspacesTabOnNavigate') as {default: () => () => void}).default;
 
@@ -237,7 +240,7 @@ describe('useRestoreWorkspacesTabOnNavigate', () => {
 
         // The older TabNavigator is reached via StackActions.pop (popping the newer empty one off the root stack),
         // not via a fresh Navigation.navigate. Verify dispatch was called with a POP action.
-        expect(navigationRef.dispatch).toHaveBeenCalledWith(expect.objectContaining({type: 'POP'}));
+        expect(mockedDispatch).toHaveBeenCalledWith(expect.objectContaining({type: 'POP'}));
         expect(Navigation.navigate).not.toHaveBeenCalled();
     });
 
