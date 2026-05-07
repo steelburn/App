@@ -773,6 +773,197 @@ describe('actions/Policy', () => {
             expect(messages?.at(0)?.text).toBe(callerEmail);
         });
 
+        it('duplicate workspace with distance rates clones all source rates in optimistic data with the default rebound to the API-known rate ID', async () => {
+            await Onyx.set(ONYXKEYS.SESSION, {email: ESH_EMAIL, accountID: ESH_ACCOUNT_ID});
+
+            const sourceDistanceUnitID = 'srcDistUnit';
+            const sourceDefaultRateID = 'srcDefaultRate';
+            const sourceExtraRateID = 'srcExtraRate';
+            const fakePolicy: PolicyType = {
+                ...createRandomPolicy(19, CONST.POLICY.TYPE.TEAM),
+                customUnits: {
+                    [sourceDistanceUnitID]: {
+                        customUnitID: sourceDistanceUnitID,
+                        name: CONST.CUSTOM_UNITS.NAME_DISTANCE,
+                        enabled: true,
+                        attributes: {unit: CONST.CUSTOM_UNITS.DISTANCE_UNIT_MILES},
+                        rates: {
+                            [sourceDefaultRateID]: {customUnitRateID: sourceDefaultRateID, name: 'Default Rate', rate: 72.5, currency: 'USD', enabled: true, index: 0},
+                            [sourceExtraRateID]: {customUnitRateID: sourceExtraRateID, name: 'Extra Rate', rate: 100, currency: 'USD', enabled: true, index: 1},
+                        },
+                    },
+                },
+            };
+            await Onyx.set(`${ONYXKEYS.COLLECTION.POLICY}${fakePolicy.id}`, fakePolicy);
+            await waitForBatchedUpdates();
+
+            const policyID = Policy.generatePolicyID();
+            const options = {
+                currentUserAccountID: ESH_ACCOUNT_ID,
+                currentUserEmail: ESH_EMAIL,
+                policyName: 'Distance Rates Duplicate',
+                policyID: fakePolicy.id,
+                targetPolicyID: policyID,
+                welcomeNote: 'Join my policy',
+                parts: {
+                    people: false,
+                    reports: false,
+                    connections: false,
+                    categories: false,
+                    tags: false,
+                    taxes: false,
+                    perDiem: false,
+                    reimbursements: false,
+                    expenses: false,
+                    distance: true,
+                    invoices: false,
+                    exportLayouts: false,
+                },
+                localCurrency: 'USD',
+            };
+
+            // Pause the API call so successData (which clears the optimistic source rate IDs) does not
+            // run yet — this lets us inspect the optimistic state the user sees offline.
+            mockFetch.pause();
+            Policy.duplicateWorkspace(fakePolicy, options);
+            await waitForBatchedUpdates();
+
+            const duplicatePolicy: OnyxEntry<PolicyType> = await new Promise((resolve) => {
+                const connection = Onyx.connect({
+                    key: `${ONYXKEYS.COLLECTION.POLICY}${policyID}`,
+                    callback: (workspace) => {
+                        Onyx.disconnect(connection);
+                        resolve(workspace);
+                    },
+                });
+            });
+
+            expect(duplicatePolicy?.areDistanceRatesEnabled).toBe(true);
+            const distanceUnit = Object.values(duplicatePolicy?.customUnits ?? {}).find((unit) => unit.name === CONST.CUSTOM_UNITS.NAME_DISTANCE);
+            if (!distanceUnit) {
+                throw new Error('Expected duplicated distance unit');
+            }
+            // The duplicated unit's customUnitID should differ from the source's (fresh ID).
+            expect(distanceUnit.customUnitID).not.toBe(sourceDistanceUnitID);
+            // Both rates should be present in optimistic data: the extra rate keeps its source ID,
+            // and the default is rebound to a fresh API-known customUnitRateID.
+            const rateKeys = Object.keys(distanceUnit.rates);
+            expect(rateKeys).toContain(sourceExtraRateID);
+            expect(rateKeys).not.toContain(sourceDefaultRateID);
+            expect(rateKeys).toHaveLength(2);
+            // The Default Rate should be the one picked by getDefaultDistanceRate (lowest enabled index).
+            const defaultRate = Object.values(distanceUnit.rates)
+                .filter((rate) => rate.enabled !== false)
+                .sort((a, b) => (a.index ?? CONST.DEFAULT_NUMBER_ID) - (b.index ?? CONST.DEFAULT_NUMBER_ID))
+                .at(0);
+            expect(defaultRate?.name).toBe('Default Rate');
+            expect(defaultRate?.rate).toBe(72.5);
+            // The default rate's customUnitRateID matches its dictionary key (rebound).
+            expect(defaultRate?.customUnitRateID).not.toBe(sourceDefaultRateID);
+            const defaultRateID = defaultRate?.customUnitRateID;
+            if (!defaultRateID) {
+                throw new Error('Expected default rate to have a customUnitRateID');
+            }
+            expect(distanceUnit.rates[defaultRateID]).toBe(defaultRate);
+
+            // Resume the mocked fetch so successData fires and clears the optimistic source rate IDs.
+            // After success, only the rebound default remains until a Pusher response (not mocked here)
+            // would repopulate the rates with fresh server IDs.
+            await mockFetch.resume?.();
+            await waitForBatchedUpdates();
+
+            const duplicateAfterSuccess: OnyxEntry<PolicyType> = await new Promise((resolve) => {
+                const connection = Onyx.connect({
+                    key: `${ONYXKEYS.COLLECTION.POLICY}${policyID}`,
+                    callback: (workspace) => {
+                        Onyx.disconnect(connection);
+                        resolve(workspace);
+                    },
+                });
+            });
+
+            const distanceUnitAfter = Object.values(duplicateAfterSuccess?.customUnits ?? {}).find((unit) => unit.name === CONST.CUSTOM_UNITS.NAME_DISTANCE);
+            if (!distanceUnitAfter) {
+                throw new Error('Expected duplicated distance unit to still exist after success');
+            }
+            const ratesAfter = Object.entries(distanceUnitAfter.rates).filter(([, rate]) => rate !== null);
+            expect(ratesAfter).toHaveLength(1);
+            expect(ratesAfter.at(0)?.[1]?.name).toBe('Default Rate');
+        });
+
+        it('duplicate workspace without distance rates does not write any customUnits cleanup for the source distance rates', async () => {
+            await Onyx.set(ONYXKEYS.SESSION, {email: ESH_EMAIL, accountID: ESH_ACCOUNT_ID});
+
+            const sourceDistanceUnitID = 'srcDistUnitB';
+            const sourceExtraRateID = 'srcExtraRateB';
+            const fakePolicy: PolicyType = {
+                ...createRandomPolicy(20, CONST.POLICY.TYPE.TEAM),
+                customUnits: {
+                    [sourceDistanceUnitID]: {
+                        customUnitID: sourceDistanceUnitID,
+                        name: CONST.CUSTOM_UNITS.NAME_DISTANCE,
+                        enabled: true,
+                        attributes: {unit: CONST.CUSTOM_UNITS.DISTANCE_UNIT_MILES},
+                        rates: {
+                            srcDefaultRateB: {customUnitRateID: 'srcDefaultRateB', name: 'Default Rate', rate: 72.5, currency: 'USD', enabled: true, index: 0},
+                            [sourceExtraRateID]: {customUnitRateID: sourceExtraRateID, name: 'Extra Rate', rate: 100, currency: 'USD', enabled: true, index: 1},
+                        },
+                    },
+                },
+            };
+            await Onyx.set(`${ONYXKEYS.COLLECTION.POLICY}${fakePolicy.id}`, fakePolicy);
+            await waitForBatchedUpdates();
+
+            const policyID = Policy.generatePolicyID();
+            const options = {
+                currentUserAccountID: ESH_ACCOUNT_ID,
+                currentUserEmail: ESH_EMAIL,
+                policyName: 'No Distance Duplicate',
+                policyID: fakePolicy.id,
+                targetPolicyID: policyID,
+                welcomeNote: 'Join my policy',
+                parts: {
+                    people: false,
+                    reports: false,
+                    connections: false,
+                    categories: false,
+                    tags: false,
+                    taxes: false,
+                    perDiem: false,
+                    reimbursements: false,
+                    expenses: false,
+                    distance: false,
+                    invoices: false,
+                    exportLayouts: false,
+                },
+                localCurrency: 'USD',
+            };
+
+            Policy.duplicateWorkspace(fakePolicy, options);
+            await waitForBatchedUpdates();
+
+            const duplicatePolicy: OnyxEntry<PolicyType> = await new Promise((resolve) => {
+                const connection = Onyx.connect({
+                    key: `${ONYXKEYS.COLLECTION.POLICY}${policyID}`,
+                    callback: (workspace) => {
+                        Onyx.disconnect(connection);
+                        resolve(workspace);
+                    },
+                });
+            });
+
+            // The duplicate should not have any distance custom unit because parts.distance is false.
+            // In particular, it should not contain a partial/orphan distance unit consisting only of
+            // nulled-out source rate IDs (which would be the regression the gating prevents).
+            const distanceUnits = Object.values(duplicatePolicy?.customUnits ?? {}).filter((unit) => unit.name === CONST.CUSTOM_UNITS.NAME_DISTANCE);
+            expect(distanceUnits).toHaveLength(0);
+            // The source's extra rate ID must not appear anywhere in the duplicate's customUnits as
+            // a stale "null" entry from successData cleanup.
+            for (const unit of Object.values(duplicatePolicy?.customUnits ?? {})) {
+                expect(Object.keys(unit.rates ?? {})).not.toContain(sourceExtraRateID);
+            }
+        });
+
         it('creates a new workspace with BASIC approval mode if the introSelected is MANAGE_TEAM', async () => {
             const policyID = Policy.generatePolicyID();
             // When a new workspace is created with introSelected set to MANAGE_TEAM

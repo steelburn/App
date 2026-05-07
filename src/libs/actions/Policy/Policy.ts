@@ -90,7 +90,14 @@ import Permissions from '@libs/Permissions';
 import * as PersonalDetailsUtils from '@libs/PersonalDetailsUtils';
 import * as PhoneNumber from '@libs/PhoneNumber';
 import * as PolicyUtils from '@libs/PolicyUtils';
-import {getCustomUnitsForDuplication, getMemberAccountIDsForWorkspace, goBackWhenEnableFeature, isControlPolicy, navigateToExpensifyCardPage} from '@libs/PolicyUtils';
+import {
+    getCustomUnitsForDuplication,
+    getDefaultDistanceRate,
+    getMemberAccountIDsForWorkspace,
+    goBackWhenEnableFeature,
+    isControlPolicy,
+    navigateToExpensifyCardPage,
+} from '@libs/PolicyUtils';
 import * as ReportUtils from '@libs/ReportUtils';
 import {hasValidModifiedAmount} from '@libs/TransactionUtils';
 import type {Feature} from '@pages/OnboardingInterestedFeatures/types';
@@ -3236,16 +3243,13 @@ function buildDuplicatePolicyData(policy: Policy, options: DuplicatePolicyDataOp
     const {customUnitID: distanceCustomUnitID, customUnitRateID} = buildOptimisticDistanceRateCustomUnits(outputCurrency);
     const perDiemCustomUnitID = generateCustomUnitID();
 
-    // Source non-default distance rate IDs — kept in optimistic data so they're visible offline,
-    // then nulled in successData so the server's Pusher response can repopulate with fresh server
-    // IDs without leaving optimistic-vs-server duplicates.
-    const sourceDistanceUnit = Object.values(policy?.customUnits ?? {}).find((unit) => unit.name === CONST.CUSTOM_UNITS.NAME_DISTANCE);
-    const sourceDistanceDefaultRate = sourceDistanceUnit
-        ? Object.values(sourceDistanceUnit.rates)
-              .filter((rate) => rate.enabled !== false)
-              .sort((a, b) => (a.index ?? CONST.DEFAULT_NUMBER_ID) - (b.index ?? CONST.DEFAULT_NUMBER_ID))
-              .at(0)
-        : undefined;
+    // Source non-default distance rate IDs — kept in optimistic data (by cloneCustomUnitWithNewIDs)
+    // so they're visible offline, then nulled in successData so the server's Pusher response can
+    // repopulate with fresh server IDs without leaving optimistic-vs-server duplicates. Only
+    // computed when the user actually selected distance rates for duplication; otherwise no
+    // optimistic distance unit was created and there's nothing to clean up.
+    const sourceDistanceUnit = parts?.distance ? Object.values(policy?.customUnits ?? {}).find((unit) => unit.name === CONST.CUSTOM_UNITS.NAME_DISTANCE) : undefined;
+    const sourceDistanceDefaultRate = getDefaultDistanceRate(sourceDistanceUnit?.rates);
     const sourceNonDefaultDistanceRateIDs = sourceDistanceUnit
         ? Object.values(sourceDistanceUnit.rates)
               .filter((rate) => rate.customUnitRateID !== sourceDistanceDefaultRate?.customUnitRateID)
