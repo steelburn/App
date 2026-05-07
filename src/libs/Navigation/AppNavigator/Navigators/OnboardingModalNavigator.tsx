@@ -91,7 +91,7 @@ function OnboardingModalNavigator() {
         return {
             headerShown: false,
             animation: Animations.SLIDE_FROM_RIGHT,
-            animationTypeForReplace: 'push',
+            animationTypeForReplace: 'pop',
             gestureDirection: 'horizontal',
             web: {
                 // The .forHorizontalIOS interpolator from `@react-navigation` is misbehaving on Safari, so we override it with Expensify custom interpolator
@@ -134,6 +134,7 @@ function OnboardingModalNavigator() {
                             <Stack.Screen
                                 name={SCREENS.ONBOARDING.WORK_EMAIL}
                                 component={OnboardingWorkEmail}
+                                options={{animationTypeForReplace: 'push'}}
                             />
                             <Stack.Screen
                                 name={SCREENS.ONBOARDING.WORK_EMAIL_VALIDATION}
