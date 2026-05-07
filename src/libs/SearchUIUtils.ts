@@ -91,15 +91,14 @@ import arraysEqual from '@src/utils/arraysEqual';
 import {hasSynchronizationErrorMessage} from './actions/connections';
 import {startMoneyRequest} from './actions/IOU';
 import {canApproveIOU, canIOUBePaid, canSubmitReport} from './actions/IOU/ReportWorkflow';
-import {setIsOpenConfirmNavigateExpensifyClassicModalOpen} from './actions/isOpenConfirmNavigateExpensifyClassicModal';
 import {createTransactionThreadReport} from './actions/Report';
 import type {TransactionPreviewData} from './actions/Search';
 import {setOptimisticDataForTransactionThreadPreview} from './actions/Search';
+import {convertAttendeesToArray} from './AttendeeUtils';
 import type {CardFeedForDisplay} from './CardFeedUtils';
 import {getCardFeedsForDisplay} from './CardFeedUtils';
 import {getCardDescriptionForSearchTable, getFeedNameForDisplay} from './CardUtils';
 import {getDecodedCategoryName} from './CategoryUtils';
-import {convertToDisplayStringWithoutCurrency} from './CurrencyUtils';
 import DateUtils from './DateUtils';
 import interceptAnonymousUser from './interceptAnonymousUser';
 import isSearchTopmostFullScreenRoute from './Navigation/helpers/isSearchTopmostFullScreenRoute';
@@ -414,6 +413,23 @@ function formatBadgeText(count: number): string {
     return count > CONST.SEARCH.TODO_BADGE_MAX_COUNT ? `${CONST.SEARCH.TODO_BADGE_MAX_COUNT}+` : count.toString();
 }
 
+function getSectionBadgeText(sectionTranslationPath: TranslationPaths, reportCounts: Record<string, number>): string | undefined {
+    if (
+        sectionTranslationPath === 'search.tabs.expenseReports' &&
+        (CONST.SEARCH.SEARCH_KEYS.SUBMIT in reportCounts || CONST.SEARCH.SEARCH_KEYS.APPROVE in reportCounts || CONST.SEARCH.SEARCH_KEYS.PAY in reportCounts)
+    ) {
+        return formatBadgeText(
+            (reportCounts[CONST.SEARCH.SEARCH_KEYS.SUBMIT] ?? 0) + (reportCounts[CONST.SEARCH.SEARCH_KEYS.APPROVE] ?? 0) + (reportCounts[CONST.SEARCH.SEARCH_KEYS.PAY] ?? 0),
+        );
+    }
+
+    if (sectionTranslationPath === 'search.tabs.accounting' && CONST.SEARCH.SEARCH_KEYS.EXPORT in reportCounts) {
+        return formatBadgeText(reportCounts[CONST.SEARCH.SEARCH_KEYS.EXPORT]);
+    }
+
+    return undefined;
+}
+
 function getItemBadgeText(itemKey: string, reportCounts: Record<string, number>): string | undefined {
     if (itemKey in reportCounts) {
         return formatBadgeText(reportCounts[itemKey]);
@@ -596,18 +612,6 @@ type GetSectionsParams = {
  * sortBy/sortOrder to match the menu item's defaults for it to be active.
  */
 const GENERIC_SEARCH_KEYS: ReadonlySet<SearchKey> = new Set([CONST.SEARCH.SEARCH_KEYS.EXPENSES, CONST.SEARCH.SEARCH_KEYS.REPORTS]);
-
-const SKIPPED_SEARCH_FILTERS = new Set<SearchAdvancedFiltersKey>([
-    FILTER_KEYS.GROUP_BY,
-    FILTER_KEYS.GROUP_CURRENCY,
-    FILTER_KEYS.LIMIT,
-    FILTER_KEYS.TYPE,
-    FILTER_KEYS.VIEW,
-    FILTER_KEYS.PAYER,
-    FILTER_KEYS.ACTION,
-    FILTER_KEYS.COLUMNS,
-    FILTER_KEYS.KEYWORD,
-]);
 
 function doesSearchItemMatchSort(key: SearchKey, itemSortBy: string | undefined, itemSortOrder: string | undefined, currentSortBy: string | undefined, currentSortOrder: string | undefined) {
     return GENERIC_SEARCH_KEYS.has(key) || (itemSortBy === currentSortBy && itemSortOrder === currentSortOrder);
@@ -2342,8 +2346,19 @@ function getActions(
             : undefined;
 
     const chatReport = getChatReport(data, report);
-    const canBePaid = canIOUBePaid(report, chatReport, policy, bankAccountList, allReportTransactions, false, chatReportRNVP, invoiceReceiverPolicy);
-    const canOnlyBePaidElsewhere = canIOUBePaid(report, chatReport, policy, bankAccountList, allReportTransactions, true, chatReportRNVP, invoiceReceiverPolicy);
+    const canBePaid = canIOUBePaid(report, chatReport, policy, bankAccountList, currentUserLogin, currentUserAccountID, allReportTransactions, false, chatReportRNVP, invoiceReceiverPolicy);
+    const canOnlyBePaidElsewhere = canIOUBePaid(
+        report,
+        chatReport,
+        policy,
+        bankAccountList,
+        currentUserLogin,
+        currentUserAccountID,
+        allReportTransactions,
+        true,
+        chatReportRNVP,
+        invoiceReceiverPolicy,
+    );
     const shouldOnlyShowElsewhere = !canBePaid && canOnlyBePaidElsewhere;
 
     // We're not supporting pay partial amount on search page now.
@@ -2446,7 +2461,6 @@ function getTaskSections(
             if (parentReport && personalDetails) {
                 const policy = data[`${ONYXKEYS.COLLECTION.POLICY}${parentReport.policyID}`];
                 const isParentReportArchived = archivedReportsIDList?.has(`${ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS}${parentReport?.reportID}`);
-                // eslint-disable-next-line @typescript-eslint/no-deprecated
                 const parentReportName = getReportName({report: parentReport, policy, isReportArchived: isParentReportArchived, conciergeReportID});
                 const icons = getIcons(parentReport, formatPhoneNumber, personalDetails, null, '', -1, policy, undefined, isParentReportArchived);
                 const parentReportIcon = icons?.at(0);
@@ -2587,7 +2601,6 @@ function getReportActionsSections(data: OnyxTypes.SearchResults['data'], visible
                     ...reportAction,
                     reportID,
                     from,
-                    // eslint-disable-next-line @typescript-eslint/no-deprecated
                     reportName: getSearchReportName({report, policy, personalDetails: data.personalDetailsList, transactions, invoiceReceiverPolicy, reports, isReportArchived}),
                     formattedFrom: from?.displayName ?? from?.login ?? '',
                     date: reportAction.created,
@@ -3715,15 +3728,15 @@ function getSortedTransactionData(
 
     if (sortBy === CONST.SEARCH.TABLE_COLUMNS.ATTENDEES) {
         return data.sort((a, b) => {
-            const aValue = a.comment?.attendees?.length ?? 0;
-            const bValue = b.comment?.attendees?.length ?? 0;
+            const aValue = convertAttendeesToArray(a.comment?.attendees).length;
+            const bValue = convertAttendeesToArray(b.comment?.attendees).length;
             return compareValues(aValue, bValue, sortOrder, sortBy, localeCompare);
         });
     }
 
     if (sortBy === CONST.SEARCH.TABLE_COLUMNS.TOTAL_PER_ATTENDEE) {
         const getTotalPerAttendee = (t: TransactionListItemType) => {
-            const attendeesCount = t.comment?.attendees?.length ?? 0;
+            const attendeesCount = convertAttendeesToArray(t.comment?.attendees).length;
             if (!attendeesCount) {
                 return 0;
             }
@@ -4189,10 +4202,6 @@ function isCorrectSearchUserName(displayName?: string) {
     return displayName && displayName.toUpperCase() !== CONST.REPORT.OWNER_EMAIL_FAKE;
 }
 
-function isTransactionSearchType(type: string | undefined): boolean {
-    return type === CONST.SEARCH.DATA_TYPES.EXPENSE || type === CONST.SEARCH.DATA_TYPES.INVOICE;
-}
-
 function isTodoSearch(recentSearchHash: number, suggestedSearches: Record<string, SearchTypeMenuItem>) {
     const matchedSearchKey = Object.values(suggestedSearches).find((search) => search.recentSearchHash === recentSearchHash)?.key;
     return !!matchedSearchKey && TODO_SEARCH_KEYS.has(matchedSearchKey);
@@ -4207,25 +4216,13 @@ type TypeMenuSectionsParams = {
     savedSearches: OnyxEntry<OnyxTypes.SaveSearch>;
     isOffline: boolean;
     defaultExpensifyCard: CardFeedForDisplay | undefined;
-    shouldRedirectToExpensifyClassic: boolean;
     draftTransactionIDs: string[] | undefined;
     isTrackIntentUser: boolean;
 };
 
 function createTypeMenuSections(params: TypeMenuSectionsParams): SearchTypeMenuSection[] {
-    const {
-        currentUserEmail,
-        currentUserAccountID,
-        cardFeedsByPolicy,
-        defaultCardFeed,
-        policies,
-        savedSearches,
-        isOffline,
-        defaultExpensifyCard,
-        shouldRedirectToExpensifyClassic,
-        draftTransactionIDs,
-        isTrackIntentUser,
-    } = params;
+    const {currentUserEmail, currentUserAccountID, cardFeedsByPolicy, defaultCardFeed, policies, savedSearches, isOffline, defaultExpensifyCard, draftTransactionIDs, isTrackIntentUser} =
+        params;
     const typeMenuSections: SearchTypeMenuSection[] = [];
 
     const {
@@ -4263,11 +4260,6 @@ function createTypeMenuSections(params: TypeMenuSectionsParams): SearchTypeMenuS
                                       buttonText: 'report.newReport.createExpense',
                                       buttonAction: () => {
                                           interceptAnonymousUser(() => {
-                                              if (shouldRedirectToExpensifyClassic) {
-                                                  setIsOpenConfirmNavigateExpensifyClassicModalOpen(true);
-                                                  return;
-                                              }
-
                                               startMoneyRequest(CONST.IOU.TYPE.CREATE, generateReportID(), draftTransactionIDs, CONST.IOU.REQUEST_TYPE.SCAN);
                                           });
                                       },
@@ -4807,7 +4799,12 @@ function getDateDisplayValue(syntaxKey: SearchDateFilterKeys, form: Partial<Sear
     return parts.join(', ');
 }
 
-function getAmountDisplayValue(syntaxKey: SearchAmountFilterKeys, form: Partial<SearchAdvancedFiltersForm>, translate: LocalizedTranslate): string | undefined {
+function getAmountDisplayValue(
+    syntaxKey: SearchAmountFilterKeys,
+    form: Partial<SearchAdvancedFiltersForm>,
+    translate: LocalizedTranslate,
+    convertToDisplayStringWithoutCurrency: CurrencyListActionsContextType['convertToDisplayStringWithoutCurrency'],
+): string | undefined {
     const lessThan = form[`${syntaxKey}${CONST.SEARCH.AMOUNT_MODIFIERS.LESS_THAN}`];
     const greaterThan = form[`${syntaxKey}${CONST.SEARCH.AMOUNT_MODIFIERS.GREATER_THAN}`];
     const equalTo = form[`${syntaxKey}${CONST.SEARCH.AMOUNT_MODIFIERS.EQUAL_TO}`];
@@ -4971,6 +4968,7 @@ function mapFiltersFormToLabelValueList<T extends Record<string, unknown>>(
     skipFilters: Set<SearchAdvancedFiltersKey> | undefined,
     translate: LocalizedTranslate,
     localeCompare: LocaleContextProps['localeCompare'],
+    convertToDisplayStringWithoutCurrency: CurrencyListActionsContextType['convertToDisplayStringWithoutCurrency'],
     mapper?: (filterKey: SearchAdvancedFiltersKey) => T,
 ): Array<SearchFilter & T> {
     const filters: Array<SearchFilter & T> = [];
@@ -4993,7 +4991,7 @@ function mapFiltersFormToLabelValueList<T extends Record<string, unknown>>(
             }
 
             const displayValue = isAmountFilterKey(groupConfig.syntax)
-                ? getAmountDisplayValue(groupConfig.syntax, searchAdvancedFiltersForm, translate)
+                ? getAmountDisplayValue(groupConfig.syntax, searchAdvancedFiltersForm, translate, convertToDisplayStringWithoutCurrency)
                 : getDateDisplayValue(groupConfig.syntax, searchAdvancedFiltersForm, translate);
 
             if (displayValue) {
@@ -5807,6 +5805,7 @@ export {
     getActions,
     createTypeMenuSections,
     formatBadgeText,
+    getSectionBadgeText,
     getItemBadgeText,
     createBaseSavedSearchMenuItem,
     shouldShowEmptyState,
@@ -5855,8 +5854,6 @@ export {
     FILTER_LABEL_MAP,
     doesSearchItemMatchSort,
     isPolicyEligibleForSpendOverTime,
-    isTransactionSearchType,
-    SKIPPED_SEARCH_FILTERS,
 };
 export type {
     SavedSearchMenuItem,
