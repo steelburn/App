@@ -74,7 +74,7 @@ To create an expense using your vehicle's odometer readings:
 4. Enter the **End reading** from your odometer after the trip.
    - The total distance is calculated automatically as you type.
 5. (Optional) Select the image icon next to each reading to attach a photo of your odometer.
-6. (Optional) If you only have your start reading, select **Save for later** to keep the expense in progress on your device. Reopen it after your trip to enter the end reading.
+6. (Optional) To finish creating the expense later, select **Save for later** to keep the expense in progress on your device. Reopen it after your trip to enter the end reading.
 7. Select **Next**.
 8. On the confirmation screen, review and confirm:
    - Distance
