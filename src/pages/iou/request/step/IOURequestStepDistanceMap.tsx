@@ -82,7 +82,6 @@ function IOURequestStepDistanceMap({
     const [splitDraftTransaction] = useOnyx(`${ONYXKEYS.COLLECTION.SPLIT_TRANSACTION_DRAFT}${transactionID}`);
     const selfDMReport = useSelfDMReport();
     const policy = usePolicy(report?.policyID);
-    const [allPolicies] = useOnyx(ONYXKEYS.COLLECTION.POLICY);
     const [policyCategories] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${policy?.id}`);
     const [policyTags] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_TAGS}${policy?.id}`);
     const personalPolicy = usePersonalPolicy();
@@ -453,7 +452,6 @@ function IOURequestStepDistanceMap({
                     recentWaypoints,
                     ...(hasRouteChanged ? {routes: transaction?.routes} : {}),
                     policy,
-                    allPolicies,
                     policyTagList: policyTags,
                     policyCategories,
                     transactionBackup,
@@ -494,7 +492,6 @@ function IOURequestStepDistanceMap({
         isASAPSubmitBetaEnabled,
         parentReportNextStep,
         recentWaypoints,
-        allPolicies,
     ]);
 
     const renderItem = useCallback(
