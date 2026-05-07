@@ -44,7 +44,7 @@ No interactive prompts. Missing inputs that cannot be defaulted hard-fail.
 
 ## Tests parsing rules
 
-The **only hard rule**: tests live under the `### Tests` heading. Everything inside it varies wildly across authors - single numbered list, multiple numbered lists with restarts, h4 sub-headers, prose paragraphs, "N/A", or empty. Do not mechanically parse it; let the LLM interpret structure.
+The **only hard rule**: tests live under the `### Tests` heading. Everything inside it varies wildly across authors.
 
 Operating on the `### Tests` block of the PR body:
 
@@ -116,12 +116,6 @@ For each flow, in order:
 3. **On Phase 1 success** (cache miss path): write `$TEST_FLOW.ad` to the cache, write `<fingerprint>.meta.json` with `{created_ts, original_pr, hits: 1}`.
 4. **On Phase 2 replay failure** (cache hit path only): the cached script is stale (UI changed under it). Delete the cache entry, mark the flow `cache: "invalidated"`, re-run Phase 1 fresh, retry Phase 2 once. If the retry still fails, mark `phase2_failed`.
 5. **On Phase 2 success** (cache hit path): bump `last_used_ts` and increment `hits` in the meta file.
-
-### TTL / disk hygiene
-
-- No hard TTL. Self-healing on replay failure handles correctness; old unused entries just sit on disk.
-- Soft cap: at the start of each run, prune entries with `last_used_ts` older than 30 days. Keeps the cache directory bounded without forcing regeneration of frequently-used flows.
-- `--cache-clear` wipes the whole cache up-front (escape hatch).
 
 ## Capture loop (per flow per platform)
 
@@ -329,7 +323,6 @@ Hitting any cap marks the flow `phase1_failed` / `phase2_failed` and proceeds to
 - Mobile web (`iOS: mWeb Safari`, `Android: mWeb Chrome`) and Desktop (`MacOS: Chrome / Safari`) - belong in `playwright-app-testing` or a future browser-driver skill.
 - Standalone (non-HybridApp) builds - parent skill is HybridApp-only and this specialization inherits the gate. Production mobile evidence runs against HybridApp.
 - Device lifecycle (Metro, simulator boot, bundle ID resolution, session reuse, app install verification) - fully delegated to the parent skill's [Bring-up](../agent-device/SKILL.md#bring-up). This skill does not call `agent-device metro prepare`, `xcrun simctl`, or `is-hybrid-app.sh` directly.
-- S3 / R2 / GitHub artifact upload - deferred to Melvin (the eventual CI caller).
 - Editing the PR body or posting PR comments - the skill only writes local files.
 - Interactive prompts of any kind. CI is the eventual host; the skill must run end-to-end without human input.
 - Test data cleanup. Accounts/expenses/workspaces created during runs accumulate; rely on periodic test-account reset.
