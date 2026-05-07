@@ -66,6 +66,7 @@ import findNodeHandle from '@src/utils/findNodeHandle';
 import {useComposerEditState, useComposerState} from './ComposerContext';
 import getCursorPosition from './getCursorPosition';
 import getScrollPosition from './getScrollPosition';
+import getUpdatedSyncSelection from './getUpdatedSyncSelection/index.ios';
 import type {SuggestionsRef} from './ReportActionCompose';
 import ReportActionComposeUtils from './ReportActionComposeUtils';
 import SilentCommentUpdater from './SilentCommentUpdater';

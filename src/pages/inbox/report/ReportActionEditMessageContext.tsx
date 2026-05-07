@@ -12,24 +12,35 @@ function NOOP() {
     return null;
 }
 
+/** Whether the report is currently being edited, is already submitted or is not editing any m */
 type EditingState = 'off' | 'editing' | 'submitted';
 
 type ReportActionActiveEdit = {
+    /** The report ID */
     editingReportID: string | null;
+    /** The report action ID */
     editingReportActionID: string | null;
+    /** The report action */
     editingReportAction: OnyxTypes.ReportAction | null;
+    /** The editing message */
     editingMessage: string | null;
 };
 
 type ReportActionEditMessageContextValue = ReportActionActiveEdit & {
+    /** The current edit message selection */
     currentEditMessageSelection: TextSelection | null;
+    /** The editing state */
     editingState: EditingState;
 };
 
 type ReportActionEditMessageContextActions = {
+    /** Set the editing message */
     setEditingMessage: Dispatch<SetStateAction<string | null>>;
+    /** Set the current edit message selection */
     setCurrentEditMessageSelection: Dispatch<SetStateAction<TextSelection | null>>;
+    /** Submit the edit */
     submitEdit: () => void;
+    /** Stop the editing */
     stopEditing: () => void;
 };
 
@@ -50,7 +61,9 @@ const ReportActionEditMessageActionsContext = createContext<ReportActionEditMess
 });
 
 type ReportActionEditMessageContextProviderProps = {
+    /** The report ID */
     reportID: string | undefined;
+    /** The children */
     children: React.ReactNode;
 };
 

@@ -7,6 +7,7 @@ import ComposerExpandCollapseButton from './ComposerExpandCollapseButton';
 import MessageEditCancelButton from './MessageEditCancelButton';
 
 type ComposerEditingButtonsProps = {
+    /** The report ID */
     reportID: string;
 };
 

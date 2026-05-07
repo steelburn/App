@@ -4,7 +4,10 @@ import {getCommentLength} from '@libs/ReportUtils';
 import CONST from '@src/CONST';
 
 type UseDebouncedCommentValidationProps = {
+    /** The report ID */
     reportID: string | undefined;
+
+    /** Whether the composer is in edit mode */
     isEditing?: boolean;
 };
 

@@ -28,12 +28,7 @@ import type * as OnyxTypes from '@src/types/onyx';
 import {useComposerActions, useComposerEditActions, useComposerEditState, useComposerMeta, useComposerSendState, useComposerState} from './ComposerContext';
 import useSidePanelContext from './useSidePanelContext';
 
-type ComposerSubmitFunctions = {
-    validateAndSubmitDraft: (draftMessage: string) => void;
-    submitDraftAndClearComposer: () => void;
-};
-
-function useComposerSubmit(reportID: string): ComposerSubmitFunctions {
+function useComposerSubmit(reportID: string) {
     const {isOffline} = useNetwork();
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const personalDetails = usePersonalDetails();

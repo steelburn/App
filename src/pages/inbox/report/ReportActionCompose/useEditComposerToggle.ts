@@ -7,11 +7,22 @@ import ReportActionComposeUtils from './ReportActionComposeUtils';
 import updateNativeTextInputValue from './updateNativeTextInputValue/index.ios';
 
 type UseEditComposerToggleProps = {
+    /** The selection of the composer */
     selection: TextSelection;
+
+    /** The draft comment of the composer */
     draftComment: string;
+
+    /** The ref to the composer */
     composerRef: RefObject<ComposerRef | null>;
+
+    /** Handle changing the selection of the composer */
     onSelectionChange?: (selection: TextSelection) => void;
+
+    /** Handle focusing the composer */
     onFocus?: () => void;
+
+    /** Handle changing the value of the composer */
     onValueChange?: (value: string) => void;
 };
 

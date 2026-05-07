@@ -17,11 +17,17 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import type * as OnyxTypes from '@src/types/onyx';
 
 type UseEditMessageProps = {
+    /** The report ID */
     reportID: string | undefined;
+    /** The original report ID */
     originalReportID: string | undefined;
+    /** The report action */
     reportAction: OnyxTypes.ReportAction | null | undefined;
+    /** Whether to scroll to the last message */
     shouldScrollToLastMessage?: boolean;
+    /** The debounced comment max length validation */
     debouncedCommentMaxLengthValidation: DebouncedFuncLeading<(value: string) => boolean>;
+    /** The ref to the composer */
     composerRef: React.RefObject<ComposerRef | null>;
 };
 

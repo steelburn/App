@@ -11,7 +11,10 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import CONST from '@src/CONST';
 
 type MessageEditCancelButtonProps = ViewProps & {
+    /** Handle clicking on cancel button */
     onCancel: () => void;
+
+    /** The test ID to use for the button */
     testID?: string;
 };
 
