@@ -1802,4 +1802,32 @@ describe('teardown / setup lifecycle', () => {
             navigationRef.isReady = originalIsReady;
         }
     });
+
+    it('does not subscribe a state listener pre-mount; the queue-only unsubscribe would leak past teardown when the container forwards it (StrictMode cleanup/re-setup leak)', () => {
+        type NavigationRefMock = {
+            addListener: (event: string, callback: (...args: unknown[]) => void) => () => void;
+            isReady: () => boolean;
+            getRootState: () => unknown;
+        };
+        // eslint-disable-next-line import/extensions
+        const navigationRefModule = require<{default: NavigationRefMock}>('../../src/libs/Navigation/navigationRef.ts');
+        const navigationRef = navigationRefModule.default;
+        const originalAddListener = navigationRef.addListener.bind(navigationRef);
+        const originalIsReady = navigationRef.isReady.bind(navigationRef);
+        const originalGetRootState = navigationRef.getRootState.bind(navigationRef);
+        const addListenerSpy = jest.fn(() => () => {});
+        navigationRef.addListener = addListenerSpy as unknown as typeof navigationRef.addListener;
+        navigationRef.isReady = () => false;
+        navigationRef.getRootState = () => undefined;
+        try {
+            teardownNavigationFocusReturn();
+            resetForTests();
+            setupNavigationFocusReturn();
+            expect(addListenerSpy).not.toHaveBeenCalled();
+        } finally {
+            navigationRef.addListener = originalAddListener;
+            navigationRef.isReady = originalIsReady;
+            navigationRef.getRootState = originalGetRootState;
+        }
+    });
 });

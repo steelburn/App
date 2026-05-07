@@ -421,8 +421,8 @@ function setupNavigationFocusReturn(): void {
     if (!prevState && navigationRefHasLiveState()) {
         prevState = navigationRef.getRootState() ?? prevState;
     }
-    // addListener is absent pre-mount and in test mocks; NavigationRoot.onReady re-invokes once live.
-    if (!stateUnsubscribe && typeof navigationRef?.addListener === 'function') {
+    // Pre-mount addListener returns a queue-only unsubscribe; once the container forwards the listener it can't be detached. NavigationRoot's onReady/useEffect re-invoke once current is set.
+    if (!stateUnsubscribe && navigationRef?.current != null && typeof navigationRef?.addListener === 'function') {
         stateUnsubscribe = navigationRef.addListener('state', () => {
             if (typeof navigationRef.getRootState !== 'function') {
                 return;
