@@ -895,6 +895,14 @@ function getUpdatedTransaction({
         const updatedMileageRate = DistanceRequestUtils.getRate({transaction: updatedTransaction, policy, useTransactionDistanceUnit: false});
         const {unit, rate} = updatedMileageRate;
 
+        // Sync the stored distanceUnit to the policy's current unit. The user's input on the Manual
+        // tab is already in this unit; without writing it back, the optimistic state carries a stale
+        // unit (e.g. "miles" when the workspace switched to km) and the display stays wrong until the
+        // BE response — which never lands offline.
+        if (unit) {
+            lodashSet(updatedTransaction, 'comment.customUnit.distanceUnit', unit);
+        }
+
         const distanceInMeters = getDistanceInMeters(updatedTransaction, unit);
         let amount = DistanceRequestUtils.getDistanceRequestAmount(distanceInMeters, unit, rate ?? 0);
         amount = isFromExpenseReport || isUnReportedExpense ? -amount : amount;

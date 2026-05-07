@@ -192,7 +192,13 @@ function IOURequestStepDistance({
     const distanceUnit = mileageRate.unit;
     const distanceRate = mileageRate.rate ?? 0;
     const currentTransactionDistanceUnit = currentTransaction?.comment?.customUnit?.distanceUnit;
-    const distanceInMeters = getDistanceInMeters(currentTransaction, currentTransactionDistanceUnit ?? distanceUnit);
+    const currentDistanceInMeters = getDistanceInMeters(currentTransaction, currentTransactionDistanceUnit ?? distanceUnit);
+    // While a new route is in flight (the user added/edited a waypoint on the Map tab), `saveWaypoint`
+    // clears `customUnit.quantity` and `routes.route0.distance` to null, so `getDistanceInMeters` returns
+    // 0. Fall back to the pre-edit `transactionBackup` distance so switching to the Manual tab keeps
+    // showing the previous value instead of "0 mi" until the BE returns the new route.
+    const distanceInMeters =
+        currentDistanceInMeters > 0 ? currentDistanceInMeters : getDistanceInMeters(transactionBackup, transactionBackup?.comment?.customUnit?.distanceUnit ?? distanceUnit);
     const currentDistance = useMemo(
         () => (distanceInMeters > 0 ? roundToTwoDecimalPlaces(DistanceRequestUtils.convertDistanceUnit(distanceInMeters, distanceUnit)) : undefined),
         [distanceInMeters, distanceUnit],
@@ -330,8 +336,15 @@ function IOURequestStepDistance({
     }, [backTo]);
 
     const navigateBackAfterSave = useCallback(() => {
+        // When editing an individual split, the previous RHP screen is the edit-split page the user
+        // wants to return to — `closeRHPFlow` would tear it down too. Use `goBack` so the RHP stays
+        // open at the edit-split page.
+        if (isEditingSplit) {
+            Navigation.goBack(backTo);
+            return;
+        }
         Navigation.closeRHPFlow();
-    }, []);
+    }, [isEditingSplit, backTo]);
 
     /**
      * Takes the user to the page for editing a specific waypoint
@@ -571,6 +584,19 @@ function IOURequestStepDistance({
 
     const submitManualDistance = useCallback(() => {
         isManuallyEditing.current = false;
+
+        // For a map-based distance edit, require valid waypoints even when saving from the Manual tab.
+        // Without this, clearing waypoints on the Map tab and then saving on Manual would persist a
+        // half-broken transaction and surface "Please select a valid waypoint" only post-save. Surface
+        // the error inline on the Manual tab pointing the user back to the Map tab — the existing
+        // address-based copy ("at least two different addresses") would be confusing here since the
+        // Manual tab has no address inputs.
+        const wasOriginallyMapDistance = !isEmpty(transactionBackup?.comment?.waypoints);
+        if (wasOriginallyMapDistance && (duplicateWaypointsError || atLeastTwoDifferentWaypointsError || hasRouteError)) {
+            setManualFormError(translate('iou.error.fixWaypointsOnMapTab'));
+            return;
+        }
+
         const value = manualNumberFormRef.current?.getNumber() ?? '';
         if (!value.length || parseFloat(value) <= 0) {
             setManualFormError(translate('iou.error.invalidDistance'));
@@ -652,6 +678,9 @@ function IOURequestStepDistance({
         isASAPSubmitBetaEnabled,
         parentReportNextStep,
         recentWaypoints,
+        duplicateWaypointsError,
+        atLeastTwoDifferentWaypointsError,
+        hasRouteError,
     ]);
 
     const renderItem = useCallback(
