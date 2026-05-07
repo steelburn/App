@@ -193,10 +193,10 @@ describe('ChronosTimerHeaderButton', () => {
         // Then every rendered button reports a disabled accessibility state
         const buttons = screen.getAllByRole('button');
         expect(buttons.length).toBeGreaterThan(0);
-        buttons.forEach((btn) => {
+        for (const btn of buttons) {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- React test instance `.props` is typed as `unknown`; we read the rendered accessibilityState directly here
             expect(btn.props.accessibilityState?.disabled).toBe(true);
-        });
+        }
 
         // And pressing the main "Start Timer" button does not trigger addComment
         fireEvent.press(screen.getByText('Start Timer'));
@@ -228,6 +228,30 @@ describe('ChronosTimerHeaderButton', () => {
         expect(mockAddComment).not.toHaveBeenCalled();
     });
 
+    it('should not navigate to Schedule OOO from an already-open dropdown when OpenReport flips to in-progress', async () => {
+        // Given the report is already loaded and the dropdown menu is open with the Schedule OOO option visible
+        renderComponent();
+        await waitForBatchedUpdates();
+        fireEvent.press(getDropdownArrowButton());
+        await waitForBatchedUpdates();
+        await waitFor(() => {
+            expect(screen.getByTestId('PopoverMenuItem-Schedule OOO')).toBeOnTheScreen();
+        });
+
+        // When a background OpenReport for the same report kicks off
+        await Onyx.merge(`${ONYXKEYS.COLLECTION.RAM_ONLY_REPORT_LOADING_STATE}${TEST_REPORT_ID}`, {
+            isLoadingInitialReportActions: true,
+        });
+        await waitForBatchedUpdates();
+
+        // And the user selects the (already-visible) Schedule OOO item from the popover
+        fireEvent.press(screen.getByTestId('PopoverMenuItem-Schedule OOO'));
+        await waitForBatchedUpdates();
+
+        // Then Navigation.navigate is not called because the option is gated by the in-flight OpenReport
+        expect(mockNavigate).not.toHaveBeenCalled();
+    });
+
     it('should keep the button enabled while offline so queued start/stop comments are sent on reconnect', async () => {
         // Given the OpenReport API is optimistically in flight for this report
         // (its optimisticData sets isLoadingInitialReportActions=true)
@@ -246,10 +270,10 @@ describe('ChronosTimerHeaderButton', () => {
         // Then no rendered button is marked disabled via accessibility state
         const buttons = screen.getAllByRole('button');
         expect(buttons.length).toBeGreaterThan(0);
-        buttons.forEach((btn) => {
+        for (const btn of buttons) {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- React test instance `.props` is typed as `unknown`; we read the rendered accessibilityState directly here
             expect(btn.props.accessibilityState?.disabled).not.toBe(true);
-        });
+        }
 
         // And pressing the main "Start Timer" button still queues the start timer command
         fireEvent.press(screen.getByText('Start Timer'));
