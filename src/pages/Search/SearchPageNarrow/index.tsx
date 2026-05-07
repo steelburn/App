@@ -218,7 +218,13 @@ function SearchPageNarrow({
     // useFocusEffect avoids the extra re-renders that useIsFocused causes on every focus change.
     useFocusEffect(
         useCallback(() => {
-            if (!isHeaderInteractive || isInteractive) {
+            if (isInteractive) {
+                return;
+            }
+            if (!isHeaderInteractive) {
+                startTransition(() => {
+                    setIsHeaderInteractive(true);
+                });
                 return;
             }
             startTransition(() => {
