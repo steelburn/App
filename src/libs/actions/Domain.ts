@@ -2175,8 +2175,9 @@ function clearDomainGroupCreatePreferredPolicyID() {
  * @param domainAccountID - The account ID of the domain
  * @param newSecurityGroup - The security group data to create
  * @param shouldSetAsDefaultGroup - Whether we want to set newly created security group as the default
+ * @param previousDefaultGroupID - The current default group ID, used to revert on failure when shouldSetAsDefaultGroup is true
  */
-function createDomainSecurityGroup(domainAccountID: number, newSecurityGroup: DomainSecurityGroup, shouldSetAsDefaultGroup = false) {
+function createDomainSecurityGroup(domainAccountID: number, newSecurityGroup: DomainSecurityGroup, shouldSetAsDefaultGroup = false, previousDefaultGroupID?: string) {
     const groupID = String(Num.generateRandom6DigitID());
     const SECURITY_GROUP_KEY = `${CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX}${groupID}`;
 
@@ -2188,6 +2189,8 @@ function createDomainSecurityGroup(domainAccountID: number, newSecurityGroup: Do
             key: `${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`,
             value: {
                 [SECURITY_GROUP_KEY]: newSecurityGroup,
+                // eslint-disable-next-line @typescript-eslint/naming-convention
+                ...(shouldSetAsDefaultGroup && {domain_defaultSecurityGroupID: groupID}),
             } as PrefixedRecord<typeof CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX, DomainSecurityGroup>,
         },
         {
@@ -2218,6 +2221,8 @@ function createDomainSecurityGroup(domainAccountID: number, newSecurityGroup: Do
             key: `${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`,
             value: {
                 [SECURITY_GROUP_KEY]: newSecurityGroup,
+                // eslint-disable-next-line @typescript-eslint/naming-convention
+                ...(shouldSetAsDefaultGroup && {domain_defaultSecurityGroupID: previousDefaultGroupID}),
             } as PrefixedRecord<typeof CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX, DomainSecurityGroup>,
         },
         {

@@ -1319,7 +1319,17 @@ describe('actions/Domain', () => {
     });
 
     describe('createDomainSecurityGroup', () => {
-        it('sends UPDATE_DOMAIN_SECURITY_GROUP with correct optimistic, success, and failure data', () => {
+        const FIXED_GROUP_ID = '123456';
+
+        beforeEach(() => {
+            jest.spyOn(require('expensify-common').Num, 'generateRandom6DigitID').mockReturnValue(Number(FIXED_GROUP_ID));
+        });
+
+        afterEach(() => {
+            jest.restoreAllMocks();
+        });
+
+        it('sends CREATE_DOMAIN_SECURITY_GROUP with correct optimistic, success, and failure data', () => {
             const apiWriteSpy = jest.spyOn(require('@libs/API'), 'write').mockImplementation(() => Promise.resolve());
             const domainAccountID = 123;
             const newSecurityGroup: DomainSecurityGroup = {
@@ -1328,9 +1338,9 @@ describe('actions/Domain', () => {
                 enableRestrictedPolicyCreation: false,
                 enableRestrictedPrimaryLogin: false,
             };
+            const SECURITY_GROUP_KEY = `${CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX}${FIXED_GROUP_ID}`;
 
-            const groupID = createDomainSecurityGroup(domainAccountID, newSecurityGroup);
-            const SECURITY_GROUP_KEY = `${CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX}${groupID}`;
+            createDomainSecurityGroup(domainAccountID, newSecurityGroup);
 
             expect(apiWriteSpy).toHaveBeenCalledWith(
                 WRITE_COMMANDS.CREATE_DOMAIN_SECURITY_GROUP,
@@ -1377,8 +1387,42 @@ describe('actions/Domain', () => {
                     ]),
                 },
             );
+        });
 
-            apiWriteSpy.mockRestore();
+        it('optimistically sets domain_defaultSecurityGroupID to the new group when shouldSetAsDefaultGroup is true and reverts it on failure', () => {
+            const apiWriteSpy = jest.spyOn(require('@libs/API'), 'write').mockImplementation(() => Promise.resolve());
+            const domainAccountID = 123;
+            const previousDefaultGroupID = '999';
+            const newSecurityGroup: DomainSecurityGroup = {
+                name: 'Default Group',
+                shared: {},
+                enableRestrictedPolicyCreation: false,
+                enableRestrictedPrimaryLogin: false,
+            };
+            const SECURITY_GROUP_KEY = `${CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX}${FIXED_GROUP_ID}`;
+
+            createDomainSecurityGroup(domainAccountID, newSecurityGroup, true, previousDefaultGroupID);
+
+            expect(apiWriteSpy).toHaveBeenCalledWith(
+                WRITE_COMMANDS.CREATE_DOMAIN_SECURITY_GROUP,
+                {domainAccountID, name: SECURITY_GROUP_KEY, value: JSON.stringify(newSecurityGroup), shouldSetAsDefaultGroup: true},
+                expect.objectContaining({
+                    optimisticData: expect.arrayContaining([
+                        expect.objectContaining({
+                            key: `${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`,
+                            // eslint-disable-next-line @typescript-eslint/naming-convention
+                            value: expect.objectContaining({domain_defaultSecurityGroupID: FIXED_GROUP_ID}),
+                        }),
+                    ]),
+                    failureData: expect.arrayContaining([
+                        expect.objectContaining({
+                            key: `${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`,
+                            // eslint-disable-next-line @typescript-eslint/naming-convention
+                            value: expect.objectContaining({domain_defaultSecurityGroupID: previousDefaultGroupID}),
+                        }),
+                    ]),
+                }),
+            );
         });
     });
 

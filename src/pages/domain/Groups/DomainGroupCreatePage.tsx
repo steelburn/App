@@ -111,6 +111,7 @@ function DomainGroupCreatePage({route}: DomainGroupCreatePageProps) {
                                 overridePreferredPolicyWithCardPolicy: expensifyCardPreferredWorkspace,
                             },
                             defaultGroupForNewMembers,
+                            defaultSecurityGroupID,
                         );
                         clearDomainGroupCreatePreferredPolicyID();
                         Navigation.goBack(ROUTES.DOMAIN_GROUPS.getRoute(domainAccountID));
