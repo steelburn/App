@@ -133,7 +133,7 @@ function PrivatePersonalDetailsPage() {
 
         const stateValue = values[INPUT_IDS.STATE] || selectedState || '';
         const effectiveCountry = (values[INPUT_IDS.COUNTRY] || selectedCountry) ?? '';
-        if (effectiveCountry === CONST.COUNTRY.US && !stateValue) {
+        if (!stateValue.trim()) {
             errors[INPUT_IDS.STATE] = translate('common.error.fieldRequired');
         }
 
