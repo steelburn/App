@@ -80,6 +80,7 @@ function SelectFeedType() {
         {
             value: CONST.COMPANY_CARDS.FEED_TYPE.FILE_IMPORT,
             text: translate('workspace.companyCards.addNewCard.fileImport'),
+            alternateText: translate('workspace.companyCards.addNewCard.fileImportDescription'),
             keyForList: CONST.COMPANY_CARDS.FEED_TYPE.FILE_IMPORT,
             isSelected: typeSelected === CONST.COMPANY_CARDS.FEED_TYPE.FILE_IMPORT,
         },
