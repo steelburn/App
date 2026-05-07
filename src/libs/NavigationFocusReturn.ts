@@ -251,8 +251,6 @@ function restoreTriggerForRoute(routeKey: string): boolean {
         candidates.push(entry.fallback);
     }
 
-    // focusVisible: Chromium/Firefox only (missing from lib.dom.d.ts); Safari's :focus-visible heuristic aligns.
-    // @ts-expect-error -- focusVisible isn't in FocusOptions yet.
     const focusOptions: FocusOptions = {preventScroll: true, focusVisible: getHadTabNavigation()};
     for (const candidate of candidates) {
         const before = document.activeElement;
@@ -342,11 +340,14 @@ function handleStateChange(newState: NavigationState | undefined): void {
     if (!newState) {
         return;
     }
-    // A stale return-hold timer would reset the new cycle's priority.
-    cancelReturnHoldRelease();
-    lastRestoreTarget = null;
-    resetCycle();
     const {action, removedKeys} = diffNavigationState(prevState, newState);
+
+    // noop (e.g. setParams on focused route): preserve in-flight RETURN hold + AUTO claim so a deferred restore can still complete.
+    if (action.type !== 'noop') {
+        cancelReturnHoldRelease();
+        lastRestoreTarget = null;
+        resetCycle();
+    }
 
     if (action.type === 'forward') {
         cancelPendingRestore();
@@ -357,7 +358,6 @@ function handleStateChange(newState: NavigationState | undefined): void {
         // Stale restore would steal focus back on sibling nav.
         cancelPendingRestore();
     }
-    // noop (e.g. setParams on same route): leave pending restore intact.
 
     for (const key of removedKeys) {
         triggerMap.delete(key);

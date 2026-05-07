@@ -119,14 +119,22 @@ function addPushParamsRouterExtension<RouterOptions extends PlatformStackRouterO
         // lastIndex is ambiguous for duplicates (A→B→A), so we track cursor explicitly. Per-router so tests stay isolated.
         let pushParamsHistoryPosition = -1;
 
+        // Without seeding, the first reflexive RESET before any PUSH_PARAMS hits inRange=false and is classified as 'forward', cancelling pending Esc-triggered restores.
+        const seedCursor = (state: ReturnType<typeof enhanceStateWithHistory>) => {
+            if (pushParamsHistoryPosition < 0 && state?.history?.length) {
+                pushParamsHistoryPosition = state.history.length - 1;
+            }
+            return state;
+        };
+
         const getInitialState = (configOptions: RouterConfigOptions) => {
             const state = router.getInitialState(configOptions);
-            return enhanceStateWithHistory(state);
+            return seedCursor(enhanceStateWithHistory(state));
         };
 
         const getRehydratedState = (partialState: PartialState<PlatformStackNavigationState<ParamListBase>>, configOptions: RouterConfigOptions) => {
             const state = router.getRehydratedState(partialState, configOptions);
-            return enhanceStateWithHistory(state);
+            return seedCursor(enhanceStateWithHistory(state));
         };
 
         const getStateForAction = (

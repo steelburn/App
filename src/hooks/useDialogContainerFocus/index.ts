@@ -20,8 +20,6 @@ function focusFirstInteractiveElement(container: HTMLElement | null): boolean {
     if (!tryClaim(Priorities.INITIAL)) {
         return false;
     }
-    // focusVisible: Chromium/Firefox only (missing from lib.dom.d.ts); Safari's :focus-visible heuristic aligns.
-    // @ts-expect-error -- focusVisible isn't in FocusOptions yet.
     target.focus({preventScroll: true, focusVisible: true});
     return true;
 }
