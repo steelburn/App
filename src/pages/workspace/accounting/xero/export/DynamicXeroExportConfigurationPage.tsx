@@ -6,7 +6,6 @@ import useDynamicBackPath from '@hooks/useDynamicBackPath';
 import useLocalize from '@hooks/useLocalize';
 import useThemeStyles from '@hooks/useThemeStyles';
 import createDynamicRoute from '@libs/Navigation/helpers/dynamicRoutesUtils/createDynamicRoute';
-import replaceCompanyCardsRoute from '@libs/Navigation/helpers/replaceCompanyCardsRoute';
 import Navigation from '@libs/Navigation/Navigation';
 import {areSettingsInErrorFields, getCurrentXeroOrganizationName, settingsPendingAction} from '@libs/PolicyUtils';
 import type {WithPolicyConnectionsProps} from '@pages/workspace/withPolicyConnections';
@@ -87,7 +86,7 @@ function DynamicXeroExportConfigurationPage({policy}: WithPolicyConnectionsProps
             title="workspace.xero.exportDescription"
             accessVariants={[CONST.POLICY.ACCESS_VARIANTS.ADMIN]}
             policyID={policyID}
-            onBackButtonPress={() => Navigation.goBack(replaceCompanyCardsRoute(dynamicBackPath))}
+            onBackButtonPress={() => Navigation.goBack(dynamicBackPath)}
             featureName={CONST.POLICY.MORE_FEATURES.ARE_CONNECTIONS_ENABLED}
             contentContainerStyle={styles.pb2}
             titleStyle={styles.ph5}
