@@ -88,68 +88,68 @@ function IOURequestStepCategoryCreate({
     } = useOnboardingTaskInformation(CONST.ONBOARDING_TASK_TYPE.SETUP_CATEGORIES_AND_TAGS);
 
     const createCategory = (values: FormOnyxValues<typeof ONYXKEYS.FORMS.WORKSPACE_CATEGORY_FORM>) => {
-            const categoryName = values.categoryName.trim();
+        const categoryName = values.categoryName.trim();
 
-            if (!policyID) {
-                return;
-            }
+        if (!policyID) {
+            return;
+        }
 
-            // 1. Create the category in the workspace (optimistic update, queued API call).
-            createPolicyCategory({
-                policyID,
-                categoryName,
-                isSetupCategoriesTaskParentReportArchived: isSetupCategoryTaskParentReportArchived,
-                setupCategoryTaskReport,
-                setupCategoryTaskParentReport,
-                currentUserAccountID: currentUserPersonalDetails.accountID,
-                hasOutstandingChildTask,
-                parentReportAction,
-                setupCategoriesAndTagsTaskReport,
-                setupCategoriesAndTagsTaskParentReport,
-                isSetupCategoriesAndTagsTaskParentReportArchived,
-                setupCategoriesAndTagsHasOutstandingChildTask,
-                setupCategoriesAndTagsParentReportAction,
-                policyHasTags,
+        // 1. Create the category in the workspace (optimistic update, queued API call).
+        createPolicyCategory({
+            policyID,
+            categoryName,
+            isSetupCategoriesTaskParentReportArchived: isSetupCategoryTaskParentReportArchived,
+            setupCategoryTaskReport,
+            setupCategoryTaskParentReport,
+            currentUserAccountID: currentUserPersonalDetails.accountID,
+            hasOutstandingChildTask,
+            parentReportAction,
+            setupCategoriesAndTagsTaskReport,
+            setupCategoriesAndTagsTaskParentReport,
+            isSetupCategoriesAndTagsTaskParentReportArchived,
+            setupCategoriesAndTagsHasOutstandingChildTask,
+            setupCategoriesAndTagsParentReportAction,
+            policyHasTags,
+        });
+
+        // 2. Apply the newly created category to the transaction.
+        const policyCategoriesWithNewCategory = {
+            ...policyCategories,
+            [categoryName]: {
+                name: categoryName,
+                enabled: true,
+                errors: null,
+                pendingAction: CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD,
+            },
+        };
+
+        if (isEditingSplit && transaction) {
+            setDraftSplitTransaction(transaction.transactionID, splitDraftTransaction, {category: categoryName}, policy);
+        } else if (isEditing && report) {
+            updateMoneyRequestCategory({
+                transactionID: transaction?.transactionID ?? transactionID,
+                transactionThreadReport: report,
+                parentReport,
+                parentReportNextStep,
+                category: categoryName,
+                policy,
+                policyTagList: policyTags,
+                policyCategories: policyCategoriesWithNewCategory,
+                policyRecentlyUsedCategories,
+                currentUserAccountIDParam: currentUserPersonalDetails.accountID,
+                currentUserEmailParam: currentUserPersonalDetails.login ?? '',
+                isASAPSubmitBetaEnabled,
+                hash: currentSearchHash,
             });
+        } else {
+            setMoneyRequestCategory(transactionID, categoryName, policy);
+        }
 
-            // 2. Apply the newly created category to the transaction.
-            const policyCategoriesWithNewCategory = {
-                ...policyCategories,
-                [categoryName]: {
-                    name: categoryName,
-                    enabled: true,
-                    errors: null,
-                    pendingAction: CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD,
-                },
-            };
-
-            if (isEditingSplit && transaction) {
-                setDraftSplitTransaction(transaction.transactionID, splitDraftTransaction, {category: categoryName}, policy);
-            } else if (isEditing && report) {
-                updateMoneyRequestCategory({
-                    transactionID: transaction?.transactionID ?? transactionID,
-                    transactionThreadReport: report,
-                    parentReport,
-                    parentReportNextStep,
-                    category: categoryName,
-                    policy,
-                    policyTagList: policyTags,
-                    policyCategories: policyCategoriesWithNewCategory,
-                    policyRecentlyUsedCategories,
-                    currentUserAccountIDParam: currentUserPersonalDetails.accountID,
-                    currentUserEmailParam: currentUserPersonalDetails.login ?? '',
-                    isASAPSubmitBetaEnabled,
-                    hash: currentSearchHash,
-                });
-            } else {
-                setMoneyRequestCategory(transactionID, categoryName, policy);
-            }
-
-            if (!isEditing && action === CONST.IOU.ACTION.CATEGORIZE && !backTo) {
-                Navigation.navigate(ROUTES.MONEY_REQUEST_STEP_CONFIRMATION.getRoute(action, iouType, transactionID, report?.reportID ?? reportID));
-                return;
-            }
-            Navigation.goBack(backTo);
+        if (!isEditing && action === CONST.IOU.ACTION.CATEGORIZE && !backTo) {
+            Navigation.navigate(ROUTES.MONEY_REQUEST_STEP_CONFIRMATION.getRoute(action, iouType, transactionID, report?.reportID ?? reportID));
+            return;
+        }
+        Navigation.goBack(backTo);
     };
 
     return (
