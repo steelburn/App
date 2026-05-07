@@ -204,6 +204,30 @@ describe('ChronosTimerHeaderButton', () => {
         expect(mockAddComment).not.toHaveBeenCalled();
     });
 
+    it('should not send a start timer command from an already-open dropdown when OpenReport flips to in-progress', async () => {
+        // Given the report is already loaded and the dropdown menu is open with the Start Timer option visible
+        renderComponent();
+        await waitForBatchedUpdates();
+        fireEvent.press(getDropdownArrowButton());
+        await waitForBatchedUpdates();
+        await waitFor(() => {
+            expect(screen.getByTestId('PopoverMenuItem-Start Timer')).toBeOnTheScreen();
+        });
+
+        // When a background OpenReport for the same report kicks off (e.g. from a remount of the report list)
+        await Onyx.merge(`${ONYXKEYS.COLLECTION.RAM_ONLY_REPORT_LOADING_STATE}${TEST_REPORT_ID}`, {
+            isLoadingInitialReportActions: true,
+        });
+        await waitForBatchedUpdates();
+
+        // And the user selects the (already-visible) Start Timer item from the popover
+        fireEvent.press(screen.getByTestId('PopoverMenuItem-Start Timer'));
+        await waitForBatchedUpdates();
+
+        // Then addComment is not called because the option is gated by the in-flight OpenReport
+        expect(mockAddComment).not.toHaveBeenCalled();
+    });
+
     it('should keep the button enabled while offline so queued start/stop comments are sent on reconnect', async () => {
         // Given the OpenReport API is optimistically in flight for this report
         // (its optimisticData sets isLoadingInitialReportActions=true)

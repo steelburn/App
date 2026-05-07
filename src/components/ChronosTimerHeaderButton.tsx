@@ -83,12 +83,24 @@ function ChronosTimerHeaderButton({report}: ChronosTimerHeaderButtonProps) {
         {
             value: 'timer' as const,
             text: translate(isTimerRunning ? 'chronos.stopTimer' : 'chronos.startTimer'),
-            onSelected: () => callFunctionIfActionIsAllowed(sendCommentToChronos)(),
+            disabled: shouldDisableButton,
+            onSelected: () => {
+                if (shouldDisableButton) {
+                    return;
+                }
+                callFunctionIfActionIsAllowed(sendCommentToChronos)();
+            },
         },
         {
             value: 'scheduleOOO' as const,
             text: translate('chronos.scheduleOOO'),
-            onSelected: () => Navigation.navigate(ROUTES.CHRONOS_SCHEDULE_OOO.getRoute(report.reportID)),
+            disabled: shouldDisableButton,
+            onSelected: () => {
+                if (shouldDisableButton) {
+                    return;
+                }
+                Navigation.navigate(ROUTES.CHRONOS_SCHEDULE_OOO.getRoute(report.reportID));
+            },
             shouldUpdateSelectedIndex: false,
         },
     ];
