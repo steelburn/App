@@ -126,6 +126,7 @@ function OnboardingModalNavigator() {
                             <Stack.Screen
                                 name={SCREENS.ONBOARDING.PURPOSE}
                                 component={OnboardingPurpose}
+                                options={{animationTypeForReplace: 'push'}}
                             />
                             <Stack.Screen
                                 name={SCREENS.ONBOARDING.PERSONAL_DETAILS}
