@@ -303,16 +303,27 @@ function cloneCustomUnitWithNewIDs(unit: CustomUnit, newCustomUnitID: string, ne
         // The server-side DUPLICATE_POLICY assigns newDefaultRateID to the source's default rate.
         // Mirror getDefaultMileageRate's selection (enabled rates, sorted by index with
         // CONST.DEFAULT_NUMBER_ID for missing indexes) so the optimistic clone aligns with the
-        // rate the expense flow will later treat as default. Other source rates get fresh server
-        // IDs, so we drop them from the optimistic state to avoid stale duplicates.
+        // rate the expense flow will later treat as default. Non-default rates keep their source
+        // IDs so they remain visible offline; successData clears them after the API succeeds so
+        // the server response can repopulate with fresh server IDs without leaving duplicates.
         const defaultRate = Object.values(unit.rates)
             .filter((rate) => rate.enabled !== false)
             .sort((a, b) => (a.index ?? CONST.DEFAULT_NUMBER_ID) - (b.index ?? CONST.DEFAULT_NUMBER_ID))
             .at(0);
+        const rates: Record<string, Rate> = {};
+        for (const rate of Object.values(unit.rates)) {
+            if (rate.customUnitRateID === defaultRate?.customUnitRateID) {
+                continue;
+            }
+            rates[rate.customUnitRateID] = rate;
+        }
+        if (defaultRate) {
+            rates[newDefaultRateID] = {...defaultRate, customUnitRateID: newDefaultRateID};
+        }
         return {
             ...unit,
             customUnitID: newCustomUnitID,
-            rates: defaultRate ? {[newDefaultRateID]: {...defaultRate, customUnitRateID: newDefaultRateID}} : {},
+            rates,
         };
     }
 

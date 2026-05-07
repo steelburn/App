@@ -3236,6 +3236,22 @@ function buildDuplicatePolicyData(policy: Policy, options: DuplicatePolicyDataOp
     const {customUnitID: distanceCustomUnitID, customUnitRateID} = buildOptimisticDistanceRateCustomUnits(outputCurrency);
     const perDiemCustomUnitID = generateCustomUnitID();
 
+    // Source non-default distance rate IDs — kept in optimistic data so they're visible offline,
+    // then nulled in successData so the server's Pusher response can repopulate with fresh server
+    // IDs without leaving optimistic-vs-server duplicates.
+    const sourceDistanceUnit = Object.values(policy?.customUnits ?? {}).find((unit) => unit.name === CONST.CUSTOM_UNITS.NAME_DISTANCE);
+    const sourceDistanceDefaultRate = sourceDistanceUnit
+        ? Object.values(sourceDistanceUnit.rates)
+              .filter((rate) => rate.enabled !== false)
+              .sort((a, b) => (a.index ?? CONST.DEFAULT_NUMBER_ID) - (b.index ?? CONST.DEFAULT_NUMBER_ID))
+              .at(0)
+        : undefined;
+    const sourceNonDefaultDistanceRateIDs = sourceDistanceUnit
+        ? Object.values(sourceDistanceUnit.rates)
+              .filter((rate) => rate.customUnitRateID !== sourceDistanceDefaultRate?.customUnitRateID)
+              .map((rate) => rate.customUnitRateID)
+        : [];
+
     const optimisticAnnounceChat = ReportUtils.buildOptimisticAnnounceChat(targetPolicyID, [...policyMemberAccountIDs], currentUserAccountID);
     const announceRoomChat = optimisticAnnounceChat.announceChatData;
 
@@ -3351,6 +3367,13 @@ function buildDuplicatePolicyData(policy: Policy, options: DuplicatePolicyDataOp
                     type: null,
                     areReportFieldsEnabled: null,
                 },
+                ...(sourceNonDefaultDistanceRateIDs.length > 0 && {
+                    customUnits: {
+                        [distanceCustomUnitID]: {
+                            rates: Object.fromEntries(sourceNonDefaultDistanceRateIDs.map((id) => [id, null])),
+                        },
+                    },
+                }),
             },
         },
         {

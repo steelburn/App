@@ -352,7 +352,7 @@ describe('PolicyUtils', () => {
             ).toBeUndefined();
         });
 
-        it('clones the source default rate (lowest enabled index) under the API-known customUnitRateID', () => {
+        it('rebinds the default rate to the API-known customUnitRateID and keeps non-default rates with their source IDs', () => {
             const distanceUnitWithMultipleRates = {
                 customUnitID: 'srcDist',
                 name: CONST.CUSTOM_UNITS.NAME_DISTANCE,
@@ -377,13 +377,14 @@ describe('PolicyUtils', () => {
                     ...distanceUnitWithMultipleRates,
                     customUnitID: 'newDist',
                     rates: {
+                        rateB: {customUnitRateID: 'rateB', name: 'New Rate 1', rate: 100, currency: 'USD', enabled: true, index: 1, attributes: {taxRateExternalID: 'tax_other'}},
                         newRate: {customUnitRateID: 'newRate', name: 'Default Rate', rate: 70, currency: 'USD', enabled: true, index: 0, attributes: {taxRateExternalID: 'tax_default'}},
                     },
                 },
             });
         });
 
-        it('drops all rates when no enabled rate exists', () => {
+        it('keeps source rates with their source IDs when no enabled rate exists', () => {
             const distanceUnitAllDisabled = {
                 customUnitID: 'srcDist',
                 name: CONST.CUSTOM_UNITS.NAME_DISTANCE,
@@ -402,7 +403,9 @@ describe('PolicyUtils', () => {
                 perDiemCustomUnitID: 'newPerDiem',
                 customUnitRateID: 'newRate',
             });
-            expect(result?.newDist.rates).toEqual({});
+            expect(result?.newDist.rates).toEqual({
+                rateA: {customUnitRateID: 'rateA', name: 'Disabled', rate: 50, currency: 'USD', enabled: false, index: 0},
+            });
         });
 
         it('treats missing index as 0 when picking the default rate', () => {
@@ -426,6 +429,7 @@ describe('PolicyUtils', () => {
                 customUnitRateID: 'newRate',
             });
             expect(result?.newDist.rates).toEqual({
+                rateB: {customUnitRateID: 'rateB', name: 'Indexed Rate', rate: 100, currency: 'USD', enabled: true, index: 1},
                 newRate: {customUnitRateID: 'newRate', name: 'No-Index Rate', rate: 70, currency: 'USD', enabled: true},
             });
         });
