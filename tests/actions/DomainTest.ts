@@ -1,3 +1,4 @@
+import {Num} from 'expensify-common';
 import Onyx from 'react-native-onyx';
 import {
     addAdminToDomain,
@@ -1114,7 +1115,7 @@ describe('actions/Domain', () => {
                     optimisticData: expect.arrayContaining([
                         expect.objectContaining({
                             key: `${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`,
-                            value: {[SECURITY_GROUP_KEY]: {pendingAction: CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE}},
+                            value: {[SECURITY_GROUP_KEY]: {deleteGroup: CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE}},
                         }),
                         expect.objectContaining({
                             key: `${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`,
@@ -1139,7 +1140,7 @@ describe('actions/Domain', () => {
                         }),
                         expect.objectContaining({
                             key: `${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`,
-                            value: {[SECURITY_GROUP_KEY]: {pendingAction: null}},
+                            value: {[SECURITY_GROUP_KEY]: {deleteGroup: null}},
                         }),
                         expect.objectContaining({
                             key: `${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`,
@@ -1160,7 +1161,7 @@ describe('actions/Domain', () => {
                     failureData: expect.arrayContaining([
                         expect.objectContaining({
                             key: `${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`,
-                            value: {[SECURITY_GROUP_KEY]: {pendingAction: null}},
+                            value: {[SECURITY_GROUP_KEY]: {deleteGroup: null}},
                         }),
                         expect.objectContaining({
                             key: `${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`,
@@ -1322,7 +1323,7 @@ describe('actions/Domain', () => {
         const FIXED_GROUP_ID = '123456';
 
         beforeEach(() => {
-            jest.spyOn(require('expensify-common').Num, 'generateRandom6DigitID').mockReturnValue(Number(FIXED_GROUP_ID));
+            jest.spyOn(Num, 'generateRandom6DigitID').mockReturnValue(Number(FIXED_GROUP_ID));
         });
 
         afterEach(() => {

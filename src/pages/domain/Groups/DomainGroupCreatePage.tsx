@@ -2,7 +2,6 @@ import {defaultSecurityGroupIDSelector, domainNameSelector} from '@selectors/Dom
 import {createAdminPoliciesSelector, policyNameSelector} from '@selectors/Policy';
 import React, {useEffect, useRef, useState} from 'react';
 import {View} from 'react-native';
-import ConfirmModal from '@components/ConfirmModal';
 import FormProvider from '@components/Form/FormProvider';
 import InputWrapper from '@components/Form/InputWrapper';
 import type {FormOnyxValues} from '@components/Form/types';
@@ -12,6 +11,7 @@ import type {AnimatedTextInputRef} from '@components/RNTextInput';
 import ScreenWrapper from '@components/ScreenWrapper';
 import Text from '@components/Text';
 import TextInput from '@components/TextInput';
+import useConfirmModal from '@hooks/useConfirmModal';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
@@ -21,7 +21,7 @@ import type {PlatformStackScreenProps} from '@navigation/PlatformStackNavigation
 import type {SettingsNavigatorParamList} from '@navigation/types';
 import DomainNotFoundPageWrapper from '@pages/domain/DomainNotFoundPageWrapper';
 import ToggleSettingOptionRow from '@pages/workspace/workflows/ToggleSettingsOptionRow';
-import {clearDomainGroupCreatePreferredPolicyID, createDomainSecurityGroup, setDefaultSecurityGroup, setDomainGroupCreatePreferredPolicyID} from '@userActions/Domain';
+import {clearDomainGroupCreatePreferredPolicyID, createDomainSecurityGroup, setDomainGroupCreatePreferredPolicyID} from '@userActions/Domain';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
@@ -43,15 +43,12 @@ function DomainGroupCreatePage({route}: DomainGroupCreatePageProps) {
     const [restrictExpenseWorkspaceCreation, setRestrictExpenseWorkspaceCreation] = useState(false);
     const [expensifyCardPreferredWorkspace, setExpensifyCardPreferredWorkspace] = useState(false);
     const [preferredWorkspace, setPreferredWorkspace] = useState(false);
-    const [isNoWorkspacesModalVisible, setIsNoWorkspacesModalVisible] = useState(false);
-    const [isExpensifyCardDisabledModalVisible, setIsExpensifyCardDisabledModalVisible] = useState(false);
+
+    const {showConfirmModal} = useConfirmModal();
 
     const [preferredPolicyID] = useOnyx(ONYXKEYS.DOMAIN_GROUP_CREATE_PREFERRED_POLICY_ID);
     const [preferredPolicyName] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${preferredPolicyID}`, {
         selector: policyNameSelector,
-    });
-    const [domainName] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {
-        selector: domainNameSelector,
     });
     const [defaultSecurityGroupID] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {
         selector: defaultSecurityGroupIDSelector,
@@ -176,7 +173,14 @@ function DomainGroupCreatePage({route}: DomainGroupCreatePageProps) {
                         switchAccessibilityLabel={translate('domain.groups.preferredWorkspace')}
                         isActive={preferredWorkspace}
                         disabled={!hasAdminPolicies}
-                        disabledAction={() => setIsNoWorkspacesModalVisible(true)}
+                        disabledAction={() => {
+                            showConfirmModal({
+                                title: translate('workspace.distanceRates.oopsNotSoFast'),
+                                prompt: translate('domain.groups.noWorkspacesMessage'),
+                                confirmText: translate('common.buttonConfirm'),
+                                shouldShowCancelButton: false,
+                            });
+                        }}
                         onToggle={(value) => {
                             setPreferredWorkspace(value);
                             if (value) {
@@ -190,15 +194,6 @@ function DomainGroupCreatePage({route}: DomainGroupCreatePageProps) {
                         }}
                         wrapperStyle={[styles.ph5, styles.mv3]}
                         shouldPlaceSubtitleBelowSwitch
-                    />
-                    <ConfirmModal
-                        onConfirm={() => setIsNoWorkspacesModalVisible(false)}
-                        onCancel={() => setIsNoWorkspacesModalVisible(false)}
-                        isVisible={isNoWorkspacesModalVisible}
-                        title={translate('workspace.distanceRates.oopsNotSoFast')}
-                        prompt={translate('domain.groups.noWorkspacesMessage')}
-                        confirmText={translate('common.buttonConfirm')}
-                        shouldShowCancelButton={false}
                     />
                     {hasAdminPolicies && (
                         <MenuItemWithTopDescription
@@ -215,19 +210,17 @@ function DomainGroupCreatePage({route}: DomainGroupCreatePageProps) {
                         switchAccessibilityLabel={translate('domain.groups.expensifyCardPreferredWorkspace')}
                         isActive={expensifyCardPreferredWorkspace}
                         disabled={!preferredWorkspace || !isDomainUsingExpensifyCard}
-                        disabledAction={() => setIsExpensifyCardDisabledModalVisible(true)}
+                        disabledAction={() => {
+                            showConfirmModal({
+                                title: translate('workspace.distanceRates.oopsNotSoFast'),
+                                prompt: translate('domain.groups.expensifyCardPreferredWorkspaceDisabledMessage'),
+                                confirmText: translate('common.buttonConfirm'),
+                                shouldShowCancelButton: false,
+                            });
+                        }}
                         onToggle={setExpensifyCardPreferredWorkspace}
                         wrapperStyle={[styles.ph5, styles.mv3]}
                         shouldPlaceSubtitleBelowSwitch
-                    />
-                    <ConfirmModal
-                        onConfirm={() => setIsExpensifyCardDisabledModalVisible(false)}
-                        onCancel={() => setIsExpensifyCardDisabledModalVisible(false)}
-                        isVisible={isExpensifyCardDisabledModalVisible}
-                        title={translate('workspace.distanceRates.oopsNotSoFast')}
-                        prompt={translate('domain.groups.expensifyCardPreferredWorkspaceDisabledMessage')}
-                        confirmText={translate('common.buttonConfirm')}
-                        shouldShowCancelButton={false}
                     />
                 </FormProvider>
             </ScreenWrapper>

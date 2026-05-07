@@ -106,24 +106,6 @@ const policyMapper = (policy: OnyxEntry<Policy>): PolicySelector =>
         areInvoicesEnabled: policy.areInvoicesEnabled,
     }) as PolicySelector;
 
-const policyNameSelector = (policy: OnyxEntry<Policy>) => policy?.name;
-
-const createAdminPoliciesSelector =
-    (currentPolicyID: string | undefined = undefined) =>
-    (policies: OnyxCollection<Policy>) => {
-        return Object.entries(policies ?? {}).reduce<Record<string, Pick<Policy, 'name' | 'id' | 'avatarURL' | 'created'>>>((acc, [key, policy]) => {
-            if (!policy?.id || !policy?.name) {
-                return acc;
-            }
-            const isCurrentPolicy = policy.id === currentPolicyID;
-            if (!isCurrentPolicy && (policy.type === CONST.POLICY.TYPE.PERSONAL || policy.role !== CONST.POLICY.ROLE.ADMIN)) {
-                return acc;
-            }
-            acc[key] = {id: policy.id, name: policy.name, avatarURL: policy.avatarURL, created: policy.created};
-            return acc;
-        }, {});
-    };
-
 // deepEqual on ~15 fields is cheaper than re-rendering IOURequestStartPage's full hook/memo tree.
 const iouRequestPolicyCollectionSelector = (policies: OnyxCollection<Policy>): OnyxCollection<Policy> => {
     if (!policies) {
@@ -229,6 +211,24 @@ function lastWorkspaceNumberSelector(policies: OnyxCollection<Policy>, email: st
 
     return lastWorkspaceNumber;
 }
+
+const policyNameSelector = (policy: OnyxEntry<Policy>) => policy?.name;
+
+const createAdminPoliciesSelector =
+    (currentPolicyID: string | undefined = undefined) =>
+    (policies: OnyxCollection<Policy>) => {
+        return Object.entries(policies ?? {}).reduce<Record<string, Pick<Policy, 'name' | 'id' | 'avatarURL' | 'created'>>>((acc, [key, policy]) => {
+            if (!policy?.id || !policy?.name) {
+                return acc;
+            }
+            const isCurrentPolicy = policy.id === currentPolicyID;
+            if (!isCurrentPolicy && (policy.type === CONST.POLICY.TYPE.PERSONAL || policy.role !== CONST.POLICY.ROLE.ADMIN)) {
+                return acc;
+            }
+            acc[key] = {id: policy.id, name: policy.name, avatarURL: policy.avatarURL, created: policy.created};
+            return acc;
+        }, {});
+    };
 
 export type {PolicySelector};
 export {
