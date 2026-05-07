@@ -259,17 +259,21 @@ function IOURequestStepDistanceOdometer({
         const startValue = currentStart !== null && currentStart !== undefined ? currentStart.toString() : '';
         const endValue = currentEnd !== null && currentEnd !== undefined ? currentEnd.toString() : '';
 
+        // External resync: txn was edited elsewhere with no in-flight typing here, making it the new baseline.
+        const isExternalResync =
+            hasTransactionData && hasInitializedRefs.current && !userHasUnsavedTypingRef.current && (startValue !== startReadingRef.current || endValue !== endReadingRef.current);
+
         // Only initialize if:
         // 1. We haven't initialized yet AND transaction has data, OR
         // 2. We're editing and transaction has data (to load existing values), OR
         // 3. Transaction has data but local state is empty (user navigated back from another page), OR
-        // 4. An external update arrived (e.g. the user edited readings via the confirmation page's
-        //    distance edit) - the typing-flag guard avoids clobbering in-progress keystrokes here.
+        // 4. An external resync arrived - the typing-flag inside isExternalResync avoids clobbering
+        //    in-progress keystrokes here.
         const shouldInitialize =
             (!hasInitializedRefs.current && hasTransactionData) ||
             (isEditing && hasTransactionData && !hasLocalState) ||
             (hasTransactionData && !hasLocalState && hasInitializedRefs.current) ||
-            (hasTransactionData && hasInitializedRefs.current && !userHasUnsavedTypingRef.current && (startValue !== startReadingRef.current || endValue !== endReadingRef.current));
+            isExternalResync;
 
         if (shouldInitialize) {
             if (startValue || endValue) {
@@ -278,6 +282,12 @@ function IOURequestStepDistanceOdometer({
                 startReadingRef.current = startValue;
                 endReadingRef.current = endValue;
             }
+        }
+
+        // Slide the discard-changes baseline up so leaving doesn't flag the externally-saved value as unsaved
+        if (isExternalResync) {
+            initialStartReadingRef.current = startValue;
+            initialEndReadingRef.current = endValue;
         }
     }, [currentTransaction?.comment?.odometerStart, currentTransaction?.comment?.odometerEnd, isEditing]);
 
