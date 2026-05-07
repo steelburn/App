@@ -151,21 +151,19 @@ function useSearchFiltersBar(queryJSON: SearchQueryJSON): UseSearchFiltersBarRes
             sentryLabel: getFilterSentryLabel(filterKey),
             onClosePress: () => {
                 if (isAmountFilterKey(filterKey)) {
-                    updateFilterForm({
-                        [`${filterKey}${CONST.SEARCH.AMOUNT_MODIFIERS.EQUAL_TO}`]: undefined,
-                        [`${filterKey}${CONST.SEARCH.AMOUNT_MODIFIERS.GREATER_THAN}`]: undefined,
-                        [`${filterKey}${CONST.SEARCH.AMOUNT_MODIFIERS.LESS_THAN}`]: undefined,
-                    });
+                    const equalToKey = `${filterKey}${CONST.SEARCH.AMOUNT_MODIFIERS.EQUAL_TO}`;
+                    const greaterThanKey = `${filterKey}${CONST.SEARCH.AMOUNT_MODIFIERS.EQUAL_TO}`;
+                    const lessThanKey = `${filterKey}${CONST.SEARCH.AMOUNT_MODIFIERS.EQUAL_TO}`;
+                    updateFilterForm({[equalToKey]: undefined, [greaterThanKey]: undefined, [lessThanKey]: undefined});
                     return;
                 }
 
                 if (isDateFilterKey(filterKey)) {
-                    updateFilterForm({
-                        [`${filterKey}${CONST.SEARCH.DATE_MODIFIERS.ON}`]: undefined,
-                        [`${filterKey}${CONST.SEARCH.DATE_MODIFIERS.BEFORE}`]: undefined,
-                        [`${filterKey}${CONST.SEARCH.DATE_MODIFIERS.AFTER}`]: undefined,
-                        [`${filterKey}${CONST.SEARCH.DATE_MODIFIERS.RANGE}`]: undefined,
-                    });
+                    const onKey = `${filterKey}${CONST.SEARCH.DATE_MODIFIERS.ON}`;
+                    const beforeKey = `${filterKey}${CONST.SEARCH.DATE_MODIFIERS.ON}`;
+                    const afterKey = `${filterKey}${CONST.SEARCH.DATE_MODIFIERS.ON}`;
+                    const rangeKey = `${filterKey}${CONST.SEARCH.DATE_MODIFIERS.ON}`;
+                    updateFilterForm({[onKey]: undefined, [beforeKey]: undefined, [afterKey]: undefined, [rangeKey]: undefined});
                     return;
                 }
 
