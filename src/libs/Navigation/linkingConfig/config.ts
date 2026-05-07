@@ -1619,6 +1619,13 @@ const config: LinkingOptions<RootNavigatorParamList>['config'] = {
                         [SCREENS.WORKSPACE_DUPLICATE.SELECT_FEATURES]: ROUTES.WORKSPACE_DUPLICATE_SELECT_FEATURES.route,
                     },
                 },
+                [SCREENS.RIGHT_MODAL.POLICY_COPY_SETTINGS]: {
+                    screens: {
+                        [SCREENS.POLICY_COPY_SETTINGS.ROOT]: ROUTES.POLICY_COPY_SETTINGS.route,
+                        [SCREENS.POLICY_COPY_SETTINGS.SELECT_FEATURES]: ROUTES.POLICY_COPY_SETTINGS_SELECT_FEATURES.route,
+                        [SCREENS.POLICY_COPY_SETTINGS.CONFIRM]: ROUTES.POLICY_COPY_SETTINGS_CONFIRM.route,
+                    },
+                },
                 [SCREENS.RIGHT_MODAL.NEW_TASK]: {
                     screens: {
                         [SCREENS.NEW_TASK.ROOT]: ROUTES.NEW_TASK.route,
