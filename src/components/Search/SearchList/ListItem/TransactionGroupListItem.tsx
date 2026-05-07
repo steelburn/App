@@ -210,7 +210,7 @@ function TransactionGroupListItem<TItem extends ListItem>({
     const pressableStyle = [
         styles.transactionGroupListItemStyle,
         isLargeScreenWidth && {
-            ...styles.searchTableRowHeight,
+            ...styles.tableRowHeight,
             borderRadius: 0,
             paddingVertical: variables.tableGroupRowPaddingVertical,
             ...(isLastItem ? styles.tableBottomRadius : {}),

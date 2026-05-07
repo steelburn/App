@@ -290,6 +290,7 @@ function WorkspaceCompanyCardsTable({
             isAssigningCardDisabled={isAssigningCardDisabled}
             shouldUseNarrowTableLayout={shouldUseNarrowTableLayout}
             columnCount={columns.length}
+            isLastItem={index === cardsData.length - 1}
         />
     );
 

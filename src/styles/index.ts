@@ -2533,7 +2533,7 @@ const staticStyles = (theme: ThemeColors) =>
             borderBottomRightRadius: variables.componentBorderRadius,
         },
 
-        searchTableRowHeight: {
+        tableRowHeight: {
             minHeight: variables.tableRowHeight,
         },
 

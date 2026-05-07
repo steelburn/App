@@ -60,6 +60,9 @@ type WorkspaceCompanyCardTableItemProps = {
     /** Number of columns in the table */
     columnCount: number;
 
+    /** Whether or not the item is the last item in the table */
+    isLastItem: boolean;
+
     /**
      * Callback when assigning a card.
      * @param cardName - The masked card number displayed to users
@@ -77,6 +80,7 @@ function WorkspaceCompanyCardTableItem({
     columnCount,
     isAssigningCardDisabled,
     onAssignCard,
+    isLastItem,
 }: WorkspaceCompanyCardTableItemProps) {
     const styles = useThemeStyles();
     const theme = useTheme();
@@ -110,7 +114,7 @@ function WorkspaceCompanyCardTableItem({
             shouldHideOnDelete={false}
         >
             {isDeleting ? (
-                <View style={[styles.mh5, styles.flexRow, styles.br3, styles.mb2, styles.highlightBG, styles.overflowHidden]}>
+                <View style={[styles.mh5, styles.flexRow, styles.mb2, styles.highlightBG, styles.overflowHidden]}>
                     <TableRowSkeleton
                         fixedNumItems={1}
                         useCompanyCardsLayout
@@ -120,7 +124,17 @@ function WorkspaceCompanyCardTableItem({
             ) : (
                 <PressableWithFeedback
                     role={isAssigned ? CONST.ROLE.BUTTON : CONST.ROLE.PRESENTATION}
-                    style={[styles.mh5, styles.flexRow, styles.br3, styles.mb2, styles.highlightBG, styles.overflowHidden]}
+                    style={[
+                        styles.mh5,
+                        styles.flexRow,
+                        styles.highlightBG,
+                        styles.overflowHidden,
+                        styles.ph3,
+                        styles.tableRowHeight,
+                        styles.alignItemsCenter,
+                        !isLastItem && styles.borderBottom,
+                        isLastItem && styles.tableBottomRadius,
+                    ]}
                     sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.COMPANY_CARDS.TABLE_ITEM}
                     accessibilityLabel="row"
                     hoverStyle={isAssigned && styles.hoveredComponentBG}
@@ -148,7 +162,6 @@ function WorkspaceCompanyCardTableItem({
                                 styles.flex1,
                                 styles.flexRow,
                                 styles.alignItemsCenter,
-                                styles.p4,
                                 styles.gap3,
                                 styles.dFlex,
                                 // Use Grid on web when available (will override flex if supported)
@@ -218,8 +231,8 @@ function WorkspaceCompanyCardTableItem({
                                     </View>
                                 ) : (
                                     <Button
+                                        small
                                         success
-                                        small={shouldUseNarrowTableLayout}
                                         text={shouldUseNarrowTableLayout ? translate('workspace.companyCards.assign') : translate('workspace.companyCards.assignCard')}
                                         onPress={assignCard}
                                         isDisabled={isAssigningCardDisabled}
