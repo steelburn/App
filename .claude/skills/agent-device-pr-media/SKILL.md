@@ -331,6 +331,5 @@ Hitting any cap marks the flow `phase1_failed` / `phase2_failed` and proceeds to
 - Device lifecycle (Metro, simulator boot, bundle ID resolution, session reuse, app install verification) - fully delegated to the parent skill's [Bring-up](../agent-device/SKILL.md#bring-up). This skill does not call `agent-device metro prepare`, `xcrun simctl`, or `is-hybrid-app.sh` directly.
 - S3 / R2 / GitHub artifact upload - deferred to Melvin (the eventual CI caller).
 - Editing the PR body or posting PR comments - the skill only writes local files.
-- Macro composition from `flows/macros/*.ad` - Phase 1 drives setup autonomously; no `@provides`/`@pre` graph, no fixed registry.
 - Interactive prompts of any kind. CI is the eventual host; the skill must run end-to-end without human input.
 - Test data cleanup. Accounts/expenses/workspaces created during runs accumulate; rely on periodic test-account reset.
