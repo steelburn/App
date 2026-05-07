@@ -89,7 +89,7 @@ function WorkspaceCompanyCardTableItem({
     const Expensicons = useMemoizedLazyExpensifyIcons(['ArrowRight']);
     const {isOffline} = useNetwork();
 
-    const {cardName, encryptedCardNumber, customCardName, cardholder, assignedCard, isAssigned, isCardDeleted, errors, pendingAction, onDismissError} = item;
+    const {cardName, encryptedCardNumber, customCardName, cardholder, assignedCard, isAssigned, errors, pendingAction, onDismissError} = item;
 
     const lastCardNumbers = isPlaidCardFeed ? lastFourNumbersFromCardName(cardName) : splitMaskedCardNumber(cardName)?.lastDigits;
     const cardholderLoginText = !shouldUseNarrowTableLayout && isAssigned ? Str.removeSMSDomain(cardholder?.login ?? '') : undefined;
@@ -97,13 +97,15 @@ function WorkspaceCompanyCardTableItem({
 
     const leftColumnTitle = isAssigned ? Str.removeSMSDomain(cardholder?.displayName ?? '') : translate('workspace.moreFeatures.companyCards.unassignedCards');
     const leftColumnSubtitle = shouldUseNarrowTableLayout ? narrowWidthCardName : cardholderLoginText;
-
-    const assignCard = () => onAssignCard(cardName, encryptedCardNumber);
     const isDeleting = !isOffline && pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE;
 
     const reasonAttributes: SkeletonSpanReasonAttributes = {
         context: 'WorkspaceCompanyCardsTableItem',
         isDeleting,
+    };
+
+    const assignCard = () => {
+        onAssignCard(cardName, encryptedCardNumber);
     };
 
     const handleRowPress = () => {
