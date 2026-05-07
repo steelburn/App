@@ -104,7 +104,7 @@ function DomainGroupCreatePage({route}: DomainGroupCreatePageProps) {
                                 enableRestrictedPrimaryLogin: restrictDefaultLoginSelection,
                                 enableStrictPolicyRules: strictlyEnforceWorkspaceRules,
                                 enableRestrictedPrimaryPolicy: preferredWorkspace,
-                                restrictedPrimaryPolicyID: preferredWorkspace ? preferredPolicyID : undefined,
+                                restrictedPrimaryPolicyID: preferredPolicyID ?? firstAdminPolicy?.id,
                                 overridePreferredPolicyWithCardPolicy: expensifyCardPreferredWorkspace,
                             },
                             defaultGroupForNewMembers,
