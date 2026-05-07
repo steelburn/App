@@ -490,6 +490,7 @@ function ComposerWithSuggestions({
             selection?.end,
             selection?.start,
             currentUserAccountID,
+            setText,
         ],
     );
 

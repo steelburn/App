@@ -39,7 +39,7 @@ function ComposerInput({reportID}: ComposerInputProps) {
     const {isBlockedFromConcierge} = useComposerSendState();
     const {setIsFullComposerAvailable, onBlur, onFocus, setComposerRef} = useComposerActions();
     const {handleSendMessage, onValueChange} = useComposerSendActions();
-    const {containerRef, suggestionsRef, isNextModalWillOpenRef, attachmentFileRef} = useComposerMeta();
+    const {containerRef, suggestionsRef, isNextModalWillOpenRef} = useComposerMeta();
 
     const [isComposerFullSize = false] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_IS_COMPOSER_FULL_SIZE}${reportID}`);
     const [shouldShowComposeInput = true] = useOnyx(ONYXKEYS.SHOULD_SHOW_COMPOSE_INPUT);
@@ -54,7 +54,7 @@ function ComposerInput({reportID}: ComposerInputProps) {
 
     const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportID}`);
 
-    const submitForm = useComposerSubmit({report, reportID, attachmentFileRef});
+    const submitForm = useComposerSubmit(reportID);
     const {pickAttachments, PDFValidationComponent, ErrorModal} = useAttachmentPicker(reportID);
     const isReportArchived = useReportIsArchived(report?.reportID);
 
