@@ -266,6 +266,8 @@ function usePaymentOptions({
         onPress,
         onlyShowPayElsewhere,
         icons,
+        hasActivatedWallet,
+        hasPersonalBankAccount,
     ]);
 
     return paymentButtonOptions;
