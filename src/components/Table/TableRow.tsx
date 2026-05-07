@@ -1,8 +1,11 @@
 import React from 'react';
 import PressableWithFeedback, {PressableWithFeedbackProps} from '@components/Pressable/PressableWithFeedback';
+import SkeletonViewContentLoader from '@components/SkeletonViewContentLoader';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
+import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {SkeletonSpanReasonAttributes} from '@libs/telemetry/useSkeletonSpan';
+import variables from '@styles/variables';
 import CONST from '@src/CONST';
 import {useTableContext} from './TableContext';
 
@@ -27,6 +30,7 @@ type TableRowProps = Omit<PressableWithFeedbackProps, 'accessible'> & {
 };
 
 export default function TableRow({children, accessible, rowIndex, interactive, isLoading, skeletonReasonAttributes, LoadingComponent, onPress, ...props}: TableRowProps) {
+    const theme = useTheme();
     const styles = useThemeStyles();
     const {processedData} = useTableContext();
     const {shouldUseNarrowLayout, isMediumScreenWidth} = useResponsiveLayout();
@@ -62,7 +66,17 @@ export default function TableRow({children, accessible, rowIndex, interactive, i
             onPress={onPress}
             {...props}
         >
-            {children}
+            {!!isLoading && LoadingComponent ? (
+                <SkeletonViewContentLoader
+                    backgroundColor={theme.skeletonLHNIn}
+                    foregroundColor={theme.skeletonLHNOut}
+                    height={isSmallView ? variables.tableRowHeightCompact : variables.tableRowHeight}
+                >
+                    <LoadingComponent />
+                </SkeletonViewContentLoader>
+            ) : (
+                children
+            )}
         </PressableWithFeedback>
     );
 }
