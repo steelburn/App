@@ -18,7 +18,6 @@ import useStyleUtils from '@hooks/useStyleUtils';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import DateUtils from '@libs/DateUtils';
-import FS from '@libs/Fullstory';
 import {shouldUseBoldText} from '@libs/OptionsListUtils';
 import {isChatUsedForOnboarding as isChatUsedForOnboardingReportUtils, isGroupChat, isOneOnOneChat, isSystemChat} from '@libs/ReportUtils';
 import FreeTrial from '@pages/settings/Subscription/FreeTrial';
@@ -26,6 +25,7 @@ import variables from '@styles/variables';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
+import DescriptiveText from './OptionRow/DescriptiveText';
 import OptionRowAlternateText from './OptionRowAlternateText';
 import OptionRowAvatar from './OptionRowAvatar';
 import OptionRowErrorBadge from './OptionRowErrorBadge';
@@ -185,14 +185,10 @@ function OptionRowLHN({
                                         style={style}
                                     />
                                 </View>
-                                {optionItem?.descriptiveText ? (
-                                    <View
-                                        style={[styles.flexWrap]}
-                                        fsClass={FS.getChatFSClass(report)}
-                                    >
-                                        <Text style={[styles.textLabel]}>{optionItem.descriptiveText}</Text>
-                                    </View>
-                                ) : null}
+                                <DescriptiveText
+                                    descriptiveText={optionItem?.descriptiveText}
+                                    report={report}
+                                />
                                 <OptionRowErrorBadge
                                     brickRoadIndicator={brickRoadIndicator}
                                     actionBadgeText={actionBadgeText}
