@@ -951,7 +951,6 @@ describe('actions/IOU/UpdateMoneyRequest', () => {
                 recentWaypoints,
                 distance: 5000,
                 policy: fakePolicy,
-                allPolicies: {},
                 policyTagList: undefined,
                 policyCategories: undefined,
                 transactionBackup: fakeTransaction,
@@ -1051,7 +1050,6 @@ describe('actions/IOU/UpdateMoneyRequest', () => {
                 recentWaypoints,
                 distance: undefined, // No distance provided
                 policy: fakePolicy,
-                allPolicies: {},
                 policyTagList: undefined,
                 policyCategories: undefined,
                 transactionBackup: fakeTransaction,
@@ -1159,7 +1157,6 @@ describe('actions/IOU/UpdateMoneyRequest', () => {
                 recentWaypoints: [],
                 distance: 350000, // 350 miles in meters
                 policy: fakePolicy,
-                allPolicies: {},
                 policyTagList: undefined,
                 policyCategories: undefined,
                 transactionBackup: fakeTransaction,
@@ -1233,7 +1230,6 @@ describe('actions/IOU/UpdateMoneyRequest', () => {
                 recentWaypoints: [],
                 distance: undefined, // No distance change
                 policy: fakePolicy,
-                allPolicies: {},
                 policyTagList: undefined,
                 policyCategories: undefined,
                 transactionBackup: fakeTransaction,
@@ -1286,7 +1282,6 @@ describe('actions/IOU/UpdateMoneyRequest', () => {
                 recentWaypoints: [],
                 distance: undefined,
                 policy: fakePolicy,
-                allPolicies: {},
                 policyTagList: undefined,
                 policyCategories: undefined,
                 transactionBackup: fakeTransaction2,
