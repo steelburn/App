@@ -1,13 +1,8 @@
 import {useEffect} from 'react';
 import useAutoUpdateTimezone from '@hooks/useAutoUpdateTimezone';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
-import * as User from '@userActions/User';
+import {clearCustomStatus, clearDraftCustomStatus} from '@userActions/User';
 import CONST from '@src/CONST';
-
-function clearStatus(currentUserAccountID: number) {
-    User.clearCustomStatus(currentUserAccountID);
-    User.clearDraftCustomStatus();
-}
 
 /**
  * Component that does not render anything and owns the timezone auto-update logic and
@@ -21,11 +16,15 @@ function UserStatusHandler() {
 
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
 
+    const clearStatus = () => {
+        clearCustomStatus(currentUserPersonalDetails.accountID);
+        clearDraftCustomStatus();
+    };
+
     useEffect(() => {
         if (!currentUserPersonalDetails.status?.clearAfter) {
             return;
         }
-        const currentUserAccountID = currentUserPersonalDetails.accountID;
         const currentTime = new Date();
         const clearAfterTime = new Date(currentUserPersonalDetails.status.clearAfter);
         if (Number.isNaN(clearAfterTime.getTime())) {
@@ -42,7 +41,7 @@ function UserStatusHandler() {
                     const remainingTime = clearAfterTime.getTime() - now.getTime();
 
                     if (remainingTime <= 0) {
-                        clearStatus(currentUserAccountID);
+                        clearStatus();
                         if (intervalId) {
                             clearInterval(intervalId);
                         }
@@ -51,13 +50,13 @@ function UserStatusHandler() {
                             clearInterval(intervalId);
                         }
                         timeoutId = setTimeout(() => {
-                            clearStatus(currentUserAccountID);
+                            clearStatus();
                         }, remainingTime);
                     }
                 }, CONST.LIMIT_TIMEOUT);
             } else {
                 timeoutId = setTimeout(() => {
-                    clearStatus(currentUserAccountID);
+                    clearStatus();
                 }, subMillisecondsTime);
             }
 
@@ -71,8 +70,8 @@ function UserStatusHandler() {
             };
         }
 
-        clearStatus(currentUserAccountID);
-    }, [currentUserPersonalDetails.accountID, currentUserPersonalDetails.status?.clearAfter]);
+        clearStatus();
+    }, [clearStatus, currentUserPersonalDetails.status?.clearAfter]);
 
     return null;
 }
