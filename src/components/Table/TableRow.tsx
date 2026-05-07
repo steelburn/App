@@ -38,8 +38,8 @@ export default function TableRow({children, accessible, rowIndex, interactive, i
     const rowCount = processedData.length;
     const isFirstRow = rowIndex === 0;
     const isLastRow = rowIndex === rowCount - 1;
-    const isSmallView = isMediumScreenWidth || shouldUseNarrowLayout;
     const isInteractive = interactive && !isLoading;
+    const isSmallView = isMediumScreenWidth || shouldUseNarrowLayout;
 
     const tableRowStyles = [
         styles.mh5,
