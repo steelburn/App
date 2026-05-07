@@ -129,8 +129,8 @@ function captureTriggerForRoute(routeKey: string): void {
 }
 
 function notifyPushParamsForward(routeKey: string, prevParams: unknown): void {
-    // Same-key transitions are noop in handleStateChange, which doesn't cancel — do it here.
-    cancelPendingRestore();
+    // Same-key transition is noop in handleStateChange — clear pending restores AND completed-RETURN state here so neither leaks into the next params screen.
+    cancelPendingFocusRestore();
     captureTriggerForRoute(compoundParamsKey(routeKey, prevParams));
 }
 

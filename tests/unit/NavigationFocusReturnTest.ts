@@ -970,6 +970,26 @@ describe('restoreTriggerForRoute', () => {
         });
     });
 
+    it('clears completed RETURN hold/cycle on PUSH_PARAMS forward so the next params screen can claim AUTO/INITIAL', () => {
+        withFakeTimers(() => {
+            const trigger = appendButton();
+            trigger.focus();
+            setLastInteractiveElementForTests(trigger);
+            captureTriggerForRoute(compoundParamsKey('search', {q: 'A'}));
+            trigger.blur();
+            expect(restoreTriggerForRoute(compoundParamsKey('search', {q: 'A'}))).toBe(true);
+            expect(document.activeElement).toBe(trigger);
+            expect(tryClaim(Priorities.AUTO)).toBe(false);
+            expect(shouldSkipAutoFocusDueToExistingFocus()).toBe(true);
+
+            // User activates another same-route PUSH_PARAMS forward while the restored trigger still has focus.
+            notifyPushParamsForward('search', {q: 'B'});
+
+            expect(tryClaim(Priorities.AUTO)).toBe(true);
+            expect(shouldSkipAutoFocusDueToExistingFocus()).toBe(false);
+        });
+    });
+
     it('preserves an in-flight RETURN hold across a noop state update (e.g. setParams on the focused route)', () => {
         withFakeTimers(() => {
             // Seed prevState so the post-restore handleStateChange diffs as 'noop' (same focused key).
