@@ -1,4 +1,4 @@
-import {defaultSecurityGroupIDSelector, domainNameSelector} from '@selectors/Domain';
+import {defaultSecurityGroupIDSelector} from '@selectors/Domain';
 import {createAdminPoliciesSelector, policyNameSelector} from '@selectors/Policy';
 import React, {useEffect, useRef, useState} from 'react';
 import {View} from 'react-native';
