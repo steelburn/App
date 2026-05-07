@@ -147,7 +147,7 @@ function CopyCodesPage({route}: TwoFactorAuthPageProps) {
                                             text={translate('common.download')}
                                             icon={icons.Download}
                                             onPress={() => {
-                                                localFileDownload('two-factor-auth-codes', account?.recoveryCodes ?? '', translate);
+                                                localFileDownload('DO-NOT-DELETE_Expensify-2FA-RecoveryCodes.txt', account?.recoveryCodes ?? '', translate, undefined, undefined, false);
                                                 setError('');
                                                 setCodesAreCopied();
                                                 announceStatus(translate('fileDownload.success.title'));
