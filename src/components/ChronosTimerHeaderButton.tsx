@@ -6,6 +6,7 @@ import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails'
 import useDelegateAccountID from '@hooks/useDelegateAccountID';
 import useIsInSidePanel from '@hooks/useIsInSidePanel';
 import useLocalize from '@hooks/useLocalize';
+import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
 import useReportIsArchived from '@hooks/useReportIsArchived';
 import useThemeStyles from '@hooks/useThemeStyles';
@@ -53,6 +54,11 @@ function ChronosTimerHeaderButton({report}: ChronosTimerHeaderButtonProps) {
     const [isLoadingInitialReportActions] = useOnyx(`${ONYXKEYS.COLLECTION.RAM_ONLY_REPORT_LOADING_STATE}${report.reportID}`, {
         selector: isLoadingInitialReportActionsSelector,
     });
+    const {isOffline} = useNetwork();
+
+    // Keep the button usable while offline so queued start/stop comments are sent on reconnect,
+    // even though the optimistic OpenReport request leaves isLoadingInitialReportActions=true.
+    const shouldDisableButton = !!isLoadingInitialReportActions && !isOffline;
 
     const ancestors = useAncestors(report);
     const isInSidePanel = useIsInSidePanel();
@@ -94,7 +100,7 @@ function ChronosTimerHeaderButton({report}: ChronosTimerHeaderButtonProps) {
         <View style={[styles.flexRow, styles.alignItemsCenter, styles.justifyContentEnd]}>
             <ButtonWithDropdownMenu<ChronosAction>
                 success={!isTimerRunning}
-                isDisabled={!!isLoadingInitialReportActions}
+                isDisabled={shouldDisableButton}
                 onPress={() => {
                     callFunctionIfActionIsAllowed(sendCommentToChronos)();
                 }}

@@ -50,6 +50,12 @@ jest.mock('@hooks/useIsInSidePanel', () => ({
     default: () => false,
 }));
 
+const mockUseNetwork = jest.fn(() => ({isOffline: false}));
+jest.mock('@hooks/useNetwork', () => ({
+    __esModule: true,
+    default: () => mockUseNetwork(),
+}));
+
 jest.mock('@hooks/useReportIsArchived', () => ({
     __esModule: true,
     default: () => false,
@@ -128,6 +134,7 @@ describe('ChronosTimerHeaderButton', () => {
         await Onyx.clear();
         await waitForBatchedUpdates();
         jest.clearAllMocks();
+        mockUseNetwork.mockReturnValue({isOffline: false});
     });
 
     it('should send a start timer command when the main button is pressed', async () => {
@@ -195,6 +202,41 @@ describe('ChronosTimerHeaderButton', () => {
         fireEvent.press(screen.getByText('Start Timer'));
         await waitForBatchedUpdates();
         expect(mockAddComment).not.toHaveBeenCalled();
+    });
+
+    it('should keep the button enabled while offline so queued start/stop comments are sent on reconnect', async () => {
+        // Given the OpenReport API is optimistically in flight for this report
+        // (its optimisticData sets isLoadingInitialReportActions=true)
+        await Onyx.merge(`${ONYXKEYS.COLLECTION.RAM_ONLY_REPORT_LOADING_STATE}${TEST_REPORT_ID}`, {
+            isLoadingInitialReportActions: true,
+        });
+
+        // And the app is offline (so the OpenReport request is queued and isLoadingInitialReportActions
+        // would stay true until reconnect)
+        mockUseNetwork.mockReturnValue({isOffline: true});
+
+        // When ChronosTimerHeaderButton is rendered
+        renderComponent();
+        await waitForBatchedUpdates();
+
+        // Then no rendered button is marked disabled via accessibility state
+        const buttons = screen.getAllByRole('button');
+        expect(buttons.length).toBeGreaterThan(0);
+        buttons.forEach((btn) => {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+            expect(btn.props.accessibilityState?.disabled).not.toBe(true);
+        });
+
+        // And pressing the main "Start Timer" button still queues the start timer command
+        fireEvent.press(screen.getByText('Start Timer'));
+        await waitForBatchedUpdates();
+        expect(mockAddComment).toHaveBeenCalledTimes(1);
+        expect(mockAddComment).toHaveBeenCalledWith(
+            expect.objectContaining({
+                report: mockReport,
+                text: CONST.CHRONOS.TIMER_COMMAND.START,
+            }),
+        );
     });
 
     it('should navigate to Schedule OOO when the option is selected from the dropdown menu', async () => {
