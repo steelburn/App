@@ -168,7 +168,7 @@ Yes. When you add two odometer images to a distance expense, they will be merged
 
 ## Can I save an odometer expense for later?
 
-Yes! Enter your start reading before the trip, then select **Save for later** to keep the expense on your device. Reopen it after your trip to add your end reading and create the expense.
+Yes. Enter your start reading before the trip, then select **Save for later**. After the trip, reopen the expense to enter the end reading.
 
 ## Can I have multiple incomplete odometer expenses at the same time?
 
