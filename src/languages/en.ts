@@ -2926,6 +2926,7 @@ const translations = {
             incorrectMagicCode: 'Incorrect or invalid magic code. Please try again or request a new code.',
             pleaseFillTwoFactorAuth: 'Please enter your two-factor authentication code',
         },
+        avoidScamsMessage: '<strong>Avoid scams. Do not share your code with anyone.</strong> Our team will never call, text, or email you for this code.',
     },
     passwordForm: {
         pleaseFillOutAllFields: 'Please fill out all fields',
