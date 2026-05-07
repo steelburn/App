@@ -578,7 +578,7 @@ type SettingsNavigatorParamList = {
     };
     [SCREENS.SETTINGS_TAGS.DYNAMIC_SETTINGS_TAGS_EDIT]: {
         policyID: string;
-        orderWeight: number | string;
+        orderWeight: number;
     };
     [SCREENS.WORKSPACE.TAG_EDIT]: {
         policyID: string;
@@ -589,7 +589,7 @@ type SettingsNavigatorParamList = {
     };
     [SCREENS.SETTINGS_TAGS.DYNAMIC_SETTINGS_TAG_EDIT]: {
         policyID: string;
-        orderWeight: number | string;
+        orderWeight: number;
         tagName: string;
     };
     [SCREENS.WORKSPACE.TAG_APPROVER]: {
@@ -613,7 +613,7 @@ type SettingsNavigatorParamList = {
     };
     [SCREENS.SETTINGS_TAGS.DYNAMIC_SETTINGS_TAG_GL_CODE]: {
         policyID: string;
-        orderWeight: number | string;
+        orderWeight: number;
         tagName: string;
     };
     [SCREENS.SETTINGS.SUBSCRIPTION.SIZE]: {
