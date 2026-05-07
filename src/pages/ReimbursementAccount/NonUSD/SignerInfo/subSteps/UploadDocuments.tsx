@@ -17,7 +17,7 @@ import {getFieldRequiredErrors} from '@libs/ValidationUtils';
 import getCurrencyForNonUSDBankAccount from '@pages/ReimbursementAccount/NonUSD/utils/getCurrencyForNonUSDBankAccount';
 import getNeededDocumentsStatusForSignerInfo from '@pages/ReimbursementAccount/utils/getNeededDocumentsStatusForSignerInfo';
 import WhyLink from '@pages/ReimbursementAccount/WhyLink';
-import {clearErrorFields, setDraftValues, setErrorFields} from '@userActions/FormActions';
+import {clearErrorFields, clearErrors, setDraftValues, setErrorFields} from '@userActions/FormActions';
 import {openExternalLink} from '@userActions/Link';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -97,6 +97,7 @@ function UploadDocuments({onNext, isEditing}: UploadDocumentsProps) {
             return;
         }
 
+        clearErrors(ONYXKEYS.FORMS.REIMBURSEMENT_ACCOUNT_FORM);
         setErrorFields(ONYXKEYS.FORMS.REIMBURSEMENT_ACCOUNT_FORM, {[inputID]: {onUpload: error}});
     };
 

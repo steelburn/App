@@ -87,6 +87,7 @@ function DocusignFullStep<TFormID extends keyof OnyxFormValuesMapping>({
             return;
         }
 
+        clearErrors(formID);
         setErrorFields(formID, {[inputID]: {onUpload: error}});
     };
 
