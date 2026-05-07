@@ -61,7 +61,6 @@ function useReportActionsPagination(reportID: string | undefined): UseReportActi
     const isInitiallyLoadingTransactionThread = isReportTransactionThread && (!!isLoadingInitialReportActions || (allReportActions ?? [])?.length <= 1);
 
     const lastAction = allReportActions?.at(-1);
-    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
     const shouldAddCreatedAction = !isCreatedAction(lastAction) && (isMoneyRequestReport(report) || isInvoiceReport(report) || isInitiallyLoadingTransactionThread || isConciergeSidePanel);
 
     const reportPreviewAction = getReportPreviewAction(report?.chatReportID, report?.reportID);
