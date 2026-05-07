@@ -1,4 +1,3 @@
-/* eslint-disable no-param-reassign */
 import {useCallback, useEffect, useRef} from 'react';
 import type {RefObject} from 'react';
 import type {ComposerRef, TextSelection} from '@components/Composer/types';
