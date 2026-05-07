@@ -381,6 +381,7 @@ function BasePopoverMenu({
                 setHasKeyBeenPressed(false);
             }
         } else if (selectedItem.shouldCloseModalOnSelect === false) {
+            onItemSelected?.(selectedItem, index, event);
             selectedItem.onSelected?.();
             setFocusedIndex(-1);
         } else if (selectedItem.shouldCallAfterModalHide && (!isSafari() || shouldAvoidSafariException)) {
