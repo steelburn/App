@@ -1,17 +1,19 @@
 import React from 'react';
 import {View} from 'react-native';
 import {Gesture, GestureDetector} from 'react-native-gesture-handler';
+import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
 import CONST from '@src/CONST';
 import {useComposerEditState, useComposerSendState} from './ComposerContext';
-import SendOrSaveButton from './SendOrSaveButton';
+import SubmitDraftButton from './SubmitDraftButton';
 import useComposerSubmit from './useComposerSubmit';
 
 function ComposerSendButton({reportID}: {reportID: string}) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
+    const icons = useMemoizedLazyExpensifyIcons(['Send']);
 
     const {isEditingInComposer} = useComposerEditState();
     const {isSendDisabled} = useComposerSendState();
@@ -48,9 +50,14 @@ function ComposerSendButton({reportID}: {reportID: string}) {
                     accessibilityLabel={accessibilityLabel}
                     collapsable={false}
                 >
-                    <SendOrSaveButton
+                    <SubmitDraftButton
                         isDisabled={isSendDisabled}
-                        isEditing={isEditingInComposer}
+                        icon={icons.Send}
+                        label={translate('common.send')}
+                        sentryLabel={CONST.SENTRY_LABEL.REPORT.SEND_BUTTON}
+                        onPress={submitDraftAndClearComposer}
+                        // Since the parent View has accessible, we need to set accessible to false here to avoid duplicate accessibility elements.
+                        // On Android when TalkBack is enabled, only the parent element should be accessible, otherwise the button will not work.
                         accessible={false}
                         focusable={false}
                     />

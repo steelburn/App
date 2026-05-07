@@ -12,6 +12,7 @@ import EmojiPickerButton from '@components/EmojiPicker/EmojiPickerButton';
 import ExceededCommentLength from '@components/ExceededCommentLength';
 import useIsScrollLikelyLayoutTriggered from '@hooks/useIsScrollLikelyLayoutTriggered';
 import useKeyboardState from '@hooks/useKeyboardState';
+import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useReportScrollManager from '@hooks/useReportScrollManager';
@@ -40,7 +41,7 @@ import getCursorPosition from './ReportActionCompose/getCursorPosition';
 import getScrollPosition from './ReportActionCompose/getScrollPosition';
 import MessageEditCancelButton from './ReportActionCompose/MessageEditCancelButton';
 import type {SuggestionsRef} from './ReportActionCompose/ReportActionCompose';
-import SendOrSaveButton from './ReportActionCompose/SendOrSaveButton';
+import SubmitDraftButton from './ReportActionCompose/SubmitDraftButton';
 import Suggestions from './ReportActionCompose/Suggestions';
 import useDebouncedCommentMaxLengthValidation from './ReportActionCompose/useDebouncedCommentMaxLengthValidation';
 import useEditMessage from './ReportActionCompose/useEditMessage';
@@ -96,6 +97,7 @@ function ReportActionItemMessageEdit({action, reportID, originalReportID, policy
     const cursorPositionValue = useSharedValue({x: 0, y: 0});
     const tag = useSharedValue(-1);
     const emojisPresentBefore = useRef<Emoji[]>([]);
+    const icons = useMemoizedLazyExpensifyIcons(['Checkmark']);
 
     const {currentEditMessageSelection, editingMessage} = useReportActionActiveEdit();
     const {setEditingMessage, setCurrentEditMessageSelection} = useReportActionActiveEditActions();
@@ -483,10 +485,12 @@ function ReportActionItemMessageEdit({action, reportID, originalReportID, policy
                     </View>
 
                     <View style={styles.alignSelfEnd}>
-                        <SendOrSaveButton
+                        <SubmitDraftButton
                             isDisabled={isExceedingMaxLength}
-                            isEditing
-                            onSendOrSave={() => publishDraft(draft)}
+                            icon={icons.Checkmark}
+                            label={translate('common.saveChanges')}
+                            sentryLabel={CONST.SENTRY_LABEL.REPORT.REPORT_ACTION_ITEM_MESSAGE_EDIT_SAVE_BUTTON}
+                            onPress={() => publishDraft(draft)}
                             accessibilityLabel={translate('common.saveChanges')}
                             role={CONST.ROLE.BUTTON}
                             hoverDimmingValue={1}

@@ -3,30 +3,27 @@ import Icon from '@components/Icon';
 import PressableWithFeedback from '@components/Pressable/PressableWithFeedback';
 import type {PressableWithFeedbackProps} from '@components/Pressable/PressableWithFeedback';
 import Tooltip from '@components/Tooltip';
-import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
-import useLocalize from '@hooks/useLocalize';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
-import CONST from '@src/CONST';
+import type IconAsset from '@src/types/utils/IconAsset';
 
-type SendOrSaveButtonProps = PressableWithFeedbackProps & {
+type SubmitDraftButtonProps = PressableWithFeedbackProps & {
+    /** The label to display on the button */
+    label: string;
+
+    /** The icon to display on the button */
+    icon: IconAsset;
+
     /** Whether the button is disabled */
     isDisabled: boolean;
 
-    /** Whether the button is in editing mode */
-    isEditing?: boolean;
-
     /** Handle clicking on send button */
-    onSendOrSave?: () => void;
+    onPress?: () => void;
 };
 
-function SendOrSaveButton({isDisabled: isDisabledProp = false, isEditing = false, onSendOrSave, ...restProps}: SendOrSaveButtonProps) {
+function SubmitDraftButton({isDisabled: isDisabledProp = false, icon, label, sentryLabel, onPress, ...restProps}: SubmitDraftButtonProps) {
     const theme = useTheme();
     const styles = useThemeStyles();
-    const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Send', 'Checkmark']);
-    const label = translate(isEditing ? 'common.saveChanges' : 'common.send');
-    const sentryLabel = isEditing ? CONST.SENTRY_LABEL.REPORT.REPORT_ACTION_ITEM_MESSAGE_EDIT_SAVE_BUTTON : CONST.SENTRY_LABEL.REPORT.SEND_BUTTON;
 
     return (
         <Tooltip text={label}>
@@ -36,9 +33,7 @@ function SendOrSaveButton({isDisabled: isDisabledProp = false, isEditing = false
                     isDisabledProp || pressed || isDisabled ? undefined : styles.buttonSuccess,
                     isDisabledProp ? styles.cursorDisabled : undefined,
                 ]}
-                // Since the parent View has accessible, we need to set accessible to false here to avoid duplicate accessibility elements.
-                // On Android when TalkBack is enabled, only the parent element should be accessible, otherwise the button will not work.
-                onPress={onSendOrSave}
+                onPress={onPress}
                 sentryLabel={sentryLabel}
                 disabled={isDisabledProp}
                 // eslint-disable-next-line react/jsx-props-no-spreading
@@ -46,7 +41,7 @@ function SendOrSaveButton({isDisabled: isDisabledProp = false, isEditing = false
             >
                 {({pressed}) => (
                     <Icon
-                        src={isEditing ? icons.Checkmark : icons.Send}
+                        src={icon}
                         fill={isDisabledProp || pressed ? theme.icon : theme.textLight}
                     />
                 )}
@@ -55,4 +50,4 @@ function SendOrSaveButton({isDisabled: isDisabledProp = false, isEditing = false
     );
 }
 
-export default SendOrSaveButton;
+export default SubmitDraftButton;
