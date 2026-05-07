@@ -1,6 +1,5 @@
 import {createAdminPoliciesSelector} from '@selectors/Policy';
-import React, {useState} from 'react';
-import FormAlertWithSubmitButton from '@components/FormAlertWithSubmitButton';
+import React from 'react';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import ScreenWrapper from '@components/ScreenWrapper';
 import SelectionList from '@components/SelectionList';
@@ -38,8 +37,6 @@ function DomainGroupCreatePreferredWorkspacePage({route}: DomainGroupCreatePrefe
 
     const [currentPolicyID] = useOnyx(ONYXKEYS.DOMAIN_GROUP_CREATE_PREFERRED_POLICY_ID);
     const [policies] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {selector: createAdminPoliciesSelector(currentPolicyID)});
-    const [selectedPolicyID, setSelectedPolicyID] = useState<string | undefined>(currentPolicyID);
-    const [shouldShowError, setShouldShowError] = useState(false);
 
     const workspaceOptions: WorkspaceListItem[] = [];
     for (const policy of Object.values(policies ?? {})) {
@@ -52,7 +49,7 @@ function DomainGroupCreatePreferredWorkspacePage({route}: DomainGroupCreatePrefe
             policyID: policy.id,
             created: policy.created,
             keyForList: policy.id,
-            isSelected: selectedPolicyID === policy.id,
+            isSelected: currentPolicyID === policy.id,
             icons: [
                 {
                     source: policy.avatarURL ?? getDefaultWorkspaceAvatar(policy.name),
@@ -64,15 +61,6 @@ function DomainGroupCreatePreferredWorkspacePage({route}: DomainGroupCreatePrefe
             ],
         });
     }
-
-    const handleSubmit = () => {
-        if (!selectedPolicyID) {
-            setShouldShowError(true);
-            return;
-        }
-        setDomainGroupCreatePreferredPolicyID(selectedPolicyID);
-        Navigation.goBack(ROUTES.DOMAIN_GROUP_CREATE.getRoute(domainAccountID));
-    };
 
     return (
         <DomainNotFoundPageWrapper domainAccountID={domainAccountID}>
@@ -90,20 +78,11 @@ function DomainGroupCreatePreferredWorkspacePage({route}: DomainGroupCreatePrefe
                     data={workspaceOptions.sort((a, b) => localeCompare(a.created ?? '', b.created ?? ''))}
                     ListItem={UserListItem}
                     onSelectRow={(item: WorkspaceListItem) => {
-                        setSelectedPolicyID(item.policyID);
-                        setShouldShowError(false);
+                        setDomainGroupCreatePreferredPolicyID(item.policyID);
+                        Navigation.goBack(ROUTES.DOMAIN_GROUP_CREATE.getRoute(domainAccountID));
                     }}
                     initiallyFocusedItemKey={currentPolicyID}
                     shouldUpdateFocusedIndex
-                    footerContent={
-                        <FormAlertWithSubmitButton
-                            buttonText={translate('common.save')}
-                            onSubmit={handleSubmit}
-                            isAlertVisible={shouldShowError}
-                            containerStyles={[!shouldShowError && styles.mt5]}
-                            message={translate('common.error.pleaseSelectOne')}
-                        />
-                    }
                 />
             </ScreenWrapper>
         </DomainNotFoundPageWrapper>

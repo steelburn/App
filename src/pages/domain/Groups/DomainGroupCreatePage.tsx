@@ -44,6 +44,7 @@ function DomainGroupCreatePage({route}: DomainGroupCreatePageProps) {
     const [expensifyCardPreferredWorkspace, setExpensifyCardPreferredWorkspace] = useState(false);
     const [preferredWorkspace, setPreferredWorkspace] = useState(false);
     const [isNoWorkspacesModalVisible, setIsNoWorkspacesModalVisible] = useState(false);
+    const [isExpensifyCardDisabledModalVisible, setIsExpensifyCardDisabledModalVisible] = useState(false);
 
     const [preferredPolicyID] = useOnyx(ONYXKEYS.DOMAIN_GROUP_CREATE_PREFERRED_POLICY_ID);
     const [preferredPolicyName] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${preferredPolicyID}`, {
@@ -56,6 +57,8 @@ function DomainGroupCreatePage({route}: DomainGroupCreatePageProps) {
         selector: defaultSecurityGroupIDSelector,
     });
     const [adminPolicies] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {selector: createAdminPoliciesSelector()});
+    const [domainCardSettings] = useOnyx(`${ONYXKEYS.COLLECTION.PRIVATE_EXPENSIFY_CARD_SETTINGS}${domainAccountID}`);
+    const isDomainUsingExpensifyCard = !!domainCardSettings;
 
     const firstAdminPolicy = Object.values(adminPolicies ?? {})
         .sort((a, b) => localeCompare(a?.created ?? '', b?.created ?? ''))
@@ -181,6 +184,7 @@ function DomainGroupCreatePage({route}: DomainGroupCreatePageProps) {
                                 }
                             } else {
                                 clearDomainGroupCreatePreferredPolicyID();
+                                setExpensifyCardPreferredWorkspace(false);
                             }
                         }}
                         wrapperStyle={[styles.ph5, styles.mv3]}
@@ -209,9 +213,20 @@ function DomainGroupCreatePage({route}: DomainGroupCreatePageProps) {
                         subtitle={translate('domain.groups.expensifyCardPreferredWorkspaceDescription')}
                         switchAccessibilityLabel={translate('domain.groups.expensifyCardPreferredWorkspace')}
                         isActive={expensifyCardPreferredWorkspace}
+                        disabled={!preferredWorkspace || !isDomainUsingExpensifyCard}
+                        disabledAction={() => setIsExpensifyCardDisabledModalVisible(true)}
                         onToggle={setExpensifyCardPreferredWorkspace}
                         wrapperStyle={[styles.ph5, styles.mv3]}
                         shouldPlaceSubtitleBelowSwitch
+                    />
+                    <ConfirmModal
+                        onConfirm={() => setIsExpensifyCardDisabledModalVisible(false)}
+                        onCancel={() => setIsExpensifyCardDisabledModalVisible(false)}
+                        isVisible={isExpensifyCardDisabledModalVisible}
+                        title={translate('workspace.distanceRates.oopsNotSoFast')}
+                        prompt={translate('domain.groups.expensifyCardPreferredWorkspaceDisabledMessage')}
+                        confirmText={translate('common.buttonConfirm')}
+                        shouldShowCancelButton={false}
                     />
                 </FormProvider>
             </ScreenWrapper>
