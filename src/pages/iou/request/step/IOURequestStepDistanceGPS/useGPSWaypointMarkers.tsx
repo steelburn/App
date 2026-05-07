@@ -5,7 +5,7 @@ import type {WayPoint} from '@components/MapView/MapViewTypes';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useOnyx from '@hooks/useOnyx';
 import useTheme from '@hooks/useTheme';
-import {getGPSWaypoints, getTotalGpsTripSegments, isTripStopped as isTripStoppedUtil} from '@libs/GPSDraftDetailsUtils';
+import {getGPSWaypoints, isTripStopped as isTripStoppedUtil} from '@libs/GPSDraftDetailsUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type IconAsset from '@src/types/utils/IconAsset';
@@ -28,28 +28,32 @@ function useGPSWaypointMarkers(): WayPoint[] {
     );
 
     const gpsWaypoints = getGPSWaypoints(gpsDraftDetails);
+    const waypointEntries = Object.entries(gpsWaypoints);
+    const lastIndex = waypointEntries.length - 1;
 
-    const gpsWaypointMarkers = Object.entries(gpsWaypoints).map(([key, waypoint], index): WayPoint | null => {
-        const tripSegmentsCount = getTotalGpsTripSegments(gpsDraftDetails);
-        let icon = DotIndicator;
-        if (index === 0) {
-            icon = DotIndicatorUnfilled;
-        } else if (index === tripSegmentsCount * 2 - 1) {
-            icon = Location;
+    return waypointEntries.flatMap(([key, waypoint], index): WayPoint[] => {
+        const isStart = index === 0;
+        const isEnd = index === lastIndex;
 
-            if (!isTripStopped) {
-                return null;
-            }
+        if (isEnd && !isTripStopped) {
+            return [];
         }
 
-        return {
-            id: key,
-            coordinate: [waypoint.lng, waypoint.lat],
-            markerComponent: (): ReactNode => getMarkerComponent(icon),
-        };
-    });
+        let icon = DotIndicator;
+        if (isStart) {
+            icon = DotIndicatorUnfilled;
+        } else if (isEnd) {
+            icon = Location;
+        }
 
-    return gpsWaypointMarkers.filter((waypoint): waypoint is WayPoint => !!waypoint);
+        return [
+            {
+                id: key,
+                coordinate: [waypoint.lng, waypoint.lat],
+                markerComponent: (): ReactNode => getMarkerComponent(icon),
+            },
+        ];
+    });
 }
 
 export default useGPSWaypointMarkers;
