@@ -512,6 +512,7 @@ function deleteAvatar(currentUserPersonalDetails: Pick<CurrentUserPersonalDetail
 function clearPersonalDetailsErrors() {
     Onyx.merge(ONYXKEYS.PRIVATE_PERSONAL_DETAILS, {
         errors: null,
+        errorFields: {personalDetails: null},
     });
 }
 
