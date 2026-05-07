@@ -10018,7 +10018,7 @@ function getMoneyRequestOptions(
     // This will be fixed as part of https://github.com/Expensify/Expensify/issues/507850
     const policyOwnerAccountID = getPolicy(report?.policyID)?.ownerAccountID;
     const isPolicyOwnedByExpensifyAccounts = policyOwnerAccountID ? CONST.EXPENSIFY_ACCOUNT_IDS.includes(policyOwnerAccountID) : false;
-    if (doParticipantsIncludeExpensifyAccounts && !isPolicyOwnedByExpensifyAccounts) {
+    if (doParticipantsIncludeExpensifyAccounts && !isPolicyOwnedByExpensifyAccounts && !isPolicyExpenseChat(report) && !isExpenseReport(report)) {
         // Allow create expense option for Manager McTest report
         if (
             canRequestMoney(report, policy, otherParticipants) &&
