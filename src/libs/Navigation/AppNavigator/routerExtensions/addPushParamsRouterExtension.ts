@@ -266,7 +266,9 @@ function addPushParamsRouterExtension<RouterOptions extends PlatformStackRouterO
                         cancelPendingFocusRestore();
                         // Focused route+params is unseen: preserve entries for other surviving routes (still relevant), drop stale entries for the focused key, append the new focused entry.
                         const otherRoutesHistory = preserveHistoryForRoutes(history, rehydratedState.routes).filter((e) => typeof e === 'string' || e.key !== newFocused.key);
-                        const newHistory = [...otherRoutesHistory, newFocused];
+                        const appended = [...otherRoutesHistory, newFocused];
+                        // Same FIFO cap as the PUSH_PARAMS path.
+                        const newHistory = appended.length > PUSH_PARAMS_HISTORY_MAX ? appended.slice(appended.length - PUSH_PARAMS_HISTORY_MAX) : appended;
                         pushParamsHistoryPosition = newHistory.length - 1;
                         return {
                             ...rehydratedState,

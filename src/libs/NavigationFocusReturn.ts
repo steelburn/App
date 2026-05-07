@@ -181,8 +181,13 @@ function shouldSkipAutoFocusDueToExistingFocus(): boolean {
         return false;
     }
     if (typeof window !== 'undefined' && document.activeElement instanceof HTMLElement) {
-        const style = window.getComputedStyle(document.activeElement);
-        if (style.display === 'none' || style.visibility === 'hidden') {
+        // `display` is element-self only — walk ancestors. `visibility` is inherited — self-check suffices.
+        for (let node: HTMLElement | null = document.activeElement; node && node !== document.body; node = node.parentElement) {
+            if (window.getComputedStyle(node).display === 'none') {
+                return false;
+            }
+        }
+        if (window.getComputedStyle(document.activeElement).visibility === 'hidden') {
             return false;
         }
     }
@@ -246,8 +251,9 @@ function restoreTriggerForRoute(routeKey: string): boolean {
         candidates.push(entry.fallback);
     }
 
-    // focusVisible: Chromium/Firefox only (lib.dom.d.ts too); Safari's :focus-visible heuristic aligns.
-    const focusOptions = {preventScroll: true, focusVisible: getHadTabNavigation()} as FocusOptions;
+    // focusVisible: Chromium/Firefox only (missing from lib.dom.d.ts); Safari's :focus-visible heuristic aligns.
+    // @ts-expect-error -- focusVisible isn't in FocusOptions yet.
+    const focusOptions: FocusOptions = {preventScroll: true, focusVisible: getHadTabNavigation()};
     for (const candidate of candidates) {
         const before = document.activeElement;
         candidate.focus(focusOptions);

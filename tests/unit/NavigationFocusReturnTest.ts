@@ -1179,6 +1179,24 @@ describe('shouldSkipAutoFocusDueToExistingFocus', () => {
         trigger.style[prop] = value;
         expect(shouldSkipAutoFocusDueToExistingFocus()).toBe(false);
     });
+
+    it('returns false when an ANCESTOR of the restored target has display:none (getComputedStyle reports element-self only — needs ancestor walk)', () => {
+        const ancestor = document.createElement('div');
+        const trigger = document.createElement('button');
+        ancestor.appendChild(trigger);
+        document.body.appendChild(ancestor);
+        simulateTab();
+        trigger.focus();
+        setLastInteractiveElementForTests(trigger);
+        captureTriggerForRoute('route-a');
+        trigger.blur();
+        expect(restoreTriggerForRoute('route-a')).toBe(true);
+        resetArbiter();
+        // Hide the ancestor — `getComputedStyle(trigger).display` still reports the element's own visible value.
+        ancestor.style.display = 'none';
+        trigger.focus();
+        expect(shouldSkipAutoFocusDueToExistingFocus()).toBe(false);
+    });
 });
 
 describe('hasFocusableAttributes', () => {

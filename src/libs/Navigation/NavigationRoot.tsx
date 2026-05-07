@@ -259,8 +259,11 @@ function NavigationRoot({authenticated, lastVisitedPath, initialUrl, onReady}: N
         setupNavigationFocusReturn();
     }, [onReady]);
 
-    // Tear down focus-return listeners on full unmount (HMR in dev; symmetric lifecycle for tests).
-    useEffect(() => teardownNavigationFocusReturn, []);
+    // Re-establish on (re)mount — StrictMode's cleanup-then-remount otherwise leaves us listener-less; setup is idempotent.
+    useEffect(() => {
+        setupNavigationFocusReturn();
+        return teardownNavigationFocusReturn;
+    }, []);
 
     return (
         <NavigationContainer

@@ -913,6 +913,28 @@ describe('addPushParamsRouterExtension', () => {
         state = enhancedRouter.getStateForAction(state, CommonActions.goBack(), CONFIG_OPTIONS) as TestState;
         expect((state.routes.at(0)?.params as {q: string}).q).toBe('typed');
     });
+
+    it('unknown-RESET path applies the same FIFO cap as PUSH_PARAMS append', () => {
+        const factory = createMockRouterFactory();
+        const enhancedRouter = addPushParamsRouterExtension(factory)({} as PlatformStackRouterOptions);
+        const initial = makeRoute('Search', 'search-1', {q: 'A'});
+        let state: TestState = makeState([initial], {history: [{...initial}] as CustomHistoryEntry[]});
+
+        for (let i = 1; i < 32; i += 1) {
+            state = enhancedRouter.getStateForAction(state, {type: CONST.NAVIGATION.ACTION_TYPE.PUSH_PARAMS, payload: {params: {q: `v${i}`}}}, CONFIG_OPTIONS) as TestState;
+        }
+        expect(state.history).toHaveLength(32);
+
+        // Unknown outcome: target compound not in history; rebuilt history runs through the cap path.
+        const unknownReset: PushParamsRouterAction = {
+            type: CONST.NAVIGATION.ACTION_TYPE.RESET,
+            payload: {routes: [{name: 'Search', key: 'search-1', params: {q: 'NEW'}}], index: 0},
+        };
+        state = enhancedRouter.getStateForAction(state, unknownReset, CONFIG_OPTIONS) as TestState;
+
+        expect(state.history?.length).toBeLessThanOrEqual(32);
+        expect((asRouteEntry(state.history?.at(-1) as CustomHistoryEntry).params as {q: string}).q).toBe('NEW');
+    });
 });
 
 describe('resolveCursorForReset (pure function)', () => {
