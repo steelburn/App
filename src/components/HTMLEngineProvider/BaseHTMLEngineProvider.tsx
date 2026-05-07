@@ -189,7 +189,7 @@ function BaseHTMLEngineProvider({textSelectable = false, children, enableExperim
             ul: HTMLElementModel.fromCustomModel({
                 tagName: 'ul',
                 contentModel: HTMLContentModel.block,
-                mixedUAStyles: {marginVertical: 12},
+                mixedUAStyles: styles.mv3,
             }),
             'sparkles-icon': HTMLElementModel.fromCustomModel({
                 tagName: 'sparkles-icon',
@@ -200,6 +200,7 @@ function BaseHTMLEngineProvider({textSelectable = false, children, enableExperim
             styles.taskTitleMenuItem,
             styles.formError,
             styles.mb0,
+            styles.mv3,
             styles.colorMuted,
             styles.mutedNormalTextLabel,
             styles.productTrainingTooltipText,

@@ -2,6 +2,7 @@ import React from 'react';
 import {View} from 'react-native';
 import type {CustomRendererProps, TBlock} from 'react-native-render-html';
 import {TNodeRenderer} from 'react-native-render-html';
+import useThemeStyles from '@hooks/useThemeStyles';
 import BulletItemRenderer from './BulletItemRenderer';
 
 /**
@@ -11,8 +12,9 @@ import BulletItemRenderer from './BulletItemRenderer';
  * unregistered globally so that <ol><li> still uses the library's default numeric markers.
  */
 function ULRenderer({tnode, style}: CustomRendererProps<TBlock>) {
+    const styles = useThemeStyles();
     return (
-        <View style={[style, {gap: 8}]}>
+        <View style={[style, styles.gap2]}>
             {tnode.children.map((child, index) => {
                 const key = `${child.tagName ?? 'node'}-${index}`;
                 if (child.tagName === 'li') {
