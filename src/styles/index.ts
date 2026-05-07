@@ -5920,6 +5920,9 @@ const staticStyles = (theme: ThemeColors) =>
             width: 272,
             height: 138,
         },
+        copilotRoleBadge: {
+            marginLeft: 6,
+        },
         aboutStaticIllustration: {
             width: 100,
             height: 106,

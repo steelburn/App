@@ -206,7 +206,7 @@ function CopilotPage() {
                         <Badge
                             text={translate('delegate.role', {role})}
                             isCondensed
-                            badgeStyles={[styles.ml3, styles.flexShrink0]}
+                            badgeStyles={[styles.copilotRoleBadge, styles.flexShrink0]}
                         />
                     )}
                 </View>
@@ -296,7 +296,8 @@ function CopilotPage() {
                 icon: personalDetail?.avatar ?? getDefaultAvatarURL({accountID: personalDetail?.accountID, accountEmail: email}),
                 iconType: CONST.ICON_TYPE_AVATAR,
                 wrapperStyle: [styles.sectionMenuItemTopDescription],
-                interactive: false,
+                disabled: isPending || isCurrentUser,
+                onPress: () => switchToDelegator(email),
                 error: connectError,
                 onPendingActionDismiss: () => clearDelegatorErrors({delegatedAccess: account?.delegatedAccess}),
                 shouldShowRightComponent: true,
