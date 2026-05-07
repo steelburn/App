@@ -278,13 +278,13 @@ describe('deleteAgent', () => {
     });
 
     it('calls write with DELETE_AGENT command and correct params', () => {
-        deleteAgent(TEST_ACCOUNT_ID, {prompt: 'Test prompt'});
+        deleteAgent(TEST_ACCOUNT_ID, {prompt: 'Test prompt'}, undefined);
 
         expect(mockWrite).toHaveBeenCalledWith(WRITE_COMMANDS.DELETE_AGENT, {accountID: TEST_ACCOUNT_ID}, expect.any(Object));
     });
 
     it('optimistic data sets the prompt key to null using SET method', () => {
-        deleteAgent(TEST_ACCOUNT_ID, {prompt: 'Test prompt'});
+        deleteAgent(TEST_ACCOUNT_ID, {prompt: 'Test prompt'}, undefined);
 
         const {optimisticData} = getWriteOptions();
         const promptUpdate = optimisticData.find((u) => u.key === `${ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT}${TEST_ACCOUNT_ID}`);
@@ -294,7 +294,7 @@ describe('deleteAgent', () => {
     });
 
     it('optimistic data nulls the personal detail entry', () => {
-        deleteAgent(TEST_ACCOUNT_ID, {prompt: 'Test prompt'});
+        deleteAgent(TEST_ACCOUNT_ID, {prompt: 'Test prompt'}, undefined);
 
         const {optimisticData} = getWriteOptions();
         const personalDetailUpdate = optimisticData.find((u) => u.key === ONYXKEYS.PERSONAL_DETAILS_LIST);
@@ -302,8 +302,18 @@ describe('deleteAgent', () => {
         expect((personalDetailUpdate?.value as Record<string, unknown>)[TEST_ACCOUNT_ID]).toBeNull();
     });
 
-    it('failure data restores the personal detail entry with accountID', () => {
-        deleteAgent(TEST_ACCOUNT_ID, {prompt: 'Test prompt'});
+    it('failure data restores the full personal detail entry', () => {
+        const personalDetails = {accountID: TEST_ACCOUNT_ID, displayName: 'Test Agent', login: 'agent@test.com', avatar: 'https://example.com/avatar.png'};
+        deleteAgent(TEST_ACCOUNT_ID, {prompt: 'Test prompt'}, personalDetails);
+
+        const {failureData} = getWriteOptions();
+        const personalDetailUpdate = failureData.find((u) => u.key === ONYXKEYS.PERSONAL_DETAILS_LIST);
+
+        expect((personalDetailUpdate?.value as Record<string, unknown>)[TEST_ACCOUNT_ID]).toMatchObject(personalDetails);
+    });
+
+    it('failure data falls back to accountID-only when personalDetails is undefined', () => {
+        deleteAgent(TEST_ACCOUNT_ID, {prompt: 'Test prompt'}, undefined);
 
         const {failureData} = getWriteOptions();
         const personalDetailUpdate = failureData.find((u) => u.key === ONYXKEYS.PERSONAL_DETAILS_LIST);
@@ -312,7 +322,7 @@ describe('deleteAgent', () => {
     });
 
     it('failure data restores the agent prompt key using SET method', () => {
-        deleteAgent(TEST_ACCOUNT_ID, {prompt: 'Test prompt'});
+        deleteAgent(TEST_ACCOUNT_ID, {prompt: 'Test prompt'}, undefined);
 
         const {failureData} = getWriteOptions();
         const promptUpdate = failureData.find((u) => u.key === `${ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT}${TEST_ACCOUNT_ID}`);
@@ -322,7 +332,7 @@ describe('deleteAgent', () => {
     });
 
     it('calls Navigation.navigate after issuing the write', () => {
-        deleteAgent(TEST_ACCOUNT_ID, {prompt: 'Test prompt'});
+        deleteAgent(TEST_ACCOUNT_ID, {prompt: 'Test prompt'}, undefined);
 
         expect(mockNavigate).toHaveBeenCalledTimes(1);
     });

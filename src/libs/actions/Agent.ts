@@ -7,6 +7,7 @@ import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type AgentPrompt from '@src/types/onyx/AgentPrompt';
+import type PersonalDetails from '@src/types/onyx/PersonalDetails';
 import type {AnyOnyxUpdate} from '@src/types/onyx/Request';
 
 function openAgentsPage() {
@@ -151,7 +152,7 @@ function updateAgentPrompt(accountID: number, prompt: string, originalPrompt: st
     write(WRITE_COMMANDS.UPDATE_AGENT_PROMPT, {agentAccountID: accountID, prompt}, {optimisticData, successData, failureData});
 }
 
-function deleteAgent(accountID: number, agentPrompt: AgentPrompt | undefined) {
+function deleteAgent(accountID: number, agentPrompt: AgentPrompt | undefined, personalDetails: PersonalDetails | undefined) {
     const optimisticData: AnyOnyxUpdate[] = [
         {
             onyxMethod: Onyx.METHOD.SET,
@@ -176,7 +177,7 @@ function deleteAgent(accountID: number, agentPrompt: AgentPrompt | undefined) {
         {
             onyxMethod: Onyx.METHOD.MERGE,
             key: ONYXKEYS.PERSONAL_DETAILS_LIST,
-            value: {[accountID]: {accountID}},
+            value: {[accountID]: personalDetails ?? {accountID}},
         },
     ];
 
