@@ -27,6 +27,7 @@ type LazyFallbackProps = {tabSpanName?: string};
 
 function LazyFallback({tabSpanName}: LazyFallbackProps) {
     const styles = useThemeStyles();
+    // Lets Sentry split slow tab navigations into "lazy chunk fetch" vs "screen render" buckets.
     useEffect(() => {
         if (!tabSpanName) {
             return;

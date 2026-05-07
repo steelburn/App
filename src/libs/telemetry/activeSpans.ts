@@ -84,11 +84,9 @@ function cancelSpansByPrefix(prefix: string) {
 
 const TAB_NAVIGATION_SPAN_IDS = [CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS, CONST.TELEMETRY.SPAN_NAVIGATE_TO_INBOX_TAB] as const;
 
-function cancelTabNavigationSpans(except?: string) {
+// Cancels in-flight tab-navigation spans so an abandoned tap doesn't leave one ticking until the user returns.
+function cancelTabNavigationSpans() {
     for (const id of TAB_NAVIGATION_SPAN_IDS) {
-        if (id === except) {
-            continue;
-        }
         cancelSpan(id);
     }
 }

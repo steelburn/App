@@ -105,7 +105,7 @@ function NavigationTabBar({selectedTab, shouldShowFloatingButtons = true}: Navig
             return;
         }
 
-        cancelTabNavigationSpans(CONST.TELEMETRY.SPAN_NAVIGATE_TO_INBOX_TAB);
+        cancelTabNavigationSpans();
         startSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_INBOX_TAB, {
             name: CONST.TELEMETRY.SPAN_NAVIGATE_TO_INBOX_TAB,
             op: CONST.TELEMETRY.SPAN_NAVIGATE_TO_INBOX_TAB,
