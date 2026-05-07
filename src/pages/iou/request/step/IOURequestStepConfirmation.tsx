@@ -309,37 +309,33 @@ function IOURequestStepConfirmation({
         const hasDefaultParticipants = defaultParticipants.length > 0;
         return !hasTransactionParticipants && !hasDefaultParticipants && isNewManualExpenseFlowEnabled && isManualRequest;
     }, [transaction?.transactionID, transaction?.participants, defaultParticipants.length, isNewManualExpenseFlowEnabled, isManualRequest]);
-    const [isParticipantPickerVisible, setIsParticipantPickerVisible] = useState(false);
-    const [hasAutoOpenedParticipantPicker, setHasAutoOpenedParticipantPicker] = useState(false);
+    const activeTransactionID = transaction?.transactionID;
+    const [manuallyOpenedParticipantPickerForTransactionID, setManuallyOpenedParticipantPickerForTransactionID] = useState<string | undefined>();
+    const [dismissedAutoOpenParticipantPickerForTransactionID, setDismissedAutoOpenParticipantPickerForTransactionID] = useState<string | undefined>();
     const participantPickerIOUType = iouType === CONST.IOU.TYPE.SUBMIT || iouType === CONST.IOU.TYPE.TRACK ? CONST.IOU.TYPE.CREATE : iouType;
-
-    useEffect(() => {
-        setHasAutoOpenedParticipantPicker(false);
-    }, [transaction?.transactionID]);
-
-    useEffect(() => {
-        if (!shouldAutoOpenParticipantPicker || hasAutoOpenedParticipantPicker) {
-            return;
-        }
-        setIsParticipantPickerVisible(true);
-        setHasAutoOpenedParticipantPicker(true);
-    }, [shouldAutoOpenParticipantPicker, hasAutoOpenedParticipantPicker]);
+    const isParticipantPickerVisible =
+        manuallyOpenedParticipantPickerForTransactionID === activeTransactionID ||
+        (shouldAutoOpenParticipantPicker && dismissedAutoOpenParticipantPickerForTransactionID !== activeTransactionID);
 
     const closeParticipantPicker = useCallback(() => {
-        setIsParticipantPickerVisible(false);
-    }, []);
+        setManuallyOpenedParticipantPickerForTransactionID(undefined);
+        if (!activeTransactionID) {
+            return;
+        }
+        setDismissedAutoOpenParticipantPickerForTransactionID(activeTransactionID);
+    }, [activeTransactionID]);
 
     const handleParticipantsAdded = useCallback(
         (participantsList: Participant[]) => {
-            if (!transaction?.transactionID) {
+            if (!activeTransactionID) {
                 return;
             }
-            setMoneyRequestParticipants(transaction.transactionID, participantsList);
+            setMoneyRequestParticipants(activeTransactionID, participantsList);
             if (participantsList.length > 0) {
-                setIsParticipantPickerVisible(false);
+                closeParticipantPicker();
             }
         },
-        [transaction?.transactionID],
+        [activeTransactionID, closeParticipantPicker],
     );
 
     useEffect(() => {
@@ -794,7 +790,12 @@ function IOURequestStepConfirmation({
                             <MoneyRequestConfirmationList
                                 transaction={transaction}
                                 selectedParticipants={participants}
-                                onOpenParticipantPicker={() => setIsParticipantPickerVisible(true)}
+                                onOpenParticipantPicker={() => {
+                                    if (!activeTransactionID) {
+                                        return;
+                                    }
+                                    setManuallyOpenedParticipantPickerForTransactionID(activeTransactionID);
+                                }}
                                 onToggleBillable={setBillable}
                                 onConfirm={onConfirm}
                                 onSendMoney={sendMoney}
