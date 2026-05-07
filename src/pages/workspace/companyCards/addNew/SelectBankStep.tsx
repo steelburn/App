@@ -13,7 +13,6 @@ import {useCompanyCardBankIcons} from '@hooks/useCompanyCardIcons';
 import useLocalize from '@hooks/useLocalize';
 import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
-import usePermissions from '@hooks/usePermissions';
 import useThemeIllustrations from '@hooks/useThemeIllustrations';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {isUsingStagingApi} from '@libs/ApiUtils';
@@ -35,8 +34,6 @@ function SelectBankStep() {
     const illustrations = useThemeIllustrations();
     const companyCardBankIcons = useCompanyCardBankIcons();
     const {isOffline} = useNetwork();
-    const {isBetaEnabled} = usePermissions();
-
     const [addNewCard] = useOnyx(ONYXKEYS.ADD_NEW_COMPANY_CARD);
     const [shouldUseStagingServer = isUsingStagingApi()] = useOnyx(ONYXKEYS.SHOULD_USE_STAGING_SERVER);
     const [localBankSelected, setLocalBankSelected] = useState<ValueOf<typeof CONST.COMPANY_CARDS.BANKS> | null>();
@@ -86,7 +83,7 @@ function SelectBankStep() {
                 return CONFIG.ENVIRONMENT !== CONST.ENVIRONMENT.PRODUCTION || shouldUseStagingServer;
             }
             if (bank === CONST.COMPANY_CARDS.BANKS.FILE_IMPORT) {
-                return isBetaEnabled(CONST.BETAS.CSV_CARD_IMPORT);
+                return false;
             }
             return true;
         })
