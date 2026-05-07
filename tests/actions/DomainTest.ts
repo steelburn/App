@@ -1333,9 +1333,8 @@ describe('actions/Domain', () => {
             const SECURITY_GROUP_KEY = `${CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX}${groupID}`;
 
             expect(apiWriteSpy).toHaveBeenCalledWith(
-                WRITE_COMMANDS.UPDATE_DOMAIN_SECURITY_GROUP,
-                // placeholder settingsName, waiting for BE
-                {domainAccountID, name: SECURITY_GROUP_KEY, value: JSON.stringify(newSecurityGroup), settingsName: 'createGroup'},
+                WRITE_COMMANDS.CREATE_DOMAIN_SECURITY_GROUP,
+                {domainAccountID, name: SECURITY_GROUP_KEY, value: JSON.stringify(newSecurityGroup), shouldSetAsDefaultGroup: false},
                 {
                     optimisticData: expect.arrayContaining([
                         expect.objectContaining({
@@ -1344,7 +1343,7 @@ describe('actions/Domain', () => {
                         }),
                         expect.objectContaining({
                             key: `${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`,
-                            value: {[SECURITY_GROUP_KEY]: {pendingAction: CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD}},
+                            value: {[SECURITY_GROUP_KEY]: {createGroup: CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD}},
                         }),
                         expect.objectContaining({
                             key: `${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`,
@@ -1354,7 +1353,7 @@ describe('actions/Domain', () => {
                     successData: expect.arrayContaining([
                         expect.objectContaining({
                             key: `${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`,
-                            value: {[SECURITY_GROUP_KEY]: {pendingAction: null}},
+                            value: {[SECURITY_GROUP_KEY]: {createGroup: null}},
                         }),
                         expect.objectContaining({
                             key: `${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`,
@@ -1368,7 +1367,7 @@ describe('actions/Domain', () => {
                         }),
                         expect.objectContaining({
                             key: `${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`,
-                            value: {[SECURITY_GROUP_KEY]: {pendingAction: null}},
+                            value: {[SECURITY_GROUP_KEY]: {createGroup: CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD}},
                         }),
                         expect.objectContaining({
                             key: `${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`,
