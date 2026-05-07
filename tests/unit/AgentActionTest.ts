@@ -278,13 +278,13 @@ describe('deleteAgent', () => {
     });
 
     it('calls write with DELETE_AGENT command and correct params', () => {
-        deleteAgent(TEST_ACCOUNT_ID);
+        deleteAgent(TEST_ACCOUNT_ID, {prompt: 'Test prompt'});
 
         expect(mockWrite).toHaveBeenCalledWith(WRITE_COMMANDS.DELETE_AGENT, {accountID: TEST_ACCOUNT_ID}, expect.any(Object));
     });
 
     it('optimistic data sets the prompt key to null using SET method', () => {
-        deleteAgent(TEST_ACCOUNT_ID);
+        deleteAgent(TEST_ACCOUNT_ID, {prompt: 'Test prompt'});
 
         const {optimisticData} = getWriteOptions();
         const promptUpdate = optimisticData.find((u) => u.key === `${ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT}${TEST_ACCOUNT_ID}`);
@@ -294,7 +294,7 @@ describe('deleteAgent', () => {
     });
 
     it('optimistic data nulls the personal detail entry', () => {
-        deleteAgent(TEST_ACCOUNT_ID);
+        deleteAgent(TEST_ACCOUNT_ID, {prompt: 'Test prompt'});
 
         const {optimisticData} = getWriteOptions();
         const personalDetailUpdate = optimisticData.find((u) => u.key === ONYXKEYS.PERSONAL_DETAILS_LIST);
@@ -303,7 +303,7 @@ describe('deleteAgent', () => {
     });
 
     it('failure data restores the personal detail entry with accountID', () => {
-        deleteAgent(TEST_ACCOUNT_ID);
+        deleteAgent(TEST_ACCOUNT_ID, {prompt: 'Test prompt'});
 
         const {failureData} = getWriteOptions();
         const personalDetailUpdate = failureData.find((u) => u.key === ONYXKEYS.PERSONAL_DETAILS_LIST);
@@ -311,8 +311,18 @@ describe('deleteAgent', () => {
         expect((personalDetailUpdate?.value as Record<string, unknown>)[TEST_ACCOUNT_ID]).toMatchObject({accountID: TEST_ACCOUNT_ID});
     });
 
+    it('failure data restores the agent prompt key using SET method', () => {
+        deleteAgent(TEST_ACCOUNT_ID, {prompt: 'Test prompt'});
+
+        const {failureData} = getWriteOptions();
+        const promptUpdate = failureData.find((u) => u.key === `${ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT}${TEST_ACCOUNT_ID}`);
+
+        expect(promptUpdate?.onyxMethod).toBe('set');
+        expect(promptUpdate?.value).toMatchObject({prompt: 'Test prompt'});
+    });
+
     it('calls Navigation.navigate after issuing the write', () => {
-        deleteAgent(TEST_ACCOUNT_ID);
+        deleteAgent(TEST_ACCOUNT_ID, {prompt: 'Test prompt'});
 
         expect(mockNavigate).toHaveBeenCalledTimes(1);
     });

@@ -37,7 +37,7 @@ function EditAgentPage({route}: EditAgentPageProps) {
 
     const handleDeleteAgent = () => {
         setIsDeleteModalVisible(false);
-        deleteAgent(accountID);
+        deleteAgent(accountID, agent);
     };
 
     return (
