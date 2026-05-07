@@ -588,12 +588,10 @@ function IOURequestStepDistance({
         // For a map-based distance edit, require valid waypoints even when saving from the Manual tab.
         // Without this, clearing waypoints on the Map tab and then saving on Manual would persist a
         // half-broken transaction and surface "Please select a valid waypoint" only post-save. Surface
-        // the error inline on the Manual tab pointing the user back to the Map tab — the existing
-        // address-based copy ("at least two different addresses") would be confusing here since the
-        // Manual tab has no address inputs.
+        // the existing waypoint error inline on the Manual tab so the user sees it immediately.
         const wasOriginallyMapDistance = !isEmpty(transactionBackup?.comment?.waypoints);
         if (wasOriginallyMapDistance && (duplicateWaypointsError || atLeastTwoDifferentWaypointsError || hasRouteError)) {
-            setManualFormError(translate('iou.error.fixWaypointsOnMapTab'));
+            setManualFormError(translate('iou.error.atLeastTwoDifferentWaypoints'));
             return;
         }
 
