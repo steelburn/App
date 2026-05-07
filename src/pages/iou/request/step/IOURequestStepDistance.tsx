@@ -92,6 +92,7 @@ function IOURequestStepDistance({
     const policy = usePolicy(report?.policyID);
     const [policyCategories] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${policy?.id}`);
     const [policyTags] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_TAGS}${policy?.id}`);
+    const [allPolicies] = useOnyx(ONYXKEYS.COLLECTION.POLICY);
     const personalPolicy = usePersonalPolicy();
     const [personalDetails] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST);
     const defaultExpensePolicy = useDefaultExpensePolicy();
@@ -529,6 +530,7 @@ function IOURequestStepDistance({
                     currentUserEmailParam,
                     isASAPSubmitBetaEnabled,
                     parentReportNextStep,
+                    allPolicies,
                 });
             }
             transactionWasSaved.current = true;
@@ -567,6 +569,7 @@ function IOURequestStepDistance({
         currentUserEmailParam,
         isASAPSubmitBetaEnabled,
         parentReportNextStep,
+        allPolicies,
     ]);
 
     const submitManualDistance = useCallback(() => {
@@ -621,6 +624,7 @@ function IOURequestStepDistance({
             isASAPSubmitBetaEnabled,
             parentReportNextStep,
             recentWaypoints,
+            allPolicies,
         });
         transactionWasSaved.current = true;
         // Remove the backup eagerly so the parent report view reads the optimistic transaction
@@ -652,6 +656,7 @@ function IOURequestStepDistance({
         isASAPSubmitBetaEnabled,
         parentReportNextStep,
         recentWaypoints,
+        allPolicies,
     ]);
 
     const renderItem = useCallback(

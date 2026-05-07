@@ -169,15 +169,6 @@ Onyx.connect({
     },
 });
 
-let allPolicies: OnyxCollection<OnyxTypes.Policy>;
-Onyx.connect({
-    key: ONYXKEYS.COLLECTION.POLICY,
-    waitForCollectionCallback: true,
-    callback: (value) => {
-        allPolicies = value;
-    },
-});
-
 let allReports: OnyxCollection<OnyxTypes.Report>;
 Onyx.connect({
     key: ONYXKEYS.COLLECTION.REPORT,
@@ -232,10 +223,6 @@ Onyx.connectWithoutView({
     key: ONYXKEYS.NVP_RECENT_ATTENDEES,
     callback: (value) => (recentAttendees = value),
 });
-
-function getAllPolicies(): OnyxCollection<OnyxTypes.Policy> {
-    return allPolicies;
-}
 
 function getAllPersonalDetails(): OnyxTypes.PersonalDetailsList {
     return allPersonalDetails;
@@ -1106,7 +1093,6 @@ export {
     shouldOptimisticallyUpdateSearch,
     setMoneyRequestReimbursable,
     startDistanceRequest,
-    getAllPolicies,
     getAllPersonalDetails,
     getAllTransactions,
     getAllTransactionViolations,

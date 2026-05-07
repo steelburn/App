@@ -48,7 +48,7 @@ import type {SearchResultDataType} from '@src/types/onyx/SearchResults';
 import type {Routes, TransactionChanges, WaypointCollection} from '@src/types/onyx/Transaction';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
 import type {UpdateMoneyRequestData} from '.';
-import {getAllPolicies, getAllReports, getAllTransactions, getAllTransactionViolations, getPolicyTagsData, getRecentAttendees} from '.';
+import {getAllReports, getAllTransactions, getAllTransactionViolations, getPolicyTagsData, getRecentAttendees} from '.';
 import {getUpdatedMoneyRequestReportData, mergePolicyRecentlyUsedCategories, mergePolicyRecentlyUsedCurrencies} from './MoneyRequestBuilder';
 
 type UpdateMoneyRequestDateParams = {
@@ -498,6 +498,7 @@ type UpdateMoneyRequestDistanceParams = {
     odometerStart?: number;
     odometerEnd?: number;
     parentReportNextStep: OnyxEntry<OnyxTypes.ReportNextStepDeprecated>;
+    allPolicies?: OnyxCollection<OnyxTypes.Policy>;
 };
 
 /** Updates the waypoints of a distance expense */
@@ -519,6 +520,7 @@ function updateMoneyRequestDistance({
     odometerStart,
     odometerEnd,
     parentReportNextStep,
+    allPolicies,
 }: UpdateMoneyRequestDistanceParams) {
     const transactionChanges: TransactionChanges = {
         // Don't sanitize waypoints here - keep all fields for Onyx optimistic data (e.g., keyForList)
@@ -535,7 +537,7 @@ function updateMoneyRequestDistance({
     let data: UpdateMoneyRequestData<UpdateMoneyRequestDataKeys | typeof ONYXKEYS.NVP_RECENT_WAYPOINTS>;
 
     if (isTrackExpenseReport(transactionThreadReport) && isSelfDM(parentReport)) {
-        data = getUpdateTrackExpenseParams(transaction?.transactionID, transactionThreadReport?.reportID, transactionChanges, policy);
+        data = getUpdateTrackExpenseParams(transaction?.transactionID, transactionThreadReport?.reportID, transactionChanges, policy, undefined, allPolicies);
     } else {
         data = getUpdateMoneyRequestParams({
             transactionID: transaction?.transactionID,
@@ -1535,6 +1537,7 @@ function getUpdateTrackExpenseParams(
     transactionChanges: TransactionChanges,
     policy: OnyxEntry<OnyxTypes.Policy>,
     shouldBuildOptimisticModifiedExpenseReportAction = true,
+    allPolicies?: OnyxCollection<OnyxTypes.Policy>,
 ): UpdateMoneyRequestData<
     typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS | typeof ONYXKEYS.COLLECTION.TRANSACTION | typeof ONYXKEYS.COLLECTION.REPORT | typeof ONYXKEYS.COLLECTION.TRANSACTION_DRAFT
 > {
@@ -1553,8 +1556,7 @@ function getUpdateTrackExpenseParams(
     const chatReport = getAllReports()?.[`${ONYXKEYS.COLLECTION.REPORT}${transactionThread?.parentReportID}`] ?? null;
     const isDistanceTransaction = transaction && isDistanceRequestTransactionUtils(transaction);
     const isUnreported = transaction && isExpenseUnreported(transaction);
-    const distanceOriginalPolicy =
-        isDistanceTransaction && isUnreported ? getDistanceRateOriginalPolicy(transaction?.comment?.customUnit?.customUnitRateID, getAllPolicies(), policy) : undefined;
+    const distanceOriginalPolicy = isDistanceTransaction && isUnreported ? getDistanceRateOriginalPolicy(transaction?.comment?.customUnit?.customUnitRateID, allPolicies, policy) : undefined;
     const policyForTransaction = distanceOriginalPolicy ?? policy;
     const updatedTransaction = transaction
         ? getUpdatedTransaction({
