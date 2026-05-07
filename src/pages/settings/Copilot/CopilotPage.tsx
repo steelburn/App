@@ -298,6 +298,7 @@ function CopilotPage() {
                 wrapperStyle: [styles.sectionMenuItemTopDescription],
                 disabled: isPending || isCurrentUser,
                 onPress: () => switchToDelegator(email),
+                role: CONST.ROLE.LINK,
                 error: connectError,
                 onPendingActionDismiss: () => clearDelegatorErrors({delegatedAccess: account?.delegatedAccess}),
                 shouldShowRightComponent: true,
