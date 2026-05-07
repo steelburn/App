@@ -1,113 +1,90 @@
-import {useCallback} from 'react';
-import type {OnyxCollection} from 'react-native-onyx';
+import type {NavigationState, PartialState} from '@react-navigation/native';
 import {getPreservedNavigatorState} from '@libs/Navigation/AppNavigator/createSplitNavigator/usePreserveNavigatorState';
 import {isFullScreenName, isWorkspaceNavigatorRouteName} from '@libs/Navigation/helpers/isNavigatorName';
 import {getWorkspacesTabStateFromSessionStorage} from '@libs/Navigation/helpers/lastVisitedTabPathUtils';
 import navigateToWorkspacesPage from '@libs/Navigation/helpers/navigateToWorkspacesPage';
 import {getTabState} from '@libs/Navigation/helpers/tabNavigatorUtils';
+import navigationRef from '@libs/Navigation/navigationRef';
 import type {DomainSplitNavigatorParamList, WorkspaceSplitNavigatorParamList} from '@libs/Navigation/types';
 import NAVIGATORS from '@src/NAVIGATORS';
-import ONYXKEYS from '@src/ONYXKEYS';
 import type SCREENS from '@src/SCREENS';
-import type {Domain, Policy} from '@src/types/onyx';
-import useCurrentUserPersonalDetails from './useCurrentUserPersonalDetails';
-import useOnyx from './useOnyx';
 import useResponsiveLayout from './useResponsiveLayout';
-import useRootNavigationState from './useRootNavigationState';
+
+type WorkspaceRouteType = NavigationState['routes'][number] | NonNullable<PartialState<NavigationState>['routes']>[number];
+type WorkspaceParams = WorkspaceSplitNavigatorParamList[typeof SCREENS.WORKSPACE.INITIAL] | DomainSplitNavigatorParamList[typeof SCREENS.DOMAIN.INITIAL];
+
+/**
+ * Walks the root nav state to find the last workspace/domain route the user had open.
+ * Falls back to session storage when no live workspace route exists.
+ *
+ * Multiple TAB_NAVIGATOR instances can coexist in the root stack — when navigation from
+ * inside an RHP targets a tab, linkTo PUSHes a fresh TabNavigator above the modal, and that
+ * new instance's WORKSPACE_NAVIGATOR slot starts empty. Older instances kept alive by
+ * ensureTabNavigatorRoutes still hold the previous workspace state, so flatten every
+ * workspace route from every TabNavigator in stack order and take the most recent one.
+ */
+function findLastWorkspaceRoute(rootState: NavigationState | undefined): WorkspaceRouteType | undefined {
+    const topmostFullScreenRoute = rootState?.routes?.findLast((route) => isFullScreenName(route.name));
+    if (!topmostFullScreenRoute) {
+        return undefined;
+    }
+
+    const lastWorkspaceRoute = (rootState?.routes ?? [])
+        .filter((route) => route.name === NAVIGATORS.TAB_NAVIGATOR)
+        .flatMap((tabNavigatorRoute) => {
+            const workspaceNavigatorRoute = getTabState(tabNavigatorRoute)?.routes?.find((route) => route.name === NAVIGATORS.WORKSPACE_NAVIGATOR);
+            const workspaceNavigatorState = workspaceNavigatorRoute?.state ?? (workspaceNavigatorRoute?.key ? getPreservedNavigatorState(workspaceNavigatorRoute.key) : undefined);
+            return workspaceNavigatorState?.routes?.filter((route) => isWorkspaceNavigatorRouteName(route.name)) ?? [];
+        })
+        .at(-1);
+
+    if (lastWorkspaceRoute) {
+        return lastWorkspaceRoute;
+    }
+
+    return getWorkspacesTabStateFromSessionStorage()
+        ?.routes?.findLast((route) => route.name === NAVIGATORS.WORKSPACE_NAVIGATOR)
+        ?.state?.routes?.findLast((route) => isWorkspaceNavigatorRouteName(route.name));
+}
+
+function getWorkspacesTabState(route: WorkspaceRouteType | undefined): NavigationState | PartialState<NavigationState> | undefined {
+    if (!route) {
+        return undefined;
+    }
+    return route.state ?? (route.key ? getPreservedNavigatorState(route.key) : undefined);
+}
 
 /**
  * The Workspaces tab can show three things: the workspaces list, a specific workspace page,
  * or a specific domain page. When the user navigates away and comes back to the tab,
  * this hook ensures they return to whichever of those they had open last — not always the list.
  *
- * It resolves the last visited route from navigation state, fetches the matching policy/domain
- * from Onyx (to verify it's still accessible), and returns a callback that performs the navigation.
+ * Resolves nav state and route IDs at click time inside the returned callback so the hook
+ * has no reactive subscriptions to nav state — unrelated navigations (e.g. opening a report)
+ * don't trigger re-renders. The destination workspace/domain page handles invalid IDs.
  */
 function useRestoreWorkspacesTabOnNavigate() {
     const {shouldUseNarrowLayout} = useResponsiveLayout();
-    const {login: currentUserLogin} = useCurrentUserPersonalDetails();
 
-    // Find the last route the user had open in the Workspaces tab (workspace, domain, or list).
-    // Priority: live nav state (root level) -> inside TabNavigator -> preserved state -> session storage.
-    const routeState = useRootNavigationState((rootState) => {
+    return () => {
+        const rootState = navigationRef.isReady() ? navigationRef.getRootState() : undefined;
         const topmostFullScreenRoute = rootState?.routes?.findLast((route) => isFullScreenName(route.name));
-        if (!topmostFullScreenRoute) {
-            return {};
-        }
+        const lastWorkspacesTabNavigatorRoute = findLastWorkspaceRoute(rootState);
+        const workspacesTabState = getWorkspacesTabState(lastWorkspacesTabNavigatorRoute);
 
-        // Multiple TAB_NAVIGATOR instances can coexist in the root stack — when navigation from
-        // inside an RHP targets a tab, linkTo PUSHes a fresh TabNavigator above the modal, and that
-        // new instance's WORKSPACE_NAVIGATOR slot starts empty. Older instances kept alive by
-        // ensureTabNavigatorRoutes still hold the previous workspace state, so flatten every
-        // workspace route from every TabNavigator in stack order and take the most recent one.
-        const lastWorkspaceRoute = (rootState?.routes ?? [])
-            .filter((route) => route.name === NAVIGATORS.TAB_NAVIGATOR)
-            .flatMap((tabNavigatorRoute) => {
-                const workspaceNavigatorRoute = getTabState(tabNavigatorRoute)?.routes?.find((route) => route.name === NAVIGATORS.WORKSPACE_NAVIGATOR);
-                const workspaceNavigatorState = workspaceNavigatorRoute?.state ?? (workspaceNavigatorRoute?.key ? getPreservedNavigatorState(workspaceNavigatorRoute.key) : undefined);
-                return workspaceNavigatorState?.routes?.filter((route) => isWorkspaceNavigatorRouteName(route.name)) ?? [];
-            })
-            .at(-1);
+        const params = workspacesTabState?.routes?.at(0)?.params as WorkspaceParams | undefined;
+        const policyID = params && 'policyID' in params ? params.policyID : undefined;
+        const domainAccountID = params && 'domainAccountID' in params ? params.domainAccountID : undefined;
 
-        if (lastWorkspaceRoute) {
-            const tabState = lastWorkspaceRoute.state ?? (lastWorkspaceRoute.key ? getPreservedNavigatorState(lastWorkspaceRoute.key) : undefined);
-            return {lastWorkspacesTabNavigatorRoute: lastWorkspaceRoute, workspacesTabState: tabState, topmostFullScreenRoute};
-        }
-
-        // Fall back to session storage when no workspace route exists anywhere in the navigation tree.
-        const sessionRoute = getWorkspacesTabStateFromSessionStorage()
-            ?.routes?.findLast((route) => route.name === NAVIGATORS.WORKSPACE_NAVIGATOR)
-            ?.state?.routes?.findLast((route) => isWorkspaceNavigatorRouteName(route.name));
-        if (sessionRoute) {
-            return {lastWorkspacesTabNavigatorRoute: sessionRoute, workspacesTabState: sessionRoute.state, topmostFullScreenRoute};
-        }
-
-        return {topmostFullScreenRoute};
-    });
-
-    const {lastWorkspacesTabNavigatorRoute, workspacesTabState, topmostFullScreenRoute} = routeState;
-
-    // If the last route was a specific workspace or domain, extract its ID from params
-    const params = workspacesTabState?.routes?.at(0)?.params as
-        | WorkspaceSplitNavigatorParamList[typeof SCREENS.WORKSPACE.INITIAL]
-        | DomainSplitNavigatorParamList[typeof SCREENS.DOMAIN.INITIAL];
-    const paramsPolicyID = params && 'policyID' in params ? params.policyID : undefined;
-    const paramsDomainAccountID = params && 'domainAccountID' in params ? params.domainAccountID : undefined;
-
-    // Fetch the policy/domain to verify it's still accessible (not deleted/hidden) before restoring
-    const lastViewedPolicySelector = useCallback(
-        (policies: OnyxCollection<Policy>) => {
-            if (lastWorkspacesTabNavigatorRoute?.name !== NAVIGATORS.WORKSPACE_SPLIT_NAVIGATOR || !paramsPolicyID) {
-                return undefined;
-            }
-            return policies?.[`${ONYXKEYS.COLLECTION.POLICY}${paramsPolicyID}`];
-        },
-        [lastWorkspacesTabNavigatorRoute?.name, paramsPolicyID],
-    );
-    const [lastViewedPolicy] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {selector: lastViewedPolicySelector});
-
-    const lastViewedDomainSelector = useCallback(
-        (domains: OnyxCollection<Domain>) => {
-            if (lastWorkspacesTabNavigatorRoute?.name !== NAVIGATORS.DOMAIN_SPLIT_NAVIGATOR || !paramsDomainAccountID) {
-                return undefined;
-            }
-            return domains?.[`${ONYXKEYS.COLLECTION.DOMAIN}${paramsDomainAccountID}`];
-        },
-        [lastWorkspacesTabNavigatorRoute?.name, paramsDomainAccountID],
-    );
-    const [lastViewedDomain] = useOnyx(ONYXKEYS.COLLECTION.DOMAIN, {selector: lastViewedDomainSelector});
-
-    return useCallback(() => {
         navigateToWorkspacesPage({
             shouldUseNarrowLayout,
-            currentUserLogin,
-            policy: lastViewedPolicy,
-            domain: lastViewedDomain,
+            policyID,
+            domainAccountID,
             lastWorkspacesTabNavigatorRoute,
             topmostFullScreenRoute,
             workspacesTabState,
         });
-    }, [shouldUseNarrowLayout, currentUserLogin, lastViewedPolicy, lastViewedDomain, lastWorkspacesTabNavigatorRoute, topmostFullScreenRoute, workspacesTabState]);
+    };
 }
 
 export default useRestoreWorkspacesTabOnNavigate;
