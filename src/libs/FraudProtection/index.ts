@@ -14,6 +14,9 @@ function sendAccountAttributes() {
     setAttribute('email', cachedAccount?.primaryLogin ?? '', false, true);
     setAttribute('mfa', cachedAccount?.requiresTwoFactorAuth ? '2fa_enabled' : '2fa_disabled', false, true);
     setAttribute('is_validated', cachedAccount?.validated ? 'true' : 'false', false, true);
+    if (cachedSession?.authMethod) {
+        setAttribute('authentication', cachedSession.authMethod, false, true);
+    }
 }
 
 function trySendToFraudProtection() {
