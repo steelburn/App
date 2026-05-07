@@ -9725,12 +9725,6 @@ const CONST = {
     HOME: {
         ANNOUNCEMENTS: [
             {
-                title: 'New global partnerships: banking, travel, accounting, & more',
-                subtitle: 'Newsletter',
-                url: 'https://use.expensify.com/blog/expensify-new-integrations-march-2026',
-                publishedDate: '2026-03-25',
-            },
-            {
                 title: 'Smarter cards, mileage, and approvals',
                 subtitle: 'Product update',
                 url: 'https://use.expensify.com/blog/expensify-april-2026-product-update',
@@ -9741,6 +9735,12 @@ const CONST = {
                 subtitle: 'Press release',
                 url: 'https://www.businesswire.com/news/home/20260421550894/en/Expensify-Partners-With-IOCP-to-Expand-Access-to-Modern-Spend-Management',
                 publishedDate: '2026-04-21',
+            },
+            {
+                title: 'Expensify named Expense Platform of the Year',
+                subtitle: 'Press release',
+                url: 'https://www.businesswire.com/news/home/20260506556347/en/Expensify-Named-Expense-Management-Platform-of-the-Year',
+                publishedDate: '2026-05-06',
             },
         ],
     },
