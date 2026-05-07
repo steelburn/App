@@ -1,3 +1,4 @@
+import {useNavigation} from '@react-navigation/native';
 import {domainSecurityGroupSettingErrorsSelector, domainSecurityGroupSettingPendingActionSelector, selectGroupByID} from '@selectors/Domain';
 import React from 'react';
 import {View} from 'react-native';
@@ -33,6 +34,8 @@ function DomainGroupDetailsPage({route}: DomainGroupDetailsPageProps) {
 
     const {translate} = useLocalize();
 
+    const navigation = useNavigation();
+
     const [group] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {
         selector: selectGroupByID(groupID),
     });
@@ -40,8 +43,18 @@ function DomainGroupDetailsPage({route}: DomainGroupDetailsPageProps) {
     const [namePendingAction] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`, {selector: domainSecurityGroupSettingPendingActionSelector('name', groupID)});
     const [nameErrors] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN_ERRORS}${domainAccountID}`, {selector: domainSecurityGroupSettingErrorsSelector('nameErrors', groupID)});
 
+    const [deleteGroupPendingAction] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`, {
+        selector: domainSecurityGroupSettingPendingActionSelector('deleteGroup', groupID),
+    });
+
+    // Block access to a group being deleted, and avoid flashing the not-found page during RHP navigation
+    const isDeleting = !group || (!!deleteGroupPendingAction && navigation.canGoBack());
+
     return (
-        <DomainNotFoundPageWrapper domainAccountID={domainAccountID}>
+        <DomainNotFoundPageWrapper
+            domainAccountID={domainAccountID}
+            shouldBeBlocked={isDeleting}
+        >
             <ScreenWrapper
                 shouldEnableMaxHeight
                 testID="DomainGroupDetailsPage"

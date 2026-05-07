@@ -12,7 +12,10 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 
 type DeleteGroupRowProps = {
+    /** The account ID of the domain */
     domainAccountID: number;
+
+    /** The ID of the security group */
     groupID: string;
 };
 
@@ -48,9 +51,8 @@ function DeleteGroupRow({domainAccountID, groupID}: DeleteGroupRowProps) {
         if (result.action !== ModalActions.CONFIRM) {
             return;
         }
-
-        deleteDomainSecurityGroup(domainAccountID, groupID);
         Navigation.goBack(ROUTES.DOMAIN_GROUPS.getRoute(domainAccountID));
+        deleteDomainSecurityGroup(domainAccountID, groupID);
     };
 
     return groupID !== defaultSecurityGroupID ? (
