@@ -57,14 +57,14 @@ function ReportScreen({route, navigation}: ReportScreenProps) {
     const isTopMostReportId = currentReportIDValue === reportIDFromRoute;
     const screenWrapperStyle: ViewStyle[] = [styles.appContent, styles.flex1, {marginTop: viewportOffsetTop}];
 
-    // When the report screen is navigated away from, clear all report action edit drafts
+    // When the report screen is navigated away from or the report changes, clear all report action edit drafts
     useEffect(() => {
         clearAllReportActionDrafts();
 
         return () => {
             clearAllReportActionDrafts();
         };
-    }, []);
+    }, [reportIDFromRoute]);
 
     const shouldDeferNonEssentials = useDeferNonEssentials(reportIDFromRoute);
 
