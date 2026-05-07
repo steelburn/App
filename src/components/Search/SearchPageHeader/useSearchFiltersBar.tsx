@@ -8,6 +8,7 @@ import ReportFieldPopup from '@components/Search/FilterDropdowns/ReportFieldPopu
 import useUpdateFilterQuery from '@components/Search/hooks/useUpdateFilterQuery';
 import {useSearchStateContext} from '@components/Search/SearchContext';
 import type {ReportFieldKey, SearchFilterKey, SearchQueryJSON} from '@components/Search/types';
+import {useCurrencyListActions} from '@hooks/useCurrencyList';
 import useLocalize from '@hooks/useLocalize';
 import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
@@ -125,55 +126,64 @@ function useSearchFiltersBar(queryJSON: SearchQueryJSON): UseSearchFiltersBarRes
     const [searchAdvancedFiltersForm = getEmptyObject<Partial<SearchAdvancedFiltersForm>>()] = useOnyx(ONYXKEYS.FORMS.SEARCH_ADVANCED_FILTERS_FORM);
     const {translate, localeCompare} = useLocalize();
     const {isOffline} = useNetwork();
+    const {convertToDisplayStringWithoutCurrency} = useCurrencyListActions();
     const {shouldShowFiltersBarLoading, currentSearchResults} = useSearchStateContext();
     const updateFilterForm = useUpdateFilterQuery(queryJSON, false);
-    const filters = mapFiltersFormToLabelValueList<FilterItem>(searchAdvancedFiltersForm, queryJSON.policyID, SKIPPED_FILTERS, translate, localeCompare, (filterKey) => ({
-        PopoverComponent: ({closeOverlay, setPopoverWidth}) => (
-            <ListFilterHeightContextProvider>
-                <FilterPopup
-                    filterKey={filterKey}
-                    searchAdvancedFiltersForm={searchAdvancedFiltersForm}
-                    queryJSON={queryJSON}
-                    closeOverlay={closeOverlay}
-                    setPopoverWidth={setPopoverWidth}
-                />
-            </ListFilterHeightContextProvider>
-        ),
-        sentryLabel: getFilterSentryLabel(filterKey),
-        onClosePress: () => {
-            if (isAmountFilterKey(filterKey)) {
-                updateFilterForm({
-                    [`${filterKey}${CONST.SEARCH.AMOUNT_MODIFIERS.EQUAL_TO}`]: undefined,
-                    [`${filterKey}${CONST.SEARCH.AMOUNT_MODIFIERS.GREATER_THAN}`]: undefined,
-                    [`${filterKey}${CONST.SEARCH.AMOUNT_MODIFIERS.LESS_THAN}`]: undefined,
-                });
-                return;
-            }
+    const filters = mapFiltersFormToLabelValueList<FilterItem>(
+        searchAdvancedFiltersForm,
+        queryJSON.policyID,
+        SKIPPED_FILTERS,
+        translate,
+        localeCompare,
+        convertToDisplayStringWithoutCurrency,
+        (filterKey) => ({
+            PopoverComponent: ({closeOverlay, setPopoverWidth}) => (
+                <ListFilterHeightContextProvider>
+                    <FilterPopup
+                        filterKey={filterKey}
+                        searchAdvancedFiltersForm={searchAdvancedFiltersForm}
+                        queryJSON={queryJSON}
+                        closeOverlay={closeOverlay}
+                        setPopoverWidth={setPopoverWidth}
+                    />
+                </ListFilterHeightContextProvider>
+            ),
+            sentryLabel: getFilterSentryLabel(filterKey),
+            onClosePress: () => {
+                if (isAmountFilterKey(filterKey)) {
+                    updateFilterForm({
+                        [`${filterKey}${CONST.SEARCH.AMOUNT_MODIFIERS.EQUAL_TO}`]: undefined,
+                        [`${filterKey}${CONST.SEARCH.AMOUNT_MODIFIERS.GREATER_THAN}`]: undefined,
+                        [`${filterKey}${CONST.SEARCH.AMOUNT_MODIFIERS.LESS_THAN}`]: undefined,
+                    });
+                    return;
+                }
 
-            if (isDateFilterKey(filterKey)) {
-                updateFilterForm({
-                    [`${filterKey}${CONST.SEARCH.DATE_MODIFIERS.ON}`]: undefined,
-                    [`${filterKey}${CONST.SEARCH.DATE_MODIFIERS.BEFORE}`]: undefined,
-                    [`${filterKey}${CONST.SEARCH.DATE_MODIFIERS.AFTER}`]: undefined,
-                    [`${filterKey}${CONST.SEARCH.DATE_MODIFIERS.RANGE}`]: undefined,
-                });
-                return;
-            }
+                if (isDateFilterKey(filterKey)) {
+                    updateFilterForm({
+                        [`${filterKey}${CONST.SEARCH.DATE_MODIFIERS.ON}`]: undefined,
+                        [`${filterKey}${CONST.SEARCH.DATE_MODIFIERS.BEFORE}`]: undefined,
+                        [`${filterKey}${CONST.SEARCH.DATE_MODIFIERS.AFTER}`]: undefined,
+                        [`${filterKey}${CONST.SEARCH.DATE_MODIFIERS.RANGE}`]: undefined,
+                    });
+                    return;
+                }
 
-            if (filterKey === CONST.SEARCH.REPORT_FIELD.GLOBAL_PREFIX) {
-                const formValues = Object.keys(searchAdvancedFiltersForm).reduce((acc, curr) => {
-                    if (curr.startsWith(CONST.SEARCH.REPORT_FIELD.GLOBAL_PREFIX)) {
-                        acc[curr as SearchAdvancedFiltersKey] = undefined;
-                    }
-                    return acc;
-                }, {} as Partial<SearchAdvancedFiltersForm>);
-                updateFilterForm(formValues);
-                return;
-            }
+                if (filterKey === CONST.SEARCH.REPORT_FIELD.GLOBAL_PREFIX) {
+                    const formValues = Object.keys(searchAdvancedFiltersForm).reduce((acc, curr) => {
+                        if (curr.startsWith(CONST.SEARCH.REPORT_FIELD.GLOBAL_PREFIX)) {
+                            acc[curr as SearchAdvancedFiltersKey] = undefined;
+                        }
+                        return acc;
+                    }, {} as Partial<SearchAdvancedFiltersForm>);
+                    updateFilterForm(formValues);
+                    return;
+                }
 
-            updateFilterForm({[filterKey]: undefined});
-        },
-    }));
+                updateFilterForm({[filterKey]: undefined});
+            },
+        }),
+    );
 
     return {
         filters,
