@@ -45,6 +45,11 @@ function SearchPage({route}: SearchPageProps) {
     useConfirmReadyToOpenApp();
     useSearchPageSetup(currentSearchQueryJSON);
 
+    // Adjust state during rendering rather than in a useEffect: the value is consumed in the same
+    // render below (`searchResults = lastNonEmptySearchResults` when sorting), so a useEffect would
+    // commit one stale render before catching up. The reference equality check
+    // (`currentSearchResults !== lastNonEmptySearchResults`) bounds the re-render loop to a single
+    // extra pass — see https://react.dev/reference/react/useState#storing-information-from-previous-renders.
     if (currentSearchResults?.data && !shouldUseLiveData && currentSearchResults !== lastNonEmptySearchResults) {
         setLastNonEmptySearchResults(currentSearchResults);
     }

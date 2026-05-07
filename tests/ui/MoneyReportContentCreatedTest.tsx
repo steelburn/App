@@ -98,7 +98,7 @@ describe('MoneyReportContentCreated', () => {
         renderWithProps({report, transactionThreadReport: undefined});
         await waitForBatchedUpdatesWithAct();
 
-        const lastCall = mockMoneyReportView.mock.calls.at(-1)?.at(0) as Record<string, unknown> | undefined;
+        const lastCall = mockMoneyReportView.mock.calls.at(-1)?.at(0);
         expect(lastCall?.isTotalPending).toBe(true);
     });
 
@@ -126,7 +126,7 @@ describe('MoneyReportContentCreated', () => {
         renderWithProps({report, transactionThreadReport: undefined});
         await waitForBatchedUpdatesWithAct();
 
-        const lastCall = mockMoneyReportView.mock.calls.at(-1)?.at(0) as Record<string, unknown> | undefined;
+        const lastCall = mockMoneyReportView.mock.calls.at(-1)?.at(0);
         expect(lastCall?.isTotalPending).toBe(false);
     });
 
@@ -143,7 +143,7 @@ describe('MoneyReportContentCreated', () => {
         renderWithProps({report, transactionThreadReport: undefined});
         await waitForBatchedUpdatesWithAct();
 
-        const lastCall = mockMoneyReportView.mock.calls.at(-1)?.at(0) as Record<string, unknown> | undefined;
+        const lastCall = mockMoneyReportView.mock.calls.at(-1)?.at(0);
         expect(lastCall?.isTotalPending).toBe(false);
     });
 
@@ -158,7 +158,7 @@ describe('MoneyReportContentCreated', () => {
         renderWithProps({report, transactionThreadReport: undefined});
         await waitForBatchedUpdatesWithAct();
 
-        const lastCall = mockMoneyReportView.mock.calls.at(-1)?.at(0) as Record<string, unknown> | undefined;
+        const lastCall = mockMoneyReportView.mock.calls.at(-1)?.at(0);
         expect(lastCall?.isTotalPending).toBe(false);
     });
 });

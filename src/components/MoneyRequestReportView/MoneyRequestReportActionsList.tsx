@@ -26,7 +26,7 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import useWindowDimensions from '@hooks/useWindowDimensions';
 import {isConsecutiveChronosAutomaticTimerAction} from '@libs/ChronosUtils';
 import DateUtils from '@libs/DateUtils';
-import {hasDeferredWrite} from '@libs/deferredLayoutWrite';
+import {hasDeferredWriteForReport} from '@libs/deferredLayoutWrite';
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import {getAllNonDeletedTransactions, isActionVisibleOnMoneyRequestReport} from '@libs/MoneyRequestReportUtils';
 import Navigation from '@libs/Navigation/Navigation';
@@ -664,11 +664,13 @@ function MoneyRequestReportActionsList({onLayout}: MoneyRequestReportListProps) 
     }, [styles.chatItem.paddingBottom, styles.chatItem.paddingTop, windowHeight, linkedReportActionID]);
 
     const isReportEmpty = isEmpty(visibleReportActions) && isEmpty(transactions) && !showReportActionsLoadingState;
-    // hasDeferredWrite is non-reactive (reads a module-level Map, not tracked by React).
+    // hasDeferredWriteForReport is non-reactive (reads a module-level Map, not tracked by React).
     // This is intentional: we only check on the initial render after the RHP dismisses.
     // Once the deferred write flushes and createTransaction runs, Onyx updates make
     // transactions non-empty, which drives the transition away from the skeleton.
-    const isAwaitingDeferredTransaction = isReportEmpty && hasDeferredWrite(CONST.DEFERRED_LAYOUT_WRITE_KEYS.DISMISS_MODAL);
+    // Scoping to `report.reportID` ensures an unrelated submit flow's pending dismiss doesn't keep
+    // *this* report stuck on the skeleton.
+    const isAwaitingDeferredTransaction = isReportEmpty && hasDeferredWriteForReport(CONST.DEFERRED_LAYOUT_WRITE_KEYS.DISMISS_MODAL, report?.reportID);
     const showEmptyState = isReportEmpty && !isAwaitingDeferredTransaction;
 
     if (!report) {
