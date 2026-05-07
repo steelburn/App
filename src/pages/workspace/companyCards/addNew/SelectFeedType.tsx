@@ -62,41 +62,33 @@ function SelectFeedType() {
         setAddNewCompanyCardStepAndData({step: CONST.COMPANY_CARDS.STEP.SELECT_COUNTRY});
     };
 
-    const data = [
-        {
-            value: CONST.COMPANY_CARDS.FEED_TYPE.CUSTOM,
-            text: translate('workspace.companyCards.commercialFeed'),
-            alternateText: translate('workspace.companyCards.addNewCard.commercialFeedPlaidDetails'),
-            keyForList: CONST.COMPANY_CARDS.FEED_TYPE.CUSTOM,
-            isSelected: typeSelected === CONST.COMPANY_CARDS.FEED_TYPE.CUSTOM,
-        },
-        {
-            value: CONST.COMPANY_CARDS.FEED_TYPE.DIRECT,
-            text: translate('workspace.companyCards.directFeed'),
-            alternateText: translate('workspace.companyCards.addNewCard.directFeedDetails'),
-            keyForList: CONST.COMPANY_CARDS.FEED_TYPE.DIRECT,
-            isSelected: typeSelected === CONST.COMPANY_CARDS.FEED_TYPE.DIRECT,
-        },
-        {
-            value: CONST.COMPANY_CARDS.FEED_TYPE.FILE_IMPORT,
-            text: translate('workspace.companyCards.addNewCard.fileImport'),
-            alternateText: translate('workspace.companyCards.addNewCard.fileImportDescription'),
-            keyForList: CONST.COMPANY_CARDS.FEED_TYPE.FILE_IMPORT,
-            isSelected: typeSelected === CONST.COMPANY_CARDS.FEED_TYPE.FILE_IMPORT,
-        },
-    ];
-
-    const getFinalData = () => {
-        if (doesCountrySupportPlaid) {
-            // Show Direct first, then Commercial, then Import from file
-            return [data.at(1), data.at(0), data.at(2)];
-        }
-
-        // Non-Plaid countries: Commercial feed and Import from file (no Direct feed)
-        return [data.at(0), data.at(2)];
+    const commercialFeedItem = {
+        value: CONST.COMPANY_CARDS.FEED_TYPE.CUSTOM,
+        text: translate('workspace.companyCards.commercialFeed'),
+        alternateText: translate('workspace.companyCards.addNewCard.commercialFeedPlaidDetails'),
+        keyForList: CONST.COMPANY_CARDS.FEED_TYPE.CUSTOM,
+        isSelected: typeSelected === CONST.COMPANY_CARDS.FEED_TYPE.CUSTOM,
     };
 
-    const finalData = getFinalData();
+    const directFeedItem = {
+        value: CONST.COMPANY_CARDS.FEED_TYPE.DIRECT,
+        text: translate('workspace.companyCards.directFeed'),
+        alternateText: translate('workspace.companyCards.addNewCard.directFeedDetails'),
+        keyForList: CONST.COMPANY_CARDS.FEED_TYPE.DIRECT,
+        isSelected: typeSelected === CONST.COMPANY_CARDS.FEED_TYPE.DIRECT,
+    };
+
+    const fileImportItem = {
+        value: CONST.COMPANY_CARDS.FEED_TYPE.FILE_IMPORT,
+        text: translate('workspace.companyCards.addNewCard.fileImport'),
+        alternateText: translate('workspace.companyCards.addNewCard.fileImportDescription'),
+        keyForList: CONST.COMPANY_CARDS.FEED_TYPE.FILE_IMPORT,
+        isSelected: typeSelected === CONST.COMPANY_CARDS.FEED_TYPE.FILE_IMPORT,
+    };
+
+    const finalData = doesCountrySupportPlaid
+        ? [directFeedItem, commercialFeedItem, fileImportItem]
+        : [commercialFeedItem, fileImportItem];
 
     const confirmButtonOptions = useMemo(
         () => ({
