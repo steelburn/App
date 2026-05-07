@@ -36,6 +36,7 @@ import type {
 } from './CardFeeds';
 import type CardOnWaitlist from './CardOnWaitlist';
 import type CodingRuleMatchingTransaction from './CodingRuleMatchingTransaction';
+import type CopyPolicySettings from './CopyPolicySettings';
 import type {CorpayFields, CorpayFormField} from './CorpayFields';
 import type {CorpayOnboardingFields} from './CorpayOnboardingFields';
 import type Credentials from './Credentials';
@@ -213,6 +214,7 @@ export type {
     Domain,
     Download,
     DuplicateWorkspace,
+    CopyPolicySettings,
     WorkspaceCardsList,
     ExpenseRule,
     ExpensifyCardSettings,
