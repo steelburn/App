@@ -40,7 +40,6 @@ import {containsOnlyEmojis, extractEmojis, getAddedEmojis, getTextVSCursorOffset
 import focusComposerWithDelay from '@libs/focusComposerWithDelay';
 import type {Selection} from '@libs/focusComposerWithDelay/types';
 import type {ForwardedFSClassProps} from '@libs/Fullstory/types';
-import getPlatform from '@libs/getPlatform';
 import {addKeyDownPressListener, removeKeyDownPressListener} from '@libs/KeyboardShortcut/KeyDownPressListener';
 import {detectAndRewritePaste} from '@libs/MarkdownLinkHelpers';
 import Parser from '@libs/Parser';
@@ -176,8 +175,6 @@ type SwitchToCurrentReportProps = {
     callback: () => void;
 };
 const {RNTextInputReset} = NativeModules;
-
-const isIOSNative = getPlatform() === CONST.PLATFORM.IOS;
 
 /**
  * Broadcast that the user is typing. Debounced to limit how often we publish client events.
@@ -512,8 +509,9 @@ function ComposerWithSuggestions({
                 const adjustedCursorPosition = cursorPosition !== undefined && cursorPosition !== null ? cursorPosition + textVSOffset : undefined;
                 const position = Math.max((selection.end ?? 0) + (newComment.length - commentRef.current.length), adjustedCursorPosition ?? 0);
 
-                if (commentWithSpaceInserted !== newComment && isIOSNative) {
-                    syncSelectionWithOnChangeTextRef.current = {position, value: newComment};
+                const updatedSyncSelection = getUpdatedSyncSelection({commentWithSpaceInserted, newComment, position});
+                if (updatedSyncSelection) {
+                    syncSelectionWithOnChangeTextRef.current = updatedSyncSelection;
                 }
 
                 // Keep selection in sync after emoji conversion / insertion while editing (e.g. emoji picker on web);

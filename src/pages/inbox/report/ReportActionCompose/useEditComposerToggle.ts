@@ -2,12 +2,10 @@ import {useCallback, useEffect, useRef} from 'react';
 import type {RefObject} from 'react';
 import type {ComposerRef, TextSelection} from '@components/Composer/types';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
-import getPlatform from '@libs/getPlatform';
-import CONST from '@src/CONST';
 import {useComposerActions, useComposerEditState} from './ComposerContext';
 import ReportActionComposeUtils from './ReportActionComposeUtils';
+import updateNativeTextInputValue from './updateNativeTextInputValue/index.ios';
 
-const isIOSNative = getPlatform() === CONST.PLATFORM.IOS;
 type UseEditComposerToggleProps = {
     selection: TextSelection;
     draftComment: string;
@@ -55,12 +53,7 @@ function useEditComposerToggle({selection, draftComment, composerRef, onFocus, o
             const selectionToApply = explicitSelection ?? (shouldUseEditingSelection && !shouldForceSelectionToEnd ? (currentEditMessageSelection ?? defaultSelection) : defaultSelection);
 
             onValueChange?.(nextValue);
-            // We need to manually update the native text prop,
-            // in order to force a re-calculation of the composer height and layout,
-            // when the composer changes in or out of edit mode.
-            if (isIOSNative && options?.shouldForceNativeValueUpdate) {
-                composerRef.current?.setNativeProps({text: nextValue});
-            }
+            updateNativeTextInputValue({text: nextValue, shouldForceNativeValueUpdate: options?.shouldForceNativeValueUpdate ?? false, composerRef});
 
             onSelectionChange?.(selectionToApply);
             ReportActionComposeUtils.updateNativeSelectionValue(composerRef, selectionToApply.start, selectionToApply.end ?? selectionToApply.start);
