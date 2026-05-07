@@ -96,7 +96,7 @@ Concierge can automatically approve reports that don't exceed a specific thresho
 
 Even with auto-approvals enabled, you can route a percentage of compliant reports for manual approval.
 
-1. On the **Workflows** page, click **Random repor.t audit**.
+1. On the **Workflows** page, click **Random report audit**.
 2. Enter your desired percentage amount
 3. Click **Save**.
 
