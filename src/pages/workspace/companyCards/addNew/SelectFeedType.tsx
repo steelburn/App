@@ -91,7 +91,8 @@ function SelectFeedType() {
             return [data[1], data[0], data[2]];
         }
 
-        return data.slice(0, 1);
+        // Non-Plaid countries: Commercial feed and Import from file (no Direct feed)
+        return [data[0], data[2]];
     };
 
     const finalData = getFinalData();
