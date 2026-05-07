@@ -302,7 +302,7 @@ function CopilotPage() {
                 onPendingActionDismiss: () => clearDelegatorErrors({delegatedAccess: account?.delegatedAccess}),
                 shouldShowRightComponent: true,
                 rightComponent: (
-                    <View style={styles.ml2}>
+                    <View style={[styles.ml2, styles.alignSelfCenter]}>
                         <Button
                             small
                             success
