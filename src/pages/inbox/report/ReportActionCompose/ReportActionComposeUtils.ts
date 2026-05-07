@@ -1,10 +1,11 @@
+import type {RefObject} from 'react';
 import type {ComposerRef} from '@components/Composer/types';
 import getPlatform from '@libs/getPlatform';
 import CONST from '@src/CONST';
 
 const isIOSNative = getPlatform() === CONST.PLATFORM.IOS;
 
-const updateNativeSelectionValue = (composerRef: React.RefObject<ComposerRef | null>, start: number, end: number) => {
+const updateNativeSelectionValue = (composerRef: RefObject<ComposerRef | null>, start: number, end: number) => {
     if (!isIOSNative) {
         return;
     }
