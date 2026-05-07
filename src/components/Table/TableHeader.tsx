@@ -60,9 +60,11 @@ function TableHeader<T, ColumnKey extends string = string>({style, shouldHideHea
     return (
         <View
             style={[
-                styles.appBG,
+                styles.highlightBG,
                 styles.mh5,
-                styles.p4,
+                styles.p3,
+                styles.borderBottom,
+                styles.tableTopRadius,
                 // Flexbox fallback for browsers / native devices wider than 1024px which don't support grid
                 styles.dFlex,
                 styles.flexRow,

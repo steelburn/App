@@ -213,7 +213,7 @@ function TransactionGroupListItem<TItem extends ListItem>({
             ...styles.searchTableRowHeight,
             borderRadius: 0,
             paddingVertical: variables.tableGroupRowPaddingVertical,
-            ...(isLastItem ? styles.searchTableBottomRadius : {}),
+            ...(isLastItem ? styles.tableBottomRadius : {}),
         },
         isItemSelected && styles.activeComponentBG,
     ];
@@ -543,8 +543,8 @@ function TransactionGroupListItem<TItem extends ListItem>({
                     isLargeScreenWidth
                         ? [StyleUtils.getSearchTableGroupRowBorderStyle(isFirstItem, isLastItem, isItemSelected), isLastItem && styles.overflowHidden]
                         : [
-                              isFirstItem && [styles.searchTableTopRadius, styles.overflowHidden],
-                              isLastItem && [styles.searchTableBottomRadius, styles.overflowHidden],
+                              isFirstItem && [styles.tableTopRadius, styles.overflowHidden],
+                              isLastItem && [styles.tableBottomRadius, styles.overflowHidden],
                               !isLastItem && StyleUtils.getSelectedBorderBottomStyle(isItemSelected),
                           ],
                 ]}

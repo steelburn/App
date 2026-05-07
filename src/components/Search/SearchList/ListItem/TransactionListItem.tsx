@@ -121,9 +121,9 @@ function TransactionListItem<TItem extends ListItem>({
                   ...StyleUtils.getSearchTableRowPressableStyle(!!isLastItem, item.isSelected),
               }
             : {...styles.flexColumn, ...styles.alignItemsStretch},
-        isLargeScreenWidth && isLastItem && [styles.searchTableBottomRadius, styles.overflowHidden],
-        !isLargeScreenWidth && isFirstItem && [styles.searchTableTopRadius, styles.overflowHidden],
-        !isLargeScreenWidth && isLastItem && [styles.searchTableBottomRadius, styles.overflowHidden],
+        isLargeScreenWidth && isLastItem && [styles.tableBottomRadius, styles.overflowHidden],
+        !isLargeScreenWidth && isFirstItem && [styles.tableTopRadius, styles.overflowHidden],
+        !isLargeScreenWidth && isLastItem && [styles.tableBottomRadius, styles.overflowHidden],
     ];
 
     const animatedHighlightStyle = useAnimatedHighlightStyle({
@@ -223,9 +223,9 @@ function TransactionListItem<TItem extends ListItem>({
                     styles.flex1,
                     animatedHighlightStyle,
                     styles.userSelectNone,
-                    isLargeScreenWidth && isLastItem && styles.searchTableBottomRadius,
-                    !isLargeScreenWidth && isFirstItem && styles.searchTableTopRadius,
-                    !isLargeScreenWidth && isLastItem && styles.searchTableBottomRadius,
+                    isLargeScreenWidth && isLastItem && styles.tableBottomRadius,
+                    !isLargeScreenWidth && isFirstItem && styles.tableTopRadius,
+                    !isLargeScreenWidth && isLastItem && styles.tableBottomRadius,
                     !isLargeScreenWidth && !isLastItem && StyleUtils.getSelectedBorderBottomStyle(item.isSelected),
                 ]}
             >
@@ -266,8 +266,8 @@ function TransactionListItem<TItem extends ListItem>({
                             style={[
                                 styles.p3,
                                 styles.pv2,
-                                !isLargeScreenWidth && [styles.p0, styles.pt3, isLastItem ? styles.searchTableBottomRadius : styles.noBorderRadius],
-                                isLargeScreenWidth && (isLastItem ? styles.searchTableBottomRadius : styles.noBorderRadius),
+                                !isLargeScreenWidth && [styles.p0, styles.pt3, isLastItem ? styles.tableBottomRadius : styles.noBorderRadius],
+                                isLargeScreenWidth && (isLastItem ? styles.tableBottomRadius : styles.noBorderRadius),
                             ]}
                             violations={transactionViolations}
                             onArrowRightPress={isDeletedTransaction ? undefined : () => onSelectRow(item, transactionPreviewData)}

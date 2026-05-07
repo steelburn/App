@@ -2523,12 +2523,12 @@ const staticStyles = (theme: ThemeColors) =>
             borderBottomRightRadius: variables.componentBorderRadiusNormal,
         },
 
-        searchTableTopRadius: {
+        tableTopRadius: {
             borderTopLeftRadius: variables.componentBorderRadius,
             borderTopRightRadius: variables.componentBorderRadius,
         },
 
-        searchTableBottomRadius: {
+        tableBottomRadius: {
             borderBottomLeftRadius: variables.componentBorderRadius,
             borderBottomRightRadius: variables.componentBorderRadius,
         },
