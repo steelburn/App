@@ -190,6 +190,14 @@ function ParentNavigationSubtitle({
                     return;
                 }
             }
+
+            // Stay in the Search tab when the parent link is tapped from a SEARCH_REPORT RHP
+            // and the parent isn't already in the stack — otherwise the REPORT_WITH_ID fallback
+            // would yank the user to Inbox.
+            if (isReportInRHP) {
+                Navigation.navigate(ROUTES.SEARCH_REPORT.getRoute({reportID: parentReportID, reportActionID: isVisibleAction ? parentReportActionID : undefined}));
+                return;
+            }
         }
 
         // If the parent report is already the previous screen in the main stack, go back to it
