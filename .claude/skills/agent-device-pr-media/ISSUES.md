@@ -34,7 +34,7 @@
 - **Concurrent runs / locking**: single-user assumption. Latest run wins. Two simultaneous runs against the same PR cache dir = undefined behavior.
 - **Idempotency**: two runs on the same PR may produce different videos (LLM-driven Phase 1 may take different paths). Acceptable for PR evidence - demonstrates the flow works, byte-identity not required.
 - **Test data accumulation**: accounts/expenses/workspaces created during runs accumulate in the test backend; rely on periodic test-account reset.
-- **Self-demo paradox**: the skill's own PR (`#89475`) is `.claude/`-only and would correctly hit the `SKIP: no runtime code changed` gate. First real demo target should be a PR with `#### Test case N:` headers (e.g. PR #89743 - 5 explicit flows).
+- **Self-demo path**: the skill's own PR (`#89475`) is `.claude/`-only but the skill no longer gates on code changes - it would parse the Tests section and try to drive whatever steps are there. Demo target choice should reflect what the steps actually exercise on the device.
 
 ## Convention adopted (v1)
 
@@ -42,6 +42,23 @@
 - **Platform restriction is opt-in** via PR title or Tests prose ("iOS only", "Android only", "On iOS:"). Default is both. No file-path heuristics, no PR-checklist parsing.
 - **Per-flow artifact**: one MP4 per flow per platform (or one PNG for verify-only single-step flows). Not one big MP4.
 - **Persistent cache**: `~/.cache/agent-device-pr-media/<pr-num>/<run-ts>/`. Survives reboots; latest-run-wins.
+
+## Generalize input source: PR or issue (added 2026-05-07)
+
+- **Removed**: the runtime-code gate. The skill no longer fetches `gh pr diff --name-only` and no longer skips PRs whose diff is `.claude/`-only / docs-only. The user's directive: test steps are the source of truth, not the surrounding code; the skill should be smart enough to extract them from whatever GitHub Markdown body it's pointed at.
+- **Inputs broadened** from "PR number or URL" to "Source URL (PR or issue)". URL path disambiguates kind: `/pull/N` → PR, `/issues/N` → issue. Bare numbers rejected (PR/issue share namespace).
+- **Source-aware parsing**:
+  - PR body → anchor on `### Tests` (with `### Test`, `## Tests` fallbacks).
+  - Issue body → anchor on `## Action Performed:` (with `## Repro`, `## Steps to reproduce`, `## Reproduction Steps` fallbacks).
+  - No anchor match → pass whole body to LLM. The anchor list is a token-cost optimization, not a hard contract.
+- **Issue platform-checklist is a real signal** (unlike PR's, where every box is always checked as "tested on"). The issue template's `## Platforms:` checkboxes denote where the bug reproduces. The platform resolver now uses this when the source is an issue. Aliases: `iOS: App` ≡ `iOS: Native`, `Android: App` ≡ `Android: Native`. mWeb / Windows / MacOS variants stay out of scope.
+- **Issues are typically single-flow.** Bug reports describe one repro path. Multi-flow segmentation logic stays for PRs.
+- **`expected` field added to per-flow manifest** (issues only) - populated from `## Expected Result:`. The driver MAY use it as a final-state assertion target.
+- **New exit code `8 BAD_INPUT`** for malformed / non-PR-non-issue source URLs. Replaces the old exit `2 SKIP` behavior.
+- **Run-output dir generalized** from `<pr-num>/` to `<source-kind>-<source-num>/` (e.g. `pr-89475/`, `issue-89855/`).
+- **Skill name not yet aligned with broadened scope.** Directory + cache path + cross-links still say `agent-device-pr-media`. Rename to something like `agent-device-flow-evidence` or `agent-device-test-recorder` is a candidate follow-up.
+
+Reference: https://github.com/Expensify/App/issues/89855 (and 6 other recent bug-tagged issues sampled 2026-05-07) - all follow the `## Action Performed:` + `## Expected Result:` + `## Platforms:` template consistently.
 
 ## Phase 1 cache (added 2026-05-07)
 

@@ -1,12 +1,14 @@
 ---
 name: agent-device-pr-media
-description: Records iOS/Android native MP4 evidence for an Expensify PR's `### Tests` section flows. Use when the user asks to "record the flow for PR #X", "capture mobile evidence for PR X", or "produce screenshots/videos for PR X". Mobile-native only - declines mWeb and Desktop.
-allowed-tools: Bash(agent-device *) Bash(gh pr view *) Bash(gh pr diff *) Bash(mkdir -p *) Bash(rm -rf *) Bash(ls *) Bash(file *) Bash(test *) Bash(date *) Read Write
+description: Records iOS/Android native MP4 evidence for test/repro flows extracted from an Expensify GitHub PR or issue. Use when the user asks to "record the flow for PR #X", "capture mobile evidence for issue #Y", or "produce screenshots/videos for <PR or issue URL>". Mobile-native only - declines mWeb and Desktop.
+allowed-tools: Bash(agent-device *) Bash(gh pr view *) Bash(gh issue view *) Bash(gh api *) Bash(mkdir -p *) Bash(rm -rf *) Bash(ls *) Bash(file *) Bash(test *) Bash(date *) Read Write
 ---
 
 # agent-device-pr-media
 
-Records `iOS: Native` and `Android: Native` MP4 evidence for an Expensify PR's `### Tests` section. Specializes the [`agent-device`](../agent-device/SKILL.md) skill: delegates device lifecycle (bundle ID, Metro, device pick, session, open) to its [Bring-up](../agent-device/SKILL.md#bring-up), then captures one artifact per declared test flow per platform, writes a JSON manifest, and surfaces local file paths.
+Records `iOS: Native` and `Android: Native` MP4 evidence for the test or repro steps declared in an Expensify GitHub **PR or issue**. The source of truth is the test/repro steps themselves, not the surrounding code or context - the skill works equally well on a PR's `### Tests` section, an issue's `## Action Performed:` block, or any future Markdown body where steps are clearly authored.
+
+Specializes the [`agent-device`](../agent-device/SKILL.md) skill: delegates device lifecycle (bundle ID, Metro, device pick, session, open) to its [Bring-up](../agent-device/SKILL.md#bring-up), then captures one artifact per declared flow per platform, writes a JSON manifest, and surfaces local file paths.
 
 The skill is **autonomous and non-interactive**. It never pauses for user input mid-run. All inputs are provided at invocation time; all failures surface as structured errors with exit codes.
 
@@ -14,58 +16,93 @@ HybridApp-only (the parent skill's pre-flight enforces this). Standalone (non-Hy
 
 ## Scope
 
-**In scope:** `iOS: Native` (iOS Simulator), `Android: Native` (Android Emulator), HybridApp dev build only.
+**In scope:** `iOS: Native` (iOS Simulator), `Android: Native` (Android Emulator), HybridApp dev build only. Inputs may come from PRs or issues - the skill does not gate on code changes.
 
-**Out of scope:** `Android: mWeb Chrome`, `iOS: mWeb Safari`, `MacOS: Chrome / Safari`. Decline with `EXIT 4` and point to a browser-driver skill (`playwright-app-testing`). Standalone (non-HybridApp) builds. Decline with `EXIT 7 NO_BUILD` per the parent skill's gate.
+**Out of scope:** `Android: mWeb Chrome`, `iOS: mWeb Safari`, `iOS: mWeb Chrome`, `Windows: Chrome`, `MacOS: Chrome / Safari`. Decline with `EXIT 4` and point to a browser-driver skill (`playwright-app-testing`). Standalone (non-HybridApp) builds. Decline with `EXIT 7 NO_BUILD` per the parent skill's gate.
 
 ## Inputs
 
 | Input | Source | Required |
 | --- | --- | --- |
-| PR number or URL | First positional arg | Yes |
+| Source URL (PR or issue) | First positional arg, e.g. `https://github.com/Expensify/App/pull/89475` or `.../issues/89855` | Yes |
 | `--platforms ios,android` | Flag | No (default: derived) |
 | `-e KEY=VALUE` step-param overrides | Repeatable | No |
 | `--no-cache` | Flag | No (default: cache enabled) - forces fresh Phase 1, bypasses `.ad` cache |
 | `--cache-clear` | Flag | No - wipes the entire `.ad` cache before running |
 
-No interactive prompts. Missing inputs that cannot be defaulted hard-fail.
+Bare numbers are rejected (PRs and issues share the GitHub number namespace; the URL path is the safe disambiguator). No interactive prompts.
 
 ## Triage gates (run in order, before any device work)
 
-1. **Fetch PR** - `gh pr view <num> --json title,body` and `gh pr diff <num> --name-only`.
-2. **Runtime-code gate** - if every changed path matches `^(\.claude/|docs/|.*\.md$|\.github/)`, **exit `2 SKIP: no runtime code changed`**. The skill does not record docs/skill-only PRs.
+1. **Detect source kind** from the URL: `/pull/N` → PR, `/issues/N` → issue. Anything else → exit `8 BAD_INPUT`.
+2. **Fetch the source body**:
+   - PR: `gh pr view <num> --json title,body`
+   - Issue: `gh issue view <num> --json title,body,labels`
 3. **Platform resolution** - in priority order:
    1. `--platforms` arg (CSV, wins all).
-   2. Explicit prose markers in PR title or `### Tests` body: `iOS only`, `Android only`, `On iOS:`, `On Android:`. Restrict to that platform if found.
-   3. Default: both `ios` and `android`.
+   2. **PR source**: explicit prose markers in title or `### Tests` body - `iOS only`, `Android only`, `On iOS:`, `On Android:`.
+   3. **Issue source**: the `## Platforms:` checkbox list. Filled boxes denote where the bug reproduces; restrict to the matching native platforms.
+   4. Default: both `ios` and `android`.
 
-   If the resolved set requests an out-of-scope platform (e.g. `mweb`), **exit `4 PLATFORM_UNSUPPORTED`**.
-4. **Tests parsing** - extract `### Tests` content; produce a flow list (see below). If the flow list is empty after stripping, **exit `3 NO_FLOWS`**.
+   Aliases: `iOS: Native` ≡ `iOS: App` (both → `ios`); `Android: Native` ≡ `Android: App` (both → `android`). All mWeb / Windows / MacOS variants are out of scope.
 
-## Tests parsing rules
+   If the only platforms matched are out of scope (e.g. an issue checks only `MacOS: Chrome / Safari`), **exit `4 PLATFORM_UNSUPPORTED`**.
+4. **Steps parsing** - extract the steps section and produce a flow list (see below). If the flow list is empty, **exit `3 NO_FLOWS`**.
 
-The **only hard rule**: tests live under the `### Tests` heading. Everything inside it varies wildly across authors.
+## Steps parsing rules
 
-Operating on the `### Tests` block of the PR body:
+The **only hard rule**: steps live in a Markdown body. Where they live within that body depends on the source kind, and what counts as "structure" inside the steps section varies wildly across authors.
 
-1. **Strip the boilerplate** "Verify that no errors appear in the JS console" line wherever it appears.
-2. **Strip trailing checklist metadata** (`- [x] ...` blocks).
-3. **LLM-driven flow segmentation.** Pass the stripped section to the LLM and ask it to return a list of distinct test flows: `[{title, precondition?, steps[]}, ...]`. Signals it may use (all optional, none required - the LLM picks whichever apply to the input):
-   - Explicit separators: `#### Test case N:` / `## ...` headers, `---` rules.
-   - Numbered-list restarts (a fresh `1.` after a `5.` typically signals a new flow).
-   - Prose markers: "Test case N:", "Repeat with...", "Then test...", "Now do...".
-   - State-change indicators: "Sign out, then ...", "On a fresh session, ...".
-   - Any per-author writing pattern when nothing explicit is present.
+### Section anchor (heuristic, with fallback)
 
-   When the LLM finds a single coherent flow, the whole section is one flow. When it finds N, it produces N. The skill does not enforce a particular separator convention.
-4. **Per flow** (LLM returns these fields):
-   - `title` - short label (header text if present, or LLM-summarized intent).
-   - `precondition` - free-form setup metadata if the author provided one (e.g. "Account has no workspace.", "Enable Invoices in workspace settings.").
-   - `steps[]` - the numbered/listed items belonging to this flow, with nested `a/b/c` sub-items flattened into the parent.
-5. **Single-step verify-only classification**: if a flow has exactly one step whose intent is purely a `Verify|Confirm|Check` (no preceding action), set `kind: still`. Otherwise `kind: video`. The LLM makes this call too - no leading-verb regex.
-6. **Step interpretation is also LLM-driven, not parsed.** Each step's text is passed verbatim to the agent-device driver, which decides per-step whether it's a tap, fill, navigation, or assertion. If the driver cannot interpret a step, that step (and the rest of the flow) hard-fails - no fallback to coordinates, no skipping.
+Strip the body to the steps section using a list of known headings, in order:
 
-If the LLM returns an empty flow list (Tests was prose-only, "N/A", "We'll test it live", or empty after stripping), exit `3 NO_FLOWS`.
+| Source | Anchor (in priority order) |
+| --- | --- |
+| PR | `### Tests`, `### Test`, `## Tests` |
+| Issue | `## Action Performed:`, `## Repro`, `## Steps to reproduce`, `## Reproduction Steps` |
+
+If no anchor matches, pass the **whole body** to the LLM and ask it to find the steps. The anchor list is a hint to reduce token cost on the 99% case, not a hard contract.
+
+Stop the section at the next equal-or-higher heading (e.g. for issues, `## Expected Result:` ends the steps section). Strip trailing GitHub-template footers (Upwork automation block, contributing-guide preamble, `## Workaround:`, `## Screenshots/Videos`).
+
+### Boilerplate stripping
+
+- "Verify that no errors appear in the JS console" line - strip wherever it appears.
+- Trailing `- [x] ...` checklist blocks - strip.
+- Preamble metadata blocks (`**Version Number:** ...`, `**Device used:** ...`, etc.) - strip.
+
+### Flow segmentation (LLM-driven)
+
+Pass the stripped section to the LLM and ask it to return a list of flows: `[{title, precondition?, steps[]}, ...]`. Signals it may use (all optional - the LLM picks whichever apply):
+
+- Explicit separators: `#### Test case N:` / `## ...` headers, `---` rules.
+- Numbered-list restarts (a fresh `1.` after a `5.` typically signals a new flow).
+- Prose markers: "Test case N:", "Repeat with...", "Then test...", "Now do...".
+- State-change indicators: "Sign out, then ...", "On a fresh session, ...".
+
+**Issues are typically single-flow.** Bug reports describe one repro path. The LLM should return one flow for an issue body unless it sees explicit multi-scenario structure (rare).
+
+When the LLM finds a single coherent flow, the whole section is one flow. When it finds N, it produces N.
+
+### Per flow
+
+The LLM returns these fields:
+
+- `title` - short label (header text if present, or LLM-summarized intent).
+- `precondition` - free-form setup metadata if the author provided one (e.g. "Account has no workspace.", "Log in with Expensifail account.").
+- `steps[]` - the numbered/listed items belonging to this flow, with nested `a/b/c` sub-items flattened into the parent.
+- `expected` (issues only) - free-form expected outcome from the issue's `## Expected Result:` block. The driver MAY use this as a final-state assertion target after the flow drives.
+
+### Single-step verify-only classification
+
+If a flow has exactly one step whose intent is purely a `Verify|Confirm|Check` (no preceding action), set `kind: still`. Otherwise `kind: video`. LLM judgment, not regex.
+
+### Step interpretation
+
+Each step's text is passed verbatim to the agent-device driver, which decides per-step whether it's a tap, fill, navigation, or assertion. If the driver cannot interpret a step, that step (and the rest of the flow) hard-fails.
+
+If the LLM returns an empty flow list (body was prose-only, "N/A", "We'll test it live", or empty after stripping), exit `3 NO_FLOWS`.
 
 ## Phase 1 cache (skip warm-up when flow text is unchanged)
 
@@ -226,10 +263,10 @@ For flows classified `kind: still`:
 
 ```
 ~/.cache/agent-device-pr-media/
-├── .ad-cache/                    # cross-PR Phase 1 cache (see "Phase 1 cache")
+├── .ad-cache/                            # cross-source Phase 1 cache (see "Phase 1 cache")
 │   ├── <fingerprint>.ad
 │   └── <fingerprint>.meta.json
-└── <pr-num>/                     # per-PR run output
+└── <source-kind>-<source-num>/           # per-source run output, e.g. pr-89475/ or issue-89855/
     └── <run-ts>/
         ├── manifest.json
         ├── ios/
@@ -241,7 +278,7 @@ For flows classified `kind: still`:
             └── ...
 ```
 
-Run output is persistent across reboots. The skill purges prior runs for the same PR at the start of each new run (latest-run-wins; no concurrent locking; single-user assumption). The `.ad-cache/` directory is **not** purged on per-PR runs - it's shared across PRs and self-heals on Phase 2 replay failure.
+Run output is persistent across reboots. The skill purges prior runs for the same source at the start of each new run (latest-run-wins; no concurrent locking; single-user assumption). The `.ad-cache/` directory is **not** purged on per-source runs - it's shared across sources and self-heals on Phase 2 replay failure.
 
 ### Manifest schema
 
@@ -249,11 +286,14 @@ Run output is persistent across reboots. The skill purges prior runs for the sam
 
 ```json
 {
-  "pr": 89475,
-  "title": "<PR title>",
+  "source": {
+    "kind": "pr",
+    "number": 89475,
+    "url": "https://github.com/Expensify/App/pull/89475",
+    "title": "<source title>"
+  },
   "platforms_requested": ["ios", "android"],
   "platforms_run": ["ios", "android"],
-  "skipped": null,
   "flows": {
     "ios": [
       {
@@ -262,6 +302,7 @@ Run output is persistent across reboots. The skill purges prior runs for the sam
         "kind": "video",
         "path": "ios/flow-1.mp4",
         "stills": ["ios/flow-1-step-2-tap-signin.png"],
+        "expected": "App will show error when creating new agent without name.",
         "status": "ok",
         "cache": "hit",
         "fingerprint": "a3f9b2c4...",
@@ -274,23 +315,23 @@ Run output is persistent across reboots. The skill purges prior runs for the sam
 }
 ```
 
-`status` is one of: `ok`, `phase1_failed`, `phase2_failed`, `skipped_after_failure`. `cache` is one of: `"hit"` (cached `.ad` reused, Phase 1 skipped), `"miss"` (no cache, Phase 1 ran fresh), `"invalidated"` (cache hit but Phase 2 replay failed; entry deleted, Phase 1 re-ran fresh, Phase 2 retried), `"bypassed"` (`--no-cache` flag).
+`source.kind` is `"pr"` or `"issue"`. `expected` is populated for issues (from `## Expected Result:`); absent for PRs. `status` is one of: `ok`, `phase1_failed`, `phase2_failed`, `skipped_after_failure`. `cache` is one of: `"hit"` (cached `.ad` reused, Phase 1 skipped), `"miss"` (no cache, Phase 1 ran fresh), `"invalidated"` (cache hit but Phase 2 replay failed; entry deleted, Phase 1 re-ran fresh, Phase 2 retried), `"bypassed"` (`--no-cache` flag).
 
 ### Handoff
 
-After all platforms, the skill prints the run directory and lists per-flow paths. The user drags each artifact into the PR's `### Screenshots/Videos` section. The skill never edits the PR.
+After all platforms, the skill prints the run directory and lists per-flow paths. The user drags each artifact into the PR's `### Screenshots/Videos` section (or attaches to the issue, depending on source). The skill never edits the source.
 
 ## Exit codes
 
 | Code | Meaning |
 | --- | --- |
 | `0` | All applicable flows produced an artifact (or the run was best-effort with at least one usable artifact; per-flow status reflects reality). |
-| `2` | `SKIP: no runtime code changed` - PR diff is entirely docs/skills/CI metadata. |
-| `3` | `NO_FLOWS` - Tests section unparseable or empty after stripping. |
-| `4` | `PLATFORM_UNSUPPORTED` - mWeb / Desktop requested. |
+| `3` | `NO_FLOWS` - steps section unparseable or empty after stripping. |
+| `4` | `PLATFORM_UNSUPPORTED` - mWeb / Desktop / Windows requested or only out-of-scope platforms checked on the source. |
 | `5` | `PHASE1_TOTAL_FAILURE` - every flow failed Phase 1. |
 | `6` | `PHASE2_TOTAL_FAILURE` - every flow failed Phase 2 despite Phase 1 success. |
 | `7` | `NO_BUILD` - `agent-device open` failed because the dev build is not installed. |
+| `8` | `BAD_INPUT` - source URL is missing, malformed, or not a recognised PR/issue URL. |
 
 ## Cost guards
 
@@ -306,9 +347,10 @@ Hitting any cap marks the flow `phase1_failed` / `phase2_failed` and proceeds to
 
 | Situation | Action |
 | --- | --- |
-| `### Tests` section missing or empty | Exit `3 NO_FLOWS` |
-| Only docs/skill paths changed | Exit `2 SKIP` |
-| mWeb / Desktop requested | Exit `4 PLATFORM_UNSUPPORTED` |
+| Source URL missing or not a recognised PR/issue URL | Exit `8 BAD_INPUT` |
+| Steps section missing or empty (PR `### Tests` / issue `## Action Performed:`) | Exit `3 NO_FLOWS` |
+| Only out-of-scope platforms checked on issue (e.g. `MacOS: Chrome / Safari` only) | Exit `4 PLATFORM_UNSUPPORTED` |
+| mWeb / Desktop / Windows explicitly requested via `--platforms` | Exit `4 PLATFORM_UNSUPPORTED` |
 | Bring-up fails (HybridApp gate, missing dev build, Metro start, etc.) | Surface parent skill's error verbatim; exit `7 NO_BUILD` |
 | Phase 1 step uninterpretable by LLM | Mark flow `phase1_failed`, log the step that failed, continue to next flow |
 | Phase 1 a11y empty (0 nodes) on a screen | Use coordinate fallback; log `warnings: ["a11y_fallback:<screen>"]` |
