@@ -26,6 +26,7 @@ import variables from '@styles/variables';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
+import PinIndicator from './OptionRow/PinIndicator';
 import OptionRowAlternateText from './OptionRowAlternateText';
 import OptionRowAvatar from './OptionRowAvatar';
 import OptionRowErrorBadge from './OptionRowErrorBadge';
@@ -50,7 +51,7 @@ function OptionRowLHN({
     const styles = useThemeStyles();
     const popoverAnchor = useRef<View>(null);
     const StyleUtils = useStyleUtils();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Pencil', 'Pin']);
+    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Pencil']);
 
     const {onboardingPurpose, onboarding, isScreenFocused} = useLHNTooltipContext();
     const [conciergeReportID] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID);
@@ -218,20 +219,10 @@ function OptionRowLHN({
                                     />
                                 </View>
                             )}
-                            {!brickRoadIndicator && !!optionItem.isPinned && (
-                                <View
-                                    style={styles.ml2}
-                                    accessibilityLabel={translate('sidebarScreen.chatPinned')}
-                                >
-                                    <Icon
-                                        testID="Pin Icon"
-                                        fill={theme.icon}
-                                        src={expensifyIcons.Pin}
-                                        width={variables.iconSizeSmall}
-                                        height={variables.iconSizeSmall}
-                                    />
-                                </View>
-                            )}
+                            <PinIndicator
+                                isPinned={optionItem.isPinned}
+                                brickRoadIndicator={brickRoadIndicator}
+                            />
                         </View>
                     </>
                 );
