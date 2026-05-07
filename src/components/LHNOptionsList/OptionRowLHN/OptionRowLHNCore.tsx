@@ -6,10 +6,8 @@ import Icon from '@components/Icon';
 import {useLHNTooltipContext} from '@components/LHNOptionsList/LHNTooltipContext';
 import type {OptionRowLHNProps} from '@components/LHNOptionsList/types';
 import Text from '@components/Text';
-import Tooltip from '@components/Tooltip';
 import getContextMenuAccessibilityHint from '@components/utils/getContextMenuAccessibilityHint';
 import getContextMenuAccessibilityProps from '@components/utils/getContextMenuAccessibilityProps';
-import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useEnvironment from '@hooks/useEnvironment';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
@@ -17,15 +15,14 @@ import useOnyx from '@hooks/useOnyx';
 import useStyleUtils from '@hooks/useStyleUtils';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
-import DateUtils from '@libs/DateUtils';
 import FS from '@libs/Fullstory';
 import {shouldUseBoldText} from '@libs/OptionsListUtils';
-import {isChatUsedForOnboarding as isChatUsedForOnboardingReportUtils, isGroupChat, isOneOnOneChat, isSystemChat} from '@libs/ReportUtils';
+import {isChatUsedForOnboarding as isChatUsedForOnboardingReportUtils, isGroupChat, isSystemChat} from '@libs/ReportUtils';
 import FreeTrial from '@pages/settings/Subscription/FreeTrial';
 import variables from '@styles/variables';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
-import {isEmptyObject} from '@src/types/utils/EmptyObject';
+import Status from './OptionRow/Status';
 import OptionRowAlternateText from './OptionRowAlternateText';
 import OptionRowAvatar from './OptionRowAvatar';
 import OptionRowErrorBadge from './OptionRowErrorBadge';
@@ -57,7 +54,6 @@ function OptionRowLHN({
     const isChatUsedForOnboarding = isChatUsedForOnboardingReportUtils(report, onboarding, conciergeReportID, onboardingPurpose);
 
     const {translate} = useLocalize();
-    const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const isInFocusMode = viewMode === CONST.OPTION_MODE.COMPACT;
     const sidebarInnerRowStyle = StyleSheet.flatten<ViewStyle>(
         isInFocusMode
@@ -82,14 +78,6 @@ function OptionRowLHN({
     const contentContainerStyles = isInFocusMode ? [styles.flex1, styles.flexRow, styles.overflowHidden, StyleUtils.getCompactContentContainerStyles()] : [styles.flex1];
     const hoveredBackgroundColor = !!styles.sidebarLinkHover && 'backgroundColor' in styles.sidebarLinkHover ? styles.sidebarLinkHover.backgroundColor : theme.sidebar;
     const focusedBackgroundColor = styles.sidebarLinkActive.backgroundColor;
-
-    const emojiCode = optionItem.status?.emojiCode ?? '';
-    const statusText = optionItem.status?.text ?? '';
-    const statusClearAfterDate = optionItem.status?.clearAfter ?? '';
-    const currentSelectedTimezone = currentUserPersonalDetails?.timezone?.selected ?? CONST.DEFAULT_TIME_ZONE.selected;
-    const formattedDate = DateUtils.getStatusUntilDate(translate, statusClearAfterDate, optionItem?.timezone?.selected ?? CONST.DEFAULT_TIME_ZONE.selected, currentSelectedTimezone);
-    const statusContent = formattedDate ? `${statusText ? `${statusText} ` : ''}(${formattedDate})` : statusText;
-    const isStatusVisible = !!emojiCode && isOneOnOneChat(!isEmptyObject(report) ? report : undefined);
 
     const subscriptAvatarBorderColor = isOptionFocused ? focusedBackgroundColor : theme.sidebar;
 
@@ -168,14 +156,10 @@ function OptionRowLHN({
                                             testID={testID}
                                         />
                                         {isChatUsedForOnboarding && <FreeTrial badgeStyles={[styles.mnh0, styles.pl2, styles.pr2, styles.ml1, styles.flexShrink1]} />}
-                                        {isStatusVisible && (
-                                            <Tooltip
-                                                text={statusContent}
-                                                shiftVertical={-4}
-                                            >
-                                                <Text style={styles.ml1}>{emojiCode}</Text>
-                                            </Tooltip>
-                                        )}
+                                        <Status
+                                            optionItem={optionItem}
+                                            report={report}
+                                        />
                                     </View>
                                     <OptionRowAlternateText
                                         alternateText={optionItem.alternateText}
