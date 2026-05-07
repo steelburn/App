@@ -494,6 +494,7 @@ function IOURequestStepDistanceMap({
         isASAPSubmitBetaEnabled,
         parentReportNextStep,
         recentWaypoints,
+        allPolicies,
     ]);
 
     const renderItem = useCallback(
