@@ -5768,8 +5768,8 @@ const FLEX_COLUMNS = new Set<string>([
     CONST.SEARCH.TABLE_COLUMNS.TAX_RATE,
 ]);
 
-function hasFlexColumn(columns: SearchColumnType[]): boolean {
-    return columns.some((col) => FLEX_COLUMNS.has(col));
+function hasFlexColumn(columns?: SearchColumnType[]): boolean {
+    return !!columns?.some((col) => FLEX_COLUMNS.has(col));
 }
 
 export {
