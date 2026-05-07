@@ -1137,7 +1137,7 @@ function PureReportActionItem({
                     {(hovered) => (
                         <View style={highlightedBackgroundColorIfNeeded}>
                             {shouldDisplayNewMarker && (!shouldUseThreadDividerLine || !isFirstVisibleReportAction) && <UnreadActionIndicator reportActionID={action.reportActionID} />}
-                            {shouldDisplayContextMenuValue && hovered && draftMessage === undefined && !hasErrors && (
+                            {shouldDisplayContextMenuValue && (hovered || !!isEmojiPickerActive || isContextMenuActive) && draftMessage === undefined && !hasErrors && (
                                 <MiniReportActionContextMenu
                                     reportID={reportID}
                                     reportActionID={action.reportActionID}
@@ -1146,7 +1146,7 @@ function PureReportActionItem({
                                     isArchivedRoom={isArchivedRoom}
                                     displayAsGroup={displayAsGroup}
                                     disabledActions={disabledActions}
-                                    isVisible
+                                    isVisible={hovered}
                                     isThreadReportParentAction={isThreadReportParentAction}
                                     draftMessage={draftMessage}
                                     isChronosReport={isChronosReport}
