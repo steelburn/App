@@ -1,10 +1,10 @@
 ---
-name: agent-device-pr-media
+name: agent-device-evidence
 description: Records iOS/Android native MP4 evidence for test/repro flows extracted from an Expensify GitHub PR or issue. Use when the user asks to "record the flow for PR #X", "capture mobile evidence for issue #Y", or "produce screenshots/videos for <PR or issue URL>". Mobile-native only - declines mWeb and Desktop.
 allowed-tools: Bash(agent-device *) Bash(gh pr view *) Bash(gh issue view *) Bash(gh api *) Bash(mkdir -p *) Bash(rm -rf *) Bash(ls *) Bash(file *) Bash(test *) Bash(date *) Read Write
 ---
 
-# agent-device-pr-media
+# agent-device-evidence
 
 Records `iOS: Native` and `Android: Native` MP4 evidence for the test or repro steps declared in an Expensify GitHub **PR or issue**. The source of truth is the test/repro steps themselves, not the surrounding code or context - the skill works equally well on a PR's `### Tests` section, an issue's `## Action Performed:` block, or any future Markdown body where steps are clearly authored.
 
@@ -111,7 +111,7 @@ Phase 1 is the expensive part - it runs the LLM-driven exploration loop to produ
 ### Cache layout
 
 ```
-~/.cache/agent-device-pr-media/.ad-cache/
+~/.cache/agent-device-evidence/.ad-cache/
 ├── <fingerprint>.ad         # the cached Phase 1 script
 └── <fingerprint>.meta.json  # {created_ts, original_pr, last_used_ts, hits}
 ```
@@ -147,7 +147,7 @@ Fields NOT included (intentionally):
 For each flow, in order:
 
 1. **Compute fingerprint** from flow + platform + bundle_id + CLI version.
-2. **Look up** `~/.cache/agent-device-pr-media/.ad-cache/<fingerprint>.ad`:
+2. **Look up** `~/.cache/agent-device-evidence/.ad-cache/<fingerprint>.ad`:
    - **Hit** (and `--no-cache` is not set): copy cached `.ad` to `$TEST_FLOW.ad`, mark `cache: "hit"` in the manifest, **skip Phase 1 entirely**, proceed to Phase 2.
    - **Miss** (or `--no-cache`): mark `cache: "miss"`, run Phase 1 normally.
 3. **On Phase 1 success** (cache miss path): write `$TEST_FLOW.ad` to the cache, write `<fingerprint>.meta.json` with `{created_ts, original_pr, hits: 1}`.
@@ -172,7 +172,7 @@ Two phases per flow. Lifecycle delegated to the parent skill's bring-up. Phase 1
 3. **Set up run directory** - persistent cache, latest-run-wins:
    ```bash
    PR_NUM=<num>; RUN_TS=$(date -u +%Y%m%dT%H%M%SZ)
-   RUN_DIR="$HOME/.cache/agent-device-pr-media/$PR_NUM/$RUN_TS"
+   RUN_DIR="$HOME/.cache/agent-device-evidence/$PR_NUM/$RUN_TS"
    mkdir -p "$RUN_DIR/ios" "$RUN_DIR/android"
    # Optional: rm -rf prior runs for this PR before mkdir to keep disk lean
    ```
@@ -207,7 +207,7 @@ On cache miss (or `--no-cache`):
    test -s "$TEST_FLOW.ad" || { record per-flow status "phase1_failed: empty script"; continue }
    ```
 
-7. **Write to cache** - on success, copy `$TEST_FLOW.ad` to `~/.cache/agent-device-pr-media/.ad-cache/<fingerprint>.ad` and write the meta sidecar.
+7. **Write to cache** - on success, copy `$TEST_FLOW.ad` to `~/.cache/agent-device-evidence/.ad-cache/<fingerprint>.ad` and write the meta sidecar.
 
 ### Phase 2 - Recording (per flow, deterministic replay)
 
@@ -262,7 +262,7 @@ For flows classified `kind: still`:
 ### Run-output layout
 
 ```
-~/.cache/agent-device-pr-media/
+~/.cache/agent-device-evidence/
 ├── .ad-cache/                            # cross-source Phase 1 cache (see "Phase 1 cache")
 │   ├── <fingerprint>.ad
 │   └── <fingerprint>.meta.json

@@ -1,4 +1,4 @@
-# agent-device-pr-media issues
+# agent-device-evidence issues
 
 ## Resolved by v1 design (SKILL.md)
 
@@ -41,7 +41,7 @@
 - **`### Tests` is the only hard structural anchor.** Everything inside it is freeform - authors use single numbered lists, restarted numbered lists, h4 sub-headers, prose, "N/A", or leave it empty. The skill does **not** enforce a separator convention. Flow segmentation is LLM-driven; the LLM uses whatever signals are present (h4 headers, numbered restarts, prose markers like "Test case N:" / "Repeat with...", state-change cues). Sample (9 recent merged PRs, 2026-05-07): 0/9 used `#### Test case N:` headers - that convention exists (e.g. PR #89743) but is a minority pattern, not a default.
 - **Platform restriction is opt-in** via PR title or Tests prose ("iOS only", "Android only", "On iOS:"). Default is both. No file-path heuristics, no PR-checklist parsing.
 - **Per-flow artifact**: one MP4 per flow per platform (or one PNG for verify-only single-step flows). Not one big MP4.
-- **Persistent cache**: `~/.cache/agent-device-pr-media/<pr-num>/<run-ts>/`. Survives reboots; latest-run-wins.
+- **Persistent cache**: `~/.cache/agent-device-evidence/<pr-num>/<run-ts>/`. Survives reboots; latest-run-wins.
 
 ## Generalize input source: PR or issue (added 2026-05-07)
 
@@ -56,14 +56,14 @@
 - **`expected` field added to per-flow manifest** (issues only) - populated from `## Expected Result:`. The driver MAY use it as a final-state assertion target.
 - **New exit code `8 BAD_INPUT`** for malformed / non-PR-non-issue source URLs. Replaces the old exit `2 SKIP` behavior.
 - **Run-output dir generalized** from `<pr-num>/` to `<source-kind>-<source-num>/` (e.g. `pr-89475/`, `issue-89855/`).
-- **Skill name not yet aligned with broadened scope.** Directory + cache path + cross-links still say `agent-device-pr-media`. Rename to something like `agent-device-flow-evidence` or `agent-device-test-recorder` is a candidate follow-up.
+- **Skill renamed** from `agent-device-pr-media` to `agent-device-evidence` to match the broadened scope (PR + issue inputs, not just PRs). Cache path moved from `~/.cache/agent-device-pr-media/` to `~/.cache/agent-device-evidence/`. Existing prior caches under the old path are orphaned - users can `rm -rf ~/.cache/agent-device-pr-media` to reclaim disk; not worth a migration script for v1.
 
 Reference: https://github.com/Expensify/App/issues/89855 (and 6 other recent bug-tagged issues sampled 2026-05-07) - all follow the `## Action Performed:` + `## Expected Result:` + `## Platforms:` template consistently.
 
 ## Phase 1 cache (added 2026-05-07)
 
 - **Problem**: Phase 1 (LLM-driven exploration) is the expensive part; Phase 2 is just `agent-device replay`. Re-running on a PR whose Tests steps haven't changed wastes Phase 1's full cost on every invocation.
-- **Solution**: content-addressable `.ad` cache at `~/.cache/agent-device-pr-media/.ad-cache/<fingerprint>.ad`, shared across PRs.
+- **Solution**: content-addressable `.ad` cache at `~/.cache/agent-device-evidence/.ad-cache/<fingerprint>.ad`, shared across PRs.
 - **Fingerprint** = `sha256(precondition + json(steps) + platform + bundle_id + agent_device_version)`. Title is excluded (label only). PR number / app SHA excluded so the cache shares across PRs; correctness enforced at replay time, not lookup time.
 - **Self-healing**: on Phase 2 replay failure (cache hit path only), invalidate the entry, re-run Phase 1, retry Phase 2 once. Stale entries get evicted lazily as the underlying app changes.
 - **Manifest**: per-flow `cache: "hit" | "miss" | "invalidated" | "bypassed"` and `fingerprint` so reviewers can see what was reused.
