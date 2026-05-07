@@ -115,6 +115,7 @@ function useSelectionModeReportActions({
 
     const [activePolicyID] = useOnyx(ONYXKEYS.NVP_ACTIVE_POLICY_ID);
     const activePolicy = usePolicy(activePolicyID);
+    const chatReportPolicy = usePolicy(chatReport?.policyID);
     const [invoiceReceiverPolicy] = useOnyx(
         `${ONYXKEYS.COLLECTION.POLICY}${chatReport?.invoiceReceiver && 'policyID' in chatReport.invoiceReceiver ? chatReport.invoiceReceiver.policyID : undefined}`,
     );
@@ -162,7 +163,7 @@ function useSelectionModeReportActions({
     const nonPendingDeleteTransactions = transactions.filter((t): t is OnyxTypes.Transaction => !!t && (isOffline || t.pendingAction !== CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE));
 
     const getCanIOUBePaid = (onlyShowPayElsewhere = false) =>
-        canIOUBePaidAction(report, chatReport, policy, bankAccountList, transactions, onlyShowPayElsewhere, undefined, invoiceReceiverPolicy);
+        canIOUBePaidAction(report, chatReport, policy, bankAccountList, currentUserLogin ?? '', currentUserAccountID, transactions, onlyShowPayElsewhere, undefined, invoiceReceiverPolicy);
 
     const canIOUBePaid = getCanIOUBePaid();
     const onlyShowPayElsewhere = !canIOUBePaid && getCanIOUBePaid(true);
@@ -171,7 +172,7 @@ function useSelectionModeReportActions({
 
     const {nonHeldAmount, fullAmount, hasValidNonHeldAmount} = getNonHeldAndFullAmount(report, shouldShowPayButton);
 
-    const shouldShowApproveButton = canApproveIOU(report, policy, reportMetadata, transactions) && !hasOnlyPendingTransactions;
+    const shouldShowApproveButton = canApproveIOU(report, policy, reportMetadata, currentUserAccountID, transactions) && !hasOnlyPendingTransactions;
 
     const shouldDisableApproveButton = shouldShowApproveButton && !isAllowedToApproveExpenseReport(report);
 
@@ -352,7 +353,6 @@ function useSelectionModeReportActions({
             setSelectedVBBAToPayFromHoldMenu(type === CONST.IOU.PAYMENT_TYPE.VBBA ? methodID : undefined);
             if (getPlatform() === CONST.PLATFORM.IOS) {
                 // On iOS, opening the hold menu immediately can conflict with the popover dismiss animation, so we defer it.
-                // eslint-disable-next-line @typescript-eslint/no-deprecated
                 InteractionManager.runAfterInteractions(() => setIsHoldMenuVisible(true));
             } else {
                 setIsHoldMenuVisible(true);
@@ -389,6 +389,7 @@ function useSelectionModeReportActions({
                 currentUserLogin: currentUserLogin ?? '',
                 activePolicy,
                 policy,
+                chatReportPolicy,
                 betas,
                 isSelfTourViewed,
                 userBillingGracePeriodEnds,
@@ -430,7 +431,6 @@ function useSelectionModeReportActions({
         }
         // This callback fires via onSubItemSelected before the popover closes. Defer heavy payment
         // work so the dropdown dismiss animation completes first, avoiding perceived UI lag.
-        // eslint-disable-next-line @typescript-eslint/no-deprecated
         InteractionManager.runAfterInteractions(() => {
             selectPaymentType({
                 event,

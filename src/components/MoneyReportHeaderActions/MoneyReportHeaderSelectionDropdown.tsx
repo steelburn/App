@@ -119,6 +119,7 @@ function MoneyReportHeaderSelectionDropdown({reportID, primaryAction, isReportIn
     const [activePolicyID] = useOnyx(ONYXKEYS.NVP_ACTIVE_POLICY_ID);
     const [isSelfTourViewed = false] = useOnyx(ONYXKEYS.NVP_ONBOARDING, {selector: hasSeenTourSelector});
     const activePolicy = usePolicy(activePolicyID);
+    const chatReportPolicy = usePolicy(chatReport?.policyID);
     const existingB2BInvoiceReport = useParticipantsInvoiceReport(activePolicyID, CONST.REPORT.INVOICE_RECEIVER_TYPE.BUSINESS, chatReport?.policyID);
     const isInvoiceReport = isInvoiceReportUtil(moneyRequestReport);
 
@@ -222,8 +223,9 @@ function MoneyReportHeaderSelectionDropdown({reportID, primaryAction, isReportIn
 
     const canAllowSettlement = hasUpdatedTotal(moneyRequestReport, policy);
     const totalAmount = getTotalAmountForIOUReportPreviewButton(moneyRequestReport, policy, CONST.REPORT.PRIMARY_ACTIONS.PAY, nonPendingDeleteTransactions, convertToDisplayString);
-    const canIOUBePaid = canIOUBePaidAction(moneyRequestReport, chatReport, policy, bankAccountList, undefined, false, undefined, invoiceReceiverPolicy);
-    const onlyShowPayElsewhere = !canIOUBePaid && canIOUBePaidAction(moneyRequestReport, chatReport, policy, bankAccountList, undefined, true, undefined, invoiceReceiverPolicy);
+    const canIOUBePaid = canIOUBePaidAction(moneyRequestReport, chatReport, policy, bankAccountList, currentUserLogin ?? '', accountID, undefined, false, undefined, invoiceReceiverPolicy);
+    const onlyShowPayElsewhere =
+        !canIOUBePaid && canIOUBePaidAction(moneyRequestReport, chatReport, policy, bankAccountList, currentUserLogin ?? '', accountID, undefined, true, undefined, invoiceReceiverPolicy);
     const isPayable = hasPayAction && canIOUBePaid;
 
     const confirmPayment = ({paymentType: type, payAsBusiness, methodID, paymentMethod}: PaymentActionParams) => {
@@ -275,6 +277,7 @@ function MoneyReportHeaderSelectionDropdown({reportID, primaryAction, isReportIn
                 currentUserLogin: currentUserLogin ?? '',
                 activePolicy,
                 policy,
+                chatReportPolicy,
                 betas,
                 isSelfTourViewed,
                 userBillingGracePeriodEnds,
