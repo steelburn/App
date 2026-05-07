@@ -5,8 +5,6 @@ import Avatar from '@components/Avatar';
 import Button from '@components/Button';
 import Icon from '@components/Icon';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
-import {PressableWithFeedback} from '@components/Pressable';
-import TableRowSkeleton from '@components/Skeletons/TableRowSkeleton';
 import Table from '@components/Table';
 import Text from '@components/Text';
 import TextWithTooltip from '@components/TextWithTooltip';
@@ -132,102 +130,101 @@ function WorkspaceCompanyCardTableItem({
             onClose={onDismissError}
             shouldHideOnDelete={false}
         >
-            {true ? (
-                <WorkspaceCompanyCardsTableSkeleton reasonAttributes={reasonAttributes} />
-            ) : (
-                <Table.Row
-                    rowIndex={rowIndex}
-                    interactive={isAssigned}
-                    sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.COMPANY_CARDS.TABLE_ITEM}
-                    onPress={handleRowPress}
-                >
-                    {({hovered}) => (
-                        <View
-                            style={[
-                                styles.flex1,
-                                styles.flexRow,
-                                styles.alignItemsCenter,
-                                styles.gap3,
-                                styles.dFlex,
-                                // Use Grid on web when available (will override flex if supported)
-                                !shouldUseNarrowTableLayout && [styles.dGrid, {gridTemplateColumns: `repeat(${columnCount}, 1fr)`}],
-                            ]}
-                        >
-                            <View style={[styles.flex1, styles.flexRow, styles.alignItemsCenter, styles.gap3]}>
-                                {isAssigned ? (
-                                    <Avatar
-                                        source={
-                                            cardholder?.avatar ??
-                                            getDefaultAvatarURL({
-                                                accountID: cardholder?.accountID,
-                                            })
-                                        }
-                                        avatarID={cardholder?.accountID}
-                                        type={CONST.ICON_TYPE_AVATAR}
-                                        size={CONST.AVATAR_SIZE.SMALL}
-                                    />
-                                ) : (
-                                    CardFeedIcon
-                                )}
-
-                                <View style={[styles.flex1, styles.flexColumn, styles.justifyContentCenter, styles.alignItemsStretch]}>
-                                    <TextWithTooltip
-                                        text={leftColumnTitle}
-                                        style={[styles.optionDisplayName, styles.sidebarLinkTextBold, styles.pre, styles.justifyContentCenter, !isAssigned && styles.cursorText]}
-                                    />
-                                    {!!leftColumnSubtitle && (
-                                        <TextWithTooltip
-                                            text={leftColumnSubtitle}
-                                            style={[styles.textLabelSupporting, styles.lh16, styles.pre, styles.mr3, !isAssigned && styles.cursorText]}
-                                        />
-                                    )}
-                                </View>
-                            </View>
-
-                            {!shouldUseNarrowTableLayout && (
-                                <View style={[styles.flex1]}>
-                                    <Text
-                                        numberOfLines={1}
-                                        style={[styles.lh16, styles.optionDisplayName, styles.pre, !isAssigned && styles.cursorText]}
-                                    >
-                                        {formatMaskedCardName(cardName)}
-                                    </Text>
-                                </View>
+            <Table.Row
+                rowIndex={rowIndex}
+                interactive={isAssigned}
+                sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.COMPANY_CARDS.TABLE_ITEM}
+                isLoading={isDeleting}
+                LoadingComponent={WorkspaceCompanyCardsTableSkeleton}
+                skeletonReasonAttributes={reasonAttributes}
+                onPress={handleRowPress}
+            >
+                {({hovered}) => (
+                    <View
+                        style={[
+                            styles.flex1,
+                            styles.flexRow,
+                            styles.alignItemsCenter,
+                            styles.gap3,
+                            styles.dFlex,
+                            // Use Grid on web when available (will override flex if supported)
+                            !shouldUseNarrowTableLayout && [styles.dGrid, {gridTemplateColumns: `repeat(${columnCount}, 1fr)`}],
+                        ]}
+                    >
+                        <View style={[styles.flex1, styles.flexRow, styles.alignItemsCenter, styles.gap3]}>
+                            {isAssigned ? (
+                                <Avatar
+                                    source={
+                                        cardholder?.avatar ??
+                                        getDefaultAvatarURL({
+                                            accountID: cardholder?.accountID,
+                                        })
+                                    }
+                                    avatarID={cardholder?.accountID}
+                                    type={CONST.ICON_TYPE_AVATAR}
+                                    size={CONST.AVATAR_SIZE.SMALL}
+                                />
+                            ) : (
+                                CardFeedIcon
                             )}
 
-                            <View style={[styles.flexRow, styles.alignItemsCenter, styles.justifyContentEnd]}>
-                                {isAssigned ? (
-                                    <View style={[styles.flexRow, styles.ml2, styles.gap3, styles.mw100]}>
-                                        {!shouldUseNarrowTableLayout && (
-                                            <Text
-                                                numberOfLines={1}
-                                                style={[styles.optionDisplayName, styles.pre]}
-                                            >
-                                                {customCardName}
-                                            </Text>
-                                        )}
-                                        <Icon
-                                            src={Expensicons.ArrowRight}
-                                            fill={theme.icon}
-                                            additionalStyles={[styles.alignSelfCenter, !hovered && styles.opacitySemiTransparent]}
-                                            width={variables.iconSizeNormal}
-                                            height={variables.iconSizeNormal}
-                                        />
-                                    </View>
-                                ) : (
-                                    <Button
-                                        small
-                                        success
-                                        text={shouldUseNarrowTableLayout ? translate('workspace.companyCards.assign') : translate('workspace.companyCards.assignCard')}
-                                        onPress={assignCard}
-                                        isDisabled={isAssigningCardDisabled}
+                            <View style={[styles.flex1, styles.flexColumn, styles.justifyContentCenter, styles.alignItemsStretch]}>
+                                <TextWithTooltip
+                                    text={leftColumnTitle}
+                                    style={[styles.optionDisplayName, styles.sidebarLinkTextBold, styles.pre, styles.justifyContentCenter, !isAssigned && styles.cursorText]}
+                                />
+                                {!!leftColumnSubtitle && (
+                                    <TextWithTooltip
+                                        text={leftColumnSubtitle}
+                                        style={[styles.textLabelSupporting, styles.lh16, styles.pre, styles.mr3, !isAssigned && styles.cursorText]}
                                     />
                                 )}
                             </View>
                         </View>
-                    )}
-                </Table.Row>
-            )}
+
+                        {!shouldUseNarrowTableLayout && (
+                            <View style={[styles.flex1]}>
+                                <Text
+                                    numberOfLines={1}
+                                    style={[styles.lh16, styles.optionDisplayName, styles.pre, !isAssigned && styles.cursorText]}
+                                >
+                                    {formatMaskedCardName(cardName)}
+                                </Text>
+                            </View>
+                        )}
+
+                        <View style={[styles.flexRow, styles.alignItemsCenter, styles.justifyContentEnd]}>
+                            {isAssigned ? (
+                                <View style={[styles.flexRow, styles.ml2, styles.gap3, styles.mw100]}>
+                                    {!shouldUseNarrowTableLayout && (
+                                        <Text
+                                            numberOfLines={1}
+                                            style={[styles.optionDisplayName, styles.pre]}
+                                        >
+                                            {customCardName}
+                                        </Text>
+                                    )}
+                                    <Icon
+                                        src={Expensicons.ArrowRight}
+                                        fill={theme.icon}
+                                        additionalStyles={[styles.alignSelfCenter, !hovered && styles.opacitySemiTransparent]}
+                                        width={variables.iconSizeNormal}
+                                        height={variables.iconSizeNormal}
+                                    />
+                                </View>
+                            ) : (
+                                <Button
+                                    small
+                                    success
+                                    text={shouldUseNarrowTableLayout ? translate('workspace.companyCards.assign') : translate('workspace.companyCards.assignCard')}
+                                    onPress={assignCard}
+                                    isDisabled={isAssigningCardDisabled}
+                                />
+                            )}
+                        </View>
+                    </View>
+                )}
+            </Table.Row>
         </OfflineWithFeedback>
     );
 }

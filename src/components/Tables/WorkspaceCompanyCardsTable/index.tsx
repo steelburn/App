@@ -5,9 +5,9 @@ import BlockingView from '@components/BlockingViews/BlockingView';
 import Button from '@components/Button';
 import CardFeedIcon from '@components/CardFeedIcon';
 import ScrollView from '@components/ScrollView';
-import TableRowSkeleton from '@components/Skeletons/TableRowSkeleton';
 import Table from '@components/Table';
 import type {ActiveSorting, CompareItemsCallback, FilterConfig, IsItemInFilterCallback, IsItemInSearchCallback, TableColumn, TableHandle} from '@components/Table';
+import TableSkeleton from '@components/Table/TableSkeleton';
 import useBottomSafeSafeAreaPaddingStyle from '@hooks/useBottomSafeSafeAreaPaddingStyle';
 import useCardFeedErrors from '@hooks/useCardFeedErrors';
 import type {UseCompanyCardsResult} from '@hooks/useCompanyCards';
@@ -345,7 +345,13 @@ function WorkspaceCompanyCardsTable({
         isLoadingCards,
     };
 
-    return <WorkspaceCompanyCardsTableSkeleton reasonAttributes={reasonAttributes} />;
+    const LoadingComponent = () => (
+        <TableSkeleton
+            rowCount={5}
+            reasonAttributes={reasonAttributes}
+            renderSkeletonItem={WorkspaceCompanyCardsTableSkeleton}
+        />
+    );
 
     return (
         <Table
@@ -359,23 +365,14 @@ function WorkspaceCompanyCardsTable({
             isItemInFilter={isItemInFilter}
             filters={filterConfig}
             initialSortColumn="member"
-            ListEmptyComponent={
-                isLoadingCards ? (
-                    <TableRowSkeleton
-                        fixedNumItems={5}
-                        reasonAttributes={reasonAttributes}
-                    />
-                ) : (
-                    <WorkspaceCompanyCardsFeedAddedEmptyPage shouldShowGBDisclaimer={shouldShowGBDisclaimer} />
-                )
-            }
+            ListEmptyComponent={isLoadingCards ? LoadingComponent : <WorkspaceCompanyCardsFeedAddedEmptyPage shouldShowGBDisclaimer={shouldShowGBDisclaimer} />}
             ListHeaderComponent={shouldUseNarrowTableLayout ? headerButtonsComponent : undefined}
         >
             {shouldRenderHeaderAsChild && headerButtonsComponent}
 
             {(isLoading || isFeedPending || isNoFeed) && !feedErrorKey && (
                 <ScrollView>
-                    {isLoading && <WorkspaceCompanyCardsTableSkeleton reasonAttributes={reasonAttributes} />}
+                    {isLoading && <LoadingComponent />}
 
                     {!isLoading && isFeedPending && (
                         <View style={styles.flex1}>

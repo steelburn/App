@@ -14,7 +14,7 @@ type TableSkeletonProps = {
     /** The reason attributes for the skeleton */
     reasonAttributes: SkeletonSpanReasonAttributes;
 
-    /** The element to render within the table row as a skeleton */
+    /** The skeleton elements to render within the table row as a skeleton */
     renderSkeletonItem: () => React.ReactNode;
 };
 
@@ -31,7 +31,6 @@ export default function TableSkeleton({renderSkeletonItem, reasonAttributes, row
         styles.flexRow,
         styles.overflowHidden,
         styles.alignItemsCenter,
-        styles.highlightBG,
         isSmallView ? styles.ph4 : styles.ph3,
         isSmallView ? styles.tableRowHeightCompact : styles.tableRowHeight,
     ];
@@ -51,5 +50,5 @@ export default function TableSkeleton({renderSkeletonItem, reasonAttributes, row
         </View>
     ));
 
-    return <View style={[styles.flex1, styles.m5, styles.tableBottomRadius, styles.overflowHidden, styles.tableTopRadius]}>{rows}</View>;
+    return <View style={[styles.m5, styles.tableBottomRadius, styles.overflowHidden, styles.tableTopRadius, styles.highlightBG]}>{rows}</View>;
 }

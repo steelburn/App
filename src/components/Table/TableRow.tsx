@@ -2,6 +2,7 @@ import React from 'react';
 import PressableWithFeedback, {PressableWithFeedbackProps} from '@components/Pressable/PressableWithFeedback';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
+import {SkeletonSpanReasonAttributes} from '@libs/telemetry/useSkeletonSpan';
 import CONST from '@src/CONST';
 import {useTableContext} from './TableContext';
 
@@ -14,9 +15,18 @@ type TableRowProps = Omit<PressableWithFeedbackProps, 'accessible'> & {
 
     /** The index of the row in the table */
     rowIndex: number;
+
+    /** Whether or not the table row is loading */
+    isLoading?: boolean;
+
+    /** The loading component to render within the table row when the row is loading */
+    LoadingComponent?: React.ComponentType;
+
+    /** The reason attributes if the table row is loading */
+    skeletonReasonAttributes?: SkeletonSpanReasonAttributes;
 };
 
-export default function TableRow({children, accessible, rowIndex, interactive, onPress, ...props}: TableRowProps) {
+export default function TableRow({children, accessible, rowIndex, interactive, isLoading, skeletonReasonAttributes, LoadingComponent, onPress, ...props}: TableRowProps) {
     const styles = useThemeStyles();
     const {processedData} = useTableContext();
     const {shouldUseNarrowLayout, isMediumScreenWidth} = useResponsiveLayout();
@@ -25,6 +35,7 @@ export default function TableRow({children, accessible, rowIndex, interactive, o
     const isFirstRow = rowIndex === 0;
     const isLastRow = rowIndex === rowCount - 1;
     const isSmallView = isMediumScreenWidth || shouldUseNarrowLayout;
+    const isInteractive = interactive && !isLoading;
 
     const tableRowStyles = [
         styles.mh5,
@@ -44,10 +55,10 @@ export default function TableRow({children, accessible, rowIndex, interactive, o
             accessible
             accessibilityLabel="row"
             style={tableRowStyles}
-            interactive={interactive}
-            pressDimmingValue={interactive ? undefined : 1}
-            hoverStyle={interactive && styles.hoveredComponentBG}
-            role={interactive ? CONST.ROLE.BUTTON : CONST.ROLE.PRESENTATION}
+            interactive={isInteractive}
+            pressDimmingValue={isInteractive ? undefined : 1}
+            hoverStyle={isInteractive && styles.hoveredComponentBG}
+            role={isInteractive ? CONST.ROLE.BUTTON : CONST.ROLE.PRESENTATION}
             onPress={onPress}
             {...props}
         >
