@@ -81,6 +81,7 @@ function TransactionItemRowWide({
     reportActions,
     checkboxSentryLabel,
     isActionColumnWide: isActionColumnWideProp,
+    shouldRemoveTotalColumnFlex,
     bgActiveStyles,
     merchant,
     description,
@@ -379,7 +380,7 @@ function TransactionItemRowWide({
                 return (
                     <View
                         key={column}
-                        style={[StyleUtils.getReportTableColumnStyles(CONST.SEARCH.TABLE_COLUMNS.TOTAL_AMOUNT, {isAmountColumnWide})]}
+                        style={[StyleUtils.getReportTableColumnStyles(CONST.SEARCH.TABLE_COLUMNS.TOTAL_AMOUNT, {isAmountColumnWide, shouldRemoveTotalColumnFlex})]}
                     >
                         <TotalCell
                             transactionItem={transactionItem}
@@ -392,7 +393,7 @@ function TransactionItemRowWide({
                 return (
                     <View
                         key={column}
-                        style={[StyleUtils.getReportTableColumnStyles(CONST.SEARCH.TABLE_COLUMNS.TOTAL_PER_ATTENDEE, {isAmountColumnWide})]}
+                        style={[StyleUtils.getReportTableColumnStyles(CONST.SEARCH.TABLE_COLUMNS.TOTAL_PER_ATTENDEE, {isAmountColumnWide, shouldRemoveTotalColumnFlex})]}
                     >
                         {shouldShowAttendees && (
                             <AmountCell
@@ -407,7 +408,7 @@ function TransactionItemRowWide({
                 return (
                     <View
                         key={column}
-                        style={[StyleUtils.getReportTableColumnStyles(CONST.SEARCH.TABLE_COLUMNS.ORIGINAL_AMOUNT, {isAmountColumnWide})]}
+                        style={[StyleUtils.getReportTableColumnStyles(CONST.SEARCH.TABLE_COLUMNS.ORIGINAL_AMOUNT, {isAmountColumnWide, shouldRemoveTotalColumnFlex})]}
                     >
                         <AmountCell
                             total={getOriginalAmountForDisplay(transactionItem, isExpenseReport(transactionItem.report))}
@@ -515,7 +516,7 @@ function TransactionItemRowWide({
                 return (
                     <View
                         key={column}
-                        style={[StyleUtils.getReportTableColumnStyles(CONST.SEARCH.TABLE_COLUMNS.TOTAL_AMOUNT, {isAmountColumnWide})]}
+                        style={[StyleUtils.getReportTableColumnStyles(CONST.SEARCH.TABLE_COLUMNS.TOTAL_AMOUNT, {isAmountColumnWide, shouldRemoveTotalColumnFlex})]}
                     >
                         <AmountCell
                             total={totalAmount}
@@ -603,7 +604,7 @@ function TransactionItemRowWide({
             {!!shouldShowBottomBorder && (
                 <View style={bgActiveStyles}>
                     <View style={styles.ph3}>
-                        <View style={styles.borderBottom} />
+                        <View style={[StyleUtils.getSelectedBorderBottomStyle(isSelected)]} />
                     </View>
                 </View>
             )}

@@ -87,6 +87,7 @@ type TransactionItemRowProps = {
     policyForMovingExpenses?: Policy;
     nonPersonalAndWorkspaceCards?: CardList;
     isActionColumnWide?: boolean;
+    shouldRemoveTotalColumnFlex?: boolean;
 };
 
 /**

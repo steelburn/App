@@ -7,7 +7,6 @@ import UserInfoAndActionButtonRow from '@components/Search/SearchList/ListItem/U
 import type {ListItem} from '@components/SelectionList/types';
 import TransactionItemRow from '@components/TransactionItemRow';
 import useAnimatedHighlightStyle from '@hooks/useAnimatedHighlightStyle';
-import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useStyleUtils from '@hooks/useStyleUtils';
 import useSyncFocus from '@hooks/useSyncFocus';
 import useTheme from '@hooks/useTheme';
@@ -43,7 +42,6 @@ function TransactionListItemNarrow<TItem extends ListItem>({
     const styles = useThemeStyles();
     const theme = useTheme();
     const StyleUtils = useStyleUtils();
-    const {shouldUseNarrowLayout} = useResponsiveLayout();
     const pressableRef = useRef<View>(null);
     useSyncFocus(pressableRef, !!isFocused, shouldSyncFocus);
 
@@ -59,7 +57,7 @@ function TransactionListItemNarrow<TItem extends ListItem>({
         borderRadius: 0,
         shouldHighlight: item?.shouldAnimateInHighlight ?? false,
         highlightColor: theme.messageHighlightBG,
-        backgroundColor: theme.highlightBG,
+        backgroundColor: item.isSelected ? theme.activeComponentBG : theme.highlightBG,
         shouldApplyOtherStyles: true,
     });
 
@@ -91,7 +89,7 @@ function TransactionListItemNarrow<TItem extends ListItem>({
                     styles.userSelectNone,
                     isFirstItem && [styles.searchTableTopRadius, styles.overflowHidden, styles.searchTableTopRadius],
                     isLastItem && [styles.searchTableBottomRadius, styles.overflowHidden, styles.searchTableBottomRadius],
-                    !isLastItem && styles.borderBottom,
+                    !isLastItem && StyleUtils.getSelectedBorderBottomStyle(item.isSelected),
                 ]}
             >
                 {() => (
@@ -121,7 +119,7 @@ function TransactionListItemNarrow<TItem extends ListItem>({
                             taxAmountColumnSize={CONST.SEARCH.TABLE_COLUMN_SIZES.NORMAL}
                             shouldShowCheckbox={!!canSelectMultiple}
                             checkboxSentryLabel={CONST.SENTRY_LABEL.SEARCH.TRANSACTION_LIST_ITEM_CHECKBOX}
-                            style={[styles.p3, styles.pv2, shouldUseNarrowLayout ? [styles.p0, styles.pt3] : [styles.noBorderRadius]]}
+                            style={[styles.p3, styles.pv2, styles.p0, styles.pt3, isLastItem ? styles.searchTableBottomRadius : styles.noBorderRadius]}
                             violations={transactionViolations}
                             onArrowRightPress={isDeletedTransaction ? undefined : () => onSelectRow(item, transactionPreviewData)}
                             isHover={false}

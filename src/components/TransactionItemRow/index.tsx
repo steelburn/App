@@ -79,6 +79,7 @@ function TransactionItemRow({
     nonPersonalAndWorkspaceCards = {},
     policyForMovingExpenses,
     isActionColumnWide: isActionColumnWideProp,
+    shouldRemoveTotalColumnFlex,
 }: TransactionItemRowProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
@@ -192,6 +193,7 @@ function TransactionItemRow({
         checkboxSentryLabel,
         nonPersonalAndWorkspaceCards,
         isActionColumnWide: isActionColumnWideProp,
+        shouldRemoveTotalColumnFlex,
     };
 
     const description = getDescription(transactionItem);

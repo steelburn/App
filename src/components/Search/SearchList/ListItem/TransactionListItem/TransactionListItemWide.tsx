@@ -66,7 +66,7 @@ function TransactionListItemWide<TItem extends ListItem>({
         borderRadius: 0,
         shouldHighlight: item?.shouldAnimateInHighlight ?? false,
         highlightColor: theme.messageHighlightBG,
-        backgroundColor: theme.highlightBG,
+        backgroundColor: item.isSelected ? theme.activeComponentBG : theme.highlightBG,
         shouldApplyOtherStyles: false,
     });
 
@@ -123,7 +123,7 @@ function TransactionListItemWide<TItem extends ListItem>({
                         isActionColumnWide={transactionItem.isActionColumnWide}
                         shouldShowCheckbox={!!canSelectMultiple}
                         checkboxSentryLabel={CONST.SENTRY_LABEL.SEARCH.TRANSACTION_LIST_ITEM_CHECKBOX}
-                        style={[styles.p3, styles.pv2, styles.noBorderRadius]}
+                        style={[styles.p3, styles.pv2, isLastItem ? styles.searchTableBottomRadius : styles.noBorderRadius]}
                         violations={transactionViolations}
                         onArrowRightPress={isDeletedTransaction ? undefined : () => onSelectRow(item, transactionPreviewData)}
                         isHover={hovered}

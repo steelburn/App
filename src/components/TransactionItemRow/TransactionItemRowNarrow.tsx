@@ -5,6 +5,7 @@ import Icon from '@components/Icon';
 import RadioButton from '@components/RadioButton';
 import DateCell from '@components/Search/SearchList/ListItem/DateCell';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
+import useStyleUtils from '@hooks/useStyleUtils';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import variables from '@styles/variables';
@@ -68,6 +69,7 @@ function TransactionItemRowNarrow({
 }: TransactionItemRowNarrowProps) {
     const styles = useThemeStyles();
     const theme = useTheme();
+    const StyleUtils = useStyleUtils();
     const expensicons = useMemoizedLazyExpensifyIcons(['ArrowRight']);
 
     return (
@@ -172,7 +174,7 @@ function TransactionItemRowNarrow({
             {!!shouldShowBottomBorder && (
                 <View style={bgActiveStyles}>
                     <View style={styles.ph3}>
-                        <View style={[styles.borderBottom]} />
+                        <View style={[StyleUtils.getSelectedBorderBottomStyle(isSelected)]} />
                     </View>
                 </View>
             )}
