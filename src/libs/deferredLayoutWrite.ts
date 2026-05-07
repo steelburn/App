@@ -182,10 +182,12 @@ function hasDeferredWrite(key: string): boolean {
 }
 
 /**
- * Scoped variant of `hasDeferredWrite`. Returns true only when the channel for `key`
- * is registered AND its destination report matches `reportID`. Channels reserved
- * without a destination (e.g. SEARCH-flow writes) never match — callers should fall
- * back to `hasDeferredWrite` if they need the global flag.
+ * Scoped variant of `hasDeferredWrite`. Returns true when an active channel exists for `key`
+ * (either reserved via `reserveDeferredWriteChannel` or fully registered via
+ * `registerDeferredWrite`) AND its `destinationReportID` matches `reportID`. Channels stored
+ * without a destination (e.g. SEARCH-flow writes, or DISMISS_MODAL reservations made before
+ * the destination is known) never match - callers should fall back to `hasDeferredWrite` if
+ * they need the global flag.
  */
 function hasDeferredWriteForReport(key: string, reportID: string | undefined): boolean {
     if (!reportID) {
