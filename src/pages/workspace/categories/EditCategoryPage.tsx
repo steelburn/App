@@ -50,10 +50,10 @@ function EditCategoryPage({route}: EditCategoryPageProps) {
 
     const editCategory = useCallback(
         (values: FormOnyxValues<typeof ONYXKEYS.FORMS.WORKSPACE_CATEGORY_FORM>) => {
-            const newCategoryName = values.categoryName.trim();
+            const newCategoryName = values.categoryName.replaceAll('\u00A0', ' ').trim();
             // Do not call the API if the edited category name is the same as the current category name
             if (currentCategoryName !== newCategoryName) {
-                renamePolicyCategory(policyData, {oldName: currentCategoryName, newName: values.categoryName.replaceAll('\u00A0', ' ').trim()});
+                renamePolicyCategory(policyData, {oldName: currentCategoryName, newName: newCategoryName});
             }
 
             // Ensure Onyx.update is executed before navigation to prevent UI blinking issues, affecting the category name and rate.
