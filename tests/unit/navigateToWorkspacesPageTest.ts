@@ -2,13 +2,16 @@ import interceptAnonymousUser from '@libs/interceptAnonymousUser';
 import getPathFromState from '@libs/Navigation/helpers/getPathFromState';
 import navigateToWorkspacesPage from '@libs/Navigation/helpers/navigateToWorkspacesPage';
 import Navigation from '@libs/Navigation/Navigation';
+import * as PolicyUtils from '@libs/PolicyUtils';
 import NAVIGATORS from '@src/NAVIGATORS';
 import ROUTES from '@src/ROUTES';
 import SCREENS from '@src/SCREENS';
+import createRandomPolicy from '../utils/collections/policies';
 
 jest.mock('@libs/Navigation/navigationRef');
 jest.mock('@libs/Navigation/Navigation');
 jest.mock('@libs/Navigation/AppNavigator/createSplitNavigator/usePreserveNavigatorState');
+jest.mock('@libs/PolicyUtils');
 jest.mock('@libs/interceptAnonymousUser');
 jest.mock('@libs/Navigation/helpers/getPathFromState', () => ({
     __esModule: true,
@@ -18,7 +21,8 @@ jest.mock('@libs/Navigation/helpers/getPathFromState', () => ({
 const mockedGetPathFromState = getPathFromState as jest.MockedFunction<typeof getPathFromState>;
 
 const fakePolicyID = '344559B2CCF2B6C1';
-const baseParams = {shouldUseNarrowLayout: false, policyID: fakePolicyID};
+const mockPolicy = {...createRandomPolicy(0), id: fakePolicyID};
+const baseParams = {currentUserLogin: 'test@example.com', shouldUseNarrowLayout: false, policy: mockPolicy};
 
 describe('navigateToWorkspacesPage', () => {
     beforeEach(() => {
@@ -63,6 +67,9 @@ describe('navigateToWorkspacesPage', () => {
     });
 
     it('navigates to the workspace initial URL when no workspacesTabState is provided', () => {
+        (PolicyUtils.shouldShowPolicy as jest.Mock).mockReturnValue(true);
+        (PolicyUtils.isPendingDeletePolicy as jest.Mock).mockReturnValue(false);
+
         mockIntercept();
         navigateToWorkspacesPage({
             ...baseParams,
@@ -75,6 +82,8 @@ describe('navigateToWorkspacesPage', () => {
     });
 
     it('navigates to the URL produced by getPathFromState when workspacesTabState is provided on wide layouts', () => {
+        (PolicyUtils.shouldShowPolicy as jest.Mock).mockReturnValue(true);
+        (PolicyUtils.isPendingDeletePolicy as jest.Mock).mockReturnValue(false);
         const restoredPath = `/workspaces/${fakePolicyID}/workflows` as const;
         mockedGetPathFromState.mockReturnValue(restoredPath);
 
@@ -119,6 +128,9 @@ describe('navigateToWorkspacesPage', () => {
     });
 
     it('falls back to the workspace initial URL on narrow layouts even when workspacesTabState is provided', () => {
+        (PolicyUtils.shouldShowPolicy as jest.Mock).mockReturnValue(true);
+        (PolicyUtils.isPendingDeletePolicy as jest.Mock).mockReturnValue(false);
+
         mockIntercept();
         navigateToWorkspacesPage({
             ...baseParams,
@@ -138,11 +150,39 @@ describe('navigateToWorkspacesPage', () => {
         expect(Navigation.navigate).toHaveBeenCalledWith(ROUTES.WORKSPACE_INITIAL.getRoute(fakePolicyID));
     });
 
+    it('navigates to WORKSPACES_LIST if policy is pending delete', () => {
+        (PolicyUtils.shouldShowPolicy as jest.Mock).mockReturnValue(true);
+        (PolicyUtils.isPendingDeletePolicy as jest.Mock).mockReturnValue(true);
+
+        mockIntercept();
+        navigateToWorkspacesPage({
+            ...baseParams,
+            topmostFullScreenRoute: {name: NAVIGATORS.REPORTS_SPLIT_NAVIGATOR},
+            lastWorkspacesTabNavigatorRoute: {name: NAVIGATORS.WORKSPACE_SPLIT_NAVIGATOR},
+        });
+
+        expect(Navigation.navigate).toHaveBeenCalledWith(ROUTES.WORKSPACES_LIST.route);
+    });
+
+    it('navigates to WORKSPACES_LIST if shouldShowPolicy is false for the user', () => {
+        (PolicyUtils.shouldShowPolicy as jest.Mock).mockReturnValue(false);
+        (PolicyUtils.isPendingDeletePolicy as jest.Mock).mockReturnValue(false);
+
+        mockIntercept();
+        navigateToWorkspacesPage({
+            ...baseParams,
+            topmostFullScreenRoute: {name: NAVIGATORS.REPORTS_SPLIT_NAVIGATOR},
+            lastWorkspacesTabNavigatorRoute: {name: NAVIGATORS.WORKSPACE_SPLIT_NAVIGATOR},
+        });
+
+        expect(Navigation.navigate).toHaveBeenCalledWith(ROUTES.WORKSPACES_LIST.route);
+    });
+
     it('navigates to WORKSPACES_LIST if policyID is missing', () => {
         mockIntercept();
         navigateToWorkspacesPage({
             ...baseParams,
-            policyID: undefined,
+            policy: undefined,
             topmostFullScreenRoute: {name: NAVIGATORS.REPORTS_SPLIT_NAVIGATOR},
             lastWorkspacesTabNavigatorRoute: {name: NAVIGATORS.WORKSPACE_SPLIT_NAVIGATOR},
         });

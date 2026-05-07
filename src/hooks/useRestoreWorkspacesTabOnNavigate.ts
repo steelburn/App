@@ -7,7 +7,10 @@ import {getTabState} from '@libs/Navigation/helpers/tabNavigatorUtils';
 import navigationRef from '@libs/Navigation/navigationRef';
 import type {DomainSplitNavigatorParamList, WorkspaceSplitNavigatorParamList} from '@libs/Navigation/types';
 import NAVIGATORS from '@src/NAVIGATORS';
+import ONYXKEYS from '@src/ONYXKEYS';
 import type SCREENS from '@src/SCREENS';
+import useCurrentUserPersonalDetails from './useCurrentUserPersonalDetails';
+import useOnyx from './useOnyx';
 import useResponsiveLayout from './useResponsiveLayout';
 
 type WorkspaceRouteType = NavigationState['routes'][number] | NonNullable<PartialState<NavigationState>['routes']>[number];
@@ -59,12 +62,17 @@ function getWorkspacesTabState(route: WorkspaceRouteType | undefined): Navigatio
  * or a specific domain page. When the user navigates away and comes back to the tab,
  * this hook ensures they return to whichever of those they had open last — not always the list.
  *
- * Resolves nav state and route IDs at click time inside the returned callback so the hook
- * has no reactive subscriptions to nav state — unrelated navigations (e.g. opening a report)
- * don't trigger re-renders. The destination workspace/domain page handles invalid IDs.
+ * Resolves nav state and route IDs at click time inside the returned callback so the hook has
+ * no reactive subscriptions to nav state — unrelated navigations (e.g. opening a report) don't
+ * trigger re-renders. The POLICY/DOMAIN collections are subscribed at hook level so the click
+ * handler can validate the last viewed workspace/domain via closure; these collections rarely
+ * tick during navigation.
  */
 function useRestoreWorkspacesTabOnNavigate() {
     const {shouldUseNarrowLayout} = useResponsiveLayout();
+    const {login: currentUserLogin} = useCurrentUserPersonalDetails();
+    const [allPolicies] = useOnyx(ONYXKEYS.COLLECTION.POLICY);
+    const [allDomains] = useOnyx(ONYXKEYS.COLLECTION.DOMAIN);
 
     return () => {
         const rootState = navigationRef.isReady() ? navigationRef.getRootState() : undefined;
@@ -73,13 +81,21 @@ function useRestoreWorkspacesTabOnNavigate() {
         const workspacesTabState = getWorkspacesTabState(lastWorkspacesTabNavigatorRoute);
 
         const params = workspacesTabState?.routes?.at(0)?.params as WorkspaceParams | undefined;
-        const policyID = params && 'policyID' in params ? params.policyID : undefined;
-        const domainAccountID = params && 'domainAccountID' in params ? params.domainAccountID : undefined;
+        const paramsPolicyID = params && 'policyID' in params ? params.policyID : undefined;
+        const paramsDomainAccountID = params && 'domainAccountID' in params ? params.domainAccountID : undefined;
+
+        const policy =
+            lastWorkspacesTabNavigatorRoute?.name === NAVIGATORS.WORKSPACE_SPLIT_NAVIGATOR && paramsPolicyID ? allPolicies?.[`${ONYXKEYS.COLLECTION.POLICY}${paramsPolicyID}`] : undefined;
+        const domain =
+            lastWorkspacesTabNavigatorRoute?.name === NAVIGATORS.DOMAIN_SPLIT_NAVIGATOR && paramsDomainAccountID
+                ? allDomains?.[`${ONYXKEYS.COLLECTION.DOMAIN}${paramsDomainAccountID}`]
+                : undefined;
 
         navigateToWorkspacesPage({
             shouldUseNarrowLayout,
-            policyID,
-            domainAccountID,
+            currentUserLogin,
+            policy,
+            domain,
             lastWorkspacesTabNavigatorRoute,
             topmostFullScreenRoute,
             workspacesTabState,

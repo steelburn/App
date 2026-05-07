@@ -4,10 +4,12 @@ import interceptAnonymousUser from '@libs/interceptAnonymousUser';
 import {getPreservedNavigatorState} from '@libs/Navigation/AppNavigator/createSplitNavigator/usePreserveNavigatorState';
 import Navigation from '@libs/Navigation/Navigation';
 import navigationRef from '@libs/Navigation/navigationRef';
+import {isPendingDeletePolicy, shouldShowPolicy as shouldShowPolicyUtil} from '@libs/PolicyUtils';
 import NAVIGATORS from '@src/NAVIGATORS';
 import ROUTES from '@src/ROUTES';
 import type {Route} from '@src/ROUTES';
 import SCREENS from '@src/SCREENS';
+import type {Domain, Policy} from '@src/types/onyx';
 import getActiveTabName from './getActiveTabName';
 import getPathFromState from './getPathFromState';
 import {getTabState} from './tabNavigatorUtils';
@@ -24,9 +26,10 @@ function wrapStateInNavigators(state: PartialState<NavigationState>, navigators:
 }
 
 type Params = {
+    currentUserLogin?: string;
     shouldUseNarrowLayout: boolean;
-    policyID?: string;
-    domainAccountID?: number;
+    policy?: Policy;
+    domain?: Domain;
     lastWorkspacesTabNavigatorRoute?: RouteType;
     topmostFullScreenRoute?: RouteType;
     /**
@@ -40,7 +43,7 @@ type Params = {
     workspacesTabState?: NavigationState | PartialState<NavigationState>;
 };
 
-const navigateToWorkspacesPage = ({shouldUseNarrowLayout, policyID, domainAccountID, lastWorkspacesTabNavigatorRoute, topmostFullScreenRoute, workspacesTabState}: Params) => {
+const navigateToWorkspacesPage = ({currentUserLogin, shouldUseNarrowLayout, policy, domain, lastWorkspacesTabNavigatorRoute, topmostFullScreenRoute, workspacesTabState}: Params) => {
     const rootState = navigationRef.getRootState();
     const focusedRoute = rootState ? findFocusedRoute(rootState) : undefined;
     const isOnWorkspacesList = focusedRoute?.name === SCREENS.WORKSPACES_LIST;
@@ -90,40 +93,45 @@ const navigateToWorkspacesPage = ({shouldUseNarrowLayout, policyID, domainAccoun
             return;
         }
 
-        // Workspace route found: navigate to last workspace screen by ID.
-        // Validation is deferred to the destination — if the policy was deleted or access
-        // revoked, the workspace page will redirect to the list itself.
+        // Workspace route found: try to restore last workspace screen.
         if (lastWorkspacesTabNavigatorRoute.name === NAVIGATORS.WORKSPACE_SPLIT_NAVIGATOR) {
-            if (!policyID) {
+            const shouldShowPolicy = shouldShowPolicyUtil(policy, false, currentUserLogin);
+            const isPendingDelete = isPendingDeletePolicy(policy);
+
+            // Workspace is not accessible or is being deleted: go to list.
+            if (!shouldShowPolicy || isPendingDelete) {
                 Navigation.navigate(ROUTES.WORKSPACES_LIST.route);
                 return;
             }
-            // Synthesize a URL from the captured WorkspaceSplitNavigator inner state and navigate
-            // to it. URL-based navigation goes through `getStateFromPath`, which produces a fully
-            // formed nested state and reliably handles pushing a fresh TabNavigator on top of an
-            // existing fullscreen stack. The state has to be wrapped with its full ancestor chain
-            // (TAB_NAVIGATOR > WORKSPACE_NAVIGATOR > WORKSPACE_SPLIT_NAVIGATOR) so `getPathFromState`
-            // can match the linking-config hierarchy and produce a real URL like
-            // `/workspaces/POLICY_ID/workflows`; otherwise the resolver falls back to navigator
-            // names as path segments and the result hits 404. Narrow layouts skip the deep-restore
-            // and go to the workspace's initial page (mirrors mobile behavior).
-            const wrappedState =
-                !shouldUseNarrowLayout && workspacesTabState
-                    ? wrapStateInNavigators(workspacesTabState as PartialState<NavigationState>, [
-                          NAVIGATORS.TAB_NAVIGATOR,
-                          NAVIGATORS.WORKSPACE_NAVIGATOR,
-                          NAVIGATORS.WORKSPACE_SPLIT_NAVIGATOR,
-                      ])
-                    : undefined;
-            const targetPath = (wrappedState ? getPathFromState(wrappedState) : ROUTES.WORKSPACE_INITIAL.getRoute(policyID)) as Route;
-            Navigation.navigate(targetPath);
+
+            if (policy?.id) {
+                // Synthesize a URL from the captured WorkspaceSplitNavigator inner state and navigate
+                // to it. URL-based navigation goes through `getStateFromPath`, which produces a fully
+                // formed nested state and reliably handles pushing a fresh TabNavigator on top of an
+                // existing fullscreen stack. The state has to be wrapped with its full ancestor chain
+                // (TAB_NAVIGATOR > WORKSPACE_NAVIGATOR > WORKSPACE_SPLIT_NAVIGATOR) so `getPathFromState`
+                // can match the linking-config hierarchy and produce a real URL like
+                // `/workspaces/POLICY_ID/workflows`; otherwise the resolver falls back to navigator
+                // names as path segments and the result hits 404. Narrow layouts skip the deep-restore
+                // and go to the workspace's initial page (mirrors mobile behavior).
+                const wrappedState =
+                    !shouldUseNarrowLayout && workspacesTabState
+                        ? wrapStateInNavigators(workspacesTabState as PartialState<NavigationState>, [
+                              NAVIGATORS.TAB_NAVIGATOR,
+                              NAVIGATORS.WORKSPACE_NAVIGATOR,
+                              NAVIGATORS.WORKSPACE_SPLIT_NAVIGATOR,
+                          ])
+                        : undefined;
+                const targetPath = (wrappedState ? getPathFromState(wrappedState) : ROUTES.WORKSPACE_INITIAL.getRoute(policy.id)) as Route;
+                Navigation.navigate(targetPath);
+            }
             return;
         }
 
-        // Domain route found: navigate to last domain screen by ID.
+        // Domain route found: try to restore last domain screen.
         if (lastWorkspacesTabNavigatorRoute.name === NAVIGATORS.DOMAIN_SPLIT_NAVIGATOR) {
-            if (domainAccountID !== undefined) {
-                Navigation.navigate(ROUTES.DOMAIN_INITIAL.getRoute(domainAccountID));
+            if (domain?.accountID !== undefined) {
+                Navigation.navigate(ROUTES.DOMAIN_INITIAL.getRoute(domain.accountID));
                 return;
             }
         }
