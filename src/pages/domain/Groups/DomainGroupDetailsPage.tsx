@@ -1,4 +1,3 @@
-import {useNavigation} from '@react-navigation/native';
 import {domainSecurityGroupSettingErrorsSelector, domainSecurityGroupSettingPendingActionSelector, selectGroupByID} from '@selectors/Domain';
 import React from 'react';
 import {View} from 'react-native';
@@ -34,8 +33,6 @@ function DomainGroupDetailsPage({route}: DomainGroupDetailsPageProps) {
 
     const {translate} = useLocalize();
 
-    const navigation = useNavigation();
-
     const [group] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {
         selector: selectGroupByID(groupID),
     });
@@ -48,7 +45,7 @@ function DomainGroupDetailsPage({route}: DomainGroupDetailsPageProps) {
     });
 
     // Block access to a group being deleted, and avoid flashing the not-found page during RHP navigation
-    const isDeleting = !group || (!!deleteGroupPendingAction && navigation.canGoBack());
+    const isDeleting = !group || !!deleteGroupPendingAction;
 
     return (
         <DomainNotFoundPageWrapper

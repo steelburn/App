@@ -51,8 +51,9 @@ function DeleteGroupRow({domainAccountID, groupID}: DeleteGroupRowProps) {
         if (result.action !== ModalActions.CONFIRM) {
             return;
         }
-        Navigation.goBack(ROUTES.DOMAIN_GROUPS.getRoute(domainAccountID));
-        deleteDomainSecurityGroup(domainAccountID, groupID);
+        Navigation.goBack(ROUTES.DOMAIN_GROUPS.getRoute(domainAccountID), {
+            afterTransition: () => deleteDomainSecurityGroup(domainAccountID, groupID),
+        });
     };
 
     return groupID !== defaultSecurityGroupID ? (
