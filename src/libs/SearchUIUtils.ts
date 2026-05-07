@@ -5766,26 +5766,16 @@ const FLEX_COLUMNS = new Set<string>([
     CONST.SEARCH.TABLE_COLUMNS.CATEGORY,
     CONST.SEARCH.TABLE_COLUMNS.TAG,
     CONST.SEARCH.TABLE_COLUMNS.TAX_RATE,
-]);
-
-const TOTAL_COLUMNS = new Set<string>([
-    CONST.SEARCH.TABLE_COLUMNS.TOTAL,
-    CONST.SEARCH.TABLE_COLUMNS.TOTAL_AMOUNT,
-    CONST.SEARCH.TABLE_COLUMNS.TOTAL_PER_ATTENDEE,
-    CONST.SEARCH.TABLE_COLUMNS.ORIGINAL_AMOUNT,
+    CONST.SEARCH.TABLE_COLUMNS.CARD,
+    CONST.SEARCH.TABLE_COLUMNS.EXCHANGE_RATE,
 ]);
 
 /**
- * Returns true when it's safe to remove flex from total columns — i.e., another flex column
- * exists to fill the space, and the total column is the last visible column.
+ * Returns true when another flex column exists that can fill the remaining space,
+ * making it safe to remove flex from total columns.
  */
 function hasFlexColumn(columns?: SearchColumnType[]): boolean {
-    if (!columns?.length) {
-        return false;
-    }
-    const lastColumn = columns.at(-1);
-    const isTotalLastColumn = !!lastColumn && TOTAL_COLUMNS.has(lastColumn);
-    return isTotalLastColumn && columns.some((col) => FLEX_COLUMNS.has(col));
+    return !!columns?.some((col) => FLEX_COLUMNS.has(col));
 }
 
 export {
