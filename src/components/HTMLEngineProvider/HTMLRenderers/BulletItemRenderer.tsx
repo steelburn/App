@@ -13,7 +13,7 @@ function BulletItemRenderer({tnode}: {tnode: TNode}) {
     const theme = useTheme();
 
     return (
-        <View style={styles.flexRow}>
+        <View style={[styles.flexRow, styles.w100]}>
             <Text style={{color: theme.text, fontSize: variables.fontSizeNormal, lineHeight: variables.fontSizeNormalHeight, paddingHorizontal: 8}}>{CONST.DOT_SEPARATOR}</Text>
             <View style={styles.flex1}>
                 <TNodeChildrenRenderer tnode={tnode} />
