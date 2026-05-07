@@ -382,7 +382,7 @@ function ReportParticipantsPage({report, route}: ReportParticipantsPageProps) {
                         shouldSingleExecuteRowSelect={!isCurrentUserGroupChatAdmin}
                         onTurnOnSelectionMode={(item) => item && toggleUser(item)}
                         onSelectAll={() => toggleAllUsers(participants)}
-                        onCheckboxPress={toggleUser}
+                        onSelectionButtonPress={toggleUser}
                         shouldShowTextInput={shouldShowTextInput}
                         customListHeader={customListHeader}
                         showScrollIndicator

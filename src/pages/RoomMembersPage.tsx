@@ -460,7 +460,7 @@ function RoomMembersPage({report, policy}: RoomMembersPageProps) {
                         data={data}
                         ListItem={TableListItem}
                         onSelectRow={openRoomMemberDetails}
-                        onCheckboxPress={toggleUser}
+                        onSelectionButtonPress={toggleUser}
                         textInputOptions={textInputOptions}
                         shouldShowTextInput={shouldShowTextInput}
                         shouldShowLoadingPlaceholder={!isPersonalDetailsReady(personalDetails) || !didLoadRoomMembers}

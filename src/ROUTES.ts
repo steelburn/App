@@ -99,6 +99,10 @@ const DYNAMIC_ROUTES = {
         path: 'owner-selector',
         entryScreens: [],
     },
+    EXPENSE_LIMIT_TYPE_SELECTOR: {
+        path: 'expense-limit-type',
+        entryScreens: [SCREENS.WORKSPACE.CATEGORY_FLAG_AMOUNTS_OVER],
+    },
     REPORT_SETTINGS_NAME: {
         path: 'settings/name',
         entryScreens: [SCREENS.REPORT_DETAILS.ROOT],
@@ -304,6 +308,24 @@ const DYNAMIC_ROUTES = {
         path: 'imported',
         entryScreens: [SCREENS.WORKSPACE.CATEGORIES],
     },
+    WORKSPACE_CATEGORIES_SETTINGS: {
+        path: 'categories-settings',
+        entryScreens: [SCREENS.WORKSPACE.CATEGORIES],
+    },
+    WORKSPACE_CATEGORY_CREATE: {
+        path: 'category-new',
+        entryScreens: [SCREENS.WORKSPACE.CATEGORIES],
+    },
+    SPEND_CATEGORY_SELECTOR: {
+        path: 'spend-category-selector/:groupID',
+        entryScreens: [SCREENS.WORKSPACE.DYNAMIC_CATEGORIES_SETTINGS, SCREENS.SETTINGS_CATEGORIES.SETTINGS_CATEGORIES_SETTINGS],
+        getRoute: (groupID: string) => `spend-category-selector/${groupID}` as const,
+    },
+    DEFAULT_CATEGORY_SELECTOR: {
+        path: 'default-category-selector/:customUnitID',
+        entryScreens: [SCREENS.WORKSPACE.DISTANCE_RATES_SETTINGS, SCREENS.WORKSPACE.PER_DIEM_SETTINGS],
+        getRoute: (customUnitID: string) => `default-category-selector/${customUnitID}` as const,
+    },
     WORKSPACE_INVITE: {
         path: 'invite',
         entryScreens: [SCREENS.WORKSPACE.PROFILE, SCREENS.WORKSPACE.MEMBERS],
@@ -391,7 +413,7 @@ const ROUTES = {
     SEARCH_SAVE: 'search/save',
     SEARCH_SAVED_SEARCH_RENAME: {
         route: 'search/saved-search/rename',
-        getRoute: ({name, jsonQuery}: {name: string; jsonQuery: SearchQueryString}) => `search/saved-search/rename?name=${name}&q=${jsonQuery}` as const,
+        getRoute: ({name, jsonQuery}: {name: string; jsonQuery: SearchQueryString}) => `search/saved-search/rename?name=${name}&q=${encodeURIComponent(jsonQuery)}` as const,
     },
     SEARCH_COLUMNS: 'search/columns',
     SEARCH_ADVANCED_FILTERS: {
@@ -491,7 +513,15 @@ const ROUTES = {
             return `search/move-transactions/search/${encodeURIComponent(backTo)}` as const;
         },
     },
-    CHANGE_APPROVER_SEARCH_RHP: 'search/change-approver',
+    CHANGE_APPROVER_SEARCH_RHP: {
+        route: 'search/change-approver/search/:backTo?',
+        getRoute: (backTo?: string) => {
+            if (!backTo) {
+                return 'search/change-approver/search' as const;
+            }
+            return `search/change-approver/search/${encodeURIComponent(backTo)}` as const;
+        },
+    },
     CHANGE_APPROVER_ADD_APPROVER_SEARCH_RHP: 'search/change-approver/add',
 
     // This is a utility route used to go to the user's concierge chat, or the sign-in page if the user's not authenticated
@@ -746,6 +776,15 @@ const ROUTES = {
     },
     SETTINGS_ADD_US_BANK_ACCOUNT: 'settings/wallet/add-us-bank-account',
     SETTINGS_ADD_US_BANK_ACCOUNT_ENTRY_POINT: 'settings/wallet/add-us-bank-account/entry-point',
+    SETTINGS_UPDATE_PERSONAL_BANK_ACCOUNT: {
+        route: 'settings/wallet/update-personal-bank-account/:subPage?',
+        getRoute: (subPage?: string) => {
+            if (!subPage) {
+                return 'settings/wallet/update-personal-bank-account' as const;
+            }
+            return `settings/wallet/update-personal-bank-account/${subPage}` as const;
+        },
+    },
     SETTINGS_ADD_BANK_ACCOUNT_SELECT_COUNTRY_VERIFY_ACCOUNT: `settings/wallet/add-bank-account/select-country/${VERIFY_ACCOUNT}`,
     SETTINGS_BANK_ACCOUNT_PURPOSE: 'settings/wallet/bank-account-purpose',
     SETTINGS_ENABLE_PAYMENTS: 'settings/wallet/enable-payments',
@@ -774,6 +813,10 @@ const ROUTES = {
     SETTINGS_WALLET_PERSONAL_CARD_BANK_CONNECTION: {
         route: 'settings/wallet/add-personal-card/:feed/bank-connection',
         getRoute: (feed: PersonalCardFeed) => `settings/wallet/add-personal-card/${feed}/bank-connection` as const,
+    },
+    SETTINGS_WALLET_PERSONAL_CARD_FIX_CONNECTION: {
+        route: 'settings/wallet/personal-card/:cardID/fix-connection',
+        getRoute: (cardID: string) => `settings/wallet/personal-card/${cardID}/fix-connection` as const,
     },
     SETTINGS_WALLET_PERSONAL_CARD_UPGRADE: 'settings/wallet/add-personal-card/upgrade',
     SETTINGS_WALLET_PERSONAL_CARD_WARNING: 'settings/wallet/add-personal-card/warning',
@@ -826,6 +869,7 @@ const ROUTES = {
     },
     SETTINGS_WALLET_TRAVEL_CVV: 'settings/wallet/travel-cvv',
     SETTINGS_WALLET_TRAVEL_CVV_VERIFY_ACCOUNT: `settings/wallet/travel-cvv/${VERIFY_ACCOUNT}`,
+    SETTINGS_AGENTS: 'settings/agents',
     SETTINGS_RULES: 'settings/rules',
     SETTINGS_RULES_ADD: {
         route: 'settings/rules/new/:field?/:index?',
@@ -882,6 +926,15 @@ const ROUTES = {
             // should be removed once https://github.com/Expensify/App/pull/72219 is resolved
             // eslint-disable-next-line no-restricted-syntax -- Legacy route generation
             return getUrlWithBackToParam(`settings/profile/contact-methods/new/confirm-magic-code`, backTo);
+        },
+    },
+    SETTINGS_CONTACT_METHOD_SET_DEFAULT_CONFIRM: {
+        route: 'settings/profile/contact-methods/:contactMethod/set-default/confirm',
+        getRoute: (contactMethod: string, backTo?: string) => {
+            const encodedMethod = encodeURIComponent(contactMethod);
+
+            // eslint-disable-next-line no-restricted-syntax -- Legacy route generation
+            return getUrlWithBackToParam(`settings/profile/contact-methods/${encodedMethod}/set-default/confirm`, backTo);
         },
     },
     SETTINGS_CONTACT_METHOD_VERIFY_ACCOUNT: {
@@ -2135,10 +2188,6 @@ const ROUTES = {
         route: 'workspaces/:policyID/avatar',
         getRoute: (policyID: string, fallbackLetter?: UpperCaseCharacters) => `workspaces/${policyID}/avatar${fallbackLetter ? `?letter=${fallbackLetter}` : ''}` as const,
     },
-    WORKSPACE_DOCUMENT: {
-        route: 'workspaces/:policyID/document',
-        getRoute: (policyID: string) => `workspaces/${policyID}/document` as const,
-    },
     WORKSPACE_JOIN_USER: {
         route: 'workspaces/:policyID/join',
         getRoute: (policyID: string, inviterEmail: string) => `workspaces/${policyID}/join?email=${inviterEmail}` as const,
@@ -2327,14 +2376,6 @@ const ROUTES = {
 
         // eslint-disable-next-line no-restricted-syntax -- Legacy route generation
         getRoute: (backTo?: string) => getUrlWithBackToParam(`workspaces/pay-and-downgrade` as const, backTo),
-    },
-    WORKSPACE_CATEGORIES_SETTINGS: {
-        route: 'workspaces/:policyID/categories/settings',
-        getRoute: (policyID: string) => `workspaces/${policyID}/categories/settings` as const,
-    },
-    WORKSPACE_CATEGORY_CREATE: {
-        route: 'workspaces/:policyID/categories/new',
-        getRoute: (policyID: string) => `workspaces/${policyID}/categories/new` as const,
     },
     WORKSPACE_CATEGORY_EDIT: {
         route: 'workspaces/:policyID/category/:categoryName/edit',
@@ -3357,6 +3398,7 @@ const ROUTES = {
         getRoute: (backTo?: string) => getUrlWithBackToParam(`workspace/confirmation`, backTo),
     },
     WORKSPACE_CONFIRMATION_OWNER_SELECTOR: 'workspace/confirmation/owner-selector',
+    WORKSPACE_CONFIRMATION_SUCCESS: 'workspace/confirmation/success',
     MIGRATED_USER_WELCOME_MODAL: {
         route: 'onboarding/migrated-user-welcome',
 
@@ -4069,6 +4111,10 @@ const ROUTES = {
         route: 'domain/:domainAccountID/members/move',
         getRoute: (domainAccountID: number) => `domain/${domainAccountID}/members/move` as const,
     },
+    DOMAIN_MEMBER_MOVE_TO_GROUP: {
+        route: 'domain/:domainAccountID/members/:accountID/move',
+        getRoute: (domainAccountID: number, accountID: number) => `domain/${domainAccountID}/members/${accountID}/move` as const,
+    },
 
     MULTIFACTOR_AUTHENTICATION_MAGIC_CODE: `multifactor-authentication/magic-code`,
     MULTIFACTOR_AUTHENTICATION_BIOMETRICS_TEST: 'multifactor-authentication/scenario/biometrics-test',
@@ -4110,6 +4156,11 @@ const ROUTES = {
     DOMAIN_GROUP_EDIT_NAME: {
         route: 'domain/:domainAccountID/groups/:groupID/name',
         getRoute: (domainAccountID: number, groupID: string) => `domain/${domainAccountID}/groups/${groupID}/name` as const,
+    },
+
+    DOMAIN_SECURITY_GROUPS_PREFERRED_WORKSPACE: {
+        route: 'domain/:domainAccountID/groups/:groupID/preferred-workspace',
+        getRoute: (domainAccountID: number, groupID: string) => `domain/${domainAccountID}/groups/${groupID}/preferred-workspace` as const,
     },
 } as const;
 
