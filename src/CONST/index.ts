@@ -3739,6 +3739,7 @@ const CONST = {
             GAMBLING: 'gambling',
             TOBACCO: 'tobacco',
             ADULT_ENTERTAINMENT: 'adultEntertainment',
+            HANDWRITTEN_RECEIPT: 'handwrittenReceipt',
         },
         RECEIPT_PARTNERS: {
             NAME: {UBER: 'uber'},
@@ -3904,6 +3905,7 @@ const CONST = {
             gambling: true,
             tobacco: false,
             adultEntertainment: true,
+            handwrittenReceipt: false,
         },
         DEFAULT_BILLABLE: false,
         DEFAULT_REIMBURSABLE: true,
