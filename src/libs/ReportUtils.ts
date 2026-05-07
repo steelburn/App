@@ -4166,9 +4166,9 @@ type ReasonAndReportActionThatRequiresAttention = {
 /**
  * Returns the unresolved card fraud alert action for a given report.
  */
-function getUnresolvedCardFraudAlertAction(reportID: string): OnyxEntry<ReportAction> {
-    const reportActions = getAllReportActions(reportID);
-    return Object.values(reportActions).find((action): action is ReportAction => isActionableCardFraudAlert(action) && !getOriginalMessage(action)?.resolution);
+function getUnresolvedCardFraudAlertAction(reportID: string, reportActions?: OnyxEntry<ReportActions>): OnyxEntry<ReportAction> {
+    const actions = reportActions ?? getAllReportActions(reportID);
+    return Object.values(actions).find((action): action is ReportAction => isActionableCardFraudAlert(action) && !getOriginalMessage(action)?.resolution);
 }
 
 /**
@@ -13647,6 +13647,7 @@ export {
     hasMissingInvoiceBankAccount,
     reasonForReportToBeInOptionList,
     getReasonAndReportActionThatRequiresAttention,
+    getUnresolvedCardFraudAlertAction,
     buildOptimisticChangeFieldAction,
     isPolicyRelatedReport,
     hasReportErrorsOtherThanFailedReceipt,
