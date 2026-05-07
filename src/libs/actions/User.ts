@@ -1452,9 +1452,9 @@ function lockAccount(accountID?: number, domainAccountID?: number, domainName?: 
     return API.makeRequestWithSideEffects(SIDE_EFFECT_REQUEST_COMMANDS.LOCK_ACCOUNT, params, {optimisticData, successData, failureData});
 }
 
-function requestUnlockAccount(currentAccountIDParam: number, accountID: number | undefined) {
+function requestUnlockAccount(accountID: number) {
     const params: LockAccountParams = {
-        accountID: accountID ?? currentAccountIDParam,
+        accountID,
     };
 
     API.write(WRITE_COMMANDS.REQUEST_UNLOCK_ACCOUNT, params);

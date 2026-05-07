@@ -792,23 +792,11 @@ describe('actions/User', () => {
 
     describe('requestUnlockAccount', () => {
         it('should call API.write with REQUEST_UNLOCK_ACCOUNT command and explicit accountID', async () => {
-            const currentAccountID = 888;
             const accountID = 123456;
-            UserActions.requestUnlockAccount(currentAccountID, accountID);
+            UserActions.requestUnlockAccount(accountID);
             await waitForBatchedUpdates();
 
             expect(mockAPI.write).toHaveBeenCalledWith(WRITE_COMMANDS.REQUEST_UNLOCK_ACCOUNT, {accountID});
-        });
-
-        it('should fall back to currentUserAccountID when no accountID is provided', async () => {
-            const currentAccountID = 888;
-            await Onyx.merge(ONYXKEYS.SESSION, {accountID: currentAccountID, email: 'user@expensify.com'});
-            await waitForBatchedUpdates();
-
-            UserActions.requestUnlockAccount(currentAccountID, undefined);
-            await waitForBatchedUpdates();
-
-            expect(mockAPI.write).toHaveBeenCalledWith(WRITE_COMMANDS.REQUEST_UNLOCK_ACCOUNT, {accountID: currentAccountID});
         });
     });
 

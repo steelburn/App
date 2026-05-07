@@ -35,7 +35,7 @@ function UnlockAccountPage() {
                     descriptionStyle={styles.colorMuted}
                     buttonText={translate('unlockAccountPage.chatWithConcierge')}
                     onButtonPress={() => {
-                        requestUnlockAccount(currentUserPersonalDetails.accountID, undefined);
+                        requestUnlockAccount(currentUserPersonalDetails.accountID);
                         Navigation.navigate(ROUTES.CONCIERGE);
                     }}
                     containerStyle={styles.h100}

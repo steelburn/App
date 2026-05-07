@@ -10,7 +10,6 @@ import MenuItem from '@components/MenuItem';
 import {ModalActions} from '@components/Modal/Global/ModalContext';
 import VacationDelegateMenuItem from '@components/VacationDelegateMenuItem';
 import useConfirmModal from '@hooks/useConfirmModal';
-import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
@@ -37,7 +36,6 @@ function DomainMemberDetailsPage({route}: DomainMemberDetailsPageProps) {
     const {domainAccountID, accountID} = route.params;
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const icons = useMemoizedLazyExpensifyIcons(['RemoveMembers', 'Flag', 'Unlock', 'CircularArrowBackwards']);
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [shouldForceCloseAccount, setShouldForceCloseAccount] = useState<boolean>();
@@ -121,7 +119,7 @@ function DomainMemberDetailsPage({route}: DomainMemberDetailsPageProps) {
     );
 
     const showUnlockAccountModal = () => {
-        requestUnlockAccount(currentUserPersonalDetails.accountID, accountID);
+        requestUnlockAccount(accountID);
         showConfirmModal({
             title: translate('lockAccountPage.unlockTitle'),
             prompt: translate('lockAccountPage.unlockDescription'),
