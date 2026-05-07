@@ -121,6 +121,7 @@ function IOURequestStepDistanceOdometer({
     const [parentReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(report?.parentReportID)}`);
     const [parentReportNextStep] = useOnyx(`${ONYXKEYS.COLLECTION.NEXT_STEP}${getNonEmptyStringOnyxID(report?.parentReportID)}`);
     const policy = usePolicy(report?.policyID);
+    const [allPolicies] = useOnyx(ONYXKEYS.COLLECTION.POLICY);
     const [policyCategories] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${policy?.id}`);
     const [policyTags] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_TAGS}${policy?.id}`);
     const personalPolicy = usePersonalPolicy();
@@ -480,6 +481,7 @@ function IOURequestStepDistanceOdometer({
                     // Not required for odometer distance request
                     transactionBackup: undefined,
                     policy,
+                    allPolicies,
                     policyTagList: policyTags,
                     policyCategories,
                     currentUserAccountIDParam,
