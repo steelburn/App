@@ -74,7 +74,7 @@ To create an expense using your vehicle's odometer readings:
 4. Enter the **End reading** from your odometer after the trip.
    - The total distance is calculated automatically as you type.
 5. (Optional) Select the image icon next to each reading to attach a photo of your odometer.
-6. (Optional) To finish creating the expense later, select **Save for later** to keep the expense in progress on your device. Reopen it after your trip to enter the end reading.
+6. (Optional) To finish creating the expense later, select **Save for later** to keep the expense in progress on your device. After your trip, return to **➕ Create** > **Track distance** > **Odometer** to resume the saved expense and enter the end reading.
 7. Select **Next**.
 8. On the confirmation screen, review and confirm:
    - Distance
@@ -168,7 +168,7 @@ Yes. When you add two odometer images to a distance expense, they will be merged
 
 ## Can I save an odometer expense for later?
 
-Yes. Enter your start reading before the trip, then select **Save for later**. After the trip, reopen the expense to enter the end reading.
+Yes. Enter your start reading before the trip, then select **Save for later**. After the trip, return to **➕ Create** > **Track distance** > **Odometer** to resume the saved expense and enter the end reading.
 
 ## Can I have multiple incomplete odometer expenses at the same time?
 
