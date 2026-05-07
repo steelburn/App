@@ -1926,7 +1926,12 @@ const createStyleUtils = (theme: ThemeColors, styles: ThemeStyles) => ({
             case CONST.SEARCH.TABLE_COLUMNS.GROUP_TOTAL:
             case CONST.SEARCH.TABLE_COLUMNS.TOTAL_PER_ATTENDEE:
             case CONST.SEARCH.TABLE_COLUMNS.TOTAL:
-                columnWidth = {...getWidthStyle(isAmountColumnWide ? variables.w130 : variables.w96), ...(!shouldRemoveTotalColumnFlex && styles.flex1), ...styles.alignItemsEnd};
+                columnWidth = {
+                    ...getWidthStyle(isAmountColumnWide ? variables.w130 : variables.w96),
+                    ...(!shouldRemoveTotalColumnFlex && styles.flex1),
+                    ...(shouldRemoveTotalColumnFlex && styles.mlAuto),
+                    ...styles.alignItemsEnd,
+                };
                 break;
             case CONST.SEARCH.TABLE_COLUMNS.TYPE:
                 columnWidth = {...getWidthStyle(variables.w16), ...styles.alignItemsCenter};
