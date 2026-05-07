@@ -24,6 +24,6 @@ type ExpenseReportListItemRowWideProps = ExpenseReportListItemRowNarrowProps & {
     columns?: SearchColumnType[];
 };
 
-type ExpenseReportListItemRowProps = ExpenseReportListItemRowWideProps & {isLargeScreenWidth?: boolean};
+type ExpenseReportListItemRowProps = ExpenseReportListItemRowWideProps;
 
 export type {ExpenseReportListItemRowProps, ExpenseReportListItemRowNarrowProps, ExpenseReportListItemRowWideProps};

@@ -1,10 +1,13 @@
 import React from 'react';
+import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import ExpenseReportListItemRowNarrow from './ExpenseReportListItemRowNarrow';
 import ExpenseReportListItemRowWide from './ExpenseReportListItemRowWide';
 import type {ExpenseReportListItemRowProps} from './types';
 
 function ExpenseReportListItemRow(props: ExpenseReportListItemRowProps) {
-    if (props.isLargeScreenWidth) {
+    const {isLargeScreenWidth} = useResponsiveLayout();
+
+    if (isLargeScreenWidth) {
         return (
             <ExpenseReportListItemRowWide
                 item={props.item}

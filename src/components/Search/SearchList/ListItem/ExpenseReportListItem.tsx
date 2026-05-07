@@ -315,7 +315,6 @@ function ExpenseReportListItem<TItem extends ListItem>({
                         isHovered={hovered}
                         isFocused={isFocused}
                         isPendingDelete={isPendingDelete}
-                        isLargeScreenWidth={isLargeScreenWidth}
                     />
                     {getDescription}
                 </View>
