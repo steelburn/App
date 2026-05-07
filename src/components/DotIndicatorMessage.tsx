@@ -98,7 +98,13 @@ function DotIndicatorMessage({messages = {}, style, type, textStyles, dismissErr
                         fill={isErrorMessage ? theme.danger : theme.success}
                     />
                 </View>
-                <Text style={[StyleUtils.getDotIndicatorTextStyles(isErrorMessage), textStyles, styles.flex1]}>{translate('iou.error.receiptUploadFailedMessage')}</Text>
+                <Text
+                    style={[StyleUtils.getDotIndicatorTextStyles(isErrorMessage), textStyles, styles.flex1]}
+                    accessibilityRole={isErrorMessage ? CONST.ROLE.ALERT : undefined}
+                    accessibilityLiveRegion={isErrorMessage ? 'assertive' : undefined}
+                >
+                    {translate('iou.error.receiptUploadFailedMessage')}
+                </Text>
             </View>
         );
         const buttonsRow = (

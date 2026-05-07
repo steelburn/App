@@ -105,6 +105,8 @@ function getLatestErrorMessageField<TOnyxData extends OnyxDataWithErrors>(onyxDa
     if (isEmptyValueObject(errors)) {
         return {};
     }
+    // Receipt errors are handled separately by MoneyRequestReceiptView and DotIndicatorMessage
+    // and should never surface as a generic text error via this utility.
     const filteredKeys = Object.keys(errors)
         .filter((k) => !isReceiptError(errors[k]))
         .sort()
