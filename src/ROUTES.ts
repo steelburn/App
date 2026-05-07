@@ -2903,6 +2903,18 @@ const ROUTES = {
         route: 'workspace/:policyID/duplicate/select-features',
         getRoute: (policyID: string) => `workspace/${policyID}/duplicate/select-features` as const,
     },
+    POLICY_COPY_SETTINGS: {
+        route: 'policy/:policyID/copy-settings',
+        getRoute: (policyID: string) => `policy/${policyID}/copy-settings` as const,
+    },
+    POLICY_COPY_SETTINGS_SELECT_FEATURES: {
+        route: 'policy/:policyID/copy-settings/select-features',
+        getRoute: (policyID: string) => `policy/${policyID}/copy-settings/select-features` as const,
+    },
+    POLICY_COPY_SETTINGS_CONFIRM: {
+        route: 'policy/:policyID/copy-settings/confirm',
+        getRoute: (policyID: string) => `policy/${policyID}/copy-settings/confirm` as const,
+    },
     WORKSPACE_RECEIPT_PARTNERS: {
         route: 'workspaces/:policyID/receipt-partners',
         getRoute: (policyID: string | undefined, backTo?: string) => {
