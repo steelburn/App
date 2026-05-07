@@ -8,6 +8,7 @@ import {LocaleContextProvider} from '@components/LocaleContextProvider';
 import OnyxListItemProvider from '@components/OnyxListItemProvider';
 import type {PopoverMenuItem, PopoverMenuProps} from '@components/PopoverMenu';
 import CONST from '@src/CONST';
+import ONYXKEYS from '@src/ONYXKEYS';
 import type {Report} from '@src/types/onyx';
 import waitForBatchedUpdates from '../utils/waitForBatchedUpdates';
 
@@ -170,6 +171,30 @@ describe('ChronosTimerHeaderButton', () => {
                 text: CONST.CHRONOS.TIMER_COMMAND.START,
             }),
         );
+    });
+
+    it('should disable the button while the OpenReport API is in progress', async () => {
+        // Given the OpenReport API is in flight for this report (RAM-only loading state set)
+        await Onyx.merge(`${ONYXKEYS.COLLECTION.RAM_ONLY_REPORT_LOADING_STATE}${TEST_REPORT_ID}`, {
+            isLoadingInitialReportActions: true,
+        });
+
+        // When ChronosTimerHeaderButton is rendered
+        renderComponent();
+        await waitForBatchedUpdates();
+
+        // Then every rendered button reports a disabled accessibility state
+        const buttons = screen.getAllByRole('button');
+        expect(buttons.length).toBeGreaterThan(0);
+        buttons.forEach((btn) => {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+            expect(btn.props.accessibilityState?.disabled).toBe(true);
+        });
+
+        // And pressing the main "Start Timer" button does not trigger addComment
+        fireEvent.press(screen.getByText('Start Timer'));
+        await waitForBatchedUpdates();
+        expect(mockAddComment).not.toHaveBeenCalled();
     });
 
     it('should navigate to Schedule OOO when the option is selected from the dropdown menu', async () => {

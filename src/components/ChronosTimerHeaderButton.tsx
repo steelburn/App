@@ -18,6 +18,7 @@ import {callFunctionIfActionIsAllowed} from '@userActions/Session';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
+import {isLoadingInitialReportActionsSelector} from '@src/selectors/ReportMetaData';
 import type * as OnyxTypes from '@src/types/onyx';
 import type {ReportActions} from '@src/types/onyx/ReportAction';
 import ButtonWithDropdownMenu from './ButtonWithDropdownMenu';
@@ -48,6 +49,10 @@ function ChronosTimerHeaderButton({report}: ChronosTimerHeaderButtonProps) {
         },
         [canPerformWriteAction, visibleReportActionsData, report.reportID, currentUserAccountID],
     );
+
+    const [isLoadingInitialReportActions] = useOnyx(`${ONYXKEYS.COLLECTION.RAM_ONLY_REPORT_LOADING_STATE}${report.reportID}`, {
+        selector: isLoadingInitialReportActionsSelector,
+    });
 
     const ancestors = useAncestors(report);
     const isInSidePanel = useIsInSidePanel();
@@ -89,6 +94,7 @@ function ChronosTimerHeaderButton({report}: ChronosTimerHeaderButtonProps) {
         <View style={[styles.flexRow, styles.alignItemsCenter, styles.justifyContentEnd]}>
             <ButtonWithDropdownMenu<ChronosAction>
                 success={!isTimerRunning}
+                isDisabled={!!isLoadingInitialReportActions}
                 onPress={() => {
                     callFunctionIfActionIsAllowed(sendCommentToChronos)();
                 }}
