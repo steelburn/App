@@ -179,7 +179,7 @@ function WorkspaceCompanyCardTableItem({
                                         }
                                         avatarID={cardholder?.accountID}
                                         type={CONST.ICON_TYPE_AVATAR}
-                                        size={CONST.AVATAR_SIZE.DEFAULT}
+                                        size={CONST.AVATAR_SIZE.SMALL}
                                     />
                                 ) : (
                                     CardFeedIcon
