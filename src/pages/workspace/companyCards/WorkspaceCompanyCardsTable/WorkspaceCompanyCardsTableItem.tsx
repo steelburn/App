@@ -7,6 +7,7 @@ import Icon from '@components/Icon';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
 import {PressableWithFeedback} from '@components/Pressable';
 import TableRowSkeleton from '@components/Skeletons/TableRowSkeleton';
+import Table from '@components/Table';
 import Text from '@components/Text';
 import TextWithTooltip from '@components/TextWithTooltip';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
@@ -61,7 +62,7 @@ type WorkspaceCompanyCardTableItemProps = {
     columnCount: number;
 
     /** Whether or not the item is the last item in the table */
-    isLastItem: boolean;
+    isLastRow: boolean;
 
     /**
      * Callback when assigning a card.
@@ -80,7 +81,7 @@ function WorkspaceCompanyCardTableItem({
     columnCount,
     isAssigningCardDisabled,
     onAssignCard,
-    isLastItem,
+    isLastRow,
 }: WorkspaceCompanyCardTableItemProps) {
     const styles = useThemeStyles();
     const theme = useTheme();
@@ -105,6 +106,21 @@ function WorkspaceCompanyCardTableItem({
         isDeleting,
     };
 
+    const handleRowPress = () => {
+        if (!assignedCard) {
+            assignCard();
+            return;
+        }
+
+        if (!assignedCard?.accountID || !assignedCard?.fundID) {
+            return;
+        }
+
+        const feedName = getCardFeedWithDomainID(assignedCard?.bank as CompanyCardFeed, assignedCard.fundID);
+
+        return Navigation.navigate(ROUTES.WORKSPACE_COMPANY_CARD_DETAILS.getRoute(policyID, feedName as CompanyCardFeedWithDomainID, assignedCard.cardID.toString()));
+    };
+
     return (
         <OfflineWithFeedback
             errorRowStyles={[styles.ph5, styles.mb4]}
@@ -122,39 +138,11 @@ function WorkspaceCompanyCardTableItem({
                     />
                 </View>
             ) : (
-                <PressableWithFeedback
-                    role={isAssigned ? CONST.ROLE.BUTTON : CONST.ROLE.PRESENTATION}
-                    style={[
-                        styles.mh5,
-                        styles.flexRow,
-                        styles.highlightBG,
-                        styles.overflowHidden,
-                        styles.ph3,
-                        styles.tableRowHeight,
-                        styles.alignItemsCenter,
-                        !isLastItem && styles.borderBottom,
-                        isLastItem && styles.tableBottomRadius,
-                    ]}
-                    sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.COMPANY_CARDS.TABLE_ITEM}
-                    accessibilityLabel="row"
-                    hoverStyle={isAssigned && styles.hoveredComponentBG}
-                    disabled={isCardDeleted}
+                <Table.Row
+                    isLastRow={isLastRow}
                     interactive={isAssigned}
-                    pressDimmingValue={isAssigned ? undefined : 1}
-                    onPress={() => {
-                        if (!assignedCard) {
-                            assignCard();
-                            return;
-                        }
-
-                        if (!assignedCard?.accountID || !assignedCard?.fundID) {
-                            return;
-                        }
-
-                        const feedName = getCardFeedWithDomainID(assignedCard?.bank as CompanyCardFeed, assignedCard.fundID);
-
-                        return Navigation.navigate(ROUTES.WORKSPACE_COMPANY_CARD_DETAILS.getRoute(policyID, feedName as CompanyCardFeedWithDomainID, assignedCard.cardID.toString()));
-                    }}
+                    sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.COMPANY_CARDS.TABLE_ITEM}
+                    onPress={handleRowPress}
                 >
                     {({hovered}) => (
                         <View
@@ -241,7 +229,7 @@ function WorkspaceCompanyCardTableItem({
                             </View>
                         </View>
                     )}
-                </PressableWithFeedback>
+                </Table.Row>
             )}
         </OfflineWithFeedback>
     );

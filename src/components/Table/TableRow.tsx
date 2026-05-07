@@ -2,14 +2,19 @@ import PressableWithFeedback, {PressableWithFeedbackProps} from '@components/Pre
 import useThemeStyles from '@hooks/useThemeStyles';
 import CONST from '@src/CONST';
 
-type TableRowProps = PressableWithFeedbackProps & {
+type TableRowProps = Omit<PressableWithFeedbackProps, 'accessible'> & {
+    /** When true, indicates that the view is an accessibility element.  By default, all the rows are accessible. */
+    accessible?: boolean;
+
+    /** Whether or not the table row is pressable or not */
+    interactive: boolean;
+
     /** Whether this row is the last row in the table */
-    isLastRow?: boolean;
+    isLastRow: boolean;
 };
 
-export default function TableRow({children, isLastRow, onPress, ...props}: TableRowProps) {
+export default function TableRow({children, accessible, isLastRow, interactive, onPress, ...props}: TableRowProps) {
     const styles = useThemeStyles();
-    const isPressable = onPress !== undefined;
 
     const tableRowStyles = [
         styles.mh5,
@@ -24,12 +29,13 @@ export default function TableRow({children, isLastRow, onPress, ...props}: Table
 
     return (
         <PressableWithFeedback
+            accessible
             accessibilityLabel="row"
             style={tableRowStyles}
-            interactive={isPressable}
-            pressDimmingValue={isPressable ? undefined : 1}
-            hoverStyle={isPressable && styles.hoveredComponentBG}
-            role={isPressable ? CONST.ROLE.BUTTON : CONST.ROLE.PRESENTATION}
+            interactive={interactive}
+            pressDimmingValue={interactive ? undefined : 1}
+            hoverStyle={interactive && styles.hoveredComponentBG}
+            role={interactive ? CONST.ROLE.BUTTON : CONST.ROLE.PRESENTATION}
             onPress={onPress}
             {...props}
         >
