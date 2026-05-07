@@ -135,6 +135,7 @@ const SCREENS = {
         DYNAMIC_EXIT_SURVEY_CONFIRM: 'Dynamic_ExitSurvey_Confirm',
         DYNAMIC_EXIT_SURVEY_REASON: 'Dynamic_ExitSurvey_Reason',
         DYNAMIC_KEYBOARD_SHORTCUTS: 'Dynamic_Keyboard_Shortcuts',
+        DYNAMIC_SAGE_INTACCT_EXPORT: 'Dynamic_Sage_Intacct_Export',
 
         PROFILE: {
             ROOT: 'Settings_Profile',
@@ -650,6 +651,7 @@ const SCREENS = {
             SAGE_INTACCT_ADD_USER_DIMENSION: 'Policy_Accounting_Sage_Intacct_Add_User_Dimension',
             SAGE_INTACCT_EDIT_USER_DIMENSION: 'Policy_Accounting_Sage_Intacct_Edit_User_Dimension',
             SAGE_INTACCT_EXPORT: 'Policy_Accounting_Sage_Intacct_Export',
+            DYNAMIC_SAGE_INTACCT_EXPORT: 'Dynamic_Policy_Accounting_Sage_Intacct_Export',
             SAGE_INTACCT_PREFERRED_EXPORTER: 'Policy_Accounting_Sage_Intacct_Preferred_Exporter',
             SAGE_INTACCT_EXPORT_DATE: 'Policy_Accounting_Sage_Intacct_Export_Date',
             SAGE_INTACCT_REIMBURSABLE_EXPENSES: 'Policy_Accounting_Sage_Intacct_Reimbursable_Expenses',
