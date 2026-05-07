@@ -5173,5 +5173,13 @@ describe('ReportActionsUtils', () => {
                 hasBeenFlagged: true,
             });
         });
+
+        it('returns the safe default for non-ADD_COMMENT actions even when the message carries a flagged decision', () => {
+            const action = {
+                ...makeActionWithDecision(CONST.MODERATION.MODERATOR_DECISION_HIDDEN),
+                actionName: CONST.REPORT.ACTIONS.TYPE.IOU,
+            } as ReportAction;
+            expect(getModerationFlagState(action)).toEqual({latestDecision: undefined, hasBeenFlagged: false});
+        });
     });
 });

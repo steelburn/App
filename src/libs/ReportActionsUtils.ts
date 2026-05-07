@@ -265,6 +265,10 @@ function isPendingRemove(reportAction: OnyxInputOrEntry<ReportAction>): boolean 
  * Used by leaves that previously received the equivalent values as props from PureReportActionItem.
  */
 function getModerationFlagState(reportAction: OnyxInputOrEntry<ReportAction>): {latestDecision: DecisionName | undefined; hasBeenFlagged: boolean} {
+    // Moderation only applies to ADD_COMMENT actions
+    if (reportAction?.actionName !== CONST.REPORT.ACTIONS.TYPE.ADD_COMMENT) {
+        return {latestDecision: undefined, hasBeenFlagged: false};
+    }
     const latestDecision = getReportActionMessage(reportAction)?.moderationDecision?.decision;
     const hasBeenFlagged =
         !!latestDecision &&
