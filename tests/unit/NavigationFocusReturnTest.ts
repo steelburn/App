@@ -20,6 +20,7 @@ const {
     setLastMouseTriggerForTests,
     notifyPushParamsForward,
     notifyPushParamsBackward,
+    cancelPendingFocusRestore,
     compoundParamsKey,
     shouldSkipAutoFocusDueToExistingFocus,
     setupNavigationFocusReturn,
@@ -35,6 +36,7 @@ const {
     setLastMouseTriggerForTests: (element: HTMLElement | null) => void;
     notifyPushParamsForward: (routeKey: string, prevParams: unknown) => void;
     notifyPushParamsBackward: (routeKey: string, targetParams: unknown) => void;
+    cancelPendingFocusRestore: () => void;
     compoundParamsKey: (routeKey: string, params: unknown) => string;
     shouldSkipAutoFocusDueToExistingFocus: () => boolean;
     setupNavigationFocusReturn: () => void;
@@ -926,6 +928,9 @@ describe('restoreTriggerForRoute', () => {
 
     it('should cancel a pending return-hold timer when a new navigation starts so stale timers do not wipe the new cycle', () => {
         withFakeTimers(() => {
+            // Seed prevState so the post-restore handleStateChange diffs as non-noop.
+            handleStateChange(stackState(0, [{key: 'route-a', name: 'A'}]));
+
             const trigger = appendButton();
             trigger.focus();
             setLastInteractiveElementForTests(trigger);
@@ -941,6 +946,46 @@ describe('restoreTriggerForRoute', () => {
             // Stale 500ms timer must NOT wipe AUTO later.
             jest.advanceTimersByTime(1000);
             expect(tryClaim(Priorities.INITIAL)).toBe(false);
+        });
+    });
+
+    it('clears completed RETURN hold/cycle on browser-forward RESET so the destination screen can claim AUTO/INITIAL', () => {
+        withFakeTimers(() => {
+            const trigger = appendButton();
+            trigger.focus();
+            setLastInteractiveElementForTests(trigger);
+            captureTriggerForRoute('route-a');
+            trigger.blur();
+            expect(restoreTriggerForRoute('route-a')).toBe(true);
+            expect(document.activeElement).toBe(trigger);
+
+            // Pre-cancel: RETURN claimed, AUTO blocked.
+            expect(tryClaim(Priorities.AUTO)).toBe(false);
+            expect(shouldSkipAutoFocusDueToExistingFocus()).toBe(true);
+
+            cancelPendingFocusRestore();
+
+            expect(tryClaim(Priorities.AUTO)).toBe(true);
+            expect(shouldSkipAutoFocusDueToExistingFocus()).toBe(false);
+        });
+    });
+
+    it('preserves an in-flight RETURN hold across a noop state update (e.g. setParams on the focused route)', () => {
+        withFakeTimers(() => {
+            // Seed prevState so the post-restore handleStateChange diffs as 'noop' (same focused key).
+            handleStateChange(stackState(0, [{key: 'route-a', name: 'A'}]));
+
+            const trigger = appendButton();
+            trigger.focus();
+            setLastInteractiveElementForTests(trigger);
+            captureTriggerForRoute('route-a');
+            trigger.blur();
+            expect(restoreTriggerForRoute('route-a')).toBe(true);
+            expect(document.activeElement).toBe(trigger);
+
+            // Noop update (e.g. setParams on the same focused route) must NOT wipe the RETURN hold/cycle.
+            handleStateChange(stackState(0, [{key: 'route-a', name: 'A'}]));
+            expect(tryClaim(Priorities.AUTO)).toBe(false);
         });
     });
 
@@ -1144,9 +1189,10 @@ describe('shouldSkipAutoFocusDueToExistingFocus', () => {
     });
 
     it('returns false when restored target was wiped by a subsequent navigation (handleStateChange clears lastRestoreTarget)', () => {
+        // Seed prevState so the post-restore handleStateChange diffs as non-noop.
+        handleStateChange(stackState(0, [{key: 'route-a', name: 'A'}]));
         const trigger = performRestore();
         handleStateChange(stackState(0, [{key: 'next', name: 'Next'}]));
-        // Simulate the trigger still happening to be focused after handleStateChange (focus didn't naturally move yet).
         trigger.focus();
         expect(shouldSkipAutoFocusDueToExistingFocus()).toBe(false);
     });

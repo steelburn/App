@@ -581,6 +581,26 @@ describe('addPushParamsRouterExtension', () => {
         expect(cancelPendingFocusRestore).not.toHaveBeenCalled();
     });
 
+    it('first reflexive RESET before any PUSH_PARAMS is classified as noop (cursor seeded from initial history)', () => {
+        // Without cursor seeding, cursor=-1 at startup makes the first reflexive RESET classify as 'forward' and cancel pending Esc-triggered restores.
+        const factory = createMockRouterFactory();
+        const enhancedRouter = addPushParamsRouterExtension(factory)({} as PlatformStackRouterOptions);
+        const initialState = enhancedRouter.getInitialState(CONFIG_OPTIONS);
+        (cancelPendingFocusRestore as jest.Mock).mockClear();
+
+        const initialFocused = initialState.routes.at(initialState.index ?? -1);
+        if (!initialFocused) {
+            throw new Error('expected getInitialState to produce a focused route');
+        }
+        const reflexiveReset: PushParamsRouterAction = {
+            type: CONST.NAVIGATION.ACTION_TYPE.RESET,
+            payload: {routes: [{name: initialFocused.name, key: initialFocused.key, params: initialFocused.params}], index: 0},
+        };
+        enhancedRouter.getStateForAction(initialState as TestState, reflexiveReset, CONFIG_OPTIONS);
+
+        expect(cancelPendingFocusRestore).not.toHaveBeenCalled();
+    });
+
     it('RESET with route removal remaps the cursor to the same logical entry in the preserved history', () => {
         // Two-route history → RESET keeps only one → preservation filters the other → cursor must remap to the entry's new index.
         const factory = createMockRouterFactory();

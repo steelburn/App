@@ -138,11 +138,6 @@ function notifyPushParamsBackward(routeKey: string, targetParams: unknown): void
     scheduleRestore(compoundParamsKey(routeKey, targetParams));
 }
 
-/** For PUSH_PARAMS browser-forward RESET: cancel a queued restore without capturing. */
-function cancelPendingFocusRestore(): void {
-    cancelPendingRestore();
-}
-
 // 'retry' = in DOM but cannot accept focus now; 'gone' = detached, drop the entry.
 type RestorePick = {target: HTMLElement; source: 'primary' | 'fallback'} | 'retry' | 'gone';
 
@@ -215,6 +210,16 @@ function cancelReturnHoldRelease(): void {
     }
     clearTimeout(returnHoldTimerId);
     returnHoldTimerId = undefined;
+}
+
+// PUSH_PARAMS browser-forward fires same-key RESET (noop in handleStateChange) — also drop completed-RETURN state so it doesn't leak into the forward screen and block AUTO/INITIAL.
+function cancelPendingFocusRestore(): void {
+    cancelPendingRestore();
+    if (lastRestoreTarget) {
+        cancelReturnHoldRelease();
+        lastRestoreTarget = null;
+        resetCycle();
+    }
 }
 
 function restoreTriggerForRoute(routeKey: string): boolean {
