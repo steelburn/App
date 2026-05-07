@@ -306,6 +306,9 @@ function cloneCustomUnitWithNewIDs(unit: CustomUnit, newCustomUnitID: string, ne
         // rate the expense flow will later treat as default. Non-default rates keep their source
         // IDs so they remain visible offline; successData clears them after the API succeeds so
         // the server response can repopulate with fresh server IDs without leaving duplicates.
+        // Iteration order is preserved from the source (default's key swapped in place) so
+        // getDefaultMileageRate's stable sort still picks the original default when other rates
+        // have a missing index (which would otherwise tie at CONST.DEFAULT_NUMBER_ID).
         const defaultRate = Object.values(unit.rates)
             .filter((rate) => rate.enabled !== false)
             .sort((a, b) => (a.index ?? CONST.DEFAULT_NUMBER_ID) - (b.index ?? CONST.DEFAULT_NUMBER_ID))
@@ -313,12 +316,10 @@ function cloneCustomUnitWithNewIDs(unit: CustomUnit, newCustomUnitID: string, ne
         const rates: Record<string, Rate> = {};
         for (const rate of Object.values(unit.rates)) {
             if (rate.customUnitRateID === defaultRate?.customUnitRateID) {
-                continue;
+                rates[newDefaultRateID] = {...rate, customUnitRateID: newDefaultRateID};
+            } else {
+                rates[rate.customUnitRateID] = rate;
             }
-            rates[rate.customUnitRateID] = rate;
-        }
-        if (defaultRate) {
-            rates[newDefaultRateID] = {...defaultRate, customUnitRateID: newDefaultRateID};
         }
         return {
             ...unit,
