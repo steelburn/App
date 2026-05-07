@@ -1,10 +1,11 @@
 import React from 'react';
-import PressableWithFeedback, {PressableWithFeedbackProps} from '@components/Pressable/PressableWithFeedback';
+import type {PressableWithFeedbackProps} from '@components/Pressable/PressableWithFeedback';
+import PressableWithFeedback from '@components/Pressable/PressableWithFeedback';
 import SkeletonViewContentLoader from '@components/SkeletonViewContentLoader';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
-import {SkeletonSpanReasonAttributes} from '@libs/telemetry/useSkeletonSpan';
+import type {SkeletonSpanReasonAttributes} from '@libs/telemetry/useSkeletonSpan';
 import variables from '@styles/variables';
 import CONST from '@src/CONST';
 import {useTableContext} from './TableContext';
@@ -29,7 +30,7 @@ type TableRowProps = Omit<PressableWithFeedbackProps, 'accessible'> & {
     skeletonReasonAttributes?: SkeletonSpanReasonAttributes;
 };
 
-export default function TableRow({children, accessible, rowIndex, interactive, isLoading, skeletonReasonAttributes, LoadingComponent, onPress, ...props}: TableRowProps) {
+export default function TableRow({children, accessible, rowIndex, sentryLabel, interactive, isLoading, skeletonReasonAttributes, LoadingComponent, onPress, ...props}: TableRowProps) {
     const theme = useTheme();
     const styles = useThemeStyles();
     const {processedData} = useTableContext();
@@ -60,11 +61,13 @@ export default function TableRow({children, accessible, rowIndex, interactive, i
             accessible
             accessibilityLabel="row"
             style={tableRowStyles}
+            sentryLabel={sentryLabel}
             interactive={isInteractive}
             pressDimmingValue={isInteractive ? undefined : 1}
             hoverStyle={isInteractive && styles.hoveredComponentBG}
             role={isInteractive ? CONST.ROLE.BUTTON : CONST.ROLE.PRESENTATION}
             onPress={onPress}
+            // eslint-disable-next-line react/jsx-props-no-spreading
             {...props}
         >
             {!!isLoading && LoadingComponent ? (

@@ -4,7 +4,8 @@ import SkeletonViewContentLoader from '@components/SkeletonViewContentLoader';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
-import useSkeletonSpan, {SkeletonSpanReasonAttributes} from '@libs/telemetry/useSkeletonSpan';
+import type {SkeletonSpanReasonAttributes} from '@libs/telemetry/useSkeletonSpan';
+import useSkeletonSpan from '@libs/telemetry/useSkeletonSpan';
 import variables from '@styles/variables';
 
 type TableSkeletonProps = {
@@ -37,6 +38,8 @@ export default function TableSkeleton({renderSkeletonItem, reasonAttributes, row
 
     const rows = new Array(rowCount).fill(null).map((_, index) => (
         <View
+            // We use an index since this is a loading state w/ no other data
+            // eslint-disable-next-line react/no-array-index-key
             key={index}
             style={[tableSkeletonRowStyles, index !== rowCount - 1 && styles.borderBottom]}
         >
