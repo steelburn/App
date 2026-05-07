@@ -90,14 +90,7 @@ import Permissions from '@libs/Permissions';
 import * as PersonalDetailsUtils from '@libs/PersonalDetailsUtils';
 import * as PhoneNumber from '@libs/PhoneNumber';
 import * as PolicyUtils from '@libs/PolicyUtils';
-import {
-    getCustomUnitsForDuplication,
-    getDefaultDistanceRate,
-    getMemberAccountIDsForWorkspace,
-    goBackWhenEnableFeature,
-    isControlPolicy,
-    navigateToExpensifyCardPage,
-} from '@libs/PolicyUtils';
+import {getCustomUnitsForDuplication, getMemberAccountIDsForWorkspace, goBackWhenEnableFeature, isControlPolicy, navigateToExpensifyCardPage} from '@libs/PolicyUtils';
 import * as ReportUtils from '@libs/ReportUtils';
 import {hasValidModifiedAmount} from '@libs/TransactionUtils';
 import type {Feature} from '@pages/OnboardingInterestedFeatures/types';
@@ -3243,19 +3236,6 @@ function buildDuplicatePolicyData(policy: Policy, options: DuplicatePolicyDataOp
     const {customUnitID: distanceCustomUnitID, customUnitRateID} = buildOptimisticDistanceRateCustomUnits(outputCurrency);
     const perDiemCustomUnitID = generateCustomUnitID();
 
-    // Source non-default distance rate IDs — kept in optimistic data (by cloneCustomUnitWithNewIDs)
-    // so they're visible offline, then nulled in successData so the server's Pusher response can
-    // repopulate with fresh server IDs without leaving optimistic-vs-server duplicates. Only
-    // computed when the user actually selected distance rates for duplication; otherwise no
-    // optimistic distance unit was created and there's nothing to clean up.
-    const sourceDistanceUnit = parts?.distance ? Object.values(policy?.customUnits ?? {}).find((unit) => unit.name === CONST.CUSTOM_UNITS.NAME_DISTANCE) : undefined;
-    const sourceDistanceDefaultRate = getDefaultDistanceRate(sourceDistanceUnit?.rates);
-    const sourceNonDefaultDistanceRateIDs = sourceDistanceUnit
-        ? Object.values(sourceDistanceUnit.rates)
-              .filter((rate) => rate.customUnitRateID !== sourceDistanceDefaultRate?.customUnitRateID)
-              .map((rate) => rate.customUnitRateID)
-        : [];
-
     const optimisticAnnounceChat = ReportUtils.buildOptimisticAnnounceChat(targetPolicyID, [...policyMemberAccountIDs], currentUserAccountID);
     const announceRoomChat = optimisticAnnounceChat.announceChatData;
 
@@ -3371,13 +3351,6 @@ function buildDuplicatePolicyData(policy: Policy, options: DuplicatePolicyDataOp
                     type: null,
                     areReportFieldsEnabled: null,
                 },
-                ...(sourceNonDefaultDistanceRateIDs.length > 0 && {
-                    customUnits: {
-                        [distanceCustomUnitID]: {
-                            rates: Object.fromEntries(sourceNonDefaultDistanceRateIDs.map((id) => [id, null])),
-                        },
-                    },
-                }),
             },
         },
         {

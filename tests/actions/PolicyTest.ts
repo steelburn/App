@@ -866,102 +866,12 @@ describe('actions/Policy', () => {
             }
             expect(distanceUnit.rates[defaultRateID]).toBe(defaultRate);
 
-            // Resume the mocked fetch so successData fires and clears the optimistic source rate IDs.
-            // After success, only the rebound default remains until a Pusher response (not mocked here)
-            // would repopulate the rates with fresh server IDs.
+            // Resume the mocked fetch so the API call resolves; the duplicated workspace's optimistic
+            // rates remain visible until a Pusher response (not mocked here) repopulates them with
+            // the server's rate set. We rely on the server preserving the source's non-default rate
+            // IDs in the duplicate, so the optimistic state and the eventual server state line up.
             await mockFetch.resume?.();
             await waitForBatchedUpdates();
-
-            const duplicateAfterSuccess: OnyxEntry<PolicyType> = await new Promise((resolve) => {
-                const connection = Onyx.connect({
-                    key: `${ONYXKEYS.COLLECTION.POLICY}${policyID}`,
-                    callback: (workspace) => {
-                        Onyx.disconnect(connection);
-                        resolve(workspace);
-                    },
-                });
-            });
-
-            const distanceUnitAfter = Object.values(duplicateAfterSuccess?.customUnits ?? {}).find((unit) => unit.name === CONST.CUSTOM_UNITS.NAME_DISTANCE);
-            if (!distanceUnitAfter) {
-                throw new Error('Expected duplicated distance unit to still exist after success');
-            }
-            const ratesAfter = Object.entries(distanceUnitAfter.rates).filter(([, rate]) => rate !== null);
-            expect(ratesAfter).toHaveLength(1);
-            expect(ratesAfter.at(0)?.[1]?.name).toBe('Default Rate');
-        });
-
-        it('duplicate workspace without distance rates does not write any customUnits cleanup for the source distance rates', async () => {
-            await Onyx.set(ONYXKEYS.SESSION, {email: ESH_EMAIL, accountID: ESH_ACCOUNT_ID});
-
-            const sourceDistanceUnitID = 'srcDistUnitB';
-            const sourceExtraRateID = 'srcExtraRateB';
-            const fakePolicy: PolicyType = {
-                ...createRandomPolicy(20, CONST.POLICY.TYPE.TEAM),
-                customUnits: {
-                    [sourceDistanceUnitID]: {
-                        customUnitID: sourceDistanceUnitID,
-                        name: CONST.CUSTOM_UNITS.NAME_DISTANCE,
-                        enabled: true,
-                        attributes: {unit: CONST.CUSTOM_UNITS.DISTANCE_UNIT_MILES},
-                        rates: {
-                            srcDefaultRateB: {customUnitRateID: 'srcDefaultRateB', name: 'Default Rate', rate: 72.5, currency: 'USD', enabled: true, index: 0},
-                            [sourceExtraRateID]: {customUnitRateID: sourceExtraRateID, name: 'Extra Rate', rate: 100, currency: 'USD', enabled: true, index: 1},
-                        },
-                    },
-                },
-            };
-            await Onyx.set(`${ONYXKEYS.COLLECTION.POLICY}${fakePolicy.id}`, fakePolicy);
-            await waitForBatchedUpdates();
-
-            const policyID = Policy.generatePolicyID();
-            const options = {
-                currentUserAccountID: ESH_ACCOUNT_ID,
-                currentUserEmail: ESH_EMAIL,
-                policyName: 'No Distance Duplicate',
-                policyID: fakePolicy.id,
-                targetPolicyID: policyID,
-                welcomeNote: 'Join my policy',
-                parts: {
-                    people: false,
-                    reports: false,
-                    connections: false,
-                    categories: false,
-                    tags: false,
-                    taxes: false,
-                    perDiem: false,
-                    reimbursements: false,
-                    expenses: false,
-                    distance: false,
-                    invoices: false,
-                    exportLayouts: false,
-                },
-                localCurrency: 'USD',
-            };
-
-            Policy.duplicateWorkspace(fakePolicy, options);
-            await waitForBatchedUpdates();
-
-            const duplicatePolicy: OnyxEntry<PolicyType> = await new Promise((resolve) => {
-                const connection = Onyx.connect({
-                    key: `${ONYXKEYS.COLLECTION.POLICY}${policyID}`,
-                    callback: (workspace) => {
-                        Onyx.disconnect(connection);
-                        resolve(workspace);
-                    },
-                });
-            });
-
-            // The duplicate should not have any distance custom unit because parts.distance is false.
-            // In particular, it should not contain a partial/orphan distance unit consisting only of
-            // nulled-out source rate IDs (which would be the regression the gating prevents).
-            const distanceUnits = Object.values(duplicatePolicy?.customUnits ?? {}).filter((unit) => unit.name === CONST.CUSTOM_UNITS.NAME_DISTANCE);
-            expect(distanceUnits).toHaveLength(0);
-            // The source's extra rate ID must not appear anywhere in the duplicate's customUnits as
-            // a stale "null" entry from successData cleanup.
-            for (const unit of Object.values(duplicatePolicy?.customUnits ?? {})) {
-                expect(Object.keys(unit.rates ?? {})).not.toContain(sourceExtraRateID);
-            }
         });
 
         it('creates a new workspace with BASIC approval mode if the introSelected is MANAGE_TEAM', async () => {
