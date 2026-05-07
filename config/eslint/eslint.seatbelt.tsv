@@ -155,7 +155,6 @@
 "../../src/components/Search/SearchPageHeader/useSearchPageInput.tsx"	"react-hooks/set-state-in-effect"	2
 "../../src/components/Search/SearchRouter/SearchRouter.tsx"	"@typescript-eslint/no-deprecated/InteractionManager.runAfterInteractions"	1
 "../../src/components/Search/SearchSingleSelectionPicker.tsx"	"react-hooks/set-state-in-effect"	1
-"../../src/components/Search/index.tsx"	"react-hooks/exhaustive-deps"	1
 "../../src/components/Search/index.tsx"	"react-hooks/preserve-manual-memoization"	2
 "../../src/components/Search/index.tsx"	"react-hooks/refs"	30
 "../../src/components/Search/index.tsx"	"react-hooks/set-state-in-effect"	2
