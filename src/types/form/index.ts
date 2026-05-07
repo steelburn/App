@@ -124,3 +124,4 @@ export type {WorkspaceTimeTrackingDefaultRateForm} from './WorkspaceTimeTracking
 export type {EditExpensifyCardLimitTypeForm} from './EditExpensifyCardLimitTypeForm';
 export type {DomainGroupCreateForm} from './DomainGroupCreateForm';
 export type {AddWorkEmailForm} from './AddWorkEmailForm';
+export type {AddAgentForm} from './AddAgentForm';
