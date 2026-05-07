@@ -1,8 +1,8 @@
-import React, {useCallback, useMemo, useState} from 'react';
+import React, {useCallback, useMemo, useRef, useState} from 'react';
 import {View} from 'react-native';
 import FormProvider from '@components/Form/FormProvider';
 import InputWrapper from '@components/Form/InputWrapper';
-import type {FormInputErrors, FormOnyxValues} from '@components/Form/types';
+import type {FormInputErrors, FormOnyxValues, FormRef} from '@components/Form/types';
 import Text from '@components/Text';
 import UploadFile from '@components/UploadFile';
 import useLocalize from '@hooks/useLocalize';
@@ -45,6 +45,8 @@ function Documents({onNext, isEditing, ownerBeingModifiedID}: DocumentsProps) {
         [codiceFiscaleInputID]: Array.isArray(reimbursementAccountDraft?.[codiceFiscaleInputID]) ? (reimbursementAccountDraft?.[codiceFiscaleInputID] ?? []) : [],
     };
 
+    const formRef = useRef<FormRef | null>(null);
+
     const [uploadedProofOfOwnership, setUploadedProofOfOwnership] = useState<FileObject[]>(defaultValues[proofOfOwnershipInputID]);
     const [uploadedCopyOfID, setUploadedCopyOfID] = useState<FileObject[]>(defaultValues[copyOfIDInputID]);
     const [uploadedAddressProof, setUploadedAddressProof] = useState<FileObject[]>(defaultValues[addressProofInputID]);
@@ -78,6 +80,7 @@ function Documents({onNext, isEditing, ownerBeingModifiedID}: DocumentsProps) {
             return;
         }
 
+        formRef.current?.resetFormFieldError(inputID);
         clearErrors(ONYXKEYS.FORMS.REIMBURSEMENT_ACCOUNT_FORM);
         setErrorFields(ONYXKEYS.FORMS.REIMBURSEMENT_ACCOUNT_FORM, {[inputID]: {onUpload: error}});
     };
@@ -98,6 +101,7 @@ function Documents({onNext, isEditing, ownerBeingModifiedID}: DocumentsProps) {
 
     return (
         <FormProvider
+            ref={formRef}
             formID={ONYXKEYS.FORMS.REIMBURSEMENT_ACCOUNT_FORM}
             submitButtonText={translate(isEditing ? 'common.confirm' : 'common.next')}
             validate={validate}

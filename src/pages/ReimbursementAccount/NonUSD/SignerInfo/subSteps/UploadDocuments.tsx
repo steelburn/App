@@ -1,10 +1,10 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {View} from 'react-native';
 import Button from '@components/Button';
 import DotIndicatorMessage from '@components/DotIndicatorMessage';
 import FormProvider from '@components/Form/FormProvider';
 import InputWrapper from '@components/Form/InputWrapper';
-import type {FormInputErrors, FormOnyxKeys, FormOnyxValues} from '@components/Form/types';
+import type {FormInputErrors, FormOnyxKeys, FormOnyxValues, FormRef} from '@components/Form/types';
 import Text from '@components/Text';
 import UploadFile from '@components/UploadFile';
 import useLocalize from '@hooks/useLocalize';
@@ -49,6 +49,8 @@ function UploadDocuments({onNext, isEditing}: UploadDocumentsProps) {
         [PROOF_OF_DIRECTORS]: Array.isArray(reimbursementAccountDraft?.[PROOF_OF_DIRECTORS]) ? (reimbursementAccountDraft?.[PROOF_OF_DIRECTORS] ?? []) : [],
         [CODICE_FISCALE]: Array.isArray(reimbursementAccountDraft?.[CODICE_FISCALE]) ? (reimbursementAccountDraft?.[CODICE_FISCALE] ?? []) : [],
     };
+
+    const formRef = useRef<FormRef | null>(null);
 
     const [uploadedIDs, setUploadedID] = useState<FileObject[]>(defaultValues[COPY_OF_ID]);
     const [uploadedProofsOfAddress, setUploadedProofOfAddress] = useState<FileObject[]>(defaultValues[ADDRESS_PROOF]);
@@ -97,6 +99,7 @@ function UploadDocuments({onNext, isEditing}: UploadDocumentsProps) {
             return;
         }
 
+        formRef.current?.resetFormFieldError(inputID);
         clearErrors(ONYXKEYS.FORMS.REIMBURSEMENT_ACCOUNT_FORM);
         setErrorFields(ONYXKEYS.FORMS.REIMBURSEMENT_ACCOUNT_FORM, {[inputID]: {onUpload: error}});
     };
@@ -109,6 +112,7 @@ function UploadDocuments({onNext, isEditing}: UploadDocumentsProps) {
 
     return (
         <FormProvider
+            ref={formRef}
             formID={ONYXKEYS.FORMS.REIMBURSEMENT_ACCOUNT_FORM}
             submitButtonText={translate(isEditing ? 'common.confirm' : 'common.next')}
             onSubmit={handleSubmitWithDownload}
