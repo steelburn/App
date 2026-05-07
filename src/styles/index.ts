@@ -5365,25 +5365,24 @@ const staticStyles = (theme: ThemeColors) =>
         },
 
         travelCVVDigitBox: {
-            width: 64,
-            height: 64,
+            width: variables.componentSizeLarge,
+            height: variables.componentSizeLarge,
             borderWidth: 1,
             borderColor: theme.border,
-            borderRadius: variables.componentBorderRadiusNormal,
-            backgroundColor: theme.appBG,
-            alignItems: 'center',
-            justifyContent: 'center',
+            borderRadius: variables.componentBorderRadiusMedium,
+            backgroundColor: theme.componentBG,
         },
 
-        travelCVVDigit: {
-            ...headlineFont,
+        travelCVVDigitText: {
             color: theme.text,
-            fontSize: variables.fontSizeXXXLarge,
-            lineHeight: variables.lineHeightXXXLarge,
         },
 
-        travelCVVCopyButton: {
-            backgroundColor: theme.buttonHoveredBG,
+        travelCVVDigitTextMasked: {
+            lineHeight: variables.lineHeightSizeH1,
+        },
+
+        travelCVVDigitTextRevealed: {
+            lineHeight: variables.lineHeightXXXLarge,
         },
 
         travelInvoicingIcon: {

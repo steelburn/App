@@ -1,11 +1,9 @@
-import {useNavigationState} from '@react-navigation/native';
-import React, {useCallback, useEffect, useMemo, useRef} from 'react';
+import React, {useCallback, useEffect} from 'react';
 import {View} from 'react-native';
 import FullPageOfflineBlockingView from '@components/BlockingViews/FullPageOfflineBlockingView';
 import Button from '@components/Button';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import {useLockedAccountActions, useLockedAccountState} from '@components/LockedAccountModalProvider';
-import PressableWithDelayToggle from '@components/Pressable/PressableWithDelayToggle';
 import ScreenWrapper from '@components/ScreenWrapper';
 import ScrollView from '@components/ScrollView';
 import Text from '@components/Text';
@@ -17,11 +15,8 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import {resetValidateActionCodeSent} from '@libs/actions/User';
 import Clipboard from '@libs/Clipboard';
 import Navigation from '@libs/Navigation/Navigation';
-import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
-import SCREENS from '@src/SCREENS';
-import isLoadingOnyxValue from '@src/types/utils/isLoadingOnyxValue';
 import {useTravelCVVActions, useTravelCVVState} from './TravelCVVContextProvider';
 
 /**
@@ -35,68 +30,30 @@ function TravelCVVPage() {
     const {translate} = useLocalize();
     const icons = useMemoizedLazyExpensifyIcons(['Copy']);
 
-    const [account, accountMetadata] = useOnyx(ONYXKEYS.ACCOUNT);
-    const [, lockAccountDetailsMetadata] = useOnyx(ONYXKEYS.NVP_PRIVATE_LOCK_ACCOUNT_DETAILS);
+    const [account] = useOnyx(ONYXKEYS.ACCOUNT);
     const {isAccountLocked} = useLockedAccountState();
     const {showLockedAccountModal} = useLockedAccountActions();
 
     // Get CVV from context - shared with TravelCVVVerifyAccountPage
     const {cvv} = useTravelCVVState();
     const {setCvv} = useTravelCVVActions();
-    const cvvCharacters = useMemo(() => Array.from(cvv ?? '•••'), [cvv]);
-    const copyCVVLabel = `${translate('common.copy')} ${translate('cardPage.cardDetails.cvv')}`;
+    const hasRevealedCVV = !!cvv;
+    const cvvDigits = (cvv ?? '•••').slice(0, 3).padEnd(3, '•').split('');
 
-    // Clear CVV when the page unmounts (e.g. backdrop close) so it doesn't
-    // remain visible the next time the page is opened
-    useEffect(() => () => setCvv(null), [setCvv]);
+    // Reset CVV when this page mounts so a fresh open always starts with the masked state.
+    // When we return from the verify step, this page does not remount, so the revealed CVV is preserved.
+    useEffect(() => {
+        setCvv(null);
+
+        return () => setCvv(null);
+    }, [setCvv]);
 
     const isSignedInAsDelegate = !!account?.delegatedAccess?.delegate || false;
-    const isLoadingAccount = isLoadingOnyxValue(accountMetadata);
-    const isLoadingLockAccountDetails = isLoadingOnyxValue(lockAccountDetailsMetadata);
-    const isVerifyAccountInStack = useNavigationState((state) => state.routes.some((route) => route.name === SCREENS.SETTINGS.WALLET.TRAVEL_CVV_VERIFY_ACCOUNT));
-
-    // Auto-navigate to the magic code screen on first mount so the user
-    // doesn't have to click "Reveal Details" manually.
-    const hasAutoNavigatedRef = useRef(false);
-    useEffect(() => {
-        if (hasAutoNavigatedRef.current) {
-            return;
-        }
-        // If the verify-account (magic code) screen is already in the navigation
-        // stack, the user has previously visited it during this mount cycle (e.g.
-        // they completed or cancelled the magic code flow and returned here).
-        // Skip auto-navigation so we don't push a duplicate screen. This check
-        // runs before the loading guards because it doesn't depend on Onyx data.
-        if (isVerifyAccountInStack) {
-            hasAutoNavigatedRef.current = true;
-            return;
-        }
-        if (isLoadingAccount || isLoadingLockAccountDetails) {
-            return;
-        }
-        // Permanent conditions — set the ref so we never retry auto-navigation.
-        // If CVV is already revealed there's no reason to navigate to the magic
-        // code screen, and delegates are not allowed to request one. Unlike the
-        // transient guards below (offline / locked), these won't change during
-        // this mount, so we mark the ref to stop future effect re-runs.
-        if (cvv || isSignedInAsDelegate) {
-            hasAutoNavigatedRef.current = true;
-            return;
-        }
-        // Transient conditions — we intentionally do NOT set hasAutoNavigatedRef here.
-        // isOffline and isAccountLocked can change at any time (e.g. the user regains
-        // connectivity or the account is unlocked). By leaving the ref unset, the
-        // effect will re-run and auto-navigate once the blocking condition clears,
-        // rather than permanently giving up and forcing the user to tap "Reveal Details".
-        if (isOffline || isAccountLocked) {
-            return;
-        }
-        hasAutoNavigatedRef.current = true;
-        resetValidateActionCodeSent();
-        Navigation.navigate(ROUTES.SETTINGS_WALLET_TRAVEL_CVV_VERIFY_ACCOUNT);
-    }, [isLoadingAccount, isLoadingLockAccountDetails, cvv, isSignedInAsDelegate, isOffline, isAccountLocked, isVerifyAccountInStack]);
 
     const handleRevealDetailsPress = useCallback(() => {
+        if (isSignedInAsDelegate) {
+            return;
+        }
         if (isAccountLocked) {
             showLockedAccountModal();
             return;
@@ -107,14 +64,7 @@ function TravelCVVPage() {
         resetValidateActionCodeSent();
         // Navigate to the verify account page
         Navigation.navigate(ROUTES.SETTINGS_WALLET_TRAVEL_CVV_VERIFY_ACCOUNT);
-    }, [isAccountLocked, showLockedAccountModal]);
-
-    const handleCopyCVVPress = useCallback(() => {
-        if (!cvv) {
-            return;
-        }
-        Clipboard.setString(cvv);
-    }, [cvv]);
+    }, [isAccountLocked, isSignedInAsDelegate, showLockedAccountModal]);
 
     return (
         <ScreenWrapper
@@ -131,48 +81,36 @@ function TravelCVVPage() {
                         <Text style={[styles.textNormal, styles.textSupporting]}>{translate('walletPage.travelCVV.description')}</Text>
                     </View>
 
-                    <View style={[styles.flexRow, styles.justifyContentCenter, styles.gap3, styles.mb12]}>
-                        {cvvCharacters.map((character, index) => (
+                    <View style={[styles.mt0Half, styles.flexRow, styles.justifyContentCenter, styles.gap1]}>
+                        {cvvDigits.map((digit, index) => (
                             <View
                                 // eslint-disable-next-line react/no-array-index-key
-                                key={`${character}-${index}`}
-                                style={styles.travelCVVDigitBox}
+                                key={`${digit}-${index}`}
+                                style={[styles.alignItemsCenter, styles.justifyContentCenter, styles.travelCVVDigitBox]}
                             >
-                                <Text
-                                    fsClass={CONST.FULLSTORY.CLASS.MASK}
-                                    style={styles.travelCVVDigit}
-                                >
-                                    {character}
+                                <Text style={[styles.textXXXLarge, styles.travelCVVDigitText, hasRevealedCVV ? styles.travelCVVDigitTextRevealed : styles.travelCVVDigitTextMasked]}>
+                                    {digit}
                                 </Text>
                             </View>
                         ))}
                     </View>
 
-                    {!isSignedInAsDelegate && !cvv && (
+                    {hasRevealedCVV ? (
+                        <Button
+                            icon={icons.Copy}
+                            text={`Copy ${translate('cardPage.cardDetails.cvv')}`}
+                            onPress={() => Clipboard.setString(cvv)}
+                            style={[styles.mt10, styles.w100]}
+                        />
+                    ) : !isSignedInAsDelegate ? (
                         <Button
                             text={translate('cardPage.cardDetails.revealDetails')}
                             onPress={handleRevealDetailsPress}
                             isDisabled={isOffline}
-                            style={styles.w100}
+                            style={[styles.mt10, styles.w100]}
+                            success
                         />
-                    )}
-
-                    {!!cvv && (
-                        <PressableWithDelayToggle
-                            text={copyCVVLabel}
-                            textChecked={translate('common.copied')}
-                            tooltipText={copyCVVLabel}
-                            tooltipTextChecked={translate('common.copied')}
-                            accessibilityLabel={copyCVVLabel}
-                            accessibilityLabelChecked={translate('common.copied')}
-                            icon={icons.Copy}
-                            inline={false}
-                            onPress={handleCopyCVVPress}
-                            styles={[styles.button, styles.buttonLarge, styles.w100, styles.travelCVVCopyButton]}
-                            textStyles={styles.buttonLargeText}
-                            sentryLabel={CONST.SENTRY_LABEL.COPY_TEXT_TO_CLIPBOARD.COPY_BUTTON}
-                        />
-                    )}
+                    ) : null}
                 </ScrollView>
             </FullPageOfflineBlockingView>
         </ScreenWrapper>
