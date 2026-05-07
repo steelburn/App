@@ -6,17 +6,17 @@ export default function WorkspaceCompanyCardsTableSkeleton() {
     return (
         <>
             <Circle
-                cx={28}
+                cx={20}
                 cy={28}
                 r="14"
             />
             <SkeletonRect
-                transform={[{translateX: 58}, {translateY: 16}]}
+                transform={[{translateX: 50}, {translateY: 16}]}
                 width={124}
                 height={8}
             />
             <SkeletonRect
-                transform={[{translateX: 58}, {translateY: 32}]}
+                transform={[{translateX: 50}, {translateY: 32}]}
                 width={60}
                 height={8}
             />

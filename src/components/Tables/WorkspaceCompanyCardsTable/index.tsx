@@ -29,8 +29,8 @@ import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import isLoadingOnyxValue from '@src/types/utils/isLoadingOnyxValue';
 import WorkspaceCompanyCardsTableHeaderButtons from './WorkspaceCompanyCardsTableHeaderButtons';
-import WorkspaceCompanyCardTableItem from './WorkspaceCompanyCardsTableItem';
-import type {WorkspaceCompanyCardTableItemData} from './WorkspaceCompanyCardsTableItem';
+import WorkspaceCompanyCardTableItem from './WorkspaceCompanyCardsTableRow';
+import type {WorkspaceCompanyCardTableItemData} from './WorkspaceCompanyCardsTableRow';
 import WorkspaceCompanyCardsTableSkeleton from './WorkspaceCompanyCardsTableSkeleton';
 
 type CompanyCardsTableColumnKey = 'member' | 'card' | 'customCardName';

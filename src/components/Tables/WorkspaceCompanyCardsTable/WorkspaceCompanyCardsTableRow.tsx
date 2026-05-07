@@ -24,7 +24,7 @@ import type {Card, CompanyCardFeed, CompanyCardFeedWithDomainID} from '@src/type
 import type {CardAssignmentData} from '@src/types/onyx/Card';
 import WorkspaceCompanyCardsTableSkeleton from './WorkspaceCompanyCardsTableSkeleton';
 
-type WorkspaceCompanyCardTableItemData = CardAssignmentData & {
+type WorkspaceCompanyCardTableRowData = CardAssignmentData & {
     /** Whether the card is deleted */
     isCardDeleted: boolean;
 
@@ -38,9 +38,9 @@ type WorkspaceCompanyCardTableItemData = CardAssignmentData & {
     onDismissError?: () => void;
 };
 
-type WorkspaceCompanyCardTableItemProps = {
+type WorkspaceCompanyCardTableRowProps = {
     /** The workspace company card table item */
-    item: WorkspaceCompanyCardTableItemData;
+    item: WorkspaceCompanyCardTableRowData;
 
     /** Policy ID */
     policyID: string;
@@ -71,7 +71,7 @@ type WorkspaceCompanyCardTableItemProps = {
     onAssignCard: (cardName: string, cardID: string) => void;
 };
 
-function WorkspaceCompanyCardTableItem({
+function WorkspaceCompanyCardTableRow({
     item,
     policyID,
     CardFeedIcon,
@@ -81,7 +81,7 @@ function WorkspaceCompanyCardTableItem({
     rowIndex,
     isAssigningCardDisabled,
     onAssignCard,
-}: WorkspaceCompanyCardTableItemProps) {
+}: WorkspaceCompanyCardTableRowProps) {
     const styles = useThemeStyles();
     const theme = useTheme();
     const {translate} = useLocalize();
@@ -132,11 +132,11 @@ function WorkspaceCompanyCardTableItem({
         >
             <Table.Row
                 rowIndex={rowIndex}
-                interactive={isAssigned}
-                sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.COMPANY_CARDS.TABLE_ITEM}
                 isLoading={isDeleting}
-                LoadingComponent={WorkspaceCompanyCardsTableSkeleton}
+                interactive={isAssigned}
                 skeletonReasonAttributes={reasonAttributes}
+                sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.COMPANY_CARDS.TABLE_ITEM}
+                LoadingComponent={WorkspaceCompanyCardsTableSkeleton}
                 onPress={handleRowPress}
             >
                 {({hovered}) => (
@@ -229,5 +229,5 @@ function WorkspaceCompanyCardTableItem({
     );
 }
 
-export default WorkspaceCompanyCardTableItem;
-export type {WorkspaceCompanyCardTableItemData};
+export default WorkspaceCompanyCardTableRow;
+export type {WorkspaceCompanyCardTableRowData as WorkspaceCompanyCardTableItemData};

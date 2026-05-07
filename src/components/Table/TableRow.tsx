@@ -47,11 +47,12 @@ export default function TableRow({children, accessible, rowIndex, interactive, i
         styles.highlightBG,
         styles.overflowHidden,
         styles.alignItemsCenter,
-        isSmallView ? styles.pv4 : styles.pv2,
         isSmallView ? styles.ph4 : styles.ph3,
-        isSmallView ? styles.tableRowHeightCompact : styles.tableRowHeight,
+        isSmallView && !isLoading && styles.pv4,
+        !isSmallView && !isLoading && styles.pv2,
         isSmallView && isFirstRow && styles.tableTopRadius,
         isLastRow ? styles.tableBottomRadius : styles.borderBottom,
+        isSmallView ? styles.tableRowHeightCompact : styles.tableRowHeight,
     ];
 
     return (
