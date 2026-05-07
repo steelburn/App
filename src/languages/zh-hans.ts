@@ -5136,6 +5136,7 @@ _如需更详细的说明，请[访问我们的帮助网站](${CONST.NETSUITE_IM
                     requiredColumns: (missingColumns: string) => `请为以下每个属性分配一列：${missingColumns}`,
                     duplicateColumns: (duplicateColumn: string) => `哎呀！你已将单个字段（“${duplicateColumn}”）映射到了多个列。请检查后重试。`,
                 },
+                fileImportDescription: '如果不支持您的银行，可使用手动选项。',
             },
             statementCloseDate: {
                 [CONST.COMPANY_CARDS.STATEMENT_CLOSE_DATE.LAST_DAY_OF_MONTH]: '月末最后一天',
