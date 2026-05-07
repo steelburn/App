@@ -321,14 +321,15 @@ describe('deleteAgent', () => {
         expect((personalDetailUpdate?.value as Record<string, unknown>)[TEST_ACCOUNT_ID]).toMatchObject({accountID: TEST_ACCOUNT_ID});
     });
 
-    it('failure data restores the agent prompt key using SET method', () => {
+    it('failure data restores the agent prompt key using SET method with pendingAction DELETE and errors', () => {
         deleteAgent(TEST_ACCOUNT_ID, {prompt: 'Test prompt'}, undefined);
 
         const {failureData} = getWriteOptions();
         const promptUpdate = failureData.find((u) => u.key === `${ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT}${TEST_ACCOUNT_ID}`);
 
         expect(promptUpdate?.onyxMethod).toBe('set');
-        expect(promptUpdate?.value).toMatchObject({prompt: 'Test prompt'});
+        expect(promptUpdate?.value).toMatchObject({prompt: 'Test prompt', pendingAction: 'delete'});
+        expect((promptUpdate?.value as Record<string, unknown>)?.errors).toBeTruthy();
     });
 
     it('calls Navigation.navigate after issuing the write', () => {

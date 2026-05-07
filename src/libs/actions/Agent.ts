@@ -86,6 +86,10 @@ function clearAgentUpdateError(accountID: number) {
     Onyx.merge(`${ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT}${accountID}`, {errors: null});
 }
 
+function clearAgentDeleteError(accountID: number) {
+    Onyx.merge(`${ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT}${accountID}`, {pendingAction: null, errors: null});
+}
+
 function updateAgentName(accountID: number, firstName: string, originalFirstName: string) {
     const optimisticData: AnyOnyxUpdate[] = [
         {
@@ -172,7 +176,13 @@ function deleteAgent(accountID: number, agentPrompt: AgentPrompt | undefined, pe
         {
             onyxMethod: Onyx.METHOD.SET,
             key: `${ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT}${accountID}`,
-            value: agentPrompt ?? null,
+            value: agentPrompt
+                ? {
+                      ...agentPrompt,
+                      pendingAction: CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE,
+                      errors: getMicroSecondOnyxErrorWithTranslationKey('common.genericErrorMessage'),
+                  }
+                : null,
         },
         {
             onyxMethod: Onyx.METHOD.MERGE,
@@ -185,4 +195,4 @@ function deleteAgent(accountID: number, agentPrompt: AgentPrompt | undefined, pe
     Navigation.navigate(ROUTES.SETTINGS_AGENTS);
 }
 
-export {openAgentsPage, createAgent, clearAgentError, clearAgentUpdateError, updateAgentName, updateAgentPrompt, deleteAgent};
+export {openAgentsPage, createAgent, clearAgentError, clearAgentUpdateError, clearAgentDeleteError, updateAgentName, updateAgentPrompt, deleteAgent};
