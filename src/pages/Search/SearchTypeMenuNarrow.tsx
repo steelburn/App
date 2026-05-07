@@ -250,9 +250,11 @@ function SearchTypeMenuNarrow({queryJSON, onTabPress}: SearchTypeMenuNarrowProps
                     horizontal: CONST.MODAL.ANCHOR_ORIGIN_HORIZONTAL.LEFT,
                     vertical: CONST.MODAL.ANCHOR_ORIGIN_VERTICAL.BOTTOM,
                 }}
-                onItemSelected={() => {
+                onItemSelected={(item) => {
                     setRestoreFocusType(CONST.MODAL.RESTORE_FOCUS_TYPE.PRESERVE);
-                    setSavedSearchToModifyKey(null);
+                    if (item?.shouldCloseModalOnSelect !== false) {
+                        setSavedSearchToModifyKey(null);
+                    }
                 }}
                 menuItems={popoverMenuItems}
                 anchorRef={menuAnchorRef}
