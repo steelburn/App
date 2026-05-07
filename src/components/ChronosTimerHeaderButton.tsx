@@ -58,6 +58,8 @@ function ChronosTimerHeaderButton({report}: ChronosTimerHeaderButtonProps) {
 
     // Keep the button usable while offline so queued start/stop comments are sent on reconnect,
     // even though the optimistic OpenReport request leaves isLoadingInitialReportActions=true.
+    // The button should be disabled if the OpenReport request is in progress, so that the state of the button (wither it says "start" or "stop") will reflect the most recent data coming from the server.
+    // There is still a possible bug where if you are offline, the button could reflect the wrong state. However, there is really no way to fix this without breaking the offline experience.
     const shouldDisableButton = !!isLoadingInitialReportActions && !isOffline;
 
     const ancestors = useAncestors(report);
