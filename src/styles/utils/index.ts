@@ -1929,7 +1929,6 @@ const createStyleUtils = (theme: ThemeColors, styles: ThemeStyles) => ({
                 columnWidth = {
                     ...getWidthStyle(isAmountColumnWide ? variables.w130 : variables.w96),
                     ...(!shouldRemoveTotalColumnFlex && styles.flex1),
-                    ...(shouldRemoveTotalColumnFlex && styles.mlAuto),
                     ...styles.alignItemsEnd,
                 };
                 break;
