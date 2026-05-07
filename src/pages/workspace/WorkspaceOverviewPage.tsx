@@ -107,6 +107,7 @@ function WorkspaceOverviewPage({policyDraft, policy: policyProp, route}: Workspa
     const expensifyIcons = useMemoizedLazyExpensifyIcons(['Exit', 'FallbackWorkspaceAvatar', 'ImageCropSquareMask', 'QrCode', 'Transfer', 'Trashcan', 'Upload', 'UserPlus']);
 
     const backTo = route.params.backTo;
+    const routePolicyID = route.params.policyID;
     const [account] = useOnyx(ONYXKEYS.ACCOUNT);
     const [fundList] = useOnyx(ONYXKEYS.FUND_LIST);
     const [personalPolicyID] = useOnyx(ONYXKEYS.PERSONAL_POLICY_ID);
@@ -279,8 +280,8 @@ function WorkspaceOverviewPage({policyDraft, policy: policyProp, route}: Workspa
         if (policyDraftID || !isFocused) {
             return;
         }
-        openPolicyProfilePage(policyID ?? '');
-    }, [policyDraftID, isFocused, policyID]);
+        openPolicyProfilePage(routePolicyID);
+    }, [policyDraftID, isFocused, routePolicyID]);
 
     const {isOffline} = useNetwork({onReconnect: fetchPolicyData});
 
