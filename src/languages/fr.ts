@@ -921,11 +921,6 @@ const translations: TranslationDeepObject<typeof en> = {
         listOfChats: 'Liste des discussions',
         saveTheWorld: 'Sauver le monde',
         tooltip: 'Commencez ici !',
-        redirectToExpensifyClassicModal: {
-            title: 'Bientôt disponible',
-            description:
-                'Nous sommes en train d’ajuster encore quelques éléments de New Expensify pour l’adapter à votre configuration spécifique. En attendant, rendez-vous sur Expensify Classic.',
-        },
     },
     homePage: {
         forYou: 'Pour vous',
@@ -1043,6 +1038,7 @@ const translations: TranslationDeepObject<typeof en> = {
             customizeCategories: 'Personnaliser les catégories comptables',
             linkCompanyCards: 'Lier des cartes d’entreprise',
             setupRules: 'Configurer les règles de dépense',
+            inviteAccountant: 'Inviter votre comptable',
         },
     },
     allSettingsScreen: {
@@ -4322,6 +4318,10 @@ ${amount} pour ${merchant} - ${date}`,
             travelInvoicingPayableAccount: 'Compte fournisseur déplacements',
             hr: 'RH',
         },
+        createdForClient: {
+            title: 'Vous avez créé un espace de travail pour votre client !',
+            description: "Excellente nouvelle 🎉. Contactez-nous si votre client a besoin d'aide pour la configuration.",
+        },
         receiptPartners: {
             uber: {
                 subtitle: (organizationName: string) =>
@@ -6478,7 +6478,7 @@ _Pour des instructions plus détaillées, [visitez notre site d’aide](${CONST.
             updateToUSD: 'Mettre à jour en USD',
             updateWorkspaceCurrency: 'Mettre à jour la devise de l’espace de travail',
             workspaceCurrencyNotSupported: "Devise de l'espace de travail non prise en charge",
-            yourWorkspace: `Votre espace de travail est défini sur une devise non prise en charge. Consultez la <a href="${CONST.CONNECT_A_BUSINESS_BANK_ACCOUNT_HELP_URL}">liste des devises prises en charge</a>.`,
+            yourWorkspace: `Votre espace de travail est défini sur une devise non prise en charge. Consultez la <a href="${CONST.ENABLE_GLOBAL_REIMBURSEMENT_HELP_URL}">liste des devises prises en charge</a>.`,
             chooseAnExisting: 'Choisissez un compte bancaire existant pour payer les dépenses ou ajoutez-en un nouveau.',
         },
         changeOwner: {
@@ -7797,6 +7797,7 @@ Ajoutez davantage de règles de dépenses pour protéger la trésorerie de l’e
             withdrawalType: {
                 [CONST.SEARCH.WITHDRAWAL_TYPE.EXPENSIFY_CARD]: 'Carte Expensify',
                 [CONST.SEARCH.WITHDRAWAL_TYPE.REIMBURSEMENT]: 'Remboursement',
+                [CONST.SEARCH.WITHDRAWAL_TYPE.CENTRAL_TRAVEL_INVOICING]: 'Facturation centralisée',
             },
             is: 'Est',
             action: {
