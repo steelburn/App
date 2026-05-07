@@ -26,10 +26,10 @@ import variables from '@styles/variables';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
+import InfoBadge from './OptionRow/InfoBadge';
 import OptionRowAlternateText from './OptionRowAlternateText';
 import OptionRowAvatar from './OptionRowAvatar';
 import OptionRowErrorBadge from './OptionRowErrorBadge';
-import OptionRowInfoBadge from './OptionRowInfoBadge';
 import OptionRowPressable from './OptionRowPressable';
 import OptionRowTooltipLayer from './OptionRowTooltipLayer';
 
@@ -200,9 +200,9 @@ function OptionRowLHN({
                             </View>
                         </View>
                         <View style={[styles.flexRow, styles.alignItemsCenter]}>
-                            <OptionRowInfoBadge
+                            <InfoBadge
                                 brickRoadIndicator={brickRoadIndicator}
-                                actionBadgeText={actionBadgeText}
+                                actionBadge={optionItem.actionBadge}
                             />
                             {hasDraftComment && !!optionItem.isAllowedToComment && (
                                 <View
