@@ -14,7 +14,10 @@ const DEFAULT_DEBOUNCE_DELAY = 1000;
 function useDebouncedSaveDraft<SaveDraftArgs extends unknown[]>(saveDraftFn: (...args: SaveDraftArgs) => void, wait = DEFAULT_DEBOUNCE_DELAY) {
     const isSavePending = useRef(false);
 
-    const debouncedSaveDraft = useDebounce(saveDraftFn, wait);
+    const debouncedSaveDraft = useDebounce((...args: SaveDraftArgs) => {
+        saveDraftFn(...args);
+        isSavePending.current = false;
+    }, wait);
 
     const saveDraft = (...args: SaveDraftArgs) => {
         isSavePending.current = true;
