@@ -33,10 +33,20 @@ function SelectFeedType() {
             return;
         }
         const isDirectSelected = typeSelected === CONST.COMPANY_CARDS.FEED_TYPE.DIRECT;
+        const isFileImportSelected = typeSelected === CONST.COMPANY_CARDS.FEED_TYPE.FILE_IMPORT;
+
+        if (isFileImportSelected) {
+            setAddNewCompanyCardStepAndData({
+                step: CONST.COMPANY_CARDS.STEP.IMPORT_FROM_FILE,
+                data: {selectedFeedType: typeSelected},
+                isEditing: false,
+            });
+            return;
+        }
 
         if (!isDirectSelected) {
             setAddNewCompanyCardStepAndData({
-                step: isDirectSelected ? CONST.COMPANY_CARDS.STEP.BANK_CONNECTION : CONST.COMPANY_CARDS.STEP.CARD_TYPE,
+                step: CONST.COMPANY_CARDS.STEP.CARD_TYPE,
                 data: {selectedFeedType: typeSelected},
             });
             return;
@@ -67,11 +77,18 @@ function SelectFeedType() {
             keyForList: CONST.COMPANY_CARDS.FEED_TYPE.DIRECT,
             isSelected: typeSelected === CONST.COMPANY_CARDS.FEED_TYPE.DIRECT,
         },
+        {
+            value: CONST.COMPANY_CARDS.FEED_TYPE.FILE_IMPORT,
+            text: translate('workspace.companyCards.addNewCard.fileImport'),
+            keyForList: CONST.COMPANY_CARDS.FEED_TYPE.FILE_IMPORT,
+            isSelected: typeSelected === CONST.COMPANY_CARDS.FEED_TYPE.FILE_IMPORT,
+        },
     ];
 
     const getFinalData = () => {
         if (doesCountrySupportPlaid) {
-            return data.reverse();
+            // Show Direct first, then Commercial, then Import from file
+            return [data[1], data[0], data[2]];
         }
 
         return data.slice(0, 1);
