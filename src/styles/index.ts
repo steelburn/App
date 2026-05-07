@@ -2533,6 +2533,10 @@ const staticStyles = (theme: ThemeColors) =>
             borderBottomRightRadius: variables.componentBorderRadius,
         },
 
+        tableRowHeightCompact: {
+            minHeight: variables.tableRowHeightCompact,
+        },
+
         tableRowHeight: {
             minHeight: variables.tableRowHeight,
         },

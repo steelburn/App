@@ -30,9 +30,10 @@ export default function TableRow({children, accessible, rowIndex, interactive, o
         styles.flexRow,
         styles.highlightBG,
         styles.overflowHidden,
-        styles.ph3,
-        styles.tableRowHeight,
         styles.alignItemsCenter,
+        shouldUseNarrowLayout ? styles.pv4 : styles.pv2,
+        shouldUseNarrowLayout ? styles.ph4 : styles.ph3,
+        shouldUseNarrowLayout ? styles.tableRowHeightCompact : styles.tableRowHeight,
         shouldUseNarrowLayout && isFirstRow && styles.tableTopRadius,
         isLastRow ? styles.tableBottomRadius : styles.borderBottom,
     ];

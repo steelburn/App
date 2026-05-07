@@ -122,6 +122,7 @@ export default {
     optionRowHeight: 64,
     optionRowHeightCompact: 52,
     tableRowHeight: 56,
+    tableRowHeightCompact: 64,
     tableRowPaddingVertical: 8,
     tableRowPaddingHorizontal: 12,
     tableGroupRowPaddingVertical: 4,
