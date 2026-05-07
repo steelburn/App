@@ -26,9 +26,9 @@ import variables from '@styles/variables';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
+import ErrorBadge from './OptionRow/ErrorBadge';
 import OptionRowAlternateText from './OptionRowAlternateText';
 import OptionRowAvatar from './OptionRowAvatar';
-import OptionRowErrorBadge from './OptionRowErrorBadge';
 import OptionRowInfoBadge from './OptionRowInfoBadge';
 import OptionRowPressable from './OptionRowPressable';
 import OptionRowTooltipLayer from './OptionRowTooltipLayer';
@@ -193,9 +193,9 @@ function OptionRowLHN({
                                         <Text style={[styles.textLabel]}>{optionItem.descriptiveText}</Text>
                                     </View>
                                 ) : null}
-                                <OptionRowErrorBadge
+                                <ErrorBadge
                                     brickRoadIndicator={brickRoadIndicator}
-                                    actionBadgeText={actionBadgeText}
+                                    actionBadge={optionItem.actionBadge}
                                 />
                             </View>
                         </View>
