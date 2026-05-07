@@ -1,11 +1,10 @@
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {Modal, View} from 'react-native';
-import {Gesture, GestureDetector} from 'react-native-gesture-handler';
+import {GestureDetector} from 'react-native-gesture-handler';
 import {RESULTS} from 'react-native-permissions';
-import Animated, {useAnimatedStyle, useSharedValue, withDelay, withSequence, withSpring, withTiming} from 'react-native-reanimated';
-import type {Camera, PhotoFile, Point} from 'react-native-vision-camera';
+import Animated from 'react-native-reanimated';
+import type {Camera, PhotoFile} from 'react-native-vision-camera';
 import {useCameraDevice, useCameraFormat, Camera as VisionCamera} from 'react-native-vision-camera';
-import {scheduleOnRN} from 'react-native-worklets';
 import ActivityIndicator from '@components/ActivityIndicator';
 import Button from '@components/Button';
 import Icon from '@components/Icon';
@@ -14,6 +13,7 @@ import PressableWithFeedback from '@components/Pressable/PressableWithFeedback';
 import Text from '@components/Text';
 import {useMemoizedLazyExpensifyIcons, useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
+import {useTapToFocusGesture} from '@hooks/useNativeCamera';
 import useSafeAreaInsets from '@hooks/useSafeAreaInsets';
 import useStyleUtils from '@hooks/useStyleUtils';
 import useTheme from '@hooks/useTheme';
@@ -73,41 +73,7 @@ function AttachmentCamera({isVisible, onCapture, onClose}: AttachmentCameraProps
     // Format dimensions are in landscape orientation, so height/width gives portrait aspect ratio
     const cameraAspectRatio = useMemo(() => (format ? format.photoHeight / format.photoWidth : undefined), [format]);
 
-    // Focus indicator animations (same pattern as useNativeCamera)
-    const focusIndicatorOpacity = useSharedValue(0);
-    const focusIndicatorScale = useSharedValue(2);
-    const focusIndicatorPosition = useSharedValue({x: 0, y: 0});
-
-    const cameraFocusIndicatorAnimatedStyle = useAnimatedStyle(() => ({
-        opacity: focusIndicatorOpacity.get(),
-        transform: [{translateX: focusIndicatorPosition.get().x}, {translateY: focusIndicatorPosition.get().y}, {scale: focusIndicatorScale.get()}],
-    }));
-
-    const focusCamera = useCallback((point: Point) => {
-        if (!cameraRef.current) {
-            return;
-        }
-
-        cameraRef.current.focus(point).catch((error: Record<string, unknown>) => {
-            if (error.message === '[unknown/unknown] Cancelled by another startFocusAndMetering()') {
-                return;
-            }
-            Log.warn('Error focusing camera', error);
-        });
-    }, []);
-
-    const tapGesture = Gesture.Tap()
-        .enabled(device?.supportsFocus ?? false)
-        .onStart((ev: {x: number; y: number}) => {
-            const point = {x: ev.x, y: ev.y};
-
-            focusIndicatorOpacity.set(withSequence(withTiming(0.8, {duration: 250}), withDelay(1000, withTiming(0, {duration: 250}))));
-            focusIndicatorScale.set(2);
-            focusIndicatorScale.set(withSpring(1, {damping: 10, stiffness: 200}));
-            focusIndicatorPosition.set(point);
-
-            scheduleOnRN(focusCamera, point);
-        });
+    const {tapGesture, cameraFocusIndicatorAnimatedStyle} = useTapToFocusGesture(cameraRef, device?.supportsFocus ?? false);
 
     // Permission management
     const askForPermissions = useCallback(() => {
