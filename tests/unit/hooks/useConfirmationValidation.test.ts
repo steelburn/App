@@ -39,6 +39,7 @@ const baseParams = {
     isPerDiemRequest: false,
     isTimeRequest: false,
     routeError: undefined,
+    isNewManualExpenseFlowEnabled: false,
 } satisfies UseConfirmationValidationParams;
 
 describe('useConfirmationValidation', () => {
