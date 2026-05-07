@@ -816,12 +816,9 @@ function getReportFromHoldRequestsOnyxData({
 
     const isApprovalEnabled = policy ? policy.approvalMode && policy.approvalMode !== CONST.POLICY.APPROVAL_MODE.OPTIONAL : false;
 
-    // After the held transactions are reassigned to the new hold report, the original iouReport
-    // only contains the previously-unheld transactions. Its total/nonReimbursableTotal must be
-    // updated optimistically so that offline consumers (e.g. the Pay button label computed from
-    // report.total via getMoneyRequestSpendBreakdown) reflect the new remaining amount instead
-    // of the stale pre-move total. unheldTotal is intentionally left unchanged because it already
-    // equals the new total once all remaining transactions on this report are unheld.
+    // Held transactions just moved out, leaving total/nonReimbursableTotal stale on this report —
+    // offline consumers (e.g. the Pay button) would read the wrong amount until server reconciles.
+    // unheldTotal stays as-is: every remaining transaction is unheld, so it already equals the new total.
     const shouldUpdateOriginalReportTotals = holdTransactions.length > 0 && iouReport?.unheldTotal !== undefined;
 
     const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.REPORT | typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS | typeof ONYXKEYS.COLLECTION.TRANSACTION>> = [
