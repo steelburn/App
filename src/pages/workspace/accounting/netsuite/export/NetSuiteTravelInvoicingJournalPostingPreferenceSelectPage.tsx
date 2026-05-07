@@ -22,7 +22,7 @@ type MenuListItem = ListItem & {
 function NetSuiteTravelInvoicingJournalPostingPreferenceSelectPage({policy}: WithPolicyConnectionsProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
-    const policyID = policy?.id;
+    const policyID = policy?.id ?? String(CONST.DEFAULT_NUMBER_ID);
     const config = policy?.connections?.netsuite?.options.config;
 
     const selectedValue =
@@ -37,12 +37,12 @@ function NetSuiteTravelInvoicingJournalPostingPreferenceSelectPage({policy}: Wit
     }));
 
     const goBack = useCallback(() => {
-        Navigation.goBack(ROUTES.POLICY_ACCOUNTING_NETSUITE_TRAVEL_INVOICING_CONFIGURATION.getRoute(policyID ?? ''));
+        Navigation.goBack(ROUTES.POLICY_ACCOUNTING_NETSUITE_TRAVEL_INVOICING_CONFIGURATION.getRoute(policyID));
     }, [policyID]);
 
     const selectPostingPreference = useCallback(
         (row: MenuListItem) => {
-            if (row.value !== config?.travelInvoicingJournalPostingPreference && policyID) {
+            if (row.value !== config?.travelInvoicingJournalPostingPreference) {
                 updateNetSuiteTravelInvoicingJournalPostingPreference(policyID, row.value, config?.travelInvoicingJournalPostingPreference);
             }
             goBack();
