@@ -87,8 +87,9 @@ function useEditComposerToggle({selection, draftComment, composerRef, onFocus, o
                 // Editing just ended in the composer – restore the draft comment and its previous selection.
                 applyComposerValue(draftComment ?? '', {selection: previousDraftSelectionRef.current, shouldForceNativeValueUpdate: true});
 
+                // Once the composer is no longer in edit mode, we can reset the manual composer height.
                 if (isEditingInComposer) {
-                    setDidResetComposerHeight(true);
+                    setDidResetComposerHeight(false);
                 }
 
                 if (!wasComposerFocusedBeforeEditingRef.current) {
