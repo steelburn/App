@@ -22,6 +22,7 @@ jest.mock('react-native-render-html', () => {
             return ReactModule.createElement(MockView);
         },
         TNodeChildrenRenderer: ({tnode}: {tnode?: {mockText?: string}}) => ReactModule.createElement(MockText, null, tnode?.mockText ?? ''),
+        TNodeRenderer: ({tnode}: {tnode?: {mockText?: string}}) => ReactModule.createElement(MockText, null, tnode?.mockText ?? ''),
     };
 });
 
@@ -33,6 +34,10 @@ jest.mock('@libs/Parser', () => ({
 }));
 
 const buildTNode = (text = '') => ({mockText: text}) as unknown as CustomRendererProps<TBlock>['tnode'];
+const buildULTNode = (children: Array<{tagName: string; text: string}>) =>
+    ({
+        children: children.map((child) => ({tagName: child.tagName, mockText: child.text})),
+    }) as unknown as CustomRendererProps<TBlock>['tnode'];
 
 describe('Bullet list rendering', () => {
     beforeEach(() => {
@@ -40,21 +45,37 @@ describe('Bullet list rendering', () => {
     });
 
     describe('ULRenderer', () => {
-        it('renders its children', () => {
+        it('wraps each <li> child with a bullet marker', () => {
             render(
                 // @ts-expect-error — only the props read by the renderer are needed for this test
                 <ULRenderer
-                    tnode={buildTNode('child content')}
+                    tnode={buildULTNode([
+                        {tagName: 'li', text: 'One'},
+                        {tagName: 'li', text: 'Two'},
+                    ])}
                     style={{}}
                 />,
             );
-            expect(screen.getByText('child content')).toBeTruthy();
+            expect(screen.getAllByText(CONST.DOT_SEPARATOR)).toHaveLength(2);
+            expect(screen.getByText('One')).toBeTruthy();
+            expect(screen.getByText('Two')).toBeTruthy();
+        });
+
+        it('renders non-<li> children with the default node renderer', () => {
+            render(
+                // @ts-expect-error — only the props read by the renderer are needed for this test
+                <ULRenderer
+                    tnode={buildULTNode([{tagName: 'span', text: 'stray child'}])}
+                    style={{}}
+                />,
+            );
+            expect(screen.queryByText(CONST.DOT_SEPARATOR)).toBeNull();
+            expect(screen.getByText('stray child')).toBeTruthy();
         });
     });
 
     describe('BulletItemRenderer (used for both <li> and <bullet-item>)', () => {
         it('renders a bullet marker next to the item content', () => {
-            // @ts-expect-error — only the props read by the renderer are needed for this test
             render(<BulletItemRenderer tnode={buildTNode('First item')} />);
             expect(screen.getByText(CONST.DOT_SEPARATOR)).toBeTruthy();
             expect(screen.getByText('First item')).toBeTruthy();

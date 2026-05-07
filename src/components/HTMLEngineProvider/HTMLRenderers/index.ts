@@ -31,7 +31,6 @@ const HTMLEngineProviderComponentList: CustomTagRendererRecord = {
     a: AnchorRenderer,
     code: CodeRenderer,
     img: ImageRenderer,
-    li: BulletItemRenderer,
     ul: ULRenderer,
     video: VideoRenderer,
 

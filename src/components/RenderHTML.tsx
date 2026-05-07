@@ -59,7 +59,6 @@ function RenderHTML({html: htmlParam, onLinkPress, isSelectable}: RenderHTMLProp
         /* eslint-disable @typescript-eslint/naming-convention */
         'bullet-item': BulletItemRenderer,
         'sparkles-icon': SparklesIconRenderer,
-        li: BulletItemRenderer,
         ul: ULRenderer,
     };
 

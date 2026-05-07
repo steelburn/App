@@ -191,10 +191,6 @@ function BaseHTMLEngineProvider({textSelectable = false, children, enableExperim
                 contentModel: HTMLContentModel.block,
                 mixedUAStyles: {marginVertical: 12},
             }),
-            li: HTMLElementModel.fromCustomModel({
-                tagName: 'li',
-                contentModel: HTMLContentModel.block,
-            }),
             'sparkles-icon': HTMLElementModel.fromCustomModel({
                 tagName: 'sparkles-icon',
                 contentModel: HTMLContentModel.mixed,
