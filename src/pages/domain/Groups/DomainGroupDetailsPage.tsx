@@ -54,6 +54,9 @@ function DomainGroupDetailsPage({route}: DomainGroupDetailsPageProps) {
         <DomainNotFoundPageWrapper
             domainAccountID={domainAccountID}
             shouldBeBlocked={isDeleting}
+            fullPageNotFoundViewProps={{
+                onBackButtonPress: () => Navigation.goBack(ROUTES.DOMAIN_GROUPS.getRoute(domainAccountID)),
+            }}
         >
             <ScreenWrapper
                 shouldEnableMaxHeight
