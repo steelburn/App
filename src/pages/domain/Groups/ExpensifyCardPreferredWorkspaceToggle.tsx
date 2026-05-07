@@ -1,7 +1,7 @@
 import {domainSecurityGroupSettingErrorsSelector, domainSecurityGroupSettingPendingActionSelector, selectGroupByID} from '@selectors/Domain';
-import React, {useState} from 'react';
+import React from 'react';
 import {View} from 'react-native';
-import ConfirmModal from '@components/ConfirmModal';
+import useConfirmModal from '@hooks/useConfirmModal';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
@@ -20,7 +20,7 @@ type ExpensifyCardPreferredWorkspaceToggleProps = {
 function ExpensifyCardPreferredWorkspaceToggle({domainAccountID, groupID}: ExpensifyCardPreferredWorkspaceToggleProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const [isDisabledModalVisible, setIsDisabledModalVisible] = useState(false);
+    const {showConfirmModal} = useConfirmModal();
 
     const [group] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {
         selector: selectGroupByID(groupID),
@@ -43,38 +43,34 @@ function ExpensifyCardPreferredWorkspaceToggle({domainAccountID, groupID}: Expen
     const isDisabled = (!isPreferredPolicyEnabled || !isDomainUsingExpensifyCard) && !isActive;
 
     return (
-        <>
-            <View style={styles.mv3}>
-                <ToggleSettingOptionRow
-                    title={translate('domain.groups.expensifyCardPreferredWorkspace')}
-                    subtitle={translate('domain.groups.expensifyCardPreferredWorkspaceDescription')}
-                    switchAccessibilityLabel={translate('domain.groups.expensifyCardPreferredWorkspace')}
-                    shouldPlaceSubtitleBelowSwitch
-                    disabled={isDisabled}
-                    disabledAction={() => setIsDisabledModalVisible(true)}
-                    isActive={isActive}
-                    onToggle={(enabled) => {
-                        if (!group) {
-                            return;
-                        }
-                        updateDomainSecurityGroup(domainAccountID, groupID, group, {overridePreferredPolicyWithCardPolicy: enabled}, 'overridePreferredPolicyWithCardPolicy');
-                    }}
-                    wrapperStyle={styles.ph5}
-                    pendingAction={overridePreferredPolicyWithCardPolicyPendingAction}
-                    errors={overridePreferredPolicyWithCardPolicyErrors}
-                    onCloseError={() => clearDomainSecurityGroupSettingError(domainAccountID, groupID, 'overridePreferredPolicyWithCardPolicyErrors')}
-                />
-            </View>
-            <ConfirmModal
-                onConfirm={() => setIsDisabledModalVisible(false)}
-                onCancel={() => setIsDisabledModalVisible(false)}
-                isVisible={isDisabledModalVisible}
-                title={translate('workspace.distanceRates.oopsNotSoFast')}
-                prompt={translate('domain.groups.expensifyCardPreferredWorkspaceDisabledMessage')}
-                confirmText={translate('common.buttonConfirm')}
-                shouldShowCancelButton={false}
+        <View style={styles.mv3}>
+            <ToggleSettingOptionRow
+                title={translate('domain.groups.expensifyCardPreferredWorkspace')}
+                subtitle={translate('domain.groups.expensifyCardPreferredWorkspaceDescription')}
+                switchAccessibilityLabel={translate('domain.groups.expensifyCardPreferredWorkspace')}
+                shouldPlaceSubtitleBelowSwitch
+                disabled={isDisabled}
+                disabledAction={() => {
+                    showConfirmModal({
+                        title: translate('workspace.distanceRates.oopsNotSoFast'),
+                        prompt: translate('domain.groups.expensifyCardPreferredWorkspaceDisabledMessage'),
+                        confirmText: translate('common.buttonConfirm'),
+                        shouldShowCancelButton: false,
+                    });
+                }}
+                isActive={isActive}
+                onToggle={(enabled) => {
+                    if (!group) {
+                        return;
+                    }
+                    updateDomainSecurityGroup(domainAccountID, groupID, group, {overridePreferredPolicyWithCardPolicy: enabled}, 'overridePreferredPolicyWithCardPolicy');
+                }}
+                wrapperStyle={styles.ph5}
+                pendingAction={overridePreferredPolicyWithCardPolicyPendingAction}
+                errors={overridePreferredPolicyWithCardPolicyErrors}
+                onCloseError={() => clearDomainSecurityGroupSettingError(domainAccountID, groupID, 'overridePreferredPolicyWithCardPolicyErrors')}
             />
-        </>
+        </View>
     );
 }
 
