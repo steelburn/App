@@ -19,11 +19,12 @@ type TableRowProps = Omit<PressableWithFeedbackProps, 'accessible'> & {
 export default function TableRow({children, accessible, rowIndex, interactive, onPress, ...props}: TableRowProps) {
     const styles = useThemeStyles();
     const {processedData} = useTableContext();
-    const {shouldUseNarrowLayout} = useResponsiveLayout();
+    const {shouldUseNarrowLayout, isMediumScreenWidth} = useResponsiveLayout();
 
     const rowCount = processedData.length;
     const isFirstRow = rowIndex === 0;
     const isLastRow = rowIndex === rowCount - 1;
+    const isSmallView = isMediumScreenWidth || shouldUseNarrowLayout;
 
     const tableRowStyles = [
         styles.mh5,
@@ -31,10 +32,10 @@ export default function TableRow({children, accessible, rowIndex, interactive, o
         styles.highlightBG,
         styles.overflowHidden,
         styles.alignItemsCenter,
-        shouldUseNarrowLayout ? styles.pv4 : styles.pv2,
-        shouldUseNarrowLayout ? styles.ph4 : styles.ph3,
-        shouldUseNarrowLayout ? styles.tableRowHeightCompact : styles.tableRowHeight,
-        shouldUseNarrowLayout && isFirstRow && styles.tableTopRadius,
+        isSmallView ? styles.pv4 : styles.pv2,
+        isSmallView ? styles.ph4 : styles.ph3,
+        isSmallView ? styles.tableRowHeightCompact : styles.tableRowHeight,
+        isSmallView && isFirstRow && styles.tableTopRadius,
         isLastRow ? styles.tableBottomRadius : styles.borderBottom,
     ];
 
