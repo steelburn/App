@@ -81,7 +81,7 @@ You can update or remove approval workflows at any time as your team or process 
 
 ---
 
-# Enable Concierge to auto-approve compliant reports
+## Enable Concierge to auto-approve compliant reports
 
 Concierge can automatically approve reports that don't exceed a specific threshold and don't contain violations.
 
