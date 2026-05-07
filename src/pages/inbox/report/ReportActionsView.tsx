@@ -18,7 +18,6 @@ import useReportIsArchived from '@hooks/useReportIsArchived';
 import useReportTransactionsCollection from '@hooks/useReportTransactionsCollection';
 import useSidePanelState from '@hooks/useSidePanelState';
 import useTransactionsAndViolationsForReport from '@hooks/useTransactionsAndViolationsForReport';
-import useTransactionThreadPendingSkeleton from '@hooks/useTransactionThreadPendingSkeleton';
 import {getReportPreviewAction} from '@libs/actions/IOU/MoneyRequestBuilder';
 import {updateLoadingInitialReportAction} from '@libs/actions/Report';
 import DateUtils from '@libs/DateUtils';
@@ -273,8 +272,6 @@ function ReportActionsView({reportID, onLayout}: ReportActionsViewProps) {
     const isReportDataIncomplete = isSingleExpenseReport && isMissingTransactionThreadReportID;
     const isMissingReportActions = visibleReportActions.length === 0;
 
-    const shouldShowSkeletonForTransactionThread = useTransactionThreadPendingSkeleton(isSingleExpenseReport, transactionThreadReportID, transactionThreadReport, isOffline);
-
     const allReportActionIDs = useMemo(() => allReportActions?.map((action) => action.reportActionID) ?? [], [allReportActions]);
 
     const {loadOlderChats, loadNewerChats} = useLoadReportActions({
@@ -335,7 +332,7 @@ function ReportActionsView({reportID, onLayout}: ReportActionsViewProps) {
     const shouldShowSkeletonForConciergePanel = isConciergeSidePanel && !hasOnceLoadedReportActions && !isOffline;
 
     // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-    const shouldShowSkeleton = shouldShowSkeletonForConciergePanel || shouldShowSkeletonForInitialLoad || shouldShowSkeletonForAppLoad || shouldShowSkeletonForTransactionThread;
+    const shouldShowSkeleton = shouldShowSkeletonForConciergePanel || shouldShowSkeletonForInitialLoad || shouldShowSkeletonForAppLoad;
 
     useEffect(() => {
         if (!shouldShowSkeleton || !report) {

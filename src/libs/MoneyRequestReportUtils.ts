@@ -203,6 +203,7 @@ export {
     getReportIDForTransaction,
     getTotalAmountForIOUReportPreviewButton,
     getAllNonDeletedTransactions,
+    isSingleTransactionReport,
     shouldDisplayReportTableView,
     shouldWaitForTransactions,
     isBillableEnabledOnPolicy,

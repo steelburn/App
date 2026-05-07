@@ -18,7 +18,6 @@ import usePaginatedReportActions from '@hooks/usePaginatedReportActions';
 import useReportTransactionsCollection from '@hooks/useReportTransactionsCollection';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
-import useTransactionThreadPendingSkeleton from '@hooks/useTransactionThreadPendingSkeleton';
 import {removeFailedReport} from '@libs/actions/Report';
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import Log from '@libs/Log';
@@ -156,15 +155,12 @@ function MoneyRequestReportView({report, reportLoadingState, shouldDisplayReport
     // We need to wait for both the selector to finish AND ensure we're not in a loading state where transactions could still populate
     const shouldWaitForTransactions = shouldWaitForTransactionsUtil(report, transactions, reportLoadingState, isOffline);
 
-    const [transactionThreadReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${transactionThreadReportID}`);
-
-    const shouldShowSkeletonForTransactionThread = useTransactionThreadPendingSkeleton(visibleTransactions.length === 1, transactionThreadReportID, transactionThreadReport, isOffline);
-
-    const shouldShowOpenReportLoadingSkeleton =
-        !!(isLoadingInitialReportActions && reportActions.length === 0 && !isOffline) || shouldWaitForTransactions || shouldShowSkeletonForTransactionThread;
+    const shouldShowOpenReportLoadingSkeleton = !!(isLoadingInitialReportActions && reportActions.length === 0 && !isOffline) || shouldWaitForTransactions;
 
     const isEmptyTransactionReport = visibleTransactions?.length === 0 && transactionThreadReportID === undefined;
     const shouldDisplayMoneyRequestActionsList = !!isEmptyTransactionReport || shouldDisplayReportTableView(report, visibleTransactions ?? []);
+
+    const [transactionThreadReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${transactionThreadReportID}`);
     const shouldShowWideRHPReceipt = visibleTransactions.length === 1 && !isSmallScreenWidth && !!transactionThreadReport;
 
     const reportHeaderView = useMemo(
@@ -215,7 +211,6 @@ function MoneyRequestReportView({report, reportLoadingState, shouldDisplayReport
             context: 'MoneyRequestReportView.InitialLoadingSkeleton',
             isLoadingInitialReportActions: !!isLoadingInitialReportActions,
             shouldWaitForTransactions,
-            shouldShowSkeletonForTransactionThread,
         };
         return (
             <InitialLoadingSkeleton
