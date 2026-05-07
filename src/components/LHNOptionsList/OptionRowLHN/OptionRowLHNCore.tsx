@@ -26,7 +26,7 @@ import variables from '@styles/variables';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
-import OptionRowAlternateText from './OptionRowAlternateText';
+import Subtitle from './OptionRow/Subtitle';
 import OptionRowAvatar from './OptionRowAvatar';
 import OptionRowErrorBadge from './OptionRowErrorBadge';
 import OptionRowInfoBadge from './OptionRowInfoBadge';
@@ -177,7 +177,7 @@ function OptionRowLHN({
                                             </Tooltip>
                                         )}
                                     </View>
-                                    <OptionRowAlternateText
+                                    <Subtitle
                                         alternateText={optionItem.alternateText}
                                         report={report}
                                         viewMode={viewMode}

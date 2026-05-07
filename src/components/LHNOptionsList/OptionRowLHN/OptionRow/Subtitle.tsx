@@ -12,7 +12,7 @@ import type {Report} from '@src/types/onyx';
 
 type OptionMode = ValueOf<typeof CONST.OPTION_MODE>;
 
-type OptionRowAlternateTextProps = {
+type SubtitleProps = {
     alternateText: string | undefined;
     report?: Report;
     viewMode: OptionMode;
@@ -20,7 +20,7 @@ type OptionRowAlternateTextProps = {
     style?: StyleProp<TextStyle>;
 };
 
-function OptionRowAlternateText({alternateText, report, viewMode, isOptionFocused, style}: OptionRowAlternateTextProps) {
+function Subtitle({alternateText, report, viewMode, isOptionFocused, style}: SubtitleProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
 
@@ -57,6 +57,6 @@ function OptionRowAlternateText({alternateText, report, viewMode, isOptionFocuse
     );
 }
 
-OptionRowAlternateText.displayName = 'OptionRowAlternateText';
+Subtitle.displayName = 'OptionRow.Subtitle';
 
-export default OptionRowAlternateText;
+export default Subtitle;
