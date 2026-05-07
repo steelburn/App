@@ -742,7 +742,6 @@ function ComposerWithSuggestions({
         }
         delayedAutoFocusRouteKeyRef.current = route.key;
 
-        // eslint-disable-next-line @typescript-eslint/no-deprecated
         const task = InteractionManager.runAfterInteractions(() => {
             focus(true);
         });
