@@ -1,11 +1,10 @@
-import React, {startTransition, Suspense, useEffect, useState} from 'react';
-import {ErrorBoundary as ReactErrorBoundary} from 'react-error-boundary';
+import React, {startTransition, useEffect, useState} from 'react';
 import DelegateNoAccessModalProvider from './components/DelegateNoAccessModalProvider';
 import EmojiPicker from './components/EmojiPicker/EmojiPicker';
 import GrowlNotification from './components/GrowlNotification';
+import LazyModalSlot from './components/LazyModalSlot';
 import * as EmojiPickerAction from './libs/actions/EmojiPickerAction';
 import {growlRef} from './libs/Growl';
-import Log from './libs/Log';
 import * as ReportActionContextMenu from './pages/inbox/report/ContextMenu/ReportActionContextMenu';
 
 const LazyPopoverReportActionContextMenu = React.lazy(() => import('./pages/inbox/report/ContextMenu/PopoverReportActionContextMenu'));
@@ -16,24 +15,6 @@ const LazyProactiveAppReviewModalManager = React.lazy(() => import('./components
 // Maximum time (ms) the context menu mount can stay deferred before requestIdleCallback forces it to run,
 // guaranteeing mount even if the main thread never becomes idle.
 const IDLE_CALLBACK_TIMEOUT_MS = 2000;
-
-const logModalChunkFailure = (error: Error, info: {componentStack?: string | null}) =>
-    Log.alert(`[GlobalModals] lazy chunk failure - ${error.message}`, {componentStack: info.componentStack ?? undefined}, false);
-
-/**
- * Wraps a lazy modal in its own ErrorBoundary + Suspense pair so a chunk-load failure
- * (or unrelated load latency) in one modal cannot tear down sibling modals or the rest of GlobalModals.
- */
-function LazyModalSlot({children}: {children: React.ReactNode}) {
-    return (
-        <ReactErrorBoundary
-            fallback={null}
-            onError={logModalChunkFailure}
-        >
-            <Suspense fallback={null}>{children}</Suspense>
-        </ReactErrorBoundary>
-    );
-}
 
 /**
  * Renders global modals and overlays that are mounted once at the top level.
