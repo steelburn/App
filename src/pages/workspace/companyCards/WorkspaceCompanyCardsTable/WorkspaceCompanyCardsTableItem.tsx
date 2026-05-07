@@ -61,8 +61,8 @@ type WorkspaceCompanyCardTableItemProps = {
     /** Number of columns in the table */
     columnCount: number;
 
-    /** Whether or not the item is the last item in the table */
-    isLastRow: boolean;
+    /** The index of the row */
+    rowIndex: number;
 
     /**
      * Callback when assigning a card.
@@ -79,9 +79,9 @@ function WorkspaceCompanyCardTableItem({
     isPlaidCardFeed,
     shouldUseNarrowTableLayout,
     columnCount,
+    rowIndex,
     isAssigningCardDisabled,
     onAssignCard,
-    isLastRow,
 }: WorkspaceCompanyCardTableItemProps) {
     const styles = useThemeStyles();
     const theme = useTheme();
@@ -139,7 +139,7 @@ function WorkspaceCompanyCardTableItem({
                 </View>
             ) : (
                 <Table.Row
-                    isLastRow={isLastRow}
+                    rowIndex={rowIndex}
                     interactive={isAssigned}
                     sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.COMPANY_CARDS.TABLE_ITEM}
                     onPress={handleRowPress}

@@ -1,6 +1,9 @@
+import React from 'react';
 import PressableWithFeedback, {PressableWithFeedbackProps} from '@components/Pressable/PressableWithFeedback';
+import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
 import CONST from '@src/CONST';
+import {useTableContext} from './TableContext';
 
 type TableRowProps = Omit<PressableWithFeedbackProps, 'accessible'> & {
     /** When true, indicates that the view is an accessibility element.  By default, all the rows are accessible. */
@@ -9,12 +12,18 @@ type TableRowProps = Omit<PressableWithFeedbackProps, 'accessible'> & {
     /** Whether or not the table row is pressable or not */
     interactive: boolean;
 
-    /** Whether this row is the last row in the table */
-    isLastRow: boolean;
+    /** The index of the row in the table */
+    rowIndex: number;
 };
 
-export default function TableRow({children, accessible, isLastRow, interactive, onPress, ...props}: TableRowProps) {
+export default function TableRow({children, accessible, rowIndex, interactive, onPress, ...props}: TableRowProps) {
     const styles = useThemeStyles();
+    const {processedData} = useTableContext();
+    const {shouldUseNarrowLayout} = useResponsiveLayout();
+
+    const rowCount = processedData.length;
+    const isFirstRow = rowIndex === 0;
+    const isLastRow = rowIndex === rowCount - 1;
 
     const tableRowStyles = [
         styles.mh5,
@@ -24,6 +33,7 @@ export default function TableRow({children, accessible, isLastRow, interactive, 
         styles.ph3,
         styles.tableRowHeight,
         styles.alignItemsCenter,
+        shouldUseNarrowLayout && isFirstRow && styles.tableTopRadius,
         isLastRow ? styles.tableBottomRadius : styles.borderBottom,
     ];
 

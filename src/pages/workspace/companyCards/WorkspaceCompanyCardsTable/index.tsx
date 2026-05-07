@@ -283,6 +283,7 @@ function WorkspaceCompanyCardsTable({
         <WorkspaceCompanyCardTableItem
             key={`${item.cardName}_${index}`}
             item={item}
+            rowIndex={index}
             policyID={policyID ?? String(CONST.DEFAULT_NUMBER_ID)}
             CardFeedIcon={cardFeedIcon}
             isPlaidCardFeed={!!getPlaidInstitutionId(feedName)}
@@ -290,7 +291,6 @@ function WorkspaceCompanyCardsTable({
             isAssigningCardDisabled={isAssigningCardDisabled}
             shouldUseNarrowTableLayout={shouldUseNarrowTableLayout}
             columnCount={columns.length}
-            isLastRow={index === cardsData.length - 1}
         />
     );
 
