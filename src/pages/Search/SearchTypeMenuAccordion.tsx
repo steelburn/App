@@ -61,7 +61,7 @@ function AnimatedBadge({text, isExpanded}: AnimatedBadgeProps) {
         <Animated.View style={[badgeAnimatedStyle]}>
             <Badge
                 text={text}
-                badgeStyles={styles.todoBadge}
+                badgeStyles={styles.searchSectionBadge}
                 success
                 isCondensed
             />
@@ -103,7 +103,7 @@ function SearchTypeMenuAccordion({title, defaultExpanded = true, badgeText, chil
                 hoverStyle={styles.hoveredComponentBG}
             >
                 <Text
-                    style={[styles.flex1, styles.textLabelSupporting]}
+                    style={[styles.flex1, styles.mutedNormalTextLabel]}
                     accessibilityRole={CONST.ROLE.HEADER}
                 >
                     {title}
