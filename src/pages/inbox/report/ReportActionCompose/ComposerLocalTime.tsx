@@ -2,7 +2,6 @@ import React from 'react';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
 import {usePersonalDetails} from '@components/OnyxListItemProvider';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
-import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
 import {canShowReportRecipientLocalTime, getReportOfflinePendingActionAndErrors, getReportRecipientAccountIDs} from '@libs/ReportUtils';
 import ParticipantLocalTime from '@pages/inbox/report/ParticipantLocalTime';
@@ -14,16 +13,11 @@ type ComposerLocalTimeProps = {
 };
 
 function ComposerLocalTime({reportID}: ComposerLocalTimeProps) {
-    const {isOffline} = useNetwork();
     const [isComposerFullSize = false] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_IS_COMPOSER_FULL_SIZE}${reportID}`);
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const personalDetails = usePersonalDetails();
     const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportID}`);
     const {reportPendingAction: pendingAction} = getReportOfflinePendingActionAndErrors(report);
-
-    if (isOffline) {
-        return null;
-    }
 
     const shouldShow = canShowReportRecipientLocalTime(personalDetails, report, currentUserPersonalDetails.accountID) && !isComposerFullSize;
     const reportRecipientAccountIDs = getReportRecipientAccountIDs(report, currentUserPersonalDetails.accountID);
