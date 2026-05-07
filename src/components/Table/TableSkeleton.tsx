@@ -1,3 +1,4 @@
+import React from 'react';
 import {View} from 'react-native';
 import SkeletonViewContentLoader from '@components/SkeletonViewContentLoader';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';

@@ -1,22 +1,18 @@
+import React from 'react';
 import {Circle} from 'react-native-svg';
 import SkeletonRect from '@components/SkeletonRect';
 import TableSkeleton from '@components/Table/TableSkeleton';
-import useSkeletonSpan from '@libs/telemetry/useSkeletonSpan';
+import {SkeletonSpanReasonAttributes} from '@libs/telemetry/useSkeletonSpan';
 
-type WorkspaceCompanyCardsTableSkeletonProps = {};
+type WorkspaceCompanyCardsTableSkeletonProps = {
+    reasonAttributes: SkeletonSpanReasonAttributes;
+};
 
-export default function WorkspaceCompanyCardsTableSkeleton({}: WorkspaceCompanyCardsTableSkeletonProps) {
-    useSkeletonSpan('TableRowSkeleton', reasonAttributes);
-
-    const circleX = 36;
-    const circleY = 36;
-    const rectX = 68;
-    const rectY1 = 24;
-    const rectY2 = 40;
-
+export default function WorkspaceCompanyCardsTableSkeleton({reasonAttributes}: WorkspaceCompanyCardsTableSkeletonProps) {
     return (
         <TableSkeleton
             rowCount={5}
+            reasonAttributes={reasonAttributes}
             renderSkeletonItem={() => {
                 <>
                     <Circle
@@ -25,12 +21,12 @@ export default function WorkspaceCompanyCardsTableSkeleton({}: WorkspaceCompanyC
                         r="20"
                     />
                     <SkeletonRect
-                        transform={[{translateX: rectX}, {translateY: rectY1}]}
+                        transform={[{translateX: 68}, {translateY: 20}]}
                         width={124}
                         height={8}
                     />
                     <SkeletonRect
-                        transform={[{translateX: rectX}, {translateY: rectY2}]}
+                        transform={[{translateX: 68}, {translateY: 362}]}
                         width={60}
                         height={8}
                     />

@@ -31,6 +31,7 @@ import isLoadingOnyxValue from '@src/types/utils/isLoadingOnyxValue';
 import WorkspaceCompanyCardsTableHeaderButtons from './WorkspaceCompanyCardsTableHeaderButtons';
 import WorkspaceCompanyCardTableItem from './WorkspaceCompanyCardsTableItem';
 import type {WorkspaceCompanyCardTableItemData} from './WorkspaceCompanyCardsTableItem';
+import WorkspaceCompanyCardsTableSkeleton from './WorkspaceCompanyCardsTableSkeleton';
 
 type CompanyCardsTableColumnKey = 'member' | 'card' | 'customCardName';
 
@@ -372,12 +373,7 @@ function WorkspaceCompanyCardsTable({
 
             {(isLoading || isFeedPending || isNoFeed) && !feedErrorKey && (
                 <ScrollView>
-                    {isLoading && (
-                        <TableRowSkeleton
-                            fixedNumItems={5}
-                            reasonAttributes={reasonAttributes}
-                        />
-                    )}
+                    {isLoading && <WorkspaceCompanyCardsTableSkeleton reasonAttributes={reasonAttributes} />}
 
                     {!isLoading && isFeedPending && (
                         <View style={styles.flex1}>

@@ -24,6 +24,7 @@ import CONST from '@src/CONST';
 import ROUTES from '@src/ROUTES';
 import type {Card, CompanyCardFeed, CompanyCardFeedWithDomainID} from '@src/types/onyx';
 import type {CardAssignmentData} from '@src/types/onyx/Card';
+import WorkspaceCompanyCardsTableSkeleton from './WorkspaceCompanyCardsTableSkeleton';
 
 type WorkspaceCompanyCardTableItemData = CardAssignmentData & {
     /** Whether the card is deleted */
@@ -131,14 +132,8 @@ function WorkspaceCompanyCardTableItem({
             onClose={onDismissError}
             shouldHideOnDelete={false}
         >
-            {isDeleting ? (
-                <View style={[styles.mh5, styles.flexRow, styles.mb2, styles.highlightBG, styles.overflowHidden]}>
-                    <TableRowSkeleton
-                        fixedNumItems={1}
-                        useCompanyCardsLayout
-                        reasonAttributes={reasonAttributes}
-                    />
-                </View>
+            {true ? (
+                <WorkspaceCompanyCardsTableSkeleton reasonAttributes={reasonAttributes} />
             ) : (
                 <Table.Row
                     rowIndex={rowIndex}
