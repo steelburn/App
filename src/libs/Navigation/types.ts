@@ -556,7 +556,7 @@ type SettingsNavigatorParamList = {
     };
     [SCREENS.SETTINGS_TAGS.DYNAMIC_SETTINGS_TAG_SETTINGS]: {
         policyID: string;
-        orderWeight: number | string;
+        orderWeight: number;
         tagName: string;
         parentTagsFilter?: string;
     };
