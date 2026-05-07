@@ -86,9 +86,7 @@ function SelectFeedType() {
         isSelected: typeSelected === CONST.COMPANY_CARDS.FEED_TYPE.FILE_IMPORT,
     };
 
-    const finalData = doesCountrySupportPlaid
-        ? [directFeedItem, commercialFeedItem, fileImportItem]
-        : [commercialFeedItem, fileImportItem];
+    const finalData = doesCountrySupportPlaid ? [directFeedItem, commercialFeedItem, fileImportItem] : [commercialFeedItem, fileImportItem];
 
     const confirmButtonOptions = useMemo(
         () => ({
