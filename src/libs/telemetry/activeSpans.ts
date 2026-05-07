@@ -82,6 +82,17 @@ function cancelSpansByPrefix(prefix: string) {
     }
 }
 
+const TAB_NAVIGATION_SPAN_IDS = [CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS, CONST.TELEMETRY.SPAN_NAVIGATE_TO_INBOX_TAB] as const;
+
+function cancelTabNavigationSpans(except?: string) {
+    for (const id of TAB_NAVIGATION_SPAN_IDS) {
+        if (id === except) {
+            continue;
+        }
+        cancelSpan(id);
+    }
+}
+
 function getSpan(spanId: string) {
     return activeSpans.get(spanId)?.span;
 }
@@ -92,4 +103,4 @@ function endSpanWithAttributes(spanId: string, attributes: Record<string, SpanAt
     endSpan(spanId);
 }
 
-export {startSpan, endSpan, endSpanWithAttributes, getSpan, cancelSpan, cancelAllSpans, cancelSpansByPrefix};
+export {startSpan, endSpan, endSpanWithAttributes, getSpan, cancelSpan, cancelAllSpans, cancelSpansByPrefix, cancelTabNavigationSpans};

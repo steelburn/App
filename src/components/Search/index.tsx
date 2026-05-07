@@ -1504,17 +1504,18 @@ function Search({
 
     // On re-visits, react-freeze serves the cached layout — onLayout/onLayoutSkeleton never fire.
     // useFocusEffect fires on unfreeze, which is when the screen becomes visible.
+    // Blur cleanup cancels orphaned spans when the user leaves before onLayout fires
+    // (e.g. tabs away during the Suspense fallback, or follows a deep link out).
     useFocusEffect(
         useCallback(() => {
-            if (!hasHadFirstLayout.current) {
-                return;
+            if (hasHadFirstLayout.current) {
+                onDestinationVisible?.(isSearchResultsEmptyRef.current, 'focus');
+                endSpanWithAttributes(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS, {
+                    [CONST.TELEMETRY.ATTRIBUTE_IS_WARM]: !shouldShowLoadingState,
+                });
+                flushDeferredWrite(CONST.DEFERRED_LAYOUT_WRITE_KEYS.SEARCH);
             }
-            onDestinationVisible?.(isSearchResultsEmptyRef.current, 'focus');
-            endSpanWithAttributes(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS, {
-                [CONST.TELEMETRY.ATTRIBUTE_IS_WARM]: !shouldShowLoadingState,
-            });
-            // On re-focus (e.g. DISMISS_MODAL_ONLY) onLayout won't re-fire — flush here.
-            flushDeferredWrite(CONST.DEFERRED_LAYOUT_WRITE_KEYS.SEARCH);
+            return () => cancelSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS);
         }, [shouldShowLoadingState, onDestinationVisible]),
     );
 
