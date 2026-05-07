@@ -131,14 +131,14 @@ function UploadDocuments({onNext, isEditing}: UploadDocumentsProps) {
                         onRemove={(fileName) => {
                             handleRemoveFile(fileName, uploadedIDs, COPY_OF_ID, setUploadedID);
                         }}
-                        acceptedFileTypes={[...CONST.NON_USD_BANK_ACCOUNT.ALLOWED_FILE_TYPES]}
+                        acceptedFileTypes={[...CONST.CORPAY_DOCUMENT.ALLOWED_FILE_TYPES]}
                         value={uploadedIDs}
                         inputID={COPY_OF_ID}
                         setError={(error) => {
                             setUploadError(error, COPY_OF_ID);
                         }}
-                        fileLimit={CONST.NON_USD_BANK_ACCOUNT.FILE_LIMIT}
-                        maxFileSize={CONST.NON_USD_BANK_ACCOUNT.MAX_FILE_SIZE}
+                        fileLimit={CONST.CORPAY_DOCUMENT.FILE_LIMIT}
+                        maxFileSize={CONST.CORPAY_DOCUMENT.MAX_FILE_SIZE}
                     />
                     <Text style={[styles.mutedTextLabel, styles.mt6]}>{translate('ownershipInfoStep.copyOfIDDescription')}</Text>
                     {(isDocumentNeededStatus.isAddressProofNeeded ||
@@ -160,14 +160,14 @@ function UploadDocuments({onNext, isEditing}: UploadDocumentsProps) {
                         onRemove={(fileName) => {
                             handleRemoveFile(fileName, uploadedProofsOfAddress, ADDRESS_PROOF, setUploadedProofOfAddress);
                         }}
-                        acceptedFileTypes={[...CONST.NON_USD_BANK_ACCOUNT.ALLOWED_FILE_TYPES]}
+                        acceptedFileTypes={[...CONST.CORPAY_DOCUMENT.ALLOWED_FILE_TYPES]}
                         value={uploadedProofsOfAddress}
                         inputID={ADDRESS_PROOF}
                         setError={(error) => {
                             setUploadError(error, ADDRESS_PROOF);
                         }}
-                        fileLimit={CONST.NON_USD_BANK_ACCOUNT.FILE_LIMIT}
-                        maxFileSize={CONST.NON_USD_BANK_ACCOUNT.MAX_FILE_SIZE}
+                        fileLimit={CONST.CORPAY_DOCUMENT.FILE_LIMIT}
+                        maxFileSize={CONST.CORPAY_DOCUMENT.MAX_FILE_SIZE}
                     />
                     <Text style={[styles.mutedTextLabel, styles.mt6]}>{translate('ownershipInfoStep.proofOfAddressDescription')}</Text>
                     {(isDocumentNeededStatus.isProofOfDirectorsNeeded || isDocumentNeededStatus.isCodiceFiscaleNeeded || isDocumentNeededStatus.isPRDAndFSGNeeded) && (
@@ -188,14 +188,14 @@ function UploadDocuments({onNext, isEditing}: UploadDocumentsProps) {
                         onRemove={(fileName) => {
                             handleRemoveFile(fileName, uploadedProofsOfDirectors, PROOF_OF_DIRECTORS, setUploadedProofsOfDirectors);
                         }}
-                        acceptedFileTypes={[...CONST.NON_USD_BANK_ACCOUNT.ALLOWED_FILE_TYPES]}
+                        acceptedFileTypes={[...CONST.CORPAY_DOCUMENT.ALLOWED_FILE_TYPES]}
                         value={uploadedProofsOfDirectors}
                         inputID={PROOF_OF_DIRECTORS}
                         setError={(error) => {
                             setUploadError(error, PROOF_OF_DIRECTORS);
                         }}
-                        fileLimit={CONST.NON_USD_BANK_ACCOUNT.FILE_LIMIT}
-                        maxFileSize={CONST.NON_USD_BANK_ACCOUNT.MAX_FILE_SIZE}
+                        fileLimit={CONST.CORPAY_DOCUMENT.FILE_LIMIT}
+                        maxFileSize={CONST.CORPAY_DOCUMENT.MAX_FILE_SIZE}
                     />
                     <Text style={[styles.mutedTextLabel, styles.mt6]}>{translate('signerInfoStep.proofOfDirectorsDescription')}</Text>
                     {(isDocumentNeededStatus.isCodiceFiscaleNeeded || isDocumentNeededStatus.isPRDAndFSGNeeded) && <View style={[styles.sectionDividerLine, styles.mt6, styles.mb6]} />}
@@ -214,14 +214,14 @@ function UploadDocuments({onNext, isEditing}: UploadDocumentsProps) {
                         onRemove={(fileName) => {
                             handleRemoveFile(fileName, uploadedCodiceFiscale, CODICE_FISCALE, setUploadedCodiceFiscale);
                         }}
-                        acceptedFileTypes={[...CONST.NON_USD_BANK_ACCOUNT.ALLOWED_FILE_TYPES]}
+                        acceptedFileTypes={[...CONST.CORPAY_DOCUMENT.ALLOWED_FILE_TYPES]}
                         value={uploadedCodiceFiscale}
                         inputID={CODICE_FISCALE}
                         setError={(error) => {
                             setUploadError(error, CODICE_FISCALE);
                         }}
-                        fileLimit={CONST.NON_USD_BANK_ACCOUNT.FILE_LIMIT}
-                        maxFileSize={CONST.NON_USD_BANK_ACCOUNT.MAX_FILE_SIZE}
+                        fileLimit={CONST.CORPAY_DOCUMENT.FILE_LIMIT}
+                        maxFileSize={CONST.CORPAY_DOCUMENT.MAX_FILE_SIZE}
                     />
                     <Text style={[styles.mutedTextLabel, styles.mt6]}>{translate('signerInfoStep.codiceFiscaleDescription')}</Text>
                     {isDocumentNeededStatus.isPRDAndFSGNeeded && <View style={[styles.sectionDividerLine, styles.mt6, styles.mb6]} />}

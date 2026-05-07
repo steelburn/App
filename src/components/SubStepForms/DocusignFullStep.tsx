@@ -148,14 +148,14 @@ function DocusignFullStep<TFormID extends keyof OnyxFormValuesMapping>({
                     onRemove={(fileName) => {
                         handleRemoveFile(fileName);
                     }}
-                    acceptedFileTypes={[...CONST.NON_USD_BANK_ACCOUNT.ALLOWED_FILE_TYPES]}
+                    acceptedFileTypes={[...CONST.CORPAY_DOCUMENT.ALLOWED_FILE_TYPES]}
                     value={uploadedFiles}
                     inputID={inputID as string}
                     setError={(error) => {
                         setUploadError(error);
                     }}
                     fileLimit={1}
-                    maxFileSize={CONST.NON_USD_BANK_ACCOUNT.MAX_FILE_SIZE}
+                    maxFileSize={CONST.CORPAY_DOCUMENT.MAX_FILE_SIZE}
                 />
             </FormProvider>
         </InteractiveStepWrapper>

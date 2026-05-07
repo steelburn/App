@@ -124,9 +124,9 @@ function Documents({onNext, isEditing, ownerBeingModifiedID}: DocumentsProps) {
                         setError={(error) => {
                             setUploadError(error, proofOfOwnershipInputID);
                         }}
-                        fileLimit={CONST.NON_USD_BANK_ACCOUNT.FILE_LIMIT}
-                        maxFileSize={CONST.NON_USD_BANK_ACCOUNT.MAX_FILE_SIZE}
-                        acceptedFileTypes={[...CONST.NON_USD_BANK_ACCOUNT.ALLOWED_FILE_TYPES]}
+                        fileLimit={CONST.CORPAY_DOCUMENT.FILE_LIMIT}
+                        maxFileSize={CONST.CORPAY_DOCUMENT.MAX_FILE_SIZE}
+                        acceptedFileTypes={[...CONST.CORPAY_DOCUMENT.ALLOWED_FILE_TYPES]}
                         value={defaultValues[proofOfOwnershipInputID]}
                         inputID={proofOfOwnershipInputID}
                     />
@@ -153,9 +153,9 @@ function Documents({onNext, isEditing, ownerBeingModifiedID}: DocumentsProps) {
                         setError={(error) => {
                             setUploadError(error, copyOfIDInputID);
                         }}
-                        fileLimit={CONST.NON_USD_BANK_ACCOUNT.FILE_LIMIT}
-                        maxFileSize={CONST.NON_USD_BANK_ACCOUNT.MAX_FILE_SIZE}
-                        acceptedFileTypes={[...CONST.NON_USD_BANK_ACCOUNT.ALLOWED_FILE_TYPES]}
+                        fileLimit={CONST.CORPAY_DOCUMENT.FILE_LIMIT}
+                        maxFileSize={CONST.CORPAY_DOCUMENT.MAX_FILE_SIZE}
+                        acceptedFileTypes={[...CONST.CORPAY_DOCUMENT.ALLOWED_FILE_TYPES]}
                         value={defaultValues[copyOfIDInputID]}
                         inputID={copyOfIDInputID}
                     />
@@ -180,9 +180,9 @@ function Documents({onNext, isEditing, ownerBeingModifiedID}: DocumentsProps) {
                         setError={(error) => {
                             setUploadError(error, addressProofInputID);
                         }}
-                        fileLimit={CONST.NON_USD_BANK_ACCOUNT.FILE_LIMIT}
-                        maxFileSize={CONST.NON_USD_BANK_ACCOUNT.MAX_FILE_SIZE}
-                        acceptedFileTypes={[...CONST.NON_USD_BANK_ACCOUNT.ALLOWED_FILE_TYPES]}
+                        fileLimit={CONST.CORPAY_DOCUMENT.FILE_LIMIT}
+                        maxFileSize={CONST.CORPAY_DOCUMENT.MAX_FILE_SIZE}
+                        acceptedFileTypes={[...CONST.CORPAY_DOCUMENT.ALLOWED_FILE_TYPES]}
                         value={defaultValues[addressProofInputID]}
                         inputID={addressProofInputID}
                     />
@@ -207,9 +207,9 @@ function Documents({onNext, isEditing, ownerBeingModifiedID}: DocumentsProps) {
                         setError={(error) => {
                             setUploadError(error, codiceFiscaleInputID);
                         }}
-                        fileLimit={CONST.NON_USD_BANK_ACCOUNT.FILE_LIMIT}
-                        maxFileSize={CONST.NON_USD_BANK_ACCOUNT.MAX_FILE_SIZE}
-                        acceptedFileTypes={[...CONST.NON_USD_BANK_ACCOUNT.ALLOWED_FILE_TYPES]}
+                        fileLimit={CONST.CORPAY_DOCUMENT.FILE_LIMIT}
+                        maxFileSize={CONST.CORPAY_DOCUMENT.MAX_FILE_SIZE}
+                        acceptedFileTypes={[...CONST.CORPAY_DOCUMENT.ALLOWED_FILE_TYPES]}
                         value={defaultValues[codiceFiscaleInputID]}
                         inputID={codiceFiscaleInputID}
                     />
