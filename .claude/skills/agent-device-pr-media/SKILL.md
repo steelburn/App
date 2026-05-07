@@ -42,20 +42,28 @@ No interactive prompts. Missing inputs that cannot be defaulted hard-fail.
 
 ## Tests parsing rules
 
+The **only hard rule**: tests live under the `### Tests` heading. Everything inside it varies wildly across authors - single numbered list, multiple numbered lists with restarts, h4 sub-headers, prose paragraphs, "N/A", or empty. Do not mechanically parse it; let the LLM interpret structure.
+
 Operating on the `### Tests` block of the PR body:
 
-1. **Strip prose intro** before the first numbered item or `####` header (still used as triage signal - already consumed by step 3 above).
-2. **Strip trailing checklist metadata** - lines like `- [x] Verify that no errors appear in the JS console`.
-3. **Strip the boilerplate** "Verify that no errors appear in the JS console" line wherever it appears inside the section.
-4. **Flow boundary detection** - split content on `^####\s` (h4) headers:
-   - **N headers** → N flows, titled by header text.
-   - **0 headers** → whole content is one flow titled "Test".
-5. **Per flow**:
-   - Extract optional `Precondition:` block (free-form metadata for the LLM driver).
-   - Collect numbered items (`1.`, `2.`, ...) as sequential steps.
-   - Flatten nested `a/b/c` sub-items into the parent's step list.
-6. **Single-step verify-only classification**: if a flow has exactly one numbered item whose leading verb is `Verify|Confirm|Check`, set `kind: still`. Otherwise `kind: video`.
-7. **LLM interpretation, no static parsing**: the skill does **not** classify steps by verb at parse time. Each step's text is passed verbatim to the agent-device LLM driver, which decides per-step whether it's a tap, fill, navigation, or assertion. If the driver cannot interpret a step, that step (and the rest of the flow) hard-fails - no fallback to coordinates, no skipping.
+1. **Strip the boilerplate** "Verify that no errors appear in the JS console" line wherever it appears.
+2. **Strip trailing checklist metadata** (`- [x] ...` blocks).
+3. **LLM-driven flow segmentation.** Pass the stripped section to the LLM and ask it to return a list of distinct test flows: `[{title, precondition?, steps[]}, ...]`. Signals it may use (all optional, none required - the LLM picks whichever apply to the input):
+   - Explicit separators: `#### Test case N:` / `## ...` headers, `---` rules.
+   - Numbered-list restarts (a fresh `1.` after a `5.` typically signals a new flow).
+   - Prose markers: "Test case N:", "Repeat with...", "Then test...", "Now do...".
+   - State-change indicators: "Sign out, then ...", "On a fresh session, ...".
+   - Any per-author writing pattern when nothing explicit is present.
+
+   When the LLM finds a single coherent flow, the whole section is one flow. When it finds N, it produces N. The skill does not enforce a particular separator convention.
+4. **Per flow** (LLM returns these fields):
+   - `title` - short label (header text if present, or LLM-summarized intent).
+   - `precondition` - free-form setup metadata if the author provided one (e.g. "Account has no workspace.", "Enable Invoices in workspace settings.").
+   - `steps[]` - the numbered/listed items belonging to this flow, with nested `a/b/c` sub-items flattened into the parent.
+5. **Single-step verify-only classification**: if a flow has exactly one step whose intent is purely a `Verify|Confirm|Check` (no preceding action), set `kind: still`. Otherwise `kind: video`. The LLM makes this call too - no leading-verb regex.
+6. **Step interpretation is also LLM-driven, not parsed.** Each step's text is passed verbatim to the agent-device driver, which decides per-step whether it's a tap, fill, navigation, or assertion. If the driver cannot interpret a step, that step (and the rest of the flow) hard-fails - no fallback to coordinates, no skipping.
+
+If the LLM returns an empty flow list (Tests was prose-only, "N/A", "We'll test it live", or empty after stripping), exit `3 NO_FLOWS`.
 
 ## Capture loop (per flow per platform)
 
@@ -65,7 +73,7 @@ Two phases per flow. Lifecycle delegated to the parent skill's bring-up.
 
 1. **Run the [agent-device bring-up](../agent-device/SKILL.md#bring-up)** for the target platform. The parent skill resolves bundle ID, starts Metro, picks/confirms the device, manages session, and opens the app for sanity verification. Capture the resolved `$APP_ID` (bundle ID) and `$DEVICE_NAME` for re-opens in Phases 1 and 2.
    - If the bring-up's HybridApp gate fails or the dev build is not installed, **exit `7 NO_BUILD`** with the parent skill's install instructions.
-   - Selector discipline (id > role+label, no coordinate fallback unless 0 a11y nodes) follows the parent skill's [`flows/README.md`](../agent-device/flows/README.md). This skill does not redocument it.
+   - Selector discipline (id > role+label, no coordinate fallback unless 0 a11y nodes) follows the parent skill's [`flows/README.md`](../agent-device/flows/README.md).
 
 2. **Close the bring-up session** so each phase starts cold:
    ```bash
@@ -89,7 +97,7 @@ Goal: produce a deterministic `.ad` script of the successful command sequence, p
    agent-device open "$APP_ID" --device "$DEVICE_NAME"
    ```
 
-2. **Drive setup actions** based on the flow's `Precondition:` block (if any) and what the steps imply. The LLM autonomously figures out preamble - **no macro library lookup, no `@provides` graph, no fixed registry**. Setup actions go into the `.ad` script up to the marker; everything after the marker is what Phase 2 records.
+2. **Drive setup actions** based on the flow's `Precondition:` block (if any) and what the steps imply. Setup actions go into the `.ad` script up to the marker; everything after the marker is what Phase 2 records.
 
 3. **Drive the test flow** - one numbered step at a time. For each step:
    - Send the step text verbatim to the agent-device LLM driver.

@@ -38,7 +38,7 @@
 
 ## Convention adopted (v1)
 
-- **Flow boundaries are declared explicitly** via `#### Test case N:` h4 headers within `### Tests`. 0 headers = whole section is one flow. Reference: PR #89743. The skill does not LLM-cluster numbered items into flows.
+- **`### Tests` is the only hard structural anchor.** Everything inside it is freeform - authors use single numbered lists, restarted numbered lists, h4 sub-headers, prose, "N/A", or leave it empty. The skill does **not** enforce a separator convention. Flow segmentation is LLM-driven; the LLM uses whatever signals are present (h4 headers, numbered restarts, prose markers like "Test case N:" / "Repeat with...", state-change cues). Sample (9 recent merged PRs, 2026-05-07): 0/9 used `#### Test case N:` headers - that convention exists (e.g. PR #89743) but is a minority pattern, not a default.
 - **Platform restriction is opt-in** via PR title or Tests prose ("iOS only", "Android only", "On iOS:"). Default is both. No file-path heuristics, no PR-checklist parsing.
 - **Per-flow artifact**: one MP4 per flow per platform (or one PNG for verify-only single-step flows). Not one big MP4.
 - **Persistent cache**: `~/.cache/agent-device-pr-media/<pr-num>/<run-ts>/`. Survives reboots; latest-run-wins.
