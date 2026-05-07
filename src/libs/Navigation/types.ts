@@ -2602,7 +2602,7 @@ type TravelNavigatorParamList = {
         backTo?: string;
     };
     [SCREENS.TRAVEL.DYNAMIC_TCS]: {
-        domain: string;
+        domain?: string;
         policyID?: string;
     };
     [SCREENS.TRAVEL.DYNAMIC_DOMAIN_PERMISSION_INFO]: {
@@ -2621,7 +2621,6 @@ type TravelNavigatorParamList = {
     };
     [SCREENS.TRAVEL.DYNAMIC_PUBLIC_DOMAIN_ERROR]: {
         policyID?: string;
-        travelPolicyID?: string;
     };
     [SCREENS.TRAVEL.DYNAMIC_UPGRADE]: undefined;
     [SCREENS.TRAVEL.DYNAMIC_DOMAIN_SELECTOR]: {

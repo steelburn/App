@@ -21,7 +21,7 @@ function DynamicPublicDomainErrorPage({route}: DynamicPublicDomainErrorPageProps
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const backPath = useDynamicBackPath(DYNAMIC_ROUTES.TRAVEL_PUBLIC_DOMAIN_ERROR.path);
-    const policyID = route.params.policyID ?? route.params.travelPolicyID;
+    const policyID = route.params.policyID;
 
     return (
         <AccessOrNotFoundWrapper policyID={policyID}>

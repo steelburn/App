@@ -385,8 +385,8 @@ const DYNAMIC_ROUTES = {
     TRAVEL_PUBLIC_DOMAIN_ERROR: {
         path: 'public-domain-error',
         entryScreens: [SCREENS.TRAVEL.MY_TRIPS, SCREENS.WORKSPACE.TRAVEL, SCREENS.SEARCH.ROOT],
-        getRoute: (policyID?: string) => getUrlWithParams('public-domain-error', {travelPolicyID: policyID}),
-        queryParams: ['travelPolicyID'],
+        getRoute: (policyID?: string) => getUrlWithParams('public-domain-error', {policyID}),
+        queryParams: ['policyID'],
     },
     TRAVEL_TCS: {
         path: 'terms/:domain/accept/:policyID?',
