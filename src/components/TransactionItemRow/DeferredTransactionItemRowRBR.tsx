@@ -1,16 +1,14 @@
 import React, {useDeferredValue} from 'react';
-import {View} from 'react-native';
-import useThemeStyles from '@hooks/useThemeStyles';
 import TransactionItemRowRBR from './TransactionItemRowRBR';
 
 type DeferredTransactionItemRowRBRProps = React.ComponentProps<typeof TransactionItemRowRBR>;
 
 function DeferredTransactionItemRowRBR(props: DeferredTransactionItemRowRBRProps) {
-    const styles = useThemeStyles();
     const shouldRender = useDeferredValue(true, false);
 
+    // Skip placeholder while deferring to avoid layout shift on rows without RBR content
     if (!shouldRender) {
-        return <View style={props.containerStyles ?? [styles.minHeight4]} />;
+        return null;
     }
 
     // Deferred wrapper intentionally forwards all props to the underlying component
