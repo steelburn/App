@@ -43,6 +43,16 @@
 - **Per-flow artifact**: one MP4 per flow per platform (or one PNG for verify-only single-step flows). Not one big MP4.
 - **Persistent cache**: `~/.cache/agent-device-pr-media/<pr-num>/<run-ts>/`. Survives reboots; latest-run-wins.
 
+## Phase 1 cache (added 2026-05-07)
+
+- **Problem**: Phase 1 (LLM-driven exploration) is the expensive part; Phase 2 is just `agent-device replay`. Re-running on a PR whose Tests steps haven't changed wastes Phase 1's full cost on every invocation.
+- **Solution**: content-addressable `.ad` cache at `~/.cache/agent-device-pr-media/.ad-cache/<fingerprint>.ad`, shared across PRs.
+- **Fingerprint** = `sha256(precondition + json(steps) + platform + bundle_id + agent_device_version)`. Title is excluded (label only). PR number / app SHA excluded so the cache shares across PRs; correctness enforced at replay time, not lookup time.
+- **Self-healing**: on Phase 2 replay failure (cache hit path only), invalidate the entry, re-run Phase 1, retry Phase 2 once. Stale entries get evicted lazily as the underlying app changes.
+- **Manifest**: per-flow `cache: "hit" | "miss" | "invalidated" | "bypassed"` and `fingerprint` so reviewers can see what was reused.
+- **Overrides**: `--no-cache` (force fresh Phase 1) and `--cache-clear` (wipe before run).
+- **Hygiene**: prune entries with `last_used_ts > 30d` at start of each run. No hard TTL.
+
 ## Composition refactor (Option A, applied 2026-05-06)
 
 - **Device lifecycle delegated to parent skill's bring-up.** This skill no longer documents bundle-ID resolution, Metro prepare, device pick, session reuse, or the initial `agent-device open`. It calls [`agent-device` §Bring-up](../agent-device/SKILL.md#bring-up) once per platform and reuses the resolved `$APP_ID` / `$DEVICE_NAME` for Phase 1 / Phase 2 re-opens. Selector discipline references the parent skill's `flows/README.md` rather than re-stating it.

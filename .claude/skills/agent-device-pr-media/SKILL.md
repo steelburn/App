@@ -25,6 +25,8 @@ HybridApp-only (the parent skill's pre-flight enforces this). Standalone (non-Hy
 | PR number or URL | First positional arg | Yes |
 | `--platforms ios,android` | Flag | No (default: derived) |
 | `-e KEY=VALUE` step-param overrides | Repeatable | No |
+| `--no-cache` | Flag | No (default: cache enabled) - forces fresh Phase 1, bypasses `.ad` cache |
+| `--cache-clear` | Flag | No - wipes the entire `.ad` cache before running |
 
 No interactive prompts. Missing inputs that cannot be defaulted hard-fail.
 
@@ -65,9 +67,65 @@ Operating on the `### Tests` block of the PR body:
 
 If the LLM returns an empty flow list (Tests was prose-only, "N/A", "We'll test it live", or empty after stripping), exit `3 NO_FLOWS`.
 
+## Phase 1 cache (skip warm-up when flow text is unchanged)
+
+Phase 1 is the expensive part - it runs the LLM-driven exploration loop to produce a deterministic `.ad` script. Phase 2 is just `agent-device replay` and is cheap. When a flow's text and target environment are identical to a prior run's, reuse the cached `.ad` and skip Phase 1 entirely.
+
+### Cache layout
+
+```
+~/.cache/agent-device-pr-media/.ad-cache/
+├── <fingerprint>.ad         # the cached Phase 1 script
+└── <fingerprint>.meta.json  # {created_ts, original_pr, last_used_ts, hits}
+```
+
+Content-addressable, **shared across PRs**. Two PRs whose Tests sections both contain the same "Sign in and create an expense" flow share the same cache entry.
+
+### Cache key
+
+```
+fingerprint = sha256(
+  flow.precondition  ||  "" +
+  json(flow.steps)              +
+  platform                      +
+  bundle_id                     +
+  agent_device_version
+)
+```
+
+Fields included by design:
+- **`flow.steps`** - if the steps change at all, the fingerprint changes. This is the primary correctness signal.
+- **`flow.precondition`** - drives setup behavior; affects what the `.ad` script contains.
+- **`platform`** - iOS and Android need separate scripts (different selectors).
+- **`bundle_id`** - HybridApp vs standalone (and dev vs prod) render differently.
+- **`agent_device_version`** - replay semantics can change between CLI versions; pinning to the running version protects against subtle drift.
+
+Fields NOT included (intentionally):
+- **`flow.title`** - human-readable label only; doesn't affect actions.
+- **PR number / SHA** - we want sharing across PRs. Correctness is enforced at replay time, not at lookup time.
+- **App build SHA** - hard to extract reliably; relying on Phase 2 self-healing instead (see below).
+
+### Lookup, write, invalidate
+
+For each flow, in order:
+
+1. **Compute fingerprint** from flow + platform + bundle_id + CLI version.
+2. **Look up** `~/.cache/agent-device-pr-media/.ad-cache/<fingerprint>.ad`:
+   - **Hit** (and `--no-cache` is not set): copy cached `.ad` to `$TEST_FLOW.ad`, mark `cache: "hit"` in the manifest, **skip Phase 1 entirely**, proceed to Phase 2.
+   - **Miss** (or `--no-cache`): mark `cache: "miss"`, run Phase 1 normally.
+3. **On Phase 1 success** (cache miss path): write `$TEST_FLOW.ad` to the cache, write `<fingerprint>.meta.json` with `{created_ts, original_pr, hits: 1}`.
+4. **On Phase 2 replay failure** (cache hit path only): the cached script is stale (UI changed under it). Delete the cache entry, mark the flow `cache: "invalidated"`, re-run Phase 1 fresh, retry Phase 2 once. If the retry still fails, mark `phase2_failed`.
+5. **On Phase 2 success** (cache hit path): bump `last_used_ts` and increment `hits` in the meta file.
+
+### TTL / disk hygiene
+
+- No hard TTL. Self-healing on replay failure handles correctness; old unused entries just sit on disk.
+- Soft cap: at the start of each run, prune entries with `last_used_ts` older than 30 days. Keeps the cache directory bounded without forcing regeneration of frequently-used flows.
+- `--cache-clear` wipes the whole cache up-front (escape hatch).
+
 ## Capture loop (per flow per platform)
 
-Two phases per flow. Lifecycle delegated to the parent skill's bring-up.
+Two phases per flow. Lifecycle delegated to the parent skill's bring-up. Phase 1 is skipped on cache hit (see above).
 
 ### Shared setup (run once per platform, before the first flow)
 
@@ -92,6 +150,10 @@ Two phases per flow. Lifecycle delegated to the parent skill's bring-up.
 
 Goal: produce a deterministic `.ad` script of the successful command sequence, plus per-step still candidates. Drives autonomously from cold start. No recording.
 
+**Skip if cached.** Before any device work, consult the [Phase 1 cache](#phase-1-cache-skip-warm-up-when-flow-text-is-unchanged). On cache hit, copy the cached `.ad` to `$TEST_FLOW.ad`, log `cache: "hit"` to the manifest, and proceed straight to Phase 2 for this flow.
+
+On cache miss (or `--no-cache`):
+
 1. **Open the app** with the bring-up's resolved values:
    ```bash
    agent-device open "$APP_ID" --device "$DEVICE_NAME"
@@ -113,6 +175,8 @@ Goal: produce a deterministic `.ad` script of the successful command sequence, p
    ```bash
    test -s "$TEST_FLOW.ad" || { record per-flow status "phase1_failed: empty script"; continue }
    ```
+
+7. **Write to cache** - on success, copy `$TEST_FLOW.ad` to `~/.cache/agent-device-pr-media/.ad-cache/<fingerprint>.ad` and write the meta sidecar.
 
 ### Phase 2 - Recording (per flow, deterministic replay)
 
@@ -150,6 +214,8 @@ Goal: clean MP4 of only the test-flow steps. No snapshots on camera, no retries,
      || { mark phase2_failed; continue }
    ```
 
+**On Phase 2 replay failure (cache hit path only):** the cached `.ad` is stale. Delete `<fingerprint>.ad` and `<fingerprint>.meta.json`, mark `cache: "invalidated"`, re-run Phase 1 fresh, and retry Phase 2 once. If the retry still fails, mark `phase2_failed`. (Cache miss path failures don't trigger a retry - the freshly generated `.ad` failed on its own first replay, so retrying will hit the same problem.)
+
 ### Multi-flow chunking
 
 Multiple flows in one PR share a single Phase 2 session (one `agent-device open` + replay-to-marker), with `record start` / `record stop` per flow. State carries between flows unless Phase 1 flagged `requires_cold_start: true` for a flow, in which case Phase 2 closes and re-opens before that flow.
@@ -162,21 +228,26 @@ For flows classified `kind: still`:
 
 ## Output
 
-### Cache layout
+### Run-output layout
 
 ```
-~/.cache/agent-device-pr-media/<pr-num>/<run-ts>/
-├── manifest.json
-├── ios/
-│   ├── flow-1.mp4
-│   ├── flow-1-step-2-tap-signin.png
-│   ├── flow-2.png   (still-only flow)
-│   └── ...
-└── android/
-    └── ...
+~/.cache/agent-device-pr-media/
+├── .ad-cache/                    # cross-PR Phase 1 cache (see "Phase 1 cache")
+│   ├── <fingerprint>.ad
+│   └── <fingerprint>.meta.json
+└── <pr-num>/                     # per-PR run output
+    └── <run-ts>/
+        ├── manifest.json
+        ├── ios/
+        │   ├── flow-1.mp4
+        │   ├── flow-1-step-2-tap-signin.png
+        │   ├── flow-2.png   (still-only flow)
+        │   └── ...
+        └── android/
+            └── ...
 ```
 
-Cache is persistent across reboots. The skill purges prior runs for the same PR at the start of each new run (latest-run-wins; no concurrent locking; single-user assumption).
+Run output is persistent across reboots. The skill purges prior runs for the same PR at the start of each new run (latest-run-wins; no concurrent locking; single-user assumption). The `.ad-cache/` directory is **not** purged on per-PR runs - it's shared across PRs and self-heals on Phase 2 replay failure.
 
 ### Manifest schema
 
@@ -198,6 +269,8 @@ Cache is persistent across reboots. The skill purges prior runs for the same PR 
         "path": "ios/flow-1.mp4",
         "stills": ["ios/flow-1-step-2-tap-signin.png"],
         "status": "ok",
+        "cache": "hit",
+        "fingerprint": "a3f9b2c4...",
         "warnings": [],
         "params": {"email": "test+ci-89475-1@expensify.com"}
       }
@@ -207,7 +280,7 @@ Cache is persistent across reboots. The skill purges prior runs for the same PR 
 }
 ```
 
-`status` is one of: `ok`, `phase1_failed`, `phase2_failed`, `skipped_after_failure`.
+`status` is one of: `ok`, `phase1_failed`, `phase2_failed`, `skipped_after_failure`. `cache` is one of: `"hit"` (cached `.ad` reused, Phase 1 skipped), `"miss"` (no cache, Phase 1 ran fresh), `"invalidated"` (cache hit but Phase 2 replay failed; entry deleted, Phase 1 re-ran fresh, Phase 2 retried), `"bypassed"` (`--no-cache` flag).
 
 ### Handoff
 
@@ -246,7 +319,8 @@ Hitting any cap marks the flow `phase1_failed` / `phase2_failed` and proceeds to
 | Phase 1 step uninterpretable by LLM | Mark flow `phase1_failed`, log the step that failed, continue to next flow |
 | Phase 1 a11y empty (0 nodes) on a screen | Use coordinate fallback; log `warnings: ["a11y_fallback:<screen>"]` |
 | Phase 1 `$TEST_FLOW.ad` empty after warm-up | Mark flow `phase1_failed`, continue |
-| Phase 2 `replay` fails on a step | Selector drift between Phase 1 and Phase 2; mark flow `phase2_failed`, continue |
+| Phase 2 `replay` fails on a step (cache hit path) | Cached `.ad` is stale - delete cache entry, mark `cache: "invalidated"`, re-run Phase 1, retry Phase 2 once. If still failing, mark `phase2_failed`. |
+| Phase 2 `replay` fails on a step (cache miss path) | Selector drift between Phase 1 and Phase 2; mark flow `phase2_failed`, continue. No retry - Phase 1 just ran fresh, retrying would hit the same problem. |
 | `record stop` produces 0-byte file | Retry Phase 2 once for that flow; if still empty, mark `phase2_failed` |
 | Android flow exceeds 3-min cap | Mark `phase2_failed`, continue (per-flow MP4s should rarely hit this; if they do, the Tests section is too coarse-grained) |
 
