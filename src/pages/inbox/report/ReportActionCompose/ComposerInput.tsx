@@ -39,10 +39,7 @@ function ComposerInput({reportID}: ComposerInputProps) {
     const {isBlockedFromConcierge} = useComposerSendState();
     const {setIsFullComposerAvailable, onBlur, onFocus, setComposerRef} = useComposerActions();
     const {handleSendMessage, onValueChange} = useComposerSendActions();
-    const {containerRef, suggestionsRef, isNextModalWillOpenRef} = useComposerMeta();
-
-    const submitForm = useComposerSubmit(reportID);
-    const {pickAttachments, PDFValidationComponent, ErrorModal} = useAttachmentPicker(reportID);
+    const {containerRef, suggestionsRef, isNextModalWillOpenRef, attachmentFileRef} = useComposerMeta();
 
     const [isComposerFullSize = false] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_IS_COMPOSER_FULL_SIZE}${reportID}`);
     const [shouldShowComposeInput = true] = useOnyx(ONYXKEYS.SHOULD_SHOW_COMPOSE_INPUT);
@@ -56,6 +53,9 @@ function ComposerInput({reportID}: ComposerInputProps) {
     const {isScrollLayoutTriggered, raiseIsScrollLayoutTriggered} = useIsScrollLikelyLayoutTriggered();
 
     const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportID}`);
+
+    const submitForm = useComposerSubmit({report, reportID, attachmentFileRef});
+    const {pickAttachments, PDFValidationComponent, ErrorModal} = useAttachmentPicker(reportID);
     const isReportArchived = useReportIsArchived(report?.reportID);
 
     const includesConcierge = chatIncludesConcierge({participants: report?.participants});

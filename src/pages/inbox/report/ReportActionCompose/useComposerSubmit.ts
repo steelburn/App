@@ -1,5 +1,6 @@
 import {Str} from 'expensify-common';
 import {useContext} from 'react';
+import type {RefObject} from 'react';
 import type {OnyxEntry} from 'react-native-onyx';
 import {usePersonalDetails} from '@components/OnyxListItemProvider';
 import useAncestors from '@hooks/useAncestors';
@@ -24,10 +25,16 @@ import {ActionListContext} from '@pages/inbox/ReportScreenContext';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type * as OnyxTypes from '@src/types/onyx';
-import {useComposerMeta} from './ComposerContext';
+import type {FileObject} from '@src/types/utils/Attachment';
 import useSidePanelContext from './useSidePanelContext';
 
-function useComposerSubmit(reportID: string): (comment: string) => void {
+type UseComposerSubmitParams = {
+    report: OnyxEntry<OnyxTypes.Report>;
+    reportID: string;
+    attachmentFileRef: RefObject<FileObject | FileObject[] | null>;
+};
+
+function useComposerSubmit({report, reportID, attachmentFileRef}: UseComposerSubmitParams): (comment: string) => void {
     const {isOffline} = useNetwork();
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const personalDetails = usePersonalDetails();
@@ -37,10 +44,8 @@ function useComposerSubmit(reportID: string): (comment: string) => void {
     const [quickAction] = useOnyx(ONYXKEYS.NVP_QUICK_ACTION_GLOBAL_CREATE);
     const delegateAccountID = useDelegateAccountID();
 
-    const {attachmentFileRef} = useComposerMeta();
     const {scrollOffsetRef} = useContext(ActionListContext);
 
-    const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportID}`);
     const [chatReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${report?.chatReportID}`);
 
     const {reportActions: unfilteredReportActions} = usePaginatedReportActions(report?.reportID);
