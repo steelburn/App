@@ -36,8 +36,8 @@ function useComposerSubmit(reportID: string): (comment: string) => void {
     const sidePanelContext = useSidePanelContext(reportID);
     const [quickAction] = useOnyx(ONYXKEYS.NVP_QUICK_ACTION_GLOBAL_CREATE);
     const delegateAccountID = useDelegateAccountID();
-    const {attachmentFileRef} = useComposerMeta();
 
+    const {attachmentFileRef} = useComposerMeta();
     const {scrollOffsetRef} = useContext(ActionListContext);
 
     const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportID}`);
