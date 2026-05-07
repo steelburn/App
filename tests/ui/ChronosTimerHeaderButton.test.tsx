@@ -194,7 +194,7 @@ describe('ChronosTimerHeaderButton', () => {
         const buttons = screen.getAllByRole('button');
         expect(buttons.length).toBeGreaterThan(0);
         buttons.forEach((btn) => {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- React test instance `.props` is typed as `unknown`; we read the rendered accessibilityState directly here
             expect(btn.props.accessibilityState?.disabled).toBe(true);
         });
 
@@ -247,7 +247,7 @@ describe('ChronosTimerHeaderButton', () => {
         const buttons = screen.getAllByRole('button');
         expect(buttons.length).toBeGreaterThan(0);
         buttons.forEach((btn) => {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- React test instance `.props` is typed as `unknown`; we read the rendered accessibilityState directly here
             expect(btn.props.accessibilityState?.disabled).not.toBe(true);
         });
 
