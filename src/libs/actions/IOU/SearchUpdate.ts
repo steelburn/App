@@ -192,8 +192,6 @@ function getSearchOnyxUpdate({
                     search: {
                         type: currentSearchQueryJSON.type,
                         status: currentSearchQueryJSON.status,
-                        offset: 0,
-                        hasMoreResults: false,
                         hasResults: true,
                         isLoading: false,
                     },
