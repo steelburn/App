@@ -190,6 +190,7 @@ function WorkspaceCompanyCardsTable({
     const tableBodyContentContainerStyle = useBottomSafeSafeAreaPaddingStyle({
         addBottomSafeAreaPadding: true,
         addOfflineIndicatorBottomSafeAreaPadding: true,
+        style: styles.pb4,
     });
 
     const compareItems: CompareItemsCallback<WorkspaceCompanyCardTableItemData, CompanyCardsTableColumnKey> = (a, b, activeSorting) => {
@@ -301,6 +302,7 @@ function WorkspaceCompanyCardsTable({
     const [activeSortingInWideLayout, setActiveSortingInWideLayout] = useState<ActiveSorting<CompanyCardsTableColumnKey> | undefined>(undefined);
     const isNarrowLayoutRef = useRef(shouldUseNarrowTableLayout);
     const shouldRenderHeaderAsChild = !shouldUseNarrowTableLayout || ((isFeedPending || isLoadingPage) && !showCards);
+
     // When we switch from wide to narrow layout, we want to save the active sorting and set it to the member column.
     // When switching back to wide layout, we want to restore the previous sorting.
     useEffect(() => {
@@ -331,7 +333,7 @@ function WorkspaceCompanyCardsTable({
     });
 
     const headerButtonsComponent = showTableHeaderButtons ? (
-        <View style={shouldUseNarrowTableLayout && styles.mb5}>
+        <View style={styles.mb3}>
             <WorkspaceCompanyCardsTableHeaderButtons
                 isLoading={isLoading}
                 policyID={policyID}
