@@ -2162,26 +2162,29 @@ function navigateToAndOpenReport(
     }
 
     let hasAttemptedFallback = false;
-    const reportConnection = Onyx.connectWithoutView({
-        key: `${ONYXKEYS.COLLECTION.REPORT}${chat.reportID}`,
-        callback: (updatedReport) => {
-            // If OpenReport confirms access, stop listening.
-            if (!updatedReport?.errorFields?.notFound) {
+    let hasSeenLoadingStart = false;
+    const loadingStateConnection = Onyx.connectWithoutView({
+        key: `${ONYXKEYS.COLLECTION.RAM_ONLY_REPORT_LOADING_STATE}${chat.reportID}`,
+        callback: (loadingState) => {
+            if (loadingState?.isLoadingInitialReportActions) {
+                hasSeenLoadingStart = true;
                 return;
             }
 
-            if (hasAttemptedFallback) {
+            if (!hasSeenLoadingStart) {
                 return;
             }
+
+            Onyx.disconnect(loadingStateConnection);
+            const latestReport = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${chat.reportID}`];
+            if (!latestReport?.errorFields?.notFound || hasAttemptedFallback) {
+                return;
+            }
+
             hasAttemptedFallback = true;
-            Onyx.disconnect(reportConnection);
             createAndOpenNewOptimisticChat(chat.reportID);
         },
     });
-
-    setTimeout(() => {
-        Onyx.disconnect(reportConnection);
-    }, 10000);
 
     // Re-open existing chats to re-validate server-side access and refresh stale local state.
     openReport({reportID: chat.reportID, introSelected, isSelfTourViewed, betas});
@@ -2267,26 +2270,29 @@ function navigateToAndOpenReportWithAccountIDs(
     }
 
     let hasAttemptedFallback = false;
-    const reportConnection = Onyx.connectWithoutView({
-        key: `${ONYXKEYS.COLLECTION.REPORT}${chat.reportID}`,
-        callback: (updatedReport) => {
-            // If OpenReport confirms access, stop listening.
-            if (!updatedReport?.errorFields?.notFound) {
+    let hasSeenLoadingStart = false;
+    const loadingStateConnection = Onyx.connectWithoutView({
+        key: `${ONYXKEYS.COLLECTION.RAM_ONLY_REPORT_LOADING_STATE}${chat.reportID}`,
+        callback: (loadingState) => {
+            if (loadingState?.isLoadingInitialReportActions) {
+                hasSeenLoadingStart = true;
                 return;
             }
 
-            if (hasAttemptedFallback) {
+            if (!hasSeenLoadingStart) {
                 return;
             }
+
+            Onyx.disconnect(loadingStateConnection);
+            const latestReport = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${chat.reportID}`];
+            if (!latestReport?.errorFields?.notFound || hasAttemptedFallback) {
+                return;
+            }
+
             hasAttemptedFallback = true;
-            Onyx.disconnect(reportConnection);
             createAndOpenNewOptimisticChat(chat.reportID);
         },
     });
-
-    setTimeout(() => {
-        Onyx.disconnect(reportConnection);
-    }, 10000);
 
     // Re-open existing chats to re-validate server-side access and refresh stale local state.
     openReport({reportID: chat.reportID, introSelected, isSelfTourViewed, betas});
