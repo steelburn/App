@@ -21,6 +21,7 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import Navigation from '@libs/Navigation/Navigation';
 import OnboardingRefManager from '@libs/OnboardingRefManager';
 import type {TOnboardingRef} from '@libs/OnboardingRefManager';
+import isTrackOnboardingChoice from '@libs/OnboardingUtils';
 import variables from '@styles/variables';
 import {completeOnboarding} from '@userActions/Report';
 import {setOnboardingErrorMessage, setOnboardingPurposeSelected} from '@userActions/Welcome';
@@ -103,7 +104,7 @@ function BaseOnboardingPurpose({shouldUseNativeStyles, shouldEnableMaxHeight, ro
                 }
 
                 if (isPrivateDomainAndHasAccessiblePolicies && personalDetailsForm?.firstName) {
-                    if (choice === CONST.ONBOARDING_CHOICES.TRACK_BUSINESS || choice === CONST.ONBOARDING_CHOICES.TRACK_PERSONAL) {
+                    if (isTrackOnboardingChoice(choice)) {
                         autoCreateTrackWorkspace(personalDetailsForm.firstName, personalDetailsForm.lastName ?? '', choice);
                         return;
                     }
