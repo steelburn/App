@@ -2826,6 +2826,8 @@ ${date} の ${merchant} への ${amount}`,
     },
     validateCodeForm: {
         magicCodeNotReceived: 'マジックコードを受け取っていませんか？',
+        avoidScamsMessage:
+            '<strong>詐欺に注意してください。このコードを誰にも共有しないでください。</strong>このコードについて、当社チームが電話、SMS、またはメールで連絡することはありません。',
         enterAuthenticatorCode: '認証コードを入力してください',
         enterRecoveryCode: 'リカバリーコードを入力してください',
         requiredWhen2FAEnabled: '2要素認証が有効な場合は必須',
