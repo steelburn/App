@@ -122,7 +122,7 @@ export default {
     optionRowHeight: 64,
     optionRowHeightCompact: 52,
     tableRowHeight: 56,
-    tableRowHeightCompact: 64,
+    tableRowHeightCompact: 72,
     tableRowPaddingVertical: 8,
     tableRowPaddingHorizontal: 12,
     tableGroupRowPaddingVertical: 4,
@@ -307,6 +307,8 @@ export default {
 
     cardAvatarWidth: 20,
     cardAvatarHeight: 13,
+    cardAvatarWidthSmall: 14,
+    cardAvatarHeightSmall: 9,
 
     cardNameWidth: 156,
     updateAnimationW: 390,

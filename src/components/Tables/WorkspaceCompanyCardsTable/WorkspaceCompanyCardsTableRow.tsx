@@ -13,7 +13,7 @@ import useLocalize from '@hooks/useLocalize';
 import useNetwork from '@hooks/useNetwork';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
-import {formatMaskedCardName, getCardFeedWithDomainID, lastFourNumbersFromCardName, splitMaskedCardNumber} from '@libs/CardUtils';
+import {formatMaskedCardName, getCardFeedWithDomainID} from '@libs/CardUtils';
 import Navigation from '@libs/Navigation/Navigation';
 import type {SkeletonSpanReasonAttributes} from '@libs/telemetry/useSkeletonSpan';
 import variables from '@styles/variables';
@@ -50,9 +50,6 @@ type WorkspaceCompanyCardTableRowProps = {
     /** Whether to disable assign card button */
     isAssigningCardDisabled?: boolean;
 
-    /** Whether the card is a Plaid card feed */
-    isPlaidCardFeed: boolean;
-
     /** Whether to use narrow table row layout */
     shouldUseNarrowTableLayout: boolean;
 
@@ -74,7 +71,6 @@ function WorkspaceCompanyCardTableRow({
     item,
     policyID,
     CardFeedIcon,
-    isPlaidCardFeed,
     shouldUseNarrowTableLayout,
     columnCount,
     rowIndex,
@@ -89,18 +85,27 @@ function WorkspaceCompanyCardTableRow({
 
     const {cardName, encryptedCardNumber, customCardName, cardholder, assignedCard, isAssigned, errors, pendingAction, onDismissError} = item;
 
-    const lastCardNumbers = isPlaidCardFeed ? lastFourNumbersFromCardName(cardName) : splitMaskedCardNumber(cardName)?.lastDigits;
-    const cardholderLoginText = !shouldUseNarrowTableLayout && isAssigned ? Str.removeSMSDomain(cardholder?.login ?? '') : undefined;
-    const narrowWidthCardName = isAssigned ? `${customCardName ?? ''}${lastCardNumbers ? ` - ${lastCardNumbers}` : ''}` : cardName;
-
-    const leftColumnTitle = isAssigned ? Str.removeSMSDomain(cardholder?.displayName ?? '') : translate('workspace.moreFeatures.companyCards.unassignedCards');
-    const leftColumnSubtitle = shouldUseNarrowTableLayout ? narrowWidthCardName : cardholderLoginText;
     const isDeleting = !isOffline && pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE;
+
+    const formattedCustomCardName = customCardName ?? '';
+    const formattedCardDetails = formatMaskedCardName(cardName);
+    const formattedCustomCardNameSuffix = formattedCustomCardName ? ` • ${formattedCustomCardName}` : '';
+
+    const cardholderLoginText = !shouldUseNarrowTableLayout && isAssigned ? Str.removeSMSDomain(cardholder?.login ?? '') : undefined;
+    const narrowWidthCardName = isAssigned ? `${formattedCardDetails}${formattedCustomCardNameSuffix}` : cardName;
+
+    const memberColumnTitle = isAssigned ? Str.removeSMSDomain(cardholder?.displayName ?? '') : translate('workspace.moreFeatures.companyCards.unassignedCards');
+    const memberCardSubtitle = shouldUseNarrowTableLayout ? narrowWidthCardName : cardholderLoginText;
 
     const reasonAttributes: SkeletonSpanReasonAttributes = {
         context: 'WorkspaceCompanyCardsTableItem',
         isDeleting,
     };
+
+    const avatarSize = shouldUseNarrowTableLayout ? CONST.AVATAR_SIZE.DEFAULT : CONST.AVATAR_SIZE.SMALL;
+    const subscriptCardFeedIconSize = shouldUseNarrowTableLayout
+        ? {width: variables.cardAvatarWidth, height: variables.cardAvatarHeight}
+        : {width: variables.cardAvatarWidthSmall, height: variables.cardAvatarHeightSmall};
 
     const handleRowPress = () => {
         if (!assignedCard) {
@@ -150,12 +155,12 @@ function WorkspaceCompanyCardTableRow({
                         <View style={[styles.flex1, styles.flexRow, styles.alignItemsCenter, styles.gap3]}>
                             {isAssigned ? (
                                 <ReportActionAvatars
+                                    noRightMarginOnSubscriptContainer
+                                    size={avatarSize}
                                     accountIDs={cardholder?.accountID ? [cardholder.accountID] : []}
                                     subscriptCardFeed={assignedCard?.bank as CompanyCardFeed}
-                                    subscriptCardFeedIconSize={{height: 9, width: 14}}
+                                    subscriptCardFeedIconSize={subscriptCardFeedIconSize}
                                     subscriptAvatarBorderColor={hovered ? theme.hoverComponentBG : theme.highlightBG}
-                                    noRightMarginOnSubscriptContainer
-                                    size={CONST.AVATAR_SIZE.SMALL}
                                 />
                             ) : (
                                 CardFeedIcon
@@ -163,12 +168,12 @@ function WorkspaceCompanyCardTableRow({
 
                             <View style={[styles.flex1, styles.flexColumn, styles.justifyContentCenter, styles.alignItemsStretch]}>
                                 <TextWithTooltip
-                                    text={leftColumnTitle}
+                                    text={memberColumnTitle}
                                     style={[styles.optionDisplayName, styles.pre, styles.justifyContentCenter]}
                                 />
-                                {!!leftColumnSubtitle && (
+                                {!!memberCardSubtitle && (
                                     <TextWithTooltip
-                                        text={leftColumnSubtitle}
+                                        text={memberCardSubtitle}
                                         style={[styles.textLabelSupporting, styles.lh16, styles.pre, styles.mr3]}
                                     />
                                 )}
@@ -181,19 +186,21 @@ function WorkspaceCompanyCardTableRow({
                                     numberOfLines={1}
                                     style={[styles.lh16, styles.optionDisplayName, styles.pre]}
                                 >
-                                    {formatMaskedCardName(cardName)}
+                                    {formattedCardDetails}
                                 </Text>
                             </View>
                         )}
 
-                        <View style={[styles.flex1]}>
-                            <Text
-                                numberOfLines={1}
-                                style={[styles.lh16, styles.optionDisplayName, styles.pre]}
-                            >
-                                {customCardName}
-                            </Text>
-                        </View>
+                        {!shouldUseNarrowTableLayout && (
+                            <View style={[styles.flex1]}>
+                                <Text
+                                    numberOfLines={1}
+                                    style={[styles.lh16, styles.optionDisplayName, styles.pre]}
+                                >
+                                    {customCardName}
+                                </Text>
+                            </View>
+                        )}
 
                         <View style={[styles.flexRow, styles.alignItemsCenter, styles.justifyContentEnd, styles.gap3]}>
                             {!isAssigned && (
@@ -206,15 +213,13 @@ function WorkspaceCompanyCardTableRow({
                                 />
                             )}
 
-                            <View style={[styles.flexRow, styles.ml2, styles.gap3, styles.mw100]}>
-                                <Icon
-                                    src={Expensicons.ArrowRight}
-                                    fill={theme.icon}
-                                    additionalStyles={[styles.alignSelfCenter, !hovered && styles.opacitySemiTransparent]}
-                                    width={variables.iconSizeNormal}
-                                    height={variables.iconSizeNormal}
-                                />
-                            </View>
+                            <Icon
+                                src={Expensicons.ArrowRight}
+                                fill={theme.icon}
+                                additionalStyles={[styles.alignSelfCenter, !hovered && styles.opacitySemiTransparent]}
+                                width={variables.iconSizeNormal}
+                                height={variables.iconSizeNormal}
+                            />
                         </View>
                     </View>
                 )}

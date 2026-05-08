@@ -18,7 +18,7 @@ import useOnyx from '@hooks/useOnyx';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {resetFailedWorkspaceCompanyCardUnassignment} from '@libs/actions/CompanyCards';
-import {getDefaultCardName, getPlaidInstitutionId} from '@libs/CardUtils';
+import {getDefaultCardName} from '@libs/CardUtils';
 import type {SkeletonSpanReasonAttributes} from '@libs/telemetry/useSkeletonSpan';
 import tokenizedSearch from '@libs/tokenizedSearch';
 import WorkspaceCompanyCardPageEmptyState from '@pages/workspace/companyCards/WorkspaceCompanyCardPageEmptyState';
@@ -275,9 +275,9 @@ function WorkspaceCompanyCardsTable({
         <CardFeedIcon
             key={feedName}
             iconProps={{
-                height: variables.cardIconSmallHeight,
-                width: variables.cardIconSmallWidth,
                 additionalStyles: styles.cardIcon,
+                width: shouldUseNarrowTableLayout ? variables.cardIconWidth : variables.cardIconSmallWidth,
+                height: shouldUseNarrowTableLayout ? variables.cardIconHeight : variables.cardIconSmallHeight,
             }}
             selectedFeed={feedName}
             useSkeletonLoader
@@ -291,7 +291,6 @@ function WorkspaceCompanyCardsTable({
             rowIndex={index}
             policyID={policyID ?? String(CONST.DEFAULT_NUMBER_ID)}
             CardFeedIcon={cardFeedIcon}
-            isPlaidCardFeed={!!getPlaidInstitutionId(feedName)}
             onAssignCard={onAssignCard}
             isAssigningCardDisabled={isAssigningCardDisabled}
             shouldUseNarrowTableLayout={shouldUseNarrowTableLayout}
