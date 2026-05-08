@@ -5220,7 +5220,7 @@ _詳しい手順については、[ヘルプサイトをご覧ください](${CO
                     requiredColumns: (missingColumns: string) => `各属性に列を割り当ててください：${missingColumns}`,
                     duplicateColumns: (duplicateColumn: string) => `おっと！1 つのフィールド（"${duplicateColumn}"）を複数の列にマッピングしています。確認して、もう一度お試しください。`,
                 },
-                fileImportDescription: '銀行がサポートされていない場合の手動オプションです。',
+                fileImportDescription: '銀行がフィードを送信できない場合の手動オプションです。',
             },
             statementCloseDate: {
                 [CONST.COMPANY_CARDS.STATEMENT_CLOSE_DATE.LAST_DAY_OF_MONTH]: '月末最終日',
