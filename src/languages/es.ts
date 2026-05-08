@@ -5067,7 +5067,7 @@ ${amount} para ${merchant} - ${date}`,
             addNewCard: {
                 other: 'Otros',
                 fileImport: 'Importar transacciones desde un archivo',
-                fileImportDescription: 'Una opción manual si tu banco no es compatible.',
+                fileImportDescription: 'Una opción manual si tu banco no puede enviar un feed.',
                 createFileFeedHelpText: `<muted-text>Siga este <a href="${CONST.COMPANY_CARDS_CREATE_FILE_FEED_HELP_URL}">guía de ayuda</a> para importar las transacciones de su tarjeta de empresa!</muted-text>`,
                 companyCardLayoutName: 'Nombre del layout de la tarjeta de empresa',
                 cardLayoutNameRequired: 'El nombre del layout de la tarjeta de empresa es requerido',
