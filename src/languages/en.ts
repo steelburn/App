@@ -2783,6 +2783,19 @@ const translations = {
             title: 'No agents created',
             subtitle: 'Stop manually doing stuff. Instruct an agent instead and save yourself lots of time.',
         },
+        error: {
+            genericAdd: 'There was a problem adding this agent',
+        },
+    },
+    addAgentPage: {
+        title: 'New agent',
+        agentName: 'Agent name',
+        instructions: 'Write custom instructions',
+        createAgent: 'Create agent',
+        switchAvatar: 'Switch avatar',
+        defaultAgentName: (displayName: string) => `${displayName}'s Agent`,
+        defaultPrompt:
+            "Reject expenses that are for gambling, movies, or other obvious non-business reasons.\n\nRemind the user to always include a receipt image that makes the tip clear.\n\nApprove the report if it's very similar to previous reports from the same user.\n\nReject reports with more than $500 in travel expenses.",
     },
     expenseRulesPage: {
         title: 'Expense rules',
@@ -6379,6 +6392,26 @@ const translations = {
                 connectionDescription: 'Connect Gusto to keep employee approvals in sync with your workspace.',
                 approvalMode: 'Approval mode',
                 finalApprover: 'Final approver',
+                notSet: 'Not set',
+                approvalModeDescription: 'Members and managers are set up to sync with Gusto.',
+                approvalModeWarningTitle: 'Change approval mode?',
+                approvalModeWarningPrompt: (helpSiteURL: string) =>
+                    `Are you sure you would like to change the approval mode for this workspace? Learn more about the different Gusto-enabled workflow modes in our <a href="${helpSiteURL}">help site</a>.`,
+                approvalModeWarningConfirm: 'Change approval mode',
+                approvalModes: {
+                    basic: {
+                        label: 'Basic approval',
+                        description: 'All users submit to a single person for processing and approval.',
+                    },
+                    manager: {
+                        label: 'Manager approval',
+                        description: 'Employees submit reports to their direct manager configured in Gusto.',
+                    },
+                    custom: {
+                        label: 'Custom approval',
+                        description: 'I’ll manually setup approval workflows in Expensify.',
+                    },
+                },
             },
         },
         export: {
@@ -7002,10 +7035,6 @@ const translations = {
                 corporate: {
                     label: 'Control',
                     description: 'For organizations with advanced requirements.',
-                },
-                submit2026: {
-                    label: 'Submit',
-                    description: 'For employees looking to submit expenses to their employer.',
                 },
             },
             description: "Choose a plan that's right for you. For a detailed list of features and pricing, check out our",
@@ -8286,6 +8315,8 @@ const translations = {
         gpsFloatingPillText: 'GPS tracking in progress...',
         liveActivity: {
             subtitle: 'Tracking distance',
+            lockScreenBadgeText: 'Distance',
+            lockScreenTrackingText: 'Tracking...',
             button: 'View progress',
         },
     },
@@ -9210,6 +9241,11 @@ const translations = {
             noWorkspacesMessage: 'There are no workspaces on this domain. A workspace is required to enable this restriction.',
             restrictDefaultLoginSelection: 'Restrict default login selection',
             restrictDefaultLoginSelectionDescription: 'Prevent members from changing their login email away from their company domain to avoid policy restrictions.',
+            expensifyCardPreferredWorkspace: 'Expensify Card Preferred Workspace',
+            expensifyCardPreferredWorkspaceDescription:
+                'All Expensify Card transactions will be created on the Expensify Card Preferred Workspace instead of the Preferred Workspace. Enabling this feature will override the Preferred Workspace setting for Expensify Card transactions only.',
+            expensifyCardPreferredWorkspaceDisabledMessage: 'To use this setting, Preferred Workspace must be enabled and the domain must have Expensify Card set up.',
+            findGroup: 'Find group',
         },
     },
 };
