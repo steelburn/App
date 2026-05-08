@@ -155,6 +155,8 @@ function DynamicExpensifyCardLimitPage({route}: DynamicExpensifyCardLimitPagePro
                                 inputID={INPUT_IDS.LIMIT}
                                 ref={inputCallbackRef}
                             />
+                            {/* We migrated https://github.com/Expensify/App/issues/83836 to a dynamic card limit page.`ConfirmModal` is deprecated, so we temporarily disabled the ESLint warning for this component. */}
+                            {/* eslint-disable-next-line @typescript-eslint/no-deprecated */}
                             <ConfirmModal
                                 title={translate('workspace.expensifyCard.changeCardLimit')}
                                 isVisible={isConfirmModalVisible}
