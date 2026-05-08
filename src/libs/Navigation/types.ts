@@ -1435,6 +1435,9 @@ type SettingsNavigatorParamList = {
     [SCREENS.WORKSPACE.HR_GUSTO_APPROVAL_MODE]: {
         policyID: string;
     };
+    [SCREENS.WORKSPACE.HR_GUSTO_FINAL_APPROVER]: {
+        policyID: string;
+    };
     [SCREENS.WORKSPACE.RULES_PROHIBITED_DEFAULT]: {
         policyID: string;
     };
@@ -2306,6 +2309,14 @@ type ReimbursementAccountNavigatorParamList = {
         policyID?: string;
         bankAccountID?: string;
         subStep?: typeof CONST.BANK_ACCOUNT.STEP.COUNTRY;
+    };
+    [SCREENS.REIMBURSEMENT_ACCOUNT_USD]: {
+        page?: string;
+        subPage?: string;
+        action?: 'edit';
+        policyID?: string;
+        // eslint-disable-next-line no-restricted-syntax -- backTo is a temporary param will be removed after https://github.com/Expensify/App/issues/73825 is done
+        backTo?: Routes;
     };
     [SCREENS.REIMBURSEMENT_ACCOUNT_NON_USD]: {
         page?: string;

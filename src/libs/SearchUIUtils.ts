@@ -48,6 +48,7 @@ import type {
     SearchQueryJSON,
     SearchStatus,
     SearchView,
+    SearchWithdrawalStatus,
     SearchWithdrawalType,
     SelectedReports,
     SelectedTransactionInfo,
@@ -413,6 +414,23 @@ function formatBadgeText(count: number): string {
         return '';
     }
     return count > CONST.SEARCH.TODO_BADGE_MAX_COUNT ? `${CONST.SEARCH.TODO_BADGE_MAX_COUNT}+` : count.toString();
+}
+
+function getSectionBadgeText(sectionTranslationPath: TranslationPaths, reportCounts: Record<string, number>): string | undefined {
+    if (
+        sectionTranslationPath === 'search.tabs.expenseReports' &&
+        (CONST.SEARCH.SEARCH_KEYS.SUBMIT in reportCounts || CONST.SEARCH.SEARCH_KEYS.APPROVE in reportCounts || CONST.SEARCH.SEARCH_KEYS.PAY in reportCounts)
+    ) {
+        return formatBadgeText(
+            (reportCounts[CONST.SEARCH.SEARCH_KEYS.SUBMIT] ?? 0) + (reportCounts[CONST.SEARCH.SEARCH_KEYS.APPROVE] ?? 0) + (reportCounts[CONST.SEARCH.SEARCH_KEYS.PAY] ?? 0),
+        );
+    }
+
+    if (sectionTranslationPath === 'search.tabs.accounting' && CONST.SEARCH.SEARCH_KEYS.EXPORT in reportCounts) {
+        return formatBadgeText(reportCounts[CONST.SEARCH.SEARCH_KEYS.EXPORT]);
+    }
+
+    return undefined;
 }
 
 function getItemBadgeText(itemKey: string, reportCounts: Record<string, number>): string | undefined {
@@ -4742,6 +4760,7 @@ const FILTER_LABEL_MAP = {
     [CONST.SEARCH.SYNTAX_FILTER_KEYS.TO]: 'common.to',
     [CONST.SEARCH.SYNTAX_FILTER_KEYS.TITLE]: 'common.title',
     [CONST.SEARCH.SYNTAX_FILTER_KEYS.WITHDRAWAL_ID]: 'common.withdrawalID',
+    [CONST.SEARCH.SYNTAX_FILTER_KEYS.WITHDRAWAL_STATUS]: 'common.withdrawalStatus',
     [CONST.SEARCH.SYNTAX_FILTER_KEYS.WITHDRAWAL_TYPE]: 'search.withdrawalType',
     [CONST.SEARCH.SYNTAX_FILTER_KEYS.AMOUNT]: 'iou.amount',
     [CONST.SEARCH.SYNTAX_FILTER_KEYS.PURCHASE_AMOUNT]: 'common.purchaseAmount',
@@ -4907,6 +4926,10 @@ function getDisplayValue(
         return withdrawalType ? translate(`search.filters.withdrawalType.${withdrawalType}`) : undefined;
     }
 
+    if (key === FILTER_KEYS.WITHDRAWAL_STATUS) {
+        return getWithdrawalStatusDisplayText(form[key], translate);
+    }
+
     if (key === FILTER_KEYS.STATUS) {
         const status = form[key];
         if (!status?.length) {
@@ -5063,11 +5086,29 @@ function getMultiSelectFilterOptions(filterKey: SearchAdvancedFiltersKey, type: 
         return type ? getStatusOptions(translate, type) : [];
     }
 
+    if (filterKey === FILTER_KEYS.WITHDRAWAL_STATUS) {
+        return getWithdrawalStatusOptions(translate);
+    }
+
     return [];
 }
 
 function getWithdrawalTypeOptions(translate: LocaleContextProps['translate']) {
     return Object.values(CONST.SEARCH.WITHDRAWAL_TYPE).map<SingleSelectItem<SearchWithdrawalType>>((value) => ({text: translate(`search.filters.withdrawalType.${value}`), value}));
+}
+
+function getWithdrawalStatusOptions(translate: LocaleContextProps['translate']) {
+    return Object.values(CONST.SEARCH.SETTLEMENT_STATUS).map((value) => ({text: translate(`settlement.status.${value}`), value}));
+}
+
+function getWithdrawalStatusDisplayText(value: SearchWithdrawalStatus | undefined, translate: LocaleContextProps['translate']): string | undefined {
+    if (!value?.length) {
+        return undefined;
+    }
+    return getWithdrawalStatusOptions(translate)
+        .filter((option) => value.includes(option.value))
+        .map((option) => option.text)
+        .join(', ');
 }
 
 /**
@@ -5781,6 +5822,24 @@ function applySelectionToItem(
     return {originalItem: item, itemWithSelection: {...item, isSelected, transactions}, isSelected};
 }
 
+const FLEX_COLUMNS = new Set<string>([
+    CONST.SEARCH.TABLE_COLUMNS.MERCHANT,
+    CONST.SEARCH.TABLE_COLUMNS.DESCRIPTION,
+    CONST.SEARCH.TABLE_COLUMNS.CATEGORY,
+    CONST.SEARCH.TABLE_COLUMNS.TAG,
+    CONST.SEARCH.TABLE_COLUMNS.TAX_RATE,
+    CONST.SEARCH.TABLE_COLUMNS.CARD,
+    CONST.SEARCH.TABLE_COLUMNS.EXCHANGE_RATE,
+]);
+
+/**
+ * Returns true when another flex column exists that can fill the remaining space,
+ * making it safe to remove flex from total columns.
+ */
+function hasFlexColumn(columns?: SearchColumnType[]): boolean {
+    return !!columns?.some((col) => FLEX_COLUMNS.has(col));
+}
+
 export {
     getSearchBulkEditPolicyID,
     getSuggestedSearches,
@@ -5809,6 +5868,7 @@ export {
     getActions,
     createTypeMenuSections,
     formatBadgeText,
+    getSectionBadgeText,
     getItemBadgeText,
     createBaseSavedSearchMenuItem,
     shouldShowEmptyState,
@@ -5829,6 +5889,8 @@ export {
     getDatePresets,
     createAndOpenSearchTransactionThread,
     getWithdrawalTypeOptions,
+    getWithdrawalStatusOptions,
+    getWithdrawalStatusDisplayText,
     getColumnsToShow,
     getHasOptions,
     getSettlementStatus,
@@ -5859,6 +5921,7 @@ export {
     FILTER_LABEL_MAP,
     doesSearchItemMatchSort,
     isPolicyEligibleForSpendOverTime,
+    hasFlexColumn,
 };
 export type {
     SavedSearchMenuItem,

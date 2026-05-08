@@ -1173,6 +1173,10 @@ const config: LinkingOptions<RootNavigatorParamList>['config'] = {
                             path: ROUTES.BANK_ACCOUNT_WITH_STEP_TO_OPEN.route,
                             exact: true,
                         },
+                        [SCREENS.REIMBURSEMENT_ACCOUNT_USD]: {
+                            path: ROUTES.BANK_ACCOUNT_USD_SETUP.route,
+                            exact: true,
+                        },
                         [SCREENS.REIMBURSEMENT_ACCOUNT_NON_USD]: {
                             path: ROUTES.BANK_ACCOUNT_NON_USD_SETUP.route,
                             exact: true,
@@ -1240,6 +1244,9 @@ const config: LinkingOptions<RootNavigatorParamList>['config'] = {
                         },
                         [SCREENS.WORKSPACE.HR_GUSTO_APPROVAL_MODE]: {
                             path: ROUTES.WORKSPACE_HR_GUSTO_APPROVAL_MODE.route,
+                        },
+                        [SCREENS.WORKSPACE.HR_GUSTO_FINAL_APPROVER]: {
+                            path: ROUTES.WORKSPACE_HR_GUSTO_FINAL_APPROVER.route,
                         },
                         [SCREENS.WORKSPACE.RULES_CUSTOM]: {
                             path: ROUTES.RULES_CUSTOM.route,
@@ -1970,6 +1977,7 @@ const config: LinkingOptions<RootNavigatorParamList>['config'] = {
                         [SCREENS.SEARCH.ADVANCED_FILTERS_TAX_RATE_RHP]: ROUTES.SEARCH_ADVANCED_FILTERS.getRoute(CONST.SEARCH.SEARCH_USER_FRIENDLY_KEYS.TAX_RATE),
                         [SCREENS.SEARCH.ADVANCED_FILTERS_EXPENSE_TYPE_RHP]: ROUTES.SEARCH_ADVANCED_FILTERS.getRoute(CONST.SEARCH.SEARCH_USER_FRIENDLY_KEYS.EXPENSE_TYPE),
                         [SCREENS.SEARCH.ADVANCED_FILTERS_WITHDRAWAL_TYPE_RHP]: ROUTES.SEARCH_ADVANCED_FILTERS.getRoute(CONST.SEARCH.SEARCH_USER_FRIENDLY_KEYS.WITHDRAWAL_TYPE),
+                        [SCREENS.SEARCH.ADVANCED_FILTERS_WITHDRAWAL_STATUS_RHP]: ROUTES.SEARCH_ADVANCED_FILTERS.getRoute(CONST.SEARCH.SEARCH_USER_FRIENDLY_KEYS.WITHDRAWAL_STATUS),
                         [SCREENS.SEARCH.ADVANCED_FILTERS_IS_RHP]: ROUTES.SEARCH_ADVANCED_FILTERS.getRoute(CONST.SEARCH.SEARCH_USER_FRIENDLY_KEYS.IS),
                         [SCREENS.SEARCH.ADVANCED_FILTERS_WITHDRAWAL_ID_RHP]: ROUTES.SEARCH_ADVANCED_FILTERS.getRoute(CONST.SEARCH.SEARCH_USER_FRIENDLY_KEYS.WITHDRAWAL_ID),
                         [SCREENS.SEARCH.ADVANCED_FILTERS_TAG_RHP]: ROUTES.SEARCH_ADVANCED_FILTERS.getRoute(CONST.SEARCH.SYNTAX_FILTER_KEYS.TAG),

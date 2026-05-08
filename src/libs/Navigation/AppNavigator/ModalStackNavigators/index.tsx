@@ -3,6 +3,7 @@ import React, {useCallback} from 'react';
 import {View} from 'react-native';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
+import {isMobileChrome} from '@libs/Browser';
 import createPlatformStackNavigator from '@libs/Navigation/PlatformStackNavigation/createPlatformStackNavigator';
 import Animations from '@libs/Navigation/PlatformStackNavigation/navigationOptions/animation';
 import type {PlatformStackNavigationOptions} from '@libs/Navigation/PlatformStackNavigation/types';
@@ -61,6 +62,17 @@ const loadAttachmentModalScreen = () => require<ReactComponentModule>('../../../
 
 type Screens = Partial<Record<Screen, () => React.ComponentType>>;
 
+// Reimbursement Account flow animations glitch on low-end Android devices in Chrome mWeb https://github.com/Expensify/App/issues/87658 so we intentionally disable them
+const IS_MOBILE_CHROME = isMobileChrome();
+
+const REIMBURSEMENT_ACCOUNT_FLOW_SCREENS: Screen[] = [
+    SCREENS.REIMBURSEMENT_ACCOUNT,
+    SCREENS.REIMBURSEMENT_ACCOUNT_USD,
+    SCREENS.REIMBURSEMENT_ACCOUNT_NON_USD,
+    SCREENS.REIMBURSEMENT_ACCOUNT_VERIFY_ACCOUNT,
+    SCREENS.REIMBURSEMENT_ACCOUNT_ENTER_SIGNER_INFO,
+];
+
 const OPTIONS_PER_SCREEN: Partial<Record<Screen, PlatformStackNavigationOptions>> = {
     [SCREENS.SETTINGS.MERGE_ACCOUNTS.MERGE_RESULT]: {
         animationTypeForReplace: 'push',
@@ -113,6 +125,7 @@ const OPTIONS_PER_SCREEN: Partial<Record<Screen, PlatformStackNavigationOptions>
     [SCREENS.WORKSPACE.DYNAMIC_CATEGORIES_IMPORTED]: {
         animationTypeForReplace: 'push',
     },
+    ...(IS_MOBILE_CHROME ? Object.fromEntries(REIMBURSEMENT_ACCOUNT_FLOW_SCREENS.map((screen) => [screen, {animation: Animations.NONE}])) : {}),
 };
 
 /**
@@ -662,6 +675,7 @@ const SettingsModalStackNavigator = createModalStackNavigator<SettingsNavigatorP
     [SCREENS.WORKSPACE.ACCOUNTING.QUICKBOOKS_DESKTOP_ITEMS]: () => require<ReactComponentModule>('../../../../pages/workspace/accounting/qbd/import/QuickbooksDesktopItemsPage').default,
     [SCREENS.CONNECT_EXISTING_BUSINESS_BANK_ACCOUNT_ROOT]: () => require<ReactComponentModule>('@pages/workspace/ConnectExistingBusinessBankAccountPage').default,
     [SCREENS.REIMBURSEMENT_ACCOUNT]: () => require<ReactComponentModule>('../../../../pages/ReimbursementAccount/ReimbursementAccountPage').default,
+    [SCREENS.REIMBURSEMENT_ACCOUNT_USD]: () => require<ReactComponentModule>('../../../../pages/ReimbursementAccount/USD/USDVerifiedBankAccountFlowPage').default,
     [SCREENS.REIMBURSEMENT_ACCOUNT_NON_USD]: () => require<ReactComponentModule>('../../../../pages/ReimbursementAccount/NonUSD/NonUSDVerifiedBankAccountFlowPage').default,
     [SCREENS.REIMBURSEMENT_ACCOUNT_VERIFY_ACCOUNT]: () => require<ReactComponentModule>('../../../../pages/ReimbursementAccount/ReimbursementAccountVerifyAccountPage').default,
     [SCREENS.REIMBURSEMENT_ACCOUNT_ENTER_SIGNER_INFO]: () => require<ReactComponentModule>('../../../../pages/ReimbursementAccount/EnterSignerInfo').default,
@@ -919,6 +933,7 @@ const SettingsModalStackNavigator = createModalStackNavigator<SettingsNavigatorP
     [SCREENS.SETTINGS.LOCK.UNLOCK_ACCOUNT]: () => require<ReactComponentModule>('../../../../pages/settings/Security/LockAccount/UnlockAccountPage').default,
     [SCREENS.SETTINGS.LOCK.FAILED_TO_LOCK_ACCOUNT]: () => require<ReactComponentModule>('../../../../pages/settings/Security/LockAccount/FailedToLockAccountPage').default,
     [SCREENS.WORKSPACE.HR_GUSTO_APPROVAL_MODE]: () => require<ReactComponentModule>('../../../../pages/workspace/hr/gusto/GustoApprovalModePage').default,
+    [SCREENS.WORKSPACE.HR_GUSTO_FINAL_APPROVER]: () => require<ReactComponentModule>('../../../../pages/workspace/hr/gusto/GustoFinalApproverPage').default,
     [SCREENS.WORKSPACE.REPORTS_DEFAULT_TITLE]: () => require<ReactComponentModule>('../../../../pages/workspace/reports/ReportsDefaultTitle').default,
     [SCREENS.WORKSPACE.RULES_AUTO_APPROVE_REPORTS_UNDER]: () => require<ReactComponentModule>('../../../../pages/workspace/rules/RulesAutoApproveReportsUnderPage').default,
     [SCREENS.WORKSPACE.RULES_RANDOM_REPORT_AUDIT]: () => require<ReactComponentModule>('../../../../pages/workspace/rules/RulesRandomReportAuditPage').default,
@@ -1093,6 +1108,8 @@ const SearchAdvancedFiltersModalStackNavigator = createModalStackNavigator<Searc
     [SCREENS.SEARCH.ADVANCED_FILTERS_TAX_RATE_RHP]: () => require<ReactComponentModule>('../../../../pages/Search/SearchAdvancedFiltersPage/SearchFiltersTaxRatePage').default,
     [SCREENS.SEARCH.ADVANCED_FILTERS_EXPENSE_TYPE_RHP]: () => require<ReactComponentModule>('../../../../pages/Search/SearchAdvancedFiltersPage/SearchFiltersExpenseTypePage').default,
     [SCREENS.SEARCH.ADVANCED_FILTERS_WITHDRAWAL_TYPE_RHP]: () => require<ReactComponentModule>('../../../../pages/Search/SearchAdvancedFiltersPage/SearchFiltersWithdrawalTypePage').default,
+    [SCREENS.SEARCH.ADVANCED_FILTERS_WITHDRAWAL_STATUS_RHP]: () =>
+        require<ReactComponentModule>('../../../../pages/Search/SearchAdvancedFiltersPage/SearchFiltersWithdrawalStatusPage').default,
     [SCREENS.SEARCH.ADVANCED_FILTERS_IS_RHP]: () => require<ReactComponentModule>('../../../../pages/Search/SearchAdvancedFiltersPage/SearchFiltersIsPage').default,
     [SCREENS.SEARCH.ADVANCED_FILTERS_TAG_RHP]: () => require<ReactComponentModule>('../../../../pages/Search/SearchAdvancedFiltersPage/SearchFiltersTagPage').default,
     [SCREENS.SEARCH.ADVANCED_FILTERS_HAS_RHP]: () => require<ReactComponentModule>('../../../../pages/Search/SearchAdvancedFiltersPage/SearchFiltersHasPage').default,
