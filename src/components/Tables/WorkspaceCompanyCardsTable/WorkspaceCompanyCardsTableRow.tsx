@@ -82,11 +82,11 @@ function WorkspaceCompanyCardTableRow({
     isAssigningCardDisabled,
     onAssignCard,
 }: WorkspaceCompanyCardTableRowProps) {
-    const styles = useThemeStyles();
     const theme = useTheme();
+    const styles = useThemeStyles();
+    const {isOffline} = useNetwork();
     const {translate} = useLocalize();
     const Expensicons = useMemoizedLazyExpensifyIcons(['ArrowRight']);
-    const {isOffline} = useNetwork();
 
     const {cardName, encryptedCardNumber, customCardName, cardholder, assignedCard, isAssigned, errors, pendingAction, onDismissError} = item;
 
@@ -168,12 +168,12 @@ function WorkspaceCompanyCardTableRow({
                             <View style={[styles.flex1, styles.flexColumn, styles.justifyContentCenter, styles.alignItemsStretch]}>
                                 <TextWithTooltip
                                     text={leftColumnTitle}
-                                    style={[styles.optionDisplayName, styles.pre, styles.justifyContentCenter, !isAssigned && styles.cursorText]}
+                                    style={[styles.optionDisplayName, styles.pre, styles.justifyContentCenter]}
                                 />
                                 {!!leftColumnSubtitle && (
                                     <TextWithTooltip
                                         text={leftColumnSubtitle}
-                                        style={[styles.textLabelSupporting, styles.lh16, styles.pre, styles.mr3, !isAssigned && styles.cursorText]}
+                                        style={[styles.textLabelSupporting, styles.lh16, styles.pre, styles.mr3]}
                                     />
                                 )}
                             </View>
@@ -183,7 +183,7 @@ function WorkspaceCompanyCardTableRow({
                             <View style={[styles.flex1]}>
                                 <Text
                                     numberOfLines={1}
-                                    style={[styles.lh16, styles.optionDisplayName, styles.pre, !isAssigned && styles.cursorText]}
+                                    style={[styles.lh16, styles.optionDisplayName, styles.pre]}
                                 >
                                     {formatMaskedCardName(cardName)}
                                 </Text>
@@ -193,7 +193,7 @@ function WorkspaceCompanyCardTableRow({
                         <View style={[styles.flex1]}>
                             <Text
                                 numberOfLines={1}
-                                style={[styles.lh16, styles.optionDisplayName, styles.pre, !isAssigned && styles.cursorText]}
+                                style={[styles.lh16, styles.optionDisplayName, styles.pre]}
                             >
                                 {customCardName}
                             </Text>
@@ -204,7 +204,7 @@ function WorkspaceCompanyCardTableRow({
                                 <Button
                                     small
                                     success
-                                    text={shouldUseNarrowTableLayout ? translate('workspace.companyCards.assign') : translate('workspace.companyCards.assignCard')}
+                                    text={translate('workspace.companyCards.assign')}
                                     onPress={handleRowPress}
                                     isDisabled={isAssigningCardDisabled}
                                 />
