@@ -66,7 +66,6 @@ function VideoPlayerThumbnail({thumbnailUrl, onPress, accessibilityLabel, isDele
                                 report?.reportID,
                                 action,
                                 checkIfContextMenuActive,
-                                isArchivedNonExpenseReport(report, isReportArchived),
                                 originalReportID,
                             );
                         });

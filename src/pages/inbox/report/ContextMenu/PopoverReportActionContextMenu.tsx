@@ -84,7 +84,6 @@ function PopoverReportActionContextMenu({ref}: PopoverReportActionContextMenuPro
     const [isDeleteCommentConfirmModalVisible, setIsDeleteCommentConfirmModalVisible] = useState(false);
     const [shouldSetModalVisibilityForDeleteConfirmation, setShouldSetModalVisibilityForDeleteConfirmation] = useState(true);
 
-    const [isRoomArchived, setIsRoomArchived] = useState(false);
     const [isThreadReportParentAction, setIsThreadReportParentAction] = useState(false);
     const [disabledActions, setDisabledActions] = useState<ContextMenuAction[]>([]);
     const [shouldSwitchPositionIfOverflow, setShouldSwitchPositionIfOverflow] = useState(false);
@@ -201,7 +200,7 @@ function PopoverReportActionContextMenu({ref}: PopoverReportActionContextMenuPro
             setComposerToRefocusOnClose('edit');
         }
 
-        const {reportID, originalReportID, isArchivedRoom = false} = currentReport;
+        const {reportID, originalReportID} = currentReport;
         const {reportActionID, draftMessage, isThreadReportParentAction: isThreadReportParentActionParam = false} = reportAction;
         const {onShow = () => {}, onHide = () => {}, setIsEmojiPickerActive = () => {}} = callbacks;
         setIsContextMenuOpening(true);
@@ -249,7 +248,6 @@ function PopoverReportActionContextMenu({ref}: PopoverReportActionContextMenuPro
             selectionRef.current = selection;
             setIsPopoverVisible(true);
             reportActionDraftMessageRef.current = draftMessage;
-            setIsRoomArchived(isArchivedRoom);
             setIsThreadReportParentAction(isThreadReportParentActionParam);
             setShouldSwitchPositionIfOverflow(isOverflowMenu);
         });
@@ -442,7 +440,6 @@ function PopoverReportActionContextMenu({ref}: PopoverReportActionContextMenuPro
         callbackWhenDeleteModalHide.current = () => (onCancelDeleteModal.current = runAndResetCallback(onCancelDeleteModal.current));
         setIsDeleteCommentConfirmModalVisible(false);
         setShouldSetModalVisibilityForDeleteConfirmation(true);
-        setIsRoomArchived(false);
     };
 
     /** Opens the Confirm delete action modal */
@@ -497,7 +494,6 @@ function PopoverReportActionContextMenu({ref}: PopoverReportActionContextMenuPro
                     reportActionID={reportActionIDRef.current}
                     draftMessage={reportActionDraftMessageRef.current}
                     selection={selectionRef.current}
-                    isArchivedRoom={isRoomArchived}
                     isThreadReportParentAction={isThreadReportParentAction}
                     anchor={contextMenuTargetNode}
                     contentRef={contentRef}

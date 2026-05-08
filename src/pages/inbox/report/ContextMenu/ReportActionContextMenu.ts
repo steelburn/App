@@ -25,7 +25,6 @@ type ShowContextMenuParams = {
     report?: {
         reportID?: string;
         originalReportID?: string;
-        isArchivedRoom?: boolean;
     };
     reportAction?: {
         reportActionID?: string;

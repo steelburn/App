@@ -69,7 +69,6 @@ function PreRenderer({TDefaultRenderer, onPressIn, onPressOut, onLongPress, ...d
                             report?.reportID,
                             action,
                             checkIfContextMenuActive,
-                            isArchivedNonExpenseReport(report, isReportArchived),
                             originalReportID,
                         );
                     });

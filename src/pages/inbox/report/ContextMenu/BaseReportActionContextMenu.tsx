@@ -93,9 +93,6 @@ type BaseReportActionContextMenuProps = {
     /** Target node which is the target of ContentMenu */
     anchor?: RefObject<ContextMenuAnchor>;
 
-    /** Whether the provided report is an archived room */
-    isArchivedRoom?: boolean;
-
     /**
      * Is the action a thread's parent reportAction viewed from within the thread report?
      * It will be false if we're viewing the same parent report action from the report it belongs to rather than the thread.
@@ -119,7 +116,6 @@ function BaseReportActionContextMenu({
     type = CONST.CONTEXT_MENU_TYPES.REPORT_ACTION,
     anchor,
     contentRef,
-    isArchivedRoom = false,
     isMini = false,
     isVisible = false,
     isThreadReportParentAction = false,
@@ -263,6 +259,7 @@ function BaseReportActionContextMenu({
         isMoneyRequestOrReport &&
         !isArchivedNonExpenseReport(transactionThreadReportID ? childReport : parentReport, transactionThreadReportID ? isChildReportArchived : isParentReportArchived);
 
+    const isArchivedRoom = isArchivedNonExpenseReport(originalReport, isOriginalReportArchived);
     const isChronosReport = chatIncludesChronosWithID(originalReportID);
     const isPinnedChat = !!report?.isPinned;
     // Pass undefined for oneTransactionThreadReport — BaseReportActionContextMenu doesn't subscribe to it for the
@@ -352,7 +349,6 @@ function BaseReportActionContextMenu({
             report: {
                 reportID,
                 originalReportID,
-                isArchivedRoom: isArchivedNonExpenseReport(originalReport, isOriginalReportArchived),
             },
             reportAction: {
                 reportActionID: reportAction?.reportActionID,

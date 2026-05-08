@@ -130,7 +130,6 @@ function ImageRenderer({tnode}: CustomRendererProps<TBlock>) {
                                 report?.reportID,
                                 action,
                                 checkIfContextMenuActive,
-                                isArchivedNonExpenseReport(report, isReportArchived),
                                 originalReportID,
                             ),
                         );
