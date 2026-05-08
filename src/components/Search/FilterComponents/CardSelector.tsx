@@ -64,7 +64,7 @@ function CardSelector({value = [], onChange}: CardSelectorProps) {
 
     const closedCardsSectionData = buildCardsData(workspaceCardFeeds ?? {}, userCardList ?? {}, personalDetails ?? {}, value, illustrations, companyCardFeedIcons, true, customCardNames);
 
-    const shouldShowSearchInput = individualCardsSectionData.length + closedCardsSectionData.length >= CONST.STANDARD_LIST_ITEM_LIMIT;
+    const shouldShowSearchInput = individualCardsSectionData.length >= CONST.STANDARD_LIST_ITEM_LIMIT;
 
     const searchFunction = (item: CardFilterItem) =>
         !!item.text?.toLocaleLowerCase().includes(debouncedSearchTerm.toLocaleLowerCase()) ||
