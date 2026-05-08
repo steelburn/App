@@ -80,9 +80,7 @@ function SearchFiltersCardPage() {
 
     const domainFeedsData = getDomainFeedData(workspaceCardFeeds);
 
-    const cardFeedsSectionData = buildCardFeedsData(workspaceCardFeeds ?? CONST.EMPTY_OBJECT, domainFeedsData, policies, selectedCards, translate, illustrations, companyCardFeedIcons);
-
-    const allCardFeeds = [...cardFeedsSectionData.selected, ...cardFeedsSectionData.unselected];
+    const allCardFeeds = buildCardFeedsData(workspaceCardFeeds ?? CONST.EMPTY_OBJECT, domainFeedsData, policies, selectedCards, translate, illustrations, companyCardFeedIcons);
     const allIndividualCards = [...individualCardsSectionData.selected, ...individualCardsSectionData.unselected];
     const allClosedCards = [...closedCardsSectionData.selected, ...closedCardsSectionData.unselected];
 
@@ -116,7 +114,7 @@ function SearchFiltersCardPage() {
               ];
 
     const handleConfirmSelection = () => {
-        const feeds = cardFeedsSectionData.selected.map((feed) => feed.cardFeedKey);
+        const feeds = allCardFeeds.filter((feed) => feed.isSelected).map((feed) => feed.cardFeedKey);
         const cardsFromSelectedFeed = getSelectedCardsFromFeeds(userCardList, workspaceCardFeeds, feeds);
         const IDs = selectedCards.filter((card) => !cardsFromSelectedFeed.includes(card));
 

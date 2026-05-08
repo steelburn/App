@@ -377,9 +377,8 @@ function buildCardFeedsData(
     translate: LocaleContextProps['translate'],
     illustrations: IllustrationsType,
     companyCardIcons: CompanyCardFeedIcons,
-): ItemsGroupedBySelection {
-    const selectedFeeds: CardFilterItem[] = [];
-    const unselectedFeeds: CardFilterItem[] = [];
+): CardFilterItem[] {
+    const feeds: CardFilterItem[] = [];
     const repeatingBanks = getRepeatingBanks(Object.keys(workspaceCardFeeds), domainFeedsData);
 
     for (const domainFeed of Object.values(domainFeedsData)) {
@@ -388,21 +387,18 @@ function buildCardFeedsData(
         const cardFeedKey = createCardFeedKey(domainFeed.fundID, bank, feedCountry);
         const {cardName} = getDomainCardFeedData(domainFeed, policies, repeatingBanks, translate);
 
-        const feedItem = createCardFeedItem({
-            cardName,
-            bank,
-            correspondingCardIDs,
-            keyForList: feedCountry ? `${domainName}-${bank}-${feedCountry}` : `${domainName}-${bank}`,
-            cardFeedKey,
-            selectedCards,
-            illustrations,
-            companyCardIcons,
-        });
-        if (feedItem.isSelected) {
-            selectedFeeds.push(feedItem);
-        } else {
-            unselectedFeeds.push(feedItem);
-        }
+        feeds.push(
+            createCardFeedItem({
+                cardName,
+                bank,
+                correspondingCardIDs,
+                keyForList: feedCountry ? `${domainName}-${bank}-${feedCountry}` : `${domainName}-${bank}`,
+                cardFeedKey,
+                selectedCards,
+                illustrations,
+                companyCardIcons,
+            }),
+        );
     }
 
     for (const [workspaceFeedKey, workspaceFeed] of filterOutDomainCards(workspaceCardFeeds)) {
@@ -417,24 +413,21 @@ function buildCardFeedsData(
         const {cardName, bank} = cardFeedData;
         const cardFeedKey = getCardFeedKey(workspaceCardFeeds, workspaceFeedKey);
 
-        const feedItem = createCardFeedItem({
-            cardName,
-            bank,
-            correspondingCardIDs,
-            cardFeedKey: cardFeedKey ?? '',
-            keyForList: workspaceFeedKey,
-            selectedCards,
-            illustrations,
-            companyCardIcons,
-        });
-        if (feedItem.isSelected) {
-            selectedFeeds.push(feedItem);
-        } else {
-            unselectedFeeds.push(feedItem);
-        }
+        feeds.push(
+            createCardFeedItem({
+                cardName,
+                bank,
+                correspondingCardIDs,
+                cardFeedKey: cardFeedKey ?? '',
+                keyForList: workspaceFeedKey,
+                selectedCards,
+                illustrations,
+                companyCardIcons,
+            }),
+        );
     }
 
-    return {selected: selectedFeeds, unselected: unselectedFeeds};
+    return feeds;
 }
 
 function getSelectedCardsFromFeeds(cards: CardList | undefined, workspaceCardFeeds?: Record<string, WorkspaceCardsList | undefined>, selectedFeeds?: string[]): string[] {
