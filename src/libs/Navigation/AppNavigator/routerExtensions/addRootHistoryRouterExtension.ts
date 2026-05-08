@@ -44,7 +44,7 @@ function addRootHistoryRouterExtension<RouterOptions extends PlatformStackRouter
             return stateWithInitialHistory;
         };
 
-        // Centralises the `PartialState | FullState` cast to `getRehydratedState`'s input shape.
+        // Centralizes the `PartialState | FullState` cast to `getRehydratedState`'s input shape.
         function rehydrate(newState: PartialState<RootHistoryState> | RootHistoryState, configOptions: RouterConfigOptions) {
             return getRehydratedState(newState as PartialState<RootHistoryState>, configOptions);
         }

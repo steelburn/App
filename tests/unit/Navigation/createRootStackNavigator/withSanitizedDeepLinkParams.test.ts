@@ -44,7 +44,7 @@ describe('withSanitizedDeepLinkParams', () => {
         });
 
         it('PRESERVES `params` as-is when `params.screen` is absent, even if other "chain-like" keys are present', () => {
-            // False-positive defence: legitimate user-set `path`, `initial`, etc. on a route
+            // False-positive defense: legitimate user-set `path`, `initial`, etc. on a route
             // that was NOT created by deep-link hydration must survive untouched.
             const route = {
                 key: 'k-1',

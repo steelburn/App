@@ -31,7 +31,7 @@ function isRightModalNavigatorRouteName(name: string | undefined): boolean {
     return name === NAVIGATORS.RIGHT_MODAL_NAVIGATOR;
 }
 
-/** Centralises the cast from PlatformStackNavigationState's `unknown[]` history slot to our typed array. */
+/** Centralizes the cast from PlatformStackNavigationState's `unknown[]` history slot to our typed array. */
 function asCustomHistory(history: unknown[] | undefined): CustomHistoryEntry[] | undefined {
     return history as CustomHistoryEntry[] | undefined;
 }
