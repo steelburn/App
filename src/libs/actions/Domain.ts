@@ -2081,6 +2081,7 @@ function setDefaultSecurityGroup(domainAccountID: number, groupID: string, previ
         {
             onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`,
+            // backend API uses snake_case for domain_defaultSecurityGroupID
             // eslint-disable-next-line @typescript-eslint/naming-convention
             value: {domain_defaultSecurityGroupID: groupID},
         },
@@ -2108,6 +2109,7 @@ function setDefaultSecurityGroup(domainAccountID: number, groupID: string, previ
         {
             onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`,
+            // backend API uses snake_case for domain_defaultSecurityGroupID
             // eslint-disable-next-line @typescript-eslint/naming-convention
             value: {domain_defaultSecurityGroupID: previousGroupID},
         },
