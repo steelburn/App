@@ -5,7 +5,7 @@ import type {BottomTabBarProps} from '@react-navigation/bottom-tabs';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import type {NavigationAction, NavigationState, Router, TabNavigationState} from '@react-navigation/native';
 import {findFocusedRoute, useNavigation, useNavigationState, useRoute} from '@react-navigation/native';
-import React, {useCallback, useEffect} from 'react';
+import React, {useEffect} from 'react';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useTheme from '@hooks/useTheme';
 import {getPreservedNavigatorState, setPreservedNavigatorState} from '@libs/Navigation/AppNavigator/createSplitNavigator/usePreserveNavigatorState';
@@ -70,15 +70,14 @@ function TabNavigator() {
     // this TAB_NAVIGATOR. Without restoration it would default to index 0. We restore the saved
     // state by overriding the bottom-tab router's getInitialState — the same pattern SplitRouter
     // uses for its split navigators.
-    const tabRouterOverride = useCallback(
-        <Action extends NavigationAction>(originalRouter: Router<TabNavigationState<TabNavigatorParamList>, Action>): Partial<Router<TabNavigationState<TabNavigatorParamList>, Action>> => ({
-            getInitialState: (configOptions) => {
-                const preserved = getPreservedNavigatorState<TabNavigationState<TabNavigatorParamList>>(route.key);
-                return preserved ? originalRouter.getRehydratedState(preserved, configOptions) : originalRouter.getInitialState(configOptions);
-            },
-        }),
-        [route.key],
-    );
+    const tabRouterOverride = <Action extends NavigationAction>(
+        originalRouter: Router<TabNavigationState<TabNavigatorParamList>, Action>,
+    ): Partial<Router<TabNavigationState<TabNavigatorParamList>, Action>> => ({
+        getInitialState: (configOptions) => {
+            const preserved = getPreservedNavigatorState<TabNavigationState<TabNavigatorParamList>>(route.key);
+            return preserved ? originalRouter.getRehydratedState(preserved, configOptions) : originalRouter.getInitialState(configOptions);
+        },
+    });
 
     const screenOptions = {
         ...TAB_SCREEN_OPTIONS_BASE,
