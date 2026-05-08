@@ -64,22 +64,23 @@ function PersonalCardDetailsPage({route}: PersonalCardDetailsPageProps) {
     const reimbursableSetting = card?.reimbursable ?? true;
     const isCSVImportedPersonalCard = !!(isUserPersonalCard && card && (card.bank === CONST.COMPANY_CARD.FEED_BANK_NAME.UPLOAD || card.bank.includes(CONST.COMPANY_CARD.FEED_BANK_NAME.CSV)));
 
-    const removeCardFromUser = async () => {
+    const removeCardFromUser = () => {
         if (!card) {
             return;
         }
-        const result = await showConfirmModal({
+        showConfirmModal({
             title: translate('workspace.moreFeatures.companyCards.removeCard'),
             prompt: translate('workspace.moreFeatures.companyCards.removeCardDescription'),
             confirmText: translate('workspace.moreFeatures.companyCards.remove'),
             cancelText: translate('common.cancel'),
             shouldShowCancelButton: true,
             danger: true,
+        }).then((result) => {
+            if (result.action === ModalActions.CONFIRM) {
+                unassignCard(card);
+                Navigation.goBack();
+            }
         });
-        if (result.action === ModalActions.CONFIRM) {
-            unassignCard(card);
-            Navigation.goBack();
-        }
     };
 
     const updateCard = () => {
@@ -96,23 +97,24 @@ function PersonalCardDetailsPage({route}: PersonalCardDetailsPageProps) {
         syncCard(card.cardID, card.lastScrapeResult, true);
     };
 
-    const confirmDeleteCard = async () => {
+    const confirmDeleteCard = () => {
         if (!card) {
             return;
         }
-        const result = await showConfirmModal({
+        showConfirmModal({
             title: translate('walletPage.deleteCard'),
             prompt: translate('walletPage.deleteCardConfirmation'),
             confirmText: translate('common.delete'),
             cancelText: translate('common.cancel'),
             shouldShowCancelButton: true,
             danger: true,
+        }).then((result) => {
+            if (result.action === ModalActions.CONFIRM) {
+                const savedColumnLayout = savedColumnLayouts?.[card.cardID];
+                deletePersonalCard({cardID: card.cardID, card, allTransactions, allReports, savedColumnLayout});
+                Navigation.goBack();
+            }
         });
-        if (result.action === ModalActions.CONFIRM) {
-            const savedColumnLayout = savedColumnLayouts?.[card.cardID];
-            deletePersonalCard({cardID: card.cardID, card, allTransactions, allReports, savedColumnLayout});
-            Navigation.goBack();
-        }
     };
 
     // Show "Break connection" only when Mock Bank requests target non-production APIs.
@@ -199,8 +201,8 @@ function PersonalCardDetailsPage({route}: PersonalCardDetailsPageProps) {
                         shouldShowBreakConnection={shouldShowBreakConnection}
                         onUpdateCard={updateCard}
                         onBreakConnection={breakConnection}
-                        onUnassignCard={() => void removeCardFromUser()}
-                        onDeleteCard={() => void confirmDeleteCard()}
+                        onUnassignCard={removeCardFromUser}
+                        onDeleteCard={confirmDeleteCard}
                     />
                 )}
             </ScrollView>
