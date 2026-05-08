@@ -1,11 +1,13 @@
 import React from 'react';
 import {View} from 'react-native';
+import type {OnyxEntry} from 'react-native-onyx';
 import FormProvider from '@components/Form/FormProvider';
 import InputWrapper from '@components/Form/InputWrapper';
 import type {FormInputErrors, FormOnyxValues} from '@components/Form/types';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import ScreenWrapper from '@components/ScreenWrapper';
 import TextInput from '@components/TextInput';
+import useKeyboardShortcut from '@hooks/useKeyboardShortcut';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
@@ -17,6 +19,7 @@ import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
+import type {EditAgentPromptForm} from '@src/types/form/EditAgentPromptForm';
 import INPUT_IDS from '@src/types/form/EditAgentPromptForm';
 
 type EditPromptPageProps = PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.SETTINGS.AGENTS.EDIT_PROMPT>;
@@ -26,6 +29,7 @@ function EditPromptPage({route}: EditPromptPageProps) {
     const styles = useThemeStyles();
     const accountID = route.params.accountID;
     const [agentPrompt] = useOnyx(`${ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT}${accountID}`);
+    const [promptDraft] = useOnyx(ONYXKEYS.FORMS.EDIT_AGENT_PROMPT_FORM_DRAFT, {selector: (draft: OnyxEntry<EditAgentPromptForm>) => draft?.[INPUT_IDS.PROMPT] ?? ''});
 
     const validate = (values: FormOnyxValues<typeof ONYXKEYS.FORMS.EDIT_AGENT_PROMPT_FORM>): FormInputErrors<typeof ONYXKEYS.FORMS.EDIT_AGENT_PROMPT_FORM> => {
         const errors: FormInputErrors<typeof ONYXKEYS.FORMS.EDIT_AGENT_PROMPT_FORM> = {};
@@ -35,10 +39,12 @@ function EditPromptPage({route}: EditPromptPageProps) {
         return errors;
     };
 
-    const handleSubmit = (values: FormOnyxValues<typeof ONYXKEYS.FORMS.EDIT_AGENT_PROMPT_FORM>) => {
-        updateAgentPrompt(accountID, values[INPUT_IDS.PROMPT].trim(), agentPrompt?.prompt ?? '');
+    const handleSubmit = () => {
+        updateAgentPrompt(accountID, (promptDraft ?? '').trim(), agentPrompt?.prompt ?? '');
         Navigation.goBack(ROUTES.SETTINGS_AGENTS_EDIT.getRoute(accountID));
     };
+
+    useKeyboardShortcut(CONST.KEYBOARD_SHORTCUTS.CTRL_ENTER, handleSubmit);
 
     return (
         <ScreenWrapper
@@ -60,6 +66,8 @@ function EditPromptPage({route}: EditPromptPageProps) {
                 submitFlexEnabled={false}
                 enabledWhenOffline
                 shouldHideFixErrorsAlert
+                shouldValidateOnChange
+                shouldValidateOnBlur
             >
                 <View style={[styles.flex1]}>
                     <InputWrapper
@@ -74,6 +82,7 @@ function EditPromptPage({route}: EditPromptPageProps) {
                         touchableInputWrapperStyle={[styles.flex1]}
                         textInputContainerStyles={[styles.flex1]}
                         inputStyle={[styles.flex1, styles.textAlignVerticalTop]}
+                        shouldSaveDraft
                     />
                 </View>
             </FormProvider>
