@@ -2608,7 +2608,6 @@ const translations = {
         approver: 'Approver',
         addApprovalsDescription: 'Require additional approval before authorizing a payment.',
         configureViaGusto: 'Configure via Gusto.',
-        gustoApprovalWorkflowLockedTitle: 'Not so fast...',
         gustoApprovalWorkflowLockedPrompt: 'Approvals are managed by your Gusto integration. To update your approval workflow, head to your Gusto connection settings.',
         goToGustoSettings: 'Go to Gusto settings',
         makeOrTrackPaymentsTitle: 'Payments',

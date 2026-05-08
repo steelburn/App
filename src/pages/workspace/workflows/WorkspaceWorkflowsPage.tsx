@@ -199,7 +199,7 @@ function WorkspaceWorkflowsPage({policy, route}: WorkspaceWorkflowsPageProps) {
 
     const promptConfigureApprovalsInGusto = useCallback(async () => {
         const {action} = await showConfirmModal({
-            title: translate('workflowsPage.gustoApprovalWorkflowLockedTitle'),
+            title: translate('workspace.moreFeatures.connectionsWarningModal.featureEnabledTitle'),
             prompt: translate('workflowsPage.gustoApprovalWorkflowLockedPrompt'),
             confirmText: translate('workflowsPage.goToGustoSettings'),
             cancelText: translate('common.cancel'),
