@@ -31,7 +31,7 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import {clearDelegateErrorsByField, clearDelegatorErrors, connect, disconnect, openSecuritySettingsPage, removeDelegate} from '@libs/actions/Delegate';
 import {getLatestError} from '@libs/ErrorUtils';
 import getClickedTargetLocation from '@libs/getClickedTargetLocation';
-import {stopGpsTrip} from '@libs/GPSDraftDetailsUtils';
+import {getGpsPoints, stopGpsTrip} from '@libs/GPSDraftDetailsUtils';
 import Navigation from '@libs/Navigation/Navigation';
 import {sortAlphabetically} from '@libs/OptionsListUtils';
 import {getPersonalDetailByEmail} from '@libs/PersonalDetailsUtils';
@@ -66,6 +66,7 @@ function CopilotPage() {
     const [session] = useOnyx(ONYXKEYS.SESSION);
     const [stashedSession] = useOnyx(ONYXKEYS.STASHED_SESSION);
     const [activePolicyID] = useOnyx(ONYXKEYS.NVP_ACTIVE_POLICY_ID);
+    const [gpsDraftDetails] = useOnyx(ONYXKEYS.GPS_DRAFT_DETAILS);
     const [isTrackingGPS = false] = useOnyx(ONYXKEYS.GPS_DRAFT_DETAILS, {selector: isTrackingSelector});
     const isUserValidated = account?.validated;
     const delegateButtonRef = useRef<HTMLDivElement | null>(null);
@@ -109,10 +110,10 @@ function CopilotPage() {
                 return;
             }
 
-            await stopGpsTrip(false, true);
+            await stopGpsTrip(false, getGpsPoints(gpsDraftDetails), true);
             switchAccount();
         },
-        [showConfirmModal, translate],
+        [gpsDraftDetails, showConfirmModal, translate],
     );
 
     const errorFields = account?.delegatedAccess?.errorFields ?? {};
