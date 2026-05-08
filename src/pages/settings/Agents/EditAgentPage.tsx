@@ -1,13 +1,14 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {View} from 'react-native';
-import ConfirmModal from '@components/ConfirmModal';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import MenuItem from '@components/MenuItem';
 import MenuItemWithTopDescription from '@components/MenuItemWithTopDescription';
+import {ModalActions} from '@components/Modal/Global/ModalContext';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
 import ReportActionAvatars from '@components/ReportActionAvatars';
 import ScreenWrapper from '@components/ScreenWrapper';
 import ScrollView from '@components/ScrollView';
+import useConfirmModal from '@hooks/useConfirmModal';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
@@ -33,12 +34,21 @@ function EditAgentPage({route}: EditAgentPageProps) {
     const [agent] = useOnyx(`${ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT}${accountID}`);
     const [personalDetails] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST, {selector: (list) => list?.[accountID]});
     const StyleUtils = useStyleUtils();
-    const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+    const {showConfirmModal} = useConfirmModal();
 
-    const handleDeleteAgent = () => {
-        setIsDeleteModalVisible(false);
+    async function handleDeletePress() {
+        const result = await showConfirmModal({
+            title: translate('editAgentPage.deleteAgentTitle'),
+            prompt: translate('editAgentPage.deleteAgentMessage'),
+            confirmText: translate('common.delete'),
+            cancelText: translate('common.cancel'),
+            danger: true,
+        });
+        if (result.action !== ModalActions.CONFIRM) {
+            return;
+        }
         deleteAgent(accountID, agent, personalDetails);
-    };
+    }
 
     return (
         <ScreenWrapper
@@ -81,19 +91,9 @@ function EditAgentPage({route}: EditAgentPageProps) {
                 <MenuItem
                     title={translate('editAgentPage.deleteAgent')}
                     icon={icons.Trashcan}
-                    onPress={() => setIsDeleteModalVisible(true)}
+                    onPress={handleDeletePress}
                 />
             </ScrollView>
-            <ConfirmModal
-                isVisible={isDeleteModalVisible}
-                onConfirm={handleDeleteAgent}
-                onCancel={() => setIsDeleteModalVisible(false)}
-                title={translate('editAgentPage.deleteAgentTitle')}
-                prompt={translate('editAgentPage.deleteAgentMessage')}
-                confirmText={translate('common.delete')}
-                cancelText={translate('common.cancel')}
-                danger
-            />
         </ScreenWrapper>
     );
 }
