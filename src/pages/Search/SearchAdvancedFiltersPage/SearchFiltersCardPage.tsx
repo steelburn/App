@@ -9,6 +9,7 @@ import CardListItem from '@components/SelectionList/ListItem/CardListItem';
 import SelectionListWithSections from '@components/SelectionList/SelectionListWithSections';
 import {useCompanyCardFeedIcons} from '@hooks/useCompanyCardIcons';
 import useDebouncedState from '@hooks/useDebouncedState';
+import useInitiallyFocusedKey from '@hooks/useInitiallyFocusedKey';
 import useLocalize from '@hooks/useLocalize';
 import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
@@ -76,13 +77,7 @@ function SearchFiltersCardPage() {
     const shouldShowSearchInput = allCardFeeds.length + allIndividualCards.length >= CONST.STANDARD_LIST_ITEM_LIMIT;
 
     const allItems = [...allCardFeeds, ...allIndividualCards, ...allClosedCards];
-    const [initiallyFocusedKey, setInitiallyFocusedKey] = useState(() => allItems.find((item) => item.isSelected)?.keyForList);
-    useEffect(() => {
-        const id = requestAnimationFrame(() => {
-            setInitiallyFocusedKey(undefined);
-        });
-        return () => cancelAnimationFrame(id);
-    }, []);
+    const initiallyFocusedKey = useInitiallyFocusedKey(() => allItems.find((item) => item.isSelected)?.keyForList);
 
     const searchFunction = (item: CardFilterItem) =>
         !!item.text?.toLocaleLowerCase().includes(debouncedSearchTerm.toLocaleLowerCase()) ||
