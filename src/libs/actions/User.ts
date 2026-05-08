@@ -1255,13 +1255,13 @@ function updateCustomStatus(currentUserAccountIDParam: number, status: Status) {
 /**
  * Clears the custom status
  */
-function clearCustomStatus() {
+function clearCustomStatus(currentUserAccountIDParam: number) {
     const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.PERSONAL_DETAILS_LIST>> = [
         {
             onyxMethod: Onyx.METHOD.MERGE,
             key: ONYXKEYS.PERSONAL_DETAILS_LIST,
             value: {
-                [currentUserAccountID]: {
+                [currentUserAccountIDParam]: {
                     status: null, // Clearing the field
                 },
             },
