@@ -12,9 +12,10 @@ type ExpenseReportListItemAvatarProps = {
     showTooltip: boolean;
     isHovered?: boolean;
     isFocused?: boolean;
+    isLargeScreenWidth?: boolean;
 };
 
-function ExpenseReportListItemAvatar({item, showTooltip, isHovered = false, isFocused = false}: ExpenseReportListItemAvatarProps) {
+function ExpenseReportListItemAvatar({item, showTooltip, isHovered = false, isFocused = false, isLargeScreenWidth = false}: ExpenseReportListItemAvatarProps) {
     const StyleUtils = useStyleUtils();
     const styles = useThemeStyles();
     const theme = useTheme();
@@ -32,7 +33,7 @@ function ExpenseReportListItemAvatar({item, showTooltip, isHovered = false, isFo
                 shouldShowTooltip={showTooltip}
                 subscriptAvatarBorderColor={finalAvatarBorderColor}
                 reportID={item.reportID}
-                isLargeScreenWidth
+                isLargeScreenWidth={isLargeScreenWidth}
             />
         </View>
     );

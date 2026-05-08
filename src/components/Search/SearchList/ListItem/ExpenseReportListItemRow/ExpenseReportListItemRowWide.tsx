@@ -52,6 +52,7 @@ function ExpenseReportListItemRowWide({
                 showTooltip={showTooltip}
                 isHovered={isHovered}
                 isFocused={isFocused}
+                isLargeScreenWidth
             />
         ),
         [CONST.SEARCH.TABLE_COLUMNS.DATE]: (
