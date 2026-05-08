@@ -186,6 +186,7 @@ function SearchFiltersCardPage() {
                         sections={sections}
                         ListItem={CardListItem}
                         initiallyFocusedItemKey={initiallyFocusedKey}
+                        shouldUpdateFocusedIndex
                         shouldClearInputOnSelect={false}
                         onSelectRow={updateNewCards}
                         footerContent={footerContent}
