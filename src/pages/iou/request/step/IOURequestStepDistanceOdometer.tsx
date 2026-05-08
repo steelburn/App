@@ -92,6 +92,7 @@ function IOURequestStepDistanceOdometer({
     const didSaveEditingConfirmationRef = useRef(false);
     const shouldBypassDiscardConfirmationRef = useRef(false);
     const backupHandledManually = useRef(false);
+    const userHasUnsavedTypingRef = useRef(false);
 
     const isArchived = useReportIsArchived(report?.reportID);
     const [personalDetails] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST);
@@ -295,6 +296,7 @@ function IOURequestStepDistanceOdometer({
         const textForDisplay = DistanceRequestUtils.prepareTextForDisplay(text);
         setStartReading(textForDisplay);
         startReadingRef.current = textForDisplay;
+        userHasUnsavedTypingRef.current = true;
         if (formError) {
             setFormError('');
         }
@@ -307,6 +309,7 @@ function IOURequestStepDistanceOdometer({
         const textForDisplay = DistanceRequestUtils.prepareTextForDisplay(text);
         setEndReading(textForDisplay);
         endReadingRef.current = textForDisplay;
+        userHasUnsavedTypingRef.current = true;
         if (formError) {
             setFormError('');
         }
@@ -339,6 +342,8 @@ function IOURequestStepDistanceOdometer({
         const distance = end - start;
         const calculatedDistance = roundToTwoDecimalPlaces(distance);
         setMoneyRequestDistance(transactionID, calculatedDistance, isTransactionDraft, unit);
+        // Local state has just been persisted to the transaction thus the resync guard can be lowered
+        userHasUnsavedTypingRef.current = false;
 
         if (isEditing) {
             // In the split flow, when editing we use SPLIT_TRANSACTION_DRAFT to save draft value
@@ -390,6 +395,16 @@ function IOURequestStepDistanceOdometer({
 
         if (isEditingConfirmation) {
             didSaveEditingConfirmationRef.current = true;
+            // Sync the existing save-for-later draft with the just-edited values
+            // Gated so we don't promote a non-save-for-later flow into one
+            if (odometerDraft) {
+                saveOdometerDraft({
+                    startReading: Number.isNaN(start) ? undefined : start,
+                    endReading: Number.isNaN(end) ? undefined : end,
+                    startImage: transaction?.comment?.odometerStartImage,
+                    endImage: transaction?.comment?.odometerEndImage,
+                }).catch((error: unknown) => Log.warn('Failed to update odometer draft after edit-from-confirmation', {error}));
+            }
             Navigation.goBack(confirmationRoute);
             return;
         }
