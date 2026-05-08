@@ -687,6 +687,7 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
                     <ActivityIndicator
                         size="small"
                         style={styles.ml2}
+                        reasonAttributes={{context: 'WorkspaceMembersPage.gustoSync'}}
                     />
                 )}
             </View>
