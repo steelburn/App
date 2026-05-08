@@ -46,6 +46,14 @@ function ExpenseReportListItemRowWide({
     const {totalDisplaySpend = 0, nonReimbursableSpend = 0, reimbursableSpend = 0, isAllScanning: isScanning = false} = item;
 
     const columnComponents = {
+        [CONST.SEARCH.TABLE_COLUMNS.AVATAR]: (
+            <ExpenseReportListItemAvatar
+                item={item}
+                showTooltip={showTooltip}
+                isHovered={isHovered}
+                isFocused={isFocused}
+            />
+        ),
         [CONST.SEARCH.TABLE_COLUMNS.DATE]: (
             <View style={[StyleUtils.getReportTableColumnStyles(CONST.SEARCH.TABLE_COLUMNS.DATE, {isDateColumnWide: item.shouldShowYear})]}>
                 <DateCell
@@ -218,13 +226,6 @@ function ExpenseReportListItemRowWide({
                         sentryLabel={CONST.SENTRY_LABEL.SEARCH.EXPENSE_REPORT_CHECKBOX}
                     />
                 )}
-                <ExpenseReportListItemAvatar
-                    item={item}
-                    showTooltip={showTooltip}
-                    isHovered={isHovered}
-                    isFocused={isFocused}
-                />
-
                 {columns.map((column) => {
                     const CellComponent = columnComponents[column as keyof typeof columnComponents];
                     return <Fragment key={column}>{CellComponent}</Fragment>;
