@@ -1,5 +1,5 @@
 import type {ListRenderItemInfo} from '@shopify/flash-list';
-import React, {useEffect, useMemo, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {View} from 'react-native';
 import BlockingView from '@components/BlockingViews/BlockingView';
 import Button from '@components/Button';
@@ -348,15 +348,12 @@ function WorkspaceCompanyCardsTable({
         isLoadingCards,
     };
 
-    const LoadingComponent = useMemo(
-        () => (
-            <TableSkeleton
-                rowCount={5}
-                reasonAttributes={reasonAttributes}
-                renderSkeletonItem={WorkspaceCompanyCardsTableSkeleton}
-            />
-        ),
-        [reasonAttributes],
+    const LoadingComponent = (
+        <TableSkeleton
+            rowCount={5}
+            reasonAttributes={reasonAttributes}
+            renderSkeletonItem={WorkspaceCompanyCardsTableSkeleton}
+        />
     );
 
     return (
