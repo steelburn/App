@@ -28,7 +28,7 @@ import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
-import {clearDelegateErrorsByField, clearDelegatorErrors, connect, openSecuritySettingsPage, removeDelegate} from '@libs/actions/Delegate';
+import {clearDelegateErrorsByField, clearDelegatorErrors, connect, disconnect, openSecuritySettingsPage, removeDelegate} from '@libs/actions/Delegate';
 import {getLatestError} from '@libs/ErrorUtils';
 import getClickedTargetLocation from '@libs/getClickedTargetLocation';
 import {stopGpsTrip} from '@libs/GPSDraftDetailsUtils';
@@ -62,7 +62,9 @@ function CopilotPage() {
     const personalDetails = usePersonalDetails();
     const [account] = useOnyx(ONYXKEYS.ACCOUNT, {selector: accountDelegationSelector});
     const [credentials] = useOnyx(ONYXKEYS.CREDENTIALS);
+    const [stashedCredentials = CONST.EMPTY_OBJECT] = useOnyx(ONYXKEYS.STASHED_CREDENTIALS);
     const [session] = useOnyx(ONYXKEYS.SESSION);
+    const [stashedSession] = useOnyx(ONYXKEYS.STASHED_SESSION);
     const [activePolicyID] = useOnyx(ONYXKEYS.NVP_ACTIVE_POLICY_ID);
     const [isTrackingGPS = false] = useOnyx(ONYXKEYS.GPS_DRAFT_DETAILS, {selector: isTrackingSelector});
     const isUserValidated = account?.validated;
@@ -95,7 +97,7 @@ function CopilotPage() {
     }, [showConfirmModal, translate]);
 
     const showGpsInProgressModal = useCallback(
-        async (switchAccount: () => ReturnType<typeof connect>) => {
+        async (switchAccount: () => ReturnType<typeof connect | typeof disconnect>) => {
             const result = await showConfirmModal({
                 title: translate('gps.switchAccountWarningTripInProgress.title'),
                 prompt: translate('gps.switchAccountWarningTripInProgress.prompt'),
@@ -183,13 +185,29 @@ function CopilotPage() {
                 modalClose(() => showOfflineModal());
                 return;
             }
+            const isReturningToOriginalUser = isActingAsDelegate && email === stashedSession?.email;
+            const switchAction = isReturningToOriginalUser
+                ? () => disconnect({stashedCredentials, stashedSession})
+                : () => connect({email, delegatedAccess: account?.delegatedAccess, credentials, session, activePolicyID});
             if (isTrackingGPS) {
-                modalClose(() => showGpsInProgressModal(() => connect({email, delegatedAccess: account?.delegatedAccess, credentials, session, activePolicyID})));
+                modalClose(() => showGpsInProgressModal(switchAction));
                 return;
             }
-            connect({email, delegatedAccess: account?.delegatedAccess, credentials, session, activePolicyID});
+            switchAction();
         },
-        [account?.delegatedAccess, activePolicyID, credentials, isOffline, isTrackingGPS, session, showGpsInProgressModal, showOfflineModal],
+        [
+            account?.delegatedAccess,
+            activePolicyID,
+            credentials,
+            isActingAsDelegate,
+            isOffline,
+            isTrackingGPS,
+            session,
+            showGpsInProgressModal,
+            showOfflineModal,
+            stashedCredentials,
+            stashedSession,
+        ],
     );
 
     const renderTitleWithRole = useCallback(
