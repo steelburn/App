@@ -174,7 +174,7 @@ function SingleSelectPopup<T extends string>({
                         style={{
                             contentContainerStyle: [styles.pb0],
                             ...selectionListStyle,
-                            listItemWrapperStyle: [itemHeight ? {minHeight: itemHeight} : undefined, selectionListStyle?.listItemWrapperStyle],
+                            listItemWrapperStyle: [itemHeight !== undefined && {minHeight: itemHeight}, selectionListStyle?.listItemWrapperStyle],
                         }}
                         shouldUpdateFocusedIndex={isSearchable}
                         initiallyFocusedItemKey={isSearchable ? value?.value : undefined}
