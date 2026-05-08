@@ -86,6 +86,15 @@ function SearchFiltersCardPage() {
 
     const shouldShowSearchInput = allCardFeeds.length + allIndividualCards.length >= CONST.STANDARD_LIST_ITEM_LIMIT;
 
+    const allItems = [...allCardFeeds, ...allIndividualCards, ...allClosedCards];
+    const [initiallyFocusedKey, setInitiallyFocusedKey] = useState(() => allItems.find((item) => item.isSelected)?.keyForList);
+    useEffect(() => {
+        const id = requestAnimationFrame(() => {
+            setInitiallyFocusedKey(undefined);
+        });
+        return () => cancelAnimationFrame(id);
+    }, []);
+
     const searchFunction = (item: CardFilterItem) =>
         !!item.text?.toLocaleLowerCase().includes(debouncedSearchTerm.toLocaleLowerCase()) ||
         !!item.lastFourPAN?.toLocaleLowerCase().includes(debouncedSearchTerm.toLocaleLowerCase()) ||
@@ -190,6 +199,8 @@ function SearchFiltersCardPage() {
                     <SelectionListWithSections<CardFilterItem>
                         sections={sections}
                         ListItem={CardListItem}
+                        initiallyFocusedItemKey={initiallyFocusedKey}
+                        shouldClearInputOnSelect={false}
                         onSelectRow={updateNewCards}
                         footerContent={footerContent}
                         shouldPreventDefaultFocusOnSelectRow={false}
