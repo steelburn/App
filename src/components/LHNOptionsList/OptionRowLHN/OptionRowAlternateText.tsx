@@ -31,8 +31,8 @@ function OptionRowAlternateText({alternateText, report, viewMode, isOptionFocuse
     const isInFocusMode = viewMode === CONST.OPTION_MODE.COMPACT;
     const textStyle = isOptionFocused ? styles.sidebarLinkActiveText : styles.sidebarLinkText;
     const alternateTextStyle = isInFocusMode
-        ? [textStyle, styles.textLabelSupporting, styles.optionAlternateTextCompact, styles.ml2, style]
-        : [textStyle, styles.optionAlternateText, styles.textLabelSupporting, style];
+        ? [textStyle, styles.textLabelSupporting, styles.optionAlternateTextCompact, styles.pre, styles.ml2, style]
+        : [textStyle, styles.optionAlternateText, styles.textLabelSupporting, styles.pre, style];
     const alternateTextFSClass = FS.getChatFSClass(report);
 
     const containsCustomEmojiWithText = containsCustomEmojiUtils(alternateText) && !containsOnlyCustomEmoji(alternateText);
