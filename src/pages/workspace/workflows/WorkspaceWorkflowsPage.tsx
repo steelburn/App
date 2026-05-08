@@ -281,8 +281,7 @@ function WorkspaceWorkflowsPage({policy, route}: WorkspaceWorkflowsPageProps) {
 
         return (
             <Text style={[styles.textLabelSupportingEmptyValue, styles.lh20, styles.mt1, styles.mr5]}>
-                {translate('workflowsPage.addApprovalsDescription')}{' '}
-                <TextLink onPress={navigateToGustoSettings}>{translate('workflowsPage.configureViaGusto')}</TextLink>
+                {translate('workflowsPage.addApprovalsDescription')} <TextLink onPress={navigateToGustoSettings}>{translate('workflowsPage.configureViaGusto')}</TextLink>
             </Text>
         );
     }, [isGustoConnected, navigateToGustoSettings, styles.lh20, styles.mr5, styles.mt1, styles.textLabelSupportingEmptyValue, translate]);
