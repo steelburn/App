@@ -56,6 +56,8 @@ jest.mock('@libs/PolicyUtils', () => ({
 
 const fakePolicyID = 'ABCD1234';
 const mockPolicy = {...createRandomPolicy(0), id: fakePolicyID};
+const fakeDomainAccountID = 4242;
+const mockDomain = {accountID: fakeDomainAccountID, validated: true, email: 'admin@example.com'};
 const mockedGetPathFromState = getPathFromState as jest.MockedFunction<typeof getPathFromState>;
 /* eslint-disable @typescript-eslint/unbound-method -- jest.fn() mocks don't rely on `this` binding */
 const mockedGetRootState = navigationRef.getRootState as unknown as jest.Mock<{routes: unknown[]} | undefined>;
@@ -72,6 +74,15 @@ function setupOnyxForPolicy() {
     mockUseOnyx.mockImplementation((key: unknown) => {
         if (key === ONYXKEYS.COLLECTION.POLICY) {
             return [{[`${ONYXKEYS.COLLECTION.POLICY}${fakePolicyID}`]: mockPolicy}];
+        }
+        return [undefined];
+    });
+}
+
+function setupOnyxForDomain() {
+    mockUseOnyx.mockImplementation((key: unknown) => {
+        if (key === ONYXKEYS.COLLECTION.DOMAIN) {
+            return [{[`${ONYXKEYS.COLLECTION.DOMAIN}${fakeDomainAccountID}`]: mockDomain}];
         }
         return [undefined];
     });
@@ -311,5 +322,49 @@ describe('useRestoreWorkspacesTabOnNavigate', () => {
         result.current();
 
         expect(Navigation.navigate).toHaveBeenCalledWith(restoredPath);
+    });
+
+    // Domain restore: when the last workspace-tab route is a DOMAIN_SPLIT_NAVIGATOR with a domainAccountID,
+    // resolve the matching Domain via useOnyx(ONYXKEYS.COLLECTION.DOMAIN) and navigate to the domain page.
+    it('restores to the last visited domain when re-entering the Workspaces tab', () => {
+        setupOnyxForDomain();
+        mockedGetRootState.mockReturnValue(
+            buildStateWithUserOnDifferentTab([
+                {
+                    name: NAVIGATORS.DOMAIN_SPLIT_NAVIGATOR,
+                    state: {routes: [{name: SCREENS.DOMAIN.INITIAL, params: {domainAccountID: fakeDomainAccountID}}]},
+                },
+            ]),
+        );
+
+        const {result} = renderHook(() => useRestoreWorkspacesTabOnNavigate());
+        result.current();
+
+        expect(Navigation.navigate).toHaveBeenCalledWith(ROUTES.DOMAIN_INITIAL.getRoute(fakeDomainAccountID));
+    });
+
+    // If the last route was a domain but it's no longer present in the Onyx domain collection
+    // (e.g. user lost access), the lookup yields undefined and we fall back to the workspaces list.
+    it('falls back to the workspaces list when the last visited domain is missing from Onyx', () => {
+        // Onyx returns no matching domain for the params.domainAccountID
+        mockUseOnyx.mockImplementation((key: unknown) => {
+            if (key === ONYXKEYS.COLLECTION.DOMAIN) {
+                return [{}];
+            }
+            return [undefined];
+        });
+        mockedGetRootState.mockReturnValue(
+            buildStateWithUserOnDifferentTab([
+                {
+                    name: NAVIGATORS.DOMAIN_SPLIT_NAVIGATOR,
+                    state: {routes: [{name: SCREENS.DOMAIN.INITIAL, params: {domainAccountID: fakeDomainAccountID}}]},
+                },
+            ]),
+        );
+
+        const {result} = renderHook(() => useRestoreWorkspacesTabOnNavigate());
+        result.current();
+
+        expect(Navigation.navigate).toHaveBeenCalledWith(ROUTES.WORKSPACES_LIST.route);
     });
 });
