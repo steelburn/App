@@ -23,7 +23,6 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import Navigation from '@libs/Navigation/Navigation';
 import OnboardingRefManager from '@libs/OnboardingRefManager';
 import type {TOnboardingRef} from '@libs/OnboardingRefManager';
-import {isCurrentUserValidated} from '@libs/UserUtils';
 import variables from '@styles/variables';
 import {completeOnboarding} from '@userActions/Report';
 import {setOnboardingErrorMessage, setOnboardingPurposeSelected} from '@userActions/Welcome';
@@ -77,11 +76,8 @@ function BaseOnboardingPurpose({shouldUseNativeStyles, shouldEnableMaxHeight, ro
     const [introSelected] = useOnyx(ONYXKEYS.NVP_INTRO_SELECTED);
     const [isSelfTourViewed] = useOnyx(ONYXKEYS.NVP_ONBOARDING, {selector: hasSeenTourSelector});
     const [betas] = useOnyx(ONYXKEYS.BETAS);
-    const [loginList] = useOnyx(ONYXKEYS.LOGIN_LIST);
-    const [session] = useOnyx(ONYXKEYS.SESSION);
     const {isBetaEnabled} = usePermissions();
     const canUseSubmit2026 = isBetaEnabled(CONST.BETAS.SUBMIT_2026);
-    const isValidated = isCurrentUserValidated(loginList, session?.email);
     const autoCreateSubmitWorkspace = useAutoCreateSubmitWorkspace();
     const autoCreateTrackWorkspace = useAutoCreateTrackWorkspace();
     const paddingHorizontal = onboardingIsMediumOrLargerScreenWidth ? styles.ph8 : styles.ph5;
@@ -112,13 +108,6 @@ function BaseOnboardingPurpose({shouldUseNativeStyles, shouldEnableMaxHeight, ro
                 }
 
                 if (choice === CONST.ONBOARDING_CHOICES.EMPLOYER && canUseSubmit2026) {
-                    if (isPrivateDomainAndHasAccessiblePolicies && isValidated) {
-                        Navigation.navigate(
-                            personalDetailsForm?.firstName ? ROUTES.ONBOARDING_WORKSPACES.getRoute(route.params?.backTo) : ROUTES.ONBOARDING_PERSONAL_DETAILS.getRoute(route.params?.backTo),
-                        );
-                        return;
-                    }
-
                     if (personalDetailsForm?.firstName) {
                         autoCreateSubmitWorkspace(personalDetailsForm.firstName, personalDetailsForm.lastName ?? '');
                         return;

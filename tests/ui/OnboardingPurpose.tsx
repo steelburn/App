@@ -181,7 +181,10 @@ describe('OnboardingPurpose Page', () => {
         await waitForBatchedUpdatesWithAct();
     });
 
-    it('should navigate to workspaces page when user selects EMPLOYER with Submit2026 beta and is from private domain with name set', async () => {
+    it('should create a Submit workspace when user selects EMPLOYER with Submit2026 beta and is from private domain with name set', async () => {
+        jest.spyOn(Navigation, 'dismissModal').mockImplementation(() => {});
+        jest.spyOn(Navigation, 'setNavigationActionToMicrotaskQueue').mockImplementation((callback: () => void) => callback());
+
         const testEmail = 'test@user.com';
         await TestHelper.signInWithTestUser();
 
@@ -214,7 +217,12 @@ describe('OnboardingPurpose Page', () => {
         await user.press(employerOption);
 
         await waitFor(() => {
-            expect(navigate).toHaveBeenCalledWith(ROUTES.ONBOARDING_WORKSPACES.getRoute(''));
+            expect(mockCreateWorkspace).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    type: CONST.POLICY.TYPE.SUBMIT,
+                    engagementChoice: CONST.ONBOARDING_CHOICES.EMPLOYER,
+                }),
+            );
         });
 
         unmount();
