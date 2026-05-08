@@ -678,7 +678,7 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
             <View style={[styles.pl5, styles.mb5, styles.mt3, styles.flexRow, styles.alignItemsCenter]}>
                 <Text style={[styles.textSupporting, styles.flexShrink1, isPendingAddOrDelete && styles.offlineFeedbackPending]}>
                     {translate('workspace.people.workspaceMembersCount', memberCount)}
-                    {shouldShowGustoSyncLink && ' '}
+                    {shouldShowGustoSyncLink && '. '}
                     {shouldShowGustoSyncLink && (
                         <TextLink onPress={() => Navigation.navigate(ROUTES.WORKSPACE_HR.getRoute(policyID))}>{translate('workspace.people.configureGustoSync')}</TextLink>
                     )}
