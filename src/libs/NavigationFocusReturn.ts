@@ -212,10 +212,11 @@ function cancelReturnHoldRelease(): void {
     returnHoldTimerId = undefined;
 }
 
-// PUSH_PARAMS browser-forward fires same-key RESET (noop in handleStateChange) — also drop completed-RETURN state so it doesn't leak into the forward screen and block AUTO/INITIAL.
+// Same-key forward is noop in handleStateChange — drop the cycle for both an in-flight restore (AUTO may have grabbed it during the deferred window) and a completed RETURN, otherwise it blocks the next screen's INITIAL/AUTO.
 function cancelPendingFocusRestore(): void {
+    const hadPendingRestore = pendingRestore !== null;
     cancelPendingRestore();
-    if (lastRestoreTarget) {
+    if (hadPendingRestore || lastRestoreTarget) {
         cancelReturnHoldRelease();
         lastRestoreTarget = null;
         resetCycle();

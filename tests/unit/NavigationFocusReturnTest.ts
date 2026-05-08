@@ -970,6 +970,26 @@ describe('restoreTriggerForRoute', () => {
         });
     });
 
+    it('clears a stale AUTO claimed during the deferred-restore window when an in-flight restore is cancelled (PUSH_PARAMS forward / unknown RESET race)', () => {
+        withFakeTimers(() => {
+            const trigger = appendButton();
+            trigger.focus();
+            setLastInteractiveElementForTests(trigger);
+            captureTriggerForRoute(compoundParamsKey('search', {q: 'A'}));
+            trigger.blur();
+
+            // Queue restore; don't advance timers so it stays in-flight (lastRestoreTarget unset).
+            notifyPushParamsBackward('search', {q: 'A'});
+            // AUTO grabs the cycle during the deferred window.
+            expect(tryClaim(Priorities.AUTO)).toBe(true);
+            expect(tryClaim(Priorities.INITIAL)).toBe(false);
+
+            notifyPushParamsForward('search', {q: 'B'});
+
+            expect(tryClaim(Priorities.INITIAL)).toBe(true);
+        });
+    });
+
     it('clears completed RETURN hold/cycle on PUSH_PARAMS forward so the next params screen can claim AUTO/INITIAL', () => {
         withFakeTimers(() => {
             const trigger = appendButton();
