@@ -43,7 +43,9 @@ function SearchFiltersCardPage() {
     const [searchAdvancedFiltersForm, searchAdvancedFiltersFormMetadata] = useOnyx(ONYXKEYS.FORMS.SEARCH_ADVANCED_FILTERS_FORM);
     const personalDetails = usePersonalDetails();
 
-    const [selectedCards, setSelectedCards] = useState<string[]>([]);
+    const [selectedCards, setSelectedCards] = useState<string[]>(() =>
+        generateSelectedCards(userCardList, workspaceCardFeeds, searchAdvancedFiltersForm?.feed, searchAdvancedFiltersForm?.cardID),
+    );
 
     useEffect(() => {
         if (isOffline) {
