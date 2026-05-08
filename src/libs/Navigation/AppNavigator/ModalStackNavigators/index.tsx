@@ -23,6 +23,7 @@ import type {
     NewReportWorkspaceSelectionNavigatorParamList,
     NewTaskNavigatorParamList,
     ParticipantsNavigatorParamList,
+    PolicyCopySettingsNavigatorParamList,
     PrivateNotesNavigatorParamList,
     ProfileNavigatorParamList,
     ReferralDetailsNavigatorParamList,
@@ -305,6 +306,12 @@ const WorkspaceConfirmationModalStackNavigator = createModalStackNavigator<Works
 const WorkspaceDuplicateModalStackNavigator = createModalStackNavigator<WorkspaceDuplicateNavigatorParamList>({
     [SCREENS.WORKSPACE_DUPLICATE.ROOT]: () => require<ReactComponentModule>('../../../../pages/workspace/duplicate/WorkspaceDuplicatePage').default,
     [SCREENS.WORKSPACE_DUPLICATE.SELECT_FEATURES]: () => require<ReactComponentModule>('../../../../pages/workspace/duplicate/WorkspaceDuplicateSelectFeaturesPage').default,
+});
+
+const PolicyCopySettingsModalStackNavigator = createModalStackNavigator<PolicyCopySettingsNavigatorParamList>({
+    [SCREENS.POLICY_COPY_SETTINGS.ROOT]: () => require<ReactComponentModule>('../../../../pages/workspace/copyPolicySettings/CopyPolicySettingsSelectWorkspacesPage').default,
+    [SCREENS.POLICY_COPY_SETTINGS.SELECT_FEATURES]: () => require<ReactComponentModule>('../../../../pages/workspace/copyPolicySettings/CopyPolicySettingsSelectFeaturesPage').default,
+    [SCREENS.POLICY_COPY_SETTINGS.CONFIRM]: () => require<ReactComponentModule>('../../../../pages/workspace/copyPolicySettings/CopyPolicySettingsConfirmPage').default,
 });
 
 const TaskModalStackNavigator = createModalStackNavigator<TaskDetailsNavigatorParamList>({
@@ -1241,6 +1248,7 @@ export {
     WalletStatementStackNavigator,
     WorkspaceConfirmationModalStackNavigator,
     WorkspaceDuplicateModalStackNavigator,
+    PolicyCopySettingsModalStackNavigator,
     WorkspacesDomainModalStackNavigator,
     MultifactorAuthenticationStackNavigator,
 };

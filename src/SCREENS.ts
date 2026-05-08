@@ -301,6 +301,7 @@ const SCREENS = {
         REPORT_CHANGE_WORKSPACE: 'ReportChangeWorkspace',
         WORKSPACE_CONFIRMATION: 'Workspace_Confirmation',
         WORKSPACE_DUPLICATE: 'Workspace_Duplicate',
+        POLICY_COPY_SETTINGS: 'Policy_Copy_Settings',
         REPORT_SETTINGS: 'Report_Settings',
         REPORT_DESCRIPTION: 'Report_Description',
         PARTICIPANTS: 'Participants',
@@ -527,6 +528,11 @@ const SCREENS = {
 
     WORKSPACE_CONFIRMATION: {ROOT: 'Workspace_Confirmation_Root', OWNER_SELECTOR: 'Workspace_Confirmation_Owner_Selector', SUCCESS: 'Workspace_Confirmation_Success'},
     WORKSPACE_DUPLICATE: {ROOT: 'Workspace_Duplicate_Root', SELECT_FEATURES: 'Workspace_Duplicate_Select_Features'},
+    POLICY_COPY_SETTINGS: {
+        ROOT: 'Policy_Copy_Settings_Root',
+        SELECT_FEATURES: 'Policy_Copy_Settings_Select_Features',
+        CONFIRM: 'Policy_Copy_Settings_Confirm',
+    },
 
     WORKSPACES_LIST: 'Workspaces_List',
 

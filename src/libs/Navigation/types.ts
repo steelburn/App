@@ -2233,6 +2233,18 @@ type WorkspaceDuplicateNavigatorParamList = {
     };
 };
 
+type PolicyCopySettingsNavigatorParamList = {
+    [SCREENS.POLICY_COPY_SETTINGS.ROOT]: {
+        policyID: string;
+    };
+    [SCREENS.POLICY_COPY_SETTINGS.SELECT_FEATURES]: {
+        policyID: string;
+    };
+    [SCREENS.POLICY_COPY_SETTINGS.CONFIRM]: {
+        policyID: string;
+    };
+};
+
 type NewTaskNavigatorParamList = {
     [SCREENS.NEW_TASK.ROOT]: {
         // eslint-disable-next-line no-restricted-syntax -- `backTo` usages in this file are legacy. Do not add new `backTo` params to screens. See contributingGuides/NAVIGATION.md
@@ -2517,6 +2529,7 @@ type RightModalNavigatorParamList = {
     [SCREENS.RIGHT_MODAL.MONEY_REQUEST]: NavigatorScreenParams<MoneyRequestNavigatorParamList>;
     [SCREENS.RIGHT_MODAL.WORKSPACE_CONFIRMATION]: NavigatorScreenParams<WorkspaceConfirmationNavigatorParamList>;
     [SCREENS.RIGHT_MODAL.WORKSPACE_DUPLICATE]: NavigatorScreenParams<WorkspaceDuplicateNavigatorParamList>;
+    [SCREENS.RIGHT_MODAL.POLICY_COPY_SETTINGS]: NavigatorScreenParams<PolicyCopySettingsNavigatorParamList>;
     [SCREENS.RIGHT_MODAL.NEW_TASK]: NavigatorScreenParams<NewTaskNavigatorParamList>;
     [SCREENS.RIGHT_MODAL.TEACHERS_UNITE]: NavigatorScreenParams<TeachersUniteNavigatorParamList>;
     [SCREENS.RIGHT_MODAL.TASK_DETAILS]: NavigatorScreenParams<TaskDetailsNavigatorParamList>;
@@ -3376,6 +3389,7 @@ export type {
     MigratedUserModalNavigatorParamList,
     WorkspaceConfirmationNavigatorParamList,
     WorkspaceDuplicateNavigatorParamList,
+    PolicyCopySettingsNavigatorParamList,
     TwoFactorAuthNavigatorParamList,
     ScheduleCallParamList,
     TestDriveModalNavigatorParamList,
