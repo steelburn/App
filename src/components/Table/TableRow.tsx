@@ -6,6 +6,7 @@ import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import type {SkeletonSpanReasonAttributes} from '@libs/telemetry/useSkeletonSpan';
+import useSkeletonSpan from '@libs/telemetry/useSkeletonSpan';
 import variables from '@styles/variables';
 import CONST from '@src/CONST';
 import {useTableContext} from './TableContext';
@@ -27,10 +28,12 @@ type TableRowProps = Omit<PressableWithFeedbackProps, 'accessible'> & {
     LoadingComponent?: React.ComponentType;
 
     /** The reason attributes if the table row is loading */
-    skeletonReasonAttributes?: SkeletonSpanReasonAttributes;
+    skeletonReasonAttributes: SkeletonSpanReasonAttributes;
 };
 
 export default function TableRow({children, accessible, rowIndex, sentryLabel, interactive, isLoading, skeletonReasonAttributes, LoadingComponent, onPress, ...props}: TableRowProps) {
+    useSkeletonSpan('TableRowSkeleton', skeletonReasonAttributes);
+
     const theme = useTheme();
     const styles = useThemeStyles();
     const {processedData} = useTableContext();
@@ -59,7 +62,7 @@ export default function TableRow({children, accessible, rowIndex, sentryLabel, i
 
     return (
         <PressableWithFeedback
-            accessible
+            accessible={accessible}
             accessibilityLabel="row"
             style={tableRowStyles}
             sentryLabel={sentryLabel}
