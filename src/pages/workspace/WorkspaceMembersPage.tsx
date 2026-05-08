@@ -11,10 +11,10 @@ import GenericEmptyStateComponent from '@components/EmptyStateComponent/GenericE
 import {useLockedAccountActions, useLockedAccountState} from '@components/LockedAccountModalProvider';
 import MessagesRow from '@components/MessagesRow';
 import {ModalActions} from '@components/Modal/Global/ModalContext';
+import type {SingleSelectItem} from '@components/Search/FilterComponents/SingleSelect';
 import type {PopoverComponentProps} from '@components/Search/FilterDropdowns/DropdownButton';
 import DropdownButton from '@components/Search/FilterDropdowns/DropdownButton';
 import SingleSelectPopup from '@components/Search/FilterDropdowns/SingleSelectPopup';
-import type {SingleSelectItem} from '@components/Search/FilterDropdowns/SingleSelectPopup';
 import SearchBar from '@components/SearchBar';
 import TableListItem from '@components/SelectionList/ListItem/TableListItem';
 import type {ListItem, SelectionListHandle} from '@components/SelectionList/types';
@@ -282,7 +282,6 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
             }
         }
 
-        // eslint-disable-next-line @typescript-eslint/no-deprecated
         InteractionManager.runAfterInteractions(() => {
             setSelectedEmployees([]);
             removeMembers(policy, selectedEmployees, policyMemberEmailsToAccountIDs);
@@ -567,7 +566,7 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
         });
     }
 
-    const handleRoleFilterChange = (item: WorkspaceMemberFilterOption | null) => {
+    const handleRoleFilterChange = (item: WorkspaceMemberFilterOption | undefined) => {
         setSelectedEmployees([]);
 
         if (!item || item.value === WORKSPACE_MEMBER_FILTER_VALUES.ALL) {
@@ -645,7 +644,7 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
         <SingleSelectPopup
             label={translate('common.role')}
             items={roleFilterOptions}
-            value={selectedRoleFilter ?? roleFilterOptions.at(0) ?? null}
+            value={selectedRoleFilter ?? roleFilterOptions.at(0)}
             closeOverlay={closeOverlay}
             onChange={handleRoleFilterChange}
             defaultValue={roleFilterOptions.at(0)?.value}
@@ -1006,8 +1005,7 @@ function WorkspaceMembersPage({personalDetails, route, policy}: WorkspaceMembers
                         }}
                         onTurnOnSelectionMode={(item) => item && toggleUser(item.login)}
                         shouldPreventDefaultFocusOnSelectRow={!canUseTouchScreen()}
-                        onCheckboxPress={(item) => toggleUser(item.login)}
-                        shouldUseDefaultRightHandSideCheckmark={false}
+                        onSelectionButtonPress={(item) => toggleUser(item.login)}
                         shouldSingleExecuteRowSelect={!isPolicyAdmin}
                         customListHeader={getCustomListHeader()}
                         customListHeaderContent={headerContent}
