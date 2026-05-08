@@ -7717,6 +7717,7 @@ const CONST = {
                     WITHDRAWAL_ID: this.TABLE_COLUMNS.WITHDRAWAL_ID,
                 },
                 EXPENSE_REPORT: {
+                    AVATAR: this.TABLE_COLUMNS.AVATAR,
                     DATE: this.TABLE_COLUMNS.DATE,
                     SUBMITTED: this.TABLE_COLUMNS.SUBMITTED,
                     APPROVED: this.TABLE_COLUMNS.APPROVED,
@@ -7762,17 +7763,20 @@ const CONST = {
         get GROUP_CUSTOM_COLUMNS() {
             return {
                 FROM: {
+                    AVATAR: this.TABLE_COLUMNS.AVATAR,
                     FROM: this.TABLE_COLUMNS.GROUP_FROM,
                     EXPENSES: this.TABLE_COLUMNS.GROUP_EXPENSES,
                     TOTAL: this.TABLE_COLUMNS.GROUP_TOTAL,
                 },
                 CARD: {
+                    AVATAR: this.TABLE_COLUMNS.AVATAR,
                     CARD: this.TABLE_COLUMNS.GROUP_CARD,
                     FEED: this.TABLE_COLUMNS.GROUP_FEED,
                     EXPENSES: this.TABLE_COLUMNS.GROUP_EXPENSES,
                     TOTAL: this.TABLE_COLUMNS.GROUP_TOTAL,
                 },
                 WITHDRAWAL_ID: {
+                    AVATAR: this.TABLE_COLUMNS.AVATAR,
                     WITHDRAWN: this.TABLE_COLUMNS.GROUP_WITHDRAWN,
                     WITHDRAWAL_STATUS: this.TABLE_COLUMNS.GROUP_WITHDRAWAL_STATUS,
                     BANK_ACCOUNT: this.TABLE_COLUMNS.GROUP_BANK_ACCOUNT,
@@ -7830,6 +7834,7 @@ const CONST = {
                     this.TABLE_COLUMNS.TOTAL_AMOUNT,
                 ],
                 EXPENSE_REPORT: [
+                    this.TABLE_COLUMNS.AVATAR,
                     this.TABLE_COLUMNS.DATE,
                     this.TABLE_COLUMNS.STATUS,
                     this.TABLE_COLUMNS.TITLE,
@@ -7846,9 +7851,10 @@ const CONST = {
         },
         get GROUP_DEFAULT_COLUMNS() {
             return {
-                FROM: [this.TABLE_COLUMNS.GROUP_FROM, this.TABLE_COLUMNS.GROUP_EXPENSES, this.TABLE_COLUMNS.GROUP_TOTAL],
-                CARD: [this.TABLE_COLUMNS.GROUP_CARD, this.TABLE_COLUMNS.GROUP_FEED, this.TABLE_COLUMNS.GROUP_EXPENSES, this.TABLE_COLUMNS.GROUP_TOTAL],
+                FROM: [this.TABLE_COLUMNS.AVATAR, this.TABLE_COLUMNS.GROUP_FROM, this.TABLE_COLUMNS.GROUP_EXPENSES, this.TABLE_COLUMNS.GROUP_TOTAL],
+                CARD: [this.TABLE_COLUMNS.AVATAR, this.TABLE_COLUMNS.GROUP_CARD, this.TABLE_COLUMNS.GROUP_FEED, this.TABLE_COLUMNS.GROUP_EXPENSES, this.TABLE_COLUMNS.GROUP_TOTAL],
                 WITHDRAWAL_ID: [
+                    this.TABLE_COLUMNS.AVATAR,
                     this.TABLE_COLUMNS.GROUP_WITHDRAWN,
                     this.TABLE_COLUMNS.GROUP_WITHDRAWAL_STATUS,
                     this.TABLE_COLUMNS.GROUP_BANK_ACCOUNT,
