@@ -2,7 +2,7 @@
 title: Manage Devices
 description: View and revoke device access for your Expensify account
 keywords: [device management, revoke device, security, logged in devices, New Expensify]
-internalScope: Audience is all Expensify members. Covers viewing and revoking device sessions in New Expensify. Does not cover two-factor authentication, account lockdown, or SAML/SSO configuration.
+internalScope: Audience is all Expensify members. Covers viewing and revoking device sessions in New Expensify. Does not cover two-factor authentication, account lock, or SAML/SSO configuration.
 ---
 
 # Manage Devices
