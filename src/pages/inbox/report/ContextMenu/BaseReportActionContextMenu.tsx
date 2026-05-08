@@ -46,6 +46,7 @@ import {
     getSourceIDFromReportAction,
     isArchivedNonExpenseReport,
     isHarvestCreatedExpenseReport,
+    isUnread,
     isInvoiceReport as ReportUtilsIsInvoiceReport,
     isMoneyRequest as ReportUtilsIsMoneyRequest,
     isMoneyRequestReport as ReportUtilsIsMoneyRequestReport,
@@ -264,7 +265,9 @@ function BaseReportActionContextMenu({
 
     const isChronosReport = chatIncludesChronosWithID(originalReportID);
     const isPinnedChat = !!report?.isPinned;
-    const isUnreadChat = !report?.lastReadTime || report.lastReadTime < (report.lastVisibleActionCreated ?? '');
+    // Pass undefined for oneTransactionThreadReport — BaseReportActionContextMenu doesn't subscribe to it for the
+    // context menu's report, so we fall back to report.lastVisibleActionCreated directly.
+    const isUnreadChat = isUnread(report, undefined, isOriginalReportArchived);
     const shouldEnableArrowNavigation = !isMini && (isVisible || shouldKeepOpen);
     const isHarvestReport = isHarvestCreatedExpenseReport(reportNameValuePairs?.origin, reportNameValuePairs?.originalID);
 
