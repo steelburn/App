@@ -5,7 +5,6 @@ import Navigation from '@libs/Navigation/Navigation';
 import {getDefaultChatEnabledPolicy, isPaidGroupPolicy} from '@libs/PolicyUtils';
 import {generateReportID} from '@libs/ReportUtils';
 import {shouldRestrictUserBillableActions} from '@libs/SubscriptionUtils';
-import useRedirectToExpensifyClassic from '@pages/inbox/sidebar/FABPopoverContent/useRedirectToExpensifyClassic';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
@@ -27,7 +26,7 @@ type UseCreateReportActionParams = {
 type UseCreateReportActionResult = {
     /** The action to trigger when the user clicks "Create report" */
     createReportAction: () => void;
-    /** Whether the menu item/button should be visible — false only when redirecting to Classic is required but not currently possible */
+    /** Whether the menu item/button should be visible */
     isVisible: boolean;
 };
 
@@ -36,11 +35,10 @@ type UseCreateReportActionResult = {
  * the FAB, the search Create dropdown, and the empty reports state.
  *
  * Decision flow:
- * 1. Redirect to Expensify Classic if all group policies have expense chat disabled
- * 2. Navigate to upgrade path if user has no valid group policies at all
- * 3. Navigate to workspace selector if no default workspace or restricted with multiple options
- * 4. Show empty report confirmation or create directly if workspace is valid
- * 5. Navigate to restricted action if billing restricts the workspace
+ * 1. Navigate to upgrade path if user has no valid group policies at all
+ * 2. Navigate to workspace selector if default is personal AND there are 2+ non-personal workspaces, or if the chosen default is billing-restricted and alternatives exist
+ * 3. Show empty report confirmation or create directly if workspace is valid
+ * 4. Navigate to restricted action if billing restricts the workspace
  */
 export default function useCreateReportAction({onCreateReport, groupPoliciesWithChatEnabled, shouldHandleNavigationBack = true}: UseCreateReportActionParams): UseCreateReportActionResult {
     const [activePolicyID] = useOnyx(ONYXKEYS.NVP_ACTIVE_POLICY_ID);
@@ -52,14 +50,12 @@ export default function useCreateReportAction({onCreateReport, groupPoliciesWith
     const [hasDismissedEmptyReportsConfirmation] = useOnyx(ONYXKEYS.NVP_EMPTY_REPORTS_CONFIRMATION_DISMISSED);
     const [accountID] = useOnyx(ONYXKEYS.SESSION, {selector: (session) => session?.accountID});
 
-    const {shouldRedirectToExpensifyClassic, canUseAction, showRedirectToExpensifyClassicModal} = useRedirectToExpensifyClassic();
-
     // Gate visibility and routing on policy hydration. Without this, during Onyx cold-start
     // groupPoliciesWithChatEnabled.length === 0 would be true even for users who actually have
     // workspaces, sending them to MONEY_REQUEST_UPGRADE as if they had none.
     const arePoliciesLoaded = !isLoadingOnyxValue(policiesMeta);
-    const isVisible = arePoliciesLoaded && canUseAction;
-    const shouldNavigateToUpgradePath = !shouldRedirectToExpensifyClassic && groupPoliciesWithChatEnabled.length === 0;
+    const isVisible = arePoliciesLoaded;
+    const shouldNavigateToUpgradePath = groupPoliciesWithChatEnabled.length === 0;
 
     const defaultChatEnabledPolicy = getDefaultChatEnabledPolicy(groupPoliciesWithChatEnabled as Array<OnyxEntry<OnyxTypes.Policy>>, activePolicy);
     const defaultChatEnabledPolicyID = defaultChatEnabledPolicy?.id;
@@ -77,11 +73,6 @@ export default function useCreateReportAction({onCreateReport, groupPoliciesWith
     const createReportAction = useCallback(() => {
         interceptAnonymousUser(() => {
             if (!arePoliciesLoaded) {
-                return;
-            }
-
-            if (shouldRedirectToExpensifyClassic) {
-                showRedirectToExpensifyClassicModal();
                 return;
             }
 
@@ -132,8 +123,6 @@ export default function useCreateReportAction({onCreateReport, groupPoliciesWith
         });
     }, [
         arePoliciesLoaded,
-        shouldRedirectToExpensifyClassic,
-        showRedirectToExpensifyClassicModal,
         shouldNavigateToUpgradePath,
         activePolicy,
         defaultChatEnabledPolicyID,

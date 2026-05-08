@@ -27,19 +27,6 @@ jest.mock('@hooks/useCreateEmptyReportConfirmation', () =>
     })),
 );
 
-const mockShowRedirectToExpensifyClassicModal = jest.fn();
-const mockUseRedirectToExpensifyClassic = jest.fn(() => ({
-    shouldRedirectToExpensifyClassic: false,
-    canRedirectToExpensifyClassic: false,
-    canUseAction: true,
-    showRedirectToExpensifyClassicModal: mockShowRedirectToExpensifyClassicModal,
-}));
-jest.mock('@pages/inbox/sidebar/FABPopoverContent/useRedirectToExpensifyClassic', () => ({
-    __esModule: true,
-
-    default: () => mockUseRedirectToExpensifyClassic(),
-}));
-
 jest.mock('@libs/PolicyUtils', () => ({
     getDefaultChatEnabledPolicy: jest.fn((policies: Array<OnyxEntry<Policy>>, activePolicy: OnyxEntry<Policy>) => {
         // Mirror the real helper: prefer activePolicy if it's a paid group with chat enabled, otherwise the single non-personal candidate.
@@ -97,15 +84,6 @@ function setupUseOnyx(overrides: Record<string, unknown> = {}) {
     mockUseOnyx.mockImplementation(impl);
 }
 
-function setupRedirectToExpensifyClassic({shouldRedirect = false, canRedirect = false}: {shouldRedirect?: boolean; canRedirect?: boolean} = {}) {
-    mockUseRedirectToExpensifyClassic.mockReturnValue({
-        shouldRedirectToExpensifyClassic: shouldRedirect,
-        canRedirectToExpensifyClassic: canRedirect,
-        canUseAction: !shouldRedirect || canRedirect,
-        showRedirectToExpensifyClassicModal: mockShowRedirectToExpensifyClassicModal,
-    });
-}
-
 // ── Tests ──────────────────────────────────────────────────────────────────────
 
 describe('useCreateReportAction', () => {
@@ -115,7 +93,6 @@ describe('useCreateReportAction', () => {
         mockShouldRestrictUserBillableActions.mockReturnValue(false);
         mockUseHasEmptyReportsForPolicy.mockReturnValue(false);
         setupUseOnyx();
-        setupRedirectToExpensifyClassic();
     });
 
     describe('upgrade path (no policies)', () => {
@@ -138,28 +115,6 @@ describe('useCreateReportAction', () => {
             expect(navigateArg).toContain('upgrade');
             expect(navigateArg).toContain(CONST.UPGRADE_PATHS.REPORTS);
             expect(onCreateReport).not.toHaveBeenCalled();
-        });
-    });
-
-    describe('redirect to Expensify Classic', () => {
-        it('shows classic redirect modal when shouldRedirectToExpensifyClassic is true', () => {
-            setupRedirectToExpensifyClassic({shouldRedirect: true, canRedirect: true});
-            const onCreateReport = jest.fn();
-
-            const {result} = renderHook(() =>
-                useCreateReportAction({
-                    onCreateReport,
-                    groupPoliciesWithChatEnabled: [],
-                }),
-            );
-
-            act(() => {
-                result.current.createReportAction();
-            });
-
-            expect(mockShowRedirectToExpensifyClassicModal).toHaveBeenCalledTimes(1);
-            expect(onCreateReport).not.toHaveBeenCalled();
-            expect(Navigation.navigate).not.toHaveBeenCalled();
         });
     });
 
@@ -354,26 +309,6 @@ describe('useCreateReportAction', () => {
     });
 
     describe('decision flow priority', () => {
-        it('classic redirect takes priority over upgrade path', () => {
-            setupRedirectToExpensifyClassic({shouldRedirect: true, canRedirect: true});
-            const onCreateReport = jest.fn();
-
-            const {result} = renderHook(() =>
-                useCreateReportAction({
-                    onCreateReport,
-                    groupPoliciesWithChatEnabled: [],
-                }),
-            );
-
-            act(() => {
-                result.current.createReportAction();
-            });
-
-            expect(mockShowRedirectToExpensifyClassicModal).toHaveBeenCalledTimes(1);
-            // Should NOT navigate to upgrade
-            expect(Navigation.navigate).not.toHaveBeenCalled();
-        });
-
         it('upgrade path takes priority over workspace selection when no policies exist', () => {
             const onCreateReport = jest.fn();
 
@@ -472,34 +407,6 @@ describe('useCreateReportAction', () => {
             );
 
             expect(result.current.isVisible).toBe(true);
-        });
-
-        it('isVisible is true when classic redirect is available', () => {
-            setupRedirectToExpensifyClassic({shouldRedirect: true, canRedirect: true});
-            const onCreateReport = jest.fn();
-
-            const {result} = renderHook(() =>
-                useCreateReportAction({
-                    onCreateReport,
-                    groupPoliciesWithChatEnabled: [],
-                }),
-            );
-
-            expect(result.current.isVisible).toBe(true);
-        });
-
-        it('isVisible is false when classic redirect is required but not usable', () => {
-            setupRedirectToExpensifyClassic({shouldRedirect: true, canRedirect: false});
-            const onCreateReport = jest.fn();
-
-            const {result} = renderHook(() =>
-                useCreateReportAction({
-                    onCreateReport,
-                    groupPoliciesWithChatEnabled: [],
-                }),
-            );
-
-            expect(result.current.isVisible).toBe(false);
         });
     });
 
