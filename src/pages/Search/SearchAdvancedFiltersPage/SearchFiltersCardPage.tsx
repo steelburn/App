@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {View} from 'react-native';
 import ActivityIndicator from '@components/ActivityIndicator';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
@@ -82,39 +82,39 @@ function SearchFiltersCardPage() {
 
     const cardFeedsSectionData = buildCardFeedsData(workspaceCardFeeds ?? CONST.EMPTY_OBJECT, domainFeedsData, policies, selectedCards, translate, illustrations, companyCardFeedIcons);
 
-    const shouldShowSearchInput =
-        cardFeedsSectionData.selected.length + cardFeedsSectionData.unselected.length + individualCardsSectionData.selected.length + individualCardsSectionData.unselected.length >=
-        CONST.STANDARD_LIST_ITEM_LIMIT;
+    const allCardFeeds = [...cardFeedsSectionData.selected, ...cardFeedsSectionData.unselected];
+    const allIndividualCards = [...individualCardsSectionData.selected, ...individualCardsSectionData.unselected];
+    const allClosedCards = [...closedCardsSectionData.selected, ...closedCardsSectionData.unselected];
 
-    const searchFunction = (item: CardFilterItem) =>
-        !!item.text?.toLocaleLowerCase().includes(debouncedSearchTerm.toLocaleLowerCase()) ||
-        !!item.lastFourPAN?.toLocaleLowerCase().includes(debouncedSearchTerm.toLocaleLowerCase()) ||
-        !!item.cardName?.toLocaleLowerCase().includes(debouncedSearchTerm.toLocaleLowerCase()) ||
-        (item.isVirtual && translate('workspace.expensifyCard.virtual').toLocaleLowerCase().includes(debouncedSearchTerm.toLocaleLowerCase()));
+    const shouldShowSearchInput = allCardFeeds.length + allIndividualCards.length >= CONST.STANDARD_LIST_ITEM_LIMIT;
+
+    const searchFunction = useCallback(
+        (item: CardFilterItem) =>
+            !!item.text?.toLocaleLowerCase().includes(debouncedSearchTerm.toLocaleLowerCase()) ||
+            !!item.lastFourPAN?.toLocaleLowerCase().includes(debouncedSearchTerm.toLocaleLowerCase()) ||
+            !!item.cardName?.toLocaleLowerCase().includes(debouncedSearchTerm.toLocaleLowerCase()) ||
+            (item.isVirtual && translate('workspace.expensifyCard.virtual').toLocaleLowerCase().includes(debouncedSearchTerm.toLocaleLowerCase())),
+        [debouncedSearchTerm, translate],
+    );
 
     const sections =
         searchAdvancedFiltersForm === undefined
             ? []
             : [
                   {
-                      title: undefined,
-                      data: [...cardFeedsSectionData.selected, ...individualCardsSectionData.selected, ...closedCardsSectionData.selected].filter(searchFunction),
+                      title: translate('search.filters.card.cardFeeds'),
+                      data: allCardFeeds.filter(searchFunction),
                       sectionIndex: 0,
                   },
                   {
-                      title: translate('search.filters.card.cardFeeds'),
-                      data: cardFeedsSectionData.unselected.filter(searchFunction),
+                      title: translate('search.filters.card.individualCards'),
+                      data: allIndividualCards.filter(searchFunction),
                       sectionIndex: 1,
                   },
                   {
-                      title: translate('search.filters.card.individualCards'),
-                      data: individualCardsSectionData.unselected.filter(searchFunction),
-                      sectionIndex: 2,
-                  },
-                  {
                       title: translate('search.filters.card.closedCards'),
-                      data: closedCardsSectionData.unselected.filter(searchFunction),
-                      sectionIndex: 3,
+                      data: allClosedCards.filter(searchFunction),
+                      sectionIndex: 2,
                   },
               ];
 
