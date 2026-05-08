@@ -22,7 +22,6 @@ import useCardFeeds from '@hooks/useCardFeeds';
 import useCurrencyForExpensifyCard from '@hooks/useCurrencyForExpensifyCard';
 import {useCurrencyListActions} from '@hooks/useCurrencyList';
 import useDefaultFundID from '@hooks/useDefaultFundID';
-import useDynamicBackPath from '@hooks/useDynamicBackPath';
 import useEnvironment from '@hooks/useEnvironment';
 import useExpensifyCardFeeds from '@hooks/useExpensifyCardFeeds';
 import {useMemoizedLazyExpensifyIcons, useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
@@ -54,15 +53,13 @@ import isLoadingOnyxValue from '@src/types/utils/isLoadingOnyxValue';
 
 type WorkspaceExpensifyCardDetailsPageProps = PlatformStackScreenProps<
     SettingsNavigatorParamList,
-    typeof SCREENS.WORKSPACE.EXPENSIFY_CARD_DETAILS | typeof SCREENS.EXPENSIFY_CARD.DYNAMIC_EXPENSIFY_CARD_DETAILS
+    typeof SCREENS.WORKSPACE.EXPENSIFY_CARD_DETAILS | typeof SCREENS.EXPENSIFY_CARD.EXPENSIFY_CARD_DETAILS
 >;
 
 function WorkspaceExpensifyCardDetailsPage({route}: WorkspaceExpensifyCardDetailsPageProps) {
     const {isProduction} = useEnvironment();
     const navigation = useNavigation<NavigationProp<SettingsNavigatorParamList>>();
     const {policyID, cardID, backTo} = route.params;
-    const isSettingsExpensifyCard = route.name === SCREENS.EXPENSIFY_CARD.DYNAMIC_EXPENSIFY_CARD_DETAILS;
-    const dynamicBackPath = useDynamicBackPath(DYNAMIC_ROUTES.EXPENSIFY_CARD_DETAILS.path);
     const {convertToDisplayString} = useCurrencyListActions();
     const defaultFundID = useDefaultFundID(policyID);
 
@@ -229,7 +226,7 @@ function WorkspaceExpensifyCardDetailsPage({route}: WorkspaceExpensifyCardDetail
             >
                 <HeaderWithBackButton
                     title={translate('workspace.expensifyCard.cardDetails')}
-                    onBackButtonPress={() => Navigation.goBack(isSettingsExpensifyCard ? dynamicBackPath : backTo)}
+                    onBackButtonPress={() => Navigation.goBack(backTo)}
                 />
                 <ScrollView addBottomSafeAreaPadding>
                     {canManageCardFreeze && isCardFrozen(card) ? (
@@ -288,9 +285,7 @@ function WorkspaceExpensifyCardDetailsPage({route}: WorkspaceExpensifyCardDetail
                             description={translate('workspace.expensifyCard.cardLimit')}
                             title={formattedLimit}
                             shouldShowRightIcon
-                            onPress={() => {
-                                Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.EXPENSIFY_CARD_LIMIT.path));
-                            }}
+                            onPress={() => Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.EXPENSIFY_CARD_LIMIT.path))}
                         />
                     </OfflineWithFeedback>
                     <OfflineWithFeedback pendingAction={card?.nameValuePairs?.pendingFields?.limitType}>
