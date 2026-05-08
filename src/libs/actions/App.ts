@@ -11,6 +11,7 @@ import {SIDE_EFFECT_REQUEST_COMMANDS, WRITE_COMMANDS} from '@libs/API/types';
 import DateUtils from '@libs/DateUtils';
 import Log from '@libs/Log';
 import getCurrentUrl from '@libs/Navigation/currentUrl';
+import willRouteNavigateToRHP from '@libs/Navigation/helpers/willRouteNavigateToRHP';
 import Navigation, {navigationRef} from '@libs/Navigation/Navigation';
 import {isPublicRoom, isValidReport} from '@libs/ReportUtils';
 import {isLoggingInAsNewUser as isLoggingInAsNewUserSessionUtils} from '@libs/SessionUtils';
@@ -631,6 +632,15 @@ function createWorkspaceWithPolicyDraftAndNavigateToIt(params: CreateWorkspaceWi
         if (transitionFromOldDot) {
             Navigation.navigate(routeToNavigate);
         } else if (Navigation.isTopmostRouteModalScreen()) {
+            // `revealRouteBeforeDismissingModal` only works for fullscreen targets. Modal targets
+            // (e.g. workspace confirmation success) still need to open after the current RHP closes.
+            if (willRouteNavigateToRHP(routeToNavigate)) {
+                Navigation.dismissModal({
+                    afterTransition: () => Navigation.navigate(routeToNavigate),
+                });
+                return;
+            }
+
             Navigation.revealRouteBeforeDismissingModal(routeToNavigate);
         } else {
             Navigation.navigate(routeToNavigate, {forceReplace: true});
