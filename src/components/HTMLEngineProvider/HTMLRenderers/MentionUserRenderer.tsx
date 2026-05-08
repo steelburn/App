@@ -82,9 +82,7 @@ function MentionUserRenderer({style, tnode, TDefaultRenderer, currentUserPersona
                 if (isDisabled || !shouldDisplayContextMenu) {
                     return;
                 }
-                return onShowContextMenu(() =>
-                    showContextMenuForReport(event, anchor, report?.reportID, action, checkIfContextMenuActive, originalReportID),
-                );
+                return onShowContextMenu(() => showContextMenuForReport(event, anchor, report?.reportID, action, checkIfContextMenuActive, originalReportID));
             }}
             onPress={(event) => {
                 event.preventDefault();

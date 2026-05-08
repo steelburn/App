@@ -123,16 +123,7 @@ function ImageRenderer({tnode}: CustomRendererProps<TBlock>) {
                         if (isDisabled || !shouldDisplayContextMenu) {
                             return;
                         }
-                        return onShowContextMenu(() =>
-                            showContextMenuForReport(
-                                event,
-                                anchor,
-                                report?.reportID,
-                                action,
-                                checkIfContextMenuActive,
-                                originalReportID,
-                            ),
-                        );
+                        return onShowContextMenu(() => showContextMenuForReport(event, anchor, report?.reportID, action, checkIfContextMenuActive, originalReportID));
                     }}
                     isNested
                     shouldUseHapticsOnLongPress
