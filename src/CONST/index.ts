@@ -948,6 +948,7 @@ const CONST = {
         BULK_DUPLICATE_REPORT: 'bulkDuplicateReport',
         BULK_EDIT: 'bulkEdit',
         NEW_MANUAL_EXPENSE_FLOW: 'newManualExpenseFlow',
+        SUBMIT_2026: 'submit2026',
         BULK_SUBMIT_APPROVE_PAY: 'bulkSubmitApprovePay',
     },
     BUTTON_STATES: {
@@ -3580,6 +3581,8 @@ const CONST = {
 
             // Often referred to as "collect" workspaces
             TEAM: 'team',
+
+            SUBMIT: 'submit2026',
         },
         RULE_CONDITIONS: {
             MATCHES: 'matches',
@@ -3598,6 +3601,7 @@ const CONST = {
             ADMIN: 'admin',
             AUDITOR: 'auditor',
             USER: 'user',
+            EDITOR: 'editor',
         },
         AUTO_REIMBURSEMENT_MAX_LIMIT_CENTS: 2000000,
 
