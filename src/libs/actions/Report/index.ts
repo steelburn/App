@@ -2162,26 +2162,21 @@ function navigateToAndOpenReport(
     }
 
     let hasAttemptedFallback = false;
-    let hasSeenLoadingStart = false;
-    const loadingStateConnection = Onyx.connectWithoutView({
-        key: `${ONYXKEYS.COLLECTION.RAM_ONLY_REPORT_LOADING_STATE}${chat.reportID}`,
-        callback: (loadingState) => {
-            if (loadingState?.isLoadingInitialReportActions) {
-                hasSeenLoadingStart = true;
+    const reportConnection = Onyx.connectWithoutView({
+        key: `${ONYXKEYS.COLLECTION.REPORT}${chat.reportID}`,
+        callback: (updatedReport) => {
+            const notFoundError = updatedReport?.errorFields?.notFound;
+            if (notFoundError === null) {
+                Onyx.disconnect(reportConnection);
                 return;
             }
 
-            if (!hasSeenLoadingStart) {
-                return;
-            }
-
-            Onyx.disconnect(loadingStateConnection);
-            const latestReport = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${chat.reportID}`];
-            if (!latestReport?.errorFields?.notFound || hasAttemptedFallback) {
+            if (!notFoundError || hasAttemptedFallback) {
                 return;
             }
 
             hasAttemptedFallback = true;
+            Onyx.disconnect(reportConnection);
             createAndOpenNewOptimisticChat(chat.reportID);
         },
     });
@@ -2270,26 +2265,21 @@ function navigateToAndOpenReportWithAccountIDs(
     }
 
     let hasAttemptedFallback = false;
-    let hasSeenLoadingStart = false;
-    const loadingStateConnection = Onyx.connectWithoutView({
-        key: `${ONYXKEYS.COLLECTION.RAM_ONLY_REPORT_LOADING_STATE}${chat.reportID}`,
-        callback: (loadingState) => {
-            if (loadingState?.isLoadingInitialReportActions) {
-                hasSeenLoadingStart = true;
+    const reportConnection = Onyx.connectWithoutView({
+        key: `${ONYXKEYS.COLLECTION.REPORT}${chat.reportID}`,
+        callback: (updatedReport) => {
+            const notFoundError = updatedReport?.errorFields?.notFound;
+            if (notFoundError === null) {
+                Onyx.disconnect(reportConnection);
                 return;
             }
 
-            if (!hasSeenLoadingStart) {
-                return;
-            }
-
-            Onyx.disconnect(loadingStateConnection);
-            const latestReport = allReports?.[`${ONYXKEYS.COLLECTION.REPORT}${chat.reportID}`];
-            if (!latestReport?.errorFields?.notFound || hasAttemptedFallback) {
+            if (!notFoundError || hasAttemptedFallback) {
                 return;
             }
 
             hasAttemptedFallback = true;
+            Onyx.disconnect(reportConnection);
             createAndOpenNewOptimisticChat(chat.reportID);
         },
     });
