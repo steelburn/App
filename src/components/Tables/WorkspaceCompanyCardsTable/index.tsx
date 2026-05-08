@@ -358,22 +358,30 @@ function WorkspaceCompanyCardsTable({
         />
     );
 
+    const ListHeader = (
+        <>
+            {headerButtonsComponent}
+            {!isLoadingFeed && showCards && <Table.Header />}
+        </>
+    );
+
     return (
         <Table
             ref={tableRef}
             data={cardsData}
             columns={columns}
+            filters={filterConfig}
             renderItem={renderItem}
             keyExtractor={keyExtractor}
             compareItems={compareItems}
             isItemInSearch={isItemInSearch}
             isItemInFilter={isItemInFilter}
-            filters={filterConfig}
             initialSortColumn="member"
+            title={translate('workspace.common.companyCards')}
             ListEmptyComponent={isLoadingCards ? LoadingComponent : <WorkspaceCompanyCardsFeedAddedEmptyPage shouldShowGBDisclaimer={shouldShowGBDisclaimer} />}
-            ListHeaderComponent={shouldUseNarrowTableLayout ? headerButtonsComponent : undefined}
+            ListHeaderComponent={!shouldRenderHeaderAsChild ? ListHeader : undefined}
         >
-            {shouldRenderHeaderAsChild && headerButtonsComponent}
+            {shouldRenderHeaderAsChild && ListHeader}
 
             {(isLoading || isFeedPending || isNoFeed) && !feedErrorKey && (
                 <ScrollView>
@@ -418,12 +426,7 @@ function WorkspaceCompanyCardsTable({
                 </ScrollView>
             )}
 
-            {showCards && (
-                <>
-                    {!shouldUseNarrowTableLayout && !isLoadingFeed && <Table.Header />}
-                    <Table.Body contentContainerStyle={tableBodyContentContainerStyle} />
-                </>
-            )}
+            {showCards && <Table.Body contentContainerStyle={tableBodyContentContainerStyle} />}
         </Table>
     );
 }
