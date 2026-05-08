@@ -948,7 +948,6 @@ const CONST = {
         BULK_DUPLICATE_REPORT: 'bulkDuplicateReport',
         BULK_EDIT: 'bulkEdit',
         NEW_MANUAL_EXPENSE_FLOW: 'newManualExpenseFlow',
-        BULK_SUBMIT_APPROVE_PAY: 'bulkSubmitApprovePay',
     },
     BUTTON_STATES: {
         DEFAULT: 'default',
