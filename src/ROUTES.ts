@@ -361,6 +361,10 @@ const DYNAMIC_ROUTES = {
         path: 'edit/limit-type',
         entryScreens: [SCREENS.WORKSPACE.EXPENSIFY_CARD_DETAILS],
     },
+    EXPENSIFY_CARD_LIMIT: {
+        path: 'edit/limit',
+        entryScreens: [SCREENS.WORKSPACE.EXPENSIFY_CARD_DETAILS, SCREENS.EXPENSIFY_CARD.EXPENSIFY_CARD_DETAILS],
+    },
     EXPENSIFY_CARD_NAME: {
         path: 'edit/name',
         entryScreens: [SCREENS.WORKSPACE.EXPENSIFY_CARD_DETAILS, SCREENS.EXPENSIFY_CARD.EXPENSIFY_CARD_DETAILS],
@@ -2794,18 +2798,6 @@ const ROUTES = {
 
         // eslint-disable-next-line no-restricted-syntax -- Legacy route generation
         getRoute: (policyID: string, cardID: string, backTo?: string) => getUrlWithBackToParam(`settings/${policyID}/expensify-card/${cardID}`, backTo),
-    },
-    WORKSPACE_EXPENSIFY_CARD_LIMIT: {
-        route: 'workspaces/:policyID/expensify-card/:cardID/edit/limit',
-
-        // eslint-disable-next-line no-restricted-syntax -- Legacy route generation
-        getRoute: (policyID: string, cardID: string, backTo?: string) => getUrlWithBackToParam(`workspaces/${policyID}/expensify-card/${cardID}/edit/limit`, backTo),
-    },
-    EXPENSIFY_CARD_LIMIT: {
-        route: 'settings/:policyID/expensify-card/:cardID/edit/limit',
-
-        // eslint-disable-next-line no-restricted-syntax -- Legacy route generation
-        getRoute: (policyID: string, cardID: string, backTo?: string) => getUrlWithBackToParam(`settings/${policyID}/expensify-card/${cardID}/edit/limit`, backTo),
     },
     EXPENSIFY_CARD_LIMIT_TYPE: {
         route: 'settings/:policyID/expensify-card/:cardID/edit/limit-type',
