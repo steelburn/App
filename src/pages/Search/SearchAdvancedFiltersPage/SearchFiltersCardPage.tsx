@@ -56,7 +56,7 @@ function SearchFiltersCardPage() {
         setSelectedCards(generatedCards);
     }, [searchAdvancedFiltersForm?.feed, searchAdvancedFiltersForm?.cardID, workspaceCardFeeds, userCardList]);
 
-    const individualCardsSectionData = buildCardsData(
+    const allIndividualCards = buildCardsData(
         workspaceCardFeeds ?? {},
         userCardList ?? {},
         personalDetails ?? {},
@@ -67,22 +67,11 @@ function SearchFiltersCardPage() {
         customCardNames,
     );
 
-    const closedCardsSectionData = buildCardsData(
-        workspaceCardFeeds ?? {},
-        userCardList ?? {},
-        personalDetails ?? {},
-        selectedCards,
-        illustrations,
-        companyCardFeedIcons,
-        true,
-        customCardNames,
-    );
+    const allClosedCards = buildCardsData(workspaceCardFeeds ?? {}, userCardList ?? {}, personalDetails ?? {}, selectedCards, illustrations, companyCardFeedIcons, true, customCardNames);
 
     const domainFeedsData = getDomainFeedData(workspaceCardFeeds);
 
     const allCardFeeds = buildCardFeedsData(workspaceCardFeeds ?? CONST.EMPTY_OBJECT, domainFeedsData, policies, selectedCards, translate, illustrations, companyCardFeedIcons);
-    const allIndividualCards = [...individualCardsSectionData.selected, ...individualCardsSectionData.unselected];
-    const allClosedCards = [...closedCardsSectionData.selected, ...closedCardsSectionData.unselected];
 
     const shouldShowSearchInput = allCardFeeds.length + allIndividualCards.length >= CONST.STANDARD_LIST_ITEM_LIMIT;
 

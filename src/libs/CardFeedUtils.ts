@@ -32,7 +32,6 @@ import type {OptionData} from './ReportUtils';
 
 type CardFilterItem = Partial<OptionData> & AdditionalCardProps & {isCardFeed?: boolean; correspondingCards?: string[]; cardFeedKey: string; plaidUrl?: string; keyForList: string};
 type DomainFeedData = {bank: CardFeedWithNumber; domainName: string; correspondingCardIDs: string[]; fundID?: string; feedCountry?: string};
-type ItemsGroupedBySelection = {selected: CardFilterItem[]; unselected: CardFilterItem[]};
 type CardFeedNamesWithType = Record<string, {name: string; type: 'domain' | 'workspace'}>;
 type CardFeedData = {cardName: string; bank: CardFeedWithNumber; label?: string; type: 'domain' | 'workspace'; feedCountry?: string};
 type GetCardFeedData = {
@@ -152,7 +151,7 @@ function buildCardsData(
     companyCardIcons: CompanyCardFeedIcons,
     isClosedCards = false,
     customCardNames?: Record<string, string>,
-): ItemsGroupedBySelection {
+): CardFilterItem[] {
     // Filter condition to build different cards data for closed cards and individual cards based on the isClosedCards flag, we don't want to show closed cards in the individual cards section
     const filterCondition = (card: Card) => (isClosedCards ? isCardClosed(card) : !isCardHiddenFromSearch(card) && !isCardClosed(card) && isCard(card));
     const userAssignedCards: CardFilterItem[] = Object.values(userCardList ?? {})
@@ -168,17 +167,7 @@ function buildCardsData(
                 .map((card) => createCardFilterItem(card, personalDetailsList, selectedCards, illustrations, companyCardIcons, customCardNames));
         });
 
-    const allCardItems = [...userAssignedCards, ...allWorkspaceCards];
-    const selectedCardItems: CardFilterItem[] = [];
-    const unselectedCardItems: CardFilterItem[] = [];
-    for (const card of allCardItems) {
-        if (card.isSelected) {
-            selectedCardItems.push(card);
-        } else {
-            unselectedCardItems.push(card);
-        }
-    }
-    return {selected: selectedCardItems, unselected: unselectedCardItems};
+    return [...userAssignedCards, ...allWorkspaceCards];
 }
 
 /**
