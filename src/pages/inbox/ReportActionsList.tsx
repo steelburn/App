@@ -11,7 +11,7 @@ import {getAllNonDeletedTransactions, shouldDisplayReportTableView, shouldWaitFo
 import {isInvoiceReport, isMoneyRequestReport} from '@libs/ReportUtils';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ReportActionsView from './report/ReportActionsView';
-import type {ReportScreenNavigationProps} from './types';
+import type ReportScreenNavigationProps from './types';
 
 const defaultReportLoadingState = {
     hasOnceLoadedReportActions: false,

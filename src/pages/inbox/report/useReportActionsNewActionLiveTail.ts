@@ -76,7 +76,6 @@ function useReportActionsNewActionLiveTail({
     const [isScrollToBottomEnabled, setIsScrollToBottomEnabled] = useState(false);
 
     const scrollToBottomForCurrentUserAction = useEffectEvent((isFromCurrentUser: boolean, action?: OnyxTypes.ReportAction) => {
-        // eslint-disable-next-line @typescript-eslint/no-deprecated
         InteractionManager.runAfterInteractions(() => {
             // If a new comment is added and it's from the current user scroll to the bottom otherwise leave the user positioned where
             // they are now in the list.
@@ -200,8 +199,6 @@ function useReportActionsNewActionLiveTail({
         newActionUnsubscribeMap[reportID] = cleanup;
 
         return cleanup;
-
-        // scrollToBottomForCurrentUserAction is a stable useEffectEvent callback and does not need to be listed as a dependency.
     }, [reportID]);
 
     return {

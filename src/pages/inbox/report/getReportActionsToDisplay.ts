@@ -9,7 +9,7 @@ import {isEmptyObject} from '@src/types/utils/EmptyObject';
 
 function getReportActionsToDisplay(
     allReportActions: OnyxTypes.ReportAction[],
-    lastActionCreated: string | undefined,
+    lastAction: OnyxTypes.ReportAction | undefined,
     report: OnyxTypes.Report | undefined,
     reportPreviewAction: OnyxInputValue<OnyxTypes.ReportAction<'REPORTPREVIEW'>> | undefined,
     transactionThreadReport: OnyxTypes.Report | undefined,
@@ -18,8 +18,11 @@ function getReportActionsToDisplay(
     const actions = [...(allReportActions ?? [])];
 
     if (shouldAddCreatedAction) {
-        const createdTime = lastActionCreated && DateUtils.subtractMillisecondsFromDateTime(lastActionCreated, 1);
-        const optimisticCreatedAction = buildOptimisticCreatedReportAction(String(report?.ownerAccountID), createdTime);
+        const createdTime = lastAction?.created && DateUtils.subtractMillisecondsFromDateTime(lastAction.created, 1);
+        const optimisticCreatedAction = buildOptimisticCreatedReportAction({
+            emailCreatingAction: String(report?.ownerAccountID),
+            created: createdTime,
+        });
         optimisticCreatedAction.pendingAction = null;
         actions.push(optimisticCreatedAction);
     }
