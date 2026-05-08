@@ -34,7 +34,7 @@ function useAskConcierge() {
             report: targetReport,
             notifyReportID: targetReportID,
             ancestors: [],
-            text: searchQuery,
+            text: trimmedQuery,
             timezoneParam: timezone ?? CONST.DEFAULT_TIME_ZONE,
             currentUserAccountID,
             shouldPlaySound: true,
