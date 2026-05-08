@@ -1,10 +1,10 @@
 import {Str} from 'expensify-common';
 import React from 'react';
 import {View} from 'react-native';
-import Avatar from '@components/Avatar';
 import Button from '@components/Button';
 import Icon from '@components/Icon';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
+import ReportActionAvatars from '@components/ReportActionAvatars';
 import Table from '@components/Table';
 import Text from '@components/Text';
 import TextWithTooltip from '@components/TextWithTooltip';
@@ -16,7 +16,6 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import {formatMaskedCardName, getCardFeedWithDomainID, lastFourNumbersFromCardName, splitMaskedCardNumber} from '@libs/CardUtils';
 import Navigation from '@libs/Navigation/Navigation';
 import type {SkeletonSpanReasonAttributes} from '@libs/telemetry/useSkeletonSpan';
-import {getDefaultAvatarURL} from '@libs/UserAvatarUtils';
 import variables from '@styles/variables';
 import CONST from '@src/CONST';
 import ROUTES from '@src/ROUTES';
@@ -150,15 +149,12 @@ function WorkspaceCompanyCardTableRow({
                     >
                         <View style={[styles.flex1, styles.flexRow, styles.alignItemsCenter, styles.gap3]}>
                             {isAssigned ? (
-                                <Avatar
-                                    source={
-                                        cardholder?.avatar ??
-                                        getDefaultAvatarURL({
-                                            accountID: cardholder?.accountID,
-                                        })
-                                    }
-                                    avatarID={cardholder?.accountID}
-                                    type={CONST.ICON_TYPE_AVATAR}
+                                <ReportActionAvatars
+                                    accountIDs={cardholder?.accountID ? [cardholder.accountID] : []}
+                                    subscriptCardFeed={assignedCard?.bank as CompanyCardFeed}
+                                    subscriptCardFeedIconSize={{height: 9, width: 14}}
+                                    subscriptAvatarBorderColor={hovered ? theme.hoverComponentBG : theme.highlightBG}
+                                    noRightMarginOnSubscriptContainer
                                     size={CONST.AVATAR_SIZE.SMALL}
                                 />
                             ) : (
