@@ -300,7 +300,7 @@ function PaymentMethodList({
                         interactive: !isDisabled,
                         disabled: isDisabled,
                         shouldShowRightIcon,
-                        shouldShowThreeDotsMenu: !isUserPersonalCard || isCSVCard,
+                        shouldShowThreeDotsMenu: !isUserPersonalCard,
                         errors: isUserPersonalCard ? undefined : card.errors,
                         canDismissError: false,
                         pendingAction: card.pendingAction,
