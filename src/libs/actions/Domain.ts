@@ -2189,6 +2189,7 @@ function createDomainSecurityGroup(domainAccountID: number, newSecurityGroup: Do
             key: `${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`,
             value: {
                 [SECURITY_GROUP_KEY]: newSecurityGroup,
+                // backend API uses snake_case for domain_defaultSecurityGroupID
                 // eslint-disable-next-line @typescript-eslint/naming-convention
                 ...(shouldSetAsDefaultGroup && {domain_defaultSecurityGroupID: groupID}),
             } as PrefixedRecord<typeof CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX, DomainSecurityGroup>,
@@ -2221,6 +2222,7 @@ function createDomainSecurityGroup(domainAccountID: number, newSecurityGroup: Do
             key: `${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`,
             value: {
                 [SECURITY_GROUP_KEY]: newSecurityGroup,
+                // backend API uses snake_case for domain_defaultSecurityGroupID
                 // eslint-disable-next-line @typescript-eslint/naming-convention
                 ...(shouldSetAsDefaultGroup && {domain_defaultSecurityGroupID: previousDefaultGroupID}),
             } as PrefixedRecord<typeof CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX, DomainSecurityGroup>,
