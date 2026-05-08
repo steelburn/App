@@ -6,8 +6,6 @@ import Navigation from '@libs/Navigation/Navigation';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
-import type AgentPrompt from '@src/types/onyx/AgentPrompt';
-import type PersonalDetails from '@src/types/onyx/PersonalDetails';
 import type {AnyOnyxUpdate} from '@src/types/onyx/Request';
 
 function openAgentsPage() {
@@ -156,8 +154,16 @@ function updateAgentPrompt(accountID: number, prompt: string, originalPrompt: st
     write(WRITE_COMMANDS.UPDATE_AGENT_PROMPT, {agentAccountID: accountID, prompt}, {optimisticData, successData, failureData});
 }
 
-function deleteAgent(accountID: number, agentPrompt: AgentPrompt | undefined, personalDetails: PersonalDetails | undefined) {
+function deleteAgent(accountID: number) {
     const optimisticData: AnyOnyxUpdate[] = [
+        {
+            onyxMethod: Onyx.METHOD.MERGE,
+            key: `${ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT}${accountID}`,
+            value: {pendingAction: CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE},
+        },
+    ];
+
+    const successData: AnyOnyxUpdate[] = [
         {
             onyxMethod: Onyx.METHOD.SET,
             key: `${ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT}${accountID}`,
@@ -170,24 +176,14 @@ function deleteAgent(accountID: number, agentPrompt: AgentPrompt | undefined, pe
         },
     ];
 
-    const successData: AnyOnyxUpdate[] = [];
-
     const failureData: AnyOnyxUpdate[] = [
         {
-            onyxMethod: Onyx.METHOD.SET,
-            key: `${ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT}${accountID}`,
-            value: agentPrompt
-                ? {
-                      ...agentPrompt,
-                      pendingAction: CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE,
-                      errors: getMicroSecondOnyxErrorWithTranslationKey('common.genericErrorMessage'),
-                  }
-                : null,
-        },
-        {
             onyxMethod: Onyx.METHOD.MERGE,
-            key: ONYXKEYS.PERSONAL_DETAILS_LIST,
-            value: {[accountID]: personalDetails ?? {accountID}},
+            key: `${ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT}${accountID}`,
+            value: {
+                pendingAction: CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE,
+                errors: getMicroSecondOnyxErrorWithTranslationKey('common.genericErrorMessage'),
+            },
         },
     ];
 

@@ -278,62 +278,53 @@ describe('deleteAgent', () => {
     });
 
     it('calls write with DELETE_AGENT command and correct params', () => {
-        deleteAgent(TEST_ACCOUNT_ID, {prompt: 'Test prompt'}, undefined);
+        deleteAgent(TEST_ACCOUNT_ID);
 
         expect(mockWrite).toHaveBeenCalledWith(WRITE_COMMANDS.DELETE_AGENT, {accountID: TEST_ACCOUNT_ID}, expect.any(Object));
     });
 
-    it('optimistic data sets the prompt key to null using SET method', () => {
-        deleteAgent(TEST_ACCOUNT_ID, {prompt: 'Test prompt'}, undefined);
+    it('optimistic data merges pendingAction DELETE on the prompt key', () => {
+        deleteAgent(TEST_ACCOUNT_ID);
 
         const {optimisticData} = getWriteOptions();
         const promptUpdate = optimisticData.find((u) => u.key === `${ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT}${TEST_ACCOUNT_ID}`);
+
+        expect(promptUpdate?.onyxMethod).toBe('merge');
+        expect(promptUpdate?.value).toMatchObject({pendingAction: 'delete'});
+    });
+
+    it('success data sets the prompt key to null', () => {
+        deleteAgent(TEST_ACCOUNT_ID);
+
+        const {successData} = getWriteOptions();
+        const promptUpdate = successData.find((u) => u.key === `${ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT}${TEST_ACCOUNT_ID}`);
 
         expect(promptUpdate?.onyxMethod).toBe('set');
         expect(promptUpdate?.value).toBeNull();
     });
 
-    it('optimistic data nulls the personal detail entry', () => {
-        deleteAgent(TEST_ACCOUNT_ID, {prompt: 'Test prompt'}, undefined);
+    it('success data nulls the personal detail entry', () => {
+        deleteAgent(TEST_ACCOUNT_ID);
 
-        const {optimisticData} = getWriteOptions();
-        const personalDetailUpdate = optimisticData.find((u) => u.key === ONYXKEYS.PERSONAL_DETAILS_LIST);
+        const {successData} = getWriteOptions();
+        const personalDetailUpdate = successData.find((u) => u.key === ONYXKEYS.PERSONAL_DETAILS_LIST);
 
         expect((personalDetailUpdate?.value as Record<string, unknown>)[TEST_ACCOUNT_ID]).toBeNull();
     });
 
-    it('failure data restores the full personal detail entry', () => {
-        const personalDetails = {accountID: TEST_ACCOUNT_ID, displayName: 'Test Agent', login: 'agent@test.com', avatar: 'https://example.com/avatar.png'};
-        deleteAgent(TEST_ACCOUNT_ID, {prompt: 'Test prompt'}, personalDetails);
-
-        const {failureData} = getWriteOptions();
-        const personalDetailUpdate = failureData.find((u) => u.key === ONYXKEYS.PERSONAL_DETAILS_LIST);
-
-        expect((personalDetailUpdate?.value as Record<string, unknown>)[TEST_ACCOUNT_ID]).toMatchObject(personalDetails);
-    });
-
-    it('failure data falls back to accountID-only when personalDetails is undefined', () => {
-        deleteAgent(TEST_ACCOUNT_ID, {prompt: 'Test prompt'}, undefined);
-
-        const {failureData} = getWriteOptions();
-        const personalDetailUpdate = failureData.find((u) => u.key === ONYXKEYS.PERSONAL_DETAILS_LIST);
-
-        expect((personalDetailUpdate?.value as Record<string, unknown>)[TEST_ACCOUNT_ID]).toMatchObject({accountID: TEST_ACCOUNT_ID});
-    });
-
-    it('failure data restores the agent prompt key using SET method with pendingAction DELETE and errors', () => {
-        deleteAgent(TEST_ACCOUNT_ID, {prompt: 'Test prompt'}, undefined);
+    it('failure data merges pendingAction DELETE and errors on the prompt key', () => {
+        deleteAgent(TEST_ACCOUNT_ID);
 
         const {failureData} = getWriteOptions();
         const promptUpdate = failureData.find((u) => u.key === `${ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT}${TEST_ACCOUNT_ID}`);
 
-        expect(promptUpdate?.onyxMethod).toBe('set');
-        expect(promptUpdate?.value).toMatchObject({prompt: 'Test prompt', pendingAction: 'delete'});
+        expect(promptUpdate?.onyxMethod).toBe('merge');
+        expect(promptUpdate?.value).toMatchObject({pendingAction: 'delete'});
         expect((promptUpdate?.value as Record<string, unknown>)?.errors).toBeTruthy();
     });
 
     it('calls Navigation.navigate after issuing the write', () => {
-        deleteAgent(TEST_ACCOUNT_ID, {prompt: 'Test prompt'}, undefined);
+        deleteAgent(TEST_ACCOUNT_ID);
 
         expect(mockNavigate).toHaveBeenCalledTimes(1);
     });

@@ -16,9 +16,12 @@ type AgentInfoRowProps = {
 
     /** Login (email) of the agent */
     login: string;
+
+    /** Whether the agent is pending deletion */
+    isDeleted?: boolean;
 };
 
-function AgentInfoRow({accountID, displayName, login}: AgentInfoRowProps) {
+function AgentInfoRow({accountID, displayName, login, isDeleted = false}: AgentInfoRowProps) {
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
 
@@ -33,13 +36,13 @@ function AgentInfoRow({accountID, displayName, login}: AgentInfoRowProps) {
             <View style={[styles.flex1, styles.gap1]}>
                 <Text
                     numberOfLines={1}
-                    style={styles.textStrong}
+                    style={[styles.textStrong, isDeleted ? styles.offlineFeedbackDeleted : {}]}
                 >
                     {displayName}
                 </Text>
                 <Text
                     numberOfLines={1}
-                    style={styles.mutedNormalTextLabel}
+                    style={[styles.mutedNormalTextLabel, isDeleted ? styles.offlineFeedbackDeleted : {}]}
                 >
                     {login}
                 </Text>

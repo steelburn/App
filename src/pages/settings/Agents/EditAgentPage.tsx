@@ -50,7 +50,7 @@ function EditAgentPage({route}: EditAgentPageProps) {
         if (result.action !== ModalActions.CONFIRM) {
             return;
         }
-        deleteAgent(accountID, agent, personalDetails);
+        deleteAgent(accountID);
     };
 
     return (

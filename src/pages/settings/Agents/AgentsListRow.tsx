@@ -37,6 +37,7 @@ function AgentsListRow({accountID, displayName, login, pendingAction, errors, on
     const {translate} = useLocalize();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
 
+    const isDeleted = pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE;
     const navigateToEdit = () => Navigation.navigate(ROUTES.SETTINGS_AGENTS_EDIT.getRoute(accountID));
 
     return (
@@ -45,6 +46,7 @@ function AgentsListRow({accountID, displayName, login, pendingAction, errors, on
             errors={errors}
             onClose={onErrorClose}
             errorRowStyles={[styles.ph5, styles.pb5]}
+            shouldHideOnDelete={false}
         >
             {shouldUseNarrowLayout ? (
                 <PressableWithFeedback
@@ -53,11 +55,13 @@ function AgentsListRow({accountID, displayName, login, pendingAction, errors, on
                     accessibilityLabel={displayName}
                     role={CONST.ROLE.BUTTON}
                     sentryLabel="AgentsListRow-Edit"
+                    disabled={isDeleted}
                 >
                     <AgentInfoRow
                         accountID={accountID}
                         displayName={displayName}
                         login={login}
+                        isDeleted={isDeleted}
                     />
                 </PressableWithFeedback>
             ) : (
@@ -66,11 +70,13 @@ function AgentsListRow({accountID, displayName, login, pendingAction, errors, on
                         accountID={accountID}
                         displayName={displayName}
                         login={login}
+                        isDeleted={isDeleted}
                     />
                     <Button
                         small
                         text={translate('common.edit')}
                         onPress={navigateToEdit}
+                        isDisabled={isDeleted}
                     />
                 </View>
             )}
