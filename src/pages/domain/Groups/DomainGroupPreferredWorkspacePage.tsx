@@ -44,9 +44,6 @@ function DomainGroupPreferredWorkspacePage({route}: DomainGroupPreferredWorkspac
         selector: domainSecurityGroupSettingPendingActionSelector('deleteGroup', groupID),
     });
 
-    // Block access to a group being deleted, and avoid flashing the not-found page during RHP navigation
-    const isDeleting = !group || !!deleteGroupPendingAction;
-
     const currentPolicyID = group?.restrictedPrimaryPolicyID;
 
     const [policies] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {selector: createAdminPoliciesSelector(currentPolicyID)});
@@ -78,7 +75,7 @@ function DomainGroupPreferredWorkspacePage({route}: DomainGroupPreferredWorkspac
     return (
         <DomainNotFoundPageWrapper
             domainAccountID={domainAccountID}
-            shouldBeBlocked={isDeleting}
+            shouldBeBlocked={!group || !!deleteGroupPendingAction}
             fullPageNotFoundViewProps={{
                 onBackButtonPress: () => Navigation.goBack(ROUTES.DOMAIN_GROUPS.getRoute(domainAccountID)),
             }}
