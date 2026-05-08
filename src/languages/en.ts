@@ -183,6 +183,7 @@ const translations = {
         members: 'Members',
         invite: 'Invite',
         here: 'here',
+        avatar: 'Avatar',
         date: 'Date',
         dob: 'Date of birth',
         currentYear: 'Current year',
@@ -2276,6 +2277,12 @@ const translations = {
         yourAccountIsLocked: 'Your account is locked',
         chatToConciergeToUnlock: 'Chat with Concierge to resolve security concerns and unlock your account.',
         chatWithConcierge: 'Chat with Concierge',
+    },
+    deviceManagementPage: {
+        title: 'Device management',
+        description: 'Manage all the devices that you have logged into with your Expensify Account.',
+        revoke: 'Revoke',
+        unknownDevice: 'Unknown Device',
     },
     twoFactorAuth: {
         headerTitle: 'Two-factor authentication',
@@ -5736,6 +5743,9 @@ const translations = {
                 description: 'Are you sure you want to disconnect this integration?',
                 confirmText: 'Got it',
             },
+            hrWarningModal: {
+                disconnectText: 'To disable HR, please disconnect Gusto from this workspace first.',
+            },
             workflowWarningModal: {
                 featureEnabledTitle: 'Not so fast...',
                 featureEnabledText:
@@ -6934,6 +6944,8 @@ const translations = {
             customRules: {
                 title: 'Expense policy',
                 cardSubtitle: "Here's where your team's expense policy lives, so everyone's on the same page about what's covered.",
+                policyDocument: 'Policy document',
+                policyText: 'Policy text',
             },
             spendRules: {
                 title: 'Spend',
