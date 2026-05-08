@@ -60,6 +60,9 @@ function DomainGroupEditNamePage({route}: DomainGroupEditNamePageProps) {
         <DomainNotFoundPageWrapper
             domainAccountID={domainAccountID}
             shouldBeBlocked={isDeleting}
+            fullPageNotFoundViewProps={{
+                onBackButtonPress: () => Navigation.goBack(ROUTES.DOMAIN_GROUPS.getRoute(domainAccountID)),
+            }}
         >
             <ScreenWrapper
                 onEntryTransitionEnd={() => inputRef.current?.focus()}

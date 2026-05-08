@@ -79,6 +79,9 @@ function DomainGroupPreferredWorkspacePage({route}: DomainGroupPreferredWorkspac
         <DomainNotFoundPageWrapper
             domainAccountID={domainAccountID}
             shouldBeBlocked={isDeleting}
+            fullPageNotFoundViewProps={{
+                onBackButtonPress: () => Navigation.goBack(ROUTES.DOMAIN_GROUPS.getRoute(domainAccountID)),
+            }}
         >
             <ScreenWrapper
                 shouldEnableMaxHeight
