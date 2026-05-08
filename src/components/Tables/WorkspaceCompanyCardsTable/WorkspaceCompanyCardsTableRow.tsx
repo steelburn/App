@@ -103,13 +103,10 @@ function WorkspaceCompanyCardTableRow({
         isDeleting,
     };
 
-    const assignCard = () => {
-        onAssignCard(cardName, encryptedCardNumber);
-    };
-
     const handleRowPress = () => {
         if (!assignedCard) {
-            assignCard();
+            onAssignCard(cardName, encryptedCardNumber);
+
             return;
         }
 
@@ -131,9 +128,9 @@ function WorkspaceCompanyCardTableRow({
             shouldHideOnDelete={false}
         >
             <Table.Row
+                interactive
                 rowIndex={rowIndex}
                 isLoading={isDeleting}
-                interactive={isAssigned}
                 skeletonReasonAttributes={reasonAttributes}
                 sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.COMPANY_CARDS.TABLE_ITEM}
                 LoadingComponent={WorkspaceCompanyCardsTableSkeleton}
@@ -171,7 +168,7 @@ function WorkspaceCompanyCardTableRow({
                             <View style={[styles.flex1, styles.flexColumn, styles.justifyContentCenter, styles.alignItemsStretch]}>
                                 <TextWithTooltip
                                     text={leftColumnTitle}
-                                    style={[styles.optionDisplayName, styles.sidebarLinkTextBold, styles.pre, styles.justifyContentCenter, !isAssigned && styles.cursorText]}
+                                    style={[styles.optionDisplayName, styles.pre, styles.justifyContentCenter, !isAssigned && styles.cursorText]}
                                 />
                                 {!!leftColumnSubtitle && (
                                     <TextWithTooltip
@@ -193,34 +190,35 @@ function WorkspaceCompanyCardTableRow({
                             </View>
                         )}
 
-                        <View style={[styles.flexRow, styles.alignItemsCenter, styles.justifyContentEnd]}>
-                            {isAssigned ? (
-                                <View style={[styles.flexRow, styles.ml2, styles.gap3, styles.mw100]}>
-                                    {!shouldUseNarrowTableLayout && (
-                                        <Text
-                                            numberOfLines={1}
-                                            style={[styles.optionDisplayName, styles.pre]}
-                                        >
-                                            {customCardName}
-                                        </Text>
-                                    )}
-                                    <Icon
-                                        src={Expensicons.ArrowRight}
-                                        fill={theme.icon}
-                                        additionalStyles={[styles.alignSelfCenter, !hovered && styles.opacitySemiTransparent]}
-                                        width={variables.iconSizeNormal}
-                                        height={variables.iconSizeNormal}
-                                    />
-                                </View>
-                            ) : (
+                        <View style={[styles.flex1]}>
+                            <Text
+                                numberOfLines={1}
+                                style={[styles.lh16, styles.optionDisplayName, styles.pre, !isAssigned && styles.cursorText]}
+                            >
+                                {customCardName}
+                            </Text>
+                        </View>
+
+                        <View style={[styles.flexRow, styles.alignItemsCenter, styles.justifyContentEnd, styles.gap3]}>
+                            {!isAssigned && (
                                 <Button
                                     small
                                     success
                                     text={shouldUseNarrowTableLayout ? translate('workspace.companyCards.assign') : translate('workspace.companyCards.assignCard')}
-                                    onPress={assignCard}
+                                    onPress={handleRowPress}
                                     isDisabled={isAssigningCardDisabled}
                                 />
                             )}
+
+                            <View style={[styles.flexRow, styles.ml2, styles.gap3, styles.mw100]}>
+                                <Icon
+                                    src={Expensicons.ArrowRight}
+                                    fill={theme.icon}
+                                    additionalStyles={[styles.alignSelfCenter, !hovered && styles.opacitySemiTransparent]}
+                                    width={variables.iconSizeNormal}
+                                    height={variables.iconSizeNormal}
+                                />
+                            </View>
                         </View>
                     </View>
                 )}

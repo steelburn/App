@@ -33,7 +33,7 @@ import WorkspaceCompanyCardTableItem from './WorkspaceCompanyCardsTableRow';
 import type {WorkspaceCompanyCardTableItemData} from './WorkspaceCompanyCardsTableRow';
 import WorkspaceCompanyCardsTableSkeleton from './WorkspaceCompanyCardsTableSkeleton';
 
-type CompanyCardsTableColumnKey = 'member' | 'card' | 'customCardName';
+type CompanyCardsTableColumnKey = 'member' | 'card' | 'customCardName' | 'actions';
 
 type WorkspaceCompanyCardsTableProps = {
     /** Policy ID */
@@ -156,6 +156,10 @@ function WorkspaceCompanyCardsTable({
         {
             key: 'customCardName',
             label: translate('workspace.companyCards.cardName'),
+        },
+        {
+            key: 'actions',
+            label: '',
             styling: {
                 containerStyles: [styles.justifyContentEnd, styles.pr3],
             },
@@ -271,8 +275,8 @@ function WorkspaceCompanyCardsTable({
         <CardFeedIcon
             key={feedName}
             iconProps={{
-                height: variables.cardIconHeight,
-                width: variables.cardIconWidth,
+                height: variables.cardIconSmallHeight,
+                width: variables.cardIconSmallWidth,
                 additionalStyles: styles.cardIcon,
             }}
             selectedFeed={feedName}

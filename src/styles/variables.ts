@@ -298,6 +298,8 @@ export default {
     cardScarfOverlayZIndex: 2,
     cardIconWidth: 40,
     cardIconHeight: 26,
+    cardIconSmallWidth: 28,
+    cardIconSmallHeight: 18,
     cardBorderRadius: 4,
     cardMiniatureWidth: 20,
     cardMiniatureHeight: 13,
