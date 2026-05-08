@@ -76,10 +76,11 @@ function PersonalCardDetailsPage({route}: PersonalCardDetailsPageProps) {
             shouldShowCancelButton: true,
             danger: true,
         }).then((result) => {
-            if (result.action === ModalActions.CONFIRM) {
-                unassignCard(card);
-                Navigation.goBack();
+            if (result.action !== ModalActions.CONFIRM) {
+                return;
             }
+            unassignCard(card);
+            Navigation.goBack();
         });
     };
 
@@ -109,11 +110,12 @@ function PersonalCardDetailsPage({route}: PersonalCardDetailsPageProps) {
             shouldShowCancelButton: true,
             danger: true,
         }).then((result) => {
-            if (result.action === ModalActions.CONFIRM) {
-                const savedColumnLayout = savedColumnLayouts?.[card.cardID];
-                deletePersonalCard({cardID: card.cardID, card, allTransactions, allReports, savedColumnLayout});
-                Navigation.goBack();
+            if (result.action !== ModalActions.CONFIRM) {
+                return;
             }
+            const savedColumnLayout = savedColumnLayouts?.[card.cardID];
+            deletePersonalCard({cardID: card.cardID, card, allTransactions, allReports, savedColumnLayout});
+            Navigation.goBack();
         });
     };
 
