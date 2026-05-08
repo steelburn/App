@@ -160,9 +160,9 @@ function useSearchFiltersBar(queryJSON: SearchQueryJSON): UseSearchFiltersBarRes
 
                 if (isDateFilterKey(filterKey)) {
                     const onKey = `${filterKey}${CONST.SEARCH.DATE_MODIFIERS.ON}`;
-                    const beforeKey = `${filterKey}${CONST.SEARCH.DATE_MODIFIERS.ON}`;
-                    const afterKey = `${filterKey}${CONST.SEARCH.DATE_MODIFIERS.ON}`;
-                    const rangeKey = `${filterKey}${CONST.SEARCH.DATE_MODIFIERS.ON}`;
+                    const beforeKey = `${filterKey}${CONST.SEARCH.DATE_MODIFIERS.BEFORE}`;
+                    const afterKey = `${filterKey}${CONST.SEARCH.DATE_MODIFIERS.AFTER}`;
+                    const rangeKey = `${filterKey}${CONST.SEARCH.DATE_MODIFIERS.RANGE}`;
                     updateFilterForm({[onKey]: undefined, [beforeKey]: undefined, [afterKey]: undefined, [rangeKey]: undefined});
                     return;
                 }
