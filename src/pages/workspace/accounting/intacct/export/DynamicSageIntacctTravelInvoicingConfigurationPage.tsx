@@ -50,9 +50,7 @@ function DynamicSageIntacctTravelInvoicingConfigurationPage({policy}: WithPolicy
                 <MenuItemWithTopDescription
                     title={travelPayableAccount?.name}
                     description={translate('workspace.sageIntacct.creditCardAccount')}
-                    onPress={() =>
-                        Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.POLICY_ACCOUNTING_SAGE_INTACCT_TRAVEL_INVOICING_PAYABLE_ACCOUNT_SELECT.path, travelInvoicingPath))
-                    }
+                    onPress={() => Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.POLICY_ACCOUNTING_SAGE_INTACCT_TRAVEL_INVOICING_PAYABLE_ACCOUNT_SELECT.path, travelInvoicingPath))}
                     shouldShowRightIcon
                     brickRoadIndicator={areSettingsInErrorFields(payableAccountSetting, config?.errorFields) ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined}
                 />
