@@ -2,7 +2,7 @@ import {useCallback} from 'react';
 import type {OnyxEntry} from 'react-native-onyx';
 import interceptAnonymousUser from '@libs/interceptAnonymousUser';
 import Navigation from '@libs/Navigation/Navigation';
-import {getDefaultChatEnabledPolicy} from '@libs/PolicyUtils';
+import {getDefaultChatEnabledPolicy, isPaidGroupPolicy} from '@libs/PolicyUtils';
 import {generateReportID} from '@libs/ReportUtils';
 import {shouldRestrictUserBillableActions} from '@libs/SubscriptionUtils';
 import useRedirectToExpensifyClassic from '@pages/inbox/sidebar/FABPopoverContent/useRedirectToExpensifyClassic';
@@ -103,12 +103,17 @@ export default function useCreateReportAction({onCreateReport, groupPoliciesWith
 
             const workspaceIDForReportCreation = defaultChatEnabledPolicyID;
 
-            // No default or restricted with multiple workspaces → workspace selector
-            if (
-                !workspaceIDForReportCreation ||
-                (shouldRestrictUserBillableActions(workspaceIDForReportCreation, ownerBillingGracePeriodEnd, userBillingGracePeriodEnds, amountOwed, accountID) &&
-                    groupPoliciesWithChatEnabled.length > 1)
-            ) {
+            // Per spec: show the workspace selector only when the default (active) workspace is personal
+            // AND the user has 2+ non-personal workspaces to choose between. We also fall back to the
+            // selector if the chosen default is billing-restricted and alternatives exist, so the user
+            // isn't dead-ended on the restricted-action page.
+            const isDefaultPersonal = !activePolicy || activePolicy.type === CONST.POLICY.TYPE.PERSONAL || !isPaidGroupPolicy(activePolicy);
+            const hasMultipleNonPersonalWorkspaces = groupPoliciesWithChatEnabled.length > 1;
+            const isDefaultBillingRestricted =
+                !!workspaceIDForReportCreation &&
+                shouldRestrictUserBillableActions(workspaceIDForReportCreation, ownerBillingGracePeriodEnd, userBillingGracePeriodEnds, amountOwed, accountID);
+
+            if (!workspaceIDForReportCreation || (isDefaultPersonal && hasMultipleNonPersonalWorkspaces) || (isDefaultBillingRestricted && hasMultipleNonPersonalWorkspaces)) {
                 Navigation.navigate(ROUTES.NEW_REPORT_WORKSPACE_SELECTION.getRoute());
                 return;
             }
@@ -130,6 +135,7 @@ export default function useCreateReportAction({onCreateReport, groupPoliciesWith
         shouldRedirectToExpensifyClassic,
         showRedirectToExpensifyClassicModal,
         shouldNavigateToUpgradePath,
+        activePolicy,
         defaultChatEnabledPolicyID,
         ownerBillingGracePeriodEnd,
         userBillingGracePeriodEnds,

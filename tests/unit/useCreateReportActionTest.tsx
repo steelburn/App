@@ -16,7 +16,7 @@ jest.mock('@hooks/useOnyx', () => jest.fn());
 const mockUseOnyx = useOnyx as jest.MockedFunction<typeof useOnyx>;
 
 jest.mock('@hooks/useHasEmptyReportsForPolicy', () => jest.fn(() => false));
-// eslint-disable-next-line @typescript-eslint/no-require-imports
+
 const mockUseHasEmptyReportsForPolicy = require('@hooks/useHasEmptyReportsForPolicy') as jest.Mock;
 
 const mockOpenCreateReportConfirmation = jest.fn();
@@ -35,14 +35,23 @@ const mockUseRedirectToExpensifyClassic = jest.fn(() => ({
     showRedirectToExpensifyClassicModal: mockShowRedirectToExpensifyClassicModal,
 }));
 jest.mock('@pages/inbox/sidebar/FABPopoverContent/useRedirectToExpensifyClassic', () => ({
-    // eslint-disable-next-line @typescript-eslint/naming-convention
     __esModule: true,
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+
     default: () => mockUseRedirectToExpensifyClassic(),
 }));
 
 jest.mock('@libs/PolicyUtils', () => ({
-    getDefaultChatEnabledPolicy: jest.fn((policies: Array<OnyxEntry<Policy>>) => policies.at(0) ?? undefined),
+    getDefaultChatEnabledPolicy: jest.fn((policies: Array<OnyxEntry<Policy>>, activePolicy: OnyxEntry<Policy>) => {
+        // Mirror the real helper: prefer activePolicy if it's a paid group with chat enabled, otherwise the single non-personal candidate.
+        if (activePolicy && activePolicy.isPolicyExpenseChatEnabled && (activePolicy.type === 'team' || activePolicy.type === 'corporate')) {
+            return activePolicy;
+        }
+        if (policies.length === 1) {
+            return policies.at(0);
+        }
+        return undefined;
+    }),
+    isPaidGroupPolicy: jest.fn((policy: OnyxEntry<Policy>) => policy?.type === 'team' || policy?.type === 'corporate'),
 }));
 
 jest.mock('@libs/interceptAnonymousUser', () => jest.fn((cb: () => void) => cb()));
@@ -58,7 +67,6 @@ jest.mock('@libs/ReportUtils', () => ({
 
 const mockShouldRestrictUserBillableActions = jest.fn(() => false);
 jest.mock('@libs/SubscriptionUtils', () => ({
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     shouldRestrictUserBillableActions: (...args: Parameters<typeof mockShouldRestrictUserBillableActions>) => mockShouldRestrictUserBillableActions(...args),
 }));
 
@@ -177,6 +185,12 @@ describe('useCreateReportAction', () => {
         });
 
         it('navigates to workspace selector when restricted with multiple workspaces', () => {
+            // Set activePolicy to a non-personal paid policy so isDefaultPersonal is false; the selector
+            // should fire purely on the billing-restricted safety net branch.
+            setupUseOnyx({
+                [ONYXKEYS.NVP_ACTIVE_POLICY_ID]: 'p1',
+                [`${ONYXKEYS.COLLECTION.POLICY}p1`]: makePaidPolicy('p1'),
+            });
             mockShouldRestrictUserBillableActions.mockReturnValue(true);
             const onCreateReport = jest.fn();
             const policies = [makePaidPolicy('p1'), makePaidPolicy('p2')];
@@ -193,6 +207,86 @@ describe('useCreateReportAction', () => {
             });
 
             expect(Navigation.navigate).toHaveBeenCalledWith(ROUTES.NEW_REPORT_WORKSPACE_SELECTION.getRoute());
+        });
+
+        it('navigates to workspace selector when default is personal and there are 2+ non-personal workspaces', () => {
+            // Per spec: selector shows iff default workspace is personal AND user has 2+ non-personal options.
+            const personalPolicy = {
+                ...makePaidPolicy('personal-1'),
+                type: CONST.POLICY.TYPE.PERSONAL,
+            } as OnyxEntry<Policy>;
+            setupUseOnyx({
+                [ONYXKEYS.NVP_ACTIVE_POLICY_ID]: 'personal-1',
+                [`${ONYXKEYS.COLLECTION.POLICY}personal-1`]: personalPolicy,
+            });
+            const onCreateReport = jest.fn();
+            const policies = [makePaidPolicy('p1'), makePaidPolicy('p2')];
+
+            const {result} = renderHook(() =>
+                useCreateReportAction({
+                    onCreateReport,
+                    groupPoliciesWithChatEnabled: policies,
+                }),
+            );
+
+            act(() => {
+                result.current.createReportAction();
+            });
+
+            expect(Navigation.navigate).toHaveBeenCalledWith(ROUTES.NEW_REPORT_WORKSPACE_SELECTION.getRoute());
+            expect(onCreateReport).not.toHaveBeenCalled();
+        });
+
+        it('does NOT show selector when default is non-personal, even with multiple non-personal workspaces', () => {
+            // Per spec: if default is already non-personal, just create in default — no selector.
+            setupUseOnyx({
+                [ONYXKEYS.NVP_ACTIVE_POLICY_ID]: 'p1',
+                [`${ONYXKEYS.COLLECTION.POLICY}p1`]: makePaidPolicy('p1'),
+            });
+            const onCreateReport = jest.fn();
+            const policies = [makePaidPolicy('p1'), makePaidPolicy('p2'), makePaidPolicy('p3')];
+
+            const {result} = renderHook(() =>
+                useCreateReportAction({
+                    onCreateReport,
+                    groupPoliciesWithChatEnabled: policies,
+                }),
+            );
+
+            act(() => {
+                result.current.createReportAction();
+            });
+
+            expect(Navigation.navigate).not.toHaveBeenCalledWith(ROUTES.NEW_REPORT_WORKSPACE_SELECTION.getRoute());
+            expect(onCreateReport).toHaveBeenCalledWith(false);
+        });
+
+        it('does NOT show selector when default is personal but only 1 non-personal workspace exists', () => {
+            // Per spec: with a single non-personal candidate, just create there — no selector.
+            const personalPolicy = {
+                ...makePaidPolicy('personal-1'),
+                type: CONST.POLICY.TYPE.PERSONAL,
+            } as OnyxEntry<Policy>;
+            setupUseOnyx({
+                [ONYXKEYS.NVP_ACTIVE_POLICY_ID]: 'personal-1',
+                [`${ONYXKEYS.COLLECTION.POLICY}personal-1`]: personalPolicy,
+            });
+            const onCreateReport = jest.fn();
+            const policies = [makePaidPolicy('p1')];
+
+            const {result} = renderHook(() =>
+                useCreateReportAction({
+                    onCreateReport,
+                    groupPoliciesWithChatEnabled: policies,
+                }),
+            );
+
+            act(() => {
+                result.current.createReportAction();
+            });
+
+            expect(Navigation.navigate).not.toHaveBeenCalledWith(ROUTES.NEW_REPORT_WORKSPACE_SELECTION.getRoute());
+            expect(onCreateReport).toHaveBeenCalledWith(false);
         });
     });
 
