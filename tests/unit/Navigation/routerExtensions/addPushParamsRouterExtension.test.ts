@@ -699,20 +699,21 @@ describe('addPushParamsRouterExtension', () => {
         expect((afterPush.routes.at(0)?.params as {tab: string}).tab).toBe('bar');
     });
 
-    it('PUSH_PARAMS history is FIFO-capped at PUSH_PARAMS_HISTORY_MAX so long sessions cannot grow it indefinitely', () => {
-        // Bound is 32; pushing 40 entries should leave the most recent 32 in history.
+    it('PUSH_PARAMS history grows monotonically across long sessions so React Navigation web linker keeps issuing pushState (not replaceState on length stagnation)', () => {
         const factory = createMockRouterFactory();
         const enhancedRouter = addPushParamsRouterExtension(factory)({} as PlatformStackRouterOptions);
         const initial = makeRoute('Search', 'search-1', {q: '0'});
         let state: TestState = makeState([initial], {history: [{...initial}] as CustomHistoryEntry[]});
 
+        let prevLength = state.history?.length ?? 0;
         for (let i = 1; i <= 40; i += 1) {
             state = enhancedRouter.getStateForAction(state, {type: CONST.NAVIGATION.ACTION_TYPE.PUSH_PARAMS, payload: {params: {q: String(i)}}}, CONFIG_OPTIONS) as TestState;
+            const length = state.history?.length ?? 0;
+            expect(length).toBe(prevLength + 1);
+            prevLength = length;
         }
-
-        expect(state.history).toHaveLength(32);
-        // Oldest 9 entries (q=0..8) dropped; newest entries (q=9..40) survive.
-        expect((asRouteEntry(state.history?.at(0) as CustomHistoryEntry).params as {q: string}).q).toBe('9');
+        expect(state.history).toHaveLength(41);
+        expect((asRouteEntry(state.history?.at(0) as CustomHistoryEntry).params as {q: string}).q).toBe('0');
         expect((asRouteEntry(state.history?.at(-1) as CustomHistoryEntry).params as {q: string}).q).toBe('40');
     });
 
@@ -934,26 +935,33 @@ describe('addPushParamsRouterExtension', () => {
         expect((state.routes.at(0)?.params as {q: string}).q).toBe('typed');
     });
 
-    it('unknown-RESET path applies the same FIFO cap as PUSH_PARAMS append', () => {
+    it('unknown-RESET preserves history.length (replaces the cursor entry) so a SET_PARAMS-then-RESET on layout change does not trip useLinking into goBack(historyDelta)', () => {
         const factory = createMockRouterFactory();
         const enhancedRouter = addPushParamsRouterExtension(factory)({} as PlatformStackRouterOptions);
         const initial = makeRoute('Search', 'search-1', {q: 'A'});
         let state: TestState = makeState([initial], {history: [{...initial}] as CustomHistoryEntry[]});
 
-        for (let i = 1; i < 32; i += 1) {
-            state = enhancedRouter.getStateForAction(state, {type: CONST.NAVIGATION.ACTION_TYPE.PUSH_PARAMS, payload: {params: {q: `v${i}`}}}, CONFIG_OPTIONS) as TestState;
-        }
-        expect(state.history).toHaveLength(32);
+        state = enhancedRouter.getStateForAction(state, {type: CONST.NAVIGATION.ACTION_TYPE.PUSH_PARAMS, payload: {params: {q: 'B'}}}, CONFIG_OPTIONS) as TestState;
+        state = enhancedRouter.getStateForAction(state, {type: CONST.NAVIGATION.ACTION_TYPE.PUSH_PARAMS, payload: {params: {q: 'C'}}}, CONFIG_OPTIONS) as TestState;
+        expect(state.history).toHaveLength(3);
 
-        // Unknown outcome: target compound not in history; rebuilt history runs through the cap path.
-        const unknownReset: PushParamsRouterAction = {
+        // SET_PARAMS doesn't push: focused params drift from the cursor entry.
+        state = enhancedRouter.getStateForAction(state, CommonActions.setParams({sort: 'desc'}), CONFIG_OPTIONS) as TestState;
+        expect(state.history).toHaveLength(3);
+
+        // Layout-change RESET — focused params don't match any captured snapshot → 'unknown'.
+        const layoutReset: PushParamsRouterAction = {
             type: CONST.NAVIGATION.ACTION_TYPE.RESET,
-            payload: {routes: [{name: 'Search', key: 'search-1', params: {q: 'NEW'}}], index: 0},
+            payload: {routes: [{name: 'Search', key: 'search-1', params: {q: 'C', sort: 'desc'}}], index: 0},
         };
-        state = enhancedRouter.getStateForAction(state, unknownReset, CONFIG_OPTIONS) as TestState;
+        state = enhancedRouter.getStateForAction(state, layoutReset, CONFIG_OPTIONS) as TestState;
 
-        expect(state.history?.length).toBeLessThanOrEqual(32);
-        expect((asRouteEntry(state.history?.at(-1) as CustomHistoryEntry).params as {q: string}).q).toBe('NEW');
+        expect(state.history).toHaveLength(3);
+        expect((asRouteEntry(state.history?.at(0) as CustomHistoryEntry).params as {q: string}).q).toBe('A');
+        expect((asRouteEntry(state.history?.at(1) as CustomHistoryEntry).params as {q: string}).q).toBe('B');
+        const cursorEntryParams = asRouteEntry(state.history?.at(2) as CustomHistoryEntry).params as {q: string; sort: string};
+        expect(cursorEntryParams.q).toBe('C');
+        expect(cursorEntryParams.sort).toBe('desc');
     });
 });
 

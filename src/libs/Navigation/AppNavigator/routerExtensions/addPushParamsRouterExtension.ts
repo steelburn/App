@@ -90,9 +90,6 @@ function isPopAction(action: PushParamsRouterAction): boolean {
     return action.type === CONST.NAVIGATION.ACTION_TYPE.POP;
 }
 
-// Bound PUSH_PARAMS history so a long stack-top-PUSH-only session can't grow it indefinitely.
-const PUSH_PARAMS_HISTORY_MAX = 32;
-
 /**
  * Higher-order function that extends a stack router with push-params history functionality.
  * It maintains a separate history stack of route snapshots that can diverge from the routes array,
@@ -165,9 +162,8 @@ function addPushParamsRouterExtension<RouterOptions extends PlatformStackRouterO
                     const existingHistory = stateWithUpdatedParams.history;
                     const baseHistory =
                         pushParamsHistoryPosition >= 0 && pushParamsHistoryPosition < existingHistory.length - 1 ? existingHistory.slice(0, pushParamsHistoryPosition + 1) : existingHistory;
-                    const appended = [...baseHistory, focusedRoute];
-                    // Drop oldest entries on overflow — the most recent PUSH_PARAMS snapshots are the most useful for GO_BACK.
-                    const newHistory = appended.length > PUSH_PARAMS_HISTORY_MAX ? appended.slice(appended.length - PUSH_PARAMS_HISTORY_MAX) : appended;
+                    // No FIFO cap — useLinking decides push/replace by history.length delta; a fixed cap forces replaceState past the bound.
+                    const newHistory = [...baseHistory, focusedRoute];
                     pushParamsHistoryPosition = newHistory.length - 1;
                     return {...stateWithUpdatedParams, history: newHistory};
                 }
@@ -272,16 +268,20 @@ function addPushParamsRouterExtension<RouterOptions extends PlatformStackRouterO
                         pushParamsHistoryPosition = outcome.cursor;
                     } else if (outcome.type === 'unknown') {
                         cancelPendingFocusRestore();
-                        // Focused route+params is unseen: preserve entries for other surviving routes (still relevant), drop stale entries for the focused key, append the new focused entry.
-                        const otherRoutesHistory = preserveHistoryForRoutes(history, rehydratedState.routes).filter((e) => typeof e === 'string' || e.key !== newFocused.key);
-                        const appended = [...otherRoutesHistory, newFocused];
-                        // Same FIFO cap as the PUSH_PARAMS path.
-                        const newHistory = appended.length > PUSH_PARAMS_HISTORY_MAX ? appended.slice(appended.length - PUSH_PARAMS_HISTORY_MAX) : appended;
-                        pushParamsHistoryPosition = newHistory.length - 1;
-                        return {
-                            ...rehydratedState,
-                            history: newHistory,
-                        };
+                        // Replace cursor entry to preserve history.length — useLinking interprets a shrink as goBack(delta), so a SET_PARAMS-then-layout-change-RESET would otherwise send the browser back N entries.
+                        const preservedHistory = preserveHistoryForRoutes(history, rehydratedState.routes);
+                        if (preservedHistory.length === 0) {
+                            pushParamsHistoryPosition = 0;
+                            return {...rehydratedState, history: [newFocused]};
+                        }
+                        // preserveHistoryForRoutes returns the same references, so indexOf remaps the cursor.
+                        const cursorEntry = pushParamsHistoryPosition >= 0 && pushParamsHistoryPosition < history.length ? history.at(pushParamsHistoryPosition) : null;
+                        const remappedCursor = cursorEntry ? preservedHistory.indexOf(cursorEntry) : -1;
+                        const cursorIdx = remappedCursor >= 0 ? remappedCursor : preservedHistory.length - 1;
+                        const updatedHistory = [...preservedHistory];
+                        updatedHistory[cursorIdx] = newFocused;
+                        pushParamsHistoryPosition = cursorIdx;
+                        return {...rehydratedState, history: updatedHistory};
                     }
                     // 'noop' — pending restore and cursor left intact.
                 }
