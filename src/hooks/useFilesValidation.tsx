@@ -1,6 +1,5 @@
 import {Str} from 'expensify-common';
 import React, {useEffect, useRef, useState} from 'react';
-import type {ValueOf} from 'type-fest';
 import ConfirmModal from '@components/ConfirmModal';
 import {useFullScreenLoaderActions} from '@components/FullScreenLoaderContext';
 import PDFThumbnail from '@components/PDFThumbnail';
@@ -115,11 +114,6 @@ function useFilesValidation(onFilesValidated: (files: FileObject[], dataTransfer
     const hideModalAndReset = () => {
         pendingAfterHide.current = reset;
         setIsErrorModalVisible(false);
-    };
-
-    const setErrorAndOpenModal = (error: ValueOf<typeof CONST.FILE_VALIDATION_ERRORS>) => {
-        setFileError({error, isValidatingMultipleFiles});
-        setIsErrorModalVisible(true);
     };
 
     const checkIfAllValidatedAndProceed = () => {
@@ -268,9 +262,9 @@ function useFilesValidation(onFilesValidated: (files: FileObject[], dataTransfer
                 } else {
                     const errorMessage = result.reason instanceof Error ? result.reason.message : undefined;
                     if (errorMessage === CONST.FILE_VALIDATION_ERRORS.IMAGE_DIMENSIONS_TOO_LARGE) {
-                        collectedErrors.current.push({error: CONST.FILE_VALIDATION_ERRORS.IMAGE_DIMENSIONS_TOO_LARGE, isValidatingMultipleFiles});
+                        collectedErrors.current.push({error: CONST.FILE_VALIDATION_ERRORS.IMAGE_DIMENSIONS_TOO_LARGE, isValidatingMultipleFiles: validationState.isValidatingMultipleFiles});
                     } else {
-                        collectedErrors.current.push({error: CONST.FILE_VALIDATION_ERRORS.FILE_CORRUPTED, isValidatingMultipleFiles});
+                        collectedErrors.current.push({error: CONST.FILE_VALIDATION_ERRORS.FILE_CORRUPTED, isValidatingMultipleFiles: validationState.isValidatingMultipleFiles});
                     }
                 }
             }
@@ -350,7 +344,8 @@ function useFilesValidation(onFilesValidated: (files: FileObject[], dataTransfer
             if (items) {
                 dataTransferItemList.current = items.slice(0, CONST.API_ATTACHMENT_VALIDATIONS.MAX_FILE_LIMIT);
             }
-            setErrorAndOpenModal(CONST.FILE_VALIDATION_ERRORS.MAX_FILE_LIMIT_EXCEEDED);
+            setFileError({error: CONST.FILE_VALIDATION_ERRORS.MAX_FILE_LIMIT_EXCEEDED, isValidatingMultipleFiles: validationState.isValidatingMultipleFiles});
+            setIsErrorModalVisible(true);
         } else {
             validateAndResizeFiles(files, items ?? [], validationState);
         }
