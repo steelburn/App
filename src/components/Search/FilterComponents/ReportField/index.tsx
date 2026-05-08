@@ -187,7 +187,7 @@ function ReportFieldBase({ref, values: initialValues = {}, selectedField, onFiel
 
     const getValue = (fieldName: string) => {
         const filterKey = getFilterKey(fieldName);
-        return values[filterKey] ?? '';
+        return values[filterKey]?.trim() ?? '';
     };
 
     const getDateValue = (fieldName: string) => {
