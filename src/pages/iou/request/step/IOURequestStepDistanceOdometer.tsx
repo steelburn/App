@@ -15,6 +15,7 @@ import type {WithCurrentUserPersonalDetailsProps} from '@components/withCurrentU
 import withCurrentUserPersonalDetails from '@components/withCurrentUserPersonalDetails';
 import useDefaultExpensePolicy from '@hooks/useDefaultExpensePolicy';
 import useDiscardChangesConfirmation from '@hooks/useDiscardChangesConfirmation';
+import useDistanceRateOriginalPolicy from '@hooks/useDistanceRateOriginalPolicy';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
@@ -121,7 +122,7 @@ function IOURequestStepDistanceOdometer({
     const [parentReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(report?.parentReportID)}`);
     const [parentReportNextStep] = useOnyx(`${ONYXKEYS.COLLECTION.NEXT_STEP}${getNonEmptyStringOnyxID(report?.parentReportID)}`);
     const policy = usePolicy(report?.policyID);
-    const [allPolicies] = useOnyx(ONYXKEYS.COLLECTION.POLICY);
+    const distanceOriginalPolicy = useDistanceRateOriginalPolicy(transaction?.comment?.customUnit?.customUnitRateID);
     const [policyCategories] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${policy?.id}`);
     const [policyTags] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_TAGS}${policy?.id}`);
     const personalPolicy = usePersonalPolicy();
@@ -481,7 +482,7 @@ function IOURequestStepDistanceOdometer({
                     // Not required for odometer distance request
                     transactionBackup: undefined,
                     policy,
-                    allPolicies,
+                    distanceOriginalPolicy,
                     policyTagList: policyTags,
                     policyCategories,
                     currentUserAccountIDParam,

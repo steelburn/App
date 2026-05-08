@@ -14,6 +14,7 @@ import DraggableList from '@components/DraggableList';
 import withCurrentUserPersonalDetails from '@components/withCurrentUserPersonalDetails';
 import type {WithCurrentUserPersonalDetailsProps} from '@components/withCurrentUserPersonalDetails';
 import useDefaultExpensePolicy from '@hooks/useDefaultExpensePolicy';
+import useDistanceRateOriginalPolicy from '@hooks/useDistanceRateOriginalPolicy';
 import useFetchRoute from '@hooks/useFetchRoute';
 import useIsInLandscapeMode from '@hooks/useIsInLandscapeMode';
 import useLocalize from '@hooks/useLocalize';
@@ -92,7 +93,7 @@ function IOURequestStepDistance({
     const [originalSplitTransactionDraft] = useOnyx(`${ONYXKEYS.COLLECTION.SPLIT_TRANSACTION_DRAFT}${CONST.IOU.OPTIMISTIC_TRANSACTION_ID}`);
     const selfDMReport = useSelfDMReport();
     const policy = usePolicy(report?.policyID);
-    const [allPolicies] = useOnyx(ONYXKEYS.COLLECTION.POLICY);
+    const distanceOriginalPolicy = useDistanceRateOriginalPolicy(transaction?.comment?.customUnit?.customUnitRateID);
     const [policyCategories] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${policy?.id}`);
     const [policyTags] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_TAGS}${policy?.id}`);
     const personalPolicy = usePersonalPolicy();
@@ -484,7 +485,7 @@ function IOURequestStepDistance({
                     currentUserEmailParam,
                     isASAPSubmitBetaEnabled,
                     parentReportNextStep,
-                    allPolicies,
+                    distanceOriginalPolicy,
                 });
             }
             transactionWasSaved.current = true;
@@ -520,7 +521,7 @@ function IOURequestStepDistance({
         currentUserEmailParam,
         isASAPSubmitBetaEnabled,
         parentReportNextStep,
-        allPolicies,
+        distanceOriginalPolicy,
     ]);
 
     const renderItem = useCallback(

@@ -22,6 +22,7 @@ import useCardFeedErrors from '@hooks/useCardFeedErrors';
 import useConfirmModal from '@hooks/useConfirmModal';
 import {useCurrencyListActions} from '@hooks/useCurrencyList';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
+import useDistanceRateOriginalPolicy from '@hooks/useDistanceRateOriginalPolicy';
 import useEnvironment from '@hooks/useEnvironment';
 import useHasMultipleSplitChildren from '@hooks/useHasMultipleSplitChildren';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
@@ -51,7 +52,6 @@ import {hasEnabledOptions} from '@libs/OptionsListUtils';
 import Parser from '@libs/Parser';
 import {
     canSubmitPerDiemExpenseFromWorkspace,
-    getDistanceRateOriginalPolicy,
     getLengthOfTag,
     getPerDiemCustomUnit,
     getPolicyByCustomUnitID,
@@ -208,14 +208,12 @@ function MoneyRequestView({
     const [policiesWithPerDiem] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {
         selector: perDiemPoliciesSelector,
     });
-    const [allPolicies] = useOnyx(ONYXKEYS.COLLECTION.POLICY);
     const isPerDiemRequest = isPerDiemRequestTransactionUtils(transaction);
     const perDiemOriginalPolicy = getPolicyByCustomUnitID(transaction, policiesWithPerDiem);
 
-    const distanceOriginalPolicy =
-        isDistanceRequestTransactionUtils(transaction) && isExpenseUnreported
-            ? getDistanceRateOriginalPolicy(transaction?.comment?.customUnit?.customUnitRateID, allPolicies, policyForMovingExpenses)
-            : undefined;
+    const distanceOriginalPolicy = useDistanceRateOriginalPolicy(
+        isDistanceRequestTransactionUtils(transaction) && isExpenseUnreported ? transaction?.comment?.customUnit?.customUnitRateID : undefined,
+    );
 
     let policy;
     let policyID;
