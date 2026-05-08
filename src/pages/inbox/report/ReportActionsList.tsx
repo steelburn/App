@@ -266,7 +266,7 @@ function ReportActionsList({
 
     // Index must be in the same domain as FlatList `data` (sortedVisibleReportActions), not the paginated full chain.
     const oldestUnreadReportActionMarker = useMemo<[string, number] | undefined>(() => {
-        if (!oldestUnreadReportAction) {
+        if (!oldestUnreadReportAction || reportLoadingState?.hasOnceLoadedReportActions) {
             return undefined;
         }
         const visibleIndex = sortedVisibleReportActions.findIndex((action) => action.reportActionID === oldestUnreadReportAction.reportActionID);
@@ -274,7 +274,7 @@ function ReportActionsList({
             return undefined;
         }
         return [oldestUnreadReportAction.reportActionID, visibleIndex];
-    }, [oldestUnreadReportAction, sortedVisibleReportActions]);
+    }, [oldestUnreadReportAction, reportLoadingState?.hasOnceLoadedReportActions, sortedVisibleReportActions]);
 
     /**
      * The reportActionID the unread marker should display above
