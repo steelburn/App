@@ -573,6 +573,9 @@ const ONYXKEYS = {
     /** Stores the information about duplicated workspace */
     DUPLICATE_WORKSPACE: 'duplicateWorkspace',
 
+    /** Stores the state of the bulk Copy Policy Settings flow */
+    COPY_POLICY_SETTINGS: 'copyPolicySettings',
+
     /** Stores the information about currently edited advanced approval workflow */
     APPROVAL_WORKFLOW: 'approvalWorkflow',
 
@@ -1512,6 +1515,7 @@ type OnyxValuesMapping = {
     [ONYXKEYS.ASSIGN_CARD]: OnyxTypes.AssignCard;
     [ONYXKEYS.RAM_ONLY_MOBILE_SELECTION_MODE]: boolean;
     [ONYXKEYS.DUPLICATE_WORKSPACE]: OnyxTypes.DuplicateWorkspace;
+    [ONYXKEYS.COPY_POLICY_SETTINGS]: OnyxTypes.CopyPolicySettings;
     [ONYXKEYS.NVP_FIRST_DAY_FREE_TRIAL]: string;
     [ONYXKEYS.NVP_LAST_DAY_FREE_TRIAL]: string;
     [ONYXKEYS.NVP_BILLING_FUND_ID]: number;
