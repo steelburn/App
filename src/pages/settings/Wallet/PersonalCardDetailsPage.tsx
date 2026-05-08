@@ -199,8 +199,8 @@ function PersonalCardDetailsPage({route}: PersonalCardDetailsPageProps) {
                         shouldShowBreakConnection={shouldShowBreakConnection}
                         onUpdateCard={updateCard}
                         onBreakConnection={breakConnection}
-                        onUnassignCard={removeCardFromUser}
-                        onDeleteCard={confirmDeleteCard}
+                        onUnassignCard={() => void removeCardFromUser()}
+                        onDeleteCard={() => void confirmDeleteCard()}
                     />
                 )}
             </ScrollView>
