@@ -191,6 +191,7 @@ function SearchFiltersCardPage() {
                         shouldShowTextInput={shouldShowSearchInput}
                         textInputOptions={textInputOptions}
                         shouldStopPropagation
+                        shouldPreventAutoScrollOnSelect
                         canSelectMultiple
                     />
                 </View>
