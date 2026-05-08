@@ -211,7 +211,7 @@ function SearchBulkActionsButton({queryJSON}: SearchBulkActionsButtonProps) {
                                         setPendingPaymentAdditionalData: (data) => {
                                             pendingPaymentAdditionalDataRef.current = data;
                                         },
-                                        currentUserAccountID: currentUserPersonalDetails?.accountID,
+                                        currentUserAccountID: currentUserPersonalDetails.accountID,
                                     })
                                 }
                                 isSplitButton={false}
