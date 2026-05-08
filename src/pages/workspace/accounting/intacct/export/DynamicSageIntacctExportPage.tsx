@@ -26,6 +26,8 @@ function DynamicSageIntacctExportPage({policy}: WithPolicyProps) {
     const policyID = policy?.id;
     const backPath = useDynamicBackPath(DYNAMIC_ROUTES.POLICY_ACCOUNTING_SAGE_INTACCT_EXPORT.path);
     const {export: exportConfig, pendingFields, errorFields} = policy?.connections?.intacct?.config ?? {};
+    const exportPath = policyID ? `${ROUTES.POLICY_ACCOUNTING.getRoute(policyID)}/${DYNAMIC_ROUTES.POLICY_ACCOUNTING_SAGE_INTACCT_EXPORT.path}` : undefined;
+    const travelPayableAccount = policy?.connections?.intacct?.data?.creditCards?.find((account) => account.name === exportConfig?.travelInvoicingPayableAccountID);
 
     const workspaceAccountID = useWorkspaceAccountID(policyID);
     const [cardSettings] = useOnyx(getTravelInvoicingCardSettingsKey(workspaceAccountID));
@@ -54,9 +56,11 @@ function DynamicSageIntacctExportPage({policy}: WithPolicyProps) {
         ...(isTravelInvoicingEnabled
             ? [
                   {
-                      title: translate(`workspace.sageIntacct.nonReimbursableExpenses.values.${CONST.SAGE_INTACCT_NON_REIMBURSABLE_EXPENSE_TYPE.CREDIT_CARD_CHARGE}`),
+                      title: travelPayableAccount?.name,
                       description: translate('workspace.common.travelInvoicing'),
-                      action: !policyID ? undefined : () => Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.POLICY_ACCOUNTING_SAGE_INTACCT_TRAVEL_INVOICING_CONFIGURATION.path)),
+                      action: !exportPath
+                          ? undefined
+                          : () => Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.POLICY_ACCOUNTING_SAGE_INTACCT_TRAVEL_INVOICING_CONFIGURATION.path, exportPath)),
                       subscribedSettings: [CONST.SAGE_INTACCT_CONFIG.TRAVEL_INVOICING_PAYABLE_ACCOUNT],
                   },
               ]

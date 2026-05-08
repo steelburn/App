@@ -11,7 +11,7 @@ import {areSettingsInErrorFields, settingsPendingAction} from '@libs/PolicyUtils
 import type {WithPolicyConnectionsProps} from '@pages/workspace/withPolicyConnections';
 import withPolicyConnections from '@pages/workspace/withPolicyConnections';
 import CONST from '@src/CONST';
-import {DYNAMIC_ROUTES} from '@src/ROUTES';
+import ROUTES, {DYNAMIC_ROUTES} from '@src/ROUTES';
 
 const payableAccountSetting = [CONST.SAGE_INTACCT_CONFIG.TRAVEL_INVOICING_PAYABLE_ACCOUNT];
 
@@ -23,6 +23,7 @@ function DynamicSageIntacctTravelInvoicingConfigurationPage({policy}: WithPolicy
     const config = policy?.connections?.intacct?.config;
     const travelPayableAccount = policy?.connections?.intacct?.data?.creditCards?.find((account) => account.name === config?.export?.travelInvoicingPayableAccountID);
     const backPath = useDynamicBackPath(DYNAMIC_ROUTES.POLICY_ACCOUNTING_SAGE_INTACCT_TRAVEL_INVOICING_CONFIGURATION.path);
+    const travelInvoicingPath = `${ROUTES.POLICY_ACCOUNTING.getRoute(policyID)}/${DYNAMIC_ROUTES.POLICY_ACCOUNTING_SAGE_INTACCT_EXPORT.path}/${DYNAMIC_ROUTES.POLICY_ACCOUNTING_SAGE_INTACCT_TRAVEL_INVOICING_CONFIGURATION.path}`;
 
     return (
         <ConnectionLayout
@@ -49,7 +50,9 @@ function DynamicSageIntacctTravelInvoicingConfigurationPage({policy}: WithPolicy
                 <MenuItemWithTopDescription
                     title={travelPayableAccount?.name}
                     description={translate('workspace.sageIntacct.creditCardAccount')}
-                    onPress={() => Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.POLICY_ACCOUNTING_SAGE_INTACCT_TRAVEL_INVOICING_PAYABLE_ACCOUNT_SELECT.path))}
+                    onPress={() =>
+                        Navigation.navigate(createDynamicRoute(DYNAMIC_ROUTES.POLICY_ACCOUNTING_SAGE_INTACCT_TRAVEL_INVOICING_PAYABLE_ACCOUNT_SELECT.path, travelInvoicingPath))
+                    }
                     shouldShowRightIcon
                     brickRoadIndicator={areSettingsInErrorFields(payableAccountSetting, config?.errorFields) ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : undefined}
                 />
