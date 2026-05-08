@@ -9142,6 +9142,8 @@ Aqui está um *comprovante de teste* para mostrar como funciona:`,
                 addMember: 'Não foi possível adicionar este membro. Tente novamente.',
                 vacationDelegate: 'Não foi possível definir este usuário como delegado de férias. Tente novamente.',
                 moveMember: 'Não foi possível mover este membro. Tente novamente.',
+                moveMemberNotPolicyAdmin:
+                    'Cannot move member to the domain group. You must be a Policy Admin for the Preferred Policy set on the domain group you are trying to move this user to.',
             },
             cannotSetVacationDelegateForMember: (email: string) => `Você não pode definir um procurador de férias para ${email} porque esta pessoa já é procuradora dos seguintes membros:`,
             reportSuspiciousActivityPrompt: (email: string) =>

@@ -8915,6 +8915,8 @@ ${reportName}
                 addMember: '无法添加此成员。请重试。',
                 vacationDelegate: '无法将此用户设置为休假代理人。请重试。',
                 moveMember: '无法移动此成员。请重试。',
+                moveMemberNotPolicyAdmin:
+                    'Cannot move member to the domain group. You must be a Policy Admin for the Preferred Policy set on the domain group you are trying to move this user to.',
             },
             cannotSetVacationDelegateForMember: (email: string) => `您无法为 ${email} 设置休假代理人，因为 TA 当前是以下成员的代理人：`,
             reportSuspiciousActivityPrompt: (email: string) =>

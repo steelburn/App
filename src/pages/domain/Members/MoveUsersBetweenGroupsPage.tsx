@@ -1,4 +1,5 @@
 import {domainNameSelector, groupsSelector} from '@selectors/Domain';
+import {createAdminPoliciesSelector} from '@selectors/Policy';
 import React, {useState} from 'react';
 import Button from '@components/Button';
 import FixedFooter from '@components/FixedFooter';
@@ -8,6 +9,7 @@ import SelectionList from '@components/SelectionList';
 import SingleSelectListItem from '@components/SelectionList/ListItem/SingleSelectListItem';
 import type {ListItem} from '@components/SelectionList/ListItem/types';
 import Text from '@components/Text';
+import useConfirmModal from '@hooks/useConfirmModal';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
@@ -32,13 +34,24 @@ function MoveUsersBetweenGroupsPage({route}: MoveUsersBetweenGroupsPageProps) {
     const {domainAccountID} = route.params;
     const {translate} = useLocalize();
     const styles = useThemeStyles();
+    const {showConfirmModal} = useConfirmModal();
 
     const [selectedGroupId, setSelectedGroupId] = useState<string | undefined>();
     const [domainName] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {selector: domainNameSelector});
     const [securityGroups] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {selector: groupsSelector});
     const [selectedMemberAccountIDs] = useOnyx(ONYXKEYS.DOMAIN_MEMBERS_SELECTED_FOR_MOVE);
+    const [adminPolicies] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {selector: createAdminPoliciesSelector()});
 
     const memberCount = selectedMemberAccountIDs?.length ?? 0;
+
+    const isUserBlockedFromMovingToGroup = (groupId: string): boolean => {
+        const targetGroup = securityGroups?.find((g) => g.id === groupId);
+        if (!targetGroup?.details.enableRestrictedPrimaryPolicy || !targetGroup?.details.restrictedPrimaryPolicyID) {
+            return false;
+        }
+        const policyKey = `${ONYXKEYS.COLLECTION.POLICY}${targetGroup.details.restrictedPrimaryPolicyID}`;
+        return !adminPolicies?.[policyKey];
+    };
 
     const data: SecurityGroupItem[] = (securityGroups ?? []).map(({id, details}) => ({
         text: details.name ?? '',
@@ -53,6 +66,16 @@ function MoveUsersBetweenGroupsPage({route}: MoveUsersBetweenGroupsPageProps) {
 
     const handleSave = () => {
         if (!selectedGroupId || !selectedMemberAccountIDs?.length || !domainName) {
+            return;
+        }
+
+        if (isUserBlockedFromMovingToGroup(selectedGroupId)) {
+            showConfirmModal({
+                title: translate('workspace.distanceRates.oopsNotSoFast'),
+                prompt: translate('domain.members.error.moveMemberNotPolicyAdmin'),
+                confirmText: translate('common.buttonConfirm'),
+                shouldShowCancelButton: false,
+            });
             return;
         }
 

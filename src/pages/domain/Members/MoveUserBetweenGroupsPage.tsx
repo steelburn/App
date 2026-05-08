@@ -1,4 +1,5 @@
 import {domainNameSelector, groupsSelector, selectSecurityGroupForAccount} from '@selectors/Domain';
+import {createAdminPoliciesSelector} from '@selectors/Policy';
 import React, {useState} from 'react';
 import type {OnyxEntry} from 'react-native-onyx';
 import Button from '@components/Button';
@@ -9,6 +10,7 @@ import SelectionList from '@components/SelectionList';
 import SingleSelectListItem from '@components/SelectionList/ListItem/SingleSelectListItem';
 import type {ListItem} from '@components/SelectionList/ListItem/types';
 import Text from '@components/Text';
+import useConfirmModal from '@hooks/useConfirmModal';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
@@ -34,10 +36,12 @@ function MoveUserBetweenGroupsPage({route}: MoveUserBetweenGroupsPageProps) {
     const {domainAccountID, accountID} = route.params;
     const styles = useThemeStyles();
     const {translate} = useLocalize();
+    const {showConfirmModal} = useConfirmModal();
 
     const [selectedGroupId, setSelectedGroupId] = useState<string | undefined>();
     const [domainName] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {selector: domainNameSelector});
     const [securityGroups] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {selector: groupsSelector});
+    const [adminPolicies] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {selector: createAdminPoliciesSelector()});
 
     const securityGroupSelector = (domain: OnyxEntry<Domain>) => selectSecurityGroupForAccount(accountID)(domain);
     const [userSecurityGroup] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {
@@ -46,6 +50,15 @@ function MoveUserBetweenGroupsPage({route}: MoveUserBetweenGroupsPageProps) {
     const [memberLogin] = useOnyx(ONYXKEYS.PERSONAL_DETAILS_LIST, {selector: personalDetailsLoginSelector(accountID)});
 
     const currentGroupId = userSecurityGroup?.key.replace(CONST.DOMAIN.DOMAIN_SECURITY_GROUP_PREFIX, '');
+
+    const isUserBlockedFromMovingToGroup = (groupId: string): boolean => {
+        const targetGroup = securityGroups?.find((g) => g.id === groupId);
+        if (!targetGroup?.details.enableRestrictedPrimaryPolicy || !targetGroup?.details.restrictedPrimaryPolicyID) {
+            return false;
+        }
+        const policyKey = `${ONYXKEYS.COLLECTION.POLICY}${targetGroup.details.restrictedPrimaryPolicyID}`;
+        return !adminPolicies?.[policyKey];
+    };
 
     const data: SecurityGroupItem[] = (securityGroups ?? []).map(({id, details}) => ({
         text: details.name ?? '',
@@ -65,6 +78,16 @@ function MoveUserBetweenGroupsPage({route}: MoveUserBetweenGroupsPageProps) {
 
         if (selectedGroupId === currentGroupId) {
             Navigation.goBack(ROUTES.DOMAIN_MEMBER_DETAILS.getRoute(domainAccountID, accountID));
+            return;
+        }
+
+        if (isUserBlockedFromMovingToGroup(selectedGroupId)) {
+            showConfirmModal({
+                title: translate('workspace.distanceRates.oopsNotSoFast'),
+                prompt: translate('domain.members.error.moveMemberNotPolicyAdmin'),
+                confirmText: translate('common.buttonConfirm'),
+                shouldShowCancelButton: false,
+            });
             return;
         }
 

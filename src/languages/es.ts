@@ -9422,6 +9422,8 @@ ${amount} para ${merchant} - ${date}`,
                 addMember: 'No se pudo añadir este miembro. Por favor, inténtalo de nuevo.',
                 vacationDelegate: 'No se pudo establecer a este usuario como delegado de vacaciones. Por favor, inténtalo de nuevo.',
                 moveMember: 'No se pudo mover este miembro. Por favor, inténtalo de nuevo.',
+                moveMemberNotPolicyAdmin:
+                    'Cannot move member to the domain group. You must be a Policy Admin for the Preferred Policy set on the domain group you are trying to move this user to.',
             },
             cannotSetVacationDelegateForMember: (email: string) =>
                 `No puedes establecer un delegado de vacaciones para ${email} porque actualmente es el delegado de los siguientes miembros:`,

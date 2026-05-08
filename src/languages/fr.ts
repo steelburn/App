@@ -9210,6 +9210,8 @@ Voici un *reçu test* pour vous montrer comment ça fonctionne :`,
                 addMember: 'Impossible d’ajouter ce membre. Veuillez réessayer.',
                 vacationDelegate: 'Impossible de définir cet utilisateur comme délégué de vacances. Veuillez réessayer.',
                 moveMember: 'Impossible de déplacer ce membre. Veuillez réessayer.',
+                moveMemberNotPolicyAdmin:
+                    'Cannot move member to the domain group. You must be a Policy Admin for the Preferred Policy set on the domain group you are trying to move this user to.',
             },
             cannotSetVacationDelegateForMember: (email: string) =>
                 `Vous ne pouvez pas définir un délégué de vacances pour ${email}, car cette personne est actuellement le délégué des membres suivants :`,
