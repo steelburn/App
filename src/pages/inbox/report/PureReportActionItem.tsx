@@ -511,14 +511,13 @@ function PureReportActionItem({
         () => ({
             anchor: popoverAnchorRef.current,
             report,
-            isReportArchived,
             action,
             transactionThreadReport,
             isDisabled: false,
             shouldDisplayContextMenu: shouldDisplayContextMenuValue,
             originalReportID,
         }),
-        [report, action, transactionThreadReport, shouldDisplayContextMenuValue, isReportArchived, originalReportID],
+        [report, action, transactionThreadReport, shouldDisplayContextMenuValue, originalReportID],
     );
 
     const contextMenuActionsValue = useMemo(
