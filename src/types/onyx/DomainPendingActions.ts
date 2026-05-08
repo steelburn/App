@@ -84,6 +84,11 @@ type DomainSecurityGroupPendingActions = {
      * Pending action for the restricted default login selection
      */
     enableRestrictedPrimaryLogin?: OnyxCommon.PendingAction;
+
+    /**
+     * Pending action for the override preferred policy with card policy setting
+     */
+    overridePreferredPolicyWithCardPolicy?: OnyxCommon.PendingAction;
 };
 
 /**
