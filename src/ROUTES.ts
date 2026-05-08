@@ -357,9 +357,9 @@ const DYNAMIC_ROUTES = {
             SCREENS.WORKSPACE.DYNAMIC_WORKSPACE_EXPENSIFY_CARD_ISSUE_NEW,
         ],
     },
-    WORKSPACE_EXPENSIFY_CARD_LIMIT_TYPE: {
+    EXPENSIFY_CARD_LIMIT_TYPE: {
         path: 'edit/limit-type',
-        entryScreens: [SCREENS.WORKSPACE.EXPENSIFY_CARD_DETAILS],
+        entryScreens: [SCREENS.WORKSPACE.EXPENSIFY_CARD_DETAILS, SCREENS.EXPENSIFY_CARD.EXPENSIFY_CARD_DETAILS],
     },
     EXPENSIFY_CARD_LIMIT: {
         path: 'edit/limit',
@@ -2798,12 +2798,6 @@ const ROUTES = {
 
         // eslint-disable-next-line no-restricted-syntax -- Legacy route generation
         getRoute: (policyID: string, cardID: string, backTo?: string) => getUrlWithBackToParam(`settings/${policyID}/expensify-card/${cardID}`, backTo),
-    },
-    EXPENSIFY_CARD_LIMIT_TYPE: {
-        route: 'settings/:policyID/expensify-card/:cardID/edit/limit-type',
-
-        // eslint-disable-next-line no-restricted-syntax -- Legacy route generation
-        getRoute: (policyID: string, cardID: string, backTo?: string) => getUrlWithBackToParam(`settings/${policyID}/expensify-card/${cardID}/edit/limit-type`, backTo),
     },
     EXPENSIFY_CARD_EXPIRY_OPTIONS: {
         route: 'settings/:policyID/expensify-card/:cardID/edit/expiry-options',

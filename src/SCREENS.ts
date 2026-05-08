@@ -451,7 +451,7 @@ const SCREENS = {
         EXPENSIFY_CARD_DETAILS: 'Expensify_Card_Details',
         DYNAMIC_EXPENSIFY_CARD_NAME: 'Dynamic_Expensify_Card_Name',
         DYNAMIC_EXPENSIFY_CARD_LIMIT: 'Dynamic_Expensify_Card_Limit',
-        EXPENSIFY_CARD_LIMIT_TYPE: 'Expensify_Card_Limit_Type',
+        DYNAMIC_EXPENSIFY_CARD_LIMIT_TYPE: 'Dynamic_Expensify_Card_Limit_Type',
         EXPENSIFY_CARD_EXPIRY_OPTIONS: 'Expensify_Card_Expiry_Options',
     },
     DOMAIN_CARD: {
@@ -712,7 +712,6 @@ const SCREENS = {
         DYNAMIC_WORKSPACE_EXPENSIFY_CARD_ISSUE_NEW: 'Dynamic_Workspace_ExpensifyCard_New',
         DYNAMIC_WORKSPACE_EXPENSIFY_CARD_ISSUE_NEW_CONFIRM_MAGIC_CODE: 'Dynamic_Workspace_ExpensifyCard_IssueNew_ConfirmMagicCode',
         DYNAMIC_WORKSPACE_EXPENSIFY_CARD_SELECT_FEED: 'Dynamic_Workspace_ExpensifyCard_Select_Feed',
-        DYNAMIC_WORKSPACE_EXPENSIFY_CARD_LIMIT_TYPE: 'Dynamic_Workspace_ExpensifyCard_LimitType',
         EXPENSIFY_CARD_ADD_WORK_EMAIL: 'Workspace_ExpensifyCard_Add_Work_Email',
         EXPENSIFY_CARD_VERIFY_WORK_EMAIL: 'Workspace_ExpensifyCard_Verify_Work_Email',
         EXPENSIFY_CARD_BANK_ACCOUNT: 'Workspace_ExpensifyCard_BankAccount',
