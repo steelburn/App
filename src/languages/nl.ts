@@ -9214,8 +9214,7 @@ Hier is een *proefbon* om je te laten zien hoe het werkt:`,
             expensifyCardPreferredWorkspace: 'Voorkeurswerkruimte voor Expensify Card',
             expensifyCardPreferredWorkspaceDescription:
                 'Alle Expensify Card-transacties worden aangemaakt in de voorkeurswerkruimte voor Expensify Card in plaats van de voorkeurswerkruimte. Door deze functie in te schakelen, wordt de instelling voor de voorkeurswerkruimte alleen voor Expensify Card-transacties overschreven.',
-            expensifyCardPreferredWorkspaceDisabledMessage:
-                'Om deze instelling te gebruiken, moet de voorkeurswerkruimte zijn ingeschakeld en moet voor het domein een Expensify Card zijn ingesteld.',
+            expensifyCardPreferredWorkspaceDisabledMessage: 'Om deze instelling in te schakelen, schakelt u eerst een voorkeurswerkruimte in en stelt u Expensify Cards in op uw domein.',
             findGroup: 'Groep zoeken',
         },
     },

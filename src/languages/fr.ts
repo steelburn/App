@@ -9273,11 +9273,11 @@ Voici un *reçu test* pour vous montrer comment ça fonctionne :`,
             restrictDefaultLoginSelection: 'Restreindre la sélection de connexion par défaut',
             restrictDefaultLoginSelectionDescription:
                 'Empêche les membres de modifier leur e-mail de connexion en dehors du domaine de leur entreprise afin d’éviter les restrictions de politique.',
-            expensifyCardPreferredWorkspace: 'Espace de travail préféré pour la Expensify Card',
+            expensifyCardPreferredWorkspace: 'Espace de travail préféré pour la carte Expensify',
             expensifyCardPreferredWorkspaceDescription:
                 'Toutes les transactions Expensify Card seront créées dans l’espace de travail préféré pour la Expensify Card au lieu de l’espace de travail préféré. L’activation de cette fonctionnalité remplacera le paramètre d’espace de travail préféré uniquement pour les transactions Expensify Card.',
             expensifyCardPreferredWorkspaceDisabledMessage:
-                'Pour utiliser ce paramètre, l’espace de travail préféré doit être activé et la Expensify Card doit être configurée pour le domaine.',
+                'Pour activer ce paramètre, veuillez d’abord activer un espace de travail préféré et configurer les cartes Expensify sur votre domaine.',
             findGroup: 'Trouver un groupe',
         },
     },

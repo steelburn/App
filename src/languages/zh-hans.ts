@@ -8973,7 +8973,7 @@ ${reportName}
             expensifyCardPreferredWorkspace: 'Expensify Card 首选工作区',
             expensifyCardPreferredWorkspaceDescription:
                 '所有 Expensify Card 交易将在 Expensify Card 首选工作区中创建，而不是在首选工作区中创建。启用此功能将仅覆盖 Expensify Card 交易的首选工作区设置。',
-            expensifyCardPreferredWorkspaceDisabledMessage: '要使用此设置，必须启用首选工作区，并且域必须已设置 Expensify Card。',
+            expensifyCardPreferredWorkspaceDisabledMessage: '要启用此设置，请先启用一个首选工作区，并在您的域上完成 Expensify Cards 的设置。',
             findGroup: '查找群组',
         },
     },
