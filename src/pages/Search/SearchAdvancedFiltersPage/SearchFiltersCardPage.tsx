@@ -76,13 +76,10 @@ function SearchFiltersCardPage() {
 
     const allCardFeeds = buildCardFeedsData(workspaceCardFeeds ?? CONST.EMPTY_OBJECT, domainFeedsData, policies, selectedCards, translate, illustrations, companyCardFeedIcons);
 
-    const isLoadingOnyxData = isLoadingOnyxValue(userCardListMetadata, workspaceCardFeedsMetadata, searchAdvancedFiltersFormMetadata, policiesMetadata);
-    const shouldShowLoadingState = isLoadingOnyxData || (!areCardsLoaded && !isOffline);
-
     const shouldShowSearchInput = allCardFeeds.length + allIndividualCards.length >= CONST.STANDARD_LIST_ITEM_LIMIT;
 
     const allItems = [...allCardFeeds, ...allIndividualCards, ...allClosedCards];
-    const initiallyFocusedKey = useInitiallyFocusedKey(() => allItems.find((item) => item.isSelected)?.keyForList, !shouldShowLoadingState);
+    const initiallyFocusedKey = useInitiallyFocusedKey(() => allItems.find((item) => item.isSelected)?.keyForList);
 
     const searchFunction = (item: CardFilterItem) =>
         !!item.text?.toLocaleLowerCase().includes(debouncedSearchTerm.toLocaleLowerCase()) ||
@@ -154,6 +151,8 @@ function SearchFiltersCardPage() {
         headerMessage: debouncedSearchTerm.trim() && sections.every((section) => !section.data.length) ? translate('common.noResultsFound') : '',
     };
 
+    const isLoadingOnyxData = isLoadingOnyxValue(userCardListMetadata, workspaceCardFeedsMetadata, searchAdvancedFiltersFormMetadata, policiesMetadata);
+    const shouldShowLoadingState = isLoadingOnyxData || (!areCardsLoaded && !isOffline);
     const reasonAttributes: SkeletonSpanReasonAttributes = {context: 'SearchFiltersCardPage', isLoadingFromOnyx: isLoadingOnyxData};
 
     return (
