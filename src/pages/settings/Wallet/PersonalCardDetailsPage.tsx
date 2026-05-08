@@ -1,15 +1,16 @@
 import {format} from 'date-fns';
-import React, {useState} from 'react';
+import React from 'react';
 import {View} from 'react-native';
 import Button from '@components/Button';
-import ConfirmModal from '@components/ConfirmModal';
 import FormHelpMessage from '@components/FormHelpMessage';
+import {ModalActions} from '@components/Modal/Global/ModalContext';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import ImageSVG from '@components/ImageSVG';
 import OfflineWithFeedback from '@components/OfflineWithFeedback';
 import ScreenWrapper from '@components/ScreenWrapper';
 import ScrollView from '@components/ScrollView';
 import {useCompanyCardFeedIcons} from '@hooks/useCompanyCardIcons';
+import useConfirmModal from '@hooks/useConfirmModal';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useNetwork from '@hooks/useNetwork';
@@ -40,9 +41,8 @@ function PersonalCardDetailsPage({route}: PersonalCardDetailsPageProps) {
     const {cardID} = route.params;
     const [customCardNames] = useOnyx(ONYXKEYS.NVP_EXPENSIFY_COMPANY_CARDS_CUSTOM_NAMES);
     const [shouldUseStagingServer = isUsingStagingApi()] = useOnyx(ONYXKEYS.SHOULD_USE_STAGING_SERVER);
-    const [isUnassignModalVisible, setIsUnassignModalVisible] = useState(false);
-    const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
     const {translate, getLocalDateFromDatetime} = useLocalize();
+    const {showConfirmModal} = useConfirmModal();
     const styles = useThemeStyles();
     const illustrations = useThemeIllustrations();
     const companyCardFeedIcons = useCompanyCardFeedIcons();
@@ -64,14 +64,22 @@ function PersonalCardDetailsPage({route}: PersonalCardDetailsPageProps) {
     const reimbursableSetting = card?.reimbursable ?? true;
     const isCSVImportedPersonalCard = !!(isUserPersonalCard && card && (card.bank === CONST.COMPANY_CARD.FEED_BANK_NAME.UPLOAD || card.bank.includes(CONST.COMPANY_CARD.FEED_BANK_NAME.CSV)));
 
-    const removeCardFromUser = () => {
-        setIsUnassignModalVisible(false);
+    const removeCardFromUser = async () => {
         if (!card) {
-            Navigation.goBack();
             return;
         }
-        unassignCard(card);
-        Navigation.goBack();
+        const result = await showConfirmModal({
+            title: translate('workspace.moreFeatures.companyCards.removeCard'),
+            prompt: translate('workspace.moreFeatures.companyCards.removeCardDescription'),
+            confirmText: translate('workspace.moreFeatures.companyCards.remove'),
+            cancelText: translate('common.cancel'),
+            shouldShowCancelButton: true,
+            danger: true,
+        });
+        if (result.action === ModalActions.CONFIRM) {
+            unassignCard(card);
+            Navigation.goBack();
+        }
     };
 
     const updateCard = () => {
@@ -88,15 +96,23 @@ function PersonalCardDetailsPage({route}: PersonalCardDetailsPageProps) {
         syncCard(card.cardID, card.lastScrapeResult, true);
     };
 
-    const confirmDeleteCard = () => {
-        setIsDeleteModalVisible(false);
+    const confirmDeleteCard = async () => {
         if (!card) {
-            Navigation.goBack();
             return;
         }
-        const savedColumnLayout = savedColumnLayouts?.[card.cardID];
-        deletePersonalCard({cardID: card.cardID, card, allTransactions, allReports, savedColumnLayout});
-        Navigation.goBack();
+        const result = await showConfirmModal({
+            title: translate('walletPage.deleteCard'),
+            prompt: translate('walletPage.deleteCardConfirmation'),
+            confirmText: translate('common.delete'),
+            cancelText: translate('common.cancel'),
+            shouldShowCancelButton: true,
+            danger: true,
+        });
+        if (result.action === ModalActions.CONFIRM) {
+            const savedColumnLayout = savedColumnLayouts?.[card.cardID];
+            deletePersonalCard({cardID: card.cardID, card, allTransactions, allReports, savedColumnLayout});
+            Navigation.goBack();
+        }
     };
 
     // Show "Break connection" only when Mock Bank requests target non-production APIs.
@@ -183,32 +199,10 @@ function PersonalCardDetailsPage({route}: PersonalCardDetailsPageProps) {
                         shouldShowBreakConnection={shouldShowBreakConnection}
                         onUpdateCard={updateCard}
                         onBreakConnection={breakConnection}
-                        onUnassignCard={() => setIsUnassignModalVisible(true)}
-                        onDeleteCard={() => setIsDeleteModalVisible(true)}
+                        onUnassignCard={removeCardFromUser}
+                        onDeleteCard={confirmDeleteCard}
                     />
                 )}
-                <ConfirmModal
-                    title={translate('workspace.moreFeatures.companyCards.removeCard')}
-                    isVisible={isUnassignModalVisible}
-                    onConfirm={removeCardFromUser}
-                    onCancel={() => setIsUnassignModalVisible(false)}
-                    shouldSetModalVisibility={false}
-                    prompt={translate('workspace.moreFeatures.companyCards.removeCardDescription')}
-                    confirmText={translate('workspace.moreFeatures.companyCards.remove')}
-                    cancelText={translate('common.cancel')}
-                    danger
-                />
-                <ConfirmModal
-                    title={translate('walletPage.deleteCard')}
-                    isVisible={isDeleteModalVisible}
-                    onConfirm={confirmDeleteCard}
-                    onCancel={() => setIsDeleteModalVisible(false)}
-                    shouldSetModalVisibility={false}
-                    prompt={translate('walletPage.deleteCardConfirmation')}
-                    confirmText={translate('common.delete')}
-                    cancelText={translate('common.cancel')}
-                    danger
-                />
             </ScrollView>
         </ScreenWrapper>
     );
