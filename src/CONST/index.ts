@@ -3798,7 +3798,6 @@ const CONST = {
                 xero: 'Xero',
                 intacct: 'Sage Intacct',
                 financialforce: 'Certinia',
-                certinia: 'Certinia',
                 gusto: 'Gusto',
                 billCom: 'Bill.com',
                 zenefits: 'Zenefits',
