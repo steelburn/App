@@ -20,7 +20,7 @@ import interceptAnonymousUser from '@libs/interceptAnonymousUser';
 import Navigation from '@libs/Navigation/Navigation';
 import navigationRef from '@libs/Navigation/navigationRef';
 import {isDeletedAction} from '@libs/ReportActionsUtils';
-import {cancelTabNavigationSpans, startSpan} from '@libs/telemetry/activeSpans';
+import {startSpan} from '@libs/telemetry/activeSpans';
 import type {ReportsSplitNavigatorParamList} from '@navigation/types';
 import NavigationTabBarAvatar from '@pages/inbox/sidebar/NavigationTabBarAvatar';
 import NavigationTabBarFloatingActionButton from '@pages/inbox/sidebar/NavigationTabBarFloatingActionButton';
@@ -96,7 +96,6 @@ function NavigationTabBar({selectedTab, shouldShowFloatingButtons = true}: Navig
         if (selectedTab === NAVIGATION_TABS.HOME) {
             return;
         }
-        cancelTabNavigationSpans();
         Navigation.navigate(ROUTES.HOME);
     };
 
@@ -105,7 +104,6 @@ function NavigationTabBar({selectedTab, shouldShowFloatingButtons = true}: Navig
             return;
         }
 
-        cancelTabNavigationSpans();
         startSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_INBOX_TAB, {
             name: CONST.TELEMETRY.SPAN_NAVIGATE_TO_INBOX_TAB,
             op: CONST.TELEMETRY.SPAN_NAVIGATE_TO_INBOX_TAB,
@@ -130,7 +128,6 @@ function NavigationTabBar({selectedTab, shouldShowFloatingButtons = true}: Navig
             return;
         }
         interceptAnonymousUser(() => {
-            cancelTabNavigationSpans();
             Navigation.navigate(ROUTES.SETTINGS);
         });
     };

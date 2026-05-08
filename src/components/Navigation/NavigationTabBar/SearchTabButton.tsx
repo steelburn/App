@@ -9,7 +9,7 @@ import clearSelectedText from '@libs/clearSelectedText/clearSelectedText';
 import interceptAnonymousUser from '@libs/interceptAnonymousUser';
 import Navigation from '@libs/Navigation/Navigation';
 import {buildCannedSearchQuery, buildSearchQueryJSON, buildSearchQueryString} from '@libs/SearchQueryUtils';
-import {cancelTabNavigationSpans, startSpan} from '@libs/telemetry/activeSpans';
+import {startSpan} from '@libs/telemetry/activeSpans';
 import navigationRef from '@navigation/navigationRef';
 import type {SearchFullscreenNavigatorParamList} from '@navigation/types';
 import CONST from '@src/CONST';
@@ -39,7 +39,6 @@ function SearchTabButton({selectedTab, isWideLayout}: SearchTabButtonProps) {
         }
         clearSelectedText();
         interceptAnonymousUser(() => {
-            cancelTabNavigationSpans();
             startSpan(CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS, {
                 name: CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS,
                 op: CONST.TELEMETRY.SPAN_NAVIGATE_TO_REPORTS,

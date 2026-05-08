@@ -6,7 +6,6 @@ import useLocalize from '@hooks/useLocalize';
 import useRestoreWorkspacesTabOnNavigate from '@hooks/useRestoreWorkspacesTabOnNavigate';
 import useThemeStyles from '@hooks/useThemeStyles';
 import useWorkspacesTabIndicatorStatus from '@hooks/useWorkspacesTabIndicatorStatus';
-import {cancelTabNavigationSpans} from '@libs/telemetry/activeSpans';
 import CONST from '@src/CONST';
 import NAVIGATION_TABS from './NAVIGATION_TABS';
 import TabBarItem from './TabBarItem';
@@ -24,20 +23,13 @@ function WorkspacesTabButton({selectedTab, isWideLayout}: WorkspacesTabButtonPro
 
     const navigateToWorkspaces = useRestoreWorkspacesTabOnNavigate();
 
-    const handlePress = () => {
-        if (selectedTab !== NAVIGATION_TABS.WORKSPACES) {
-            cancelTabNavigationSpans();
-        }
-        navigateToWorkspaces();
-    };
-
     const workspacesAccessibilityState = {selected: selectedTab === NAVIGATION_TABS.WORKSPACES};
     const workspacesStatusIndicatorColor = workspacesTabIndicatorStatus ? workspacesTabIndicatorColor : undefined;
 
     if (isWideLayout) {
         return (
             <PressableWithFeedback
-                onPress={handlePress}
+                onPress={navigateToWorkspaces}
                 role={CONST.ROLE.TAB}
                 accessibilityLabel={`${translate('common.workspacesTabTitle')}${workspacesTabIndicatorStatus ? `. ${translate('common.yourReviewIsRequired')}` : ''}`}
                 accessibilityState={workspacesAccessibilityState}
@@ -60,7 +52,7 @@ function WorkspacesTabButton({selectedTab, isWideLayout}: WorkspacesTabButtonPro
 
     return (
         <PressableWithFeedback
-            onPress={handlePress}
+            onPress={navigateToWorkspaces}
             role={CONST.ROLE.TAB}
             accessibilityLabel={`${translate('common.workspacesTabTitle')}${workspacesTabIndicatorStatus ? `. ${translate('common.yourReviewIsRequired')}` : ''}`}
             accessibilityState={workspacesAccessibilityState}
