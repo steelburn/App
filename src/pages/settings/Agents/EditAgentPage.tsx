@@ -36,7 +36,10 @@ function EditAgentPage({route}: EditAgentPageProps) {
     const StyleUtils = useStyleUtils();
     const {showConfirmModal} = useConfirmModal();
 
-    async function handleDeletePress() {
+    const handleBackPress = () => Navigation.goBack();
+    const handleEditNamePress = () => Navigation.navigate(ROUTES.SETTINGS_AGENTS_EDIT_NAME.getRoute(accountID));
+    const handleEditPromptPress = () => Navigation.navigate(ROUTES.SETTINGS_AGENTS_EDIT_PROMPT.getRoute(accountID));
+    const handleDeletePress = async () => {
         const result = await showConfirmModal({
             title: translate('editAgentPage.deleteAgentTitle'),
             prompt: translate('editAgentPage.deleteAgentMessage'),
@@ -48,7 +51,7 @@ function EditAgentPage({route}: EditAgentPageProps) {
             return;
         }
         deleteAgent(accountID, agent, personalDetails);
-    }
+    };
 
     return (
         <ScreenWrapper
@@ -58,7 +61,7 @@ function EditAgentPage({route}: EditAgentPageProps) {
         >
             <HeaderWithBackButton
                 title={translate('editAgentPage.title')}
-                onBackButtonPress={() => Navigation.goBack()}
+                onBackButtonPress={handleBackPress}
             />
             <ScrollView contentContainerStyle={styles.flexGrow1}>
                 <View style={[styles.alignItemsCenter, styles.pv5]}>
@@ -78,13 +81,13 @@ function EditAgentPage({route}: EditAgentPageProps) {
                         description={translate('editAgentPage.agentName')}
                         title={personalDetails?.displayName ?? ''}
                         shouldShowRightIcon
-                        onPress={() => Navigation.navigate(ROUTES.SETTINGS_AGENTS_EDIT_NAME.getRoute(accountID))}
+                        onPress={handleEditNamePress}
                     />
                     <MenuItemWithTopDescription
                         description={translate('editAgentPage.instructions')}
-                        title={agent?.prompt ?? ''}
+                        title={agent?.prompt?.trim() ?? ''}
                         shouldShowRightIcon
-                        onPress={() => Navigation.navigate(ROUTES.SETTINGS_AGENTS_EDIT_PROMPT.getRoute(accountID))}
+                        onPress={handleEditPromptPress}
                         numberOfLinesTitle={10}
                     />
                 </OfflineWithFeedback>
