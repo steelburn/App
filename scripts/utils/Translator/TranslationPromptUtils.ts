@@ -1,5 +1,4 @@
 import {createRequire} from 'node:module';
-import path from 'path';
 import getBasePrompt from '@prompts/translation/base';
 import getContextPrompt from '@prompts/translation/context';
 import type {TranslationTargetLocale} from '@src/CONST/LOCALES';
@@ -14,10 +13,9 @@ const requireLocalePrompt = createRequire(__dirname);
  */
 async function getLocaleSpecificPrompt(targetLang: TranslationTargetLocale): Promise<string> {
     try {
-        const localeModulePath = path.join(__dirname, '../../../prompts/translation', `${targetLang}.ts`);
-        const localePrompt = requireLocalePrompt(localeModulePath) as {default?: string};
+        const localePrompt = requireLocalePrompt(`@prompts/translation/${targetLang}`) as {default?: string};
         return localePrompt.default ?? '';
-    } catch (e) {
+    } catch {
         return '';
     }
 }
