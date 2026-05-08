@@ -30,6 +30,7 @@ import Navigation from '@navigation/Navigation';
 import type {PlatformStackScreenProps} from '@navigation/PlatformStackNavigation/types';
 import type {DomainSplitNavigatorParamList} from '@navigation/types';
 import BaseDomainMembersPage from '@pages/domain/BaseDomainMembersPage';
+import variables from '@styles/variables';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
@@ -80,7 +81,7 @@ function DomainMembersPage({route}: DomainMembersPageProps) {
             closeOverlay={closeOverlay}
             onChange={handleGroupChange}
             defaultValue={groupOptions.at(0)?.value}
-            selectionListStyle={{listItemWrapperStyle: {minHeight: 40}}}
+            itemHeight={variables.optionRowHeightCompact}
             shouldShowList={isExpanded}
         />
     );

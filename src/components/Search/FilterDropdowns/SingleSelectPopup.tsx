@@ -50,6 +50,9 @@ type SingleSelectPopupProps<T> = {
     /** Custom styles for the SelectionList */
     selectionListStyle?: SelectionListStyle;
 
+    /** Custom height for each item in the list. Overrides the default row height and adjusts the popover size accordingly. */
+    itemHeight?: number;
+
     /** Whether SelectionList of popup should stay mounted when popup is not visible. */
     shouldShowList?: boolean;
 };
@@ -66,6 +69,7 @@ function SingleSelectPopup<T extends string>({
     defaultValue,
     style,
     selectionListStyle,
+    itemHeight,
     shouldShowList = true,
 }: SingleSelectPopupProps<T>) {
     const {translate} = useLocalize();
@@ -151,7 +155,7 @@ function SingleSelectPopup<T extends string>({
                 style={[
                     styles.getSelectionListPopoverHeight({
                         itemCount: options.length || 1,
-                        itemHeight: variables.optionRowHeight,
+                        itemHeight: itemHeight ?? variables.optionRowHeight,
                         windowHeight,
                         isInLandscapeMode,
                         hasTitle,
@@ -167,7 +171,11 @@ function SingleSelectPopup<T extends string>({
                         ListItem={SingleSelectListItem}
                         onSelectRow={updateSelectedItem}
                         textInputOptions={textInputOptions}
-                        style={{contentContainerStyle: [styles.pb0], ...selectionListStyle}}
+                        style={{
+                            contentContainerStyle: [styles.pb0],
+                            ...selectionListStyle,
+                            listItemWrapperStyle: [itemHeight ? {minHeight: itemHeight} : undefined, selectionListStyle?.listItemWrapperStyle],
+                        }}
                         shouldUpdateFocusedIndex={isSearchable}
                         initiallyFocusedItemKey={isSearchable ? value?.value : undefined}
                         shouldShowLoadingPlaceholder={!noResultsFound}
