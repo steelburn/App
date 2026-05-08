@@ -1,4 +1,4 @@
-import {selectGroupByID} from '@selectors/Domain';
+import {domainSecurityGroupSettingPendingActionSelector, selectGroupByID} from '@selectors/Domain';
 import {createAdminPoliciesSelector} from '@selectors/Policy';
 import React from 'react';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
@@ -40,6 +40,13 @@ function DomainGroupPreferredWorkspacePage({route}: DomainGroupPreferredWorkspac
         selector: selectGroupByID(groupID),
     });
 
+    const [deleteGroupPendingAction] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`, {
+        selector: domainSecurityGroupSettingPendingActionSelector('deleteGroup', groupID),
+    });
+
+    // Block access to a group being deleted, and avoid flashing the not-found page during RHP navigation
+    const isDeleting = !group || !!deleteGroupPendingAction;
+
     const currentPolicyID = group?.restrictedPrimaryPolicyID;
 
     const [policies] = useOnyx(ONYXKEYS.COLLECTION.POLICY, {selector: createAdminPoliciesSelector(currentPolicyID)});
@@ -69,7 +76,10 @@ function DomainGroupPreferredWorkspacePage({route}: DomainGroupPreferredWorkspac
     }
 
     return (
-        <DomainNotFoundPageWrapper domainAccountID={domainAccountID}>
+        <DomainNotFoundPageWrapper
+            domainAccountID={domainAccountID}
+            shouldBeBlocked={isDeleting}
+        >
             <ScreenWrapper
                 shouldEnableMaxHeight
                 testID="DomainGroupPreferredWorkspacePage"

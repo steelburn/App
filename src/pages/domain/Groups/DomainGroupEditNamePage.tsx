@@ -1,4 +1,4 @@
-import {selectGroupByID} from '@selectors/Domain';
+import {domainSecurityGroupSettingPendingActionSelector, selectGroupByID} from '@selectors/Domain';
 import React, {useRef} from 'react';
 import FormProvider from '@components/Form/FormProvider';
 import InputWrapper from '@components/Form/InputWrapper';
@@ -35,6 +35,13 @@ function DomainGroupEditNamePage({route}: DomainGroupEditNamePageProps) {
         selector: selectGroupByID(groupID),
     });
 
+    const [deleteGroupPendingAction] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN_PENDING_ACTIONS}${domainAccountID}`, {
+        selector: domainSecurityGroupSettingPendingActionSelector('deleteGroup', groupID),
+    });
+
+    // Block access to a group being deleted, and avoid flashing the not-found page during RHP navigation
+    const isDeleting = !group || !!deleteGroupPendingAction;
+
     const inputRef = useRef<AnimatedTextInputRef>(null);
 
     const validate = (values: FormOnyxValues<typeof ONYXKEYS.FORMS.EDIT_DOMAIN_GROUP_NAME_FORM>): Errors => {
@@ -50,7 +57,10 @@ function DomainGroupEditNamePage({route}: DomainGroupEditNamePageProps) {
     };
 
     return (
-        <DomainNotFoundPageWrapper domainAccountID={domainAccountID}>
+        <DomainNotFoundPageWrapper
+            domainAccountID={domainAccountID}
+            shouldBeBlocked={isDeleting}
+        >
             <ScreenWrapper
                 onEntryTransitionEnd={() => inputRef.current?.focus()}
                 shouldEnableMaxHeight
