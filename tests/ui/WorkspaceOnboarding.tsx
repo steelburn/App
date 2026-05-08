@@ -270,7 +270,7 @@ describe('OnboardingWorkspaces Page', () => {
         await waitForBatchedUpdatesWithAct();
     });
 
-    it('should complete onboarding with the joined Submit workspace policyID and open Categories in the admins room', async () => {
+    it('should complete onboarding without passing the joined workspace policyID and open Categories in the admins room', async () => {
         jest.spyOn(Navigation, 'dismissModal').mockImplementation(() => {});
         jest.spyOn(Navigation, 'setNavigationActionToMicrotaskQueue').mockImplementation((callback: () => void) => callback());
 
@@ -294,6 +294,7 @@ describe('OnboardingWorkspaces Page', () => {
                     employeeCount: 4,
                     hasPendingAccess: false,
                     automaticJoiningEnabled: true,
+                    policyType: CONST.POLICY.TYPE.SUBMIT,
                 },
             });
         });
@@ -314,11 +315,12 @@ describe('OnboardingWorkspaces Page', () => {
         await waitFor(() => {
             expect(mockCompleteOnboarding).toHaveBeenCalledWith(
                 expect.objectContaining({
-                    engagementChoice: CONST.ONBOARDING_CHOICES.EMPLOYER,
-                    onboardingPolicyID: 'submit-policy-id',
+                    engagementChoice: CONST.ONBOARDING_CHOICES.LOOKING_AROUND,
                 }),
             );
         });
+        const lastCompleteOnboardingArgs = mockCompleteOnboarding.mock.calls.at(-1)?.[0] as Record<string, unknown> | undefined;
+        expect(lastCompleteOnboardingArgs).not.toHaveProperty('onboardingPolicyID');
 
         await waitFor(() => {
             expect(onyxSetSpy).toHaveBeenCalledWith(ONYXKEYS.NVP_ONBOARDING_RHP_VARIANT, CONST.ONBOARDING_RHP_VARIANT.RHP_ADMINS_ROOM);
