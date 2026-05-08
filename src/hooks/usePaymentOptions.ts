@@ -115,7 +115,7 @@ function usePaymentOptions({
     const isInvoiceReport = (!isEmptyObject(iouReport) && isInvoiceReportUtil(iouReport)) || false;
     const shouldShowPayWithExpensifyOption = !shouldHidePaymentOptions;
     const shouldShowPayElsewhereOption = !shouldHidePaymentOptions && !isInvoiceReport;
-    const hasPersonalBankAccount = Object.values(bankAccountList).some((account) => account.accountData?.type === CONST.BANK_ACCOUNT.TYPE.PERSONAL);
+    const hasPersonalBankAccount = Object.values(bankAccountList).some((account) => account?.accountData?.type === CONST.BANK_ACCOUNT.TYPE.PERSONAL);
     const paymentButtonOptions = useMemo(() => {
         const buttonOptions = [];
         const isExpenseReport = isExpenseReportUtil(iouReport);
