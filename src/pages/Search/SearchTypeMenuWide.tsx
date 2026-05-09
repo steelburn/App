@@ -1,8 +1,8 @@
 import {useRoute} from '@react-navigation/native';
-import React, {useCallback, useContext, useLayoutEffect, useRef, useState} from 'react';
+import React, {useContext, useLayoutEffect, useRef, useState} from 'react';
 import {View} from 'react-native';
 // eslint-disable-next-line no-restricted-imports
-import type {ScrollView as RNScrollView, ScrollViewProps} from 'react-native';
+import type {NativeScrollEvent, NativeSyntheticEvent, ScrollView as RNScrollView} from 'react-native';
 import {ScrollOffsetContext} from '@components/ScrollOffsetContextProvider';
 import ScrollView from '@components/ScrollView';
 import {useSearchActionsContext} from '@components/Search/SearchContext';
@@ -107,17 +107,14 @@ function SearchTypeMenuWide({queryJSON}: SearchTypeMenuProps) {
     const route = useRoute();
     const scrollViewRef = useRef<RNScrollView>(null);
     const {saveScrollOffset, getScrollOffset} = useContext(ScrollOffsetContext);
-    const onScroll = useCallback<NonNullable<ScrollViewProps['onScroll']>>(
-        (e) => {
-            // If the layout measurement is 0, it means the flash list is not displayed but the onScroll may be triggered with offset value 0.
-            // We should ignore this case.
-            if (e.nativeEvent.layoutMeasurement.height === 0) {
-                return;
-            }
-            saveScrollOffset(route, e.nativeEvent.contentOffset.y);
-        },
-        [route, saveScrollOffset],
-    );
+    const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+        // If the layout measurement is 0, it means the flash list is not displayed but the onScroll may be triggered with offset value 0.
+        // We should ignore this case.
+        if (e.nativeEvent.layoutMeasurement.height === 0) {
+            return;
+        }
+        saveScrollOffset(route, e.nativeEvent.contentOffset.y);
+    }
 
     const handleTypeMenuItemPress = singleExecution((searchQuery: string) => {
         clearSelectedTransactions();
