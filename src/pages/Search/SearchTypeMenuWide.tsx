@@ -37,12 +37,11 @@ type RenderSectionParams = {
     hash: number | undefined;
     activeItemIndex: number;
     sectionStartIndex: number;
+    onItemPress: (query: string) => void;
 };
 
-function Section({section, hash, activeItemIndex, sectionStartIndex}: RenderSectionParams) {
+function Section({section, hash, activeItemIndex, sectionStartIndex, onItemPress}: RenderSectionParams) {
     const {translate} = useLocalize();
-    const {singleExecution} = useSingleExecution();
-    const {clearSelectedTransactions} = useSearchActionsContext();
     const expensifyIcons = useMemoizedLazyExpensifyIcons([
         'Basket',
         'CalendarSolid',
@@ -63,12 +62,6 @@ function Section({section, hash, activeItemIndex, sectionStartIndex}: RenderSect
     const [reportCounts = CONST.EMPTY_TODOS_REPORT_COUNTS] = useOnyx(ONYXKEYS.DERIVED.TODOS, {selector: todosReportCountsSelector});
 
     const [isExpanded, setIsExpanded] = useState(true);
-
-    const handleTypeMenuItemPress = singleExecution((searchQuery: string) => {
-        clearSelectedTransactions();
-        setSearchContext(false);
-        Navigation.navigate(ROUTES.SEARCH_ROOT.getRoute({query: searchQuery}));
-    });
 
     return (
         <SearchTypeMenuAccordion
@@ -92,7 +85,7 @@ function Section({section, hash, activeItemIndex, sectionStartIndex}: RenderSect
                             icon={icon}
                             badgeText={getItemBadgeText(item.key, reportCounts)}
                             focused={focused}
-                            onPress={() => handleTypeMenuItemPress(item.searchQuery)}
+                            onPress={() => onItemPress(item.searchQuery)}
                         />
                     );
                 })
@@ -106,6 +99,8 @@ function SearchTypeMenuWide({queryJSON}: SearchTypeMenuProps) {
 
     const styles = useThemeStyles();
     const {isOffline} = useNetwork();
+    const {singleExecution} = useSingleExecution();
+    const {clearSelectedTransactions} = useSearchActionsContext();
     const {typeMenuSections, activeItemIndex} = useSearchTypeMenuSections({hash, similarSearchHash, sortBy, sortOrder, type});
     const [isSearchDataLoaded, isSearchDataLoadedResult] = useOnyx(ONYXKEYS.IS_SEARCH_PAGE_DATA_LOADED);
 
@@ -123,6 +118,12 @@ function SearchTypeMenuWide({queryJSON}: SearchTypeMenuProps) {
         },
         [route, saveScrollOffset],
     );
+
+    const handleTypeMenuItemPress = singleExecution((searchQuery: string) => {
+        clearSelectedTransactions();
+        setSearchContext(false);
+        Navigation.navigate(ROUTES.SEARCH_ROOT.getRoute({query: searchQuery}));
+    });
 
     useLayoutEffect(() => {
         const scrollOffset = getScrollOffset(route);
@@ -151,6 +152,7 @@ function SearchTypeMenuWide({queryJSON}: SearchTypeMenuProps) {
                 {!!expenseReportsSection && (
                     <Section
                         section={expenseReportsSection}
+                        onItemPress={handleTypeMenuItemPress}
                         hash={hash}
                         sectionStartIndex={0}
                         activeItemIndex={activeItemIndex}
@@ -164,6 +166,7 @@ function SearchTypeMenuWide({queryJSON}: SearchTypeMenuProps) {
                         <Section
                             key={section.translationPath}
                             section={section}
+                            onItemPress={handleTypeMenuItemPress}
                             hash={hash}
                             sectionStartIndex={sectionStartIndices.at(index + (expenseReportsSection ? 1 : 0)) ?? 0}
                             activeItemIndex={activeItemIndex}
