@@ -1281,10 +1281,8 @@ const translations = {
         findExpense: 'Find expense',
         deletedTransaction: (amount: string, merchant: string) => `deleted an expense (${amount} for ${merchant})`,
         movedFromReport: (reportName: string) => `moved an expense${reportName ? ` from ${reportName}` : ''}`,
-        movedTransactionTo: (toReportID: string, reportUrl: string, reportName?: string) =>
-            `moved this expense to${reportName ? ` <a href="${reportUrl}">${reportName}</a>` : ` report ID ${toReportID}`}`,
-        movedTransactionFrom: (fromReportID: string, reportUrl: string, reportName?: string) =>
-            `moved this expense from${reportName ? ` <a href="${reportUrl}">${reportName}</a>` : ` report ID ${fromReportID}`}`,
+        movedTransactionTo: (reportUrl: string, reportName?: string) => `moved this expense to${reportName ? ` <a href="${reportUrl}">${reportName}</a>` : ' another report'}`,
+        movedTransactionFrom: (reportUrl: string, reportName?: string) => `moved this expense from${reportName ? ` <a href="${reportUrl}">${reportName}</a>` : ' another report'}`,
         unreportedTransaction: (reportUrl: string) => `moved this expense to your <a href="${reportUrl}">personal space</a>`,
         movedAction: (shouldHideMovedReportUrl: boolean, movedReportUrl: string, newParentReportUrl: string, toPolicyName: string) => {
             if (shouldHideMovedReportUrl) {

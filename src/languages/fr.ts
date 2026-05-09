@@ -1234,10 +1234,8 @@ const translations: TranslationDeepObject<typeof en> = {
         findExpense: 'Trouver une dépense',
         deletedTransaction: (amount: string, merchant: string) => `a supprimé une dépense (${amount} pour ${merchant})`,
         movedFromReport: (reportName: string) => `a déplacé une dépense${reportName ? `de ${reportName}` : ''}`,
-        movedTransactionTo: (toReportID: string, reportUrl: string, reportName?: string) =>
-            `a déplacé cette dépense vers${reportName ? ` <a href="${reportUrl}">${reportName}</a>` : ` ID rapport ${toReportID}`}`,
-        movedTransactionFrom: (fromReportID: string, reportUrl: string, reportName?: string) =>
-            `a déplacé cette dépense depuis${reportName ? ` <a href="${reportUrl}">${reportName}</a>` : ` ID rapport ${fromReportID}`}`,
+        movedTransactionTo: (reportUrl: string, reportName?: string) => `a déplacé cette dépense vers${reportName ? ` <a href="${reportUrl}">${reportName}</a>` : ' un autre rapport'}`,
+        movedTransactionFrom: (reportUrl: string, reportName?: string) => `a déplacé cette dépense depuis${reportName ? ` <a href="${reportUrl}">${reportName}</a>` : ' un autre rapport'}`,
         unreportedTransaction: (reportUrl: string) => `a déplacé cette dépense vers votre <a href="${reportUrl}">espace personnel</a>`,
         movedAction: (shouldHideMovedReportUrl: boolean, movedReportUrl: string, newParentReportUrl: string, toPolicyName: string) => {
             if (shouldHideMovedReportUrl) {
