@@ -40,15 +40,9 @@ Once the values are confirmed, your business bank account is fully connected and
 
 ---
 
-<!-- SCREENSHOT:
-Account > Wallet > bank account with a callout on the Action required badge. 
-Design request: https://github.com/Expensify/Expensify/issues/623901
--->
+![Account > Wallet > bank account with a callout on the Action required badge]({{site.url}}/assets/images/ExpensifyHelp-BetterBusinessBankAccount_02.png){:width="100%"}
 
-<!-- SCREENSHOT:
-Account > Wallet > bank account with an Action required badge > expose validation pane. 
-Design request: https://github.com/Expensify/Expensify/issues/623901
--->
+![Account > Wallet > bank account with an Action required badge > expose validation pane]({{site.url}}/assets/images/ExpensifyHelp-BetterBusinessBankAccount_03.png){:width="100%"}
 
 ---
 
