@@ -3,6 +3,7 @@ import type {OnyxEntry} from 'react-native-onyx';
 import RenderHTML from '@components/RenderHTML';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
+import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import Parser from '@libs/Parser';
 import {getOriginalMessage, hasReasoning} from '@libs/ReportActionsUtils';
 import {getMovedTransactionMessage} from '@libs/ReportUtils';
@@ -16,20 +17,18 @@ type MovedTransactionActionProps = {
     /** The moved transaction action data */
     action: ReportAction<typeof CONST.REPORT.ACTIONS.TYPE.MOVED_TRANSACTION>;
 
-    /** The child report of the action item */
-    childReport: OnyxEntry<Report>;
-
     /** Original report from which the given reportAction is first created */
     originalReport: OnyxEntry<Report>;
 };
 
-function MovedTransactionAction({action, childReport, originalReport}: MovedTransactionActionProps) {
+function MovedTransactionAction({action, originalReport}: MovedTransactionActionProps) {
     const {translate} = useLocalize();
     const movedTransactionOriginalMessage = getOriginalMessage(action);
     const fromReportID = movedTransactionOriginalMessage?.fromReportID;
 
     const [fromReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${fromReportID}`);
     const [conciergeReportID] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID);
+    const [childReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(action.childReportID)}`);
 
     const isPendingDelete = fromReport?.pendingFields?.preview === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE;
 
