@@ -19,7 +19,7 @@ import {getReportName} from '@libs/ReportNameUtils';
 import * as ReportUtils from '@libs/ReportUtils';
 import {buildOptimisticSnapshotData} from '@libs/SearchQueryUtils';
 import playSound, {SOUNDS} from '@libs/Sound';
-import {AvatarSource} from '@libs/UserAvatarUtils';
+import type {AvatarSource} from '@libs/UserAvatarUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
