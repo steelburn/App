@@ -20,7 +20,7 @@ To switch to a different plan:
 
 # How to downgrade an Annual Subscription to a free account 
 
-If you're on an Annual Subscription (a 12-month commitment), you can cancel your subscription and switch to a free account:
+If you're on an Annual Subscription (a 12-month commitment), you may be eligible for early cancellation and a switch to a free account:
 
 1. Use the **navigation tabs** (on the left on web, and at the bottom on mobile) to go to **Account > Subscription**.
 2. Select **Cancel subscription**.
