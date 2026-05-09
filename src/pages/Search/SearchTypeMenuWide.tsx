@@ -1,5 +1,5 @@
 import {useRoute} from '@react-navigation/native';
-import React, {useCallback, useContext, useLayoutEffect, useRef} from 'react';
+import React, {useCallback, useContext, useLayoutEffect, useRef, useState} from 'react';
 import {View} from 'react-native';
 // eslint-disable-next-line no-restricted-imports
 import type {ScrollView as RNScrollView, ScrollViewProps} from 'react-native';
@@ -32,14 +32,17 @@ type SearchTypeMenuProps = {
     queryJSON: SearchQueryJSON | undefined;
 };
 
-function SearchTypeMenuWide({queryJSON}: SearchTypeMenuProps) {
-    const {hash, similarSearchHash, sortBy, sortOrder, type} = queryJSON ?? {};
+type RenderSectionParams = {
+    section: SearchTypeMenuSection;
+    hash: number | undefined;
+    activeItemIndex: number;
+    sectionStartIndex: number;
+};
 
-    const styles = useThemeStyles();
-    const {isOffline} = useNetwork();
+function Section({section, hash, activeItemIndex, sectionStartIndex}: RenderSectionParams) {
     const {translate} = useLocalize();
     const {singleExecution} = useSingleExecution();
-    const {typeMenuSections, activeItemIndex} = useSearchTypeMenuSections({hash, similarSearchHash, sortBy, sortOrder, type});
+    const {clearSelectedTransactions} = useSearchActionsContext();
     const expensifyIcons = useMemoizedLazyExpensifyIcons([
         'Basket',
         'CalendarSolid',
@@ -56,9 +59,55 @@ function SearchTypeMenuWide({queryJSON}: SearchTypeMenuProps) {
         'ThumbsUp',
         'CheckCircle',
     ]);
-    const {clearSelectedTransactions} = useSearchActionsContext();
-    const [isSearchDataLoaded, isSearchDataLoadedResult] = useOnyx(ONYXKEYS.IS_SEARCH_PAGE_DATA_LOADED);
+
     const [reportCounts = CONST.EMPTY_TODOS_REPORT_COUNTS] = useOnyx(ONYXKEYS.DERIVED.TODOS, {selector: todosReportCountsSelector});
+
+    const [isExpanded, setIsExpanded] = useState(true);
+
+    const handleTypeMenuItemPress = singleExecution((searchQuery: string) => {
+        clearSelectedTransactions();
+        setSearchContext(false);
+        Navigation.navigate(ROUTES.SEARCH_ROOT.getRoute({query: searchQuery}));
+    });
+
+    return (
+        <SearchTypeMenuAccordion
+            isExpanded={isExpanded}
+            onSectionHeaderPress={() => setIsExpanded((prevIsExpanded) => !prevIsExpanded)}
+            title={translate(section.translationPath)}
+            badgeText={getSectionBadgeText(section.translationPath, reportCounts)}
+        >
+            {section.translationPath === 'search.savedSearchesMenuItemTitle' ? (
+                <SavedSearchList hash={hash} isExpanded={isExpanded} />
+            ) : (
+                section.menuItems.map((item, itemIndex) => {
+                    const flattenedIndex = sectionStartIndex + itemIndex;
+                    const focused = activeItemIndex === flattenedIndex;
+                    const icon = typeof item.icon === 'string' ? expensifyIcons[item.icon] : item.icon;
+
+                    return (
+                        <SearchTypeMenuItem
+                            key={item.key}
+                            title={translate(item.translationPath)}
+                            icon={icon}
+                            badgeText={getItemBadgeText(item.key, reportCounts)}
+                            focused={focused}
+                            onPress={() => handleTypeMenuItemPress(item.searchQuery)}
+                        />
+                    );
+                })
+            )}
+        </SearchTypeMenuAccordion>
+    );
+}
+
+function SearchTypeMenuWide({queryJSON}: SearchTypeMenuProps) {
+    const {hash, similarSearchHash, sortBy, sortOrder, type} = queryJSON ?? {};
+
+    const styles = useThemeStyles();
+    const {isOffline} = useNetwork();
+    const {typeMenuSections, activeItemIndex} = useSearchTypeMenuSections({hash, similarSearchHash, sortBy, sortOrder, type});
+    const [isSearchDataLoaded, isSearchDataLoadedResult] = useOnyx(ONYXKEYS.IS_SEARCH_PAGE_DATA_LOADED);
 
     const route = useRoute();
     const scrollViewRef = useRef<RNScrollView>(null);
@@ -90,42 +139,7 @@ function SearchTypeMenuWide({queryJSON}: SearchTypeMenuProps) {
     const expenseReportsSection = typeMenuSections.find((section) => section.translationPath === 'search.tabs.expenseReports');
     const nonExpenseReportsSections = typeMenuSections.filter((section) => section.translationPath !== 'search.tabs.expenseReports');
 
-    const handleTypeMenuItemPress = singleExecution((searchQuery: string) => {
-        clearSelectedTransactions();
-        setSearchContext(false);
-        Navigation.navigate(ROUTES.SEARCH_ROOT.getRoute({query: searchQuery}));
-    });
-
     const areSuggestedSearchesLoading = !isOffline && !isSearchDataLoaded && !isLoadingOnyxValue(isSearchDataLoadedResult);
-
-    const renderSection = (section: SearchTypeMenuSection, sectionIndex: number) => (
-        <SearchTypeMenuAccordion
-            key={section.translationPath}
-            title={translate(section.translationPath)}
-            badgeText={getSectionBadgeText(section.translationPath, reportCounts)}
-        >
-            {section.translationPath === 'search.savedSearchesMenuItemTitle' ? (
-                <SavedSearchList hash={hash} />
-            ) : (
-                section.menuItems.map((item, itemIndex) => {
-                    const flattenedIndex = (sectionStartIndices?.at(sectionIndex) ?? 0) + itemIndex;
-                    const focused = activeItemIndex === flattenedIndex;
-                    const icon = typeof item.icon === 'string' ? expensifyIcons[item.icon] : item.icon;
-
-                    return (
-                        <SearchTypeMenuItem
-                            key={item.key}
-                            title={translate(item.translationPath)}
-                            icon={icon}
-                            badgeText={getItemBadgeText(item.key, reportCounts)}
-                            focused={focused}
-                            onPress={() => handleTypeMenuItemPress(item.searchQuery)}
-                        />
-                    );
-                })
-            )}
-        </SearchTypeMenuAccordion>
-    );
 
     return (
         <ScrollView
@@ -134,12 +148,27 @@ function SearchTypeMenuWide({queryJSON}: SearchTypeMenuProps) {
             showsVerticalScrollIndicator={false}
         >
             <View style={[styles.pb4, styles.mh3, styles.gap4]}>
-                {!!expenseReportsSection && renderSection(expenseReportsSection, 0)}
+                {!!expenseReportsSection && (
+                    <Section
+                        section={expenseReportsSection}
+                        hash={hash}
+                        sectionStartIndex={0}
+                        activeItemIndex={activeItemIndex}
+                    />
+                )}
 
                 {areSuggestedSearchesLoading ? (
                     <SuggestedSearchSkeleton sectionCount={nonExpenseReportsSections.length || 2} />
                 ) : (
-                    nonExpenseReportsSections.map((section, index) => renderSection(section, index + (expenseReportsSection ? 1 : 0)))
+                    nonExpenseReportsSections.map((section, index) => (
+                        <Section
+                            key={section.translationPath}
+                            section={section}
+                            hash={hash}
+                            sectionStartIndex={sectionStartIndices.at(index + (expenseReportsSection ? 1 : 0)) ?? 0}
+                            activeItemIndex={activeItemIndex}
+                        />
+                    ))
                 )}
             </View>
         </ScrollView>
