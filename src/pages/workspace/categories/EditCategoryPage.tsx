@@ -33,7 +33,7 @@ function EditCategoryPage({route}: EditCategoryPageProps) {
     const validate = useCallback(
         (values: FormOnyxValues<typeof ONYXKEYS.FORMS.WORKSPACE_CATEGORY_FORM>) => {
             const errors: FormInputErrors<typeof ONYXKEYS.FORMS.WORKSPACE_CATEGORY_FORM> = {};
-            const newCategoryName = values.categoryName.trim();
+            const newCategoryName = values.categoryName.replaceAll('\u00A0', ' ').trim();
 
             if (!newCategoryName) {
                 errors.categoryName = translate('workspace.categories.categoryRequiredError');
