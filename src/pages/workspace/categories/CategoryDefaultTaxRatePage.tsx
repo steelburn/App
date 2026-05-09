@@ -4,6 +4,7 @@ import ScreenWrapper from '@components/ScreenWrapper';
 import SelectionList from '@components/SelectionList';
 import SingleSelectListItem from '@components/SelectionList/ListItem/SingleSelectListItem';
 import type {ListItem} from '@components/SelectionList/types';
+import useDynamicBackPath from '@hooks/useDynamicBackPath';
 import useLocalize from '@hooks/useLocalize';
 import usePolicy from '@hooks/usePolicy';
 import useThemeStyles from '@hooks/useThemeStyles';
@@ -14,7 +15,7 @@ import type {SettingsNavigatorParamList} from '@navigation/types';
 import AccessOrNotFoundWrapper from '@pages/workspace/AccessOrNotFoundWrapper';
 import {setPolicyCategoryTax} from '@userActions/Policy/Category';
 import CONST from '@src/CONST';
-import ROUTES from '@src/ROUTES';
+import {DYNAMIC_ROUTES} from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
 import type {TaxRate} from '@src/types/onyx';
 
@@ -28,6 +29,7 @@ function CategoryDefaultTaxRatePage({
     const styles = useThemeStyles();
     const {translate, localeCompare} = useLocalize();
     const policy = usePolicy(policyID);
+    const categorySettingsBackPath = useDynamicBackPath(DYNAMIC_ROUTES.WORKSPACE_CATEGORY_DEFAULT_TAX_RATE.path);
 
     const selectedTaxRate = getCategoryDefaultTaxRate(policy?.rules?.expenseRules ?? [], categoryName, policy?.taxRates?.defaultExternalID);
 
@@ -55,14 +57,14 @@ function CategoryDefaultTaxRatePage({
             }
 
             if (item.keyForList === selectedTaxRate) {
-                Navigation.goBack(ROUTES.WORKSPACE_CATEGORY_SETTINGS.getRoute(policyID, categoryName));
+                Navigation.goBack(categorySettingsBackPath);
                 return;
             }
 
             setPolicyCategoryTax(policy, categoryName, item.keyForList);
-            Navigation.setNavigationActionToMicrotaskQueue(() => Navigation.goBack(ROUTES.WORKSPACE_CATEGORY_SETTINGS.getRoute(policyID, categoryName)));
+            Navigation.setNavigationActionToMicrotaskQueue(() => Navigation.goBack(categorySettingsBackPath));
         },
-        [policyID, policy, categoryName, selectedTaxRate],
+        [policyID, policy, categoryName, selectedTaxRate, categorySettingsBackPath],
     );
 
     return (
@@ -79,7 +81,7 @@ function CategoryDefaultTaxRatePage({
             >
                 <HeaderWithBackButton
                     title={translate('workspace.rules.categoryRules.defaultTaxRate')}
-                    onBackButtonPress={() => Navigation.goBack(ROUTES.WORKSPACE_CATEGORY_SETTINGS.getRoute(policyID, categoryName))}
+                    onBackButtonPress={() => Navigation.goBack(categorySettingsBackPath)}
                 />
                 <SelectionList
                     data={taxesList}
