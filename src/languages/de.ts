@@ -4792,7 +4792,7 @@ ${amount} für ${merchant} – ${date}`,
                 label: 'Bevorzugte Verbuchung von Journalbuchungen',
                 values: {
                     [CONST.NETSUITE_JOURNAL_POSTING_PREFERENCE.JOURNALS_POSTING_INDIVIDUAL_LINE]: 'Einzelner Eintrag für jede Ausgabe',
-                    [CONST.NETSUITE_JOURNAL_POSTING_PREFERENCE.JOURNALS_POSTING_TOTAL_LINE]: 'Einzelner, aufgeschlüsselter Eintrag für jeden Bericht',
+                    [CONST.NETSUITE_JOURNAL_POSTING_PREFERENCE.JOURNALS_POSTING_TOTAL_LINE]: 'Einzelner, aufgegliederter Eintrag für jeden Bericht',
                 },
             },
             invoiceItem: {

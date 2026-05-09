@@ -4761,7 +4761,7 @@ ${amount} dla ${merchant} - ${date}`,
                 label: 'Preferencje księgowania zapisów w dzienniku',
                 values: {
                     [CONST.NETSUITE_JOURNAL_POSTING_PREFERENCE.JOURNALS_POSTING_INDIVIDUAL_LINE]: 'Pojedynczy wpis dla każdego wydatku',
-                    [CONST.NETSUITE_JOURNAL_POSTING_PREFERENCE.JOURNALS_POSTING_TOTAL_LINE]: 'Pojedynczy, wyszczególniony wpis dla każdego raportu',
+                    [CONST.NETSUITE_JOURNAL_POSTING_PREFERENCE.JOURNALS_POSTING_TOTAL_LINE]: 'Pojedyncza, wyszczególniona pozycja dla każdego raportu',
                 },
             },
             invoiceItem: {

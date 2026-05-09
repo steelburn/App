@@ -4654,8 +4654,8 @@ ${amount}，商户：${merchant} - 日期：${date}`,
             journalPostingPreference: {
                 label: '日记账分录过账偏好',
                 values: {
-                    [CONST.NETSUITE_JOURNAL_POSTING_PREFERENCE.JOURNALS_POSTING_INDIVIDUAL_LINE]: '每笔报销一条记录',
-                    [CONST.NETSUITE_JOURNAL_POSTING_PREFERENCE.JOURNALS_POSTING_TOTAL_LINE]: '每个报表使用单独的分项条目',
+                    [CONST.NETSUITE_JOURNAL_POSTING_PREFERENCE.JOURNALS_POSTING_INDIVIDUAL_LINE]: '每笔报销仅一条记录',
+                    [CONST.NETSUITE_JOURNAL_POSTING_PREFERENCE.JOURNALS_POSTING_TOTAL_LINE]: '每份报表使用单一分项明细记录',
                 },
             },
             invoiceItem: {

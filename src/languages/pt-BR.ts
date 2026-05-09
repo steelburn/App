@@ -4764,7 +4764,7 @@ ${amount} para ${merchant} - ${date}`,
                 label: 'Preferência de lançamento de lançamentos contábeis',
                 values: {
                     [CONST.NETSUITE_JOURNAL_POSTING_PREFERENCE.JOURNALS_POSTING_INDIVIDUAL_LINE]: 'Lançamento único para cada despesa',
-                    [CONST.NETSUITE_JOURNAL_POSTING_PREFERENCE.JOURNALS_POSTING_TOTAL_LINE]: 'Lançamento único, detalhado, para cada relatório',
+                    [CONST.NETSUITE_JOURNAL_POSTING_PREFERENCE.JOURNALS_POSTING_TOTAL_LINE]: 'Lançamento único e detalhado para cada relatório',
                 },
             },
             invoiceItem: {
