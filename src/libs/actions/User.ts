@@ -650,9 +650,10 @@ function validateSecondaryLogin(contactMethod: string, validateCode: string, for
         failureData.push(optimisticResetActionCode);
     }
 
-    const parameters: ValidateSecondaryLoginParams = {partnerUserID: contactMethod, validateCode};
-
-    API.write(WRITE_COMMANDS.VALIDATE_SECONDARY_LOGIN, parameters, {optimisticData, successData, failureData});
+    getDeviceInfoWithID().then((deviceInfo) => {
+        const parameters: ValidateSecondaryLoginParams = {partnerUserID: contactMethod, validateCode, deviceInfo};
+        API.write(WRITE_COMMANDS.VALIDATE_SECONDARY_LOGIN, parameters, {optimisticData, successData, failureData});
+    });
 }
 
 /**
