@@ -218,7 +218,6 @@
 "../../src/hooks/useFilesValidation.tsx"	"@typescript-eslint/no-deprecated/ConfirmModal"	1
 "../../src/hooks/useFilesValidation.tsx"	"@typescript-eslint/no-deprecated/InteractionManager.runAfterInteractions"	2
 "../../src/hooks/useInitial.ts"	"react-hooks/refs"	4
-"../../src/hooks/useInitiallyFocusedKey.ts"	"react-hooks/set-state-in-effect"	1
 "../../src/hooks/useIsBlockedToAddFeed.ts"	"react-hooks/set-state-in-effect"	1
 "../../src/hooks/useIsOwnWorkspaceChatRef.ts"	"react-hooks/refs"	2
 "../../src/hooks/useLazyAsset.ts"	"react-hooks/refs"	2
