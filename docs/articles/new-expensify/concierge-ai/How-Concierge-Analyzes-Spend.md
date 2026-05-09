@@ -11,7 +11,7 @@ Concierge may proactively review workspace activity to identify notable spend pa
 
 These analyses are powered by the same data and reporting engine used in **Insights**, but are surfaced automatically by Concierge instead of requiring you to run reports manually.
 
-To explore and analyze spend on demand, [learn how to use Insights](https://help.expensify.com/articles/new-expensify/insights/How-to-Use-Insights-in-Expensify). 
+To explore and analyze spend on demand, [learn how to use Insights](/articles/new-expensify/insights/How-to-Use-Insights-in-Expensify). 
 
 ---
 
@@ -35,7 +35,7 @@ When Concierge analyzes spend, it sends a message to the #admins room for that w
 
 Insights are shared periodically and may vary in timing, format, and level of detail.
 
-[Learn how to find the #admins room for a workspace](https://help.expensify.com/articles/new-expensify/chat/Expensify-Chat-Rooms-for-Admins). 
+[Learn how to find the #admins room for a workspace](/articles/new-expensify/chat/Expensify-Chat-Rooms-for-Admins). 
 
 ---
 
@@ -46,7 +46,7 @@ Concierge and **Insights** use the same underlying data but serve different purp
 - Concierge proactively delivers relevant insights based on notable patterns. 
 - **Insights** allows you to analyze data and explore patterns on demand  
 
-If you need deeper customization, learn how to [use search operators to filter and analyze spend](https://help.expensify.com/articles/new-expensify/reports-and-expenses/Use-Search-Operators-to-Filter-and-Analyze).
+If you need deeper customization, learn how to [use search operators to filter and analyze spend](/articles/new-expensify/reports-and-expenses/Use-Search-Operators-to-Filter-and-Analyze).
 
 ---
 
