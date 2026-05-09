@@ -54,7 +54,7 @@ Once you’ve reviewed the expenses, you can export them to a CSV if you need to
 # FAQ
 
 ## How can I create an aging report? 
-An aging report is a breakdown of expenses by how long they have been in a given status. You can create an aging report by using the **Cash accruals** or **Card accruals** shortcut and changing **Display** to group by month, day, week, quarter or year. [Learn how to use Insignts grouping operators](/articles/new-expensify/insights/How-to-Use-Insights-in-Expensify#grouping-options-used-in-insights). 
+An aging report is a breakdown of expenses by how long they have been in a given status. You can create an aging report by using the **Cash accruals** or **Card accruals** shortcut and changing **Display** to group by month, day, week, quarter or year. [Learn how to use Insights grouping operators](/articles/new-expensify/insights/How-to-Use-Insights-in-Expensify#grouping-options-used-in-insights). 
 
 ## Why don’t I see all Accounting search shortcuts?
 
