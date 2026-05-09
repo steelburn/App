@@ -2536,6 +2536,7 @@ const translations = {
             revealDetails: 'Reveal details',
             revealCvv: 'Reveal CVV',
             copyCardNumber: 'Copy card number',
+            copyCvv: 'Copy CVV',
             updateAddress: 'Update address',
         },
         cardAddedToWallet: ({platform}: {platform: 'Google' | 'Apple'}) => `Added to ${platform} Wallet`,

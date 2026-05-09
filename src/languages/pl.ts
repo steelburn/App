@@ -2458,6 +2458,7 @@ const translations: TranslationDeepObject<typeof en> = {
             revealDetails: 'Pokaż szczegóły',
             revealCvv: 'Pokaż kod CVV',
             copyCardNumber: 'Skopiuj numer karty',
+            copyCvv: 'Skopiuj CVV',
             updateAddress: 'Zaktualizuj adres',
         },
         cardAddedToWallet: ({platform}: {platform: 'Google' | 'Apple'}) => `Dodano do portfela ${platform}`,

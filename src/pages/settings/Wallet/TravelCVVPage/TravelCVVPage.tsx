@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect} from 'react';
+import React, {useEffect} from 'react';
 import {View} from 'react-native';
 import FullPageOfflineBlockingView from '@components/BlockingViews/FullPageOfflineBlockingView';
 import Button from '@components/Button';
@@ -38,19 +38,18 @@ function TravelCVVPage() {
     const {cvv} = useTravelCVVState();
     const {setCvv} = useTravelCVVActions();
     const hasRevealedCVV = !!cvv;
-    const cvvDigits = (cvv ?? '•••').slice(0, 3).padEnd(3, '•').split('');
 
-    // Reset CVV when this page mounts so a fresh open always starts with the masked state.
-    // When we return from the verify step, this page does not remount, so the revealed CVV is preserved.
-    useEffect(() => {
-        setCvv(null);
+    const CVV_LENGTH = cvv?.length ?? 3;
+    const MASKED_CVV = '•'.repeat(CVV_LENGTH);
+    const cvvDigits = (cvv ?? MASKED_CVV).split('');
 
-        return () => setCvv(null);
-    }, [setCvv]);
+    // Clear CVV when the page unmounts (e.g. backdrop close) so it doesn't
+    // remain visible the next time the page is opened
+    useEffect(() => () => setCvv(null), [setCvv]);
 
     const isSignedInAsDelegate = !!account?.delegatedAccess?.delegate || false;
 
-    const handleRevealDetailsPress = useCallback(() => {
+    const handleRevealDetailsPress = () => {
         if (isSignedInAsDelegate) {
             return;
         }
@@ -64,7 +63,29 @@ function TravelCVVPage() {
         resetValidateActionCodeSent();
         // Navigate to the verify account page
         Navigation.navigate(ROUTES.SETTINGS_WALLET_TRAVEL_CVV_VERIFY_ACCOUNT);
-    }, [isAccountLocked, isSignedInAsDelegate, showLockedAccountModal]);
+    };
+
+    let actionButton: React.ReactNode = null;
+    if (hasRevealedCVV) {
+        actionButton = (
+            <Button
+                icon={icons.Copy}
+                text={translate('cardPage.cardDetails.copyCvv')}
+                onPress={() => Clipboard.setString(cvv)}
+                style={[styles.mt10, styles.w100]}
+            />
+        );
+    } else if (!isSignedInAsDelegate) {
+        actionButton = (
+            <Button
+                text={translate('cardPage.cardDetails.revealDetails')}
+                onPress={handleRevealDetailsPress}
+                isDisabled={isOffline}
+                style={[styles.mt10, styles.w100]}
+                success
+            />
+        );
+    }
 
     return (
         <ScreenWrapper
@@ -84,7 +105,7 @@ function TravelCVVPage() {
                     <View style={[styles.mt0Half, styles.flexRow, styles.justifyContentCenter, styles.gap1]}>
                         {cvvDigits.map((digit, index) => (
                             <View
-                                // eslint-disable-next-line react/no-array-index-key
+                                // eslint-disable-next-line react/no-array-index-key -- CVV digits are a fixed-length display-only array that is never reordered
                                 key={`${digit}-${index}`}
                                 style={[styles.alignItemsCenter, styles.justifyContentCenter, styles.travelCVVDigitBox]}
                             >
@@ -95,22 +116,7 @@ function TravelCVVPage() {
                         ))}
                     </View>
 
-                    {hasRevealedCVV ? (
-                        <Button
-                            icon={icons.Copy}
-                            text={`Copy ${translate('cardPage.cardDetails.cvv')}`}
-                            onPress={() => Clipboard.setString(cvv)}
-                            style={[styles.mt10, styles.w100]}
-                        />
-                    ) : !isSignedInAsDelegate ? (
-                        <Button
-                            text={translate('cardPage.cardDetails.revealDetails')}
-                            onPress={handleRevealDetailsPress}
-                            isDisabled={isOffline}
-                            style={[styles.mt10, styles.w100]}
-                            success
-                        />
-                    ) : null}
+                    {actionButton}
                 </ScrollView>
             </FullPageOfflineBlockingView>
         </ScreenWrapper>
