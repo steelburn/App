@@ -5377,14 +5377,6 @@ const staticStyles = (theme: ThemeColors) =>
             color: theme.text,
         },
 
-        travelCVVDigitTextMasked: {
-            lineHeight: variables.lineHeightSizeH1,
-        },
-
-        travelCVVDigitTextRevealed: {
-            lineHeight: variables.lineHeightXXXLarge,
-        },
-
         travelInvoicingIcon: {
             backgroundColor: colors.productLight700,
             borderRadius: variables.componentBorderRadiusNormal,

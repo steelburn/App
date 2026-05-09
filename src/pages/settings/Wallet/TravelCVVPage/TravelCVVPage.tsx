@@ -72,7 +72,7 @@ function TravelCVVPage() {
                 icon={icons.Copy}
                 text={translate('cardPage.cardDetails.copyCvv')}
                 onPress={() => Clipboard.setString(cvv)}
-                style={[styles.mt10, styles.w100]}
+                style={[styles.mt10, styles.alignSelfCenter]}
             />
         );
     } else if (!isSignedInAsDelegate) {
@@ -81,7 +81,7 @@ function TravelCVVPage() {
                 text={translate('cardPage.cardDetails.revealDetails')}
                 onPress={handleRevealDetailsPress}
                 isDisabled={isOffline}
-                style={[styles.mt10, styles.w100]}
+                style={[styles.mt10, styles.alignSelfCenter]}
                 success
             />
         );
@@ -97,7 +97,7 @@ function TravelCVVPage() {
                 shouldShowBackButton
             />
             <FullPageOfflineBlockingView>
-                <ScrollView contentContainerStyle={[styles.flexGrow1, styles.ph5]}>
+                <ScrollView contentContainerStyle={[styles.ph5]}>
                     <View style={[styles.mt5, styles.mb8]}>
                         <Text style={[styles.textNormal, styles.textSupporting]}>{translate('walletPage.travelCVV.description')}</Text>
                     </View>
@@ -109,7 +109,7 @@ function TravelCVVPage() {
                                 key={`${digit}-${index}`}
                                 style={[styles.alignItemsCenter, styles.justifyContentCenter, styles.travelCVVDigitBox]}
                             >
-                                <Text style={[styles.textXXXLarge, styles.travelCVVDigitText, hasRevealedCVV ? styles.travelCVVDigitTextRevealed : styles.travelCVVDigitTextMasked]}>
+                                <Text style={[styles.textXLarge, styles.travelCVVDigitText]}>
                                     {digit}
                                 </Text>
                             </View>
