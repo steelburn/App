@@ -5,7 +5,7 @@ keywords: [New Expensify, billing owner, manage subscription, update payment car
 internalScope: Audience is billing owners and Workspace Admins. Covers how to manage a paid subscription in New Expensify, including billing permissions and ownership transfer. Does not cover free workspaces or plan upgrades.
 ---
 
-You can manage your Expensify subscription in Account > Subscription. From there, you can update your billing information, request to cancel your subscription, or delete a Workspace if you're the billing owner.
+You can manage your Expensify subscription in **Account > Subscription**. From there, you can update your billing information, request to cancel your subscription, or delete a workspace if you're the billing owner.
 
 ---
 
@@ -70,7 +70,7 @@ To access the **Subscription** section:
 ---
 
 # How to request to cancel an annual subscription
-
+## How to request to cancel an annual subscription
 1. Go to **Account > Subscription**.
 2. Click **Cancel subscription**.
 3. Follow the prompts. Your request may be processed automatically or reviewed by our team.
@@ -113,7 +113,7 @@ Only Workspace Admins can transfer billing ownership to themselves - it’s not 
 # What to do if you can’t update a subscription
 
 If you’re blocked from updating billing settings, requesting to canceling your subscription, or deleting a workspace, it’s likely because you’re not the billing owner.
-
+If you're blocked from updating billing settings, requesting to cancel your subscription, or deleting a workspace, it's likely because you're not the billing owner.
 If you are a Workspace Admin, you can transfer billing ownership to yourself by following the steps to [transfer billing ownership](LINK).
 
 ---
