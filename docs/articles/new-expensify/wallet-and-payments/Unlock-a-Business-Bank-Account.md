@@ -44,7 +44,7 @@ From Wallet or the Workspace:
 
 1. Click the bank account with the **Locked** badge.
 2. Click **Fix** or **Unlock account**.
-3. In the chat that opena, send the message to Concierge to request the unlock.
+3. In the chat that opens, send the message to Concierge to request the unlock.
 
 Concierge will walk you through the next steps to unlock the account, or confirm when your account is ready to use.
 
