@@ -1,4 +1,4 @@
-/** True when the user is keyboard-navigating; false when typing or using a mouse. Typing/printable keys clear; Tab/Escape/Arrow/named navigation keys set true (ensures WCAG 2.4.7 visible focus after keyboard-triggered navigation, even mid-typing). */
+/** True when the user is keyboard-navigating; false when using a mouse. Tab + named nav keys set true; printable typing on body clears; printable typing inside editable fields preserves (data entry is not a modality switch). */
 let hadTabNavigation = false;
 let teardown: (() => void) | null = null;
 
@@ -25,9 +25,16 @@ function setup(): void {
             return;
         }
         const isTypingKey = (e.key.length === 1 && e.key !== ' ') || e.key === 'Backspace' || e.key === 'Delete';
-        if (isTypingKey) {
-            hadTabNavigation = false;
+        if (!isTypingKey) {
+            return;
         }
+        // Typing inside an editable field is data entry, not a modality switch — preserves ring focus through form-submit Enter onto the next screen. Mouse-arrived users are already false via mousedown/pointerdown.
+        const target = e.target as HTMLElement | null;
+        const isInEditable = !!target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable);
+        if (isInEditable) {
+            return;
+        }
+        hadTabNavigation = false;
     };
     // pointerdown covers pen/touch; mousedown is the legacy fallback.
     const pointerActivationHandler = () => {

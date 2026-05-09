@@ -163,6 +163,78 @@ describe('focusFirstInteractiveElement', () => {
         });
     });
 
+    describe('typing inside an editable field (data entry, not modality switch)', () => {
+        it.each<[label: string, build: () => HTMLElement]>([
+            [
+                'INPUT',
+                () => {
+                    const el = document.createElement('input');
+                    document.body.appendChild(el);
+                    return el;
+                },
+            ],
+            [
+                'TEXTAREA',
+                () => {
+                    const el = document.createElement('textarea');
+                    document.body.appendChild(el);
+                    return el;
+                },
+            ],
+            [
+                'contenteditable',
+                () => {
+                    const el = document.createElement('div');
+                    el.setAttribute('contenteditable', 'true');
+                    // JSDOM doesn't infer `isContentEditable` from the attribute alone.
+                    Object.defineProperty(el, 'isContentEditable', {value: true, configurable: true});
+                    document.body.appendChild(el);
+                    return el;
+                },
+            ],
+        ])('preserves keyboard modality across typing → Enter inside %s (form-submit flow)', (_label, buildEditable) => {
+            simulateTab();
+            const editable = buildEditable();
+            editable.focus();
+            editable.dispatchEvent(new KeyboardEvent('keydown', {key: '5', bubbles: true}));
+            editable.dispatchEvent(new KeyboardEvent('keydown', {key: 'Enter', bubbles: true}));
+            // Detach so activeElement falls back to body, mirroring the prior-screen unmount on navigation.
+            editable.remove();
+
+            const button = document.createElement('button');
+            const container = createContainer(button);
+            const spy = jest.spyOn(button, 'focus');
+            expect(focusFirstInteractiveElement(container)).toBe(true);
+            expect(spy).toHaveBeenCalledWith({preventScroll: true, focusVisible: true});
+        });
+
+        it('mouse-arrived users typing then pressing Enter inside an INPUT do not gain ring focus on the next screen (regression guard for #87304)', () => {
+            simulateMouse();
+            const input = document.createElement('input');
+            document.body.appendChild(input);
+            input.focus();
+            input.dispatchEvent(new KeyboardEvent('keydown', {key: '5', bubbles: true}));
+            input.dispatchEvent(new KeyboardEvent('keydown', {key: 'Enter', bubbles: true}));
+            input.remove();
+
+            const button = document.createElement('button');
+            const container = createContainer(button);
+            const spy = jest.spyOn(button, 'focus');
+            expect(focusFirstInteractiveElement(container)).toBe(false);
+            expect(spy).not.toHaveBeenCalled();
+        });
+
+        it('typing on body (no editable focused) still clears modality — only data entry inside text fields is exempt', () => {
+            simulateTab();
+            simulateTyping();
+            const button = document.createElement('button');
+            const container = createContainer(button);
+            const spy = jest.spyOn(button, 'focus');
+            expect(focusFirstInteractiveElement(container)).toBe(false);
+            expect(spy).not.toHaveBeenCalled();
+        });
+    });
+
     describe('element filtering', () => {
         beforeEach(() => {
             simulateTab();
