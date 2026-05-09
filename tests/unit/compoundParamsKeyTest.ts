@@ -1,19 +1,21 @@
 // Typed require with explicit .ts path — matches the project's test-file convention.
 /* eslint-disable import/extensions */
-const {default: compoundParamsKey, normalizeForKey} = require<{
+const {default: compoundParamsKey, normalizeForKey, COMPOUND_KEY_DELIMITER} = require<{
     default: (routeKey: string, params: unknown) => string;
     normalizeForKey: (value: unknown) => unknown;
+    COMPOUND_KEY_DELIMITER: string;
 }>('../../src/libs/compoundParamsKey.ts');
 /* eslint-enable import/extensions */
+const D = COMPOUND_KEY_DELIMITER;
 
 describe('compoundParamsKey', () => {
     describe('null / undefined params', () => {
-        it('returns route::"" when params are null', () => {
-            expect(compoundParamsKey('search-1', null)).toBe('search-1::');
+        it('returns "<route><DELIM>" when params are null', () => {
+            expect(compoundParamsKey('search-1', null)).toBe(`search-1${D}`);
         });
 
-        it('returns route::"" when params are undefined', () => {
-            expect(compoundParamsKey('search-1', undefined)).toBe('search-1::');
+        it('returns "<route><DELIM>" when params are undefined', () => {
+            expect(compoundParamsKey('search-1', undefined)).toBe(`search-1${D}`);
         });
     });
 
@@ -27,7 +29,7 @@ describe('compoundParamsKey', () => {
         });
 
         it('preserves string params as-is', () => {
-            expect(compoundParamsKey('r', 'hello')).toBe('r::"hello"');
+            expect(compoundParamsKey('r', 'hello')).toBe(`r${D}"hello"`);
         });
     });
 

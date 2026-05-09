@@ -76,9 +76,7 @@ function setActivePopoverLauncher(element: HTMLElement): void {
             // eslint-disable-next-line no-console
             console.warn('[NavigationFocusReturn] launcherStack overflow — dropping oldest entry');
         }
-        while (launcherStack.length > LAUNCHER_STACK_MAX) {
-            launcherStack.shift();
-        }
+        launcherStack.shift();
     }
 }
 

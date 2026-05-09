@@ -1537,8 +1537,9 @@ describe('compoundParamsKey', () => {
     });
 
     it('should handle null / undefined params', () => {
-        expect(compoundParamsKey('r', null)).toBe('r::');
-        expect(compoundParamsKey('r', undefined)).toBe('r::');
+        expect(compoundParamsKey('r', null)).toMatch(/^r/);
+        expect(compoundParamsKey('r', null)).toBe(compoundParamsKey('r', undefined));
+        expect(compoundParamsKey('r', null)).not.toBe('r');
     });
 
     it('should not collide with bare route keys', () => {

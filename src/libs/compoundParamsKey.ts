@@ -1,6 +1,7 @@
 /** Pure compound-key derivation for PUSH_PARAMS history entries. Split out so `addPushParamsRouterExtension` can use it on native without pulling in the DOM-side focus-return machinery. */
 
-const COMPOUND_KEY_DELIMITER = '::';
+// NUL — never appears in route keys or JSON-stringified params, so no chance of collision.
+const COMPOUND_KEY_DELIMITER = '\x00';
 
 // Sentinel so JSON.stringify can't collapse [undefined] → [null].
 const UNDEFINED_SENTINEL = '\u0000undefined';

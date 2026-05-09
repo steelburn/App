@@ -358,6 +358,10 @@ function handleStateChange(newState: NavigationState | undefined): void {
     if (action.type === 'forward') {
         cancelPendingRestore();
         captureTriggerForRoute(action.captureKey);
+        // Loose refs would pin detached unmounted nodes; triggerMap holds the captured copy.
+        lastInteractiveElement = null;
+        lastMouseTrigger = null;
+        lastMouseTriggerAt = 0;
     } else if (action.type === 'backward') {
         scheduleRestore(action.restoreKey);
     } else if (action.type === 'lateral') {
@@ -384,7 +388,7 @@ function navigationRefHasLiveState(): boolean {
     return typeof navigationRef?.isReady === 'function' && navigationRef.isReady() && typeof navigationRef.getRootState === 'function';
 }
 
-// Called twice: module load (pre-mount, seed skipped) and NavigationRoot.onReady (container live). Idempotent across both.
+// MUST stay idempotent — invoked from Navigation.ts module load, NavigationRoot useEffect, and NavigationRoot.onReady; each step is guarded against re-add.
 function setupNavigationFocusReturn(): void {
     if (typeof document === 'undefined') {
         return;
@@ -464,6 +468,7 @@ function resetForTests(): void {
     cancelReturnHoldRelease();
     triggerMap.clear();
     resetLauncherStackForTests();
+    resetCycle();
     prevState = undefined;
     lastInteractiveElement = null;
     lastMouseTrigger = null;
