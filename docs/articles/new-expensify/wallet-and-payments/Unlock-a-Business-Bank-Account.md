@@ -26,15 +26,9 @@ When a bank account is locked, you’ll see a **Locked** badge on the account in
 
 ---
 
-<!-- SCREENSHOT:
-Suggestion: Account > Wallet > bank account with a Locked badge 
-https://github.com/Expensify/Expensify/issues/623901
--->
+![Account > Wallet > bank account with a Locked badge ]({{site.url}}/assets/images/ExpensifyHelp-BetterBusinessBankAccount_04.png){:width="100%"}
 
-<!-- SCREENSHOT:
-Suggestion:  Workspace > Workflows > Payments > bank account with a Locked badge 
-https://github.com/Expensify/Expensify/issues/623901
--->
+![Workspace > Workflows > Payments > bank account with a Locked badge]({{site.url}}/assets/images/ExpensifyHelp-BetterBusinessBankAccount_05.png){:width="100%"}
 
 ---
 
