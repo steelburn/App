@@ -119,6 +119,7 @@ function SearchFiltersWorkspacePage() {
                             canSelectMultiple
                             shouldUpdateFocusedIndex
                             shouldShowLoadingPlaceholder={isLoadingOnyxValue(policiesResult) || !didScreenTransitionEnd}
+                            disableMaintainingScrollPosition
                             footerContent={
                                 <SearchFilterPageFooterButtons
                                     applyChanges={applyChanges}
