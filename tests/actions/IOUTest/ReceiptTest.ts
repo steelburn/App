@@ -534,6 +534,7 @@ describe('actions/IOU/Receipt', () => {
         });
 
         it('should optimistically null the receipt and set pending field', async () => {
+            // eslint-disable-next-line rulesdir/no-multiple-api-calls
             const writeSpy = jest.spyOn(API, 'write').mockImplementation(jest.fn());
             await seedOnyx();
 
@@ -571,6 +572,7 @@ describe('actions/IOU/Receipt', () => {
         });
 
         it('should call API.write with DETACH_RECEIPT command and correct params', async () => {
+            // eslint-disable-next-line rulesdir/no-multiple-api-calls
             const writeSpy = jest.spyOn(API, 'write').mockImplementation(jest.fn());
             await seedOnyx();
 
