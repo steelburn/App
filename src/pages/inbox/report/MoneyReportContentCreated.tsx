@@ -107,6 +107,4 @@ function MoneyReportContentCreated({
     );
 }
 
-MoneyReportContentCreated.displayName = 'MoneyReportContentCreated';
-
 export default MoneyReportContentCreated;
