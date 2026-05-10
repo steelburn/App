@@ -274,6 +274,7 @@ function WorkspaceWorkflowsPage({policy, route}: WorkspaceWorkflowsPageProps) {
 
     const isDEWEnabled = hasDynamicExternalWorkflow(policy);
     const isGustoConnected = isGustoConnectionEnabled(policy);
+    const shouldBlockApprovalWorkflowEditing = isGustoConnected && policy?.connections?.gusto?.config?.approvalMode === CONST.GUSTO.APPROVAL_MODE.BASIC;
     const approvalSubtitle = useMemo(() => {
         if (!isGustoConnected) {
             return translate('workflowsPage.addApprovalsDescription');
@@ -418,21 +419,28 @@ function WorkspaceWorkflowsPage({policy, route}: WorkspaceWorkflowsPageProps) {
                             >
                                 <ApprovalWorkflowSection
                                     approvalWorkflow={workflow}
-                                    onPress={() => Navigation.navigate(ROUTES.WORKSPACE_WORKFLOWS_APPROVALS_EDIT.getRoute(route.params.policyID, workflow.approvers.at(0)?.email ?? ''))}
+                                    onPress={
+                                        shouldBlockApprovalWorkflowEditing
+                                            ? undefined
+                                            : () => Navigation.navigate(ROUTES.WORKSPACE_WORKFLOWS_APPROVALS_EDIT.getRoute(route.params.policyID, workflow.approvers.at(0)?.email ?? ''))
+                                    }
                                     currency={policy?.outputCurrency}
+                                    isDisabled={shouldBlockApprovalWorkflowEditing}
                                 />
                             </OfflineWithFeedback>
                         ))}
-                        <MenuItem
-                            title={translate('workflowsPage.addApprovalButton')}
-                            titleStyle={styles.textStrong}
-                            icon={expensifyIcons.Plus}
-                            iconHeight={20}
-                            iconWidth={20}
-                            style={[styles.sectionMenuItemTopDescription, styles.mt6, styles.mbn3]}
-                            onPress={addApprovalAction}
-                            sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.WORKFLOWS.ADD_APPROVAL}
-                        />
+                        {!shouldBlockApprovalWorkflowEditing && (
+                            <MenuItem
+                                title={translate('workflowsPage.addApprovalButton')}
+                                titleStyle={styles.textStrong}
+                                icon={expensifyIcons.Plus}
+                                iconHeight={20}
+                                iconWidth={20}
+                                style={[styles.sectionMenuItemTopDescription, styles.mt6, styles.mbn3]}
+                                onPress={addApprovalAction}
+                                sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.WORKFLOWS.ADD_APPROVAL}
+                            />
+                        )}
                     </>
                 ),
                 disabled: isSmartLimitEnabled || isDEWEnabled || isGustoConnected,
@@ -607,6 +615,7 @@ function WorkspaceWorkflowsPage({policy, route}: WorkspaceWorkflowsPageProps) {
         onPressAutoReportingFrequency,
         isSmartLimitEnabled,
         isGustoConnected,
+        shouldBlockApprovalWorkflowEditing,
         approvalSubtitle,
         promptConfigureApprovalsInGusto,
         isDEWEnabled,
