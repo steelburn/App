@@ -274,7 +274,9 @@ function WorkspaceWorkflowsPage({policy, route}: WorkspaceWorkflowsPageProps) {
 
     const isDEWEnabled = hasDynamicExternalWorkflow(policy);
     const isGustoConnected = isGustoConnectionEnabled(policy);
-    const shouldBlockApprovalWorkflowEditing = isGustoConnected && policy?.connections?.gusto?.config?.approvalMode === CONST.GUSTO.APPROVAL_MODE.BASIC;
+    const shouldBlockApprovalWorkflowEditing =
+        isGustoConnected &&
+        [CONST.GUSTO.APPROVAL_MODE.BASIC, CONST.GUSTO.APPROVAL_MODE.MANAGER].some((approvalMode) => approvalMode === policy?.connections?.gusto?.config?.approvalMode);
     const approvalSubtitle = useMemo(() => {
         if (!isGustoConnected) {
             return translate('workflowsPage.addApprovalsDescription');
