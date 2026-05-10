@@ -141,7 +141,11 @@ function navigateToSubmitWorkspaceAfterOnboarding(policyID?: string, isSmallScre
     }
 
     setOnboardingRHPVariant(CONST.ONBOARDING_RHP_VARIANT.RHP_ADMINS_ROOM);
-    Navigation.navigate(`${ROUTES.WORKSPACE_CATEGORIES.getRoute(policyID)}?backTo=${encodeURIComponent(ROUTES.WORKSPACES_LIST.route)}` as Route);
+
+    const categoriesRoute = ROUTES.WORKSPACE_CATEGORIES.getRoute(policyID);
+    const backToRoute = isSmallScreenWidth ? ROUTES.WORKSPACE_INITIAL.getRoute(policyID) : ROUTES.WORKSPACES_LIST.route;
+    Navigation.navigate(`${categoriesRoute}?backTo=${encodeURIComponent(backToRoute)}` as Route);
+
     SidePanelActions.openSidePanel(!isSmallScreenWidth);
 }
 

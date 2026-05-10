@@ -39,11 +39,21 @@ describe('navigateToSubmitWorkspaceAfterOnboardingWithMicrotaskQueue', () => {
         expect(navigationMock.navigate).toHaveBeenCalledWith(ROUTES.HOME);
     });
 
-    it('navigates to Workspace Categories with backTo=/workspaces when policyID is provided', () => {
-        navigateToSubmitWorkspaceAfterOnboardingWithMicrotaskQueue('test-policy-id');
+    it('navigates to Workspace Categories with backTo=/workspaces on wide layouts', () => {
+        navigateToSubmitWorkspaceAfterOnboardingWithMicrotaskQueue('test-policy-id', false);
 
         expect(navigationMock.dismissModal).toHaveBeenCalledTimes(1);
         expect(navigationMock.navigate).toHaveBeenCalledTimes(1);
         expect(navigationMock.navigate).toHaveBeenCalledWith(`${ROUTES.WORKSPACE_CATEGORIES.getRoute('test-policy-id')}?backTo=${encodeURIComponent(ROUTES.WORKSPACES_LIST.route)}`);
+    });
+
+    it('navigates to Workspace Categories with backTo=WorkspaceInitial on narrow layouts', () => {
+        navigateToSubmitWorkspaceAfterOnboardingWithMicrotaskQueue('test-policy-id', true);
+
+        expect(navigationMock.dismissModal).toHaveBeenCalledTimes(1);
+        expect(navigationMock.navigate).toHaveBeenCalledTimes(1);
+        expect(navigationMock.navigate).toHaveBeenCalledWith(
+            `${ROUTES.WORKSPACE_CATEGORIES.getRoute('test-policy-id')}?backTo=${encodeURIComponent(ROUTES.WORKSPACE_INITIAL.getRoute('test-policy-id'))}`,
+        );
     });
 });
