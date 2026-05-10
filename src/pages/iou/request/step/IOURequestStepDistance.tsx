@@ -208,24 +208,30 @@ function IOURequestStepDistance({
     // from overwriting in-progress manual input.
     const isManuallyEditing = useRef(false);
 
-    // Push the route distance into the manual tab input only on a real waypoint-driven recalculation
-    // (a non-null → different non-null transition). Skip the initial null → value transition, which
-    // is the post-save re-fetch, so we don't overwrite a saved manual quantity with the route distance.
+    // Push the route distance into the manual tab input on any waypoint-driven recalculation,
+    // including the null → value transition that fires after `saveWaypoint` clears the route and
+    // the BE returns the new geometry. To avoid overwriting a saved manual quantity on a post-save
+    // re-fetch (where the route was also briefly null), gate the null → value sync on
+    // `customUnit.quantity` being null too — `saveWaypoint` clears both, while a post-save state
+    // has the user's manual value in `quantity` (GH #90082).
     const routeDistance = currentTransaction?.routes?.route0?.distance;
+    const customUnitQuantity = currentTransaction?.comment?.customUnit?.quantity;
     const lastSyncedRouteDistance = useRef<number | null | undefined>(routeDistance);
     useEffect(() => {
         if (routeDistance == null || !distanceUnit || isManuallyEditing.current) {
             lastSyncedRouteDistance.current = routeDistance;
             return;
         }
-        if (lastSyncedRouteDistance.current == null || lastSyncedRouteDistance.current === routeDistance) {
+        const isNullToValueTransition = lastSyncedRouteDistance.current == null;
+        const isPostSaveRefetch = isNullToValueTransition && customUnitQuantity != null;
+        if (isPostSaveRefetch || lastSyncedRouteDistance.current === routeDistance) {
             lastSyncedRouteDistance.current = routeDistance;
             return;
         }
         const routeDistanceInUnit = roundToTwoDecimalPlaces(DistanceRequestUtils.convertDistanceUnit(routeDistance, distanceUnit));
         manualNumberFormRef.current?.updateNumber(routeDistanceInUnit.toString());
         lastSyncedRouteDistance.current = routeDistance;
-    }, [routeDistance, distanceUnit]);
+    }, [routeDistance, distanceUnit, customUnitQuantity]);
 
     // Sets `amount` and `split` share data before moving to the next step to avoid briefly showing `0.00` as the split share for participants
     const setDistanceRequestData = useCallback(
@@ -356,15 +362,20 @@ function IOURequestStepDistance({
             if (isEditingSplit) {
                 iouWaypointType = CONST.IOU.TYPE.SPLIT_EXPENSE;
             }
-            // Construct the backTo URL explicitly to match the stack entry created when we navigated
-            // to this distance edit page. Using Navigation.getActiveRoute() would return a URL with
-            // the OnyxTabNavigator's tab suffix (e.g. "/distance-map") which doesn't match the stack
-            // entry — causing Navigation.goBack() to REPLACE instead of POP and creating a duplicate
-            // distance page entry in the stack.
-            const waypointBackTo = ROUTES.MONEY_REQUEST_STEP_DISTANCE.getRoute(action, iouType, transactionID, report?.reportID ?? reportID, backTo);
+            // Construct the backTo URL explicitly to match the stack entry the user is currently on.
+            // Using Navigation.getActiveRoute() would return a URL with the OnyxTabNavigator's tab
+            // suffix (e.g. "/distance-map") which doesn't match the stack entry — causing
+            // Navigation.goBack() to REPLACE instead of POP and creating a duplicate distance page
+            // entry in the stack. Edit flows are mounted on MONEY_REQUEST_STEP_DISTANCE; the CREATE
+            // tab flow ("+ > … > Distance") is mounted on MONEY_REQUEST_CREATE_TAB_DISTANCE — using
+            // the EDIT route as `backTo` for a CREATE-flow user crashes when goBack tries to pop to
+            // a route that isn't in the stack (GH #90037).
+            const waypointBackTo = isEditing
+                ? ROUTES.MONEY_REQUEST_STEP_DISTANCE.getRoute(action, iouType, transactionID, report?.reportID ?? reportID, backTo)
+                : ROUTES.MONEY_REQUEST_CREATE_TAB_DISTANCE.getRoute(action, iouType, transactionID, report?.reportID ?? reportID);
             Navigation.navigate(ROUTES.MONEY_REQUEST_STEP_WAYPOINT.getRoute(action, iouWaypointType, transactionID, report?.reportID ?? reportID, index.toString(), waypointBackTo));
         },
-        [action, iouType, transactionID, report?.reportID, reportID, backTo, isEditingSplit],
+        [action, iouType, transactionID, report?.reportID, reportID, backTo, isEditingSplit, isEditing],
     );
 
     const navigateToNextStep = useCallback(() => {
@@ -764,6 +775,8 @@ function IOURequestStepDistance({
                     id={CONST.TAB.DISTANCE_EDIT_TYPE}
                     defaultSelectedTab={CONST.TAB_REQUEST.DISTANCE_MAP}
                     tabBar={TabSelector}
+                    // Back closes the RHP directly instead of reverting the tab first.
+                    backBehavior={CONST.TAB.BACK_BEHAVIOR.NONE}
                 >
                     <TopTab.Screen name={CONST.TAB_REQUEST.DISTANCE_MAP}>{renderMapTab}</TopTab.Screen>
                     <TopTab.Screen name={CONST.TAB_REQUEST.DISTANCE_MANUAL}>{renderManualTab}</TopTab.Screen>
