@@ -78,8 +78,7 @@ function SearchFiltersCardPage() {
 
     const shouldShowSearchInput = allCardFeeds.length + allIndividualCards.length >= CONST.STANDARD_LIST_ITEM_LIMIT;
 
-    const allItems = [...allCardFeeds, ...allIndividualCards, ...allClosedCards];
-    const initiallyFocusedKey = useInitiallyFocusedKey(() => allItems.find((item) => item.isSelected)?.keyForList);
+    const initiallyFocusedKey = useInitiallyFocusedKey(() => [...allCardFeeds, ...allIndividualCards, ...allClosedCards].find((item) => item.isSelected)?.keyForList);
 
     const searchFunction = (item: CardFilterItem) =>
         !!item.text?.toLocaleLowerCase().includes(debouncedSearchTerm.toLocaleLowerCase()) ||
