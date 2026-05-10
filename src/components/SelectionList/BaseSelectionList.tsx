@@ -516,9 +516,6 @@ function BaseSelectionList<TItem extends ListItem>({
             if (newFocusedIndex < 0 || newFocusedIndex >= data.length) {
                 return;
             }
-            if (!shouldScroll) {
-                suppressNextFocusScrollRef.current = true;
-            }
             setFocusedIndex(newFocusedIndex);
             if (shouldScroll) {
                 scrollToIndex(newFocusedIndex);
