@@ -21,7 +21,8 @@ import type {SearchResultDataType} from '@src/types/onyx/SearchResults';
 import type {ReceiptSource} from '@src/types/onyx/Transaction';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
 import type {ReplaceReceipt} from '.';
-import {getAllReports, getAllTransactions, getAllTransactionViolations, getReceiptError} from '.';
+import {getAllReports, getAllTransactions, getAllTransactionViolations} from '.';
+import {getReceiptError} from './MoneyRequestBuilder';
 
 function detachReceipt(
     transactionID: string | undefined,
