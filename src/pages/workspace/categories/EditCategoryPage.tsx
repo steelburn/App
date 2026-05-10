@@ -33,7 +33,7 @@ function EditCategoryPage({route}: EditCategoryPageProps) {
     const validate = useCallback(
         (values: FormOnyxValues<typeof ONYXKEYS.FORMS.WORKSPACE_CATEGORY_FORM>) => {
             const errors: FormInputErrors<typeof ONYXKEYS.FORMS.WORKSPACE_CATEGORY_FORM> = {};
-            const newCategoryName = values.categoryName.replaceAll('\u00A0', ' ').trim();
+            const newCategoryName = values.categoryName.replaceAll(CONST.REGEX.NON_BREAKING_SPACE, ' ').trim();
 
             if (!newCategoryName) {
                 errors.categoryName = translate('workspace.categories.categoryRequiredError');
@@ -50,7 +50,7 @@ function EditCategoryPage({route}: EditCategoryPageProps) {
 
     const editCategory = useCallback(
         (values: FormOnyxValues<typeof ONYXKEYS.FORMS.WORKSPACE_CATEGORY_FORM>) => {
-            const newCategoryName = values.categoryName.replaceAll('\u00A0', ' ').trim();
+            const newCategoryName = values.categoryName.replaceAll(CONST.REGEX.NON_BREAKING_SPACE, ' ').trim();
             // Do not call the API if the edited category name is the same as the current category name
             if (currentCategoryName !== newCategoryName) {
                 renamePolicyCategory(policyData, {oldName: currentCategoryName, newName: newCategoryName});
