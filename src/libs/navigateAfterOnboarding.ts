@@ -4,6 +4,7 @@ import {handleRHPVariantNavigation, shouldOpenRHPVariant} from '@components/Side
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
+import type {Route} from '@src/ROUTES';
 import type {OnboardingRHPVariant} from '@src/types/onyx';
 import {setDisableDismissOnEscape} from './actions/Modal';
 import SidePanelActions from './actions/SidePanel';
@@ -140,7 +141,7 @@ function navigateToSubmitWorkspaceAfterOnboarding(policyID?: string, isSmallScre
     }
 
     setOnboardingRHPVariant(CONST.ONBOARDING_RHP_VARIANT.RHP_ADMINS_ROOM);
-    Navigation.navigate(ROUTES.WORKSPACE_CATEGORIES.getRoute(policyID));
+    Navigation.navigate(`${ROUTES.WORKSPACE_CATEGORIES.getRoute(policyID)}?backTo=${encodeURIComponent(ROUTES.WORKSPACES_LIST.route)}` as Route);
     SidePanelActions.openSidePanel(!isSmallScreenWidth);
 }
 

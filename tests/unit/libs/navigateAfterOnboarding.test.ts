@@ -39,11 +39,11 @@ describe('navigateToSubmitWorkspaceAfterOnboardingWithMicrotaskQueue', () => {
         expect(navigationMock.navigate).toHaveBeenCalledWith(ROUTES.HOME);
     });
 
-    it('navigates to Workspace Categories when policyID is provided', () => {
+    it('navigates to Workspace Categories with backTo=/workspaces when policyID is provided', () => {
         navigateToSubmitWorkspaceAfterOnboardingWithMicrotaskQueue('test-policy-id');
 
         expect(navigationMock.dismissModal).toHaveBeenCalledTimes(1);
         expect(navigationMock.navigate).toHaveBeenCalledTimes(1);
-        expect(navigationMock.navigate).toHaveBeenCalledWith(ROUTES.WORKSPACE_CATEGORIES.getRoute('test-policy-id'));
+        expect(navigationMock.navigate).toHaveBeenCalledWith(`${ROUTES.WORKSPACE_CATEGORIES.getRoute('test-policy-id')}?backTo=${encodeURIComponent(ROUTES.WORKSPACES_LIST.route)}`);
     });
 });
