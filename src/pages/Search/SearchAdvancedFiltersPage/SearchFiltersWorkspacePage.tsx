@@ -117,6 +117,7 @@ function SearchFiltersWorkspacePage() {
                             onSelectRow={selectWorkspace}
                             textInputOptions={textInputOptions}
                             canSelectMultiple
+                            shouldUpdateFocusedIndex
                             shouldShowLoadingPlaceholder={isLoadingOnyxValue(policiesResult) || !didScreenTransitionEnd}
                             footerContent={
                                 <SearchFilterPageFooterButtons
