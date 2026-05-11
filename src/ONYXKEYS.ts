@@ -573,6 +573,9 @@ const ONYXKEYS = {
     /** Stores the information about duplicated workspace */
     DUPLICATE_WORKSPACE: 'duplicateWorkspace',
 
+    /** Stores the state of the bulk Copy Policy Settings flow */
+    COPY_POLICY_SETTINGS: 'copyPolicySettings',
+
     /** Stores the information about currently edited advanced approval workflow */
     APPROVAL_WORKFLOW: 'approvalWorkflow',
 
@@ -605,6 +608,9 @@ const ONYXKEYS = {
 
     /** Company cards custom names */
     NVP_EXPENSIFY_COMPANY_CARDS_CUSTOM_NAMES: 'nvp_expensify_ccCustomNames',
+
+    /** Whether to kick off the "Concierge is thinking" indicator when AgentZeroStatusGate mounts */
+    CONCIERGE_THINKING_KICKOFF: 'conciergeThinkingKickoff',
 
     /** The user's Concierge reportID */
     CONCIERGE_REPORT_ID: 'conciergeReportID',
@@ -815,6 +821,9 @@ const ONYXKEYS = {
 
         /** The value that indicates whether Continuous Reconciliation should be used on the domain */
         EXPENSIFY_CARD_USE_CONTINUOUS_RECONCILIATION: 'expensifyCard_useContinuousReconciliation_',
+
+        /** Pending action for continuous reconciliation enabled status */
+        EXPENSIFY_CARD_USE_CONTINUOUS_RECONCILIATION_PENDING_ACTION: 'expensifyCard_useContinuousReconciliationPendingAction_',
 
         /** The selected accounting integration bank account ID for card reconciliation */
         EXPENSIFY_CARD_RECONCILIATION_BANK_ACCOUNT_ID: 'expensifyCard_bankAccount_',
@@ -1322,7 +1331,9 @@ type OnyxCollectionValuesMapping = {
     [ONYXKEYS.COLLECTION.PRIVATE_EXPENSIFY_CARD_MANUAL_BILLING]: boolean;
     [ONYXKEYS.COLLECTION.WORKSPACE_CARDS_LIST]: OnyxTypes.WorkspaceCardsList;
     [ONYXKEYS.COLLECTION.EXPENSIFY_CARD_CONTINUOUS_RECONCILIATION_CONNECTION]: OnyxTypes.PolicyConnectionName;
-    [ONYXKEYS.COLLECTION.EXPENSIFY_CARD_USE_CONTINUOUS_RECONCILIATION]: OnyxTypes.CardContinuousReconciliation;
+    // Old accounts may still save this as "1" or "0".
+    [ONYXKEYS.COLLECTION.EXPENSIFY_CARD_USE_CONTINUOUS_RECONCILIATION]: boolean | string;
+    [ONYXKEYS.COLLECTION.EXPENSIFY_CARD_USE_CONTINUOUS_RECONCILIATION_PENDING_ACTION]: OnyxTypes.CardContinuousReconciliation;
     [ONYXKEYS.COLLECTION.EXPENSIFY_CARD_RECONCILIATION_BANK_ACCOUNT_ID]: string;
     [ONYXKEYS.COLLECTION.LAST_SELECTED_FEED]: OnyxTypes.CompanyCardFeedWithDomainID;
     [ONYXKEYS.COLLECTION.LAST_SELECTED_EXPENSIFY_CARD_FEED]: OnyxTypes.FundID;
@@ -1512,6 +1523,7 @@ type OnyxValuesMapping = {
     [ONYXKEYS.ASSIGN_CARD]: OnyxTypes.AssignCard;
     [ONYXKEYS.RAM_ONLY_MOBILE_SELECTION_MODE]: boolean;
     [ONYXKEYS.DUPLICATE_WORKSPACE]: OnyxTypes.DuplicateWorkspace;
+    [ONYXKEYS.COPY_POLICY_SETTINGS]: OnyxTypes.CopyPolicySettings;
     [ONYXKEYS.NVP_FIRST_DAY_FREE_TRIAL]: string;
     [ONYXKEYS.NVP_LAST_DAY_FREE_TRIAL]: string;
     [ONYXKEYS.NVP_BILLING_FUND_ID]: number;
@@ -1532,6 +1544,7 @@ type OnyxValuesMapping = {
     [ONYXKEYS.LAST_ROUTE]: string;
     [ONYXKEYS.IS_USING_IMPORTED_STATE]: boolean;
     [ONYXKEYS.NVP_EXPENSIFY_COMPANY_CARDS_CUSTOM_NAMES]: Record<string, string>;
+    [ONYXKEYS.CONCIERGE_THINKING_KICKOFF]: boolean;
     [ONYXKEYS.CONCIERGE_REPORT_ID]: string;
     [ONYXKEYS.SELF_DM_REPORT_ID]: string;
     [ONYXKEYS.SHARE_UNKNOWN_USER_DETAILS]: Participant;
