@@ -78,7 +78,7 @@ function TableHeader<T, ColumnKey extends string = string>({style, shouldHideHea
                 styles.gap3,
                 // Use Grid on web when available (will override flex if supported)
                 styles.dGrid,
-                {gridTemplateColumns: `repeat(${columns.length}, 1fr)`},
+                !shouldUseNarrowTableLayout && {gridTemplateColumns: `repeat(${columns.length}, 1fr)`},
                 style,
             ]}
             // eslint-disable-next-line react/jsx-props-no-spreading
