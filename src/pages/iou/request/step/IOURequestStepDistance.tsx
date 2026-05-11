@@ -755,7 +755,7 @@ function IOURequestStepDistance({
         [currentDistance, distanceUnit, submitManualDistance, manualFormError, handleManualInputChange],
     );
 
-    if (isEditing) {
+    if (isEditing && !isProduction) {
         return (
             <StepScreenWrapper
                 headerTitle={translate('common.distance')}
@@ -764,18 +764,14 @@ function IOURequestStepDistance({
                 shouldShowNotFoundPage={!currentTransaction?.comment?.waypoints || shouldShowNotFoundPage}
                 shouldShowWrapper
             >
-                {isProduction ? (
-                    renderMapTab()
-                ) : (
-                    <OnyxTabNavigator
-                        id={CONST.TAB.DISTANCE_EDIT_TYPE}
-                        defaultSelectedTab={CONST.TAB_REQUEST.DISTANCE_MAP}
-                        tabBar={TabSelector}
-                    >
-                        <TopTab.Screen name={CONST.TAB_REQUEST.DISTANCE_MAP}>{renderMapTab}</TopTab.Screen>
-                        <TopTab.Screen name={CONST.TAB_REQUEST.DISTANCE_MANUAL}>{renderManualTab}</TopTab.Screen>
-                    </OnyxTabNavigator>
-                )}
+                <OnyxTabNavigator
+                    id={CONST.TAB.DISTANCE_EDIT_TYPE}
+                    defaultSelectedTab={CONST.TAB_REQUEST.DISTANCE_MAP}
+                    tabBar={TabSelector}
+                >
+                    <TopTab.Screen name={CONST.TAB_REQUEST.DISTANCE_MAP}>{renderMapTab}</TopTab.Screen>
+                    <TopTab.Screen name={CONST.TAB_REQUEST.DISTANCE_MANUAL}>{renderManualTab}</TopTab.Screen>
+                </OnyxTabNavigator>
             </StepScreenWrapper>
         );
     }
