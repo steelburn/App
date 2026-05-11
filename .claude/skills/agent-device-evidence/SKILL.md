@@ -49,9 +49,7 @@ Bare numbers are rejected (PRs and issues share the GitHub number namespace; the
 
 ## Steps parsing
 
-Strip the body to its steps section (PR: `### Tests`; issue: `## Action Performed:`; fall back to whole body if no anchor matches), drop boilerplate, then ask the LLM to segment the result into a flow list `[{title, precondition?, steps[], expected?}, ...]`. Issues are typically single-flow; PRs may declare multiple via `#### Test case N:`. Flows with one verify-only step are classified `kind: still`; everything else is `kind: video`. Empty flow list -> exit `3 NO_FLOWS`.
-
-Full rules (anchors, boilerplate strip list, segmentation signals, per-flow field semantics): [`references/steps-parsing.md`](references/steps-parsing.md).
+See [`references/steps-parsing.md`](references/steps-parsing.md).
 
 ## Phase 1 cache
 
@@ -194,9 +192,7 @@ Run output is persistent across reboots and append-only - the skill never delete
 
 ### Manifest schema
 
-`manifest.json` at the run root captures: `source` (kind/number/url/title), `platforms_requested` vs `platforms_run`, and `flows.<platform>[]` with per-flow `id`, `title`, `kind`, `path`, `stills`, `expected` (issues only), `status` (`ok` / `phase1_failed` / `phase2_failed` / `skipped_after_failure`), `cached`, `fingerprint`, `warnings`, and any `params` the driver chose.
-
-Full schema and field semantics: [`references/manifest-schema.md`](references/manifest-schema.md).
+See [`references/manifest-schema.md`](references/manifest-schema.md).
 
 ### Handoff
 
@@ -226,9 +222,7 @@ Hitting any cap marks the flow `phase1_failed` / `phase2_failed` and proceeds to
 
 ## Error handling
 
-Gate failures exit hard (`3 NO_FLOWS`, `4 PLATFORM_UNSUPPORTED`, `7 BRING_UP_FAILED`, `8 BAD_INPUT`). Per-flow failures during Phase 1 or Phase 2 mark the flow `phase1_failed` / `phase2_failed` and continue to the next flow - the skill never aborts the run on a single flow.
-
-Full per-situation matrix: [`references/error-handling.md`](references/error-handling.md).
+See [`references/error-handling.md`](references/error-handling.md).
 
 ## Out of scope (do not do these)
 
