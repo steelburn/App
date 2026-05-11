@@ -75,11 +75,31 @@ jobs:
 
       - name: Create and push tag
         run: |
-          git tag ${{ steps.getTagName.outputs.TAG }}
-          git push origin --tags
+          # Idempotent tag creation: if the tag already exists at HEAD (e.g. a prior deploy
+          # attempt tagged successfully before failing later), skip creation so that a manual
+          # re-trigger of the workflow doesn't abort in prep. If the tag exists but points
+          # to a different commit, fail loudly to avoid deploying the wrong code.
+          create_tag_idempotent() {
+            local tag="$1"
+            local head_sha
+            head_sha=$(git rev-parse HEAD)
+            if git tag "$tag" 2>/dev/null; then
+              git push origin --tags
+            else
+              git fetch origin "refs/tags/$tag:refs/tags/$tag" 2>/dev/null || true
+              local existing_sha
+              existing_sha=$(git rev-parse "refs/tags/$tag" 2>/dev/null || echo "unknown")
+              if [ "$existing_sha" = "$head_sha" ]; then
+                echo "Tag $tag already exists at $head_sha, skipping creation."
+              else
+                echo "ERROR: Tag $tag exists at $existing_sha, expected $head_sha"
+                exit 1
+              fi
+            fi
+          }
+          create_tag_idempotent ${{ steps.getTagName.outputs.TAG }}
           cd Mobile-Expensify
-          git tag ${{ steps.getTagName.outputs.TAG }}
-          git push origin --tags
+          create_tag_idempotent ${{ steps.getTagName.outputs.TAG }}
 
         # We use JS here instead of bash/jq because inlining potentially large json into a bash command is non-trivial.
         # JS is better at handling JSON: https://stackoverflow.com/questions/72953526/github-actions-how-to-pass-tojson-result-to-shell-commands
