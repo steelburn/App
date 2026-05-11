@@ -177,7 +177,6 @@ function PopoverReportActionContextMenu({ref}: PopoverReportActionContextMenuPro
      * @param draftMessage - ReportAction draft message
      * @param [onShow] - Run a callback when Menu is shown
      * @param [onHide] - Run a callback when Menu is hidden
-     * @param isArchivedRoom - Whether the provided report is an archived room
      */
     const showContextMenu: ReportActionContextMenu['showContextMenu'] = (showContextMenuParams) => {
         cancelAnimation(hideDelayProgress);

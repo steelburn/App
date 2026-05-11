@@ -120,7 +120,6 @@ function hideContextMenu(shouldDelay?: boolean, onHideCallback = () => {}, param
  * @param draftMessage - ReportAction draft message
  * @param [onShow=() => {}] - Run a callback when Menu is shown
  * @param [onHide=() => {}] - Run a callback when Menu is hidden
- * @param isArchivedRoom - Whether the provided report is an archived room
  */
 function showContextMenu(showContextMenuParams: ShowContextMenuParams) {
     if (!contextMenuRef.current) {
