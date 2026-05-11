@@ -695,12 +695,11 @@ describe('addRootHistoryRouterExtension', () => {
             expect(rehydrated.history?.length).toBe(1);
         });
 
-        it('preserves leading reveal-padding sentinels when a partial state carries them through getRehydratedState', () => {
-            // Symmetric to the previous test: if a resetRoot DOES install state whose history
-            // includes leading reveal-padding sentinels (e.g. a captured snapshot), the
-            // sentinels currently survive and are honoured by the default branch of
-            // getStateForAction. This validates the documented trade-off in the extension
-            // ("offset bleeds back if the installed state carries it").
+        it('drops leading reveal-padding sentinels when a partial state carries them through getRehydratedState', () => {
+            // Symmetric to the previous test: even if a resetRoot installs state whose history
+            // includes leading reveal-padding sentinels (e.g. a captured snapshot),
+            // enhanceStateWithHistory rebuilds history from routes and drops that offset at
+            // the rehydration boundary.
             const factory = createMockRouterFactory();
             const enhancedRouter = addRootHistoryRouterExtension(factory)({} as PlatformStackRouterOptions);
 

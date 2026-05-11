@@ -121,7 +121,7 @@ function getRevealDismissState(
         // so it does not inflate the computed offset.
         const lengthDelta = (state.history?.length ?? 0) - rehydratedHistory.length;
         if (lengthDelta > 0) {
-            Log.info(`[addRootHistoryRouterExtension] reveal committed; freezing history with offset ${lengthDelta}`);
+            Log.hmmm(`[addRootHistoryRouterExtension] reveal committed; freezing history with offset ${lengthDelta}`);
             return {pendingReveal: null, state: {...rehydrated, history: buildPaddedHistory(rehydratedHistory, lengthDelta)}};
         }
         Log.hmmm('[addRootHistoryRouterExtension] reveal committed with non-positive lengthDelta; no freeze', {lengthDelta});
