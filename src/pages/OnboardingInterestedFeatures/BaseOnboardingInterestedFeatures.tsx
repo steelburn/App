@@ -246,6 +246,7 @@ function BaseOnboardingInterestedFeatures({shouldUseNativeStyles}: BaseOnboardin
                     setOnboardingAdminsChatReportID();
                     setOnboardingPolicyID();
                 },
+                waitForUpcomingTransition: true,
             });
 
             // We need to wait the policy is created before navigating out the onboarding flow
