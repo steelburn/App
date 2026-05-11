@@ -71,7 +71,10 @@ function Section({section, hash, activeItemIndex, sectionStartIndex, onItemPress
             badgeText={getSectionBadgeText(section.translationPath, reportCounts)}
         >
             {section.translationPath === 'search.savedSearchesMenuItemTitle' ? (
-                <SavedSearchList hash={hash} isExpanded={isExpanded} />
+                <SavedSearchList
+                    hash={hash}
+                    isExpanded={isExpanded}
+                />
             ) : (
                 section.menuItems.map((item, itemIndex) => {
                     const flattenedIndex = sectionStartIndex + itemIndex;
@@ -114,7 +117,7 @@ function SearchTypeMenuWide({queryJSON}: SearchTypeMenuProps) {
             return;
         }
         saveScrollOffset(route, e.nativeEvent.contentOffset.y);
-    }
+    };
 
     const handleTypeMenuItemPress = singleExecution((searchQuery: string) => {
         clearSelectedTransactions();
