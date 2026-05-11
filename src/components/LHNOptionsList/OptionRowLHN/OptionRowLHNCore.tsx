@@ -22,6 +22,7 @@ import FreeTrial from '@pages/settings/Subscription/FreeTrial';
 import variables from '@styles/variables';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
+import DraftIndicator from './OptionRow/DraftIndicator';
 import Status from './OptionRow/Status';
 import OptionRowAlternateText from './OptionRowAlternateText';
 import OptionRowAvatar from './OptionRowAvatar';
@@ -47,7 +48,7 @@ function OptionRowLHN({
     const styles = useThemeStyles();
     const popoverAnchor = useRef<View>(null);
     const StyleUtils = useStyleUtils();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Pencil', 'Pin']);
+    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Pin']);
 
     const {onboardingPurpose, onboarding, isScreenFocused} = useLHNTooltipContext();
     const [conciergeReportID] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID);
@@ -188,20 +189,10 @@ function OptionRowLHN({
                                 brickRoadIndicator={brickRoadIndicator}
                                 actionBadgeText={actionBadgeText}
                             />
-                            {hasDraftComment && !!optionItem.isAllowedToComment && (
-                                <View
-                                    style={styles.ml2}
-                                    accessibilityLabel={translate('sidebarScreen.draftedMessage')}
-                                >
-                                    <Icon
-                                        testID="Pencil Icon"
-                                        fill={theme.icon}
-                                        src={expensifyIcons.Pencil}
-                                        width={variables.iconSizeSmall}
-                                        height={variables.iconSizeSmall}
-                                    />
-                                </View>
-                            )}
+                            <DraftIndicator
+                                hasDraftComment={hasDraftComment}
+                                isAllowedToComment={optionItem.isAllowedToComment}
+                            />
                             {!brickRoadIndicator && !!optionItem.isPinned && (
                                 <View
                                     style={styles.ml2}
