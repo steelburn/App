@@ -92,16 +92,33 @@ jobs:
           script: |
             let commitMessages;
             if (context.payload.commits) {
-                // push trigger: commits are in the payload
+                // push trigger: all pushed commits are in the payload
                 commitMessages = context.payload.commits.map((commit) => commit.message);
             } else {
-                // workflow_dispatch: payload has no commits array, so fetch the HEAD commit message directly
-                const { data: commit } = await github.rest.git.getCommit({
+                // workflow_dispatch: payload has no commits array.
+                // For a conflict-resolution cherry-pick, GitHub creates a merge commit at HEAD whose first
+                // parent is the branch before the merge. The cherry-picked commit (which carries the
+                // "(cherry-picked to ... by ...)" marker) sits under the merge commit, not at HEAD itself.
+                // We therefore compare the first parent against HEAD to get all commits that were merged in.
+                const headSha = process.env.HEAD_COMMIT_SHA;
+                const { data: headCommit } = await github.rest.git.getCommit({
                     owner: context.repo.owner,
                     repo: context.repo.repo,
-                    commit_sha: process.env.HEAD_COMMIT_SHA,
+                    commit_sha: headSha,
                 });
-                commitMessages = [commit.message];
+                if (headCommit.parents.length > 1) {
+                    // Merge commit: get all commits between first parent and HEAD
+                    const { data: comparison } = await github.rest.repos.compareCommits({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        base: headCommit.parents[0].sha,
+                        head: headSha,
+                    });
+                    commitMessages = [headCommit.message, ...comparison.commits.map((c) => c.commit.message)];
+                } else {
+                    // Linear commit: only check this commit's message
+                    commitMessages = [headCommit.message];
+                }
             }
             const isCherryPick = commitMessages.some((message) => /.*\(cherry-picked to .* by .*\)$/.test(message));
             console.log('Is cherry pick?', isCherryPick);
