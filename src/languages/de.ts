@@ -1138,7 +1138,6 @@ const translations: TranslationDeepObject<typeof en> = {
         dropTitle: 'Lass es los',
         dropMessage: 'Datei hierher ziehen',
         flash: 'Blitz',
-        flipCamera: 'Kamera wechseln',
         multiScan: 'Mehrfachscan',
         shutter: 'Verschluss',
         gallery: 'Galerie',
@@ -2596,6 +2595,10 @@ ${amount} für ${merchant} – ${date}`,
             approverSubtitle: 'Alle Genehmigenden gehören zu einem bestehenden Workflow.',
             bulkApproverSubtitle: 'Keine Genehmigenden entsprechen den Kriterien für die ausgewählten Berichte.',
         },
+        configureViaGusto: 'Über Gusto konfigurieren.',
+        gustoApprovalWorkflowLockedPrompt:
+            'Genehmigungen werden über deine Gusto-Integration verwaltet. Um deinen Genehmigungsworkflow zu aktualisieren, gehe zu deinen Gusto-Verbindungseinstellungen.',
+        goToGustoSettings: 'Zu den Gusto-Einstellungen gehen',
     },
     workflowsDelayedSubmissionPage: {
         autoReportingFrequencyErrorMessage: 'Sendehäufigkeit konnte nicht geändert werden. Bitte versuche es erneut oder kontaktiere den Support.',
