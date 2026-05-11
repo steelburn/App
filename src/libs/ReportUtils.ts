@@ -11358,6 +11358,7 @@ function createDraftTransactionAndNavigateToParticipantSelector({
         modifiedMerchant: '',
         modifiedAttendees: undefined,
         mccGroup,
+        participants: [],
     } as Transaction);
 
     let firstPolicy: Policy | undefined;
