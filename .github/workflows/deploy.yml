@@ -86,9 +86,23 @@ jobs:
       - name: Check if this deploy was triggered by a cherry-pick
         id: isCherryPick
         uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
+        env:
+          HEAD_COMMIT_SHA: ${{ steps.getDeploySHA.outputs.SHA }}
         with:
           script: |
-            const commitMessages = (context.payload.commits || []).map((commit) => commit.message);
+            let commitMessages;
+            if (context.payload.commits) {
+                // push trigger: commits are in the payload
+                commitMessages = context.payload.commits.map((commit) => commit.message);
+            } else {
+                // workflow_dispatch: payload has no commits array, so fetch the HEAD commit message directly
+                const { data: commit } = await github.rest.git.getCommit({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    commit_sha: process.env.HEAD_COMMIT_SHA,
+                });
+                commitMessages = [commit.message];
+            }
             const isCherryPick = commitMessages.some((message) => /.*\(cherry-picked to .* by .*\)$/.test(message));
             console.log('Is cherry pick?', isCherryPick);
             core.setOutput(
