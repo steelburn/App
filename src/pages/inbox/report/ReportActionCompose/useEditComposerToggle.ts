@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useRef} from 'react';
+import {useEffect, useRef} from 'react';
 import type {RefObject} from 'react';
 import type {ComposerRef, TextSelection} from '@components/Composer/types';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
@@ -54,27 +54,24 @@ function useEditComposerToggle({selection, draftComment, composerRef, onFocus, o
         shouldForceNativeValueUpdate?: boolean;
     };
 
-    const applyComposerValue = useCallback(
-        (nextValue: string, options?: ApplyComposerValueOptions) => {
-            const defaultSelection: TextSelection = {start: nextValue.length, end: nextValue.length};
-            const shouldUseEditingSelection = options?.isEditingInComposer ?? false;
-            const shouldForceSelectionToEnd = options?.shouldMoveSelectionToEnd ?? false;
-            const explicitSelection = options?.selection ?? null;
+    const applyComposerValue = (nextValue: string, options?: ApplyComposerValueOptions) => {
+        const defaultSelection: TextSelection = {start: nextValue.length, end: nextValue.length};
+        const shouldUseEditingSelection = options?.isEditingInComposer ?? false;
+        const shouldForceSelectionToEnd = options?.shouldMoveSelectionToEnd ?? false;
+        const explicitSelection = options?.selection ?? null;
 
-            const selectionToApply = explicitSelection ?? (shouldUseEditingSelection && !shouldForceSelectionToEnd ? (currentEditMessageSelection ?? defaultSelection) : defaultSelection);
+        const selectionToApply = explicitSelection ?? (shouldUseEditingSelection && !shouldForceSelectionToEnd ? (currentEditMessageSelection ?? defaultSelection) : defaultSelection);
 
-            onValueChange?.(nextValue);
-            updateNativeTextInputValue({text: nextValue, shouldForceNativeValueUpdate: options?.shouldForceNativeValueUpdate ?? false, composerRef});
+        onValueChange?.(nextValue);
+        updateNativeTextInputValue({text: nextValue, shouldForceNativeValueUpdate: options?.shouldForceNativeValueUpdate ?? false, composerRef});
 
-            onSelectionChange?.(selectionToApply);
-            ReportActionComposeUtils.updateNativeSelectionValue(composerRef, selectionToApply.start, selectionToApply.end ?? selectionToApply.start);
+        onSelectionChange?.(selectionToApply);
+        ReportActionComposeUtils.updateNativeSelectionValue(composerRef, selectionToApply.start, selectionToApply.end ?? selectionToApply.start);
 
-            if (options?.isEditingInComposer) {
-                onFocus?.();
-            }
-        },
-        [composerRef, currentEditMessageSelection, onFocus, onSelectionChange, onValueChange],
-    );
+        if (options?.isEditingInComposer) {
+            onFocus?.();
+        }
+    };
 
     useEffect(() => {
         // If the draft message is already being submitted, do nothing.
