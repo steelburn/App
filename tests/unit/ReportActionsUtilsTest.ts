@@ -5132,14 +5132,14 @@ describe('ReportActionsUtils', () => {
 
         it('returns original reportActions when transactionThreadReportID is null', () => {
             const actions = [makeAction('1', CONST.REPORT.ACTIONS.TYPE.ADD_COMMENT, '2024-01-01 10:00:00')];
-            const result = getCombinedReportActions(actions, null, [], undefined);
+            const result = getCombinedReportActions(actions, null, []);
             expect(result).toEqual(actions);
         });
 
         it('returns original reportActions for sent money reports', () => {
             const sentMoneyAction = makeIOUAction('1', '2024-01-01 10:00:00', CONST.IOU.REPORT_ACTION_TYPE.PAY, true);
             const actions = [sentMoneyAction];
-            const result = getCombinedReportActions(actions, 'txnThread1', [makeAction('2', CONST.REPORT.ACTIONS.TYPE.ADD_COMMENT, '2024-01-01 11:00:00')], undefined);
+            const result = getCombinedReportActions(actions, 'txnThread1', [makeAction('2', CONST.REPORT.ACTIONS.TYPE.ADD_COMMENT, '2024-01-01 11:00:00')]);
             expect(result).toEqual(actions);
         });
 
@@ -5149,7 +5149,7 @@ describe('ReportActionsUtils', () => {
             const txnComment = makeAction('3', CONST.REPORT.ACTIONS.TYPE.ADD_COMMENT, '2024-01-01 09:00:00');
             const txnCreated = makeAction('4', CONST.REPORT.ACTIONS.TYPE.CREATED, '2024-01-01 09:30:00');
 
-            const result = getCombinedReportActions([parentCreated, parentComment], 'txnThread1', [txnCreated, txnComment], undefined);
+            const result = getCombinedReportActions([parentCreated, parentComment], 'txnThread1', [txnCreated, txnComment]);
 
             // parentCreated should be kept since it's older; txnCreated should be filtered out
             // Result should be sorted descending by created, with CREATED last
@@ -5163,7 +5163,7 @@ describe('ReportActionsUtils', () => {
             const parentCreated = makeAction('1', CONST.REPORT.ACTIONS.TYPE.CREATED, '2024-01-01 10:00:00');
             const txnCreated = makeAction('2', CONST.REPORT.ACTIONS.TYPE.CREATED, '2024-01-01 08:00:00');
 
-            const result = getCombinedReportActions([parentCreated], 'txnThread1', [txnCreated], undefined);
+            const result = getCombinedReportActions([parentCreated], 'txnThread1', [txnCreated]);
             const actionNames = result.map((a) => a.actionName);
             // Only one CREATED should be present
             expect(actionNames.filter((name) => name === CONST.REPORT.ACTIONS.TYPE.CREATED).length).toBe(1);
@@ -5174,7 +5174,7 @@ describe('ReportActionsUtils', () => {
             const iouCreateAction = makeIOUAction('2', '2024-01-01 09:00:00', CONST.IOU.REPORT_ACTION_TYPE.CREATE);
             const txnComment = makeAction('3', CONST.REPORT.ACTIONS.TYPE.ADD_COMMENT, '2024-01-01 10:00:00');
 
-            const result = getCombinedReportActions([parentCreated, iouCreateAction], 'txnThread1', [txnComment], undefined);
+            const result = getCombinedReportActions([parentCreated, iouCreateAction], 'txnThread1', [txnComment]);
             const resultIDs = result.map((a) => a.reportActionID);
             expect(resultIDs).not.toContain('2');
         });
@@ -5184,7 +5184,7 @@ describe('ReportActionsUtils', () => {
             const iouTrackAction = makeIOUAction('2', '2024-01-01 09:00:00', CONST.IOU.REPORT_ACTION_TYPE.TRACK);
             const txnComment = makeAction('3', CONST.REPORT.ACTIONS.TYPE.ADD_COMMENT, '2024-01-01 10:00:00');
 
-            const result = getCombinedReportActions([parentCreated, iouTrackAction], 'txnThread1', [txnComment], undefined);
+            const result = getCombinedReportActions([parentCreated, iouTrackAction], 'txnThread1', [txnComment]);
             const resultIDs = result.map((a) => a.reportActionID);
             expect(resultIDs).not.toContain('2');
         });
@@ -5193,9 +5193,8 @@ describe('ReportActionsUtils', () => {
             const parentCreated = makeAction('1', CONST.REPORT.ACTIONS.TYPE.CREATED, '2024-01-01 08:00:00');
             const iouTrackAction = makeIOUAction('2', '2024-01-01 09:00:00', CONST.IOU.REPORT_ACTION_TYPE.TRACK);
             const txnComment = makeAction('3', CONST.REPORT.ACTIONS.TYPE.ADD_COMMENT, '2024-01-01 10:00:00');
-            const selfDMReport = {chatType: CONST.REPORT.CHAT_TYPE.SELF_DM} as Report;
 
-            const result = getCombinedReportActions([parentCreated, iouTrackAction], 'txnThread1', [txnComment], selfDMReport);
+            const result = getCombinedReportActions([parentCreated, iouTrackAction], 'txnThread1', [txnComment], true);
             const resultIDs = result.map((a) => a.reportActionID);
             expect(resultIDs).toContain('2');
         });
@@ -5204,9 +5203,8 @@ describe('ReportActionsUtils', () => {
             const parentCreated = makeAction('1', CONST.REPORT.ACTIONS.TYPE.CREATED, '2024-01-01 08:00:00');
             const iouCreateAction = makeIOUAction('2', '2024-01-01 09:00:00', CONST.IOU.REPORT_ACTION_TYPE.CREATE);
             const txnComment = makeAction('3', CONST.REPORT.ACTIONS.TYPE.ADD_COMMENT, '2024-01-01 10:00:00');
-            const selfDMReport = {chatType: CONST.REPORT.CHAT_TYPE.SELF_DM} as Report;
 
-            const result = getCombinedReportActions([parentCreated, iouCreateAction], 'txnThread1', [txnComment], selfDMReport);
+            const result = getCombinedReportActions([parentCreated, iouCreateAction], 'txnThread1', [txnComment], true);
             const resultIDs = result.map((a) => a.reportActionID);
             expect(resultIDs).not.toContain('2');
         });
@@ -5216,13 +5214,12 @@ describe('ReportActionsUtils', () => {
             const iouTrackAction = makeIOUAction('2', '2024-01-01 09:00:00', CONST.IOU.REPORT_ACTION_TYPE.TRACK);
             const txnComment = makeAction('3', CONST.REPORT.ACTIONS.TYPE.ADD_COMMENT, '2024-01-01 10:00:00');
 
-            // Without report (undefined) - TRACK should be filtered
-            const resultWithoutReport = getCombinedReportActions([parentCreated, iouTrackAction], 'txnThread1', [txnComment], undefined);
+            // Without report - TRACK should be filtered
+            const resultWithoutReport = getCombinedReportActions([parentCreated, iouTrackAction], 'txnThread1', [txnComment], false);
             expect(resultWithoutReport.map((a) => a.reportActionID)).not.toContain('2');
 
             // With selfDM report - TRACK should be kept
-            const selfDMReport = {chatType: CONST.REPORT.CHAT_TYPE.SELF_DM} as Report;
-            const resultWithReport = getCombinedReportActions([parentCreated, iouTrackAction], 'txnThread1', [txnComment], selfDMReport);
+            const resultWithReport = getCombinedReportActions([parentCreated, iouTrackAction], 'txnThread1', [txnComment], true);
             expect(resultWithReport.map((a) => a.reportActionID)).toContain('2');
         });
     });
