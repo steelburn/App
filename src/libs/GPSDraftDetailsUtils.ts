@@ -116,7 +116,7 @@ async function stopGpsTrip(isOffline: boolean, gpsPoints: GPSPoint[][], skipLast
         return;
     }
 
-    if (isLastSegmentEmptyOrHasOnlyOnePoint(lastSegment)) {
+    if (isLastSegmentEmptyOrHasOnlyOnePoint(lastSegment) && gpsPoints.length > 1) {
         removeLastSegment(gpsPoints);
         return;
     }
@@ -165,7 +165,7 @@ function getTotalGpsTripPointsInLastSegment(gpsPoints: GPSPoint[][]): number {
 }
 
 function isTripStopped(gpsDraftDetails: GpsDraftDetails | undefined): boolean {
-    return !gpsDraftDetails?.isTracking && getTotalGpsTripPoints(gpsDraftDetails) > 0;
+    return !gpsDraftDetails?.isTracking && (gpsDraftDetails?.gpsPoints?.length ?? 0) > 0;
 }
 
 function getGpsPoints(gpsDraftDetails: GpsDraftDetails | undefined): GPSPoint[][] {
