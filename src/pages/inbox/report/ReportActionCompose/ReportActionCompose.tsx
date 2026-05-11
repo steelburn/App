@@ -36,10 +36,6 @@ function ComposerInner({reportID}: ReportActionComposeProps) {
     const [isComposerFullSize = false] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_IS_COMPOSER_FULL_SIZE}${reportID}`);
     const {reportPendingAction: pendingAction} = getReportOfflinePendingActionAndErrors(report);
 
-    if (!report) {
-        return null;
-    }
-
     return (
         <View
             testID={CONST.COMPOSER.TEST_ID.REPORT_ACTION_COMPOSE}
