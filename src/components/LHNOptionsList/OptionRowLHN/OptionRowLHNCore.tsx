@@ -19,10 +19,9 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import DateUtils from '@libs/DateUtils';
 import FS from '@libs/Fullstory';
 import {shouldUseBoldText} from '@libs/OptionsListUtils';
-import {isGroupChat, isOneOnOneChat, isSystemChat} from '@libs/ReportUtils';
+import {isGroupChat, isSystemChat} from '@libs/ReportUtils';
 import variables from '@styles/variables';
 import CONST from '@src/CONST';
-import {isEmptyObject} from '@src/types/utils/EmptyObject';
 import DraftIndicator from './OptionRow/DraftIndicator';
 import OnboardingBadge from './OptionRow/OnboardingBadge';
 import OptionRowAlternateText from './OptionRowAlternateText';
@@ -32,18 +31,7 @@ import OptionRowInfoBadge from './OptionRowInfoBadge';
 import OptionRowPressable from './OptionRowPressable';
 import OptionRowTooltipLayer from './OptionRowTooltipLayer';
 
-function OptionRowLHN({
-    reportID,
-    report,
-    isOptionFocused = false,
-    onSelectRow = () => {},
-    optionItem,
-    viewMode = 'default',
-    style,
-    onLayout = () => {},
-    hasDraftComment,
-    testID,
-}: OptionRowLHNProps) {
+function OptionRowLHN({isOptionFocused = false, onSelectRow = () => {}, optionItem, viewMode = 'default', style, onLayout = () => {}, hasDraftComment, testID}: OptionRowLHNProps) {
     const {isProduction} = useEnvironment();
     const theme = useTheme();
     const styles = useThemeStyles();
@@ -86,12 +74,12 @@ function OptionRowLHN({
     const currentSelectedTimezone = currentUserPersonalDetails?.timezone?.selected ?? CONST.DEFAULT_TIME_ZONE.selected;
     const formattedDate = DateUtils.getStatusUntilDate(translate, statusClearAfterDate, optionItem?.timezone?.selected ?? CONST.DEFAULT_TIME_ZONE.selected, currentSelectedTimezone);
     const statusContent = formattedDate ? `${statusText ? `${statusText} ` : ''}(${formattedDate})` : statusText;
-    const isStatusVisible = !!emojiCode && isOneOnOneChat(!isEmptyObject(report) ? report : undefined);
+    const isStatusVisible = !!emojiCode && !!optionItem.isOneOnOneChat;
 
     const subscriptAvatarBorderColor = isOptionFocused ? focusedBackgroundColor : theme.sidebar;
 
     // This is used to ensure that we display the text exactly as the user entered it when displaying LHN title, instead of parsing their text to HTML.
-    const shouldParseFullTitle = optionItem?.parentReportAction?.actionName !== CONST.REPORT.ACTIONS.TYPE.ADD_COMMENT && !isGroupChat(report);
+    const shouldParseFullTitle = optionItem?.parentReportAction?.actionName !== CONST.REPORT.ACTIONS.TYPE.ADD_COMMENT && !isGroupChat(optionItem);
 
     const accessibilityLabel = [
         `${translate('accessibilityHints.navigatesToChat')} ${optionItem.text}`,
@@ -110,7 +98,6 @@ function OptionRowLHN({
 
     const renderPressableRow = () => (
         <OptionRowPressable
-            reportID={reportID}
             optionItem={optionItem}
             isOptionFocused={isOptionFocused}
             isScreenFocused={isScreenFocused}
@@ -135,7 +122,6 @@ function OptionRowLHN({
                             <View style={[styles.flexRow, styles.alignItemsCenter]}>
                                 <OptionRowAvatar
                                     optionItem={optionItem}
-                                    report={report}
                                     isInFocusMode={isInFocusMode}
                                     subscriptAvatarBorderColor={hovered && !isOptionFocused ? hoveredBackgroundColor : subscriptAvatarBorderColor}
                                     secondaryAvatarBackgroundColor={secondaryAvatarBgColor}
@@ -159,12 +145,12 @@ function OptionRowLHN({
                                                 !!optionItem.isMoneyRequestReport ||
                                                 !!optionItem.isInvoiceReport ||
                                                 !!optionItem.private_isArchived ||
-                                                isGroupChat(report) ||
-                                                isSystemChat(report)
+                                                isGroupChat(optionItem) ||
+                                                isSystemChat(optionItem)
                                             }
                                             testID={testID}
                                         />
-                                        <OnboardingBadge report={report} />
+                                        <OnboardingBadge optionItem={optionItem} />
                                         {isStatusVisible && (
                                             <Tooltip
                                                 text={statusContent}
@@ -175,8 +161,7 @@ function OptionRowLHN({
                                         )}
                                     </View>
                                     <OptionRowAlternateText
-                                        alternateText={optionItem.alternateText}
-                                        report={report}
+                                        optionItem={optionItem}
                                         viewMode={viewMode}
                                         isOptionFocused={isOptionFocused}
                                         style={style}
@@ -185,7 +170,7 @@ function OptionRowLHN({
                                 {optionItem?.descriptiveText ? (
                                     <View
                                         style={[styles.flexWrap]}
-                                        fsClass={FS.getChatFSClass(report)}
+                                        fsClass={FS.getChatFSClass(optionItem)}
                                     >
                                         <Text style={[styles.textLabel]}>{optionItem.descriptiveText}</Text>
                                     </View>
@@ -228,8 +213,6 @@ function OptionRowLHN({
 
     return (
         <OptionRowTooltipLayer
-            reportID={reportID}
-            report={report}
             optionItem={optionItem}
             renderChildren={renderPressableRow}
         />

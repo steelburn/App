@@ -2,21 +2,21 @@ import React from 'react';
 import {useLHNTooltipContext} from '@components/LHNOptionsList/LHNTooltipContext';
 import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
+import type {OptionData} from '@libs/ReportUtils';
 import {isChatUsedForOnboarding as isChatUsedForOnboardingReportUtils} from '@libs/ReportUtils';
 import FreeTrial from '@pages/settings/Subscription/FreeTrial';
 import ONYXKEYS from '@src/ONYXKEYS';
-import type {Report} from '@src/types/onyx';
 
 type OnboardingBadgeProps = {
-    report?: Report;
+    optionItem: OptionData;
 };
 
-function OnboardingBadge({report}: OnboardingBadgeProps) {
+function OnboardingBadge({optionItem}: OnboardingBadgeProps) {
     const styles = useThemeStyles();
     const {onboarding, onboardingPurpose} = useLHNTooltipContext();
     const [conciergeReportID] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID);
 
-    if (!isChatUsedForOnboardingReportUtils(report, onboarding, conciergeReportID, onboardingPurpose)) {
+    if (!isChatUsedForOnboardingReportUtils(optionItem, onboarding, conciergeReportID, onboardingPurpose)) {
         return null;
     }
 
