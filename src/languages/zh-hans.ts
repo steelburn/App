@@ -488,6 +488,7 @@ const translations: TranslationDeepObject<typeof en> = {
         nextMonth: '下个月',
         previousYear: '上一年',
         nextYear: '明年',
+        avatar: '头像',
     },
     socials: {
         podcast: '在播客上关注我们',
@@ -1099,6 +1100,7 @@ const translations: TranslationDeepObject<typeof en> = {
         dropTitle: '随它去',
         dropMessage: '将文件拖放到此处',
         flash: '闪光',
+        flipCamera: '切换相机',
         multiScan: '多重扫描',
         shutter: '快门',
         gallery: '图库',
@@ -2142,6 +2144,12 @@ const translations: TranslationDeepObject<typeof en> = {
         chatToConciergeToUnlock: '与 Concierge 聊天以解决安全问题并解锁您的账户。',
         chatWithConcierge: '与 Concierge 聊天',
     },
+    deviceManagementPage: {
+        title: '设备管理',
+        description: '管理您使用 Expensify 账户登录过的所有设备。',
+        revoke: '撤销',
+        unknownDevice: '未知设备',
+    },
     twoFactorAuth: {
         headerTitle: '双重身份验证',
         twoFactorAuthEnabled: '已启用双重身份验证',
@@ -2512,6 +2520,9 @@ ${amount}，商户：${merchant} - 日期：${date}`,
             approverSubtitle: '所有审批人都属于一个现有的工作流。',
             bulkApproverSubtitle: '所选报表中没有符合条件的审批人。',
         },
+        configureViaGusto: '通过 Gusto 配置。',
+        gustoApprovalWorkflowLockedPrompt: '审批由你的 Gusto 集成管理。若要更新审批流程，请前往 Gusto 连接设置。',
+        goToGustoSettings: '前往 Gusto 设置',
     },
     workflowsDelayedSubmissionPage: {
         autoReportingFrequencyErrorMessage: '提交频率无法更改。请重试或联系支持团队。',
@@ -2841,10 +2852,10 @@ ${amount}，商户：${merchant} - 日期：${date}`,
             title: '你今天想做什么？',
             errorContinue: '请按“继续”完成设置',
             errorBackButton: '请完成设置问题以开始使用此应用程序',
-            [CONST.ONBOARDING_CHOICES.EMPLOYER]: '由我的雇主报销',
+            [CONST.ONBOARDING_CHOICES.EMPLOYER]: '向雇主提交费用',
             [CONST.ONBOARDING_CHOICES.MANAGE_TEAM]: '管理我团队的报销',
-            [CONST.ONBOARDING_CHOICES.PERSONAL_SPEND]: '跟踪和预算开销',
-            [CONST.ONBOARDING_CHOICES.CHAT_SPLIT]: '与朋友聊天并平摊费用',
+            [CONST.ONBOARDING_CHOICES.TRACK_BUSINESS]: '跟踪我的商务开销',
+            [CONST.ONBOARDING_CHOICES.TRACK_PERSONAL]: '管理我的个人支出',
             [CONST.ONBOARDING_CHOICES.LOOKING_AROUND]: '其他原因',
         },
         employees: {
@@ -5562,6 +5573,7 @@ _如需更详细的说明，请[访问我们的帮助网站](${CONST.NETSUITE_IM
                 subtitle: '为时间跟踪设置可计费的小时费率。',
                 defaultHourlyRate: '默认时薪',
             },
+            hrWarningModal: {disconnectText: '若要禁用人力资源功能，请先将 Gusto 与此工作区断开连接。'},
         },
         reports: {
             reportsCustomTitleExamples: '示例：',
@@ -5849,6 +5861,8 @@ _如需更详细的说明，请[访问我们的帮助网站](${CONST.NETSUITE_IM
             approvers: '审批人',
             auditors: '审计员',
             emptyRoleFilter: {title: '没有成员符合此筛选条件', subtitle: '邀请成员或更改上方的筛选条件。'},
+            configureGustoSync: '配置 Gusto 同步。',
+            syncWithGusto: '与 Gusto 同步',
         },
         card: {
             getStartedIssuing: '从发放您的第一张虚拟卡或实体卡开始使用。',
@@ -6579,6 +6593,7 @@ ${reportName}
                 gambling: '赌博',
                 tobacco: '烟草',
                 adultEntertainment: '成人娱乐',
+                handwrittenReceipt: '手写收据',
                 requireCompanyCard: '所有消费均需使用公司卡',
                 requireCompanyCardDescription: '标记所有现金支出，包括里程和每日津贴报销。',
                 requireCompanyCardDisabledTooltip: '启用“公司卡”（位于“更多功能”下）以解锁。',
@@ -6675,6 +6690,8 @@ ${reportName}
             customRules: {
                 title: '报销政策',
                 cardSubtitle: '这是你们团队的报销政策所在之处，让所有人都清楚哪些内容在报销范围之内。',
+                policyDocument: '政策文件',
+                policyText: '政策文本',
             },
             spendRules: {
                 title: '支出',
@@ -8009,13 +8026,9 @@ ${reportName}
         stopped: '已停止',
         start: '开始',
         stop: '停止',
+        save: '保存',
+        resume: '简历',
         discard: '丢弃',
-        stopGpsTrackingModal: {
-            title: '停止 GPS 跟踪',
-            prompt: '你确定吗？这将结束你当前的流程。',
-            cancel: '恢复跟踪',
-            confirm: '停止 GPS 跟踪',
-        },
         discardDistanceTrackingModal: {
             title: '放弃距离跟踪',
             prompt: '确定要继续吗？这将放弃你当前的行程，且无法撤销。',
@@ -8185,6 +8198,8 @@ ${reportName}
                         return `成人娱乐`;
                     case 'hotelIncidentals':
                         return `酒店杂费`;
+                    case 'handwrittenReceipt':
+                        return `手写收据`;
                     default:
                         return `${prohibitedExpenseType}`;
                 }

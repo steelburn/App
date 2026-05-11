@@ -493,6 +493,7 @@ const translations: TranslationDeepObject<typeof en> = {
         nextMonth: 'Nächster Monat',
         previousYear: 'Vorheriges Jahr',
         nextYear: 'Nächstes Jahr',
+        avatar: 'Avatar',
     },
     socials: {
         podcast: 'Folgen Sie uns auf Podcast',
@@ -1137,6 +1138,7 @@ const translations: TranslationDeepObject<typeof en> = {
         dropTitle: 'Lass es los',
         dropMessage: 'Datei hierher ziehen',
         flash: 'Blitz',
+        flipCamera: 'Kamera wechseln',
         multiScan: 'Mehrfachscan',
         shutter: 'Verschluss',
         gallery: 'Galerie',
@@ -2201,6 +2203,12 @@ const translations: TranslationDeepObject<typeof en> = {
         chatToConciergeToUnlock: 'Chatte mit Concierge, um Sicherheitsbedenken zu klären und dein Konto zu entsperren.',
         chatWithConcierge: 'Mit Concierge chatten',
     },
+    deviceManagementPage: {
+        title: 'Geräteverwaltung',
+        description: 'Verwalten Sie alle Geräte, auf denen Sie sich mit Ihrem Expensify-Konto angemeldet haben.',
+        revoke: 'Widerrufen',
+        unknownDevice: 'Unbekanntes Gerät',
+    },
     twoFactorAuth: {
         headerTitle: 'Zwei-Faktor-Authentifizierung',
         twoFactorAuthEnabled: 'Zwei-Faktor-Authentifizierung aktiviert',
@@ -2588,6 +2596,10 @@ ${amount} für ${merchant} – ${date}`,
             approverSubtitle: 'Alle Genehmigenden gehören zu einem bestehenden Workflow.',
             bulkApproverSubtitle: 'Keine Genehmigenden entsprechen den Kriterien für die ausgewählten Berichte.',
         },
+        configureViaGusto: 'Über Gusto konfigurieren.',
+        gustoApprovalWorkflowLockedPrompt:
+            'Genehmigungen werden über deine Gusto-Integration verwaltet. Um deinen Genehmigungsworkflow zu aktualisieren, gehe zu deinen Gusto-Verbindungseinstellungen.',
+        goToGustoSettings: 'Zu den Gusto-Einstellungen gehen',
     },
     workflowsDelayedSubmissionPage: {
         autoReportingFrequencyErrorMessage: 'Sendehäufigkeit konnte nicht geändert werden. Bitte versuche es erneut oder kontaktiere den Support.',
@@ -2924,10 +2936,10 @@ ${amount} für ${merchant} – ${date}`,
             title: 'Was möchtest du heute tun?',
             errorContinue: 'Bitte auf „Weiter“ drücken, um die Einrichtung abzuschließen',
             errorBackButton: 'Bitte beantworte die Einrichtungsfragen, um die App verwenden zu können',
-            [CONST.ONBOARDING_CHOICES.EMPLOYER]: 'Von meinem Arbeitgeber zurückerstattet werden',
+            [CONST.ONBOARDING_CHOICES.EMPLOYER]: 'Ausgaben bei meinem Arbeitgeber einreichen',
             [CONST.ONBOARDING_CHOICES.MANAGE_TEAM]: 'Verwalte die Ausgaben meines Teams',
-            [CONST.ONBOARDING_CHOICES.PERSONAL_SPEND]: 'Ausgaben nachverfolgen und budgetieren',
-            [CONST.ONBOARDING_CHOICES.CHAT_SPLIT]: 'Chatten und Ausgaben mit Freunden aufteilen',
+            [CONST.ONBOARDING_CHOICES.TRACK_BUSINESS]: 'Geschäftsausgaben nachverfolgen',
+            [CONST.ONBOARDING_CHOICES.TRACK_PERSONAL]: 'Meine persönlichen Ausgaben organisieren',
             [CONST.ONBOARDING_CHOICES.LOOKING_AROUND]: 'Etwas anderes',
         },
         employees: {
@@ -5737,6 +5749,7 @@ _Für ausführlichere Anweisungen [besuchen Sie unsere Hilfeseite](${CONST.NETSU
                 subtitle: 'Legen Sie einen abrechnungsfähigen Stundensatz für die Zeiterfassung fest.',
                 defaultHourlyRate: 'Standardstundensatz',
             },
+            hrWarningModal: {disconnectText: 'Um HR zu deaktivieren, trenne bitte zuerst die Verbindung von Gusto mit diesem Workspace.'},
         },
         reports: {
             reportsCustomTitleExamples: 'Beispiele:',
@@ -6029,6 +6042,8 @@ _Für ausführlichere Anweisungen [besuchen Sie unsere Hilfeseite](${CONST.NETSU
             approvers: 'Genehmigende',
             auditors: 'Prüfer',
             emptyRoleFilter: {title: 'Keine Mitglieder entsprechen diesem Filter', subtitle: 'Laden Sie ein Mitglied ein oder ändern Sie den Filter oben.'},
+            configureGustoSync: 'Gusto-Synchronisierung konfigurieren.',
+            syncWithGusto: 'Mit Gusto synchronisieren',
         },
         card: {
             getStartedIssuing: 'Beginne, indem du deine erste virtuelle oder physische Karte ausstellst.',
@@ -6785,6 +6800,7 @@ Fordern Sie Spesendetails wie Belege und Beschreibungen an, legen Sie Limits und
                 gambling: 'Glücksspiel',
                 tobacco: 'Tabak',
                 adultEntertainment: 'Erwachsenenunterhaltung',
+                handwrittenReceipt: 'Handschriftliche Belege',
                 requireCompanyCard: 'Firmenkarten für alle Käufe vorschreiben',
                 requireCompanyCardDescription: 'Kennzeichne alle Barausgaben, einschließlich Kilometer- und Tagegeldspesen.',
                 requireCompanyCardDisabledTooltip: 'Aktiviere Firmenkarten (unter Weitere Funktionen), um dies freizuschalten.',
@@ -6884,6 +6900,8 @@ Fordern Sie Spesendetails wie Belege und Beschreibungen an, legen Sie Limits und
             customRules: {
                 title: 'Spesenrichtlinie',
                 cardSubtitle: 'Hier ist die Spesenrichtlinie deines Teams hinterlegt, damit alle denselben Stand haben, was abgedeckt ist.',
+                policyDocument: 'Richtliniendokument',
+                policyText: 'Richtlinientext',
             },
             spendRules: {
                 title: 'Ausgaben',
@@ -8254,13 +8272,9 @@ Fügen Sie weitere Ausgabelimits hinzu, um den Cashflow Ihres Unternehmens zu sc
         stopped: 'Angehalten',
         start: 'Start',
         stop: 'Stopp',
+        save: 'Speichern',
+        resume: 'Fortsetzen',
         discard: 'Verwerfen',
-        stopGpsTrackingModal: {
-            title: 'GPS-Tracking stoppen',
-            prompt: 'Bist du sicher? Dadurch wird deine aktuelle Sitzung beendet.',
-            cancel: 'Tracking fortsetzen',
-            confirm: 'GPS-Tracking stoppen',
-        },
         discardDistanceTrackingModal: {
             title: 'Entfernungsverfolgung verwerfen',
             prompt: 'Bist du sicher? Dadurch wird dein aktueller Ablauf verworfen und das kann nicht rückgängig gemacht werden.',
@@ -8439,6 +8453,8 @@ Fügen Sie weitere Ausgabelimits hinzu, um den Cashflow Ihres Unternehmens zu sc
                         return `Erwachsenenunterhaltung`;
                     case 'hotelIncidentals':
                         return `Nebenkosten im Hotel`;
+                    case 'handwrittenReceipt':
+                        return `handschriftliche Belege`;
                     default:
                         return `${prohibitedExpenseType}`;
                 }
