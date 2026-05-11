@@ -94,6 +94,7 @@ function SingleSelectPopup<T extends string>({
                     searchPlaceholder={searchPlaceholder}
                     selectionListStyle={selectionListStyle}
                     shouldShowList={shouldShowList}
+                    itemHeight={itemHeight}
                 />
             </ListFilterHeightContextProvider>
         </BasePopup>
