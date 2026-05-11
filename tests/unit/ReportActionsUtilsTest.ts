@@ -1821,6 +1821,7 @@ describe('ReportActionsUtils', () => {
                 created: '2021-08-31 09:00:00.000',
                 reportActionID: '1',
                 actionName: CONST.REPORT.ACTIONS.TYPE.CREATED,
+                message: [{html: '__FAKE__', type: 'COMMENT', text: '__FAKE__'}],
             } as unknown as ReportAction;
 
             const legacyExpenseUpdateAction = {
@@ -1839,10 +1840,12 @@ describe('ReportActionsUtils', () => {
                 message: [{html: 'Hello', type: 'COMMENT', text: 'Hello'}],
             } as unknown as ReportAction;
 
-            const sorted = [createdAction, legacyExpenseUpdateAction, visibleAction];
+            // Mirror the production sort used by getSortedReportActionsForDisplay (descending, CREATED last)
+            // so this test exercises the same ordering invariant the helper relies on.
+            const sorted = ReportActionsUtils.getSortedReportActions([createdAction, legacyExpenseUpdateAction, visibleAction], true);
 
             expect(() => ReportActionsUtils.getFirstVisibleReportActionID(sorted)).not.toThrow();
-            expect(ReportActionsUtils.getFirstVisibleReportActionID(sorted)).toBe('2');
+            expect(ReportActionsUtils.getFirstVisibleReportActionID(sorted)).toBe(legacyExpenseUpdateAction.reportActionID);
         });
     });
 
