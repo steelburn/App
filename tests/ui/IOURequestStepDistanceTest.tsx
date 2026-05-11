@@ -110,6 +110,8 @@ jest.mock('@libs/Navigation/OnyxTabNavigator', () => {
 });
 jest.mock('@hooks/useShowNotFoundPageInIOUStep', () => () => false);
 jest.mock('@src/hooks/useResponsiveLayout');
+// The Map/Manual tab navigator only renders outside production (`isEditing && !isProduction`); force a non-production env so the edit-flow tabs render in tests.
+jest.mock('@hooks/useEnvironment', () => () => ({environment: 'development', environmentURL: '', isProduction: false, isDevelopment: true}));
 
 jest.mock('@libs/Navigation/navigationRef', () => ({
     getCurrentRoute: jest.fn(() => ({
