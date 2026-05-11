@@ -874,6 +874,7 @@ function getOptionData({
     result.keyForList = String(report.reportID);
     result.hasOutstandingChildRequest = report.hasOutstandingChildRequest;
     result.parentReportID = report.parentReportID;
+    result.parentReportActionID = report.parentReportActionID;
     result.isWaitingOnBankAccount = report.isWaitingOnBankAccount;
     result.notificationPreference = getReportNotificationPreference(report);
     result.isAllowedToComment = canUserPerformWriteActionUtil(report, isReportArchived);
