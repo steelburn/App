@@ -4635,6 +4635,7 @@ const translations = {
             notConfigured: 'Not configured',
             bankAccountDescription: 'Choose where to send checks from.',
             creditCardAccount: 'Credit card account',
+            travelInvoicingDescription: 'Travel expenses will export as credit card charges to the QuickBooks Online account specified below.',
             companyCardsLocationEnabledDescription:
                 "QuickBooks Online doesn't support locations on vendor bill exports. As you have locations enabled on your workspace, this export option is unavailable.",
             outOfPocketTaxEnabledDescription:

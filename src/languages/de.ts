@@ -4561,6 +4561,7 @@ ${amount} für ${merchant} – ${date}`,
             notConfigured: 'Nicht konfiguriert',
             bankAccountDescription: 'Wähle aus, von wo Schecks versendet werden sollen.',
             creditCardAccount: 'Kreditkartenkonto',
+            travelInvoicingDescription: 'Reisekosten werden als Kreditkartenbelastungen in das unten angegebene QuickBooks Online-Konto exportiert.',
             companyCardsLocationEnabledDescription:
                 'QuickBooks Online unterstützt keine Standorte beim Export von Kreditorenrechnungen. Da in deinem Workspace Standorte aktiviert sind, ist diese Exportoption nicht verfügbar.',
             outOfPocketTaxEnabledDescription:

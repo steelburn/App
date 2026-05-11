@@ -4511,6 +4511,7 @@ ${integrationName === CONST.ONBOARDING_ACCOUNTING_MAPPING.other ? 'あなたの'
             notConfigured: '未設定',
             bankAccountDescription: '小切手の送金元を選択してください。',
             creditCardAccount: 'クレジットカード口座',
+            travelInvoicingDescription: '旅費は、以下で指定した QuickBooks Online アカウントにクレジットカード請求としてエクスポートされます。',
             companyCardsLocationEnabledDescription:
                 'QuickBooks Online は仕入先請求書のエクスポートでロケーションをサポートしていません。ワークスペースでロケーションが有効になっているため、このエクスポートオプションは使用できません。',
             outOfPocketTaxEnabledDescription:
