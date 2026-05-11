@@ -190,14 +190,14 @@ describe('updateAgentName', () => {
         expect((personalDetailUpdate?.value as Record<string, unknown>)[TEST_ACCOUNT_ID]).toMatchObject({displayName: 'Old Name'});
     });
 
-    it('failure data sets errors (truthy) and pendingAction null on the prompt key', () => {
+    it('failure data sets nameErrors (truthy) and pendingAction null on the prompt key', () => {
         updateAgentName(TEST_ACCOUNT_ID, 'New Name', 'Old Name');
 
         const {failureData} = getWriteOptions();
         const promptUpdate = failureData.find((u) => u.key === `${ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT}${TEST_ACCOUNT_ID}`);
         const promptValue = promptUpdate?.value as Record<string, unknown> | undefined;
 
-        expect(promptValue?.errors).toBeTruthy();
+        expect(promptValue?.nameErrors).toBeTruthy();
         expect(promptValue?.pendingAction).toBeNull();
     });
 
@@ -250,14 +250,14 @@ describe('updateAgentPrompt', () => {
         expect((promptUpdate?.value as Record<string, unknown>).prompt).toBe('Old prompt');
     });
 
-    it('failure data sets errors (truthy) and pendingAction null on the prompt key', () => {
+    it('failure data sets promptErrors (truthy) and pendingAction null on the prompt key', () => {
         updateAgentPrompt(TEST_ACCOUNT_ID, 'New prompt', 'Old prompt');
 
         const {failureData} = getWriteOptions();
         const promptUpdate = failureData.find((u) => u.key === `${ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT}${TEST_ACCOUNT_ID}`);
         const promptValue = promptUpdate?.value as Record<string, unknown> | undefined;
 
-        expect(promptValue?.errors).toBeTruthy();
+        expect(promptValue?.promptErrors).toBeTruthy();
         expect(promptValue?.pendingAction).toBeNull();
     });
 
@@ -345,6 +345,6 @@ describe('clearAgentUpdateError', () => {
     it('calls Onyx.merge on the correct prompt key with errors null', () => {
         clearAgentUpdateError(TEST_ACCOUNT_ID);
 
-        expect(mergeSpy).toHaveBeenCalledWith(`${ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT}${TEST_ACCOUNT_ID}`, {errors: null});
+        expect(mergeSpy).toHaveBeenCalledWith(`${ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT}${TEST_ACCOUNT_ID}`, {errors: null, nameErrors: null, promptErrors: null});
     });
 });
