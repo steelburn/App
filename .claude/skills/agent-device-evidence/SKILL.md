@@ -47,60 +47,11 @@ Bare numbers are rejected (PRs and issues share the GitHub number namespace; the
    If the only platforms matched are out of scope (e.g. an issue checks only `MacOS: Chrome / Safari`), **exit `4 PLATFORM_UNSUPPORTED`**.
 4. **Steps parsing** - extract the steps section and produce a flow list (see below). If the flow list is empty, **exit `3 NO_FLOWS`**.
 
-## Steps parsing rules
+## Steps parsing
 
-The **only hard rule**: steps live in a Markdown body. Where they live within that body depends on the source kind, and what counts as "structure" inside the steps section varies wildly across authors.
+Strip the body to its steps section (PR: `### Tests`; issue: `## Action Performed:`; fall back to whole body if no anchor matches), drop boilerplate, then ask the LLM to segment the result into a flow list `[{title, precondition?, steps[], expected?}, ...]`. Issues are typically single-flow; PRs may declare multiple via `#### Test case N:`. Flows with one verify-only step are classified `kind: still`; everything else is `kind: video`. Empty flow list -> exit `3 NO_FLOWS`.
 
-### Section anchor (heuristic, with fallback)
-
-Strip the body to the steps section using a list of known headings, in order:
-
-| Source | Anchor (in priority order) |
-| --- | --- |
-| PR | `### Tests`, `### Test`, `## Tests` |
-| Issue | `## Action Performed:`, `## Repro`, `## Steps to reproduce`, `## Reproduction Steps` |
-
-If no anchor matches, pass the **whole body** to the LLM and ask it to find the steps. The anchor list is a hint, not a hard contract.
-
-Stop the section at the next equal-or-higher heading (e.g. for issues, `## Expected Result:` ends the steps section). Strip trailing GitHub-template footers (Upwork automation block, contributing-guide preamble, `## Workaround:`, `## Screenshots/Videos`).
-
-### Boilerplate stripping
-
-- "Verify that no errors appear in the JS console" line - strip wherever it appears.
-- Trailing `- [x] ...` checklist blocks - strip.
-- Preamble metadata blocks (`**Version Number:** ...`, `**Device used:** ...`, etc.) - strip.
-
-### Flow segmentation (LLM-driven)
-
-Pass the stripped section to the LLM and ask it to return a list of flows: `[{title, precondition?, steps[]}, ...]`. Signals it may use (all optional - the LLM picks whichever apply):
-
-- Explicit separators: `#### Test case N:` / `## ...` headers, `---` rules.
-- Numbered-list restarts (a fresh `1.` after a `5.` typically signals a new flow).
-- Prose markers: "Test case N:", "Repeat with...", "Then test...", "Now do...".
-- State-change indicators: "Sign out, then ...", "On a fresh session, ...".
-
-**Issues are typically single-flow.** Bug reports describe one repro path. The LLM should return one flow for an issue body unless it sees explicit multi-scenario structure (rare).
-
-When the LLM finds a single coherent flow, the whole section is one flow. When it finds N, it produces N.
-
-### Per flow
-
-The LLM returns these fields:
-
-- `title` - short label (header text if present, or LLM-summarized intent).
-- `precondition` - free-form setup metadata if the author provided one (e.g. "Account has no workspace.", "Log in with Expensifail account.").
-- `steps[]` - the numbered/listed items belonging to this flow, with nested `a/b/c` sub-items flattened into the parent.
-- `expected` (issues only) - free-form expected outcome from the issue's `## Expected Result:` block. The driver MAY use this as a final-state assertion target after the flow drives.
-
-### Single-step verify-only classification
-
-If a flow has exactly one step whose intent is purely a `Verify|Confirm|Check` (no preceding action), set `kind: still`. Otherwise `kind: video`. LLM judgment, not regex.
-
-### Step interpretation
-
-Each step's text is passed verbatim to the agent-device driver, which decides per-step whether it's a tap, fill, navigation, or assertion. If the driver cannot interpret a step, that step (and the rest of the flow) hard-fails.
-
-If the LLM returns an empty flow list (body was prose-only, "N/A", "We'll test it live", or empty after stripping), exit `3 NO_FLOWS`.
+Full rules (anchors, boilerplate strip list, segmentation signals, per-flow field semantics): [`references/steps-parsing.md`](references/steps-parsing.md).
 
 ## Phase 1 cache
 
@@ -243,40 +194,9 @@ Run output is persistent across reboots and append-only - the skill never delete
 
 ### Manifest schema
 
-`manifest.json` at the run root:
+`manifest.json` at the run root captures: `source` (kind/number/url/title), `platforms_requested` vs `platforms_run`, and `flows.<platform>[]` with per-flow `id`, `title`, `kind`, `path`, `stills`, `expected` (issues only), `status` (`ok` / `phase1_failed` / `phase2_failed` / `skipped_after_failure`), `cached`, `fingerprint`, `warnings`, and any `params` the driver chose.
 
-```json
-{
-  "source": {
-    "kind": "pr",
-    "number": 89475,
-    "url": "https://github.com/Expensify/App/pull/89475",
-    "title": "<source title>"
-  },
-  "platforms_requested": ["ios", "android"],
-  "platforms_run": ["ios", "android"],
-  "flows": {
-    "ios": [
-      {
-        "id": 1,
-        "title": "Test case 1: ...",
-        "kind": "video",
-        "path": "ios/flow-1.mp4",
-        "stills": ["ios/flow-1-step-2-tap-signin.png"],
-        "expected": "App will show error when creating new agent without name.",
-        "status": "ok",
-        "cached": true,
-        "fingerprint": "a3f9b2c4...",
-        "warnings": [],
-        "params": {"email": "test+ci-89475-1@expensify.com"}
-      }
-    ],
-    "android": [...]
-  }
-}
-```
-
-`source.kind` is `"pr"` or `"issue"`. `expected` is populated for issues (from `## Expected Result:`); absent for PRs. `status` is one of: `ok`, `phase1_failed`, `phase2_failed`, `skipped_after_failure`. `cached` is `true` when the `.ad` came from the cache (Phase 1 skipped), `false` when Phase 1 ran fresh.
+Full schema and field semantics: [`references/manifest-schema.md`](references/manifest-schema.md).
 
 ### Handoff
 
@@ -306,19 +226,9 @@ Hitting any cap marks the flow `phase1_failed` / `phase2_failed` and proceeds to
 
 ## Error handling
 
-| Situation | Action |
-| --- | --- |
-| Source URL missing or not a recognised PR/issue URL | Exit `8 BAD_INPUT` |
-| Steps section missing or empty (PR `### Tests` / issue `## Action Performed:`) | Exit `3 NO_FLOWS` |
-| Only out-of-scope platforms checked on issue (e.g. `MacOS: Chrome / Safari` only) | Exit `4 PLATFORM_UNSUPPORTED` |
-| mWeb / Desktop / Windows explicitly requested via `--platforms` | Exit `4 PLATFORM_UNSUPPORTED` |
-| Bring-up fails (HybridApp gate, missing dev build, Metro start, etc.) | Surface parent skill's error verbatim; exit `7 BRING_UP_FAILED` |
-| Phase 1 step uninterpretable by LLM | Mark flow `phase1_failed`, log the step that failed, continue to next flow |
-| Phase 1 a11y empty (0 nodes) on a screen | Use coordinate fallback; log `warnings: ["a11y_fallback:<screen>"]` |
-| Phase 1 `$TEST_FLOW.ad` empty after warm-up | Mark flow `phase1_failed`, continue |
-| Phase 2 `replay` fails on a step | Mark flow `phase2_failed`, continue. |
-| `record stop` produces 0-byte file | Retry Phase 2 once for that flow; if still empty, mark `phase2_failed` |
-| Android flow exceeds 3-min cap | Mark `phase2_failed`, continue (per-flow MP4s should rarely hit this; if they do, the Tests section is too coarse-grained) |
+Gate failures exit hard (`3 NO_FLOWS`, `4 PLATFORM_UNSUPPORTED`, `7 BRING_UP_FAILED`, `8 BAD_INPUT`). Per-flow failures during Phase 1 or Phase 2 mark the flow `phase1_failed` / `phase2_failed` and continue to the next flow - the skill never aborts the run on a single flow.
+
+Full per-situation matrix: [`references/error-handling.md`](references/error-handling.md).
 
 ## Out of scope (do not do these)
 
