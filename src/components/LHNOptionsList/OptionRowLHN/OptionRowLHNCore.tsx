@@ -23,6 +23,7 @@ import {isGroupChat, isOneOnOneChat, isSystemChat} from '@libs/ReportUtils';
 import variables from '@styles/variables';
 import CONST from '@src/CONST';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
+import DraftIndicator from './OptionRow/DraftIndicator';
 import OnboardingBadge from './OptionRow/OnboardingBadge';
 import OptionRowAlternateText from './OptionRowAlternateText';
 import OptionRowAvatar from './OptionRowAvatar';
@@ -48,7 +49,7 @@ function OptionRowLHN({
     const styles = useThemeStyles();
     const popoverAnchor = useRef<View>(null);
     const StyleUtils = useStyleUtils();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Pencil', 'Pin']);
+    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Pin']);
 
     const {isScreenFocused} = useLHNTooltipContext();
 
@@ -200,20 +201,10 @@ function OptionRowLHN({
                                 brickRoadIndicator={brickRoadIndicator}
                                 actionBadgeText={actionBadgeText}
                             />
-                            {hasDraftComment && !!optionItem.isAllowedToComment && (
-                                <View
-                                    style={styles.ml2}
-                                    accessibilityLabel={translate('sidebarScreen.draftedMessage')}
-                                >
-                                    <Icon
-                                        testID="Pencil Icon"
-                                        fill={theme.icon}
-                                        src={expensifyIcons.Pencil}
-                                        width={variables.iconSizeSmall}
-                                        height={variables.iconSizeSmall}
-                                    />
-                                </View>
-                            )}
+                            <DraftIndicator
+                                hasDraftComment={hasDraftComment}
+                                isAllowedToComment={optionItem.isAllowedToComment}
+                            />
                             {!brickRoadIndicator && !!optionItem.isPinned && (
                                 <View
                                     style={styles.ml2}
