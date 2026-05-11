@@ -101,5 +101,4 @@ function ActionCell({
     );
 }
 
-export type {ActionCellProps};
 export default ActionCell;

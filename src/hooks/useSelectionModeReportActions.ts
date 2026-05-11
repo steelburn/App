@@ -581,4 +581,3 @@ function useSelectionModeReportActions({
 }
 
 export default useSelectionModeReportActions;
-export type {UseSelectionModeReportActionsParams};

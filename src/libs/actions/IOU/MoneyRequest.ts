@@ -808,4 +808,4 @@ function handleMoneyRequestStepDistanceNavigation({
 }
 
 export {createTransaction, handleMoneyRequestStepScanParticipants, handleMoneyRequestStepDistanceNavigation, getMoneyRequestParticipantOptions};
-export type {MoneyRequestStepScanParticipantsFlowParams, MoneyRequestStepDistanceNavigationParams};
+export type {MoneyRequestStepScanParticipantsFlowParams};

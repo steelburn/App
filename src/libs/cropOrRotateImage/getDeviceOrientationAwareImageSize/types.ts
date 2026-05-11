@@ -17,4 +17,4 @@ type GetDeviceOrientationAwareImageSizeParams = {
 
 type GetDeviceOrientationAwareImageSize = (params: GetDeviceOrientationAwareImageSizeParams) => DeviceOrientationAwareImageSize;
 
-export type {GetDeviceOrientationAwareImageSize, DeviceOrientationAwareImageSize};
+export type {GetDeviceOrientationAwareImageSize};

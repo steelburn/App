@@ -542,4 +542,3 @@ function ParticipantSearchResults({
 }
 
 export default ParticipantSearchResults;
-export type {ParticipantSearchResultsProps};

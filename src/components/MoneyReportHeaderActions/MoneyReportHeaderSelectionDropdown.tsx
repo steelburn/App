@@ -524,4 +524,3 @@ function MoneyReportHeaderSelectionDropdown({reportID, primaryAction, isReportIn
 }
 
 export default MoneyReportHeaderSelectionDropdown;
-export type {MoneyReportHeaderSelectionDropdownProps};

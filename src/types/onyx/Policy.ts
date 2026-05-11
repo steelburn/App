@@ -2202,7 +2202,6 @@ export type {
     Connections,
     SageIntacctOfflineStateKeys,
     ConnectionName,
-    ReceiptPartners,
     UberReceiptPartner,
     AllConnectionName,
     Tenant,
