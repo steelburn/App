@@ -213,7 +213,10 @@ function PrivatePersonalDetailsPage() {
     }
 
     return (
-        <ScreenWrapper testID="PrivatePersonalDetailsPage">
+        <ScreenWrapper
+            includeSafeAreaPaddingBottom
+            testID="PrivatePersonalDetailsPage"
+        >
             <DelegateNoAccessWrapper accessDeniedVariants={[CONST.DELEGATE.DENIED_ACCESS_VARIANTS.DELEGATE]}>
                 <HeaderWithBackButton
                     title={translate('privatePersonalDetails.personalDetails')}
@@ -226,7 +229,6 @@ function PrivatePersonalDetailsPage() {
                     onSubmit={onSubmit}
                     submitButtonText={translate('common.save')}
                     enabledWhenOffline
-                    shouldSubmitButtonStickToBottom
                 >
                     <Text style={[styles.textStrong, styles.mb2]}>{translate('privatePersonalDetails.basicDetails')}</Text>
                     <View style={styles.mb4}>
@@ -383,7 +385,6 @@ function PrivatePersonalDetailsPage() {
                             shouldSaveDraft
                         />
                     </View>
-                    <View style={styles.pb20} />
                 </FormProvider>
             </DelegateNoAccessWrapper>
         </ScreenWrapper>
