@@ -43,6 +43,7 @@ import type {ReportAttributesDerivedValue} from '@src/types/onyx/DerivedValues';
 import type {SelectedParticipant} from '@src/types/onyx/NewGroupChatDraft';
 import getEmptyArray from '@src/types/utils/getEmptyArray';
 import KeyboardUtils from '@src/utils/keyboard';
+import getRemoveAccessibilityLabel from './getRemoveAccessibilityLabel';
 import type SelectedOption from './types';
 import useGroupChatDraftParticipantSync from './useGroupDraftRestore';
 
@@ -262,7 +263,7 @@ function NewChatPage({ref}: NewChatPageProps) {
                     selected: true,
                     reportID: option.reportID,
                     keyForList: `${option.keyForList ?? option.reportID}`,
-                    accessibilityLabel: `${translate('common.remove')} ${option.text ?? ''}`,
+                    accessibilityLabel: getRemoveAccessibilityLabel(translate, option.text),
                 },
             ];
             selectionListRef?.current?.scrollToIndex(0);
@@ -349,7 +350,7 @@ function NewChatPage({ref}: NewChatPageProps) {
                     item={item}
                     onSelectRow={toggleOption}
                     disabled={!!item.isDisabled}
-                    accessibilityLabel={`${translate('common.remove')} ${item.text ?? ''}`}
+                    accessibilityLabel={getRemoveAccessibilityLabel(translate, item.text)}
                     style={styles.ml5}
                 />
             );

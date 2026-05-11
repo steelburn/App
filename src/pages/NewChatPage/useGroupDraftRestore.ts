@@ -9,6 +9,7 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import type {Login, PersonalDetails, PersonalDetailsList} from '@src/types/onyx';
 import type NewGroupChatDraft from '@src/types/onyx/NewGroupChatDraft';
 import isLoadingOnyxValue from '@src/types/utils/isLoadingOnyxValue';
+import getRemoveAccessibilityLabel from './getRemoveAccessibilityLabel';
 import type SelectedOption from './types';
 
 /**
@@ -60,7 +61,7 @@ function useGroupChatDraftParticipantSync(
                     currentUserEmail,
                 });
             if (option) {
-                result.push({...option, isSelected: true, accessibilityLabel: `${translate('common.remove')} ${option.text ?? ''}`});
+                result.push({...option, isSelected: true, accessibilityLabel: getRemoveAccessibilityLabel(translate, option.text)});
             }
             return result;
         }, []);
