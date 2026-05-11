@@ -1,12 +1,23 @@
-import type {OnyxKey, OnyxUpdate} from 'react-native-onyx';
+import type { OnyxKey, OnyxUpdate } from 'react-native-onyx';
 import Onyx from 'react-native-onyx';
-import type {TupleToUnion} from 'type-fest';
-import type {DetachReceiptParams, OpenReportParams, UpdateCommentParams} from '@libs/API/parameters';
-import {WRITE_COMMANDS} from '@libs/API/types';
-import type {ApiRequestCommandParameters} from '@libs/API/types';
+import type { TupleToUnion } from 'type-fest';
+import type { DetachReceiptParams, OpenReportParams, UpdateCommentParams } from '@libs/API/parameters';
+import { WRITE_COMMANDS } from '@libs/API/types';
+import type { ApiRequestCommandParameters } from '@libs/API/types';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type OnyxRequest from '@src/types/onyx/Request';
-import type {AnyRequest, ConflictActionData} from '@src/types/onyx/Request';
+import type { AnyRequest, ConflictActionData } from '@src/types/onyx/Request';
+
+
+
+
+
+
+
+
+
+
+
 
 type AnyRequestMatcher = (request: AnyRequest) => boolean;
 
@@ -90,8 +101,10 @@ function resolveOpenReportDuplicationConflictAction<TKey extends OnyxKey>(persis
             // ReportFetchHandler when the screen mounts has no participants. Replacing would drop the
             // accountIDList, leaving the server with no way to resolve the optimistic reportID — Auth
             // returns NIL reportSummary and PHP throws "Report not found" (da7984df).
-            const queuedHasParticipants = !!(request.data?.emailList ?? request.data?.accountIDList);
-            const newHasParticipants = !!(parameters.emailList ?? parameters.accountIDList);
+            // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+            const queuedHasParticipants = !!(request.data?.emailList || request.data?.accountIDList);
+            // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+            const newHasParticipants = !!(parameters.emailList || parameters.accountIDList);
             if (queuedHasParticipants && !newHasParticipants) {
                 return {
                     conflictAction: {
