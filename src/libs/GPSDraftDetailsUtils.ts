@@ -165,7 +165,7 @@ function getTotalGpsTripPointsInLastSegment(gpsPoints: GPSPoint[][]): number {
 }
 
 function isTripStopped(gpsDraftDetails: GpsDraftDetails | undefined): boolean {
-    return !gpsDraftDetails?.isTracking && (gpsDraftDetails?.gpsPoints?.length ?? 0) > 0;
+    return !gpsDraftDetails?.isTracking && getTotalGpsTripPoints(gpsDraftDetails) > 0;
 }
 
 function getGpsPoints(gpsDraftDetails: GpsDraftDetails | undefined): GPSPoint[][] {
