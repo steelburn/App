@@ -132,7 +132,7 @@ function navigateAfterOnboardingWithMicrotaskQueue(
  * navigate to Workspace > Categories with the side panel open so
  * the #admins room is visible in Concierge Anywhere.
  */
-function navigateToSubmitWorkspaceAfterOnboarding(policyID?: string, isSmallScreenWidth = false) {
+function navigateToSubmitWorkspaceAfterOnboarding(policyID?: string, shouldUseNarrowLayout = false) {
     setDisableDismissOnEscape(false);
 
     if (!policyID) {
@@ -143,16 +143,16 @@ function navigateToSubmitWorkspaceAfterOnboarding(policyID?: string, isSmallScre
     setOnboardingRHPVariant(CONST.ONBOARDING_RHP_VARIANT.RHP_ADMINS_ROOM);
 
     const categoriesRoute = ROUTES.WORKSPACE_CATEGORIES.getRoute(policyID);
-    const backToRoute = isSmallScreenWidth ? ROUTES.WORKSPACE_INITIAL.getRoute(policyID) : ROUTES.WORKSPACES_LIST.route;
+    const backToRoute = shouldUseNarrowLayout ? ROUTES.WORKSPACE_INITIAL.getRoute(policyID) : ROUTES.WORKSPACES_LIST.route;
     Navigation.navigate(`${categoriesRoute}?backTo=${encodeURIComponent(backToRoute)}` as Route);
 
-    SidePanelActions.openSidePanel(!isSmallScreenWidth);
+    SidePanelActions.openSidePanel(!shouldUseNarrowLayout);
 }
 
-function navigateToSubmitWorkspaceAfterOnboardingWithMicrotaskQueue(policyID?: string, isSmallScreenWidth = false) {
+function navigateToSubmitWorkspaceAfterOnboardingWithMicrotaskQueue(policyID?: string, shouldUseNarrowLayout = false) {
     Navigation.dismissModal();
     Navigation.setNavigationActionToMicrotaskQueue(() => {
-        navigateToSubmitWorkspaceAfterOnboarding(policyID, isSmallScreenWidth);
+        navigateToSubmitWorkspaceAfterOnboarding(policyID, shouldUseNarrowLayout);
     });
 }
 

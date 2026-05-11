@@ -38,9 +38,7 @@ function useOnboardingWorkspaceCreationState() {
     const hasActiveAdminPolicies = useHasActiveAdminPolicies();
     const {onboardingMessages} = useOnboardingMessages();
     const lastWorkspaceNumber = useLastWorkspaceNumber();
-
-    // eslint-disable-next-line rulesdir/prefer-shouldUseNarrowLayout-instead-of-isSmallScreenWidth
-    const {isSmallScreenWidth} = useResponsiveLayout();
+    const {shouldUseNarrowLayout} = useResponsiveLayout();
 
     return {
         onboardingPolicyID,
@@ -59,7 +57,7 @@ function useOnboardingWorkspaceCreationState() {
         hasActiveAdminPolicies,
         onboardingMessages,
         lastWorkspaceNumber,
-        isSmallScreenWidth,
+        shouldUseNarrowLayout,
     };
 }
 

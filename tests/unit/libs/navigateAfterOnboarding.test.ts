@@ -39,7 +39,7 @@ describe('navigateToSubmitWorkspaceAfterOnboardingWithMicrotaskQueue', () => {
         expect(navigationMock.navigate).toHaveBeenCalledWith(ROUTES.HOME);
     });
 
-    it('navigates to Workspace Categories with backTo=/workspaces on wide layouts', () => {
+    it('navigates to Workspace Categories with backTo=/workspaces when not using narrow layout', () => {
         navigateToSubmitWorkspaceAfterOnboardingWithMicrotaskQueue('test-policy-id', false);
 
         expect(navigationMock.dismissModal).toHaveBeenCalledTimes(1);
@@ -47,7 +47,7 @@ describe('navigateToSubmitWorkspaceAfterOnboardingWithMicrotaskQueue', () => {
         expect(navigationMock.navigate).toHaveBeenCalledWith(`${ROUTES.WORKSPACE_CATEGORIES.getRoute('test-policy-id')}?backTo=${encodeURIComponent(ROUTES.WORKSPACES_LIST.route)}`);
     });
 
-    it('navigates to Workspace Categories with backTo=WorkspaceInitial on narrow layouts', () => {
+    it('navigates to Workspace Categories with backTo=WorkspaceInitial when using narrow layout', () => {
         navigateToSubmitWorkspaceAfterOnboardingWithMicrotaskQueue('test-policy-id', true);
 
         expect(navigationMock.dismissModal).toHaveBeenCalledTimes(1);

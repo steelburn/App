@@ -39,7 +39,7 @@ function useAutoCreateTrackWorkspace() {
         hasActiveAdminPolicies,
         onboardingMessages,
         lastWorkspaceNumber,
-        isSmallScreenWidth,
+        shouldUseNarrowLayout,
     } = useOnboardingWorkspaceCreationState();
 
     const paidGroupPolicySelector = useMemo(
@@ -109,7 +109,7 @@ function useAutoCreateTrackWorkspace() {
                 setOnboardingPolicyID();
 
                 navigateAfterOnboardingWithMicrotaskQueue(
-                    isSmallScreenWidth,
+                    shouldUseNarrowLayout,
                     isBetaEnabled(CONST.BETAS.DEFAULT_ROOMS),
                     conciergeChatReportID,
                     archivedReportsIdSet,
@@ -137,7 +137,7 @@ function useAutoCreateTrackWorkspace() {
             onboardingMessages,
             betas,
             hasActiveAdminPolicies,
-            isSmallScreenWidth,
+            shouldUseNarrowLayout,
             isBetaEnabled,
             conciergeChatReportID,
             archivedReportsIdSet,
