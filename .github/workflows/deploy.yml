@@ -28,6 +28,7 @@ jobs:
       APP_VERSION: ${{ steps.getAppVersion.outputs.VERSION }}
       TAG: ${{ steps.getTagName.outputs.TAG }}
       DEPLOY_SHA: ${{ steps.getDeploySHA.outputs.SHA }}
+      DEPLOY_ENV: ${{ steps.getDeploySHA.outputs.DEPLOY_ENV }}
       # Is this deploy for a cherry-pick?
       IS_CHERRY_PICK: ${{ steps.isCherryPick.outputs.IS_CHERRY_PICK }}
       # Should we build native apps? (only on staging or cherry-pick, not production)
@@ -43,9 +44,11 @@ jobs:
           token: ${{ secrets.OS_BOTIFY_TOKEN }}
           submodules: true
 
-      - name: Get deploy SHA
+      - name: Get deploy SHA and environment
         id: getDeploySHA
-        run: echo "SHA=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+        run: |
+          echo "SHA=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          echo "DEPLOY_ENV=${{ env.DEPLOY_ENV }}" >> "$GITHUB_OUTPUT"
 
       - name: Validate actor
         id: validateActor
@@ -105,7 +108,7 @@ jobs:
   deployChecklist:
     name: Create or update deploy checklist
     uses: ./.github/workflows/createDeployChecklist.yml
-    if: ${{ env.DEPLOY_ENV == 'staging' }}
+    if: ${{ needs.prep.outputs.DEPLOY_ENV == 'staging' }}
     needs: prep
     secrets: inherit
 
@@ -178,7 +181,7 @@ jobs:
     name: Submit Android for production rollout
     needs: [prep, androidBuild, androidUploadGooglePlay]
     runs-on: blacksmith-2vcpu-ubuntu-2404
-    if: ${{ always() && !cancelled() && env.DEPLOY_ENV == 'production' && needs.androidBuild.result != 'failure' && needs.androidUploadGooglePlay.result != 'failure' }}
+    if: ${{ always() && !cancelled() && needs.prep.outputs.DEPLOY_ENV == 'production' && needs.androidBuild.result != 'failure' && needs.androidUploadGooglePlay.result != 'failure' }}
     steps:
       - name: Checkout
         # v6
@@ -278,7 +281,7 @@ jobs:
     name: Upload Android to Applause
     needs: [prep, androidBuild]
     runs-on: blacksmith-2vcpu-ubuntu-2404
-    if: ${{ github.repository == 'Expensify/App' && env.DEPLOY_ENV == 'staging' && !fromJSON(needs.prep.outputs.IS_CHERRY_PICK) }}
+    if: ${{ github.repository == 'Expensify/App' && needs.prep.outputs.DEPLOY_ENV == 'staging' && !fromJSON(needs.prep.outputs.IS_CHERRY_PICK) }}
     continue-on-error: true
     steps:
       - name: Download Android APK artifact
@@ -417,7 +420,7 @@ jobs:
     name: Submit iOS for production rollout
     needs: [prep, iosBuild, iosUploadTestflight]
     runs-on: blacksmith-12vcpu-macos-latest
-    if: ${{ always() && !cancelled() && env.DEPLOY_ENV == 'production' && needs.iosBuild.result != 'failure' && needs.iosUploadTestflight.result != 'failure' }}
+    if: ${{ always() && !cancelled() && needs.prep.outputs.DEPLOY_ENV == 'production' && needs.iosBuild.result != 'failure' && needs.iosUploadTestflight.result != 'failure' }}
     env:
       DEVELOPER_DIR: /Applications/Xcode_26.2.app/Contents/Developer
     steps:
@@ -511,7 +514,7 @@ jobs:
     name: Upload iOS to Applause
     needs: [prep, iosBuild]
     runs-on: blacksmith-2vcpu-ubuntu-2404
-    if: ${{ github.repository == 'Expensify/App' && env.DEPLOY_ENV == 'staging' && !fromJSON(needs.prep.outputs.IS_CHERRY_PICK) }}
+    if: ${{ github.repository == 'Expensify/App' && needs.prep.outputs.DEPLOY_ENV == 'staging' && !fromJSON(needs.prep.outputs.IS_CHERRY_PICK) }}
     continue-on-error: true
     steps:
       - name: Download iOS build artifact
@@ -561,7 +564,7 @@ jobs:
     uses: ./.github/workflows/buildWeb.yml
     with:
       ref: ${{ needs.prep.outputs.DEPLOY_SHA }}
-      environment: ${{ env.DEPLOY_ENV }}
+      environment: ${{ needs.prep.outputs.DEPLOY_ENV }}
     secrets: inherit
 
   webDeploy:
@@ -905,7 +908,7 @@ jobs:
   #   2. CP that version bump to staging
   cherryPickExtraVersionBump:
     needs: [prep, checkDeploymentSuccess]
-    if: ${{ always() && fromJSON(needs.checkDeploymentSuccess.outputs.IS_AT_LEAST_ONE_PLATFORM_DEPLOYED) && env.DEPLOY_ENV == 'production' && fromJSON(needs.prep.outputs.IS_CHERRY_PICK) }}
+    if: ${{ always() && fromJSON(needs.checkDeploymentSuccess.outputs.IS_AT_LEAST_ONE_PLATFORM_DEPLOYED) && needs.prep.outputs.DEPLOY_ENV == 'production' && fromJSON(needs.prep.outputs.IS_CHERRY_PICK) }}
     uses: ./.github/workflows/cherryPick.yml
     secrets: inherit
     with:
@@ -977,7 +980,7 @@ jobs:
     secrets: inherit
     with:
       version: ${{ needs.prep.outputs.APP_VERSION }}
-      env: ${{ env.DEPLOY_ENV }}
+      env: ${{ needs.prep.outputs.DEPLOY_ENV }}
       android: ${{ needs.checkDeploymentSuccess.outputs.ANDROID_RESULT }}
       ios: ${{ needs.checkDeploymentSuccess.outputs.IOS_RESULT }}
       web: ${{ needs.checkDeploymentSuccess.outputs.WEB_RESULT }}
