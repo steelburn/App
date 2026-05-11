@@ -45,7 +45,7 @@ const spanishGlossary = new Glossary([
     {sourceTerm: 'Require receipts, flag high spend, and more.', targetTerm: 'Solicita recibos, resalta gastos de alto importe y mucho más.'},
     {
         sourceTerm: "Camera access still hasn't been granted, please follow these instructions.",
-        targetTerm: 'No se ha concedido el acceso a la cámara, siga estas instrucciones.',
+        targetTerm: 'No se ha concedido el acceso a la cámara, sigue estas instrucciones.',
     },
     {sourceTerm: 'Hold', targetTerm: 'Retener', partOfSpeech: 'verb', usage: 'Payment or card hold'},
     {sourceTerm: 'You haven’t created any invoices yet', targetTerm: 'Aún no has creado ninguna factura'},
