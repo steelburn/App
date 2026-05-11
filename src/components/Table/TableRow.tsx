@@ -1,5 +1,6 @@
 import React from 'react';
-import {PressableStateCallbackType, View} from 'react-native';
+import type {PressableStateCallbackType} from 'react-native';
+import {View} from 'react-native';
 import type {PressableWithFeedbackProps} from '@components/Pressable/PressableWithFeedback';
 import PressableWithFeedback from '@components/Pressable/PressableWithFeedback';
 import SkeletonViewContentLoader from '@components/SkeletonViewContentLoader';
