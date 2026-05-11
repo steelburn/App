@@ -109,7 +109,7 @@ function getRestrictedPolicyID(
             (policyID): policyID is string =>
                 !!policyID &&
                 shouldRestrictUserBillableActions(
-                    allPolicies?.[`${ONYXKEYS.COLLECTION.POLICY}${policyID}`] ?? policyID,
+                    allPolicies?.[`${ONYXKEYS.COLLECTION.POLICY}${policyID}`],
                     ownerBillingGracePeriodEnd,
                     billingGracePeriods,
                     amountOwed,
