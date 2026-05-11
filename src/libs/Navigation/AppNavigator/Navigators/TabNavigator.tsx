@@ -23,10 +23,14 @@ const LazySearchFullscreenNavigator = lazy(() => import('./SearchFullscreenNavig
 const LazySettingsSplitNavigator = lazy(() => import('./SettingsSplitNavigator'));
 const LazyWorkspaceNavigator = lazy(() => import('./WorkspaceNavigator'));
 
-type LazyFallbackProps = {tabSpanName?: string};
+type LazyFallbackProps = {
+    /** Sentry span to tag when this fallback renders. */
+    tabSpanName?: string;
+};
 
 function LazyFallback({tabSpanName}: LazyFallbackProps) {
     const styles = useThemeStyles();
+
     // Lets Sentry split slow tab navigations into "lazy chunk fetch" vs "screen render" buckets.
     useEffect(() => {
         if (!tabSpanName) {
@@ -34,6 +38,7 @@ function LazyFallback({tabSpanName}: LazyFallbackProps) {
         }
         getSpan(tabSpanName)?.setAttribute(CONST.TELEMETRY.ATTRIBUTE_LAZY_TAB_FALLBACK_SHOWN, true);
     }, [tabSpanName]);
+
     return (
         <View style={[styles.flex1, styles.justifyContentCenter, styles.alignItemsCenter, styles.appBG]}>
             <ActivityIndicator
