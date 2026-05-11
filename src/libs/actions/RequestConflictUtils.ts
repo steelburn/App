@@ -1,23 +1,12 @@
-import type { OnyxKey, OnyxUpdate } from 'react-native-onyx';
+import type {OnyxKey, OnyxUpdate} from 'react-native-onyx';
 import Onyx from 'react-native-onyx';
-import type { TupleToUnion } from 'type-fest';
-import type { DetachReceiptParams, OpenReportParams, UpdateCommentParams } from '@libs/API/parameters';
-import { WRITE_COMMANDS } from '@libs/API/types';
-import type { ApiRequestCommandParameters } from '@libs/API/types';
+import type {TupleToUnion} from 'type-fest';
+import type {DetachReceiptParams, OpenReportParams, UpdateCommentParams} from '@libs/API/parameters';
+import {WRITE_COMMANDS} from '@libs/API/types';
+import type {ApiRequestCommandParameters} from '@libs/API/types';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type OnyxRequest from '@src/types/onyx/Request';
-import type { AnyRequest, ConflictActionData } from '@src/types/onyx/Request';
-
-
-
-
-
-
-
-
-
-
-
+import type {AnyRequest, ConflictActionData} from '@src/types/onyx/Request';
 
 type AnyRequestMatcher = (request: AnyRequest) => boolean;
 
