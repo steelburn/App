@@ -12,6 +12,7 @@ import type {BaseTextInputRef} from '@components/TextInput/BaseTextInput/types';
 import withCurrentUserPersonalDetails from '@components/withCurrentUserPersonalDetails';
 import type {WithCurrentUserPersonalDetailsProps} from '@components/withCurrentUserPersonalDetails';
 import useDefaultExpensePolicy from '@hooks/useDefaultExpensePolicy';
+import useEnvironment from '@hooks/useEnvironment';
 import useFetchRoute from '@hooks/useFetchRoute';
 import useLocalize from '@hooks/useLocalize';
 import useNetwork from '@hooks/useNetwork';
@@ -81,6 +82,7 @@ function IOURequestStepDistance({
     const {isOffline} = useNetwork();
     const {translate} = useLocalize();
     const {isBetaEnabled} = usePermissions();
+    const {isProduction} = useEnvironment();
     const isArchived = useReportIsArchived(report?.reportID);
     const [parentReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(report?.parentReportID)}`);
     const [parentReportNextStep] = useOnyx(`${ONYXKEYS.COLLECTION.NEXT_STEP}${getNonEmptyStringOnyxID(report?.parentReportID)}`);
@@ -762,14 +764,18 @@ function IOURequestStepDistance({
                 shouldShowNotFoundPage={!currentTransaction?.comment?.waypoints || shouldShowNotFoundPage}
                 shouldShowWrapper
             >
-                <OnyxTabNavigator
-                    id={CONST.TAB.DISTANCE_EDIT_TYPE}
-                    defaultSelectedTab={CONST.TAB_REQUEST.DISTANCE_MAP}
-                    tabBar={TabSelector}
-                >
-                    <TopTab.Screen name={CONST.TAB_REQUEST.DISTANCE_MAP}>{renderMapTab}</TopTab.Screen>
-                    <TopTab.Screen name={CONST.TAB_REQUEST.DISTANCE_MANUAL}>{renderManualTab}</TopTab.Screen>
-                </OnyxTabNavigator>
+                {isProduction ? (
+                    renderMapTab()
+                ) : (
+                    <OnyxTabNavigator
+                        id={CONST.TAB.DISTANCE_EDIT_TYPE}
+                        defaultSelectedTab={CONST.TAB_REQUEST.DISTANCE_MAP}
+                        tabBar={TabSelector}
+                    >
+                        <TopTab.Screen name={CONST.TAB_REQUEST.DISTANCE_MAP}>{renderMapTab}</TopTab.Screen>
+                        <TopTab.Screen name={CONST.TAB_REQUEST.DISTANCE_MANUAL}>{renderManualTab}</TopTab.Screen>
+                    </OnyxTabNavigator>
+                )}
             </StepScreenWrapper>
         );
     }
