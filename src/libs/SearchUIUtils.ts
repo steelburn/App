@@ -4239,7 +4239,6 @@ type TypeMenuSectionsParams = {
     defaultExpensifyCard: CardFeedForDisplay | undefined;
     draftTransactionIDs: string[] | undefined;
     isTrackIntentUser: boolean;
-    shouldRedirectToExpensifyClassic?: boolean;
 };
 
 function createTypeMenuSections(params: TypeMenuSectionsParams): SearchTypeMenuSection[] {
