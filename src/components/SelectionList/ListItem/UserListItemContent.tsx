@@ -8,6 +8,7 @@ import {ListItemFocusContext} from '@components/SelectionList/ListItemFocusConte
 import getAccessibilityLabel from '@components/SelectionList/utils/getAccessibilityLabel';
 import TextWithTooltip from '@components/TextWithTooltip';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
+import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useStyleUtils from '@hooks/useStyleUtils';
 import useTheme from '@hooks/useTheme';
@@ -53,6 +54,7 @@ function UserListItemContent<TItem extends ListItem>({
     const styles = useThemeStyles();
     const theme = useTheme();
     const StyleUtils = useStyleUtils();
+    const {translate} = useLocalize();
 
     const focusedBackgroundColor = styles.sidebarLinkActive.backgroundColor;
     const subscriptAvatarBorderColor = isFocused ? focusedBackgroundColor : theme.sidebar;
@@ -73,11 +75,13 @@ function UserListItemContent<TItem extends ListItem>({
 
     const isHovered = hovered && !shouldDisableHoverStyle;
     const contactAccessibilityLabel = getAccessibilityLabel(item);
+    const accessibilityHint = shouldDisableAccessibleGrouping && item.isSelected !== undefined ? translate(item.isSelected ? 'common.deselect' : 'common.select') : undefined;
 
     return (
         <View
             accessible={shouldDisableAccessibleGrouping || undefined}
             accessibilityLabel={shouldDisableAccessibleGrouping ? contactAccessibilityLabel : undefined}
+            accessibilityHint={accessibilityHint}
             role={shouldDisableAccessibleGrouping ? CONST.ROLE.BUTTON : undefined}
             style={[styles.flex1, styles.flexRow, styles.alignItemsCenter]}
         >

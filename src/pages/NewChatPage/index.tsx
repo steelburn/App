@@ -43,7 +43,6 @@ import type {ReportAttributesDerivedValue} from '@src/types/onyx/DerivedValues';
 import type {SelectedParticipant} from '@src/types/onyx/NewGroupChatDraft';
 import getEmptyArray from '@src/types/utils/getEmptyArray';
 import KeyboardUtils from '@src/utils/keyboard';
-import getRemoveAccessibilityLabel from './getRemoveAccessibilityLabel';
 import type SelectedOption from './types';
 import useGroupChatDraftParticipantSync from './useGroupDraftRestore';
 
@@ -255,17 +254,7 @@ function NewChatPage({ref}: NewChatPageProps) {
         if (isOptionInList) {
             newSelectedOptions = reject(selectedOptions, (selectedOption) => selectedOption.login === option.login);
         } else {
-            newSelectedOptions = [
-                ...selectedOptions,
-                {
-                    ...option,
-                    isSelected: true,
-                    selected: true,
-                    reportID: option.reportID,
-                    keyForList: `${option.keyForList ?? option.reportID}`,
-                    accessibilityLabel: getRemoveAccessibilityLabel(translate, option.text),
-                },
-            ];
+            newSelectedOptions = [...selectedOptions, {...option, isSelected: true, selected: true, reportID: option.reportID, keyForList: `${option.keyForList ?? option.reportID}`}];
             selectionListRef?.current?.scrollToIndex(0);
         }
 
@@ -350,7 +339,7 @@ function NewChatPage({ref}: NewChatPageProps) {
                     item={item}
                     onSelectRow={toggleOption}
                     disabled={!!item.isDisabled}
-                    accessibilityLabel={getRemoveAccessibilityLabel(translate, item.text)}
+                    accessibilityLabel={item.text ? translate('selectionList.userSelected', item.text) : ''}
                     style={styles.ml5}
                 />
             );
