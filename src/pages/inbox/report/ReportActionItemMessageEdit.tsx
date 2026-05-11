@@ -22,7 +22,7 @@ import useStyleUtils from '@hooks/useStyleUtils';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {clearActive, isActive as isEmojiPickerActive} from '@libs/actions/EmojiPickerAction';
 import {composerFocusKeepFocusOn} from '@libs/actions/InputFocus';
-import {saveReportActionDraft} from '@libs/actions/Report';
+import {clearAllReportActionDrafts, saveReportActionDraft} from '@libs/actions/Report';
 import {isMobileChrome} from '@libs/Browser';
 import {canSkipTriggerHotkeys, insertText} from '@libs/ComposerUtils';
 import DomUtils from '@libs/DomUtils';
@@ -31,6 +31,7 @@ import focusComposerWithDelay from '@libs/focusComposerWithDelay';
 import type {Selection} from '@libs/focusComposerWithDelay/types';
 import ReportActionComposeFocusManager from '@libs/ReportActionComposeFocusManager';
 import reportActionItemEventHandler from '@libs/ReportActionItemEventHandler';
+import {isDeletedAction} from '@libs/ReportActionsUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type * as OnyxTypes from '@src/types/onyx';
@@ -153,6 +154,19 @@ function ReportActionItemMessageEdit({action, reportID, originalReportID, policy
         updateDraftMessage: setDraft,
         isEditInProgressRef: isDraftSavePending,
     });
+
+    useEffect(() => {
+        focusComposerWithDelay(composerRef.current)(true);
+    }, []);
+
+    // If the underlying action becomes deleted while the user has it open in
+    // edit mode, clean up the draft so a stale draft does not linger.
+    useEffect(() => {
+        if (!isDeletedAction(action)) {
+            return;
+        }
+        clearAllReportActionDrafts();
+    }, [action, reportID]);
 
     useEffect(() => {
         composerFocusKeepFocusOn(composerRef.current as HTMLElement, isFocused, modal, onyxInputFocused);

@@ -7,7 +7,6 @@ import type {GestureResponderEvent, TextInput} from 'react-native';
 import {Keyboard, View} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';
 import * as ActionSheetAwareScrollView from '@components/ActionSheetAwareScrollView';
-import type {ComposerRef} from '@components/Composer/types';
 import Hoverable from '@components/Hoverable';
 import InlineSystemMessage from '@components/InlineSystemMessage';
 import {ModalActions} from '@components/Modal/Global/ModalContext';
@@ -33,7 +32,6 @@ import UnreadActionIndicator from '@components/UnreadActionIndicator';
 import useConfirmModal from '@hooks/useConfirmModal';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
-import usePrevious from '@hooks/usePrevious';
 import useReportIsArchived from '@hooks/useReportIsArchived';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useStyleUtils from '@hooks/useStyleUtils';
@@ -45,7 +43,6 @@ import ControlSelection from '@libs/ControlSelection';
 import {canUseTouchScreen} from '@libs/DeviceCapabilities';
 import type {OnyxDataWithErrors} from '@libs/ErrorUtils';
 import {getLatestErrorMessageField, isReceiptError} from '@libs/ErrorUtils';
-import focusComposerWithDelay from '@libs/focusComposerWithDelay';
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import {isReportMessageAttachment} from '@libs/isReportMessageAttachment';
 import type {PlatformStackNavigationProp} from '@libs/Navigation/PlatformStackNavigation/types';
@@ -76,7 +73,6 @@ import {
     isCardBrokenConnectionAction,
     isCardIssuedAction,
     isCreatedTaskReportAction,
-    isDeletedAction,
     isDeletedParentAction as isDeletedParentActionUtils,
     isIOURequestReportAction,
     isMessageDeleted,
@@ -105,7 +101,7 @@ import {ReactionListContext} from '@pages/inbox/ReportScreenContext';
 import AttachmentModalContext from '@pages/media/AttachmentModalScreen/AttachmentModalContext';
 import {clearAllRelatedReportActionErrors} from '@userActions/ClearReportActionErrors';
 import {hideEmojiPicker, isActive} from '@userActions/EmojiPickerAction';
-import {clearAllReportActionDrafts, expandURLPreview} from '@userActions/Report';
+import {expandURLPreview} from '@userActions/Report';
 import {clearError} from '@userActions/Transaction';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -295,10 +291,8 @@ function PureReportActionItem({
     const [isHidden, setIsHidden] = useState(false);
     const {isActiveReportAction: isActiveReactionListReportAction, hideReactionList} = useContext(ReactionListContext);
     const {updateHiddenAttachments} = useContext(AttachmentModalContext);
-    const composerTextInputRef = useRef<ComposerRef | null>(null);
     const popoverAnchorRef = useRef<Exclude<ContextMenuAnchor, TextInput>>(null);
     const downloadedPreviews = useRef<string[]>([]);
-    const prevDraftMessage = usePrevious(draftMessage);
     const isReportActionLinked = linkedReportActionID && action.reportActionID && linkedReportActionID === action.reportActionID;
     const [isReportActionActive, setIsReportActionActive] = useState(!!isReportActionLinked);
     const isReportArchived = useReportIsArchived(reportID);
@@ -404,14 +398,6 @@ function PureReportActionItem({
     }, [isDeletedParentAction, action.reportActionID]);
 
     useEffect(() => {
-        if (prevDraftMessage !== undefined || draftMessage === undefined) {
-            return;
-        }
-
-        focusComposerWithDelay(composerTextInputRef.current)(true);
-    }, [prevDraftMessage, draftMessage]);
-
-    useEffect(() => {
         if (!Permissions.canUseLinkPreviews()) {
             return;
         }
@@ -424,13 +410,6 @@ function PureReportActionItem({
         downloadedPreviews.current = urls;
         expandURLPreview(reportID, action.reportActionID);
     }, [action, reportID]);
-
-    useEffect(() => {
-        if (draftMessage === undefined || !isDeletedAction(action)) {
-            return;
-        }
-        clearAllReportActionDrafts();
-    }, [draftMessage, action, reportID]);
 
     // Hide the message if it is being moderated for a higher offense, or is hidden by a moderator
     // Removed messages should not be shown anyway and should not need this flow
@@ -890,7 +869,6 @@ function PureReportActionItem({
                     isHidden={isHidden}
                     updateHiddenState={updateHiddenState}
                     isArchivedRoom={isArchivedRoom}
-                    composerTextInputRef={composerTextInputRef}
                     isOnSearch={isOnSearch}
                     contextMenuStateValue={contextMenuStateValue}
                     contextMenuActionsValue={contextMenuActionsValue}

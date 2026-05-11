@@ -3,7 +3,6 @@ import {View} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';
 import {AttachmentContext} from '@components/AttachmentContext';
 import Button from '@components/Button';
-import type {ComposerRef} from '@components/Composer/types';
 import MentionReportContext from '@components/HTMLEngineProvider/HTMLRenderers/MentionReportRenderer/MentionReportContext';
 import {useBlockedFromConcierge} from '@components/OnyxListItemProvider';
 import {ShowContextMenuActionsContext, ShowContextMenuStateContext} from '@components/ShowContextMenuContext';
@@ -41,7 +40,6 @@ type ChatMessageContentProps = {
     isHidden: boolean;
     updateHiddenState: (isHiddenValue: boolean) => void;
     isArchivedRoom?: boolean;
-    composerTextInputRef: React.RefObject<ComposerRef | null>;
     isOnSearch: boolean;
     contextMenuStateValue: {
         anchor: ContextMenuAnchor | null;
@@ -72,7 +70,6 @@ function ChatMessageContent({
     isHidden,
     updateHiddenState,
     isArchivedRoom,
-    composerTextInputRef,
     isOnSearch,
     contextMenuStateValue,
     contextMenuActionsValue,
@@ -111,7 +108,6 @@ function ChatMessageContent({
                                 originalReportID={originalReportID}
                                 policyID={report?.policyID}
                                 index={index}
-                                ref={composerTextInputRef}
                                 shouldDisableEmojiPicker={
                                     (chatIncludesConcierge(report) && isBlockedFromConcierge(blockedFromConcierge)) || isArchivedNonExpenseReport(report, isArchivedRoom)
                                 }
