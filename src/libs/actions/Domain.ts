@@ -115,8 +115,8 @@ function resetDomainValidationError(accountID: number) {
  * Fetches the latest domain data from the server,
  * when accessing the domain initial page
  */
-function openDomainInitialPage(domainName: string) {
-    API.read(READ_COMMANDS.OPEN_DOMAIN_INITIAL_PAGE, {domainName});
+function openDomainPage(domainAccountID: number) {
+    API.read(READ_COMMANDS.OPEN_DOMAIN_PAGE, {domainAccountID});
 }
 
 /**
@@ -2164,7 +2164,7 @@ export {
     getDomainValidationCode,
     validateDomain,
     resetDomainValidationError,
-    openDomainInitialPage,
+    openDomainPage,
     getSamlSettings,
     setSamlEnabled,
     resetSamlEnabledError,
