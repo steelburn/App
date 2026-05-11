@@ -206,7 +206,7 @@ function IOURequestStepDistance({
         [distanceInMeters, distanceUnit],
     );
 
-    // Track whether the user has typed in the manual tab so route refetches don't clobber in-progress
+    // Track whether the user has typed in the manual tab so route re-fetches don't clobber in-progress
     // input. Editing waypoints clears this (in the effect below) — a recalculated route supersedes a
     // manual value the same way it would on a fresh map expense (GH #90083).
     const isManuallyEditing = useRef(false);
