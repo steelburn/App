@@ -94,7 +94,8 @@ function CollapsibleHeaderOnKeyboard({children, collapsibleHeaderOffset = 0}: Co
             return;
         }
         animatedHeight.set(withTiming(naturalHeightValue, {duration: RESTORE_DURATION}));
-    }, [prevIsFocused, isFocused, animatedHeight, naturalHeight]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- we only want to run this effect when the screen loses focus
+    }, [isFocused]);
 
     // Runs on the UI thread whenever keyboard state changes.
     // Fires at two key moments:
