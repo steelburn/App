@@ -893,8 +893,11 @@ function getOptionData({
 
     const status = personalDetail?.status ?? '';
 
+    const isOneOnOneChatReport = isOneOnOneChat(report);
+    result.isOneOnOneChat = isOneOnOneChatReport;
+
     // For 1:1 DMs, add the other participant's selected timezone
-    if (isOneOnOneChat(report)) {
+    if (isOneOnOneChatReport) {
         const recipientPersonalDetail = participantPersonalDetailListExcludeCurrentUser.at(0);
         result.timezone = recipientPersonalDetail?.timezone;
     }
