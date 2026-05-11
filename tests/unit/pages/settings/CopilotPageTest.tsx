@@ -12,9 +12,7 @@ jest.mock('@hooks/useOnyx', () => ({
     default: (key: string) => mockUseOnyx(key),
 }));
 
-jest.mock('@components/OnyxListItemProvider', () => ({
-    usePersonalDetails: jest.fn(() => ({})),
-}));
+jest.mock('@hooks/usePersonalDetailsByLogin', () => jest.fn(() => ({})));
 
 jest.mock('@components/DelegateNoAccessModalProvider', () => ({
     useDelegateNoAccessActions: jest.fn(() => ({showDelegateNoAccessModal: jest.fn()})),

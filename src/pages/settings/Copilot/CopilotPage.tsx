@@ -12,7 +12,6 @@ import MenuItem from '@components/MenuItem';
 import type {MenuItemProps} from '@components/MenuItem';
 import MenuItemList from '@components/MenuItemList';
 import {ModalActions} from '@components/Modal/Global/ModalContext';
-import {usePersonalDetails} from '@components/OnyxListItemProvider';
 import PopoverMenu from '@components/PopoverMenu';
 import type {PopoverMenuItem} from '@components/PopoverMenu';
 import ScreenWrapper from '@components/ScreenWrapper';
@@ -26,6 +25,7 @@ import {useMemoizedLazyExpensifyIcons, useMemoizedLazyIllustrations} from '@hook
 import useLocalize from '@hooks/useLocalize';
 import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
+import usePersonalDetailsByLogin from '@hooks/usePersonalDetailsByLogin';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {clearDelegateErrorsByField, clearDelegatorErrors, connect, disconnect, openSecuritySettingsPage, removeDelegate} from '@libs/actions/Delegate';
@@ -34,7 +34,6 @@ import getClickedTargetLocation from '@libs/getClickedTargetLocation';
 import {getGpsPoints, stopGpsTrip} from '@libs/GPSDraftDetailsUtils';
 import Navigation from '@libs/Navigation/Navigation';
 import {sortAlphabetically} from '@libs/OptionsListUtils';
-import {getPersonalDetailByEmail} from '@libs/PersonalDetailsUtils';
 import {getDefaultAvatarURL} from '@libs/UserAvatarUtils';
 import type {AnchorPosition} from '@styles/index';
 import colors from '@styles/theme/colors';
@@ -59,7 +58,7 @@ function CopilotPage() {
     const {localeCompare, translate, formatPhoneNumber} = useLocalize();
     const {shouldUseNarrowLayout} = useResponsiveLayout();
     useDocumentTitle(translate('delegate.copilot'));
-    const personalDetails = usePersonalDetails();
+    const personalDetailsByLogin = usePersonalDetailsByLogin();
     const [account] = useOnyx(ONYXKEYS.ACCOUNT, {selector: accountDelegationSelector});
     const [credentials] = useOnyx(ONYXKEYS.CREDENTIALS);
     const [stashedCredentials = CONST.EMPTY_OBJECT] = useOnyx(ONYXKEYS.STASHED_CREDENTIALS);
@@ -132,17 +131,6 @@ function CopilotPage() {
 
     const hasDelegators = delegators.length > 0;
     const hasDelegates = delegates.length > 0;
-
-    const getDetailByEmail = useMemo(() => {
-        const map = new Map<string, ReturnType<typeof getPersonalDetailByEmail>>();
-        for (const detail of Object.values(personalDetails ?? {})) {
-            if (!detail?.login) {
-                continue;
-            }
-            map.set(detail.login.toLowerCase(), detail);
-        }
-        return (email: string) => map.get(email.toLowerCase()) ?? getPersonalDetailByEmail(email);
-    }, [personalDetails]);
 
     const setMenuPosition = useCallback(() => {
         if (!delegateButtonRef.current) {
@@ -244,12 +232,12 @@ function CopilotPage() {
 
     const delegateMenuItems: MenuItemProps[] = useMemo(() => {
         const sortedDelegates = sortAlphabetically(
-            delegates.filter((d) => !d.optimisticAccountID).map((d) => ({...d, sortKey: getDetailByEmail(d.email)?.displayName ?? formatPhoneNumber(d.email)})),
+            delegates.filter((d) => !d.optimisticAccountID).map((d) => ({...d, sortKey: personalDetailsByLogin[d.email.toLowerCase()]?.displayName ?? formatPhoneNumber(d.email)})),
             'sortKey',
             localeCompare,
         );
         return sortedDelegates.map(({email, role, pendingAction, pendingFields}) => {
-            const personalDetail = getDetailByEmail(email);
+            const personalDetail = personalDetailsByLogin[email.toLowerCase()];
             const addDelegateErrors = errorFields?.addDelegate?.[email];
             const error = getLatestError(addDelegateErrors);
 
@@ -291,16 +279,28 @@ function CopilotPage() {
                 sentryLabel: CONST.SENTRY_LABEL.SETTINGS_SECURITY.DELEGATE_ITEM,
             };
         });
-    }, [delegates, errorFields, account?.delegatedAccess, formatPhoneNumber, getDetailByEmail, styles, selectedEmail, icons.ThreeDots, localeCompare, showPopoverMenu, renderTitleWithRole]);
+    }, [
+        delegates,
+        errorFields,
+        account?.delegatedAccess,
+        formatPhoneNumber,
+        personalDetailsByLogin,
+        styles,
+        selectedEmail,
+        icons.ThreeDots,
+        localeCompare,
+        showPopoverMenu,
+        renderTitleWithRole,
+    ]);
 
     const delegatorMenuItems: MenuItemProps[] = useMemo(() => {
         const sortedDelegators = sortAlphabetically(
-            delegators.map((d) => ({...d, sortKey: getDetailByEmail(d.email)?.displayName ?? formatPhoneNumber(d.email)})),
+            delegators.map((d) => ({...d, sortKey: personalDetailsByLogin[d.email.toLowerCase()]?.displayName ?? formatPhoneNumber(d.email)})),
             'sortKey',
             localeCompare,
         );
         return sortedDelegators.map(({email, role, pendingAction}) => {
-            const personalDetail = getDetailByEmail(email);
+            const personalDetail = personalDetailsByLogin[email.toLowerCase()];
             const formattedEmail = formatPhoneNumber(email);
             const connectError = getLatestError(errorFields?.connect?.[email]);
             const isCurrentUser = email === session?.email;
@@ -335,7 +335,19 @@ function CopilotPage() {
                 ),
             };
         });
-    }, [delegators, styles, translate, formatPhoneNumber, account?.delegatedAccess, getDetailByEmail, localeCompare, session?.email, errorFields, switchToDelegator, renderTitleWithRole]);
+    }, [
+        delegators,
+        styles,
+        translate,
+        formatPhoneNumber,
+        account?.delegatedAccess,
+        personalDetailsByLogin,
+        localeCompare,
+        session?.email,
+        errorFields,
+        switchToDelegator,
+        renderTitleWithRole,
+    ]);
 
     const delegatePopoverMenuItems: PopoverMenuItem[] = [
         {
