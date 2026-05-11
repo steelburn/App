@@ -42,6 +42,7 @@ function countLeadingRevealPadding(history: CustomHistoryEntry[] | undefined): n
         return 0;
     }
     let count = 0;
+    // Count how many fake history slots we previously added to keep browser history aligned.
     for (const entry of history) {
         if (entry === CONST.NAVIGATION.CUSTOM_HISTORY_ENTRY_REVEAL_PADDING) {
             count += 1;
@@ -73,6 +74,7 @@ function getFrozenHistoryStateForReplaceFullscreenUnderRHP(
         return {pendingReveal, state: rehydrate(newState, configOptions)};
     }
 
+    // Capture the RHP that should be dismissed in the second half of the reveal.
     const topRoute = state.routes.at(-1);
     const postReplaceRoutesLength = (newState.routes ?? state.routes).length;
     const nextPendingReveal =
@@ -84,6 +86,7 @@ function getFrozenHistoryStateForReplaceFullscreenUnderRHP(
               }
             : pendingReveal;
 
+    // Use the new routes but freeze old history for this hidden intermediate frame.
     // Defensive copy of state.history (shared reference; freeze must not alias).
     return {pendingReveal: nextPendingReveal, state: {...rehydrate(newState, configOptions), history: [...state.history]}};
 }
@@ -99,6 +102,7 @@ function getFrozenHistoryStateForRemoveFullscreenUnderRHP(
         return rehydrate(newState, configOptions);
     }
 
+    // Cancel path: remove the pre-inserted screen while keeping browser history still.
     return {...rehydrate(newState, configOptions), history: [...state.history]};
 }
 
@@ -109,11 +113,12 @@ function getRevealDismissState(
     pendingReveal: PendingReveal,
     rehydrate: RehydrateRootHistoryState,
 ): {pendingReveal: PendingReveal | null; state?: RootHistoryState} {
-    // `state` is the pre-DISMISS state; `state.routes.at(-1)` is what will be popped.
+    // This is the stack before closing the RHP; the top route is the one DISMISS removes.
     const dismissingTopKey = state.routes.at(-1)?.key;
     const depthMatches = state.routes.length === pendingReveal.routesLengthAtCapture;
     const historyDepthMatches = state.history?.length === pendingReveal.historyLengthAtCapture;
 
+    // Apply the reveal fix only when this DISMISS closes the same RHP we snapshotted.
     if (dismissingTopKey === pendingReveal.rhpKey && depthMatches && historyDepthMatches) {
         const rehydrated = rehydrate(newState, configOptions);
         const rehydratedHistory = asCustomHistory(rehydrated.history) ?? [];
@@ -122,6 +127,7 @@ function getRevealDismissState(
         const lengthDelta = (state.history?.length ?? 0) - rehydratedHistory.length;
         if (lengthDelta > 0) {
             Log.hmmm(`[addRootHistoryRouterExtension] reveal committed; freezing history with offset ${lengthDelta}`);
+            // Keep the pre-dismiss history length so web linking replaces instead of going back.
             return {pendingReveal: null, state: {...rehydrated, history: buildPaddedHistory(rehydratedHistory, lengthDelta)}};
         }
         Log.hmmm('[addRootHistoryRouterExtension] reveal committed with non-positive lengthDelta; no freeze', {lengthDelta});
@@ -129,7 +135,7 @@ function getRevealDismissState(
     }
 
     if (dismissingTopKey === pendingReveal.rhpKey) {
-        // Key match but depth divergence: drop snapshot, let DISMISS proceed naturally.
+        // Same RHP, but the stack/history changed unexpectedly; skip the special reveal fix.
         Log.hmmm('[addRootHistoryRouterExtension] reveal snapshot key matched but depth diverged; clearing without freeze', {
             capturedRoutesLength: pendingReveal.routesLengthAtCapture,
             currentRoutesLength: state.routes.length,
@@ -143,6 +149,7 @@ function getRevealDismissState(
 }
 
 function applyRevealPaddingOffset(state: RootHistoryState, rehydrated: RootHistoryState): RootHistoryState {
+    // Regular navigation rebuilds history from routes; put back any fake slots already in use.
     const offset = countLeadingRevealPadding(asCustomHistory(state.history));
     if (offset > 0) {
         return {...rehydrated, history: buildPaddedHistory(asCustomHistory(rehydrated.history) ?? [], offset)};

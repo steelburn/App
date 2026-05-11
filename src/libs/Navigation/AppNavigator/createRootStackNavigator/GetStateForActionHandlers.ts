@@ -59,18 +59,21 @@ const STALE_DEEP_LINK_PARAM_KEYS = new Set(['state', 'screen', 'params', 'path',
 /** Removes the RN deep-link hint chain from `route.params` when triggered by `params.screen`. */
 function withSanitizedDeepLinkParams<R extends {params?: unknown}>(route: R, focusParams: Record<string, unknown> | undefined): R {
     const rParamsRecord = route.params as Record<string, unknown> | undefined;
+    // RN stores nested deep-link instructions under params.screen/params.params.
     const looksLikeDeepLinkInitialState = !!rParamsRecord && typeof rParamsRecord.screen === 'string';
     const shouldSanitizeExistingParams = looksLikeDeepLinkInitialState && !!rParamsRecord;
+    // Remove only RN's hint keys; keep any real params that were stored next to them.
     const sanitizedExistingParams = shouldSanitizeExistingParams ? Object.fromEntries(Object.entries(rParamsRecord).filter(([key]) => !STALE_DEEP_LINK_PARAM_KEYS.has(key))) : rParamsRecord;
     const hasSanitizedExistingParams = !!sanitizedExistingParams && Object.keys(sanitizedExistingParams).length > 0;
     const fallbackParams = hasSanitizedExistingParams ? sanitizedExistingParams : undefined;
+    // The new focused tab params win; otherwise keep the cleaned existing params.
     const nextParams = focusParams ?? fallbackParams;
 
     if (nextParams !== undefined) {
         return {...route, params: nextParams};
     }
     if (looksLikeDeepLinkInitialState) {
-        // Delete (don't assign undefined) so `'params' in result` stays false.
+        // If params only contained stale RN hints, remove params entirely.
         const routeWithoutParams = {...route};
         delete (routeWithoutParams as {params?: unknown}).params;
         return routeWithoutParams;

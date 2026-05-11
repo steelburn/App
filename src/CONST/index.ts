@@ -6410,7 +6410,8 @@ const CONST = {
 
     NAVIGATION: {
         CUSTOM_HISTORY_ENTRY_SIDE_PANEL: 'CUSTOM_HISTORY-SIDE_PANEL',
-        // Leading padding sentinel; consumed by addRootHistoryRouterExtension. See its file for the contract.
+        // Fake history entry used to keep browser Back behavior correct after revealing a route under an RHP.
+        // addRootHistoryRouterExtension owns when this is added, carried forward, and removed.
         CUSTOM_HISTORY_ENTRY_REVEAL_PADDING: 'CUSTOM_HISTORY-REVEAL_PADDING',
         ACTION_TYPE: {
             REPLACE: 'REPLACE',
