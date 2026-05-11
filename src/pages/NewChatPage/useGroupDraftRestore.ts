@@ -1,6 +1,7 @@
 import {useFocusEffect} from '@react-navigation/native';
 import {useCallback, useEffect, useEffectEvent, useRef} from 'react';
 import type {OnyxEntry} from 'react-native-onyx';
+import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import {getUserToInviteOption} from '@libs/OptionsListUtils';
 import type {SearchOption} from '@libs/OptionsListUtils';
@@ -29,6 +30,7 @@ function useGroupChatDraftParticipantSync(
     selectedOptions: SelectedOption[],
     setSelectedOptions: (options: SelectedOption[]) => void,
 ) {
+    const {translate} = useLocalize();
     const shouldRestoreSelectedOptionsRef = useRef(true);
     const isScreenInBackgroundRef = useRef(false);
 
@@ -58,7 +60,7 @@ function useGroupChatDraftParticipantSync(
                     currentUserEmail,
                 });
             if (option) {
-                result.push({...option, isSelected: true});
+                result.push({...option, isSelected: true, accessibilityLabel: `${translate('common.remove')} ${option.text ?? ''}`});
             }
             return result;
         }, []);

@@ -254,7 +254,17 @@ function NewChatPage({ref}: NewChatPageProps) {
         if (isOptionInList) {
             newSelectedOptions = reject(selectedOptions, (selectedOption) => selectedOption.login === option.login);
         } else {
-            newSelectedOptions = [...selectedOptions, {...option, isSelected: true, selected: true, reportID: option.reportID, keyForList: `${option.keyForList ?? option.reportID}`}];
+            newSelectedOptions = [
+                ...selectedOptions,
+                {
+                    ...option,
+                    isSelected: true,
+                    selected: true,
+                    reportID: option.reportID,
+                    keyForList: `${option.keyForList ?? option.reportID}`,
+                    accessibilityLabel: `${translate('common.remove')} ${option.text ?? ''}`,
+                },
+            ];
             selectionListRef?.current?.scrollToIndex(0);
         }
 
@@ -339,7 +349,7 @@ function NewChatPage({ref}: NewChatPageProps) {
                     item={item}
                     onSelectRow={toggleOption}
                     disabled={!!item.isDisabled}
-                    accessibilityLabel={item.text ? translate('selectionList.userSelected', item.text) : ''}
+                    accessibilityLabel={`${translate('common.remove')} ${item.text ?? ''}`}
                     style={styles.ml5}
                 />
             );
