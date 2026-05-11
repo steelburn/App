@@ -65,7 +65,8 @@ function TableHeader<T, ColumnKey extends string = string>({style, shouldHideHea
     return (
         <View
             style={[
-                styles.p3,
+                styles.pv2,
+                styles.ph3,
                 styles.mh5,
                 styles.highlightBG,
                 styles.borderBottom,
@@ -141,13 +142,21 @@ function TableHeaderColumn<T, ColumnKey extends string = string>({column}: {colu
         toggleColumnSorting(columnKey);
     };
 
+    const tableHeaderStyles = [
+        styles.flexRow,
+        styles.alignItemsCenter,
+        styles.tableHeaderContentHeight,
+        column.styling?.flex ? {flex: column.styling.flex} : styles.flex1,
+        column.styling?.containerStyles,
+    ];
+
     return (
         <PressableWithFeedback
             accessible
             accessibilityLabel={column.label}
             accessibilityRole="button"
             sentryLabel={CONST.SENTRY_LABEL.TABLE_HEADER.SORTABLE_COLUMN}
-            style={[styles.flexRow, styles.alignItemsCenter, column.styling?.flex ? {flex: column.styling.flex} : styles.flex1, column.styling?.containerStyles]}
+            style={tableHeaderStyles}
             onPress={() => toggleSorting(column.key)}
         >
             <Text

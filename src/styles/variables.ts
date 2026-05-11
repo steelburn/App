@@ -123,6 +123,7 @@ export default {
     gutterWidth: 12,
     optionRowHeight: 64,
     optionRowHeightCompact: 52,
+    tableHeaderContentHeight: 20,
     tableRowHeight: 56,
     tableRowHeightCompact: 72,
     tableRowPaddingVertical: 8,
