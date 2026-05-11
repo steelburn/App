@@ -213,10 +213,7 @@ function PrivatePersonalDetailsPage() {
     }
 
     return (
-        <ScreenWrapper
-            includeSafeAreaPaddingBottom
-            testID="PrivatePersonalDetailsPage"
-        >
+        <ScreenWrapper testID="PrivatePersonalDetailsPage">
             <DelegateNoAccessWrapper accessDeniedVariants={[CONST.DELEGATE.DENIED_ACCESS_VARIANTS.DELEGATE]}>
                 <HeaderWithBackButton
                     title={translate('privatePersonalDetails.personalDetails')}
@@ -386,6 +383,7 @@ function PrivatePersonalDetailsPage() {
                             shouldSaveDraft
                         />
                     </View>
+                    <View style={styles.pb20} />
                 </FormProvider>
             </DelegateNoAccessWrapper>
         </ScreenWrapper>
