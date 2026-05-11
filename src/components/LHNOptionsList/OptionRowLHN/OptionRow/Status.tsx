@@ -6,23 +6,19 @@ import useLocalize from '@hooks/useLocalize';
 import useThemeStyles from '@hooks/useThemeStyles';
 import DateUtils from '@libs/DateUtils';
 import type {OptionData} from '@libs/ReportUtils';
-import {isOneOnOneChat} from '@libs/ReportUtils';
 import CONST from '@src/CONST';
-import type {Report} from '@src/types/onyx';
-import {isEmptyObject} from '@src/types/utils/EmptyObject';
 
 type StatusProps = {
     optionItem: OptionData;
-    report?: Report;
 };
 
-function Status({optionItem, report}: StatusProps) {
+function Status({optionItem}: StatusProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
 
     const emojiCode = optionItem.status?.emojiCode ?? '';
-    if (!emojiCode || !isOneOnOneChat(!isEmptyObject(report) ? report : undefined)) {
+    if (!emojiCode || !optionItem.isOneOnOneChat) {
         return null;
     }
 

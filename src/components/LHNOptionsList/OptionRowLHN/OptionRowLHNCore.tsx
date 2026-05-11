@@ -31,18 +31,7 @@ import OptionRowInfoBadge from './OptionRowInfoBadge';
 import OptionRowPressable from './OptionRowPressable';
 import OptionRowTooltipLayer from './OptionRowTooltipLayer';
 
-function OptionRowLHN({
-    reportID,
-    report,
-    isOptionFocused = false,
-    onSelectRow = () => {},
-    optionItem,
-    viewMode = 'default',
-    style,
-    onLayout = () => {},
-    hasDraftComment,
-    testID,
-}: OptionRowLHNProps) {
+function OptionRowLHN({isOptionFocused = false, onSelectRow = () => {}, optionItem, viewMode = 'default', style, onLayout = () => {}, hasDraftComment, testID}: OptionRowLHNProps) {
     const {isProduction} = useEnvironment();
     const theme = useTheme();
     const styles = useThemeStyles();
@@ -52,7 +41,7 @@ function OptionRowLHN({
 
     const {onboardingPurpose, onboarding, isScreenFocused} = useLHNTooltipContext();
     const [conciergeReportID] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID);
-    const isChatUsedForOnboarding = isChatUsedForOnboardingReportUtils(report, onboarding, conciergeReportID, onboardingPurpose);
+    const isChatUsedForOnboarding = isChatUsedForOnboardingReportUtils(optionItem, onboarding, conciergeReportID, onboardingPurpose);
 
     const {translate} = useLocalize();
     const isInFocusMode = viewMode === CONST.OPTION_MODE.COMPACT;
@@ -83,7 +72,7 @@ function OptionRowLHN({
     const subscriptAvatarBorderColor = isOptionFocused ? focusedBackgroundColor : theme.sidebar;
 
     // This is used to ensure that we display the text exactly as the user entered it when displaying LHN title, instead of parsing their text to HTML.
-    const shouldParseFullTitle = optionItem?.parentReportAction?.actionName !== CONST.REPORT.ACTIONS.TYPE.ADD_COMMENT && !isGroupChat(report);
+    const shouldParseFullTitle = optionItem?.parentReportAction?.actionName !== CONST.REPORT.ACTIONS.TYPE.ADD_COMMENT && !isGroupChat(optionItem);
 
     const accessibilityLabel = [
         `${translate('accessibilityHints.navigatesToChat')} ${optionItem.text}`,
@@ -102,7 +91,6 @@ function OptionRowLHN({
 
     const renderPressableRow = () => (
         <OptionRowPressable
-            reportID={reportID}
             optionItem={optionItem}
             isOptionFocused={isOptionFocused}
             isScreenFocused={isScreenFocused}
@@ -127,7 +115,6 @@ function OptionRowLHN({
                             <View style={[styles.flexRow, styles.alignItemsCenter]}>
                                 <OptionRowAvatar
                                     optionItem={optionItem}
-                                    report={report}
                                     isInFocusMode={isInFocusMode}
                                     subscriptAvatarBorderColor={hovered && !isOptionFocused ? hoveredBackgroundColor : subscriptAvatarBorderColor}
                                     secondaryAvatarBackgroundColor={secondaryAvatarBgColor}
@@ -151,20 +138,16 @@ function OptionRowLHN({
                                                 !!optionItem.isMoneyRequestReport ||
                                                 !!optionItem.isInvoiceReport ||
                                                 !!optionItem.private_isArchived ||
-                                                isGroupChat(report) ||
-                                                isSystemChat(report)
+                                                isGroupChat(optionItem) ||
+                                                isSystemChat(optionItem)
                                             }
                                             testID={testID}
                                         />
                                         {isChatUsedForOnboarding && <FreeTrial badgeStyles={[styles.mnh0, styles.pl2, styles.pr2, styles.ml1, styles.flexShrink1]} />}
-                                        <Status
-                                            optionItem={optionItem}
-                                            report={report}
-                                        />
+                                        <Status optionItem={optionItem} />
                                     </View>
                                     <OptionRowAlternateText
-                                        alternateText={optionItem.alternateText}
-                                        report={report}
+                                        optionItem={optionItem}
                                         viewMode={viewMode}
                                         isOptionFocused={isOptionFocused}
                                         style={style}
@@ -173,7 +156,7 @@ function OptionRowLHN({
                                 {optionItem?.descriptiveText ? (
                                     <View
                                         style={[styles.flexWrap]}
-                                        fsClass={FS.getChatFSClass(report)}
+                                        fsClass={FS.getChatFSClass(optionItem)}
                                     >
                                         <Text style={[styles.textLabel]}>{optionItem.descriptiveText}</Text>
                                     </View>
@@ -216,8 +199,6 @@ function OptionRowLHN({
 
     return (
         <OptionRowTooltipLayer
-            reportID={reportID}
-            report={report}
             optionItem={optionItem}
             renderChildren={renderPressableRow}
         />
