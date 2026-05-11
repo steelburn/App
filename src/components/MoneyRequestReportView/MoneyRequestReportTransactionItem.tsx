@@ -129,7 +129,7 @@ function MoneyRequestReportTransactionItem({
         onEditAmount,
         onEditTag,
         wasEditingOnMouseDownRef,
-    } = useTransactionInlineEdit({transactionID: transaction.transactionID, reportID: transaction.reportID});
+    } = useTransactionInlineEdit({transactionID: transaction.transactionID});
 
     const viewRef = useRef<View>(null);
 

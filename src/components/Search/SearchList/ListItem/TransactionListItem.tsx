@@ -175,8 +175,6 @@ function TransactionListItem<TItem extends ListItem>({
     const {isDelegateAccessRestricted} = useDelegateNoAccessState();
     const {showDelegateNoAccessModal} = useDelegateNoAccessActions();
 
-    const transactionID = transactionItem.transactionID;
-
     const {isEditingCell, wasRecentlyEditingCell} = useEditingCellState();
     const [shouldDisableHoverStyle, setShouldDisableHoverStyle] = useState(false);
 
@@ -205,12 +203,9 @@ function TransactionListItem<TItem extends ListItem>({
         onEditTag,
         wasEditingOnMouseDownRef,
     } = useTransactionInlineEdit({
-        transactionID,
-        reportID: transactionItem.reportID,
-        reportActionID: transactionItem.reportAction?.reportActionID,
-        parentReportAction,
+        transactionID: transactionItem.transactionID,
         hash: currentSearchHash,
-        fallbackReport: snapshotReport,
+        linkedReportAction: transactionItem.reportAction,
     });
 
     const handleOnPress = () => {

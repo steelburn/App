@@ -14,11 +14,12 @@ import {getIsOffline} from '@libs/NetworkState';
 import {hasEnabledOptions} from '@libs/OptionsListUtils';
 import Permissions from '@libs/Permissions';
 import {getTagLists, isMultiLevelTags} from '@libs/PolicyUtils';
-import {isMoneyRequestAction} from '@libs/ReportActionsUtils';
+import {getIOUActionForTransactionID, isMoneyRequestAction} from '@libs/ReportActionsUtils';
 import {
     canEditFieldOfMoneyRequest,
     canEditMoneyRequest,
     canUserPerformWriteAction,
+    findSelfDMReportID,
     isArchivedReport,
     isInvoiceReport,
     isIOUReport,
@@ -31,6 +32,7 @@ import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {
     Beta,
+    IntroSelected,
     Policy,
     PolicyCategories,
     PolicyTagLists,
@@ -38,6 +40,7 @@ import type {
     RecentlyUsedTags,
     Report,
     ReportAction,
+    ReportActions,
     ReportNameValuePairs,
     ReportNextStepDeprecated,
     Transaction,
@@ -51,6 +54,7 @@ import {
     updateMoneyRequestMerchant,
     updateMoneyRequestTag,
 } from './IOU/UpdateMoneyRequest';
+import {createTransactionThreadReport} from './Report';
 
 type TransactionEditPermissions = {
     canEditDate: boolean;
@@ -79,6 +83,24 @@ Onyx.connectWithoutView({
     },
 });
 
+let allReports: NonNullable<OnyxCollection<Report>> = {};
+Onyx.connectWithoutView({
+    key: ONYXKEYS.COLLECTION.REPORT,
+    waitForCollectionCallback: true,
+    callback: (value) => {
+        allReports = value ?? {};
+    },
+});
+
+let allReportActions: NonNullable<OnyxCollection<ReportActions>> = {};
+Onyx.connectWithoutView({
+    key: ONYXKEYS.COLLECTION.REPORT_ACTIONS,
+    waitForCollectionCallback: true,
+    callback: (value) => {
+        allReportActions = value ?? {};
+    },
+});
+
 let currentUserAccountID: number = CONST.DEFAULT_NUMBER_ID;
 let currentUserEmail = '';
 Onyx.connectWithoutView({
@@ -94,6 +116,14 @@ Onyx.connectWithoutView({
     key: ONYXKEYS.BETAS,
     callback: (value) => {
         allBetas = value ?? undefined;
+    },
+});
+
+let introSelected: OnyxEntry<IntroSelected>;
+Onyx.connectWithoutView({
+    key: ONYXKEYS.NVP_INTRO_SELECTED,
+    callback: (value) => {
+        introSelected = value;
     },
 });
 
@@ -137,6 +167,7 @@ type TransactionEditPermissionsParams = {
 type GetIouParamsInput = {
     transactionID: string;
     parentReport: OnyxEntry<Report>;
+    parentReportAction: OnyxEntry<ReportAction>;
     transactionThreadReport: OnyxEntry<Report>;
     policy: OnyxEntry<Policy>;
     policyCategories: OnyxEntry<PolicyCategories>;
@@ -160,6 +191,7 @@ type TransactionInlineEditParams = GetIouParamsInput & {
 function getIouParamsForTransaction({
     transactionID,
     parentReport,
+    parentReportAction,
     transactionThreadReport,
     policy,
     policyCategories,
@@ -169,12 +201,56 @@ function getIouParamsForTransaction({
     parentReportNextStep,
 }: GetIouParamsInput) {
     const transaction = allTransactions[`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`];
+    const transactionViolations = allTransactionViolations[`${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${transactionID}`];
+    const isUnreportedExpense = !transaction?.reportID || transaction.reportID === CONST.REPORT.UNREPORTED_REPORT_ID;
+
+    let resolvedParentReport = parentReport;
+    if (!resolvedParentReport?.reportID && transaction?.reportID && transaction.reportID !== CONST.REPORT.UNREPORTED_REPORT_ID) {
+        resolvedParentReport = allReports[`${ONYXKEYS.COLLECTION.REPORT}${transaction.reportID}`];
+    }
+
+    let resolvedParentReportAction = parentReportAction;
+    if (!resolvedParentReportAction && resolvedParentReport?.reportID) {
+        const reportActions = allReportActions[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${resolvedParentReport.reportID}`] ?? {};
+        resolvedParentReportAction = getIOUActionForTransactionID(Object.values(reportActions), transactionID);
+    }
+
+    if (isUnreportedExpense) {
+        const selfDMReportID = findSelfDMReportID(allReports);
+        if (selfDMReportID) {
+            resolvedParentReport = allReports[`${ONYXKEYS.COLLECTION.REPORT}${selfDMReportID}`] ?? resolvedParentReport;
+
+            if (!resolvedParentReportAction) {
+                const selfDMReportActions = allReportActions[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${selfDMReportID}`] ?? {};
+                resolvedParentReportAction = getIOUActionForTransactionID(Object.values(selfDMReportActions), transactionID);
+            }
+        }
+    }
+
+    let resolvedTransactionThreadReport = transactionThreadReport;
+    const transactionThreadReportID = resolvedTransactionThreadReport?.reportID ?? transaction?.transactionThreadReportID ?? resolvedParentReportAction?.childReportID;
+
+    if (!resolvedTransactionThreadReport && transactionThreadReportID) {
+        resolvedTransactionThreadReport = allReports[`${ONYXKEYS.COLLECTION.REPORT}${transactionThreadReportID}`];
+    }
+
+    if (!resolvedTransactionThreadReport && resolvedParentReportAction && transaction) {
+        resolvedTransactionThreadReport = createTransactionThreadReport(
+            introSelected,
+            currentUserEmail,
+            currentUserAccountID,
+            allBetas,
+            resolvedParentReport,
+            resolvedParentReportAction,
+            transaction,
+            transactionViolations,
+        );
+    }
 
     return {
-        // Shared base fields — spread directly into any updateMoneyRequest* call
         transactionID,
-        transactionThreadReport,
-        parentReport,
+        transactionThreadReport: resolvedTransactionThreadReport,
+        parentReport: resolvedParentReport,
         policy,
         policyCategories,
         parentReportNextStep,

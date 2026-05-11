@@ -23,28 +23,14 @@ import {getIOUActionForTransactionID} from '@libs/ReportActionsUtils';
 import {isExpenseUnreported, isPerDiemRequest} from '@libs/TransactionUtils';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
-import type {Report, ReportAction, ReportActions} from '@src/types/onyx';
+import type {ReportAction, ReportActions} from '@src/types/onyx';
 import useOnyx from './useOnyx';
 import usePolicyForMovingExpenses from './usePolicyForMovingExpenses';
 import usePolicyForTransaction from './usePolicyForTransaction';
+import useSelfDMReport from './useSelfDMReport';
 
 type UseTransactionInlineEditParams = {
     transactionID: string;
-    reportID: string | undefined;
-
-    /**
-     * When provided the action is looked up directly by ID (faster).
-     * If omitted, the hook scans all actions for the one matching this transaction.
-     * Ignored when `parentReportAction` is supplied directly.
-     */
-    reportActionID?: string;
-
-    /**
-     * Pre-fetched parent report action.
-     * When provided the hook skips its own Onyx subscription entirely, avoiding
-     * a duplicate subscription in components that already hold this data.
-     */
-    parentReportAction?: OnyxEntry<ReportAction>;
 
     /**
      * Search snapshot hash.
@@ -54,11 +40,11 @@ type UseTransactionInlineEditParams = {
     hash?: number;
 
     /**
-     * Fallback report from the search snapshot.
-     * Used when the Onyx report cache is empty (e.g. after cache clear) so that
-     * permission checks like isSettled still have a report object with statusNum.
+     * Lightweight report action hint from the current surface.
+     * Search rows already have this in snapshot data, which lets the hook avoid
+     * scanning all report actions just to recover the thread/report action IDs.
      */
-    fallbackReport?: OnyxEntry<Report>;
+    linkedReportAction?: OnyxEntry<ReportAction>;
 };
 
 type UseTransactionInlineEditReturn = {
@@ -82,39 +68,37 @@ type UseTransactionInlineEditReturn = {
     wasEditingOnMouseDownRef: React.RefObject<boolean>;
 };
 
-function useTransactionInlineEdit({
-    transactionID,
-    reportID,
-    reportActionID,
-    parentReportAction: externalParentReportAction,
-    hash,
-    fallbackReport,
-}: UseTransactionInlineEditParams): UseTransactionInlineEditReturn {
-    // Look up the parent IOU report action from live Onyx. If the caller already
-    // knows the action ID we can select it directly; otherwise we scan all actions.
-    // When the caller supplies `parentReportAction` directly we still must call
-    // useOnyx (rules of hooks) but we ignore its result and prefer the external value.
-    const parentReportActionSelector = useCallback(
-        (reportActions: ReportActions | undefined) => (reportActionID ? reportActions?.[reportActionID] : getIOUActionForTransactionID(Object.values(reportActions ?? {}), transactionID)),
-        [reportActionID, transactionID],
-    );
+function useTransactionInlineEdit({transactionID, hash, linkedReportAction}: UseTransactionInlineEditParams): UseTransactionInlineEditReturn {
+    const [transaction] = useOnyx(`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`);
 
-    const [internalParentReportAction] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${getNonEmptyStringOnyxID(reportID)}`, {
+    const reportID = transaction?.reportID;
+    const isUnreported = isExpenseUnreported(transaction);
+    const selfDMReport = useSelfDMReport();
+
+    const [parentReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(reportID)}`);
+    const effectiveParentReport = isUnreported ? selfDMReport : parentReport;
+    const effectiveParentReportID = effectiveParentReport?.reportID;
+
+    const linkedReportActionID = linkedReportAction?.reportActionID;
+
+    const parentReportActionSelector = useCallback(
+        (reportActions: ReportActions | undefined) =>
+            linkedReportActionID ? reportActions?.[linkedReportActionID] : getIOUActionForTransactionID(Object.values(reportActions ?? {}), transactionID),
+        [linkedReportActionID, transactionID],
+    );
+    const [resolvedParentReportAction] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${getNonEmptyStringOnyxID(effectiveParentReportID)}`, {
         selector: parentReportActionSelector,
     });
+    const parentReportAction = resolvedParentReportAction ?? linkedReportAction;
 
-    const [transaction] = useOnyx(`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`);
-    const [parentReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(reportID)}`);
+    const transactionThreadReportID = linkedReportAction?.childReportID ?? parentReportAction?.childReportID ?? transaction?.transactionThreadReportID;
 
-    const parentReportAction = externalParentReportAction !== undefined ? externalParentReportAction : internalParentReportAction;
-
-    const transactionThreadReportID = parentReportAction?.childReportID;
-    const chatReportID = parentReport?.chatReportID;
+    const chatReportID = effectiveParentReport?.chatReportID;
 
     // For unreported expenses (SelfDM), use active policy to show policy-specific fields like categories and tags.
     const [activePolicyID] = useOnyx(ONYXKEYS.NVP_ACTIVE_POLICY_ID);
-    const reportPolicyID = parentReport?.policyID;
-    const policyID = isExpenseUnreported(transaction) ? activePolicyID : reportPolicyID;
+    const reportPolicyID = effectiveParentReport?.policyID;
+    const policyID = isUnreported ? activePolicyID : reportPolicyID;
 
     const {policy} = usePolicyForTransaction({
         transaction,
@@ -131,7 +115,7 @@ function useTransactionInlineEdit({
     const [chatReportNVP] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT_NAME_VALUE_PAIRS}${getNonEmptyStringOnyxID(chatReportID)}`);
     const [policyRecentlyUsedCategories] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_RECENTLY_USED_CATEGORIES}${getNonEmptyStringOnyxID(policyID)}`);
     const [policyRecentlyUsedTags] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_RECENTLY_USED_TAGS}${getNonEmptyStringOnyxID(policyID)}`);
-    const [parentReportNextStep] = useOnyx(`${ONYXKEYS.COLLECTION.NEXT_STEP}${getNonEmptyStringOnyxID(reportID)}`);
+    const [parentReportNextStep] = useOnyx(`${ONYXKEYS.COLLECTION.NEXT_STEP}${getNonEmptyStringOnyxID(effectiveParentReportID)}`);
     // Use original Onyx here because the useOnyx wrapper can read partial Search snapshot policy data instead of the full policy object.
     const [completePolicy] = originalUseOnyx(`${ONYXKEYS.COLLECTION.POLICY}${getNonEmptyStringOnyxID(policyID)}`);
 
@@ -146,9 +130,9 @@ function useTransactionInlineEdit({
     const permissions = getTransactionEditPermissions({
         transaction,
         parentReportAction,
-        parentReport: parentReport ?? fallbackReport,
+        parentReport: effectiveParentReport,
         policy: completePolicy ?? policy,
-        transactionThreadReport: transactionThreadReport ?? parentReport ?? fallbackReport,
+        transactionThreadReport,
         policyCategories,
         policyTags,
         transactionThreadNVP,
@@ -164,8 +148,9 @@ function useTransactionInlineEdit({
         return {
             hash,
             transactionID,
-            parentReport: parentReport ?? fallbackReport,
-            transactionThreadReport: transactionThreadReport ?? parentReport ?? fallbackReport,
+            parentReport: effectiveParentReport,
+            parentReportAction,
+            transactionThreadReport,
             policy: completePolicy ?? policy,
             policyCategories,
             policyTags,
