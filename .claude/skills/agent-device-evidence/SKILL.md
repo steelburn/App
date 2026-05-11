@@ -18,7 +18,7 @@ HybridApp-only (the parent skill's pre-flight enforces this). Standalone (non-Hy
 
 **In scope:** `iOS: Native` (iOS Simulator), `Android: Native` (Android Emulator), HybridApp dev build only. Inputs may come from PRs or issues - the skill does not gate on code changes.
 
-**Out of scope:** `Android: mWeb Chrome`, `iOS: mWeb Safari`, `iOS: mWeb Chrome`, `Windows: Chrome`, `MacOS: Chrome / Safari`. Decline with `EXIT 4` and point to a browser-driver skill (`playwright-app-testing`). Standalone (non-HybridApp) builds. Decline with `EXIT 7 NO_BUILD` per the parent skill's gate.
+**Out of scope:** `Android: mWeb Chrome`, `iOS: mWeb Safari`, `iOS: mWeb Chrome`, `Windows: Chrome`, `MacOS: Chrome / Safari`. Decline with `EXIT 4` and point to a browser-driver skill (`playwright-app-testing`). Standalone (non-HybridApp) builds. Decline with `EXIT 7 BRING_UP_FAILED` per the parent skill's gate.
 
 ## Inputs
 
@@ -120,8 +120,11 @@ Two phases per flow. Lifecycle delegated to the parent skill's bring-up. Phase 1
 ### Shared setup (run once per platform, before the first flow)
 
 1. **Run the [agent-device bring-up](../agent-device/SKILL.md#bring-up)** for the target platform. The parent skill resolves bundle ID, starts Metro, picks/confirms the device, manages session, and opens the app for sanity verification. Capture the resolved `$APP_ID` (bundle ID) and `$DEVICE_NAME` for re-opens in Phases 1 and 2.
-   - If the bring-up's HybridApp gate fails or the dev build is not installed, **exit `7 NO_BUILD`** with the parent skill's install instructions.
+   - If bring-up fails for any reason (HybridApp gate, missing dev build, Metro start, simulator boot, etc.), **exit `7 BRING_UP_FAILED`** and surface the parent skill's error verbatim.
    - Selector discipline (id > role+label, no coordinate fallback unless 0 a11y nodes) follows the parent skill's [`flows/README.md`](../agent-device/flows/README.md).
+   - **Non-interactive overrides for the parent bring-up** (this skill never prompts):
+     - Device pick (parent step 5, "If multiple are booted, ask the user which"): pick the **first booted device** in `agent-device devices --json` order, deterministically. Log the choice in the manifest under `device_selected`.
+     - Session reuse vs reset (parent step 6, line 73): **always `reset`** for sessions not created in the current invocation - run `agent-device close --shutdown --session <name>` without prompting. Phase 1 and Phase 2 both rely on cold starts, so reuse of stale sessions is never desired here.
 
 2. **Close the bring-up session** so each phase starts cold:
    ```bash
@@ -130,8 +133,8 @@ Two phases per flow. Lifecycle delegated to the parent skill's bring-up. Phase 1
 
 3. **Set up run directory** - persistent, append-only:
    ```bash
-   PR_NUM=<num>; RUN_TS=$(date -u +%Y%m%dT%H%M%SZ)
-   RUN_DIR="$HOME/.cache/agent-device-evidence/$PR_NUM/$RUN_TS"
+   SOURCE_KIND=<pr|issue>; SOURCE_NUM=<num>; RUN_TS=$(date -u +%Y%m%dT%H%M%SZ)
+   RUN_DIR="$HOME/.cache/agent-device-evidence/$SOURCE_KIND-$SOURCE_NUM/$RUN_TS"
    mkdir -p "$RUN_DIR/ios" "$RUN_DIR/android"
    ```
 
@@ -288,7 +291,7 @@ After all platforms, the skill prints the run directory and lists per-flow paths
 | `4` | `PLATFORM_UNSUPPORTED` - mWeb / Desktop / Windows requested or only out-of-scope platforms checked on the source. |
 | `5` | `PHASE1_TOTAL_FAILURE` - every flow failed Phase 1. |
 | `6` | `PHASE2_TOTAL_FAILURE` - every flow failed Phase 2 despite Phase 1 success. |
-| `7` | `NO_BUILD` - `agent-device open` failed because the dev build is not installed. |
+| `7` | `BRING_UP_FAILED` - parent skill bring-up failed (missing dev build, HybridApp gate, Metro start, simulator boot, etc.). Parent error is surfaced verbatim. |
 | `8` | `BAD_INPUT` - source URL is missing, malformed, or not a recognised PR/issue URL. |
 
 ## Cost guards
@@ -309,7 +312,7 @@ Hitting any cap marks the flow `phase1_failed` / `phase2_failed` and proceeds to
 | Steps section missing or empty (PR `### Tests` / issue `## Action Performed:`) | Exit `3 NO_FLOWS` |
 | Only out-of-scope platforms checked on issue (e.g. `MacOS: Chrome / Safari` only) | Exit `4 PLATFORM_UNSUPPORTED` |
 | mWeb / Desktop / Windows explicitly requested via `--platforms` | Exit `4 PLATFORM_UNSUPPORTED` |
-| Bring-up fails (HybridApp gate, missing dev build, Metro start, etc.) | Surface parent skill's error verbatim; exit `7 NO_BUILD` |
+| Bring-up fails (HybridApp gate, missing dev build, Metro start, etc.) | Surface parent skill's error verbatim; exit `7 BRING_UP_FAILED` |
 | Phase 1 step uninterpretable by LLM | Mark flow `phase1_failed`, log the step that failed, continue to next flow |
 | Phase 1 a11y empty (0 nodes) on a screen | Use coordinate fallback; log `warnings: ["a11y_fallback:<screen>"]` |
 | Phase 1 `$TEST_FLOW.ad` empty after warm-up | Mark flow `phase1_failed`, continue |
@@ -317,11 +320,13 @@ Hitting any cap marks the flow `phase1_failed` / `phase2_failed` and proceeds to
 | `record stop` produces 0-byte file | Retry Phase 2 once for that flow; if still empty, mark `phase2_failed` |
 | Android flow exceeds 3-min cap | Mark `phase2_failed`, continue (per-flow MP4s should rarely hit this; if they do, the Tests section is too coarse-grained) |
 
-## Non-goals
+## Out of scope (do not do these)
 
-- Mobile web (`iOS: mWeb Safari`, `Android: mWeb Chrome`) and Desktop (`MacOS: Chrome / Safari`) - belong in `playwright-app-testing` or a future browser-driver skill.
-- Standalone (non-HybridApp) builds - parent skill is HybridApp-only and this specialization inherits the gate. Production mobile evidence runs against HybridApp.
-- Device lifecycle (Metro, simulator boot, bundle ID resolution, session reuse, app install verification) - fully delegated to the parent skill's [Bring-up](../agent-device/SKILL.md#bring-up). This skill does not call `agent-device metro prepare`, `xcrun simctl`, or `is-hybrid-app.sh` directly.
-- Editing the PR body or posting PR comments - the skill only writes local files.
-- Interactive prompts of any kind. CI is the eventual host; the skill must run end-to-end without human input.
+The skill must not attempt any of the following. If a request implies one of these, refuse or delegate.
+
+- **Mobile web and Desktop platforms** (`iOS: mWeb Safari`, `Android: mWeb Chrome`, `MacOS: Chrome / Safari`) - belong in `playwright-app-testing` or a future browser-driver skill. Exit `4 PLATFORM_UNSUPPORTED`.
+- **Standalone (non-HybridApp) builds** - parent skill is HybridApp-only and this specialization inherits the gate. Production mobile evidence runs against HybridApp.
+- **Device lifecycle** (Metro, simulator boot, bundle ID resolution, session reuse, app install verification) - fully delegated to the parent skill's [Bring-up](../agent-device/SKILL.md#bring-up). Do not call `agent-device metro prepare`, `xcrun simctl`, or `is-hybrid-app.sh` directly.
+- **Editing the PR body or posting PR comments** - the skill only writes local files. The user handles upload.
+- **Interactive prompts of any kind** - CI is the eventual host; the skill must run end-to-end without human input.
 - Test data cleanup. Accounts/expenses/workspaces created during runs accumulate; rely on periodic test-account reset.
