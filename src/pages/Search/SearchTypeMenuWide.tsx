@@ -37,10 +37,11 @@ type SectionParams = {
     hash: number | undefined;
     activeItemIndex: number;
     sectionStartIndex: number;
+    reportCounts: NonNullable<ReturnType<typeof todosReportCountsSelector>>;
     onItemPress: (query: string) => void;
 };
 
-function Section({section, hash, activeItemIndex, sectionStartIndex, onItemPress}: SectionParams) {
+function Section({section, hash, activeItemIndex, sectionStartIndex, reportCounts, onItemPress}: SectionParams) {
     const {translate} = useLocalize();
     const expensifyIcons = useMemoizedLazyExpensifyIcons([
         'Basket',
@@ -58,8 +59,6 @@ function Section({section, hash, activeItemIndex, sectionStartIndex, onItemPress
         'ThumbsUp',
         'CheckCircle',
     ]);
-
-    const [reportCounts = CONST.EMPTY_TODOS_REPORT_COUNTS] = useOnyx(ONYXKEYS.DERIVED.TODOS, {selector: todosReportCountsSelector});
 
     const [isExpanded, setIsExpanded] = useState(true);
 
@@ -106,6 +105,7 @@ function SearchTypeMenuWide({queryJSON}: SearchTypeMenuProps) {
     const {clearSelectedTransactions} = useSearchActionsContext();
     const {typeMenuSections, activeItemIndex} = useSearchTypeMenuSections({hash, similarSearchHash, sortBy, sortOrder, type});
     const [isSearchDataLoaded, isSearchDataLoadedResult] = useOnyx(ONYXKEYS.IS_SEARCH_PAGE_DATA_LOADED);
+    const [reportCounts = CONST.EMPTY_TODOS_REPORT_COUNTS] = useOnyx(ONYXKEYS.DERIVED.TODOS, {selector: todosReportCountsSelector});
 
     const route = useRoute();
     const scrollViewRef = useRef<RNScrollView>(null);
@@ -156,6 +156,7 @@ function SearchTypeMenuWide({queryJSON}: SearchTypeMenuProps) {
                         hash={hash}
                         sectionStartIndex={0}
                         activeItemIndex={activeItemIndex}
+                        reportCounts={reportCounts}
                     />
                 )}
 
@@ -170,6 +171,7 @@ function SearchTypeMenuWide({queryJSON}: SearchTypeMenuProps) {
                             hash={hash}
                             sectionStartIndex={sectionStartIndices.at(index + (expenseReportsSection ? 1 : 0)) ?? 0}
                             activeItemIndex={activeItemIndex}
+                            reportCounts={reportCounts}
                         />
                     ))
                 )}
