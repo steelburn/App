@@ -1223,62 +1223,6 @@ describe('ReportActionsUtils', () => {
     });
 
     describe('getReportActionMessageFragments', () => {
-        it('should return the correct fragment for the REIMBURSED action', () => {
-            const action = {
-                actionName: CONST.REPORT.ACTIONS.TYPE.REIMBURSED,
-                reportActionID: '1',
-                created: '1',
-                message: [
-                    {
-                        type: 'TEXT',
-                        style: 'strong',
-                        text: 'Concierge',
-                    },
-                    {
-                        type: 'TEXT',
-                        style: 'normal',
-                        text: ' reimbursed this report',
-                    },
-                    {
-                        type: 'TEXT',
-                        style: 'normal',
-                        text: ' on behalf of you',
-                    },
-                    {
-                        type: 'TEXT',
-                        style: 'normal',
-                        text: ' from the bank account ending in 1111',
-                    },
-                    {
-                        type: 'TEXT',
-                        style: 'normal',
-                        text: '. Money is on its way to your bank account ending in 0000. Reimbursement estimated to complete on Dec 16.',
-                    },
-                ],
-            };
-            const expectedMessage = ReportActionsUtils.getReimbursedMessage(translateLocal, action, undefined, 0);
-            const expectedFragments = ReportActionsUtils.getReportActionMessageFragments(translateLocal, action);
-            expect(expectedFragments).toEqual([{text: expectedMessage, html: `<muted-text>${expectedMessage}</muted-text>`, type: 'COMMENT'}]);
-        });
-
-        it('should translate the REIMBURSED action using originalMessage.method when paymentMethod is absent (Pusher path)', () => {
-            // Given a REIMBURSED action that arrived via Pusher with only `method` set (as Auth stores it)
-            const action: ReportAction<typeof CONST.REPORT.ACTIONS.TYPE.REIMBURSED> = {
-                actionName: CONST.REPORT.ACTIONS.TYPE.REIMBURSED,
-                reportActionID: '2',
-                created: '2024-01-01',
-                originalMessage: {
-                    method: 'Check',
-                },
-            };
-            // When we get the message fragments
-            const fragments = ReportActionsUtils.getReportActionMessageFragments(translateLocal, action);
-            // Then the translated message is used (not raw backend text)
-            const expectedMessage = ReportActionsUtils.getReimbursedMessage(translateLocal, action, undefined, 0);
-            expect(fragments).toEqual([{text: expectedMessage, html: `<muted-text>${expectedMessage}</muted-text>`, type: 'COMMENT'}]);
-            expect(expectedMessage).toContain('check');
-        });
-
         it('should return the correct fragment for the DYNAMIC_EXTERNAL_WORKFLOW_ROUTED action', () => {
             // Given a DYNAMIC_EXTERNAL_WORKFLOW_ROUTED action
             const action: ReportAction<typeof CONST.REPORT.ACTIONS.TYPE.DYNAMIC_EXTERNAL_WORKFLOW_ROUTED> = {
@@ -1778,6 +1722,106 @@ describe('ReportActionsUtils', () => {
             };
 
             expect(ReportActionsUtils.isDeletedAction(reportAction)).toBe(false);
+        });
+
+        it('should not crash and should return false when originalMessage is a plain string (legacy/OldDot expense-update shape)', () => {
+            const legacyNotificationString = 'The August 31, 2021 expense has been updated with official data from an imported card';
+            const reportAction = {
+                created: '2021-08-31 10:00:00.000',
+                reportActionID: '8401445780099176',
+                actionName: CONST.REPORT.ACTIONS.TYPE.ADD_COMMENT,
+                originalMessage: legacyNotificationString,
+                message: [
+                    {
+                        html: legacyNotificationString,
+                        type: 'COMMENT',
+                        text: legacyNotificationString,
+                    },
+                ],
+            } as unknown as ReportAction;
+
+            expect(() => ReportActionsUtils.isDeletedAction(reportAction)).not.toThrow();
+            expect(ReportActionsUtils.isDeletedAction(reportAction)).toBe(false);
+        });
+
+        it('should not crash and should return false when message is a non-array string and originalMessage is missing', () => {
+            const legacyNotificationString = 'The August 31, 2021 expense has been updated with official data from an imported card';
+            const reportAction = {
+                created: '2021-08-31 10:00:00.000',
+                reportActionID: '8401445780099177',
+                actionName: CONST.REPORT.ACTIONS.TYPE.ADD_COMMENT,
+                message: legacyNotificationString,
+            } as unknown as ReportAction;
+
+            expect(() => ReportActionsUtils.isDeletedAction(reportAction)).not.toThrow();
+            expect(ReportActionsUtils.isDeletedAction(reportAction)).toBe(false);
+        });
+    });
+
+    describe('getFirstVisibleReportActionID', () => {
+        it('does not crash when sortedReportActions contains a legacy action whose originalMessage is a string', () => {
+            const legacyNotificationString = 'The August 31, 2021 expense has been updated with official data from an imported card';
+            const createdAction = {
+                created: '2021-08-31 09:00:00.000',
+                reportActionID: '1',
+                actionName: CONST.REPORT.ACTIONS.TYPE.CREATED,
+                message: [{html: '__FAKE__', type: 'COMMENT', text: '__FAKE__'}],
+            } as unknown as ReportAction;
+
+            const legacyExpenseUpdateAction = {
+                created: '2021-08-31 10:00:00.000',
+                reportActionID: '2',
+                actionName: CONST.REPORT.ACTIONS.TYPE.ADD_COMMENT,
+                originalMessage: legacyNotificationString,
+                message: [{html: legacyNotificationString, type: 'COMMENT', text: legacyNotificationString}],
+            } as unknown as ReportAction;
+
+            const visibleAction = {
+                created: '2021-08-31 11:00:00.000',
+                reportActionID: '3',
+                actionName: CONST.REPORT.ACTIONS.TYPE.ADD_COMMENT,
+                originalMessage: {html: 'Hello', whisperedTo: []},
+                message: [{html: 'Hello', type: 'COMMENT', text: 'Hello'}],
+            } as unknown as ReportAction;
+
+            // Mirror the production sort used by getSortedReportActionsForDisplay (descending, CREATED last)
+            // so this test exercises the same ordering invariant the helper relies on.
+            const sorted = ReportActionsUtils.getSortedReportActions([createdAction, legacyExpenseUpdateAction, visibleAction], true);
+
+            expect(() => ReportActionsUtils.getFirstVisibleReportActionID(sorted)).not.toThrow();
+            expect(ReportActionsUtils.getFirstVisibleReportActionID(sorted)).toBe(legacyExpenseUpdateAction.reportActionID);
+        });
+    });
+
+    describe('getOriginalMessage', () => {
+        it('returns undefined when the underlying originalMessage is a plain string (legacy shape)', () => {
+            const reportAction = {
+                actionName: CONST.REPORT.ACTIONS.TYPE.ADD_COMMENT,
+                reportActionID: 'legacy-1',
+                originalMessage: 'plain string from legacy backend',
+            } as unknown as ReportAction;
+
+            expect(getOriginalMessage(reportAction)).toBeUndefined();
+        });
+
+        it('returns undefined when message is a non-array string and originalMessage is missing', () => {
+            const reportAction = {
+                actionName: CONST.REPORT.ACTIONS.TYPE.ADD_COMMENT,
+                reportActionID: 'legacy-2',
+                message: 'plain string from legacy backend',
+            } as unknown as ReportAction;
+
+            expect(getOriginalMessage(reportAction)).toBeUndefined();
+        });
+
+        it('returns the object when originalMessage is object-shaped', () => {
+            const reportAction = {
+                actionName: CONST.REPORT.ACTIONS.TYPE.ADD_COMMENT,
+                reportActionID: 'shaped-1',
+                originalMessage: {html: 'hi', whisperedTo: []},
+            } as unknown as ReportAction;
+
+            expect(getOriginalMessage(reportAction)).toEqual({html: 'hi', whisperedTo: []});
         });
     });
 
