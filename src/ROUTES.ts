@@ -2442,18 +2442,6 @@ const ROUTES = {
         route: 'workspaces/:policyID/categories/new',
         getRoute: (policyID: string) => `workspaces/${policyID}/categories/new` as const,
     },
-    WORKSPACE_CATEGORY_EDIT: {
-        route: 'workspaces/:policyID/category/:categoryName/edit',
-        getRoute: (policyID: string, categoryName: string) => `workspaces/${policyID}/category/${encodeURIComponent(categoryName)}/edit` as const,
-    },
-    WORKSPACE_CATEGORY_PAYROLL_CODE: {
-        route: 'workspaces/:policyID/category/:categoryName/payroll-code',
-        getRoute: (policyID: string, categoryName: string) => `workspaces/${policyID}/category/${encodeURIComponent(categoryName)}/payroll-code` as const,
-    },
-    WORKSPACE_CATEGORY_GL_CODE: {
-        route: 'workspaces/:policyID/category/:categoryName/gl-code',
-        getRoute: (policyID: string, categoryName: string) => `workspaces/${policyID}/category/${encodeURIComponent(categoryName)}/gl-code` as const,
-    },
     WORKSPACE_CATEGORY_DEFAULT_TAX_RATE: {
         route: 'workspaces/:policyID/category/:categoryName/tax-rate',
         getRoute: (policyID: string, categoryName: string) => `workspaces/${policyID}/category/${encodeURIComponent(categoryName)}/tax-rate` as const,
