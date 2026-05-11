@@ -2799,6 +2799,8 @@ const translations = {
         error: {
             genericAdd: 'There was a problem adding this agent',
             genericUpdate: 'There was a problem updating this agent',
+            updateName: "There was a problem updating this agent's name",
+            updatePrompt: "There was a problem updating this agent's instructions",
         },
     },
     addAgentPage: {

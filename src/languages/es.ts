@@ -2628,6 +2628,8 @@ ${amount} para ${merchant} - ${date}`,
         error: {
             genericAdd: 'Hubo un problema al agregar este agente',
             genericUpdate: 'Hubo un problema al actualizar este agente',
+            updateName: 'Hubo un problema al actualizar el nombre de este agente',
+            updatePrompt: 'Hubo un problema al actualizar las instrucciones de este agente',
         },
     },
     addAgentPage: {

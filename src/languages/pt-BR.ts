@@ -2727,7 +2727,12 @@ ${amount} para ${merchant} - ${date}`,
         subtitle: 'Crie agentes para gerenciar seu fluxo de trabalho. Pule o trabalho manual e ganhe horas de volta no seu dia.',
         newAgent: 'Novo agente',
         emptyAgents: {title: 'Nenhum agente criado', subtitle: 'Pare de fazer tudo manualmente. Instrua um agente e economize muito tempo.'},
-        error: {genericAdd: 'Houve um problema ao adicionar este agente', genericUpdate: 'Ocorreu um problema ao atualizar este agente'},
+        error: {
+            genericAdd: 'Houve um problema ao adicionar este agente',
+            genericUpdate: 'Ocorreu um problema ao atualizar este agente',
+            updateName: 'Ocorreu um problema ao atualizar o nome deste agente',
+            updatePrompt: 'Ocorreu um problema ao atualizar as instruções deste agente',
+        },
     },
     addAgentPage: {
         title: 'Novo agente',

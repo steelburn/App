@@ -2732,7 +2732,12 @@ ${amount} voor ${merchant} - ${date}`,
         subtitle: 'Maak agents aan om je workflow af te handelen. Sla het handmatige werk over en krijg uren van je dag terug.',
         newAgent: 'Nieuwe medewerker',
         emptyAgents: {title: 'Geen agents aangemaakt', subtitle: 'Stop met dingen handmatig doen. Geef in plaats daarvan een opdracht aan een agent en bespaar jezelf veel tijd.'},
-        error: {genericAdd: 'Er was een probleem bij het toevoegen van deze agent', genericUpdate: 'Er is een probleem opgetreden bij het bijwerken van deze agent'},
+        error: {
+            genericAdd: 'Er was een probleem bij het toevoegen van deze agent',
+            genericUpdate: 'Er is een probleem opgetreden bij het bijwerken van deze agent',
+            updateName: 'Er is een probleem opgetreden bij het bijwerken van de naam van deze agent',
+            updatePrompt: 'Er is een probleem opgetreden bij het bijwerken van de instructies van deze agent',
+        },
     },
     addAgentPage: {
         title: 'Nieuwe agent',

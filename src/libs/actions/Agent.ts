@@ -81,7 +81,15 @@ function clearAgentError(optimisticAccountID: number) {
 }
 
 function clearAgentUpdateError(accountID: number) {
-    Onyx.merge(`${ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT}${accountID}`, {errors: null});
+    Onyx.merge(`${ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT}${accountID}`, {errors: null, nameErrors: null, promptErrors: null});
+}
+
+function clearAgentNameUpdateError(accountID: number) {
+    Onyx.merge(`${ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT}${accountID}`, {nameErrors: null});
+}
+
+function clearAgentPromptUpdateError(accountID: number) {
+    Onyx.merge(`${ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT}${accountID}`, {promptErrors: null});
 }
 
 function clearAgentDeleteError(accountID: number) {
@@ -98,7 +106,7 @@ function updateAgentName(accountID: number, firstName: string, originalFirstName
         {
             onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT}${accountID}`,
-            value: {pendingAction: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE, errors: null},
+            value: {pendingAction: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE, errors: null, nameErrors: null},
         },
     ];
 
@@ -106,7 +114,7 @@ function updateAgentName(accountID: number, firstName: string, originalFirstName
         {
             onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT}${accountID}`,
-            value: {pendingAction: null},
+            value: {pendingAction: null, nameErrors: null},
         },
     ];
 
@@ -119,7 +127,7 @@ function updateAgentName(accountID: number, firstName: string, originalFirstName
         {
             onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT}${accountID}`,
-            value: {pendingAction: null, errors: getMicroSecondOnyxErrorWithTranslationKey('agentsPage.error.genericUpdate')},
+            value: {pendingAction: null, nameErrors: getMicroSecondOnyxErrorWithTranslationKey('agentsPage.error.updateName')},
         },
     ];
 
@@ -131,7 +139,7 @@ function updateAgentPrompt(accountID: number, prompt: string, originalPrompt: st
         {
             onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT}${accountID}`,
-            value: {prompt, pendingAction: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE, errors: null},
+            value: {prompt, pendingAction: CONST.RED_BRICK_ROAD_PENDING_ACTION.UPDATE, errors: null, promptErrors: null},
         },
     ];
 
@@ -139,7 +147,7 @@ function updateAgentPrompt(accountID: number, prompt: string, originalPrompt: st
         {
             onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT}${accountID}`,
-            value: {pendingAction: null},
+            value: {pendingAction: null, promptErrors: null},
         },
     ];
 
@@ -147,7 +155,7 @@ function updateAgentPrompt(accountID: number, prompt: string, originalPrompt: st
         {
             onyxMethod: Onyx.METHOD.MERGE,
             key: `${ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT}${accountID}`,
-            value: {prompt: originalPrompt, pendingAction: null, errors: getMicroSecondOnyxErrorWithTranslationKey('agentsPage.error.genericUpdate')},
+            value: {prompt: originalPrompt, pendingAction: null, promptErrors: getMicroSecondOnyxErrorWithTranslationKey('agentsPage.error.updatePrompt')},
         },
     ];
 
@@ -191,4 +199,15 @@ function deleteAgent(accountID: number) {
     Navigation.navigate(ROUTES.SETTINGS_AGENTS);
 }
 
-export {openAgentsPage, createAgent, clearAgentError, clearAgentUpdateError, clearAgentDeleteError, updateAgentName, updateAgentPrompt, deleteAgent};
+export {
+    openAgentsPage,
+    createAgent,
+    clearAgentError,
+    clearAgentUpdateError,
+    clearAgentNameUpdateError,
+    clearAgentPromptUpdateError,
+    clearAgentDeleteError,
+    updateAgentName,
+    updateAgentPrompt,
+    deleteAgent,
+};

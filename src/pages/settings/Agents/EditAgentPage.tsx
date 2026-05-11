@@ -14,7 +14,7 @@ import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
 import useStyleUtils from '@hooks/useStyleUtils';
 import useThemeStyles from '@hooks/useThemeStyles';
-import {clearAgentUpdateError, deleteAgent} from '@libs/actions/Agent';
+import {clearAgentNameUpdateError, clearAgentPromptUpdateError, deleteAgent} from '@libs/actions/Agent';
 import Navigation from '@libs/Navigation/Navigation';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
 import type {SettingsNavigatorParamList} from '@libs/Navigation/types';
@@ -73,9 +73,9 @@ function EditAgentPage({route}: EditAgentPageProps) {
                     />
                 </View>
                 <OfflineWithFeedback
-                    errors={agent?.errors}
+                    errors={agent?.nameErrors}
                     errorRowStyles={styles.mh5}
-                    onClose={() => clearAgentUpdateError(accountID)}
+                    onClose={() => clearAgentNameUpdateError(accountID)}
                 >
                     <MenuItemWithTopDescription
                         description={translate('editAgentPage.agentName')}
@@ -83,6 +83,12 @@ function EditAgentPage({route}: EditAgentPageProps) {
                         shouldShowRightIcon
                         onPress={handleEditNamePress}
                     />
+                </OfflineWithFeedback>
+                <OfflineWithFeedback
+                    errors={agent?.promptErrors}
+                    errorRowStyles={styles.mh5}
+                    onClose={() => clearAgentPromptUpdateError(accountID)}
+                >
                     <MenuItemWithTopDescription
                         description={translate('editAgentPage.instructions')}
                         title={agent?.prompt?.trim() ?? ''}

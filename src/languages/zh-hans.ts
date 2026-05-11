@@ -2658,7 +2658,7 @@ ${amount}，商户：${merchant} - 日期：${date}`,
         subtitle: '通过自定义智能体自动化处理任务。',
         newAgent: '新代理人',
         emptyAgents: {title: '尚未创建代理', subtitle: '别再手动处理这些事情了。交给智能代理去执行，为自己节省大量时间。'},
-        error: {genericAdd: '添加此智能体时出现了问题', genericUpdate: '更新此代理时出现问题'},
+        error: {genericAdd: '添加此智能体时出现了问题', genericUpdate: '更新此代理时出现问题', updateName: '更新此代理名称时出现问题', updatePrompt: '更新此代理指令时出现问题'},
     },
     addAgentPage: {
         title: '新代理',
