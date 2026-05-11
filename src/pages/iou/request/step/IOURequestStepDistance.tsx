@@ -362,17 +362,14 @@ function IOURequestStepDistance({
             if (isEditingSplit) {
                 iouWaypointType = CONST.IOU.TYPE.SPLIT_EXPENSE;
             }
-            // Construct the backTo URL explicitly to match the stack entry the user is currently on.
-            // Using Navigation.getActiveRoute() would return a URL with the OnyxTabNavigator's tab
-            // suffix (e.g. "/distance-map") which doesn't match the stack entry — causing
-            // Navigation.goBack() to REPLACE instead of POP and creating a duplicate distance page
-            // entry in the stack. Edit flows are mounted on MONEY_REQUEST_STEP_DISTANCE; the CREATE
-            // tab flow ("+ > … > Distance") is mounted on MONEY_REQUEST_CREATE_TAB_DISTANCE — using
-            // the EDIT route as `backTo` for a CREATE-flow user crashes when goBack tries to pop to
-            // a route that isn't in the stack (GH #90037).
+            // In the edit flow this page is wrapped in an OnyxTabNavigator, so Navigation.getActiveRoute()
+            // returns a URL with the tab suffix (e.g. "/distance-map") that doesn't match the stack entry
+            // — Navigation.goBack() then REPLACEs instead of POPs and crashes. Build the backTo URL
+            // explicitly there. The create flow has no tab navigator, so the production getActiveRoute()
+            // path is correct (GH #90037).
             const waypointBackTo = isEditing
                 ? ROUTES.MONEY_REQUEST_STEP_DISTANCE.getRoute(action, iouType, transactionID, report?.reportID ?? reportID, backTo)
-                : ROUTES.MONEY_REQUEST_CREATE_TAB_DISTANCE.getRoute(action, iouType, transactionID, report?.reportID ?? reportID);
+                : Navigation.getActiveRoute();
             Navigation.navigate(ROUTES.MONEY_REQUEST_STEP_WAYPOINT.getRoute(action, iouWaypointType, transactionID, report?.reportID ?? reportID, index.toString(), waypointBackTo));
         },
         [action, iouType, transactionID, report?.reportID, reportID, backTo, isEditingSplit, isEditing],
