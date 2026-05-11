@@ -8,6 +8,8 @@ import React from 'react';
 import Onyx from 'react-native-onyx';
 import {CurrentUserPersonalDetailsProvider} from '@components/CurrentUserPersonalDetailsProvider';
 import OnyxListItemProvider from '@components/OnyxListItemProvider';
+import DistanceRequestUtils from '@libs/DistanceRequestUtils';
+import {roundToTwoDecimalPlaces} from '@libs/NumberUtils';
 import IOURequestStepDistance from '@pages/iou/request/step/IOURequestStepDistance';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -543,5 +545,95 @@ describe('IOURequestStepDistance - navigateToWaypointEditPage backTo (GH #90037)
         expect(Navigation.navigate).toHaveBeenCalledWith(
             ROUTES.MONEY_REQUEST_STEP_WAYPOINT.getRoute(CONST.IOU.ACTION.CREATE, CONST.IOU.TYPE.SUBMIT, TRANSACTION_ID, REPORT_ID, '0', activeRoute),
         );
+    });
+});
+
+describe('IOURequestStepDistance - manual tab follows the recalculated route distance (GH #90082, #90083)', () => {
+    // Mirrors `saveWaypoint`/`updateWaypoints`: a waypoint edit clears the route + customUnit.quantity,
+    // then the BE pushes back the new geometry.
+    const initialRouteMeters = DistanceRequestUtils.convertToDistanceInMeters(100, CONST.CUSTOM_UNITS.DISTANCE_UNIT_MILES);
+    const distanceTransactionWithRoute = (): Transaction => ({
+        ...createDistanceTransaction(),
+        routes: {route0: {distance: initialRouteMeters, geometry: {coordinates: [[0, 0] as const, [1, 1] as const]}}},
+    });
+    // `getAllByLabelText` matches both the field label <Text> and the underlying <TextInput>; pick the input.
+    const distanceInput = () => screen.getAllByLabelText(/common\.distance/).find((element) => 'value' in element.props)!;
+    const displayedDistance = () => distanceInput().props.value as string;
+    const distanceUnit = () =>
+        String(distanceInput().props.accessibilityLabel ?? '').includes(`common.${CONST.CUSTOM_UNITS.DISTANCE_UNIT_KILOMETERS}`)
+            ? CONST.CUSTOM_UNITS.DISTANCE_UNIT_KILOMETERS
+            : CONST.CUSTOM_UNITS.DISTANCE_UNIT_MILES;
+    const expectedDisplayFor = (distanceInDestinationUnit: number) => {
+        const meters = DistanceRequestUtils.convertToDistanceInMeters(distanceInDestinationUnit, distanceUnit());
+        return roundToTwoDecimalPlaces(DistanceRequestUtils.convertDistanceUnit(meters, distanceUnit())).toString();
+    };
+    const recalculateRoute = async (distanceInDestinationUnit: number) => {
+        // saveWaypoint: clear the route and customUnit.quantity, change a waypoint address
+        await act(async () => {
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.TRANSACTION}${TRANSACTION_ID}`, {
+                comment: {customUnit: {quantity: null}, waypoints: {waypoint1: {address: '789 New Ave', lat: 41.5, lng: -73.5, keyForList: 'stop_waypoint'}}},
+                routes: {route0: {distance: null, geometry: {coordinates: null}}},
+            });
+        });
+        await waitForBatchedUpdatesWithAct();
+        // BE returns the recalculated geometry
+        await act(async () => {
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.TRANSACTION}${TRANSACTION_ID}`, {
+                routes: {
+                    route0: {
+                        distance: DistanceRequestUtils.convertToDistanceInMeters(distanceInDestinationUnit, distanceUnit()),
+                        geometry: {
+                            coordinates: [
+                                [0, 0],
+                                [2, 2],
+                            ],
+                        },
+                    },
+                },
+            });
+        });
+        await waitForBatchedUpdatesWithAct();
+    };
+
+    beforeAll(() => {
+        Onyx.init({
+            keys: ONYXKEYS,
+            evictableKeys: [ONYXKEYS.COLLECTION.REPORT_ACTIONS],
+        });
+    });
+
+    beforeEach(async () => {
+        jest.clearAllMocks();
+        await Onyx.clear();
+        await waitForBatchedUpdates();
+        await signInWithTestUser(ACCOUNT_ID, ACCOUNT_LOGIN);
+        await act(async () => {
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.REPORT}${REPORT_ID}`, createTestReport());
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.TRANSACTION}${TRANSACTION_ID}`, distanceTransactionWithRoute());
+            await Onyx.merge(`${ONYXKEYS.COLLECTION.TRANSACTION_DRAFT}${TRANSACTION_ID}`, null);
+            await Onyx.merge(ONYXKEYS.IS_LOADING_APP, false);
+        });
+    });
+
+    it('updates the manual tab distance when the user edits a waypoint (GH #90082)', async () => {
+        renderEditMode();
+        await waitForBatchedUpdatesWithAct();
+
+        await recalculateRoute(80);
+
+        expect(displayedDistance()).toBe(expectedDisplayFor(80));
+    });
+
+    it('updates the manual tab distance after a waypoint edit even if the user had typed a manual value first (GH #90083)', async () => {
+        renderEditMode();
+        await waitForBatchedUpdatesWithAct();
+
+        fireEvent.changeText(distanceInput(), '777');
+        await waitForBatchedUpdatesWithAct();
+        expect(displayedDistance()).toBe('777');
+
+        await recalculateRoute(55);
+
+        expect(displayedDistance()).toBe(expectedDisplayFor(55));
     });
 });

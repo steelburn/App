@@ -204,21 +204,33 @@ function IOURequestStepDistance({
         [distanceInMeters, distanceUnit],
     );
 
-    // Track whether the user has started editing on the manual tab to prevent route updates
-    // from overwriting in-progress manual input.
+    // Track whether the user has typed in the manual tab so route refetches don't clobber in-progress
+    // input. Editing waypoints clears this (in the effect below) — a recalculated route supersedes a
+    // manual value the same way it would on a fresh map expense (GH #90083).
     const isManuallyEditing = useRef(false);
 
-    // Push the route distance into the manual tab input on any waypoint-driven recalculation,
-    // including the null → value transition that fires after `saveWaypoint` clears the route and
-    // the BE returns the new geometry. To avoid overwriting a saved manual quantity on a post-save
-    // re-fetch (where the route was also briefly null), gate the null → value sync on
-    // `customUnit.quantity` being null too — `saveWaypoint` clears both, while a post-save state
-    // has the user's manual value in `quantity` (GH #90082).
+    // Keep the manual tab input in sync with the recalculated route distance:
+    //  - On a waypoint edit, `saveWaypoint`/`updateWaypoints` clear `routes.route0.distance` (and
+    //    `customUnit.quantity`) to null, then the BE returns the new geometry. That recalculation wins
+    //    over any earlier manual value, so the null → value transition flows back into the manual tab
+    //    and re-enables future syncs (GH #90082, #90083).
+    //  - A re-fetch of an already-saved expense is also a null → value transition but keeps a non-null
+    //    `customUnit.quantity` (the persisted value, possibly a manual override), so we skip it there
+    //    to avoid overwriting it (GH #90082).
     const routeDistance = currentTransaction?.routes?.route0?.distance;
     const customUnitQuantity = currentTransaction?.comment?.customUnit?.quantity;
     const lastSyncedRouteDistance = useRef<number | null | undefined>(routeDistance);
     useEffect(() => {
-        if (routeDistance == null || !distanceUnit || isManuallyEditing.current) {
+        if (routeDistance == null) {
+            // The route was cleared because the user edited waypoints — let the new value flow back
+            // into the manual tab even if the user had typed a manual distance before (GH #90083).
+            if (lastSyncedRouteDistance.current != null) {
+                isManuallyEditing.current = false;
+            }
+            lastSyncedRouteDistance.current = routeDistance;
+            return;
+        }
+        if (!distanceUnit || isManuallyEditing.current) {
             lastSyncedRouteDistance.current = routeDistance;
             return;
         }
