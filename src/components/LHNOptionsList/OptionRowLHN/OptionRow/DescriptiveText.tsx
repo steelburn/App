@@ -3,16 +3,16 @@ import {View} from 'react-native';
 import Text from '@components/Text';
 import useThemeStyles from '@hooks/useThemeStyles';
 import FS from '@libs/Fullstory';
-import type {Report} from '@src/types/onyx';
+import type {OptionData} from '@libs/ReportUtils';
 
 type DescriptiveTextProps = {
-    descriptiveText: string | undefined;
-    report?: Report;
+    optionItem: OptionData;
 };
 
-function DescriptiveText({descriptiveText, report}: DescriptiveTextProps) {
+function DescriptiveText({optionItem}: DescriptiveTextProps) {
     const styles = useThemeStyles();
 
+    const descriptiveText = optionItem?.descriptiveText;
     if (!descriptiveText) {
         return null;
     }
@@ -20,7 +20,7 @@ function DescriptiveText({descriptiveText, report}: DescriptiveTextProps) {
     return (
         <View
             style={[styles.flexWrap]}
-            fsClass={FS.getChatFSClass(report)}
+            fsClass={FS.getChatFSClass(optionItem)}
         >
             <Text style={[styles.textLabel]}>{descriptiveText}</Text>
         </View>
