@@ -68,6 +68,71 @@ type UpdateMoneyRequestDateParams = {
     hash?: number;
 };
 
+type SearchSnapshotOnyxData = {
+    optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.SNAPSHOT>>;
+    successData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.SNAPSHOT>>;
+    failureData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.SNAPSHOT>>;
+};
+
+type SearchSnapshotUpdateParams = {
+    hash?: number;
+    transactionID: string | undefined;
+    updatedTransaction: OnyxTypes.Transaction;
+    pendingFields: OnyxTypes.Transaction['pendingFields'];
+    clearedPendingFields: OnyxTypes.Transaction['pendingFields'];
+    transaction: OnyxEntry<OnyxTypes.Transaction>;
+    optimisticViolations?: OnyxEntry<OnyxTypes.TransactionViolations>;
+    currentTransactionViolations?: OnyxEntry<OnyxTypes.TransactionViolations>;
+};
+
+/**
+ * Builds Onyx writes for the Search snapshot.
+ * Search result rows render from snapshot data, so TRANSACTION writes alone do not refresh the list.
+ */
+function getSearchSnapshotUpdates({
+    hash,
+    transactionID,
+    updatedTransaction,
+    pendingFields,
+    clearedPendingFields,
+    transaction,
+    optimisticViolations,
+    currentTransactionViolations,
+}: SearchSnapshotUpdateParams): SearchSnapshotOnyxData {
+    if (!hash || !transactionID) {
+        return {
+            optimisticData: [],
+            successData: [],
+            failureData: [],
+        };
+    }
+
+    const snapshotKey = `${ONYXKEYS.COLLECTION.SNAPSHOT}${hash}` as const;
+    const transactionKey = `${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}` as const;
+    const violationsKey = `${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${transactionID}` as const;
+
+    const optimisticSnapshotData: SearchResultDataType = {};
+    optimisticSnapshotData[transactionKey] = {...updatedTransaction, pendingFields};
+    if (optimisticViolations !== undefined) {
+        optimisticSnapshotData[violationsKey] = optimisticViolations;
+    }
+
+    const successSnapshotData: NullishDeep<SearchResultDataType> = {};
+    successSnapshotData[transactionKey] = {pendingFields: clearedPendingFields};
+
+    const failureSnapshotData: NullishDeep<SearchResultDataType> = {};
+    failureSnapshotData[transactionKey] = {...transaction, pendingFields: clearedPendingFields};
+    if (currentTransactionViolations !== undefined) {
+        failureSnapshotData[violationsKey] = currentTransactionViolations;
+    }
+
+    return {
+        optimisticData: [{onyxMethod: Onyx.METHOD.MERGE, key: snapshotKey, value: {data: optimisticSnapshotData}}],
+        successData: [{onyxMethod: Onyx.METHOD.MERGE, key: snapshotKey, value: {data: successSnapshotData}}],
+        failureData: [{onyxMethod: Onyx.METHOD.MERGE, key: snapshotKey, value: {data: failureSnapshotData}}],
+    };
+}
+
 /** Updates the created date of an expense */
 function updateMoneyRequestDate({
     transactionID,
@@ -1432,27 +1497,21 @@ function getUpdateMoneyRequestParams(params: GetUpdateMoneyRequestParamsType): U
             value: currentTransactionViolations,
         });
 
-        // Optimistically update the search snapshot so the search list reflects the
-        // new values immediately (the snapshot is the exclusive data source for search
-        // result rendering and is not automatically updated by the TRANSACTION write above).
         if (hash) {
-            const snapshotKey = `${ONYXKEYS.COLLECTION.SNAPSHOT}${hash}` as const;
-            const transactionKey = `${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}` as const;
-            const violationsKey = `${ONYXKEYS.COLLECTION.TRANSACTION_VIOLATIONS}${transactionID}` as const;
+            const snapshotUpdates = getSearchSnapshotUpdates({
+                hash,
+                transactionID,
+                updatedTransaction,
+                pendingFields,
+                clearedPendingFields,
+                transaction,
+                optimisticViolations: Array.isArray(violationsOnyxData.value) ? violationsOnyxData.value : [],
+                currentTransactionViolations,
+            });
 
-            const optimisticSnapshotData: SearchResultDataType = {};
-            optimisticSnapshotData[transactionKey] = {...updatedTransaction, pendingFields};
-            optimisticSnapshotData[violationsKey] = Array.isArray(violationsOnyxData.value) ? violationsOnyxData.value : [];
-            optimisticData.push({onyxMethod: Onyx.METHOD.MERGE, key: snapshotKey, value: {data: optimisticSnapshotData}});
-
-            const successSnapshotData: NullishDeep<SearchResultDataType> = {};
-            successSnapshotData[transactionKey] = {pendingFields: clearedPendingFields};
-            successData.push({onyxMethod: Onyx.METHOD.MERGE, key: snapshotKey, value: {data: successSnapshotData}});
-
-            const failureSnapshotData: NullishDeep<SearchResultDataType> = {};
-            failureSnapshotData[transactionKey] = {...transaction, pendingFields: clearedPendingFields};
-            failureSnapshotData[violationsKey] = currentTransactionViolations;
-            failureData.push({onyxMethod: Onyx.METHOD.MERGE, key: snapshotKey, value: {data: failureSnapshotData}});
+            optimisticData.push(...snapshotUpdates.optimisticData);
+            successData.push(...snapshotUpdates.successData);
+            failureData.push(...snapshotUpdates.failureData);
         }
 
         if (
@@ -1563,8 +1622,12 @@ function getUpdateTrackExpenseParams(
     | typeof ONYXKEYS.COLLECTION.TRANSACTION_DRAFT
     | typeof ONYXKEYS.COLLECTION.SNAPSHOT
 > {
-    const optimisticData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS | typeof ONYXKEYS.COLLECTION.TRANSACTION | typeof ONYXKEYS.COLLECTION.REPORT>> = [];
-    const successData: Array<OnyxUpdate<typeof ONYXKEYS.COLLECTION.TRANSACTION_DRAFT | typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS | typeof ONYXKEYS.COLLECTION.TRANSACTION>> = [];
+    const optimisticData: Array<
+        OnyxUpdate<typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS | typeof ONYXKEYS.COLLECTION.TRANSACTION | typeof ONYXKEYS.COLLECTION.REPORT | typeof ONYXKEYS.COLLECTION.SNAPSHOT>
+    > = [];
+    const successData: Array<
+        OnyxUpdate<typeof ONYXKEYS.COLLECTION.TRANSACTION_DRAFT | typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS | typeof ONYXKEYS.COLLECTION.TRANSACTION | typeof ONYXKEYS.COLLECTION.SNAPSHOT>
+    > = [];
     const failureData: Array<
         OnyxUpdate<typeof ONYXKEYS.COLLECTION.TRANSACTION | typeof ONYXKEYS.COLLECTION.REPORT_ACTIONS | typeof ONYXKEYS.COLLECTION.REPORT | typeof ONYXKEYS.COLLECTION.SNAPSHOT>
     > = [];
@@ -1675,6 +1738,21 @@ function getUpdateTrackExpenseParams(
         },
     });
 
+    if (updatedTransaction) {
+        const snapshotUpdates = getSearchSnapshotUpdates({
+            hash,
+            transactionID,
+            updatedTransaction,
+            pendingFields,
+            clearedPendingFields,
+            transaction,
+        });
+
+        optimisticData.push(...snapshotUpdates.optimisticData);
+        successData.push(...snapshotUpdates.successData);
+        failureData.push(...snapshotUpdates.failureData);
+    }
+
     if (updatedReportAction) {
         optimisticData.push({
             onyxMethod: Onyx.METHOD.MERGE,
@@ -1723,20 +1801,6 @@ function getUpdateTrackExpenseParams(
         key: `${ONYXKEYS.COLLECTION.REPORT}${transactionThreadReportID}`,
         value: transactionThread,
     });
-
-    // Roll back the snapshot copy of the transaction so the search row reverts to its pre-edit state
-    if (hash) {
-        // @ts-expect-error - will be solved in https://github.com/Expensify/App/issues/73830
-        failureData.push({
-            onyxMethod: Onyx.METHOD.MERGE,
-            key: `${ONYXKEYS.COLLECTION.SNAPSHOT}${hash}`,
-            value: {
-                data: {
-                    [`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`]: transaction ?? null,
-                },
-            },
-        });
-    }
 
     return {
         params: apiParams,
