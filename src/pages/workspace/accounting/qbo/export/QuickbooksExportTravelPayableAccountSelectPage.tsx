@@ -26,12 +26,12 @@ function QuickbooksExportTravelPayableAccountSelectPage({policy}: WithPolicyConn
     const styles = useThemeStyles();
     const illustrations = useMemoizedLazyIllustrations(['Telescope']);
 
-    const {accountPayable} = policy?.connections?.quickbooksOnline?.data ?? {};
+    const {creditCards} = policy?.connections?.quickbooksOnline?.data ?? {};
     const qboConfig = policy?.connections?.quickbooksOnline?.config;
 
     const policyID = policy?.id ?? String(CONST.DEFAULT_NUMBER_ID);
     const data: CardListItem[] =
-        accountPayable?.map((account) => ({
+        creditCards?.map((account) => ({
             value: account,
             text: account.name,
             keyForList: account.name,
@@ -69,7 +69,7 @@ function QuickbooksExportTravelPayableAccountSelectPage({policy}: WithPolicyConn
             accessVariants={[CONST.POLICY.ACCESS_VARIANTS.ADMIN]}
             featureName={CONST.POLICY.MORE_FEATURES.ARE_CONNECTIONS_ENABLED}
             displayName="QuickbooksExportTravelPayableAccountSelectPage"
-            title="workspace.common.travelInvoicingPayableAccount"
+            title="workspace.qbo.creditCardAccount"
             data={data}
             onSelectRow={selectAccount}
             shouldSingleExecuteRowSelect
