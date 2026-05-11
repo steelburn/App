@@ -1,6 +1,5 @@
 import Onyx from 'react-native-onyx';
-import type {OnyxKey} from 'react-native-onyx';
-import type {OnyxMultiSetInput} from 'react-native-onyx/dist/types';
+import type {OnyxKey, OnyxMultiSetInput} from 'react-native-onyx';
 import DateUtils from '@libs/DateUtils';
 import ONYXKEYS from '@src/ONYXKEYS';
 
