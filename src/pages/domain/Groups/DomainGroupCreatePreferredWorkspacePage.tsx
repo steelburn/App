@@ -22,7 +22,10 @@ import ROUTES from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
 
 type WorkspaceListItem = {
+    /** The ID of the policy/workspace */
     policyID: string;
+
+    /** The timestamp of when the policy was created */
     created?: string;
 } & ListItem;
 
