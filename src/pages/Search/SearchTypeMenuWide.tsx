@@ -32,7 +32,7 @@ type SearchTypeMenuProps = {
     queryJSON: SearchQueryJSON | undefined;
 };
 
-type RenderSectionParams = {
+type SectionParams = {
     section: SearchTypeMenuSection;
     hash: number | undefined;
     activeItemIndex: number;
@@ -40,7 +40,7 @@ type RenderSectionParams = {
     onItemPress: (query: string) => void;
 };
 
-function Section({section, hash, activeItemIndex, sectionStartIndex, onItemPress}: RenderSectionParams) {
+function Section({section, hash, activeItemIndex, sectionStartIndex, onItemPress}: SectionParams) {
     const {translate} = useLocalize();
     const expensifyIcons = useMemoizedLazyExpensifyIcons([
         'Basket',
