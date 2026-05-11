@@ -4,7 +4,7 @@ import type {ComposerRef, TextSelection} from '@components/Composer/types';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import {useComposerActions, useComposerEditState} from './ComposerContext';
 import ReportActionComposeUtils from './ReportActionComposeUtils';
-import updateNativeTextInputValue from './updateNativeTextInputValue/index.ios';
+import updateNativeTextInputValue from './updateNativeTextInputValue';
 
 type UseEditComposerToggleProps = {
     /** The selection of the composer */
