@@ -1,7 +1,7 @@
 ---
 title: Accounting Search Shortcuts
 description: Use the Accounting search shortcuts on the Spend page to review expense status, prepare for export, and reconcile transactions with your accounting records.
-keywords: [New Expensify, accounting expensify, reconcile expenses, awaiting export, cash accruals, card accruals, card statements, bank reconciliation, month-end close, search shortcut, accounting shortcut]
+keywords: [New Expensify, accounting expensify, reconcile expenses, awaiting export, cash accruals, card accruals, card statements, bank reconciliation, month-end close, search shortcut, accounting shortcut, aging report]
 internalScope: Audience is Workspace Admins. Covers using the Accounting section to review expense states and support reconciliation workflows. Does not cover exporting or performing reconciliation in detail.
 ---
 
@@ -53,8 +53,8 @@ Once you’ve reviewed the expenses, you can export them to a CSV if you need to
 
 # FAQ
 
-## How can I create an aging report? 
-An aging report is a breakdown of expenses by how long they have been in a given status. You can create an aging report by using the **Cash accruals** or **Card accruals** shortcut and changing **Display** to group by month, day, week, quarter or year. [Learn how to use Insights grouping operators](/articles/new-expensify/insights/How-to-Use-Insights-in-Expensify#grouping-options-used-in-insights). 
+## How can I create an aging report?
+An aging report is a breakdown of expenses by how long they have been in a given status. You can create an aging report by using the **Cash accruals** or **Card accruals** shortcut and changing **Display** to group by month, week, quarter or year. [Learn how to use Insights grouping operators](/articles/new-expensify/insights/How-to-Use-Insights-in-Expensify#grouping-options-used-in-insights).
 
 ## Why don’t I see all Accounting search shortcuts?
 
