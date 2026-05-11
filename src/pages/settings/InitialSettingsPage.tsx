@@ -118,7 +118,6 @@ function InitialSettingsPage({currentUserPersonalDetails}: InitialSettingsPagePr
         'Exit',
         'Lightbulb',
         'Lock',
-        'UserPlus',
         'Users',
         'Emoji',
         'CreditCard',
