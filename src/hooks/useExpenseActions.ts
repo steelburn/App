@@ -40,7 +40,7 @@ import {
     isPerDiemRequest,
     isTransactionPendingDelete,
 } from '@libs/TransactionUtils';
-import {startMoneyRequest} from '@userActions/IOU';
+import {startMoneyRequest} from '@userActions/IOU/MoneyRequest';
 import {getNavigationUrlOnMoneyRequestDelete} from '@userActions/IOU/DeleteMoneyRequest';
 import {setDeleteTransactionNavigateBackUrl} from '@userActions/Report';
 import CONST from '@src/CONST';
