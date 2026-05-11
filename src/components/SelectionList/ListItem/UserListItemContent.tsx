@@ -74,14 +74,16 @@ function UserListItemContent<TItem extends ListItem>({
     const policyID = isThereOnlyWorkspaceIcon && shouldUseIconPolicyID ? String(item.icons?.at(0)?.id) : item.policyID;
 
     const isHovered = hovered && !shouldDisableHoverStyle;
-    const contactAccessibilityLabel = getAccessibilityLabel(item);
-    const accessibilityHint = shouldDisableAccessibleGrouping && item.isSelected !== undefined ? translate(item.isSelected ? 'common.deselect' : 'common.select') : undefined;
+    const baseAccessibilityLabel = getAccessibilityLabel(item);
+    const accessibilityLabel =
+        shouldDisableAccessibleGrouping && item.isSelected !== undefined
+            ? `${translate(item.isSelected ? 'common.deselect' : 'common.select')}, ${baseAccessibilityLabel}`
+            : baseAccessibilityLabel;
 
     return (
         <View
             accessible={shouldDisableAccessibleGrouping || undefined}
-            accessibilityLabel={shouldDisableAccessibleGrouping ? contactAccessibilityLabel : undefined}
-            accessibilityHint={accessibilityHint}
+            accessibilityLabel={shouldDisableAccessibleGrouping ? accessibilityLabel : undefined}
             role={shouldDisableAccessibleGrouping ? CONST.ROLE.BUTTON : undefined}
             style={[styles.flex1, styles.flexRow, styles.alignItemsCenter]}
         >
