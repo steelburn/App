@@ -3906,6 +3906,7 @@ const CONST = {
             gambling: true,
             tobacco: false,
             adultEntertainment: true,
+            giftCard: false,
             handwrittenReceipt: false,
         },
         DEFAULT_BILLABLE: false,
