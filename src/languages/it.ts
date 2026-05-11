@@ -1138,7 +1138,6 @@ const translations: TranslationDeepObject<typeof en> = {
         dropTitle: 'Lascia perdere',
         dropMessage: 'Rilascia qui il tuo file',
         flash: 'flash',
-        flipCamera: 'Cambia fotocamera',
         multiScan: 'scansione multipla',
         shutter: 'otturatore',
         gallery: 'galleria',
@@ -2591,6 +2590,10 @@ ${amount} per ${merchant} - ${date}`,
             approverSubtitle: 'Tutti gli approvatori appartengono a un workflow esistente.',
             bulkApproverSubtitle: 'Nessun approvatore corrisponde ai criteri per i report selezionati.',
         },
+        configureViaGusto: 'Configura tramite Gusto.',
+        gustoApprovalWorkflowLockedPrompt:
+            'Le approvazioni sono gestite dalla tua integrazione con Gusto. Per aggiornare il flusso di approvazione, vai alle impostazioni di connessione di Gusto.',
+        goToGustoSettings: 'Vai alle impostazioni di Gusto',
     },
     workflowsDelayedSubmissionPage: {
         autoReportingFrequencyErrorMessage: 'Impossibile modificare la frequenza di invio. Riprova oppure contatta l’assistenza.',
