@@ -5,19 +5,17 @@ import useLocalize from '@hooks/useLocalize';
 import type {OptionData} from '@libs/ReportUtils';
 import {isGroupChat, isSystemChat} from '@libs/ReportUtils';
 import CONST from '@src/CONST';
-import type {Report} from '@src/types/onyx';
 
 type TitleProps = {
     optionItem: OptionData;
-    report?: Report;
     displayNameStyle: StyleProp<TextStyle>;
     testID: number;
 };
 
-function Title({optionItem, report, displayNameStyle, testID}: TitleProps) {
+function Title({optionItem, displayNameStyle, testID}: TitleProps) {
     const {translate} = useLocalize();
 
-    const shouldParseFullTitle = optionItem?.parentReportAction?.actionName !== CONST.REPORT.ACTIONS.TYPE.ADD_COMMENT && !isGroupChat(report);
+    const shouldParseFullTitle = optionItem?.parentReportAction?.actionName !== CONST.REPORT.ACTIONS.TYPE.ADD_COMMENT && !isGroupChat(optionItem);
     const shouldUseFullTitle =
         !!optionItem.isChatRoom ||
         !!optionItem.isPolicyExpenseChat ||
@@ -26,8 +24,8 @@ function Title({optionItem, report, displayNameStyle, testID}: TitleProps) {
         !!optionItem.isMoneyRequestReport ||
         !!optionItem.isInvoiceReport ||
         !!optionItem.private_isArchived ||
-        isGroupChat(report) ||
-        isSystemChat(report);
+        isGroupChat(optionItem) ||
+        isSystemChat(optionItem);
 
     return (
         <DisplayNames
