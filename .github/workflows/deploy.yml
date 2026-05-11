@@ -18,7 +18,7 @@ env:
   DEPLOY_ENV: ${{ inputs.ENVIRONMENT || (github.ref == 'refs/heads/production' && 'production' || 'staging') }}
 
 concurrency:
-  group: ${{ github.workflow }}-${{ inputs.ENVIRONMENT || github.ref }}
+  group: ${{ github.workflow }}-${{ inputs.ENVIRONMENT || (github.ref == 'refs/heads/production' && 'production' || 'staging') }}
   cancel-in-progress: true
 
 jobs:
@@ -124,6 +124,8 @@ jobs:
     uses: ./.github/workflows/createDeployChecklist.yml
     if: ${{ needs.prep.outputs.DEPLOY_ENV == 'staging' }}
     needs: prep
+    with:
+      REF: ${{ needs.prep.outputs.DEPLOY_SHA }}
     secrets: inherit
 
   androidBuild:
