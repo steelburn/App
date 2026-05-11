@@ -294,7 +294,7 @@ function ReportActionsView({reportID, onLayout}: ReportActionsViewProps) {
 
     // When opening an unread report, it is very likely that the message we will open to is not the latest,
     // which is the only one we will have in cache.
-    const isInitiallyLoadingReport = isReportUnread && !!reportLoadingState?.isLoadingInitialReportActions && (isOffline || reportActions.length <= 1);
+    const isInitiallyLoadingReport = isReportUnread && !!reportLoadingState?.isLoadingInitialReportActions && reportActions.length <= 1;
 
     // Same for unread messages, we need to wait for the results from the OpenReport API call
     // if the oldest unread report action is not available yet. Only applies during the *first* load
