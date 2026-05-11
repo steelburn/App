@@ -38,10 +38,12 @@ type SectionParams = {
     activeItemIndex: number;
     sectionStartIndex: number;
     reportCounts: NonNullable<ReturnType<typeof todosReportCountsSelector>>;
+    areAllSectionsExpanded: boolean;
     onItemPress: (query: string) => void;
+    onExpanded: (isExpanded: boolean) => void;
 };
 
-function Section({section, hash, activeItemIndex, sectionStartIndex, reportCounts, onItemPress}: SectionParams) {
+function Section({section, hash, activeItemIndex, sectionStartIndex, reportCounts, areAllSectionsExpanded, onItemPress, onExpanded}: SectionParams) {
     const {translate} = useLocalize();
     const expensifyIcons = useMemoizedLazyExpensifyIcons([
         'Basket',
@@ -65,14 +67,20 @@ function Section({section, hash, activeItemIndex, sectionStartIndex, reportCount
     return (
         <SearchTypeMenuAccordion
             isExpanded={isExpanded}
-            onSectionHeaderPress={() => setIsExpanded((prevIsExpanded) => !prevIsExpanded)}
+            onSectionHeaderPress={() => {
+                setIsExpanded((prevIsExpanded) => {
+                    const newValue = !prevIsExpanded;
+                    onExpanded(newValue);
+                    return newValue;
+                });
+            }}
             title={translate(section.translationPath)}
             badgeText={getSectionBadgeText(section.translationPath, reportCounts)}
         >
             {section.translationPath === 'search.savedSearchesMenuItemTitle' ? (
                 <SavedSearchList
                     hash={hash}
-                    isExpanded={isExpanded}
+                    areAllSectionsExpanded={areAllSectionsExpanded}
                 />
             ) : (
                 section.menuItems.map((item, itemIndex) => {
@@ -142,6 +150,14 @@ function SearchTypeMenuWide({queryJSON}: SearchTypeMenuProps) {
 
     const areSuggestedSearchesLoading = !isOffline && !isSearchDataLoaded && !isLoadingOnyxValue(isSearchDataLoadedResult);
 
+    const numberOfSections = nonExpenseReportsSections.length + 1;
+    const [expandedSectionCount, setExpandedSectionCount] = useState(numberOfSections);
+    const areAllSectionsExpanded = expandedSectionCount === numberOfSections;
+
+    const updateExpandedCount = (isExpanded: boolean) => {
+        setExpandedSectionCount((prevExpandedCount) => prevExpandedCount + (isExpanded ? 1 : -1));
+    };
+
     return (
         <ScrollView
             onScroll={onScroll}
@@ -153,10 +169,12 @@ function SearchTypeMenuWide({queryJSON}: SearchTypeMenuProps) {
                     <Section
                         section={expenseReportsSection}
                         onItemPress={handleTypeMenuItemPress}
+                        onExpanded={updateExpandedCount}
                         hash={hash}
                         sectionStartIndex={0}
                         activeItemIndex={activeItemIndex}
                         reportCounts={reportCounts}
+                        areAllSectionsExpanded={areAllSectionsExpanded}
                     />
                 )}
 
@@ -168,10 +186,12 @@ function SearchTypeMenuWide({queryJSON}: SearchTypeMenuProps) {
                             key={section.translationPath}
                             section={section}
                             onItemPress={handleTypeMenuItemPress}
+                            onExpanded={updateExpandedCount}
                             hash={hash}
                             sectionStartIndex={sectionStartIndices.at(index + (expenseReportsSection ? 1 : 0)) ?? 0}
                             activeItemIndex={activeItemIndex}
                             reportCounts={reportCounts}
+                            areAllSectionsExpanded={areAllSectionsExpanded}
                         />
                     ))
                 )}
