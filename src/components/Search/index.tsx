@@ -1260,6 +1260,7 @@ function Search({
             queryJSON,
             offset,
             searchResults?.search?.hasMoreResults,
+            currentSearchKey,
         ],
     );
 
