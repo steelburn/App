@@ -1,4 +1,4 @@
-import React, {createContext, useCallback, useContext, useState} from 'react';
+import React, {createContext, useContext, useState} from 'react';
 import type {Dispatch, SetStateAction} from 'react';
 import type {OnyxCollection} from 'react-native-onyx';
 import type {TextSelection} from '@components/Composer/types';
@@ -73,46 +73,40 @@ function ReportActionEditMessageContextProvider({reportID, children}: ReportActi
 
     const ancestors = useAncestors(report, shouldExcludeAncestorReportAction);
 
-    const ancestorReportActionsSelector = useCallback(
-        (allReportActions: OnyxCollection<OnyxTypes.ReportActions>) => {
-            if (!allReportActions) {
-                return {};
-            }
-            const result: OnyxCollection<OnyxTypes.ReportActions> = {};
-            for (const ancestor of ancestors) {
-                const key = `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${ancestor.report.reportID}`;
-                result[key] = allReportActions[key];
-            }
-            return result;
-        },
-        [ancestors],
-    );
+    const ancestorReportActionsSelector = (allReportActions: OnyxCollection<OnyxTypes.ReportActions>) => {
+        if (!allReportActions) {
+            return {};
+        }
+        const result: OnyxCollection<OnyxTypes.ReportActions> = {};
+        for (const ancestor of ancestors) {
+            const key = `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${ancestor.report.reportID}`;
+            result[key] = allReportActions[key];
+        }
+        return result;
+    };
 
     const [ancestorsReportActions] = useOnyx(ONYXKEYS.COLLECTION.REPORT_ACTIONS, {selector: ancestorReportActionsSelector}, [ancestors]);
 
-    const ancestorDraftSelector = useCallback(
-        (allDrafts: OnyxCollection<OnyxTypes.ReportActionsDrafts>) => {
-            if (!allDrafts) {
-                return {};
+    const ancestorDraftSelector = (allDrafts: OnyxCollection<OnyxTypes.ReportActionsDrafts>) => {
+        if (!allDrafts) {
+            return {};
+        }
+        const result: OnyxCollection<OnyxTypes.ReportActionsDrafts> = {};
+        if (reportID) {
+            const currentDraftKey = `${ONYXKEYS.COLLECTION.REPORT_ACTIONS_DRAFTS}${reportID}`;
+            result[currentDraftKey] = allDrafts[currentDraftKey];
+        }
+        for (const ancestor of ancestors) {
+            const reportActionsForAncestor = ancestorsReportActions?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${ancestor.report.reportID}`];
+            const origID = getOriginalReportID(ancestor.report.reportID, ancestor.reportAction, reportActionsForAncestor);
+            if (!origID) {
+                continue;
             }
-            const result: OnyxCollection<OnyxTypes.ReportActionsDrafts> = {};
-            if (reportID) {
-                const currentDraftKey = `${ONYXKEYS.COLLECTION.REPORT_ACTIONS_DRAFTS}${reportID}`;
-                result[currentDraftKey] = allDrafts[currentDraftKey];
-            }
-            for (const ancestor of ancestors) {
-                const reportActionsForAncestor = ancestorsReportActions?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${ancestor.report.reportID}`];
-                const origID = getOriginalReportID(ancestor.report.reportID, ancestor.reportAction, reportActionsForAncestor);
-                if (!origID) {
-                    continue;
-                }
-                const draftKey = `${ONYXKEYS.COLLECTION.REPORT_ACTIONS_DRAFTS}${origID}`;
-                result[draftKey] = allDrafts[draftKey];
-            }
-            return result;
-        },
-        [ancestors, ancestorsReportActions, reportID],
-    );
+            const draftKey = `${ONYXKEYS.COLLECTION.REPORT_ACTIONS_DRAFTS}${origID}`;
+            result[draftKey] = allDrafts[draftKey];
+        }
+        return result;
+    };
 
     const [reportActionDrafts] = useOnyx(ONYXKEYS.COLLECTION.REPORT_ACTIONS_DRAFTS, {selector: ancestorDraftSelector}, [ancestors, ancestorsReportActions, reportID]);
 
