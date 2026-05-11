@@ -15,7 +15,7 @@ type JoinablePolicy = {
     hasPendingAccess: boolean;
     /** Whether the user needs an approval to join the workspace or not */
     automaticJoiningEnabled: boolean;
-    /** Policy type returned by the backend (`team` | `corporate` | `submit2026` | ...). */
+    /** Policy type returned by the backend (team | corporate | submit2026 | ...). */
     policyType?: ValueOf<typeof CONST.POLICY.TYPE>;
 };
 
