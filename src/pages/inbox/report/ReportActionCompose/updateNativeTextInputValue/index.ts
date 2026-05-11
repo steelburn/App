@@ -1,4 +1,8 @@
-// We don't need to manually update the native text prop on non-iOS platforms
+import type UpdateNativeTextInputValue from './types';
+
 const noop = () => undefined;
 
-export default noop;
+// We don't need to manually update the native text prop on non-iOS platforms
+const updateNativeTextInputValue: UpdateNativeTextInputValue = noop;
+
+export default updateNativeTextInputValue;
