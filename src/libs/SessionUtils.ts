@@ -1,4 +1,5 @@
 import Onyx from 'react-native-onyx';
+import useOnyx from '@hooks/useOnyx';
 import CONFIG from '@src/CONFIG';
 import ONYXKEYS from '@src/ONYXKEYS';
 
@@ -107,4 +108,18 @@ function checkIfShouldUseNewPartnerName(partnerUserID?: string): boolean {
     return false;
 }
 
-export {isLoggingInAsNewUser, didUserLogInDuringSession, resetDidUserLogInDuringSession, checkIfShouldUseNewPartnerName, isLoggingInAsDelegate};
+function isAgentEmail(email?: string): boolean {
+    if (!email) {
+        return false;
+    }
+
+    const AGENT_EMAIL_REGEX = /^agent_\d+@expensify\.ai$/;
+    return AGENT_EMAIL_REGEX.test(email);
+}
+
+function useIsAgentAccount(): boolean {
+    const [session] = useOnyx(ONYXKEYS.SESSION);
+    return isAgentEmail(session?.email);
+}
+
+export {isLoggingInAsNewUser, didUserLogInDuringSession, resetDidUserLogInDuringSession, checkIfShouldUseNewPartnerName, isLoggingInAsDelegate, isAgentEmail, useIsAgentAccount};
