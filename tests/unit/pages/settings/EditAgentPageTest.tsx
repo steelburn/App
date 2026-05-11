@@ -182,10 +182,10 @@ describe('EditAgentPage', () => {
         expect(JSON.stringify(toJSON())).toContain('editAgentPage.deleteAgent');
     });
 
-    it('shows error text when agent has errors', () => {
+    it('shows error text when agent has nameErrors', () => {
         mockUseOnyx.mockImplementation((key) => {
             if (key === `${ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT}${TEST_ACCOUNT_ID}`) {
-                return [{prompt: 'Some prompt', errors: {someKey: 'agentsPage.error.genericUpdate'}}, {status: 'loaded'}];
+                return [{prompt: 'Some prompt', nameErrors: {someKey: 'agentsPage.error.updateName'}}, {status: 'loaded'}];
             }
             return [undefined, {status: 'loaded'}];
         });
@@ -197,6 +197,24 @@ describe('EditAgentPage', () => {
             />,
         );
 
-        expect(JSON.stringify(toJSON())).toContain('agentsPage.error.genericUpdate');
+        expect(JSON.stringify(toJSON())).toContain('agentsPage.error.updateName');
+    });
+
+    it('shows error text when agent has promptErrors', () => {
+        mockUseOnyx.mockImplementation((key) => {
+            if (key === `${ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT}${TEST_ACCOUNT_ID}`) {
+                return [{prompt: 'Some prompt', promptErrors: {someKey: 'agentsPage.error.updatePrompt'}}, {status: 'loaded'}];
+            }
+            return [undefined, {status: 'loaded'}];
+        });
+
+        const {toJSON} = render(
+            <EditAgentPage
+                route={mockRoute}
+                navigation={mockNavigation}
+            />,
+        );
+
+        expect(JSON.stringify(toJSON())).toContain('agentsPage.error.updatePrompt');
     });
 });
