@@ -109,18 +109,24 @@ function ProfilePage() {
             brickRoadIndicator: isEmptyObject(vacationDelegate?.errors) ? undefined : CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR,
             sentryLabel: CONST.SENTRY_LABEL.SETTINGS_PROFILE.STATUS,
         },
-        {
-            description: translate('pronounsPage.pronouns'),
-            title: getPronouns(),
-            pageRoute: ROUTES.SETTINGS_PRONOUNS,
-            sentryLabel: CONST.SENTRY_LABEL.SETTINGS_PROFILE.PRONOUNS,
-        },
-        {
-            description: translate('timezonePage.timezone'),
-            title: currentUserPersonalDetails?.timezone?.selected ?? '',
-            pageRoute: ROUTES.SETTINGS_TIMEZONE,
-            sentryLabel: CONST.SENTRY_LABEL.SETTINGS_PROFILE.TIMEZONE,
-        },
+        ...(!isAgentAccount
+            ? [
+                  {
+                      description: translate('pronounsPage.pronouns'),
+                      title: getPronouns(),
+                      pageRoute: ROUTES.SETTINGS_PRONOUNS as Route,
+                      testID: 'pronouns-menu-item',
+                      sentryLabel: CONST.SENTRY_LABEL.SETTINGS_PROFILE.PRONOUNS,
+                  },
+                  {
+                      description: translate('timezonePage.timezone'),
+                      title: currentUserPersonalDetails?.timezone?.selected ?? '',
+                      pageRoute: ROUTES.SETTINGS_TIMEZONE as Route,
+                      testID: 'timezone-menu-item',
+                      sentryLabel: CONST.SENTRY_LABEL.SETTINGS_PROFILE.TIMEZONE,
+                  },
+              ]
+            : []),
     ];
 
     const privateOptions = [
