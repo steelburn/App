@@ -425,7 +425,6 @@
 "../../src/libs/actions/TwoFactorAuthActions.ts"	"@typescript-eslint/no-deprecated/InteractionManager.runAfterInteractions"	1
 "../../src/libs/actions/UnreportedExpenses.tsx"	"no-restricted-syntax"	1
 "../../src/libs/actions/User.ts"	"no-restricted-syntax"	8
-"../../src/libs/actions/User.ts"	"rulesdir/no-onyx-connect"	1
 "../../src/libs/actions/VacationDelegate.ts"	"no-restricted-syntax"	2
 "../../src/libs/actions/Wallet.ts"	"no-restricted-syntax"	1
 "../../src/libs/actions/Welcome/index.ts"	"no-restricted-syntax"	1
