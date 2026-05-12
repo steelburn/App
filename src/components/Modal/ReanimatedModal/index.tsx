@@ -68,7 +68,7 @@ function ReanimatedModal({
     const modalStyle = {zIndex: StyleSheet.flatten(style)?.zIndex};
 
     const onBackButtonPressHandler = () => {
-        if (shouldIgnoreBackHandlerDuringTransition && isVisible !== isContainerOpen) {
+        if (shouldIgnoreBackHandlerDuringTransition && isTransitioning) {
             return false;
         }
         if (isVisible) {
@@ -134,7 +134,7 @@ function ReanimatedModal({
     }, [handleEscape, onBackButtonPressHandler]);
 
     useEffect(() => {
-        if (isVisible !== isContainerOpen) {
+        if (isTransitioning) {
             handleRef.current = InteractionManager.createInteractionHandle();
             transitionHandleRef.current = TransitionTracker.startTransition();
         }
@@ -149,7 +149,7 @@ function ReanimatedModal({
                 transitionHandleRef.current = null;
             }
         };
-    }, [isVisible, isContainerOpen]);
+    }, [isTransitioning]);
 
     const fireTransitionCallbacks = useEffectEvent(() => {
         if (isVisible && !isContainerOpen) {
