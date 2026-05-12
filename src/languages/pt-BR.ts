@@ -2855,6 +2855,7 @@ ${amount} para ${merchant} - ${date}`,
     },
     validateCodeForm: {
         magicCodeNotReceived: 'Não recebeu um código mágico?',
+        avoidScamsMessage: '<strong>Evite golpes. Não compartilhe seu código com ninguém.</strong> Nossa equipe nunca ligará, enviará SMS ou e-mail para pedir esse código.',
         enterAuthenticatorCode: 'Insira seu código do autenticador',
         enterRecoveryCode: 'Insira seu código de recuperação',
         requiredWhen2FAEnabled: 'Obrigatório quando a 2FA estiver ativada',
@@ -6763,6 +6764,7 @@ Exija dados de despesas como recibos e descrições, defina limites e padrões e
                 gambling: 'Jogos de azar',
                 tobacco: 'Tabaco',
                 adultEntertainment: 'Entretenimento adulto',
+                giftCard: 'Compras de cartão-presente',
                 handwrittenReceipt: 'Recibos manuscritos',
                 requireCompanyCard: 'Exigir cartões corporativos para todas as compras',
                 requireCompanyCardDescription: 'Sinalize todos os gastos em dinheiro, incluindo despesas com quilometragem e diárias.',
@@ -6981,6 +6983,10 @@ Adicione mais regras de gasto para proteger o fluxo de caixa da empresa.`,
                 corporate: {
                     label: 'Controle',
                     description: 'Para organizações com requisitos avançados.',
+                },
+                submit2026: {
+                    label: 'Enviar',
+                    description: 'Para funcionários que desejam enviar despesas ao empregador.',
                 },
             },
             description: 'Escolha o plano ideal para você. Para ver a lista detalhada de recursos e preços, confira nosso',
@@ -8409,6 +8415,8 @@ Adicione mais regras de gasto para proteger o fluxo de caixa da empresa.`,
                         return `entretenimento adulto`;
                     case 'hotelIncidentals':
                         return `despesas incidentais de hotel`;
+                    case 'giftCard':
+                        return `compras de cartão-presente`;
                     case 'handwrittenReceipt':
                         return `recibos manuscritos`;
                     default:

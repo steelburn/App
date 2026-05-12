@@ -2864,6 +2864,8 @@ ${amount} per ${merchant} - ${date}`,
     },
     validateCodeForm: {
         magicCodeNotReceived: 'Non hai ricevuto un codice magico?',
+        avoidScamsMessage:
+            '<strong>Evita le truffe. Non condividere il tuo codice con nessuno.</strong> Il nostro team non ti chiamerà, invierà SMS o manderà email per chiederti questo codice.',
         enterAuthenticatorCode: "Inserisci il tuo codice dell'autenticatore",
         enterRecoveryCode: 'Inserisci il tuo codice di recupero',
         requiredWhen2FAEnabled: 'Obbligatorio quando l’autenticazione a due fattori è abilitata',
@@ -6784,6 +6786,7 @@ Richiedi dettagli sulle spese come ricevute e descrizioni, imposta limiti e valo
                 gambling: 'Gioco d’azzardo',
                 tobacco: 'Tabacco',
                 adultEntertainment: 'Intrattenimento per adulti',
+                giftCard: 'Acquisto di carte regalo',
                 handwrittenReceipt: 'Ricevute scritte a mano',
                 requireCompanyCard: 'Richiedi le carte aziendali per tutti gli acquisti',
                 requireCompanyCardDescription: 'Contrassegna tutte le spese in contanti, inclusi chilometraggio e indennità giornaliere.',
@@ -7003,6 +7006,10 @@ Aggiungi altre regole di spesa per proteggere il flusso di cassa aziendale.`,
                 corporate: {
                     label: 'Controllo',
                     description: 'Per le organizzazioni con requisiti avanzati.',
+                },
+                submit2026: {
+                    label: 'Invia',
+                    description: 'Per i dipendenti che desiderano inviare le spese al proprio datore di lavoro.',
                 },
             },
             description: 'Scegli il piano più adatto a te. Per un elenco dettagliato di funzionalità e prezzi, consulta la nostra',
@@ -8444,6 +8451,8 @@ Aggiungi altre regole di spesa per proteggere il flusso di cassa aziendale.`,
                         return `intrattenimento per adulti`;
                     case 'hotelIncidentals':
                         return `spese accessorie dell’hotel`;
+                    case 'giftCard':
+                        return `acquisto di carte regalo`;
                     case 'handwrittenReceipt':
                         return `ricevute scritte a mano`;
                     default:

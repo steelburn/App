@@ -2786,6 +2786,7 @@ ${amount}，商户：${merchant} - 日期：${date}`,
     },
     validateCodeForm: {
         magicCodeNotReceived: '没有收到验证码？',
+        avoidScamsMessage: '<strong>谨防诈骗。不要与任何人分享您的验证码。</strong> 我们的团队绝不会打电话、发短信或发送电子邮件向您索取此验证码。',
         enterAuthenticatorCode: '请输入您的认证器验证码',
         enterRecoveryCode: '请输入您的恢复代码',
         requiredWhen2FAEnabled: '启用双重验证时必填',
@@ -6592,6 +6593,7 @@ ${reportName}
                 gambling: '赌博',
                 tobacco: '烟草',
                 adultEntertainment: '成人娱乐',
+                giftCard: '礼品卡购买',
                 handwrittenReceipt: '手写收据',
                 requireCompanyCard: '所有消费均需使用公司卡',
                 requireCompanyCardDescription: '标记所有现金支出，包括里程和每日津贴报销。',
@@ -6807,6 +6809,10 @@ ${reportName}
                 corporate: {
                     label: '控制',
                     description: '适用于具有高级需求的组织。',
+                },
+                submit2026: {
+                    label: '提交',
+                    description: '适用于希望向雇主提交费用的员工。',
                 },
             },
             description: '选择适合您的方案。要查看详细的功能和价格列表，请访问我们的',
@@ -8197,6 +8203,8 @@ ${reportName}
                         return `成人娱乐`;
                     case 'hotelIncidentals':
                         return `酒店杂费`;
+                    case 'giftCard':
+                        return `礼品卡购买`;
                     case 'handwrittenReceipt':
                         return `手写收据`;
                     default:
