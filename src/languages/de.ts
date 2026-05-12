@@ -8236,6 +8236,7 @@ Fügen Sie weitere Ausgabelimits hinzu, um den Cashflow Ihres Unternehmens zu sc
         companyCard: 'Firmenkarte',
         expensifyCard: 'Expensify Karte',
         centralInvoicing: 'Zentrale Rechnungsstellung',
+        travelCard: 'Reisekarte',
     },
     distance: {
         addStop: 'Stopp hinzufügen',

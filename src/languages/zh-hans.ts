@@ -7989,6 +7989,7 @@ ${reportName}
         companyCard: '公司卡',
         expensifyCard: 'Expensify 卡',
         centralInvoicing: '集中开票',
+        travelCard: '旅行卡',
     },
     distance: {
         addStop: '添加站点',

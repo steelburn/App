@@ -8227,6 +8227,7 @@ Aggiungi altre regole di spesa per proteggere il flusso di cassa aziendale.`,
         companyCard: 'Carta aziendale',
         expensifyCard: 'Carta Expensify',
         centralInvoicing: 'Fatturazione centralizzata',
+        travelCard: 'Carta Viaggio',
     },
     distance: {
         addStop: 'Aggiungi fermata',

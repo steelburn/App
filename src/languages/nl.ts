@@ -8198,6 +8198,7 @@ er bestedingsregels toe om de kasstroom van het bedrijf te beschermen.`,
         companyCard: 'Bedrijfskaart',
         expensifyCard: 'Expensify Kaart',
         centralInvoicing: 'Gecentraliseerde facturatie',
+        travelCard: 'Reiskaart',
     },
     distance: {
         addStop: 'Stop toevoegen',

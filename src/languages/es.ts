@@ -8506,6 +8506,7 @@ ${amount} para ${merchant} - ${date}`,
         companyCard: 'Tarjeta corporativa',
         expensifyCard: 'Tarjeta Expensify',
         centralInvoicing: 'Facturación centralizada',
+        travelCard: 'Tarjeta de viaje',
     },
     distance: {
         addStop: 'Añadir parada',

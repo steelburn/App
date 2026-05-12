@@ -8230,6 +8230,7 @@ const translations = {
         companyCard: 'Company card',
         expensifyCard: 'Expensify Card',
         centralInvoicing: 'Central invoicing',
+        travelCard: 'Travel Card',
     },
     distance: {
         addStop: 'Add stop',

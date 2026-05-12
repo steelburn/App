@@ -8192,6 +8192,7 @@ Adicione mais regras de gasto para proteger o fluxo de caixa da empresa.`,
         companyCard: 'Cartão corporativo',
         expensifyCard: 'Cartão Expensify',
         centralInvoicing: 'Faturamento centralizado',
+        travelCard: 'Cartão de viagem',
     },
     distance: {
         addStop: 'Adicionar parada',
