@@ -7797,7 +7797,7 @@ function clearConciergeThinkingKickoff() {
     Onyx.set(ONYXKEYS.CONCIERGE_THINKING_KICKOFF, null);
 }
 
-export type {Video, GuidedSetupData, TaskForParameters, IntroSelected};
+export type {Video, GuidedSetupData, TaskForParameters, IntroSelected, OpenReportActionParams};
 
 export {
     addAttachmentWithComment,
