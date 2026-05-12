@@ -29,8 +29,7 @@ type AgentItem = {
     login: string;
     pendingAction?: PendingAction | null;
     errors?: Errors | null;
-    nameErrors?: Errors | null;
-    promptErrors?: Errors | null;
+    hasUpdateErrors: boolean;
 };
 
 function AgentsPage() {
@@ -66,8 +65,8 @@ function AgentsPage() {
                 login: details.login ?? '',
                 pendingAction: agentPrompt?.pendingAction,
                 errors: agentPrompt?.errors,
-                nameErrors: agentPrompt?.nameErrors,
-                promptErrors: agentPrompt?.promptErrors,
+                hasUpdateErrors:
+                    !!(agentPrompt?.nameErrors && Object.keys(agentPrompt.nameErrors).length > 0) || !!(agentPrompt?.promptErrors && Object.keys(agentPrompt.promptErrors).length > 0),
             };
         })
         .filter(Boolean) as AgentItem[];
@@ -85,20 +84,17 @@ function AgentsPage() {
     const shouldShowErrors = (pendingAction: PendingAction | null | undefined) =>
         pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD || pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.DELETE;
 
-    const renderItem = ({item}: {item: AgentItem}) => {
-        const hasUpdateErrors = !!(item.nameErrors && Object.keys(item.nameErrors).length > 0) || !!(item.promptErrors && Object.keys(item.promptErrors).length > 0);
-        return (
-            <AgentsListRow
-                accountID={item.accountID}
-                displayName={item.displayName}
-                login={item.login}
-                pendingAction={item.pendingAction}
-                errors={shouldShowErrors(item.pendingAction) ? item.errors : null}
-                onErrorClose={() => handleErrorClose(item.pendingAction, item.accountID)}
-                brickRoadIndicator={hasUpdateErrors ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : null}
-            />
-        );
-    };
+    const renderItem = ({item}: {item: AgentItem}) => (
+        <AgentsListRow
+            accountID={item.accountID}
+            displayName={item.displayName}
+            login={item.login}
+            pendingAction={item.pendingAction}
+            errors={shouldShowErrors(item.pendingAction) ? item.errors : null}
+            onErrorClose={() => handleErrorClose(item.pendingAction, item.accountID)}
+            brickRoadIndicator={item.hasUpdateErrors ? CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR : null}
+        />
+    );
 
     const keyExtractor = (item: AgentItem) => String(item.accountID);
 
