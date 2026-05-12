@@ -77,7 +77,7 @@ function TypeCell({transactionItem, shouldUseNarrowLayout, shouldShowTooltip}: T
             return translate('iou.pending');
         }
         if (isTravelInvoicingCard) {
-            return translate('cardTransactions.centralInvoicing');
+            return translate('cardTransactions.travelCard');
         }
         if (isExpensifyCard) {
             return translate('cardTransactions.expensifyCard');
