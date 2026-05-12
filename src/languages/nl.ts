@@ -1136,7 +1136,6 @@ const translations: TranslationDeepObject<typeof en> = {
         dropTitle: 'Laat het los',
         dropMessage: 'Zet je bestand hier neer',
         flash: 'flits',
-        flipCamera: 'Camera wisselen',
         multiScan: 'meerscannen',
         shutter: 'sluiter',
         gallery: 'galerij',
@@ -2861,6 +2860,7 @@ ${amount} voor ${merchant} - ${date}`,
     },
     validateCodeForm: {
         magicCodeNotReceived: 'Geen magische code ontvangen?',
+        avoidScamsMessage: '<strong>Voorkom oplichting. Deel je code met niemand.</strong> Ons team zal je nooit bellen, sms’en of e-mailen om deze code te vragen.',
         enterAuthenticatorCode: 'Voer je authenticatiecode in',
         enterRecoveryCode: 'Voer uw herstelcode in',
         requiredWhen2FAEnabled: 'Vereist wanneer 2FA is ingeschakeld',
@@ -6764,6 +6764,7 @@ Vereis onkostendetails zoals bonnen en beschrijvingen, stel limieten en standaar
                 gambling: 'Gokken',
                 tobacco: 'Tabak',
                 adultEntertainment: 'Volwassenenentertainment',
+                giftCard: 'Cadeaukaartaankopen',
                 handwrittenReceipt: 'Handgeschreven bonnen',
                 requireCompanyCard: 'Verplicht bedrijfskaarten voor alle aankopen',
                 requireCompanyCardDescription: 'Markeer alle contante uitgaven, inclusief kilometer- en dagvergoedingen.',
@@ -6981,6 +6982,10 @@ er bestedingsregels toe om de kasstroom van het bedrijf te beschermen.`,
                 corporate: {
                     label: 'Beheer',
                     description: 'Voor organisaties met geavanceerde vereisten.',
+                },
+                submit2026: {
+                    label: 'Indienen',
+                    description: 'Voor werknemers die onkosten bij hun werkgever willen indienen.',
                 },
             },
             description: 'Kies een pakket dat bij je past. Voor een gedetailleerd overzicht van functies en prijzen, bekijk onze',
@@ -8416,6 +8421,8 @@ er bestedingsregels toe om de kasstroom van het bedrijf te beschermen.`,
                         return `entertainment voor volwassenen`;
                     case 'hotelIncidentals':
                         return `hotelincidentals`;
+                    case 'giftCard':
+                        return `cadeaukaartaankopen`;
                     case 'handwrittenReceipt':
                         return `handgeschreven bonnen`;
                     default:

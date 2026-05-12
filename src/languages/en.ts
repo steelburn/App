@@ -1193,7 +1193,6 @@ const translations = {
         dropTitle: 'Let it go',
         dropMessage: 'Drop your file here',
         flash: 'flash',
-        flipCamera: 'Flip camera',
         multiScan: 'multi-scan',
         shutter: 'shutter',
         gallery: 'gallery',
@@ -2925,6 +2924,7 @@ const translations = {
     },
     validateCodeForm: {
         magicCodeNotReceived: "Didn't receive a magic code?",
+        avoidScamsMessage: '<strong>Avoid scams. Do not share your code with anyone.</strong> Our team will never call, text, or email you for this code.',
         enterAuthenticatorCode: 'Please enter your authenticator code',
         enterRecoveryCode: 'Please enter your recovery code',
         requiredWhen2FAEnabled: 'Required when 2FA is enabled',
@@ -6845,6 +6845,7 @@ const translations = {
                 gambling: 'Gambling',
                 tobacco: 'Tobacco',
                 adultEntertainment: 'Adult entertainment',
+                giftCard: 'Gift card purchases',
                 handwrittenReceipt: 'Handwritten receipts',
                 requireCompanyCard: 'Require company cards for all purchases',
                 requireCompanyCardDescription: 'Flag all cash spend, including mileage and per-diem expenses.',
@@ -7054,6 +7055,10 @@ const translations = {
                 corporate: {
                     label: 'Control',
                     description: 'For organizations with advanced requirements.',
+                },
+                submit2026: {
+                    label: 'Submit',
+                    description: 'For employees looking to submit expenses to their employer.',
                 },
             },
             description: "Choose a plan that's right for you. For a detailed list of features and pricing, check out our",
@@ -8456,6 +8461,8 @@ const translations = {
                         return `adult entertainment`;
                     case 'hotelIncidentals':
                         return `hotel incidentals`;
+                    case 'giftCard':
+                        return `gift card purchases`;
                     case 'handwrittenReceipt':
                         return `handwritten receipts`;
                     default:
