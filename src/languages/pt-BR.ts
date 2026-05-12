@@ -491,6 +491,7 @@ const translations: TranslationDeepObject<typeof en> = {
         nextMonth: 'Próximo mês',
         previousYear: 'Ano anterior',
         nextYear: 'Ano que vem',
+        avatar: 'Avatar',
     },
     socials: {
         podcast: 'Siga-nos no Podcast',
@@ -917,10 +918,6 @@ const translations: TranslationDeepObject<typeof en> = {
         listOfChats: 'Lista de chats',
         saveTheWorld: 'Salvar o mundo',
         tooltip: 'Comece aqui!',
-        redirectToExpensifyClassicModal: {
-            title: 'Em breve',
-            description: 'Estamos ajustando mais alguns detalhes do New Expensify para acomodar sua configuração específica. Enquanto isso, vá para o Expensify Classic.',
-        },
     },
     homePage: {
         forYou: 'Para você',
@@ -1038,6 +1035,7 @@ const translations: TranslationDeepObject<typeof en> = {
             customizeCategories: 'Personalizar categorias contábeis',
             linkCompanyCards: 'Vincular cartões corporativos',
             setupRules: 'Configurar regras de gasto',
+            inviteAccountant: 'Convide seu contador',
         },
     },
     allSettingsScreen: {
@@ -1455,6 +1453,7 @@ const translations: TranslationDeepObject<typeof en> = {
             manySplitsProvided: `O número máximo de divisões permitido é ${CONST.IOU.SPLITS_LIMIT}.`,
             dateRangeExceedsMaxDays: `O intervalo de datas não pode exceder ${CONST.IOU.SPLITS_LIMIT} dias.`,
             stitchOdometerImagesFailed: 'Falha ao combinar imagens do hodômetro. Tente novamente mais tarde.',
+            failedToSaveOdometerDraft: 'Não foi possível salvar seu rascunho do hodômetro. Tente novamente.',
         },
         dismissReceiptError: 'Dispensar erro',
         dismissReceiptErrorConfirmation: 'Atenção! Ignorar este erro removerá completamente o comprovante que você enviou. Tem certeza?',
@@ -2582,6 +2581,10 @@ ${amount} para ${merchant} - ${date}`,
             approverSubtitle: 'Todas as pessoas aprovadoras pertencem a um fluxo de trabalho existente.',
             bulkApproverSubtitle: 'Nenhum aprovador corresponde aos critérios para os relatórios selecionados.',
         },
+        configureViaGusto: 'Configurar via Gusto.',
+        gustoApprovalWorkflowLockedPrompt:
+            'As aprovações são gerenciadas pela sua integração com o Gusto. Para atualizar seu fluxo de aprovação, vá até as configurações de conexão do Gusto.',
+        goToGustoSettings: 'Ir para as configurações do Gusto',
     },
     workflowsDelayedSubmissionPage: {
         autoReportingFrequencyErrorMessage: 'Não foi possível alterar a frequência de envio. Tente novamente ou entre em contato com o suporte.',
@@ -2721,6 +2724,19 @@ ${amount} para ${merchant} - ${date}`,
         subtitle: 'Crie agentes para gerenciar seu fluxo de trabalho. Pule o trabalho manual e ganhe horas de volta no seu dia.',
         newAgent: 'Novo agente',
         emptyAgents: {title: 'Nenhum agente criado', subtitle: 'Pare de fazer tudo manualmente. Instrua um agente e economize muito tempo.'},
+        error: {
+            genericAdd: 'Houve um problema ao adicionar este agente',
+        },
+    },
+    addAgentPage: {
+        title: 'Novo agente',
+        agentName: 'Nome do agente',
+        instructions: 'Escrever instruções personalizadas',
+        createAgent: 'Criar agente',
+        switchAvatar: 'Trocar avatar',
+        defaultAgentName: (displayName: string) => `Agente de ${displayName}`,
+        defaultPrompt:
+            'Rejeite despesas relacionadas a jogos de azar, cinema ou outros motivos claramente não relacionados ao negócio.\n\nLembre o usuário de sempre incluir uma imagem do recibo em que a gorjeta fique clara.\n\nAprove o relatório se ele for muito semelhante a relatórios anteriores do mesmo usuário.\n\nRejeite relatórios com mais de US$ 500 em despesas de viagem.',
     },
     expenseRulesPage: {
         title: 'Regras de despesas',
@@ -2839,6 +2855,7 @@ ${amount} para ${merchant} - ${date}`,
     },
     validateCodeForm: {
         magicCodeNotReceived: 'Não recebeu um código mágico?',
+        avoidScamsMessage: '<strong>Evite golpes. Não compartilhe seu código com ninguém.</strong> Nossa equipe nunca ligará, enviará SMS ou e-mail para pedir esse código.',
         enterAuthenticatorCode: 'Insira seu código do autenticador',
         enterRecoveryCode: 'Insira seu código de recuperação',
         requiredWhen2FAEnabled: 'Obrigatório quando a 2FA estiver ativada',
@@ -2904,10 +2921,10 @@ ${amount} para ${merchant} - ${date}`,
             title: 'O que você quer fazer hoje?',
             errorContinue: 'Pressione continuar para concluir a configuração',
             errorBackButton: 'Conclua as perguntas de configuração para começar a usar o app',
-            [CONST.ONBOARDING_CHOICES.EMPLOYER]: 'Ser reembolsado pelo meu empregador',
+            [CONST.ONBOARDING_CHOICES.EMPLOYER]: 'Enviar despesas ao meu empregador',
             [CONST.ONBOARDING_CHOICES.MANAGE_TEAM]: 'Gerenciar as despesas da minha equipe',
-            [CONST.ONBOARDING_CHOICES.PERSONAL_SPEND]: 'Controle e planeje despesas',
-            [CONST.ONBOARDING_CHOICES.CHAT_SPLIT]: 'Converse e divida despesas com amigos',
+            [CONST.ONBOARDING_CHOICES.TRACK_BUSINESS]: 'Controlar despesas do meu negócio',
+            [CONST.ONBOARDING_CHOICES.TRACK_PERSONAL]: 'Organizar meus gastos pessoais',
             [CONST.ONBOARDING_CHOICES.LOOKING_AROUND]: 'Outra coisa',
         },
         employees: {
@@ -4294,6 +4311,10 @@ ${amount} para ${merchant} - ${date}`,
             travelInvoicingPayableAccount: 'Conta a pagar de viagens',
             hr: 'RH',
         },
+        createdForClient: {
+            title: 'Você criou um espaço de trabalho para seu cliente!',
+            description: 'Ótimas notícias 🎉. Entre em contato conosco se precisarem de ajuda com a configuração.',
+        },
         receiptPartners: {
             uber: {
                 subtitle: (organizationName: string) =>
@@ -4749,8 +4770,8 @@ ${amount} para ${merchant} - ${date}`,
             journalPostingPreference: {
                 label: 'Preferência de lançamento de lançamentos contábeis',
                 values: {
-                    [CONST.NETSUITE_JOURNAL_POSTING_PREFERENCE.JOURNALS_POSTING_INDIVIDUAL_LINE]: 'Lançamento único, detalhado, para cada relatório',
-                    [CONST.NETSUITE_JOURNAL_POSTING_PREFERENCE.JOURNALS_POSTING_TOTAL_LINE]: 'Lançamento único para cada despesa',
+                    [CONST.NETSUITE_JOURNAL_POSTING_PREFERENCE.JOURNALS_POSTING_INDIVIDUAL_LINE]: 'Lançamento único para cada despesa',
+                    [CONST.NETSUITE_JOURNAL_POSTING_PREFERENCE.JOURNALS_POSTING_TOTAL_LINE]: 'Lançamento único e detalhado para cada relatório',
                 },
             },
             invoiceItem: {
@@ -5258,6 +5279,7 @@ _Para instruções mais detalhadas, [visite nossa central de ajuda](${CONST.NETS
                     requiredColumns: (missingColumns: string) => `Atribua uma coluna a cada um dos atributos: ${missingColumns}.`,
                     duplicateColumns: (duplicateColumn: string) => `Ops! Você mapeou um único campo ("${duplicateColumn}") para várias colunas. Revise e tente novamente.`,
                 },
+                fileImportDescription: 'Uma opção manual caso seu banco não possa enviar um feed.',
             },
             statementCloseDate: {
                 [CONST.COMPANY_CARDS.STATEMENT_CLOSE_DATE.LAST_DAY_OF_MONTH]: 'Último dia do mês',
@@ -5350,6 +5372,8 @@ _Para instruções mais detalhadas, [visite nossa central de ajuda](${CONST.NETS
             settlementFrequency: 'Frequência de liquidação',
             settlementFrequencyDescription: 'Escolha com que frequência você vai pagar o saldo do seu Cartão Expensify.',
             settlementFrequencyInfo: 'Se quiser mudar para liquidação mensal, você precisará conectar sua conta bancária via Plaid e ter um histórico de saldo positivo de 90 dias.',
+            applyCashbackToBill: 'Aplicar reembolso à minha fatura do Expensify',
+            applyCashbackToBillDescription: 'O reembolso do Cartão Expensify será usado para o pagamento da sua fatura do Expensify.',
             frequency: {
                 daily: 'Diariamente',
                 monthly: 'Mensal',
@@ -5696,6 +5720,7 @@ _Para instruções mais detalhadas, [visite nossa central de ajuda](${CONST.NETS
                 subtitle: 'Defina uma taxa horária faturável para o controle de tempo.',
                 defaultHourlyRate: 'Taxa horária padrão',
             },
+            hrWarningModal: {disconnectText: 'Para desativar o RH, primeiro desconecte o Gusto deste workspace.'},
         },
         reports: {
             reportsCustomTitleExamples: 'Exemplos:',
@@ -5987,6 +6012,8 @@ _Para instruções mais detalhadas, [visite nossa central de ajuda](${CONST.NETS
             approvers: 'Aprovadores',
             auditors: 'Auditores',
             emptyRoleFilter: {title: 'Nenhum membro corresponde a este filtro', subtitle: 'Convide um membro ou altere o filtro acima.'},
+            configureGustoSync: 'Configurar sincronização com Gusto.',
+            syncWithGusto: 'Sincronizar com Gusto',
         },
         card: {
             getStartedIssuing: 'Comece emitindo seu primeiro cartão virtual ou físico.',
@@ -6424,7 +6451,7 @@ _Para instruções mais detalhadas, [visite nossa central de ajuda](${CONST.NETS
             updateToUSD: 'Atualizar para USD',
             updateWorkspaceCurrency: 'Atualizar moeda do espaço de trabalho',
             workspaceCurrencyNotSupported: 'Moeda do workspace não suportada',
-            yourWorkspace: `Seu workspace está configurado para uma moeda não compatível. Veja a <a href="${CONST.CONNECT_A_BUSINESS_BANK_ACCOUNT_HELP_URL}">lista de moedas compatíveis</a>.`,
+            yourWorkspace: `Seu workspace está configurado para uma moeda não compatível. Veja a <a href="${CONST.ENABLE_GLOBAL_REIMBURSEMENT_HELP_URL}">lista de moedas compatíveis</a>.`,
             chooseAnExisting: 'Escolha uma conta bancária existente para pagar despesas ou adicione uma nova.',
         },
         changeOwner: {
@@ -6738,6 +6765,8 @@ Exija dados de despesas como recibos e descrições, defina limites e padrões e
                 gambling: 'Jogos de azar',
                 tobacco: 'Tabaco',
                 adultEntertainment: 'Entretenimento adulto',
+                giftCard: 'Compras de cartão-presente',
+                handwrittenReceipt: 'Recibos manuscritos',
                 requireCompanyCard: 'Exigir cartões corporativos para todas as compras',
                 requireCompanyCardDescription: 'Sinalize todos os gastos em dinheiro, incluindo despesas com quilometragem e diárias.',
                 requireCompanyCardDisabledTooltip: 'Ative Cartões corporativos (em Mais recursos) para desbloquear.',
@@ -6837,6 +6866,8 @@ Exija dados de despesas como recibos e descrições, defina limites e padrões e
             customRules: {
                 title: 'Política de despesas',
                 cardSubtitle: 'Aqui é onde fica a política de despesas da sua equipe, para que todo mundo esteja alinhado sobre o que é coberto.',
+                policyDocument: 'Documento de política',
+                policyText: 'Texto da política',
             },
             spendRules: {
                 title: 'Gasto',
@@ -6973,16 +7004,12 @@ Adicione mais regras de gasto para proteger o fluxo de caixa da empresa.`,
             settingsTitle: 'Configurações do Gusto',
             syncStageName: ({stage}: SyncStageNameConnectionsParams) => {
                 switch (stage) {
-                    case 'startingImportGusto':
-                        return 'Importando dados do Gusto';
-                    case 'gustoSyncLoadCompany':
-                        return 'Carregando dados da empresa Gusto';
-                    case 'gustoSyncImportEmployees':
-                        return 'Importando funcionários';
-                    case 'gustoSyncBuildApprovalChains':
-                        return 'Criando cadeias de aprovação';
-                    case 'gustoSyncFinalize':
-                        return 'Finalizando a sincronização';
+                    case 'gustoSyncTitle':
+                        return 'Synchronizing Gusto Employees';
+                    case 'gustoSyncLoadData':
+                        return 'Loading data from Gusto';
+                    case 'gustoSyncProvisioning':
+                        return 'Provisioning employees in policy';
                     case 'jobDone':
                         return 'Aguardando o carregamento dos dados importados';
                     default: {
@@ -6994,8 +7021,25 @@ Adicione mais regras de gasto para proteger o fluxo de caixa da empresa.`,
                 title: 'Gusto',
                 approvalMode: 'Modo de aprovação',
                 finalApprover: 'Aprovador final',
+                notSet: 'Não definido',
+                approvalModeDescription: 'Membros e gerentes estão configurados para sincronizar com o Gusto.',
+                approvalModeWarningTitle: 'Alterar modo de aprovação?',
+                approvalModeWarningPrompt: (helpSiteURL: string) =>
+                    `Tem certeza de que deseja alterar o modo de aprovação deste workspace? Saiba mais sobre os diferentes modos de fluxo de trabalho com Gusto em nosso <a href="${helpSiteURL}">site de ajuda</a>.`,
+                approvalModeWarningConfirm: 'Alterar modo de aprovação',
+                approvalModes: {
+                    basic: {label: 'Aprovação básica', description: 'Todos os usuários enviam para uma única pessoa para processamento e aprovação.'},
+                    manager: {label: 'Aprovação do gerente', description: 'Os funcionários enviam relatórios ao gestor direto configurado no Gusto.'},
+                    custom: {label: 'Aprovação personalizada', description: 'Vou configurar manualmente os fluxos de aprovação no Expensify.'},
+                },
                 connect: 'Conectar',
                 connectionDescription: 'Conecte o Gusto para manter as aprovações de funcionários sincronizadas com seu workspace.',
+                syncNow: 'Sincronizar agora',
+                disconnect: 'Desconectar',
+                lastSync: (relativeDate: string) => `Última sincronização ${relativeDate}`,
+                syncError: 'Não é possível conectar ao Gusto',
+                disconnectTitle: 'Desconectar Gusto',
+                disconnectPrompt: 'Tem certeza de que deseja desconectar o Gusto?',
             },
         },
     },
@@ -7644,6 +7688,7 @@ Adicione mais regras de gasto para proteger o fluxo de caixa da empresa.`,
         deleteSavedSearchConfirm: 'Tem certeza de que deseja excluir esta pesquisa?',
         searchName: 'Pesquisar nome',
         savedSearchesMenuItemTitle: 'Salvo',
+        urlCopied: 'URL copiado',
         groupedExpenses: 'despesas agrupadas',
         bulkActions: {
             editMultiple: 'Editar múltiplos',
@@ -7732,6 +7777,7 @@ Adicione mais regras de gasto para proteger o fluxo de caixa da empresa.`,
             withdrawalType: {
                 [CONST.SEARCH.WITHDRAWAL_TYPE.EXPENSIFY_CARD]: 'Cartão Expensify',
                 [CONST.SEARCH.WITHDRAWAL_TYPE.REIMBURSEMENT]: 'Reembolso',
+                [CONST.SEARCH.WITHDRAWAL_TYPE.CENTRAL_TRAVEL_INVOICING]: 'Faturamento centralizado',
             },
             is: 'É',
             action: {
@@ -7917,6 +7963,7 @@ Adicione mais regras de gasto para proteger o fluxo de caixa da empresa.`,
                     reimburseableLink: 'despesas reembolsáveis',
                     nonReimbursableLink: 'despesas com cartão corporativo',
                     pending: (label: string) => `iniciou a exportação deste relatório para ${label}...`,
+                    travelCardLink: 'despesas do cartão de viagem',
                 },
                 integrationsMessage: (errorMessage: string, label: string, linkText?: string, linkURL?: string) =>
                     `falha ao exportar este relatório para ${label} ("${errorMessage}${linkText ? `<a href="${linkURL}">${linkText}</a>` : ''}")`,
@@ -8146,6 +8193,7 @@ Adicione mais regras de gasto para proteger o fluxo de caixa da empresa.`,
         companyCard: 'Cartão corporativo',
         expensifyCard: 'Cartão Expensify',
         centralInvoicing: 'Faturamento centralizado',
+        travelCard: 'Cartão de viagem',
     },
     distance: {
         addStop: 'Adicionar parada',
@@ -8189,13 +8237,9 @@ Adicione mais regras de gasto para proteger o fluxo de caixa da empresa.`,
         stopped: 'Parado',
         start: 'Iniciar',
         stop: 'Parar',
+        save: 'Salvar',
+        resume: 'Currículo',
         discard: 'Descartar',
-        stopGpsTrackingModal: {
-            title: 'Parar rastreamento por GPS',
-            prompt: 'Tem certeza? Isso encerrará sua jornada atual.',
-            cancel: 'Retomar rastreamento',
-            confirm: 'Parar rastreamento por GPS',
-        },
         discardDistanceTrackingModal: {
             title: 'Descartar rastreamento de distância',
             prompt: 'Tem certeza? Isso vai descartar sua jornada atual e não poderá ser desfeito.',
@@ -8254,7 +8298,7 @@ Adicione mais regras de gasto para proteger o fluxo de caixa da empresa.`,
             prompt: 'Permita o acesso à localização nas configurações do seu dispositivo para iniciar o rastreamento de distância por GPS.',
         },
         gpsFloatingPillText: 'Rastreamento por GPS em andamento...',
-        liveActivity: {subtitle: 'Rastreamento de distância', button: 'Ver progresso'},
+        liveActivity: {subtitle: 'Rastreamento de distância', button: 'Ver progresso', lockScreenBadgeText: 'Distância', lockScreenTrackingText: 'Rastreando...'},
     },
     reportCardLostOrDamaged: {
         screenTitle: 'Boletim perdido ou danificado',
@@ -8374,6 +8418,10 @@ Adicione mais regras de gasto para proteger o fluxo de caixa da empresa.`,
                         return `entretenimento adulto`;
                     case 'hotelIncidentals':
                         return `despesas incidentais de hotel`;
+                    case 'giftCard':
+                        return `compras de cartão-presente`;
+                    case 'handwrittenReceipt':
+                        return `recibos manuscritos`;
                     default:
                         return `${prohibitedExpenseType}`;
                 }
@@ -9149,7 +9197,13 @@ Aqui está um *comprovante de teste* para mostrar como funciona:`,
                 `Tem certeza de que deseja tornar ${newName} o grupo padrão? Novos membros serão convidados para este grupo em vez do grupo padrão anterior (${currentName}). `,
             makeDefault: 'Tornar padrão',
             neverMind: 'Deixa pra lá',
+            createGroupError: 'Não foi possível criar este grupo. Tente novamente.',
             permissions: 'Permissões do grupo',
+            createNewGroupButton: 'Novo grupo',
+            createGroupSubmitButton: 'Criar grupo',
+            expensifyCardPreferredWorkspace: 'Espaço de trabalho preferido do Expensify Card',
+            expensifyCardPreferredWorkspaceDescription:
+                'Todas as transações do Expensify Card serão criadas no espaço de trabalho preferido do Expensify Card em vez do espaço de trabalho preferido.',
             strictlyEnforceWorkspaceRules: 'Aplicar rigorosamente as regras do espaço de trabalho',
             strictlyEnforceWorkspaceRulesDescription: 'Todas as regras do espaço de trabalho devem ser atendidas antes de enviar um relatório. Não são permitidas exceções manuais.',
             restrictExpenseWorkspaceCreation: 'Restringir a criação/remoção de espaços de trabalho de despesas',
@@ -9168,6 +9222,9 @@ Aqui está um *comprovante de teste* para mostrar como funciona:`,
             restrictDefaultLoginSelection: 'Restringir seleção de login padrão',
             restrictDefaultLoginSelectionDescription:
                 'Impede que os membros alterem o e-mail de login para um endereço fora do domínio da empresa, evitando que burlem restrições de políticas.',
+            expensifyCardPreferredWorkspaceDisabledMessage:
+                'Para usar esta configuração, o espaço de trabalho preferido deve estar habilitado e o domínio deve ter o Expensify Card configurado.',
+            findGroup: 'Encontrar grupo',
         },
     },
     proactiveAppReview: {
