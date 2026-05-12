@@ -1,3 +1,4 @@
+import {isModalActiveSelector} from '@selectors/Modal';
 import React, {useState} from 'react';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useDelegateAccountID from '@hooks/useDelegateAccountID';
@@ -16,7 +17,7 @@ function ProactiveAppReviewModalManager() {
     const {shouldShowModal, proactiveAppReview} = useProactiveAppReview();
     const [conciergeReportID] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID);
     const [isAnyOtherModalActive] = useOnyx(ONYXKEYS.MODAL, {
-        selector: (m) => !!m?.isVisible || !!m?.willAlertModalBecomeVisible,
+        selector: isModalActiveSelector,
     });
     const delegateAccountID = useDelegateAccountID();
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
