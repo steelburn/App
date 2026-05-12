@@ -312,7 +312,9 @@ function useSearchHighlightAndScroll({
         triggeredByHookRef.current = false;
     };
 
-    return {newSearchResultKeys, handleSelectionListScroll, newTransactions};
+    const hasQueuedHighlights = newSearchResultKeys !== null && newSearchResultKeys.size > 0;
+
+    return {newSearchResultKeys, handleSelectionListScroll, newTransactions, hasQueuedHighlights};
 }
 
 /**
