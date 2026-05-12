@@ -1,4 +1,3 @@
-import React, {useCallback} from 'react';
 import type {ValueOf} from 'type-fest';
 import type {ListItem} from '@components/SelectionList/types';
 import SelectionScreen from '@components/SelectionScreen';
@@ -36,19 +35,16 @@ function NetSuiteTravelInvoicingJournalPostingPreferenceSelectPage({policy}: Wit
         isSelected: selectedValue === postingPreference,
     }));
 
-    const goBack = useCallback(() => {
+    const goBack = () => {
         Navigation.goBack(ROUTES.POLICY_ACCOUNTING_NETSUITE_TRAVEL_INVOICING_CONFIGURATION.getRoute(policyID));
-    }, [policyID]);
+    };
 
-    const selectPostingPreference = useCallback(
-        (row: MenuListItem) => {
-            if (row.value !== config?.travelInvoicingJournalPostingPreference) {
-                updateNetSuiteTravelInvoicingJournalPostingPreference(policyID, row.value, config?.travelInvoicingJournalPostingPreference);
-            }
-            goBack();
-        },
-        [config?.travelInvoicingJournalPostingPreference, goBack, policyID],
-    );
+    const selectPostingPreference = (row: MenuListItem) => {
+        if (row.value !== config?.travelInvoicingJournalPostingPreference) {
+            updateNetSuiteTravelInvoicingJournalPostingPreference(policyID, row.value, config?.travelInvoicingJournalPostingPreference);
+        }
+        goBack();
+    };
 
     return (
         <SelectionScreen
