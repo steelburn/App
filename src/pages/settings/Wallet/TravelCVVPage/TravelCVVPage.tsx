@@ -162,7 +162,7 @@ function TravelCVVPage() {
                                 key={`cvv-${digit}-${index}`}
                                 style={[styles.alignItemsCenter, styles.justifyContentCenter, styles.travelCVVDigitBox]}
                             >
-                                <Text style={[styles.textXLarge, styles.travelCVVDigitText]}>{digit}</Text>
+                                <Text style={[styles.textXLargeThemeText]}>{digit}</Text>
                             </View>
                         ))}
                     </View>

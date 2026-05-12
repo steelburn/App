@@ -563,6 +563,11 @@ const staticStyles = (theme: ThemeColors) =>
             fontSize: variables.fontSizeXLarge,
         },
 
+        textXLargeThemeText: {
+            color: theme.text,
+            fontSize: variables.fontSizeXLarge,
+        },
+
         textXXLarge: {
             fontSize: variables.fontSizeXXLarge,
         },
@@ -5370,11 +5375,6 @@ const staticStyles = (theme: ThemeColors) =>
             borderWidth: 1,
             borderColor: theme.border,
             borderRadius: variables.componentBorderRadiusMedium,
-            backgroundColor: theme.componentBG,
-        },
-
-        travelCVVDigitText: {
-            color: theme.text,
         },
 
         travelInvoicingIcon: {
