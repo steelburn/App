@@ -83,18 +83,24 @@ jobs:
             local tag="$1"
             local head_sha
             head_sha=$(git rev-parse HEAD)
-            if git tag "$tag" 2>/dev/null; then
-              git push origin --tags
-            else
-              git fetch origin "refs/tags/$tag:refs/tags/$tag" 2>/dev/null || true
+            # Fetch the tag from remote before checking locally. actions/checkout uses
+            # fetch-depth=1 and fetch-tags=false by default, so a previously pushed tag
+            # won't be present in the workspace. Without this fetch, git tag "$tag" would
+            # succeed locally and then git push would fail because the tag already exists
+            # on the remote, causing the idempotent path below to be unreachable.
+            git fetch origin "refs/tags/$tag:refs/tags/$tag" 2>/dev/null || true
+            if git rev-parse "refs/tags/$tag" >/dev/null 2>&1; then
               local existing_sha
-              existing_sha=$(git rev-parse "refs/tags/$tag" 2>/dev/null || echo "unknown")
+              existing_sha=$(git rev-parse "refs/tags/$tag")
               if [ "$existing_sha" = "$head_sha" ]; then
                 echo "Tag $tag already exists at $head_sha, skipping creation."
               else
                 echo "ERROR: Tag $tag exists at $existing_sha, expected $head_sha"
                 exit 1
               fi
+            else
+              git tag "$tag"
+              git push origin --tags
             fi
           }
           create_tag_idempotent ${{ steps.getTagName.outputs.TAG }}
