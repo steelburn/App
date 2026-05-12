@@ -25,11 +25,11 @@ import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import DescriptiveText from './OptionRow/DescriptiveText';
 import DraftIndicator from './OptionRow/DraftIndicator';
+import ErrorBadge from './OptionRow/ErrorBadge';
 import InfoBadge from './OptionRow/InfoBadge';
 import Subtitle from './OptionRow/Subtitle';
 import Title from './OptionRow/Title';
 import OptionRowAvatar from './OptionRowAvatar';
-import OptionRowErrorBadge from './OptionRowErrorBadge';
 import OptionRowPressable from './OptionRowPressable';
 import OptionRowTooltipLayer from './OptionRowTooltipLayer';
 
@@ -153,9 +153,9 @@ function OptionRowLHN({isOptionFocused = false, onSelectRow = () => {}, optionIt
                                     />
                                 </View>
                                 <DescriptiveText optionItem={optionItem} />
-                                <OptionRowErrorBadge
+                                <ErrorBadge
                                     brickRoadIndicator={brickRoadIndicator}
-                                    actionBadgeText={actionBadgeText}
+                                    actionBadge={optionItem.actionBadge}
                                 />
                             </View>
                         </View>
