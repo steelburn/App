@@ -1,4 +1,4 @@
-import React, {useCallback, useState} from 'react';
+import React, {useState} from 'react';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useDelegateAccountID from '@hooks/useDelegateAccountID';
 import useOnyx from '@hooks/useOnyx';
@@ -15,56 +15,53 @@ const CONCIERGE_NEGATIVE_MESSAGE = "Hi there! I'm sorry to hear you aren't fully
 function ProactiveAppReviewModalManager() {
     const {shouldShowModal, proactiveAppReview} = useProactiveAppReview();
     const [conciergeReportID] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID);
-    const [modal] = useOnyx(ONYXKEYS.MODAL);
+    const [isAnyOtherModalActive] = useOnyx(ONYXKEYS.MODAL, {
+        selector: (m) => !!m?.isVisible || !!m?.willAlertModalBecomeVisible,
+    });
     const delegateAccountID = useDelegateAccountID();
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
     const currentUserEmail = currentUserPersonalDetails?.email;
     const currentUserAccountID = currentUserPersonalDetails?.accountID;
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isAppReviewModalOpen, setIsAppReviewModalOpen] = useState(false);
 
-    const isOtherModalActive = !!modal?.isVisible || !!modal?.willAlertModalBecomeVisible;
-
-    // Latch: open the modal when eligible and no other modal is visible.
-    // Once open, it stays open even when BaseModal writes to ONYXKEYS.MODAL
-    // for the AppReview modal itself (which would otherwise self-dismiss).
+    // Latch open: show the App Review modal only when the user is eligible AND
+    // no other modal (e.g. attachment picker, settings) is on screen. Once latched,
+    // it stays open even though the App Review modal's own BaseModal writes
+    // isVisible:true to ONYXKEYS.MODAL (which would otherwise self-dismiss it).
     // Using setState-during-render (React-recommended derived state pattern)
     // instead of useEffect to satisfy react-hooks/set-state-in-effect.
-    if (shouldShowModal && !isOtherModalActive && !isModalOpen) {
-        setIsModalOpen(true);
+    if (shouldShowModal && !isAnyOtherModalActive && !isAppReviewModalOpen) {
+        setIsAppReviewModalOpen(true);
     }
-    if (!shouldShowModal && isModalOpen) {
-        setIsModalOpen(false);
+    // Latch reset: close the App Review modal when the user is no longer eligible
+    // (e.g. after they respond and Onyx updates shouldShowModal to false).
+    if (!shouldShowModal && isAppReviewModalOpen) {
+        setIsAppReviewModalOpen(false);
     }
 
-    const handleResponse = useCallback(
-        (response: AppReviewResponse, message?: string) => {
-            // Call the action which will create an optimistic comment (if the message is provided) and call the API
-            respondToProactiveAppReview(response, proactiveAppReview, currentUserEmail, currentUserAccountID, delegateAccountID, message, conciergeReportID);
-        },
-        [conciergeReportID, proactiveAppReview, currentUserEmail, currentUserAccountID, delegateAccountID],
-    );
+    const handleResponse = (response: AppReviewResponse, message?: string) => {
+        respondToProactiveAppReview(response, proactiveAppReview, currentUserEmail, currentUserAccountID, delegateAccountID, message, conciergeReportID);
+    };
 
-    const handlePositive = useCallback(() => {
-        setIsModalOpen(false);
+    const handlePositive = () => {
+        setIsAppReviewModalOpen(false);
         handleResponse('positive', CONCIERGE_POSITIVE_MESSAGE);
-
-        // Trigger native app store review prompt
         requestStoreReview();
-    }, [handleResponse]);
+    };
 
-    const handleNegative = useCallback(() => {
-        setIsModalOpen(false);
+    const handleNegative = () => {
+        setIsAppReviewModalOpen(false);
         handleResponse('negative', CONCIERGE_NEGATIVE_MESSAGE);
-    }, [handleResponse]);
+    };
 
-    const handleSkip = useCallback(() => {
-        setIsModalOpen(false);
+    const handleSkip = () => {
+        setIsAppReviewModalOpen(false);
         handleResponse('skip');
-    }, [handleResponse]);
+    };
 
     return (
         <ProactiveAppReviewModal
-            isVisible={isModalOpen}
+            isVisible={isAppReviewModalOpen}
             onPositive={handlePositive}
             onNegative={handleNegative}
             onSkip={handleSkip}
