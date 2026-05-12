@@ -16,7 +16,6 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import useThrottledButtonState from '@hooks/useThrottledButtonState';
 import {resetValidateActionCodeSent} from '@libs/actions/User';
 import Clipboard from '@libs/Clipboard';
-import CopyTextToClipboard from '@components/CopyTextToClipboard';
 import Navigation from '@libs/Navigation/Navigation';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
@@ -129,7 +128,7 @@ function TravelCVVPage() {
                 style={[styles.mt10, styles.alignSelfCenter]}
             />
         );
-    } else if (!isSignedInAsDelegate) {
+    } else if (!cvv && !isSignedInAsDelegate) {
         actionButton = (
             <Button
                 text={translate('cardPage.cardDetails.revealDetails')}
