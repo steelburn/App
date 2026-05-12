@@ -384,7 +384,8 @@ function IOURequestStepConfirmation({
         return hasPolicyExpenseChat(defaultParticipants);
     }, [report, transaction?.participants, defaultParticipants]);
 
-    const isFromGlobalCreate = !!transaction?.isFromGlobalCreate || !!transaction?.isFromFloatingActionButton;
+    const isFromGlobalCreate = transaction?.isFromGlobalCreate === true || transaction?.isFromFloatingActionButton === true;
+
     useFetchRoute(transaction, transaction?.comment?.waypoints, action, shouldUseTransactionDraft(action, iouType) ? CONST.TRANSACTION.STATE.DRAFT : CONST.TRANSACTION.STATE.CURRENT);
 
     const policyExpenseChatPolicyID =
@@ -462,8 +463,10 @@ function IOURequestStepConfirmation({
 
         // Only eligible when search pre-insert didn't win, and the flow ends at a report (not Search).
         // Split flows handle their own dismiss/navigation, so pre-inserting would cause double navigation.
+        // When Search is the topmost fullscreen and there's no report context (e.g. QAB from Spend tab),
+        // pre-inserting a report is wrong - the user should stay on Search after submission.
         const isSplitRequest = iouType === CONST.IOU.TYPE.SPLIT;
-        const canUseReportPreInsert = !isSplitRequest && !shouldPreInsertSearch && (!isFromGlobalCreate || isReportTopmostSplitNavigator());
+        const canUseReportPreInsert = !isSplitRequest && !shouldPreInsertSearch && (isReportTopmostSplitNavigator() || (!isFromGlobalCreate && !isSearchTopmostFullScreenRoute()));
 
         // RHP has its own dismiss handler; pre-inserting under it would break the stack.
         const isOutsideRHP = !isReportOpenInRHP(navigationRef.getRootState());
