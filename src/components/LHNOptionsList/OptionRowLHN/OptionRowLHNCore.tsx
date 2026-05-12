@@ -4,7 +4,6 @@ import {StyleSheet, View} from 'react-native';
 import Icon from '@components/Icon';
 import {useLHNTooltipContext} from '@components/LHNOptionsList/LHNTooltipContext';
 import type {OptionRowLHNProps} from '@components/LHNOptionsList/types';
-import Text from '@components/Text';
 import getContextMenuAccessibilityHint from '@components/utils/getContextMenuAccessibilityHint';
 import getContextMenuAccessibilityProps from '@components/utils/getContextMenuAccessibilityProps';
 import useEnvironment from '@hooks/useEnvironment';
