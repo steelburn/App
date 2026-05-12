@@ -66,6 +66,16 @@ function CollapsibleHeaderOnKeyboard({children, collapsibleHeaderOffset = 0}: Co
         if (height <= 0) {
             return;
         }
+
+        // Header re-measured in portrait mode and the content is taller than the previous measurement,
+        // set the natural height to the new height and animate the height to the new height.
+        // This can happen when header has different height on portrait and landscape mode.
+        if (!isInLandscapeMode && height > naturalHeightRef.current && naturalHeightRef.current !== -1) {
+            naturalHeight.set(height);
+            animatedHeight.set(withTiming(height, {duration: RESTORE_DURATION}));
+            return;
+        }
+
         // First measurement, or content changed while header is fully open
         // (to skip onLayout calls triggered by our own height animation collapsing the view to 0)
         if (naturalHeightRef.current === -1 || animatedHeight.get() >= naturalHeightRef.current) {
@@ -81,7 +91,8 @@ function CollapsibleHeaderOnKeyboard({children, collapsibleHeaderOffset = 0}: Co
         if (!isInLandscapeMode && isFocused && naturalHeightValue !== -1) {
             animatedHeight.set(withTiming(naturalHeightValue, {duration: RESTORE_DURATION}));
         }
-    }, [isInLandscapeMode, isFocused, animatedHeight]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isInLandscapeMode]);
 
     // Restores the header when the screen loses focus
     useEffect(() => {
@@ -159,7 +170,7 @@ function CollapsibleHeaderOnKeyboard({children, collapsibleHeaderOffset = 0}: Co
         // When fully open, leave height undefined so the view sizes itself naturally.
         // This avoids fighting the layout engine during orientation changes.
         if (animatedHeight.get() >= naturalHeight.get()) {
-            return {overflow: 'hidden'};
+            return {overflow: 'hidden', height: 'auto'};
         }
         return {height: animatedHeight.get(), overflow: 'hidden'};
     });
