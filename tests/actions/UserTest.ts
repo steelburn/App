@@ -6,8 +6,8 @@ import CONST from '@src/CONST';
 import type {OnyxKey} from '@src/ONYXKEYS';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {NewLogin} from '@src/types/onyx';
-import * as UserActions from '../../src/libs/actions/User';
 import redirectToSignIn from '../../src/libs/actions/SignInRedirect';
+import * as UserActions from '../../src/libs/actions/User';
 import waitForBatchedUpdates from '../utils/waitForBatchedUpdates';
 
 jest.mock('@libs/API');
