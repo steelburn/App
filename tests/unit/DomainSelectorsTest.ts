@@ -17,11 +17,9 @@ import {
     technicalContactSettingsSelector,
     vacationDelegateSelector,
 } from '@selectors/Domain';
-import {isAdminForPolicyByIDSelector} from '@selectors/Policy';
 import type {OnyxEntry} from 'react-native-onyx';
 import CONST from '@src/CONST';
-import ONYXKEYS from '@src/ONYXKEYS';
-import type {CardFeeds, Domain, DomainErrors, DomainPendingActions, DomainSecurityGroup, DomainSettings, Policy} from '@src/types/onyx';
+import type {CardFeeds, Domain, DomainErrors, DomainPendingActions, DomainSecurityGroup, DomainSettings} from '@src/types/onyx';
 import type {BaseVacationDelegate} from '@src/types/onyx/VacationDelegate';
 
 describe('domainSelectors', () => {
@@ -863,36 +861,5 @@ describe('domainSelectors', () => {
             });
             expect(selectRestrictedPrimaryPolicyID('g2')(domain)).toBe('pB');
         });
-    });
-});
-
-describe('isAdminForPolicyByIDSelector', () => {
-    const P = ONYXKEYS.COLLECTION.POLICY;
-
-    it('returns true when policyID is undefined', () => {
-        expect(isAdminForPolicyByIDSelector(undefined)(null)).toBe(true);
-    });
-
-    it('returns true when policyID is empty string', () => {
-        expect(isAdminForPolicyByIDSelector('')({[`${P}p1`]: {role: CONST.POLICY.ROLE.USER} as Policy})).toBe(true);
-    });
-
-    it('returns false when policies is null and policyID is provided', () => {
-        expect(isAdminForPolicyByIDSelector('p1')(null)).toBe(false);
-    });
-
-    it('returns false when the policy is not found in the collection', () => {
-        const policies = {[`${P}p2`]: {role: CONST.POLICY.ROLE.ADMIN} as Policy};
-        expect(isAdminForPolicyByIDSelector('p1')(policies)).toBe(false);
-    });
-
-    it('returns false when policy exists but role is not admin', () => {
-        const policies = {[`${P}p1`]: {role: CONST.POLICY.ROLE.USER} as Policy};
-        expect(isAdminForPolicyByIDSelector('p1')(policies)).toBe(false);
-    });
-
-    it('returns true when policy exists and role is admin', () => {
-        const policies = {[`${P}p1`]: {role: CONST.POLICY.ROLE.ADMIN} as Policy};
-        expect(isAdminForPolicyByIDSelector('p1')(policies)).toBe(true);
     });
 });
