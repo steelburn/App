@@ -13,8 +13,10 @@ import useLocalize from '@hooks/useLocalize';
 import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
+import useThrottledButtonState from '@hooks/useThrottledButtonState';
 import {resetValidateActionCodeSent} from '@libs/actions/User';
 import Clipboard from '@libs/Clipboard';
+import CopyTextToClipboard from '@components/CopyTextToClipboard';
 import Navigation from '@libs/Navigation/Navigation';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
@@ -29,6 +31,7 @@ import {useTravelCVVActions, useTravelCVVState} from './TravelCVVContextProvider
  */
 function TravelCVVPage() {
     const styles = useThemeStyles();
+    const [isCopyButtonActive, setCopyButtonInactive] = useThrottledButtonState();
     const {isOffline} = useNetwork();
     const {translate} = useLocalize();
     const icons = useMemoizedLazyExpensifyIcons(['Copy']);
@@ -118,8 +121,11 @@ function TravelCVVPage() {
         actionButton = (
             <Button
                 icon={icons.Copy}
-                text={translate('cardPage.cardDetails.copyCvv')}
-                onPress={() => Clipboard.setString(cvv)}
+                text={isCopyButtonActive ? translate('cardPage.cardDetails.copyCvv') : translate('common.copied')}
+                onPress={() => {
+                    Clipboard.setString(cvv);
+                    setCopyButtonInactive();
+                }}
                 style={[styles.mt10, styles.alignSelfCenter]}
             />
         );
