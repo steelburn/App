@@ -314,8 +314,9 @@ function IOURequestStepConfirmation({
     const [dismissedAutoOpenParticipantPickerForTransactionID, setDismissedAutoOpenParticipantPickerForTransactionID] = useState<string | undefined>();
     const participantPickerIOUType = iouType === CONST.IOU.TYPE.SUBMIT || iouType === CONST.IOU.TYPE.TRACK ? CONST.IOU.TYPE.CREATE : iouType;
     const isParticipantPickerVisible =
-        manuallyOpenedParticipantPickerForTransactionID === activeTransactionID ||
-        (shouldAutoOpenParticipantPicker && dismissedAutoOpenParticipantPickerForTransactionID !== activeTransactionID);
+        !!activeTransactionID &&
+        (manuallyOpenedParticipantPickerForTransactionID === activeTransactionID ||
+            (shouldAutoOpenParticipantPicker && dismissedAutoOpenParticipantPickerForTransactionID !== activeTransactionID));
 
     const closeParticipantPicker = useCallback(() => {
         setManuallyOpenedParticipantPickerForTransactionID(undefined);
