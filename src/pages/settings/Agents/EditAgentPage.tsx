@@ -74,7 +74,7 @@ function EditAgentPage({route}: EditAgentPageProps) {
                 </View>
                 <OfflineWithFeedback
                     errors={agent?.nameErrors}
-                    errorRowStyles={styles.mh5}
+                    errorRowStyles={[styles.mh5, styles.mb2]}
                     onClose={() => clearAgentNameUpdateError(accountID)}
                 >
                     <MenuItemWithTopDescription
@@ -86,7 +86,7 @@ function EditAgentPage({route}: EditAgentPageProps) {
                 </OfflineWithFeedback>
                 <OfflineWithFeedback
                     errors={agent?.promptErrors}
-                    errorRowStyles={styles.mh5}
+                    errorRowStyles={[styles.mh5, styles.mb2]}
                     onClose={() => clearAgentPromptUpdateError(accountID)}
                 >
                     <MenuItemWithTopDescription
