@@ -51,10 +51,7 @@ function DynamicNetSuiteExportExpensesPage({policy}: WithPolicyConnectionsProps)
 
     const selectedPayableAccount = useMemo(() => payableList?.find(({id}) => id === config?.payableAcct), [payableList, config?.payableAcct]);
 
-    const selectedReimbursablePayableAccount = useMemo(
-        () => payableList?.find(({id}) => id === config?.reimbursablePayableAccount),
-        [payableList, config?.reimbursablePayableAccount],
-    );
+    const selectedReimbursablePayableAccount = useMemo(() => payableList?.find(({id}) => id === config?.reimbursablePayableAccount), [payableList, config?.reimbursablePayableAccount]);
 
     const menuItems: MenuItemWithSubscribedSettings[] = [
         {
