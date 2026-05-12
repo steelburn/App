@@ -9,6 +9,7 @@ import type {OptionData} from '@libs/ReportUtils';
 import CONST from '@src/CONST';
 
 type StatusProps = {
+    /** The option data for the report row. Status is only shown for 1:1 chats whose participant has set a status emoji. */
     optionItem: OptionData;
 };
 
