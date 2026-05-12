@@ -85,8 +85,7 @@ function ReanimatedModal({
         e.stopImmediatePropagation();
     };
 
-    const onOpenCallBack = () => {
-        setIsContainerOpen(true);
+    const clearTransitionHandles = () => {
         if (handleRef.current) {
             InteractionManager.clearInteractionHandle(handleRef.current);
             handleRef.current = undefined;
@@ -95,19 +94,17 @@ function ReanimatedModal({
             TransitionTracker.endTransition(transitionHandleRef.current);
             transitionHandleRef.current = null;
         }
+    };
+
+    const onOpenCallBack = () => {
+        setIsContainerOpen(true);
+        clearTransitionHandles();
         onModalShow();
     };
 
     const onCloseCallBack = () => {
         setIsContainerOpen(false);
-        if (handleRef.current) {
-            InteractionManager.clearInteractionHandle(handleRef.current);
-            handleRef.current = undefined;
-        }
-        if (transitionHandleRef.current) {
-            TransitionTracker.endTransition(transitionHandleRef.current);
-            transitionHandleRef.current = null;
-        }
+        clearTransitionHandles();
 
         // Because on Android, the Modal's onDismiss callback does not work reliably. There's a reported issue at:
         // https://stackoverflow.com/questions/58937956/react-native-modal-ondismiss-not-invoked
@@ -140,14 +137,7 @@ function ReanimatedModal({
         }
 
         return () => {
-            if (handleRef.current) {
-                InteractionManager.clearInteractionHandle(handleRef.current);
-                handleRef.current = undefined;
-            }
-            if (transitionHandleRef.current) {
-                TransitionTracker.endTransition(transitionHandleRef.current);
-                transitionHandleRef.current = null;
-            }
+            clearTransitionHandles();
         };
     }, [isTransitioning]);
 
