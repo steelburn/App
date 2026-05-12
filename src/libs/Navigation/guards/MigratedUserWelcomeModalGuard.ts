@@ -16,6 +16,7 @@ import type {GuardResult, NavigationGuard} from './types';
 
 let hasBeenAddedToNudgeMigration = false;
 let dismissedProductTraining: OnyxEntry<DismissedProductTraining>;
+let isDismissedProductTrainingLoaded = false;
 let session: OnyxEntry<Session>;
 let isLoadingApp = true;
 
@@ -28,6 +29,8 @@ function resetSessionFlag() {
 /**
  * Proactively navigate to the migrated user welcome modal when all conditions are met,
  * without waiting for a user-initiated navigation action.
+ * Waits for NVP_DISMISSED_PRODUCT_TRAINING to load before evaluating, preventing the
+ * race condition where the modal would re-appear on app restart.
  */
 function navigateToMigratedUserWelcomeModalIfReady() {
     if (
@@ -35,6 +38,7 @@ function navigateToMigratedUserWelcomeModalIfReady() {
         isLoadingApp ||
         hasRedirectedToMigratedUserModal ||
         !hasBeenAddedToNudgeMigration ||
+        !isDismissedProductTrainingLoaded ||
         isProductTrainingElementDismissed('migratedUserWelcomeModal', dismissedProductTraining)
     ) {
         return;
@@ -47,8 +51,7 @@ function navigateToMigratedUserWelcomeModalIfReady() {
 
 /**
  * Called by guards/index.ts when session or loading app state changes.
- * Reuses the shared Onyx subscriptions from guards/index.ts to avoid duplicate connections
- * that cause extra renders in performance tests.
+ * Reuses the shared Onyx subscriptions from guards/index.ts to avoid duplicate connections.
  */
 function onSessionOrLoadingAppChanged(sessionValue: OnyxEntry<Session>, isLoadingAppValue: boolean) {
     session = sessionValue;
@@ -69,9 +72,11 @@ Onyx.connectWithoutView({
     key: ONYXKEYS.NVP_DISMISSED_PRODUCT_TRAINING,
     callback: (value) => {
         dismissedProductTraining = value;
+        isDismissedProductTrainingLoaded = true;
         if (isProductTrainingElementDismissed('migratedUserWelcomeModal', value)) {
             hasRedirectedToMigratedUserModal = false;
         }
+        navigateToMigratedUserWelcomeModalIfReady();
     },
 });
 
