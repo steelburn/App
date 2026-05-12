@@ -55,7 +55,8 @@ import {
     isOdometerDistanceRequest as isOdometerDistanceRequestTransactionUtils,
     isScanRequest,
 } from '@libs/TransactionUtils';
-import {getIOURequestPolicyID, setMoneyRequestBillable, setMoneyRequestParticipantsFromReport, setMoneyRequestReimbursable} from '@userActions/IOU';
+import {setMoneyRequestBillable, setMoneyRequestReimbursable} from '@userActions/IOU';
+import {getIOURequestPolicyID, setMoneyRequestParticipantsFromReport} from '@userActions/IOU/MoneyRequest';
 import {setMoneyRequestReceipt} from '@userActions/IOU/Receipt';
 import {removeDraftTransaction, replaceDefaultDraftTransaction} from '@userActions/TransactionEdit';
 import CONST from '@src/CONST';

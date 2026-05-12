@@ -2,7 +2,7 @@ import passthroughPolicyTagListSelector from '@selectors/PolicyTagList';
 import {useCallback} from 'react';
 import type {OnyxCollection} from 'react-native-onyx';
 import {useSearchStateContext} from '@components/Search/SearchContext';
-import {getIOURequestPolicyID} from '@libs/actions/IOU';
+import {getIOURequestPolicyID} from '@libs/actions/IOU/MoneyRequest';
 import {deleteMoneyRequest} from '@libs/actions/IOU/DeleteMoneyRequest';
 import {getIOUActionForTransactions} from '@libs/actions/IOU/Duplicate';
 import {initSplitExpenseItemData} from '@libs/actions/IOU/SplitExpenseItems';
