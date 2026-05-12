@@ -24,6 +24,7 @@ import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import DescriptiveText from './OptionRow/DescriptiveText';
 import DraftIndicator from './OptionRow/DraftIndicator';
+import Subtitle from './OptionRow/Subtitle';
 import Title from './OptionRow/Title';
 import OnboardingBadge from './OptionRow/OnboardingBadge';
 import OptionRowAlternateText from './OptionRowAlternateText';
@@ -143,7 +144,7 @@ function OptionRowLHN({isOptionFocused = false, onSelectRow = () => {}, optionIt
                                             </Tooltip>
                                         )}
                                     </View>
-                                    <OptionRowAlternateText
+                                    <Subtitle
                                         optionItem={optionItem}
                                         viewMode={viewMode}
                                         isOptionFocused={isOptionFocused}
