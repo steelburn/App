@@ -172,13 +172,7 @@ const useSearchTypeMenuSections = (queryParams?: UseSearchTypeMenuSectionsParams
         return -1;
     }, [typeMenuSections, savedSearches, hash, similarSearchHash, sortBy, sortOrder, type]);
 
-    const activeKey = useMemo(() => {
-        if (activeItemIndex < 0) {
-            return undefined;
-        }
-        const flatItems = typeMenuSections.flatMap((section) => section.menuItems);
-        return flatItems.at(activeItemIndex)?.key;
-    }, [typeMenuSections, activeItemIndex]);
+    const activeKey = activeItemIndex < 0 ? undefined : typeMenuSections.flatMap((section) => section.menuItems).at(activeItemIndex)?.key;
 
     return {
         typeMenuSections,
