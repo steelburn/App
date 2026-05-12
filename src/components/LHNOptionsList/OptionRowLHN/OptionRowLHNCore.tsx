@@ -15,13 +15,13 @@ import CONST from '@src/CONST';
 import DescriptiveText from './OptionRow/DescriptiveText';
 import DraftIndicator from './OptionRow/DraftIndicator';
 import ErrorBadge from './OptionRow/ErrorBadge';
+import InfoBadge from './OptionRow/InfoBadge';
 import OnboardingBadge from './OptionRow/OnboardingBadge';
 import PinIndicator from './OptionRow/PinIndicator';
 import Status from './OptionRow/Status';
 import Subtitle from './OptionRow/Subtitle';
 import Title from './OptionRow/Title';
 import OptionRowAvatar from './OptionRowAvatar';
-import OptionRowInfoBadge from './OptionRowInfoBadge';
 import OptionRowPressable from './OptionRowPressable';
 import OptionRowTooltipLayer from './OptionRowTooltipLayer';
 
@@ -133,9 +133,9 @@ function OptionRowLHN({isOptionFocused = false, onSelectRow = () => {}, optionIt
                             </View>
                         </View>
                         <View style={[styles.flexRow, styles.alignItemsCenter]}>
-                            <OptionRowInfoBadge
+                            <InfoBadge
                                 brickRoadIndicator={brickRoadIndicator}
-                                actionBadgeText={actionBadgeText}
+                                actionBadge={optionItem.actionBadge}
                             />
                             <DraftIndicator
                                 hasDraftComment={hasDraftComment}
