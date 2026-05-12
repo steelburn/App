@@ -103,41 +103,45 @@ function ReanimatedModal({
         };
     }, [handleEscape, onBackButtonPressHandler]);
 
-    useEffect(
-        () => () => {
+    useEffect(() => {
+        if (isVisible && !isContainerOpen) {
+            handleRef.current = InteractionManager.createInteractionHandle();
+            transitionHandleRef.current = TransitionTracker.startTransition();
+        } else if (!isVisible && isContainerOpen) {
+            handleRef.current = InteractionManager.createInteractionHandle();
+            transitionHandleRef.current = TransitionTracker.startTransition();
+        }
+
+        return () => {
             if (handleRef.current) {
                 InteractionManager.clearInteractionHandle(handleRef.current);
+                handleRef.current = undefined;
             }
             if (transitionHandleRef.current) {
                 TransitionTracker.endTransition(transitionHandleRef.current);
                 transitionHandleRef.current = null;
             }
-
-            setIsVisibleState(false);
-            setIsContainerOpen(false);
-        },
-
-        [],
-    );
+        };
+    }, [isVisible, isContainerOpen]);
 
     useEffect(() => {
         if (isVisible && !isContainerOpen && !isTransitioning) {
-            handleRef.current = InteractionManager.createInteractionHandle();
-            transitionHandleRef.current = TransitionTracker.startTransition();
             onModalWillShow();
+        } else if (!isVisible && isContainerOpen && !isTransitioning) {
+            onModalWillHide();
+            blurActiveElement();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isVisible, isContainerOpen, isTransitioning]);
 
+    useEffect(() => {
+        if (isVisible && !isContainerOpen && !isTransitioning) {
             setIsVisibleState(true);
             setIsTransitioning(true);
         } else if (!isVisible && isContainerOpen && !isTransitioning) {
-            handleRef.current = InteractionManager.createInteractionHandle();
-            transitionHandleRef.current = TransitionTracker.startTransition();
-            onModalWillHide();
-
-            blurActiveElement();
             setIsVisibleState(false);
             setIsTransitioning(true);
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isVisible, isContainerOpen, isTransitioning]);
 
     const backdropStyle: ViewStyle = useMemo(() => {
@@ -149,6 +153,7 @@ function ReanimatedModal({
         setIsContainerOpen(true);
         if (handleRef.current) {
             InteractionManager.clearInteractionHandle(handleRef.current);
+            handleRef.current = undefined;
         }
         if (transitionHandleRef.current) {
             TransitionTracker.endTransition(transitionHandleRef.current);
@@ -162,6 +167,7 @@ function ReanimatedModal({
         setIsContainerOpen(false);
         if (handleRef.current) {
             InteractionManager.clearInteractionHandle(handleRef.current);
+            handleRef.current = undefined;
         }
         if (transitionHandleRef.current) {
             TransitionTracker.endTransition(transitionHandleRef.current);
