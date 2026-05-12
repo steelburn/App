@@ -57,6 +57,7 @@ function TypeCell({transactionItem, shouldUseNarrowLayout, shouldShowTooltip}: T
         'CreditCard',
         'CreditCardLock',
         'CreditCardWithPlane',
+        'CreditCardWithPlaneHourglass',
         'ExpensifyCard',
         'ExpensifyCardHourglass',
         'Cash',
@@ -67,8 +68,9 @@ function TypeCell({transactionItem, shouldUseNarrowLayout, shouldShowTooltip}: T
     const isExpensifyCard = isExpensifyCardTransaction(transactionItem);
     const isManagedCard = isManagedCardTransaction(transactionItem);
     const isTravelInvoicingCard = isTravelCard(card);
-    const isPendingExpensifyCardTransaction = isExpensifyCard && isPending(transactionItem) && !isTravelInvoicingCard;
-    const typeIcon = isPendingExpensifyCardTransaction ? expensifyIcons.ExpensifyCardHourglass : getTypeIcon(expensifyIcons, type, isExpensifyCard, isManagedCard, isTravelInvoicingCard);
+    const isPendingExpensifyCardTransaction = isExpensifyCard && isPending(transactionItem);
+    const pendingIcon = isTravelInvoicingCard ? expensifyIcons.CreditCardWithPlaneHourglass : expensifyIcons.ExpensifyCardHourglass;
+    const typeIcon = isPendingExpensifyCardTransaction ? pendingIcon : getTypeIcon(expensifyIcons, type, isExpensifyCard, isManagedCard, isTravelInvoicingCard);
     const typeText = isPendingExpensifyCardTransaction ? 'iou.pending' : getExpenseTypeTranslationKey(type);
     const styles = useThemeStyles();
 
