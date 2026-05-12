@@ -115,12 +115,12 @@ function WorkspaceCompanyCardTableRow({item, policyID, CardFeedIcon, shouldUseNa
             interactive
             rowIndex={rowIndex}
             isLoading={isDeleting}
-            disabled={isCardDeleted}
+            disabled={isCardDeleted || isAssigningCardDisabled}
             skeletonReasonAttributes={reasonAttributes}
             sentryLabel={CONST.SENTRY_LABEL.WORKSPACE.COMPANY_CARDS.TABLE_ITEM}
             LoadingComponent={WorkspaceCompanyCardsTableSkeleton}
-            onPress={handleRowPress}
             offlineWithFeedback={{errors, pendingAction, onClose: onDismissError, shouldHideOnDelete: false}}
+            onPress={handleRowPress}
         >
             {({hovered}) => (
                 <>
