@@ -12,21 +12,18 @@ import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails'
 import useEnvironment from '@hooks/useEnvironment';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
-import useOnyx from '@hooks/useOnyx';
 import useStyleUtils from '@hooks/useStyleUtils';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import DateUtils from '@libs/DateUtils';
 import {shouldUseBoldText} from '@libs/OptionsListUtils';
-import {isChatUsedForOnboarding as isChatUsedForOnboardingReportUtils} from '@libs/ReportUtils';
-import FreeTrial from '@pages/settings/Subscription/FreeTrial';
 import variables from '@styles/variables';
 import CONST from '@src/CONST';
-import ONYXKEYS from '@src/ONYXKEYS';
 import DescriptiveText from './OptionRow/DescriptiveText';
 import DraftIndicator from './OptionRow/DraftIndicator';
 import ErrorBadge from './OptionRow/ErrorBadge';
 import InfoBadge from './OptionRow/InfoBadge';
+import OnboardingBadge from './OptionRow/OnboardingBadge';
 import Subtitle from './OptionRow/Subtitle';
 import Title from './OptionRow/Title';
 import OptionRowAvatar from './OptionRowAvatar';
@@ -41,9 +38,7 @@ function OptionRowLHN({isOptionFocused = false, onSelectRow = () => {}, optionIt
     const StyleUtils = useStyleUtils();
     const expensifyIcons = useMemoizedLazyExpensifyIcons(['Pin']);
 
-    const {onboardingPurpose, onboarding, isScreenFocused} = useLHNTooltipContext();
-    const [conciergeReportID] = useOnyx(ONYXKEYS.CONCIERGE_REPORT_ID);
-    const isChatUsedForOnboarding = isChatUsedForOnboardingReportUtils(optionItem, onboarding, conciergeReportID, onboardingPurpose);
+    const {isScreenFocused} = useLHNTooltipContext();
 
     const {translate} = useLocalize();
     const currentUserPersonalDetails = useCurrentUserPersonalDetails();
@@ -135,7 +130,7 @@ function OptionRowLHN({isOptionFocused = false, onSelectRow = () => {}, optionIt
                                             displayNameStyle={displayNameStyle}
                                             testID={testID}
                                         />
-                                        {isChatUsedForOnboarding && <FreeTrial badgeStyles={[styles.mnh0, styles.pl2, styles.pr2, styles.ml1, styles.flexShrink1]} />}
+                                        <OnboardingBadge optionItem={optionItem} />
                                         {isStatusVisible && (
                                             <Tooltip
                                                 text={statusContent}
