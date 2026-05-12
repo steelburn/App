@@ -27,7 +27,6 @@ import DraftIndicator from './OptionRow/DraftIndicator';
 import Subtitle from './OptionRow/Subtitle';
 import Title from './OptionRow/Title';
 import OnboardingBadge from './OptionRow/OnboardingBadge';
-import OptionRowAlternateText from './OptionRowAlternateText';
 import OptionRowAvatar from './OptionRowAvatar';
 import OptionRowErrorBadge from './OptionRowErrorBadge';
 import OptionRowInfoBadge from './OptionRowInfoBadge';
