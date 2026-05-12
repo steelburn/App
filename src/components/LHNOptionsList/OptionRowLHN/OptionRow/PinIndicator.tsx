@@ -9,7 +9,10 @@ import type {OptionData} from '@libs/ReportUtils';
 import variables from '@styles/variables';
 
 type PinIndicatorProps = {
+    /** Whether the report row is pinned. */
     isPinned: boolean | undefined;
+
+    /** Brick road indicator for the row. When set (error/info), the pin icon is hidden so the brick-road badge can take its place. */
     brickRoadIndicator: OptionData['brickRoadIndicator'];
 };
 
