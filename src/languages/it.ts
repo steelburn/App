@@ -7723,6 +7723,7 @@ Aggiungi altre regole di spesa per proteggere il flusso di cassa aziendale.`,
         deleteSavedSearchConfirm: 'Sei sicuro di voler eliminare questa ricerca?',
         searchName: 'Cerca nome',
         savedSearchesMenuItemTitle: 'Salvato',
+        urlCopied: 'URL copiato',
         groupedExpenses: 'spese raggruppate',
         bulkActions: {
             editMultiple: 'Modifica multipli',

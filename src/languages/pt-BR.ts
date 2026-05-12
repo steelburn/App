@@ -7688,6 +7688,7 @@ Adicione mais regras de gasto para proteger o fluxo de caixa da empresa.`,
         deleteSavedSearchConfirm: 'Tem certeza de que deseja excluir esta pesquisa?',
         searchName: 'Pesquisar nome',
         savedSearchesMenuItemTitle: 'Salvo',
+        urlCopied: 'URL copiado',
         groupedExpenses: 'despesas agrupadas',
         bulkActions: {
             editMultiple: 'Editar múltiplos',

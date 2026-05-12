@@ -7694,6 +7694,7 @@ er bestedingsregels toe om de kasstroom van het bedrijf te beschermen.`,
         deleteSavedSearchConfirm: 'Weet je zeker dat je deze zoekopdracht wilt verwijderen?',
         searchName: 'Zoeknaam',
         savedSearchesMenuItemTitle: 'Opgeslagen',
+        urlCopied: 'URL gekopieerd',
         groupedExpenses: 'gegroepeerde uitgaven',
         bulkActions: {
             editMultiple: 'Meerdere bewerken',
