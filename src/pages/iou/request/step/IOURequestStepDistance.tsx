@@ -193,6 +193,10 @@ function IOURequestStepDistance({
     //  - A re-fetch of an already-saved expense is also a null → value transition but keeps a non-null
     //    `customUnit.quantity` (the persisted value, possibly a manual override), so we skip it there
     //    to avoid overwriting it (GH #90082).
+    // Both signals are read off the same transaction object. The waypoint-edit path clears `routes` and
+    // `customUnit.quantity` together, so by the time `routeDistance` comes back non-null `customUnitQuantity`
+    // is already null; the re-fetch path never clears `customUnit.quantity` at all. So the `!= null` check
+    // below stays correct regardless of the order Onyx delivers those two updates in.
     const routeDistance = currentTransaction?.routes?.route0?.distance;
     const customUnitQuantity = currentTransaction?.comment?.customUnit?.quantity;
     const lastSyncedRouteDistance = useRef<number | null | undefined>(routeDistance);
@@ -295,6 +299,19 @@ function IOURequestStepDistance({
         }
         Navigation.closeRHPFlow();
     }, [isEditingSplit, backTo]);
+
+    // In the edit flow this page is rendered inside an OnyxTabNavigator. A plain `goBack()` with no
+    // target would be swallowed by that tab navigator (reverting to the Map tab) instead of leaving
+    // the page, so the header back must leave explicitly: honor an explicit `backTo` (e.g. the
+    // edit-split page) and otherwise close the RHP — matching other tabbed RHP pages like
+    // IOURequestStartPage. The browser/hardware back keeps the default tab behavior (revert tab first).
+    const navigateBackFromEditFlow = useCallback(() => {
+        if (backTo) {
+            Navigation.goBack(backTo);
+            return;
+        }
+        Navigation.closeRHPFlow();
+    }, [backTo]);
 
     /**
      * Takes the user to the page for editing a specific waypoint
@@ -666,7 +683,7 @@ function IOURequestStepDistance({
         return (
             <StepScreenWrapper
                 headerTitle={translate('common.distance')}
-                onBackButtonPress={navigateBack}
+                onBackButtonPress={navigateBackFromEditFlow}
                 testID="IOURequestStepDistance"
                 shouldShowNotFoundPage={!currentTransaction?.comment?.waypoints || shouldShowNotFoundPage}
                 shouldShowWrapper
@@ -675,8 +692,6 @@ function IOURequestStepDistance({
                     id={CONST.TAB.DISTANCE_EDIT_TYPE}
                     defaultSelectedTab={CONST.TAB_REQUEST.DISTANCE_MAP}
                     tabBar={TabSelector}
-                    // Back closes the RHP directly instead of reverting the tab first.
-                    backBehavior="none"
                 >
                     <TopTab.Screen name={CONST.TAB_REQUEST.DISTANCE_MAP}>{renderMapTab}</TopTab.Screen>
                     <TopTab.Screen name={CONST.TAB_REQUEST.DISTANCE_MANUAL}>{renderManualTab}</TopTab.Screen>
