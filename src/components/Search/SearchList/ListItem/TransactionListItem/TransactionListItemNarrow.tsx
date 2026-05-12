@@ -87,8 +87,8 @@ function TransactionListItemNarrow<TItem extends ListItem>({
                     styles.flex1,
                     animatedHighlightStyle,
                     styles.userSelectNone,
-                    isFirstItem && [styles.searchTableTopRadius, styles.overflowHidden, styles.searchTableTopRadius],
-                    isLastItem && [styles.searchTableBottomRadius, styles.overflowHidden, styles.searchTableBottomRadius],
+                    isFirstItem && [styles.searchTableTopRadius, styles.overflowHidden],
+                    isLastItem && [styles.searchTableBottomRadius, styles.overflowHidden],
                     !isLastItem && StyleUtils.getSelectedBorderBottomStyle(item.isSelected),
                 ]}
             >

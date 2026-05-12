@@ -172,7 +172,6 @@ function TransactionItemRow({
         amountColumnSize,
         taxAmountColumnSize,
         onCheckboxPress,
-        shouldShowCheckbox,
         columns,
         onButtonPress,
         style,

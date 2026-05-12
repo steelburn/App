@@ -48,7 +48,8 @@ import TypeCell from './DataCells/TypeCell';
 import DeferredTransactionItemRowRBR from './DeferredTransactionItemRowRBR';
 import type {TransactionItemRowProps, TransactionItemRowWideComputedData} from './types';
 
-type TransactionItemRowWideProps = Omit<TransactionItemRowProps, 'shouldUseNarrowLayout' | 'policyForMovingExpenses' | 'isLargeScreenWidth'> & TransactionItemRowWideComputedData;
+type TransactionItemRowWideProps = Omit<TransactionItemRowProps, 'shouldUseNarrowLayout' | 'policyForMovingExpenses' | 'isLargeScreenWidth' | 'shouldShowCheckbox'> &
+    TransactionItemRowWideComputedData;
 
 function TransactionItemRowWide({
     transactionItem,
@@ -303,7 +304,7 @@ function TransactionItemRowWide({
                 return (
                     <View
                         key={column}
-                        style={[StyleUtils.getReportTableColumnStyles(CONST.SEARCH.TABLE_COLUMNS.FROM)]}
+                        style={[StyleUtils.getReportTableColumnStyles(CONST.SEARCH.TABLE_COLUMNS.TO)]}
                     >
                         {!!transactionItem.to && (
                             <UserInfoCell
