@@ -8118,6 +8118,7 @@ ${reportName}
         companyCard: '会社カード',
         expensifyCard: 'Expensify カード',
         centralInvoicing: '集中請求',
+        travelCard: 'トラベルカード',
     },
     distance: {
         addStop: '経由地を追加',

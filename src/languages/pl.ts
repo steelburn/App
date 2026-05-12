@@ -8182,6 +8182,7 @@ Dodaj więcej zasad wydatków, żeby chronić płynność finansową firmy.`,
         companyCard: 'Karta firmowa',
         expensifyCard: 'Karta Expensify',
         centralInvoicing: 'Centralne fakturowanie',
+        travelCard: 'Karta podróżna',
     },
     distance: {
         addStop: 'Dodaj przystanek',

@@ -8250,6 +8250,7 @@ Ajoutez davantage de règles de dépenses pour protéger la trésorerie de l’e
         companyCard: 'Carte d’entreprise',
         expensifyCard: 'Carte Expensify',
         centralInvoicing: 'Facturation centralisée',
+        travelCard: 'Carte de voyage',
     },
     distance: {
         addStop: 'Ajouter un arrêt',
