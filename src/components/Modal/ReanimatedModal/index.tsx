@@ -55,9 +55,8 @@ function ReanimatedModal({
     shouldReturnFocus,
     ...props
 }: ReanimatedModalProps) {
-    const [isVisibleState, setIsVisibleState] = useState(isVisible);
     const [isContainerOpen, setIsContainerOpen] = useState(false);
-    const [isTransitioning, setIsTransitioning] = useState(false);
+    const isTransitioning = isVisible !== isContainerOpen;
     const {windowWidth, windowHeight} = useWindowDimensions();
 
     const backHandlerListener = useRef<NativeEventSubscription | null>(null);
@@ -67,15 +66,15 @@ function ReanimatedModal({
     const styles = useThemeStyles();
 
     const onBackButtonPressHandler = useCallback(() => {
-        if (shouldIgnoreBackHandlerDuringTransition && isTransitioning) {
+        if (shouldIgnoreBackHandlerDuringTransition && isVisible !== isContainerOpen) {
             return false;
         }
-        if (isVisibleState) {
+        if (isVisible) {
             onBackButtonPress();
             return true;
         }
         return false;
-    }, [isVisibleState, onBackButtonPress, isTransitioning, shouldIgnoreBackHandlerDuringTransition]);
+    }, [isVisible, isContainerOpen, onBackButtonPress, shouldIgnoreBackHandlerDuringTransition]);
 
     const handleEscape = useCallback(
         (e: KeyboardEvent) => {
@@ -104,10 +103,7 @@ function ReanimatedModal({
     }, [handleEscape, onBackButtonPressHandler]);
 
     useEffect(() => {
-        if (isVisible && !isContainerOpen) {
-            handleRef.current = InteractionManager.createInteractionHandle();
-            transitionHandleRef.current = TransitionTracker.startTransition();
-        } else if (!isVisible && isContainerOpen) {
+        if (isVisible !== isContainerOpen) {
             handleRef.current = InteractionManager.createInteractionHandle();
             transitionHandleRef.current = TransitionTracker.startTransition();
         }
@@ -125,9 +121,9 @@ function ReanimatedModal({
     }, [isVisible, isContainerOpen]);
 
     const fireTransitionCallbacks = useEffectEvent(() => {
-        if (isVisible && !isContainerOpen && !isTransitioning) {
+        if (isVisible && !isContainerOpen) {
             onModalWillShow();
-        } else if (!isVisible && isContainerOpen && !isTransitioning) {
+        } else if (!isVisible && isContainerOpen) {
             onModalWillHide();
             blurActiveElement();
         }
@@ -135,24 +131,13 @@ function ReanimatedModal({
 
     useEffect(() => {
         fireTransitionCallbacks();
-    }, [isVisible, isContainerOpen, isTransitioning]);
-
-    useEffect(() => {
-        if (isVisible && !isContainerOpen && !isTransitioning) {
-            setIsVisibleState(true);
-            setIsTransitioning(true);
-        } else if (!isVisible && isContainerOpen && !isTransitioning) {
-            setIsVisibleState(false);
-            setIsTransitioning(true);
-        }
-    }, [isVisible, isContainerOpen, isTransitioning]);
+    }, [isVisible, isContainerOpen]);
 
     const backdropStyle: ViewStyle = useMemo(() => {
         return {width: windowWidth, height: windowHeight, backgroundColor: backdropColor};
     }, [windowWidth, windowHeight, backdropColor]);
 
     const onOpenCallBack = useCallback(() => {
-        setIsTransitioning(false);
         setIsContainerOpen(true);
         if (handleRef.current) {
             InteractionManager.clearInteractionHandle(handleRef.current);
@@ -166,7 +151,6 @@ function ReanimatedModal({
     }, [onModalShow]);
 
     const onCloseCallBack = useCallback(() => {
-        setIsTransitioning(false);
         setIsContainerOpen(false);
         if (handleRef.current) {
             InteractionManager.clearInteractionHandle(handleRef.current);
@@ -221,7 +205,7 @@ function ReanimatedModal({
         />
     );
 
-    if (!coverScreen && isVisibleState) {
+    if (!coverScreen && isVisible) {
         return (
             <View
                 pointerEvents="box-none"
@@ -232,8 +216,8 @@ function ReanimatedModal({
             </View>
         );
     }
-    const isBackdropMounted = isVisibleState || ((isTransitioning || isContainerOpen !== isVisibleState) && getPlatform() === CONST.PLATFORM.WEB);
-    const modalVisibility = isVisibleState || isTransitioning || isContainerOpen !== isVisibleState;
+    const isBackdropMounted = isVisible || (isTransitioning && getPlatform() === CONST.PLATFORM.WEB);
+    const modalVisibility = isVisible || isTransitioning;
     return (
         <LayoutAnimationConfig skipExiting={getPlatform() !== CONST.PLATFORM.WEB}>
             <Modal
@@ -260,7 +244,7 @@ function ReanimatedModal({
                         pointerEvents="box-none"
                         style={[style, {margin: 0}]}
                     >
-                        {isVisibleState && containerView}
+                        {isVisible && containerView}
                     </KeyboardAvoidingView>
                 ) : (
                     <FocusTrapForModal
@@ -269,7 +253,7 @@ function ReanimatedModal({
                         shouldReturnFocus={shouldReturnFocus ?? !shouldEnableNewFocusManagement}
                         shouldPreventScroll={shouldPreventScrollOnFocus}
                     >
-                        {isVisibleState && containerView}
+                        {isVisible && containerView}
                     </FocusTrapForModal>
                 )}
             </Modal>
