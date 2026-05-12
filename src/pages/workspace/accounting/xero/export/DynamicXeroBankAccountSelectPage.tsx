@@ -26,7 +26,6 @@ function DynamicXeroBankAccountSelectPage({policy}: WithPolicyConnectionsProps) 
 
     const policyID = policy?.id;
     const {config} = policy?.connections?.xero ?? {};
-    const {bankAccounts} = policy?.connections?.xero?.data ?? {};
     const xeroSelectorOptions = useMemo<SelectorType[]>(
         () => getXeroBankAccounts(policy ?? undefined, config?.export?.nonReimbursableAccount),
         [config?.export?.nonReimbursableAccount, policy],
