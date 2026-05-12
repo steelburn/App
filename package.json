@@ -189,7 +189,7 @@
     "react-native-reanimated": "4.2.3",
     "react-native-render-html": "6.3.1",
     "react-native-safe-area-context": "5.6.2",
-    "react-native-screens": "4.25.0-beta.1",
+    "react-native-screens": "4.25.0",
     "react-native-share": "11.0.2",
     "react-native-svg": "15.12.1",
     "react-native-tab-view": "^4.3.0",
@@ -362,7 +362,7 @@
     "workbox-webpack-plugin": "^7.4.0"
   },
   "overrides": {
-    "react-native-screens": "4.25.0-beta.1",
+    "react-native-screens": "4.25.0",
     "babel-plugin-react-compiler": "0.0.0-experimental-a1856f3-20260422",
     "braces": "3.0.3",
     "yargs": "17.7.2",
