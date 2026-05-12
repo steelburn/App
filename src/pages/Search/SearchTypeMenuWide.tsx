@@ -75,9 +75,10 @@ function Section({section, hash, activeItemIndex, sectionStartIndex, reportCount
     // notify the parent that the section is no longer collapsed.
     useEffect(() => {
         return () => {
-            if (!isExpandedRef.current) {
-                onCollapsedCallback(false);
+            if (isExpandedRef.current) {
+                return;
             }
+            onCollapsedCallback(false);
         };
     }, []);
 
