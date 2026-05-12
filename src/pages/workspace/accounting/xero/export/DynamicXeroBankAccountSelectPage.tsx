@@ -28,9 +28,8 @@ function DynamicXeroBankAccountSelectPage({policy}: WithPolicyConnectionsProps) 
     const {config} = policy?.connections?.xero ?? {};
     const {bankAccounts} = policy?.connections?.xero?.data ?? {};
     const xeroSelectorOptions = useMemo<SelectorType[]>(
-        // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-        () => getXeroBankAccounts(policy ?? undefined, config?.export?.nonReimbursableAccount || bankAccounts?.[0]?.id),
-        [config?.export?.nonReimbursableAccount, policy, bankAccounts],
+        () => getXeroBankAccounts(policy ?? undefined, config?.export?.nonReimbursableAccount),
+        [config?.export?.nonReimbursableAccount, policy],
     );
 
     const goBack = useCallback(() => {
