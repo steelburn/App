@@ -36,7 +36,6 @@ import type {SelectedTabRequest} from '@src/types/onyx';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
 import isLoadingOnyxValue from '@src/types/utils/isLoadingOnyxValue';
 import {IOURequestStepAmountWithTransactionOnly} from './step/IOURequestStepAmount';
-import type {IOURequestStepConfirmationPublicProps} from './step/IOURequestStepConfirmation';
 import IOURequestStepConfirmation from './step/IOURequestStepConfirmation';
 import IOURequestStepDestination from './step/IOURequestStepDestination';
 import IOURequestStepDistance from './step/IOURequestStepDistance';
@@ -62,9 +61,6 @@ function IOURequestStartPage({
     // This is currently only being used for testing
     defaultSelectedTab = CONST.TAB_REQUEST.SCAN,
 }: IOURequestStartPageProps) {
-    const confirmationRoute = route as unknown as IOURequestStepConfirmationPublicProps['route'];
-    const confirmationNavigation = navigation as unknown as IOURequestStepConfirmationPublicProps['navigation'];
-
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const shouldUseTab = iouType !== CONST.IOU.TYPE.SEND && iouType !== CONST.IOU.TYPE.PAY && iouType !== CONST.IOU.TYPE.INVOICE;
@@ -254,8 +250,8 @@ function IOURequestStartPage({
                                         <TabScreenWithFocusTrapWrapper>
                                             {isNewManualExpenseFlowEnabled ? (
                                                 <IOURequestStepConfirmation
-                                                    route={confirmationRoute}
-                                                    navigation={confirmationNavigation}
+                                                    route={route}
+                                                    navigation={navigation}
                                                     shouldHideHeader
                                                 />
                                             ) : (
