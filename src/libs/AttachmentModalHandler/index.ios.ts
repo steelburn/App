@@ -1,4 +1,3 @@
-// eslint-disable-next-line no-restricted-imports
 import TransitionTracker from '@libs/Navigation/TransitionTracker';
 import type AttachmentModalHandler from './types';
 
@@ -13,6 +12,7 @@ const attachmentModalHandler: AttachmentModalHandler = {
             callback: () => {
                 onCloseCallback?.();
             },
+            waitForUpcomingTransition: true,
         });
     },
 };

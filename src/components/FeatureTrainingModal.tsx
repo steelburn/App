@@ -19,7 +19,6 @@ import Accessibility from '@libs/Accessibility';
 import isInLandscapeModeUtil from '@libs/isInLandscapeMode';
 import Log from '@libs/Log';
 import Navigation from '@libs/Navigation/Navigation';
-// eslint-disable-next-line no-restricted-imports
 import TransitionTracker from '@libs/Navigation/TransitionTracker';
 import variables from '@styles/variables';
 import {setNameValuePair} from '@userActions/User';
