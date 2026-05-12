@@ -23,8 +23,8 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import DescriptiveText from './OptionRow/DescriptiveText';
 import DraftIndicator from './OptionRow/DraftIndicator';
 import Status from './OptionRow/Status';
+import Subtitle from './OptionRow/Subtitle';
 import Title from './OptionRow/Title';
-import OptionRowAlternateText from './OptionRowAlternateText';
 import OptionRowAvatar from './OptionRowAvatar';
 import OptionRowErrorBadge from './OptionRowErrorBadge';
 import OptionRowInfoBadge from './OptionRowInfoBadge';
@@ -127,7 +127,7 @@ function OptionRowLHN({isOptionFocused = false, onSelectRow = () => {}, optionIt
                                         {isChatUsedForOnboarding && <FreeTrial badgeStyles={[styles.mnh0, styles.pl2, styles.pr2, styles.ml1, styles.flexShrink1]} />}
                                         <Status optionItem={optionItem} />
                                     </View>
-                                    <OptionRowAlternateText
+                                    <Subtitle
                                         optionItem={optionItem}
                                         viewMode={viewMode}
                                         isOptionFocused={isOptionFocused}
