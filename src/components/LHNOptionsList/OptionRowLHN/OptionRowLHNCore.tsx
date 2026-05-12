@@ -1,24 +1,22 @@
 import React, {useRef} from 'react';
 import type {ViewStyle} from 'react-native';
 import {StyleSheet, View} from 'react-native';
-import Icon from '@components/Icon';
 import {useLHNTooltipContext} from '@components/LHNOptionsList/LHNTooltipContext';
 import type {OptionRowLHNProps} from '@components/LHNOptionsList/types';
 import getContextMenuAccessibilityHint from '@components/utils/getContextMenuAccessibilityHint';
 import getContextMenuAccessibilityProps from '@components/utils/getContextMenuAccessibilityProps';
 import useEnvironment from '@hooks/useEnvironment';
-import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useStyleUtils from '@hooks/useStyleUtils';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {shouldUseBoldText} from '@libs/OptionsListUtils';
-import variables from '@styles/variables';
 import CONST from '@src/CONST';
 import DescriptiveText from './OptionRow/DescriptiveText';
 import DraftIndicator from './OptionRow/DraftIndicator';
 import ErrorBadge from './OptionRow/ErrorBadge';
 import OnboardingBadge from './OptionRow/OnboardingBadge';
+import PinIndicator from './OptionRow/PinIndicator';
 import Status from './OptionRow/Status';
 import Subtitle from './OptionRow/Subtitle';
 import Title from './OptionRow/Title';
@@ -33,7 +31,6 @@ function OptionRowLHN({isOptionFocused = false, onSelectRow = () => {}, optionIt
     const styles = useThemeStyles();
     const popoverAnchor = useRef<View>(null);
     const StyleUtils = useStyleUtils();
-    const expensifyIcons = useMemoizedLazyExpensifyIcons(['Pin']);
 
     const {isScreenFocused} = useLHNTooltipContext();
 
@@ -144,20 +141,10 @@ function OptionRowLHN({isOptionFocused = false, onSelectRow = () => {}, optionIt
                                 hasDraftComment={hasDraftComment}
                                 isAllowedToComment={optionItem.isAllowedToComment}
                             />
-                            {!brickRoadIndicator && !!optionItem.isPinned && (
-                                <View
-                                    style={styles.ml2}
-                                    accessibilityLabel={translate('sidebarScreen.chatPinned')}
-                                >
-                                    <Icon
-                                        testID="Pin Icon"
-                                        fill={theme.icon}
-                                        src={expensifyIcons.Pin}
-                                        width={variables.iconSizeSmall}
-                                        height={variables.iconSizeSmall}
-                                    />
-                                </View>
-                            )}
+                            <PinIndicator
+                                isPinned={optionItem.isPinned}
+                                brickRoadIndicator={brickRoadIndicator}
+                            />
                         </View>
                     </>
                 );
