@@ -27,13 +27,10 @@ import type {
     ConnectionName,
     Connections,
     CustomUnit,
-    InvoiceItem,
     NetSuiteAccount,
     NetSuiteConnection,
     NetSuiteCustomList,
     NetSuiteCustomSegment,
-    NetSuiteTaxAccount,
-    NetSuiteVendor,
     PolicyConnectionSyncProgress,
     PolicyFeatureName,
     Rate,
@@ -1464,26 +1461,6 @@ function settingsPendingAction(settings?: string[], pendingFields?: PendingField
     return pendingFields[key];
 }
 
-function findSelectedVendorWithDefaultSelect(vendors: NetSuiteVendor[] | undefined, selectedVendorId: string | undefined) {
-    const selectedVendor = (vendors ?? []).find(({id}) => id === selectedVendorId);
-    return selectedVendor ?? vendors?.[0] ?? undefined;
-}
-
-function findSelectedBankAccountWithDefaultSelect(accounts: NetSuiteAccount[] | undefined, selectedBankAccountId: string | undefined) {
-    const selectedBankAccount = (accounts ?? []).find(({id}) => id === selectedBankAccountId);
-    return selectedBankAccount ?? accounts?.[0] ?? undefined;
-}
-
-function findSelectedInvoiceItemWithDefaultSelect(invoiceItems: InvoiceItem[] | undefined, selectedItemId: string | undefined) {
-    const selectedInvoiceItem = (invoiceItems ?? []).find(({id}) => id === selectedItemId);
-    return selectedInvoiceItem ?? invoiceItems?.[0] ?? undefined;
-}
-
-function findSelectedTaxAccountWithDefaultSelect(taxAccounts: NetSuiteTaxAccount[] | undefined, selectedAccountId: string | undefined) {
-    const selectedTaxAccount = (taxAccounts ?? []).find(({externalID}) => externalID === selectedAccountId);
-    return selectedTaxAccount ?? taxAccounts?.[0] ?? undefined;
-}
-
 function getNetSuiteVendorOptions(policy: Policy | undefined, selectedVendorId: string | undefined): SelectorType[] {
     const vendors = policy?.connections?.netsuite?.options.data.vendors;
 
@@ -2254,10 +2231,6 @@ export {
     findCurrentXeroOrganization,
     getCurrentXeroOrganizationName,
     getXeroBankAccounts,
-    findSelectedVendorWithDefaultSelect,
-    findSelectedBankAccountWithDefaultSelect,
-    findSelectedInvoiceItemWithDefaultSelect,
-    findSelectedTaxAccountWithDefaultSelect,
     hasPolicyWithXeroConnection,
     getNetSuiteVendorOptions,
     canUseTaxNetSuite,
