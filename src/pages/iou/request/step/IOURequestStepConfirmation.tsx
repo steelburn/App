@@ -486,10 +486,12 @@ function IOURequestStepConfirmation({
 
         hasPreInsertFired.current = true;
 
-        const route: Route = shouldPreInsertSearch ? ROUTES.SEARCH_ROOT.getRoute({query: buildCannedSearchQuery({type: searchType})}) : ROUTES.REPORT_WITH_ID.getRoute(destinationReportID);
+        const preInsertFullscreenRoute: Route = shouldPreInsertSearch
+            ? ROUTES.SEARCH_ROOT.getRoute({query: buildCannedSearchQuery({type: searchType})})
+            : ROUTES.REPORT_WITH_ID.getRoute(destinationReportID);
 
         const timer = setTimeout(() => {
-            Navigation.preInsertFullscreenUnderRHP(route);
+            Navigation.preInsertFullscreenUnderRHP(preInsertFullscreenRoute);
         }, CONST.PRE_INSERT_FULLSCREEN_DELAY);
 
         return () => {
