@@ -1,3 +1,3 @@
-type ValidateSecondaryLoginParams = {partnerUserID: string; validateCode: string, deviceInfo: string};
+type ValidateSecondaryLoginParams = {partnerUserID: string; validateCode: string; deviceInfo: string};
 
 export default ValidateSecondaryLoginParams;
