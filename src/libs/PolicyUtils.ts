@@ -1487,39 +1487,33 @@ function findSelectedTaxAccountWithDefaultSelect(taxAccounts: NetSuiteTaxAccount
 function getNetSuiteVendorOptions(policy: Policy | undefined, selectedVendorId: string | undefined): SelectorType[] {
     const vendors = policy?.connections?.netsuite?.options.data.vendors;
 
-    const selectedVendor = findSelectedVendorWithDefaultSelect(vendors, selectedVendorId);
-
     return (vendors ?? []).map(({id, name}) => ({
         value: id,
         text: name,
         keyForList: id,
-        isSelected: selectedVendor?.id === id,
+        isSelected: id === selectedVendorId,
     }));
 }
 
 function getNetSuitePayableAccountOptions(policy: Policy | undefined, selectedBankAccountId: string | undefined): SelectorType[] {
     const payableAccounts = policy?.connections?.netsuite?.options.data.payableList;
 
-    const selectedPayableAccount = findSelectedBankAccountWithDefaultSelect(payableAccounts, selectedBankAccountId);
-
     return (payableAccounts ?? []).map(({id, name}) => ({
         value: id,
         text: name,
         keyForList: id,
-        isSelected: selectedPayableAccount?.id === id,
+        isSelected: id === selectedBankAccountId,
     }));
 }
 
 function getNetSuiteReceivableAccountOptions(policy: Policy | undefined, selectedBankAccountId: string | undefined): SelectorType[] {
     const receivableAccounts = policy?.connections?.netsuite?.options.data.receivableList;
 
-    const selectedReceivableAccount = findSelectedBankAccountWithDefaultSelect(receivableAccounts, selectedBankAccountId);
-
     return (receivableAccounts ?? []).map(({id, name}) => ({
         value: id,
         text: name,
         keyForList: id,
-        isSelected: selectedReceivableAccount?.id === id,
+        isSelected: id === selectedBankAccountId,
     }));
 }
 
@@ -1566,13 +1560,11 @@ function getNetSuiteReimbursableAccountOptions(policy: Policy | undefined, selec
     const payableAccounts = policy?.connections?.netsuite?.options.data.payableList;
     const accountOptions = getFilteredReimbursableAccountOptions(payableAccounts);
 
-    const selectedPayableAccount = findSelectedBankAccountWithDefaultSelect(accountOptions, selectedBankAccountId);
-
     return accountOptions.map(({id, name}) => ({
         value: id,
         text: name,
         keyForList: id,
-        isSelected: selectedPayableAccount?.id === id,
+        isSelected: id === selectedBankAccountId,
     }));
 }
 
@@ -1584,13 +1576,11 @@ function getNetSuiteCollectionAccountOptions(policy: Policy | undefined, selecte
     const payableAccounts = policy?.connections?.netsuite?.options.data.payableList;
     const accountOptions = getFilteredCollectionAccountOptions(payableAccounts);
 
-    const selectedPayableAccount = findSelectedBankAccountWithDefaultSelect(accountOptions, selectedBankAccountId);
-
     return accountOptions.map(({id, name}) => ({
         value: id,
         text: name,
         keyForList: id,
-        isSelected: selectedPayableAccount?.id === id,
+        isSelected: id === selectedBankAccountId,
     }));
 }
 
@@ -1607,13 +1597,14 @@ function getNetSuiteApprovalAccountOptions(policy: Policy | undefined, selectedB
     };
     const accountOptions = getFilteredApprovalAccountOptions([defaultApprovalAccount].concat(payableAccounts ?? []));
 
-    const selectedPayableAccount = findSelectedBankAccountWithDefaultSelect(accountOptions, selectedBankAccountId);
+    // When nothing is explicitly set, the synthesized default approval account is the effective selection in NetSuite.
+    const effectiveSelectionId = selectedBankAccountId ?? CONST.NETSUITE_APPROVAL_ACCOUNT_DEFAULT;
 
     return accountOptions.map(({id, name}) => ({
         value: id,
         text: name,
         keyForList: id,
-        isSelected: selectedPayableAccount?.id === id,
+        isSelected: id === effectiveSelectionId,
     }));
 }
 
