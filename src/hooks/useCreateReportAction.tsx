@@ -101,8 +101,7 @@ export default function useCreateReportAction({onCreateReport, groupPoliciesWith
             const isDefaultPersonal = !activePolicy || activePolicy.type === CONST.POLICY.TYPE.PERSONAL || !isPaidGroupPolicy(activePolicy);
             const hasMultipleNonPersonalWorkspaces = groupPoliciesWithChatEnabled.length > 1;
             const isDefaultBillingRestricted =
-                !!workspaceIDForReportCreation &&
-                shouldRestrictUserBillableActions(workspaceIDForReportCreation, ownerBillingGracePeriodEnd, userBillingGracePeriodEnds, amountOwed, accountID);
+                !!workspaceIDForReportCreation && shouldRestrictUserBillableActions(defaultChatEnabledPolicy, ownerBillingGracePeriodEnd, userBillingGracePeriodEnds, amountOwed, accountID);
 
             if (!workspaceIDForReportCreation || (isDefaultPersonal && hasMultipleNonPersonalWorkspaces) || (isDefaultBillingRestricted && hasMultipleNonPersonalWorkspaces)) {
                 Navigation.navigate(ROUTES.NEW_REPORT_WORKSPACE_SELECTION.getRoute());
@@ -110,7 +109,7 @@ export default function useCreateReportAction({onCreateReport, groupPoliciesWith
             }
 
             // Default workspace is not restricted → create report directly (or show empty-report confirmation)
-            if (!shouldRestrictUserBillableActions(workspaceIDForReportCreation, ownerBillingGracePeriodEnd, userBillingGracePeriodEnds, amountOwed, accountID)) {
+            if (!shouldRestrictUserBillableActions(defaultChatEnabledPolicy, ownerBillingGracePeriodEnd, userBillingGracePeriodEnds, amountOwed, accountID)) {
                 if (shouldShowEmptyReportConfirmation) {
                     openCreateReportConfirmation();
                 } else {
@@ -125,6 +124,7 @@ export default function useCreateReportAction({onCreateReport, groupPoliciesWith
         arePoliciesLoaded,
         shouldNavigateToUpgradePath,
         activePolicy,
+        defaultChatEnabledPolicy,
         defaultChatEnabledPolicyID,
         ownerBillingGracePeriodEnd,
         userBillingGracePeriodEnds,
