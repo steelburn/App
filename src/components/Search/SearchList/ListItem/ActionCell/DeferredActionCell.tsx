@@ -1,25 +1,33 @@
 import React, {useDeferredValue} from 'react';
-import {View} from 'react-native';
-import PulsingView from '@components/PulsingView';
-import useTheme from '@hooks/useTheme';
+import Button from '@components/Button';
+import useLocalize from '@hooks/useLocalize';
 import useThemeStyles from '@hooks/useThemeStyles';
+import CONST from '@src/CONST';
 import ActionCell from '.';
 import type {ActionCellProps} from '.';
+import actionTranslationsMap from './actionTranslationsMap';
 
 function DeferredActionCell(actionCellProps: ActionCellProps) {
     const styles = useThemeStyles();
-    const theme = useTheme();
+    const {translate} = useLocalize();
     const shouldRender = useDeferredValue(true, false);
 
     if (!shouldRender) {
-        const sizeStyle = actionCellProps.extraSmall ? styles.buttonExtraSmall : styles.buttonSmall;
+        const action = actionCellProps.action ?? CONST.SEARCH.ACTION_TYPES.VIEW;
+        const shouldUseViewAction = action === CONST.SEARCH.ACTION_TYPES.VIEW || action === CONST.SEARCH.ACTION_TYPES.PAID || action === CONST.SEARCH.ACTION_TYPES.DONE;
+        const isSuccess = !shouldUseViewAction && action !== CONST.SEARCH.ACTION_TYPES.UNDELETE;
+        const text = shouldUseViewAction ? translate(actionTranslationsMap[CONST.SEARCH.ACTION_TYPES.VIEW]) : translate(actionTranslationsMap[action]);
+
         return (
-            <PulsingView
-                shouldPulse
-                style={styles.w100}
-            >
-                <View style={[styles.w100, sizeStyle, {backgroundColor: theme.skeletonLHNIn}]} />
-            </PulsingView>
+            <Button
+                text={text}
+                small={!actionCellProps.extraSmall}
+                extraSmall={actionCellProps.extraSmall}
+                style={[styles.w100, styles.pointerEventsNone]}
+                isDisabled
+                success={isSuccess}
+                isNested
+            />
         );
     }
 
