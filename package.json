@@ -362,7 +362,6 @@
     "workbox-webpack-plugin": "^7.4.0"
   },
   "overrides": {
-    "react-native-screens": "4.25.0",
     "babel-plugin-react-compiler": "0.0.0-experimental-a1856f3-20260422",
     "braces": "3.0.3",
     "yargs": "17.7.2",
