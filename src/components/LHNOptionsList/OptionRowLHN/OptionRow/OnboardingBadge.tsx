@@ -8,6 +8,7 @@ import FreeTrial from '@pages/settings/Subscription/FreeTrial';
 import ONYXKEYS from '@src/ONYXKEYS';
 
 type OnboardingBadgeProps = {
+    /** The option data for the report row this badge belongs to. Used to determine whether the report is the onboarding chat. */
     optionItem: OptionData;
 };
 
