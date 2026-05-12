@@ -108,6 +108,7 @@ jobs:
         uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
         env:
           HEAD_COMMIT_SHA: ${{ steps.getDeploySHA.outputs.SHA }}
+          DEPLOY_TAG: ${{ steps.getTagName.outputs.TAG }}
         with:
           script: |
             let commitMessages;
@@ -116,27 +117,45 @@ jobs:
                 commitMessages = context.payload.commits.map((commit) => commit.message);
             } else {
                 // workflow_dispatch: payload has no commits array.
-                // For a conflict-resolution cherry-pick, GitHub creates a merge commit at HEAD whose first
-                // parent is the branch before the merge. The cherry-picked commit (which carries the
-                // "(cherry-picked to ... by ...)" marker) sits under the merge commit, not at HEAD itself.
-                // We therefore compare the first parent against HEAD to get all commits that were merged in.
+                // We must inspect the full commit range since the previous deploy, not just HEAD.
+                // Two cases where HEAD alone misses the marker:
+                //   1. Linear push: Mobile-Expensify cherry-picks amend the marker onto the
+                //      version-bump commit, then push a final unmarked submodule-update commit on top.
+                //   2. Merge commit: a conflict-resolution PR creates a merge commit at HEAD; the
+                //      cherry-picked commit with the marker is an inner commit, not HEAD itself.
+                // compareCommits(prevTag, HEAD) follows all parents and covers both cases.
                 const headSha = process.env.HEAD_COMMIT_SHA;
-                const { data: headCommit } = await github.rest.git.getCommit({
+                const currentTag = process.env.DEPLOY_TAG;
+                const isStaging = currentTag.endsWith('-staging');
+
+                const { data: tags } = await github.rest.repos.listTags({
                     owner: context.repo.owner,
                     repo: context.repo.repo,
-                    commit_sha: headSha,
+                    per_page: 20,
                 });
-                if (headCommit.parents.length > 1) {
-                    // Merge commit: get all commits between first parent and HEAD
+
+                // Find the most recent prior tag on the same branch (staging or production)
+                // to bound the commit range and avoid false positives from prior cherry-picks.
+                const prevTag = tags.find((t) => {
+                    if (t.name === currentTag) return false;
+                    return isStaging ? t.name.endsWith('-staging') : !t.name.endsWith('-staging');
+                });
+
+                if (prevTag) {
                     const { data: comparison } = await github.rest.repos.compareCommits({
                         owner: context.repo.owner,
                         repo: context.repo.repo,
-                        base: headCommit.parents[0].sha,
+                        base: prevTag.commit.sha,
                         head: headSha,
                     });
-                    commitMessages = [headCommit.message, ...comparison.commits.map((c) => c.commit.message)];
+                    commitMessages = comparison.commits.map((c) => c.commit.message);
                 } else {
-                    // Linear commit: only check this commit's message
+                    // No previous tag found: fall back to HEAD only
+                    const { data: headCommit } = await github.rest.git.getCommit({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        commit_sha: headSha,
+                    });
                     commitMessages = [headCommit.message];
                 }
             }
