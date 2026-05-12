@@ -421,14 +421,19 @@ function IOURequestStepDistance({
                 return;
             }
 
-            // If nothing was changed, simply go to transaction thread
-            // We compare only addresses because numbers are rounded while backup
+            // If nothing was changed, simply go to transaction thread.
+            // We compare addresses only because numbers are rounded vs. the backup. We also send the
+            // update when a manual `customUnit.quantity` override was cleared by `saveWaypoint` (a
+            // waypoint re-save resets the distance to the route value), so the BE re-evaluates and
+            // clears stale distance violations like `increasedDistance` (GH #90105).
             const hasRouteChanged = !deepEqual(transactionBackup?.routes, transaction?.routes);
-            if (!haveWaypointAddressesChanged(transactionBackup?.comment?.waypoints, waypoints)) {
+            const distanceWasReset = transactionBackup?.comment?.customUnit?.quantity != null && transactionBackup.comment.customUnit.quantity !== transaction?.comment?.customUnit?.quantity;
+            if (!haveWaypointAddressesChanged(transactionBackup?.comment?.waypoints, waypoints) && !distanceWasReset) {
                 transactionWasSaved.current = true;
                 navigateBackAfterSave();
                 return;
             }
+            const routeDistanceInUnit = currentDistanceInMeters > 0 ? roundToTwoDecimalPlaces(DistanceRequestUtils.convertDistanceUnit(currentDistanceInMeters, distanceUnit)) : undefined;
             if (transaction?.transactionID && report?.reportID) {
                 updateMoneyRequestDistance({
                     transaction,
@@ -437,6 +442,7 @@ function IOURequestStepDistance({
                     waypoints,
                     recentWaypoints,
                     ...(hasRouteChanged ? {routes: transaction?.routes} : {}),
+                    ...(distanceWasReset && routeDistanceInUnit !== undefined ? {distance: routeDistanceInUnit} : {}),
                     policy,
                     policyTagList: policyTags,
                     policyCategories,
@@ -474,6 +480,8 @@ function IOURequestStepDistance({
         report,
         currentTransaction?.comment?.waypoints,
         currentTransaction?.routes,
+        currentDistanceInMeters,
+        distanceUnit,
         policy,
         parentReport,
         recentWaypoints,
