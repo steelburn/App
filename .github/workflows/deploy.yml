@@ -134,18 +134,27 @@ jobs:
                 const currentTag = process.env.DEPLOY_TAG;
                 const isStaging = currentTag.endsWith('-staging');
 
-                const { data: tags } = await github.rest.repos.listTags({
-                    owner: context.repo.owner,
-                    repo: context.repo.repo,
-                    per_page: 20,
-                });
-
-                // Find the most recent prior tag on the same branch (staging or production)
-                // to bound the commit range and avoid false positives from prior cherry-picks.
-                const prevTag = tags.find((t) => {
-                    if (t.name === currentTag) return false;
-                    return isStaging ? t.name.endsWith('-staging') : !t.name.endsWith('-staging');
-                });
+                // Paginate tags (max 100 per page) until we find the most recent prior tag
+                // on the same branch. A single page of 20 isn't enough: a production deploy
+                // that follows many staging releases may have the last production tag beyond
+                // the first page, causing prevTag to be undefined and falling back to HEAD only.
+                let prevTag = null;
+                for (let page = 1; !prevTag; page++) {
+                    const { data: tags } = await github.rest.repos.listTags({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        per_page: 100,
+                        page,
+                    });
+                    if (tags.length === 0) break;
+                    // Find the most recent prior tag on the same branch (staging or production)
+                    // to bound the commit range and avoid false positives from prior cherry-picks.
+                    prevTag = tags.find((t) => {
+                        if (t.name === currentTag) return false;
+                        return isStaging ? t.name.endsWith('-staging') : !t.name.endsWith('-staging');
+                    });
+                    if (tags.length < 100) break;
+                }
 
                 if (prevTag) {
                     const { data: comparison } = await github.rest.repos.compareCommits({
