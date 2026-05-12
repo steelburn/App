@@ -106,7 +106,7 @@ function TravelCVVPage() {
                         {cvvDigits.map((digit, index) => (
                             <View
                                 // eslint-disable-next-line react/no-array-index-key -- CVV digits are a fixed-length display-only array that is never reordered
-                                key={`${digit}-${index}`}
+                                key={`cvv-${digit}-${index}`}
                                 style={[styles.alignItemsCenter, styles.justifyContentCenter, styles.travelCVVDigitBox]}
                             >
                                 <Text style={[styles.textXLarge, styles.travelCVVDigitText]}>{digit}</Text>
