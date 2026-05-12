@@ -1202,8 +1202,8 @@ describe('actions/Report', () => {
         });
 
         const loadingState = await getOnyxValue(`${ONYXKEYS.COLLECTION.RAM_ONLY_REPORT_LOADING_STATE}${REPORT_ID}`);
-        expect(loadingState?.reportID).toBeUndefined();
-        expect(loadingState?.reportName).toBeUndefined();
+        expect(loadingState).not.toHaveProperty('reportID');
+        expect(loadingState).not.toHaveProperty('reportName');
 
         setHasRadio(true);
         await waitForBatchedUpdates();
