@@ -1,7 +1,7 @@
 ---
 title: Navigating New Expensify
 description: Learn how to move around New Expensify using the navigation tabs, including Home, Inbox, Spend, Workspaces, and Account on web and mobile.
-keywords: [New Expensify, navigation tabs, navigation, Home tab, Inbox tab, Spend tab, Workspaces tab, Account tab, Receipt button, Create button, workspace filter]
+keywords: [New Expensify, navigation tabs, navigation, Home tab, Inbox tab, Spend tab, Workspaces tab, Account tab, Scan button, Create button, workspace filter]
 internalScope: Audience is all Expensify members. Covers how to navigate Expensify using the navigation tabs and primary action buttons. Does not explain the detailed behavior of the Home tab sections.
 ---
 
@@ -53,7 +53,7 @@ Use Inbox to:
 
 ---
 
-# What the Spend tab is used for
+## What the Spend tab is used for
 
 **Spend** is the main place to search and act on expenses and expense reports.
 
@@ -121,11 +121,11 @@ Paid Workspace Admins may have dedicated support contacts assigned to their acco
 
 ---
 
-## How to use the Receipt and Create buttons
+## How to use the Scan and Create buttons
 
 In addition to the navigation tabs, you’ll see two primary action buttons:
 
-- The green **Scan** button  to scan or manually add an expense.
+- The green **Scan** button to scan or manually add an expense.
 - The grey **➕ Create** button to start actions like creating a report, sending money, requesting money, or tracking distance.
 
 The **Scan** and **Create** buttons are available from all screens so you can quickly take action.
