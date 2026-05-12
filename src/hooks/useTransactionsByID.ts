@@ -6,7 +6,8 @@ import useOnyx from './useOnyx';
 
 function useTransactionsByID(transactionIDs: string[] | undefined) {
     const transactionIDsKey = transactionIDs?.join('|') ?? '';
-    const stableTransactionIDs = useMemo(() => (transactionIDsKey ? transactionIDsKey.split('|') : []), [transactionIDsKey]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- transactionIDsKey is a primitive proxy for transactionIDs to avoid changing the selector on referential-only changes
+    const stableTransactionIDs = useMemo(() => transactionIDs ?? [], [transactionIDsKey]);
 
     const transactionsSelector = useCallback(
         (transactions: OnyxCollection<Transaction>) => stableTransactionIDs.map((id) => transactions?.[`${ONYXKEYS.COLLECTION.TRANSACTION}${id}`]),
