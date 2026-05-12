@@ -1,5 +1,5 @@
 import noop from 'lodash/noop';
-import React, {useCallback, useEffect, useEffectEvent, useMemo, useRef, useState} from 'react';
+import React, {useEffect, useEffectEvent, useRef, useState} from 'react';
 import type {NativeEventSubscription, ViewStyle} from 'react-native';
 // eslint-disable-next-line no-restricted-imports
 import {BackHandler, InteractionManager, Modal, StyleSheet, View} from 'react-native';
@@ -65,7 +65,7 @@ function ReanimatedModal({
 
     const styles = useThemeStyles();
 
-    const onBackButtonPressHandler = useCallback(() => {
+    const onBackButtonPressHandler = () => {
         if (shouldIgnoreBackHandlerDuringTransition && isVisible !== isContainerOpen) {
             return false;
         }
@@ -74,17 +74,14 @@ function ReanimatedModal({
             return true;
         }
         return false;
-    }, [isVisible, isContainerOpen, onBackButtonPress, shouldIgnoreBackHandlerDuringTransition]);
+    };
 
-    const handleEscape = useCallback(
-        (e: KeyboardEvent) => {
-            if (e.key !== 'Escape' || onBackButtonPressHandler() !== true) {
-                return;
-            }
-            e.stopImmediatePropagation();
-        },
-        [onBackButtonPressHandler],
-    );
+    const handleEscape = (e: KeyboardEvent) => {
+        if (e.key !== 'Escape' || onBackButtonPressHandler() !== true) {
+            return;
+        }
+        e.stopImmediatePropagation();
+    };
 
     useEffect(() => {
         if (getPlatform() === CONST.PLATFORM.WEB) {
@@ -133,11 +130,9 @@ function ReanimatedModal({
         fireTransitionCallbacks();
     }, [isVisible, isContainerOpen]);
 
-    const backdropStyle: ViewStyle = useMemo(() => {
-        return {width: windowWidth, height: windowHeight, backgroundColor: backdropColor};
-    }, [windowWidth, windowHeight, backdropColor]);
+    const backdropStyle: ViewStyle = {width: windowWidth, height: windowHeight, backgroundColor: backdropColor};
 
-    const onOpenCallBack = useCallback(() => {
+    const onOpenCallBack = () => {
         setIsContainerOpen(true);
         if (handleRef.current) {
             InteractionManager.clearInteractionHandle(handleRef.current);
@@ -148,9 +143,9 @@ function ReanimatedModal({
             transitionHandleRef.current = null;
         }
         onModalShow();
-    }, [onModalShow]);
+    };
 
-    const onCloseCallBack = useCallback(() => {
+    const onCloseCallBack = () => {
         setIsContainerOpen(false);
         if (handleRef.current) {
             InteractionManager.clearInteractionHandle(handleRef.current);
@@ -167,11 +162,9 @@ function ReanimatedModal({
         if (getPlatform() === CONST.PLATFORM.ANDROID) {
             onModalHide();
         }
-    }, [onModalHide]);
+    };
 
-    const modalStyle = useMemo(() => {
-        return {zIndex: StyleSheet.flatten(style)?.zIndex};
-    }, [style]);
+    const modalStyle = {zIndex: StyleSheet.flatten(style)?.zIndex};
 
     const containerView = (
         <Container
