@@ -880,7 +880,7 @@ describe('actions/User', () => {
             const login = {partnerID, partnerUserID} as NewLogin;
 
             // When revokeDevice is called
-            UserActions.revokeDevice(login);
+            UserActions.revokeDevice(login, undefined);
             await waitForBatchedUpdates();
 
             // Then API.write should be called with correct command and parameters
