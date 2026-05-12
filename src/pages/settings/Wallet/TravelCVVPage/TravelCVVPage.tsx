@@ -33,7 +33,7 @@ function TravelCVVPage() {
     const [isCopyButtonActive, setCopyButtonInactive] = useThrottledButtonState();
     const {isOffline} = useNetwork();
     const {translate} = useLocalize();
-    const icons = useMemoizedLazyExpensifyIcons(['Copy']);
+    const icons = useMemoizedLazyExpensifyIcons(['Copy', 'Checkmark']);
 
     const [account, accountMetadata] = useOnyx(ONYXKEYS.ACCOUNT);
     const [, lockAccountDetailsMetadata] = useOnyx(ONYXKEYS.NVP_PRIVATE_LOCK_ACCOUNT_DETAILS);
@@ -119,7 +119,7 @@ function TravelCVVPage() {
     if (hasRevealedCVV) {
         actionButton = (
             <Button
-                icon={icons.Copy}
+                icon={isCopyButtonActive ? icons.Copy : icons.Checkmark}
                 text={isCopyButtonActive ? translate('cardPage.cardDetails.copyCvv') : translate('common.copied')}
                 onPress={() => {
                     Clipboard.setString(cvv);
