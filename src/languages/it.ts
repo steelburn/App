@@ -9199,7 +9199,7 @@ Ecco una *ricevuta di prova* per mostrarti come funziona:`,
                 vacationDelegate: 'Impossibile impostare questo utente come delegato per le ferie. Riprova.',
                 moveMember: 'Impossibile spostare questo membro. Riprova.',
                 moveMemberNotPolicyAdmin:
-                    'Cannot move member to the domain group. You must be a Policy Admin for the Preferred Policy set on the domain group you are trying to move this user to.',
+                    'Impossibile spostare il membro nel gruppo di dominio. Devi essere Amministratore di Criteri per il Criterio Preferito impostato nel gruppo di dominio in cui stai cercando di spostare questo utente.',
             },
             cannotSetVacationDelegateForMember: (email: string) => `Non puoi impostare un delegato per le vacanze per ${email} perché al momento è il delegato per i seguenti membri:`,
             reportSuspiciousActivityPrompt: (email: string) =>

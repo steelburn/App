@@ -9228,7 +9228,7 @@ Voici un *reçu test* pour vous montrer comment ça fonctionne :`,
                 vacationDelegate: 'Impossible de définir cet utilisateur comme délégué de vacances. Veuillez réessayer.',
                 moveMember: 'Impossible de déplacer ce membre. Veuillez réessayer.',
                 moveMemberNotPolicyAdmin:
-                    'Cannot move member to the domain group. You must be a Policy Admin for the Preferred Policy set on the domain group you are trying to move this user to.',
+                    'Impossible de déplacer le membre vers le groupe de domaine. Vous devez être Administrateur de Politique pour la Politique Préférée définie sur le groupe de domaine vers lequel vous essayez de déplacer cet utilisateur.',
             },
             cannotSetVacationDelegateForMember: (email: string) =>
                 `Vous ne pouvez pas définir un délégué de vacances pour ${email}, car cette personne est actuellement le délégué des membres suivants :`,
