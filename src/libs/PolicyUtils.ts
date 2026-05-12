@@ -2266,8 +2266,6 @@ export {
     isDelayedSubmissionEnabled,
     getCorrectedAutoReportingFrequency,
     isPaidGroupPolicy,
-    isSubmitPolicy,
-    isPolicyEditor,
     canEditWorkspaceSettings,
     isGroupPolicy,
     isPendingDeletePolicy,

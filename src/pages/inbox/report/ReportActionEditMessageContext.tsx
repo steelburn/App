@@ -240,5 +240,4 @@ function useReportActionActiveEditActions() {
     return useContext(ReportActionEditMessageActionsContext);
 }
 
-export {ReportActionEditMessageContextProvider, useReportActionActiveEdit, useReportActionActiveEditActions, ReportActionEditMessageContext};
-export type {ReportActionActiveEdit, ReportActionEditMessageContextValue};
+export {ReportActionEditMessageContextProvider, useReportActionActiveEdit, useReportActionActiveEditActions};
