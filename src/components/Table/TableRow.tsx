@@ -1,6 +1,8 @@
 import React from 'react';
 import type {PressableStateCallbackType} from 'react-native';
 import {View} from 'react-native';
+import type {OfflineWithFeedbackProps} from '@components/OfflineWithFeedback';
+import OfflineWithFeedback from '@components/OfflineWithFeedback';
 import type {PressableWithFeedbackProps} from '@components/Pressable/PressableWithFeedback';
 import PressableWithFeedback from '@components/Pressable/PressableWithFeedback';
 import SkeletonViewContentLoader from '@components/SkeletonViewContentLoader';
@@ -30,9 +32,24 @@ type TableRowProps = Omit<PressableWithFeedbackProps, 'accessible'> & {
 
     /** The reason attributes if the table row is loading */
     skeletonReasonAttributes: SkeletonSpanReasonAttributes;
+
+    /** Attributes for when the client is offline and there is an error related to the table row */
+    offlineWithFeedback?: OfflineWithFeedbackProps;
 };
 
-export default function TableRow({children, accessible, rowIndex, sentryLabel, interactive, isLoading, skeletonReasonAttributes, LoadingComponent, onPress, ...props}: TableRowProps) {
+export default function TableRow({
+    children,
+    accessible,
+    rowIndex,
+    sentryLabel,
+    interactive,
+    isLoading,
+    skeletonReasonAttributes,
+    LoadingComponent,
+    onPress,
+    offlineWithFeedback,
+    ...props
+}: TableRowProps) {
     useSkeletonSpan('TableRowSkeleton', skeletonReasonAttributes);
 
     const theme = useTheme();
@@ -77,32 +94,38 @@ export default function TableRow({children, accessible, rowIndex, sentryLabel, i
     };
 
     return (
-        <PressableWithFeedback
-            accessible={accessible}
-            accessibilityLabel="row"
-            style={tableRowPressableStyles}
-            sentryLabel={sentryLabel}
-            interactive={isInteractive}
-            pressDimmingValue={isInteractive ? undefined : 1}
-            hoverStyle={isInteractive && styles.hoveredComponentBG}
-            role={isInteractive ? CONST.ROLE.BUTTON : CONST.ROLE.PRESENTATION}
-            onPress={onPress}
+        <OfflineWithFeedback
+            // We need to spread the props due to how the OfflineWithFeedback component handles child components
             // eslint-disable-next-line react/jsx-props-no-spreading
-            {...props}
+            {...offlineWithFeedback}
         >
-            {(state) =>
-                !!isLoading && LoadingComponent ? (
-                    <SkeletonViewContentLoader
-                        backgroundColor={theme.skeletonLHNIn}
-                        foregroundColor={theme.skeletonLHNOut}
-                        height={shouldUseNarrowTableLayout ? variables.tableRowHeightCompact : variables.tableRowHeight}
-                    >
-                        <LoadingComponent />
-                    </SkeletonViewContentLoader>
-                ) : (
-                    <View style={tableRowContentStyles}>{renderChildren(state)}</View>
-                )
-            }
-        </PressableWithFeedback>
+            <PressableWithFeedback
+                accessible={accessible}
+                accessibilityLabel="row"
+                style={tableRowPressableStyles}
+                sentryLabel={sentryLabel}
+                interactive={isInteractive}
+                pressDimmingValue={isInteractive ? undefined : 1}
+                hoverStyle={isInteractive && styles.hoveredComponentBG}
+                role={isInteractive ? CONST.ROLE.BUTTON : CONST.ROLE.PRESENTATION}
+                onPress={onPress}
+                // eslint-disable-next-line react/jsx-props-no-spreading
+                {...props}
+            >
+                {(state) =>
+                    !!isLoading && LoadingComponent ? (
+                        <SkeletonViewContentLoader
+                            backgroundColor={theme.skeletonLHNIn}
+                            foregroundColor={theme.skeletonLHNOut}
+                            height={shouldUseNarrowTableLayout ? variables.tableRowHeightCompact : variables.tableRowHeight}
+                        >
+                            <LoadingComponent />
+                        </SkeletonViewContentLoader>
+                    ) : (
+                        <View style={tableRowContentStyles}>{renderChildren(state)}</View>
+                    )
+                }
+            </PressableWithFeedback>
+        </OfflineWithFeedback>
     );
 }
