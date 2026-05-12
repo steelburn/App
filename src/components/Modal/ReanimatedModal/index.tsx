@@ -1,5 +1,5 @@
 import noop from 'lodash/noop';
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useEffectEvent, useMemo, useRef, useState} from 'react';
 import type {NativeEventSubscription, ViewStyle} from 'react-native';
 // eslint-disable-next-line no-restricted-imports
 import {BackHandler, InteractionManager, Modal, StyleSheet, View} from 'react-native';
@@ -124,14 +124,17 @@ function ReanimatedModal({
         };
     }, [isVisible, isContainerOpen]);
 
-    useEffect(() => {
+    const fireTransitionCallbacks = useEffectEvent(() => {
         if (isVisible && !isContainerOpen && !isTransitioning) {
             onModalWillShow();
         } else if (!isVisible && isContainerOpen && !isTransitioning) {
             onModalWillHide();
             blurActiveElement();
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+    });
+
+    useEffect(() => {
+        fireTransitionCallbacks();
     }, [isVisible, isContainerOpen, isTransitioning]);
 
     useEffect(() => {
