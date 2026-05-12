@@ -2924,6 +2924,7 @@ const translations = {
     },
     validateCodeForm: {
         magicCodeNotReceived: "Didn't receive a magic code?",
+        avoidScamsMessage: '<strong>Avoid scams. Do not share your code with anyone.</strong> Our team will never call, text, or email you for this code.',
         enterAuthenticatorCode: 'Please enter your authenticator code',
         enterRecoveryCode: 'Please enter your recovery code',
         requiredWhen2FAEnabled: 'Required when 2FA is enabled',
