@@ -9265,7 +9265,13 @@ Voici un *reçu test* pour vous montrer comment ça fonctionne :`,
                 `Êtes-vous sûr de vouloir faire de ${newName} le groupe par défaut ? Les nouveaux membres seront invités à ce groupe au lieu du groupe par défaut précédent (${currentName}). `,
             makeDefault: 'Définir par défaut',
             neverMind: 'Peu importe',
+            createGroupError: 'Impossible de créer ce groupe. Veuillez réessayer.',
             permissions: 'Autorisations du groupe',
+            createNewGroupButton: 'Nouveau groupe',
+            createGroupSubmitButton: 'Créer le groupe',
+            expensifyCardPreferredWorkspace: "Espace de travail préféré pour l'Expensify Card",
+            expensifyCardPreferredWorkspaceDescription:
+                "Toutes les transactions Expensify Card seront créées dans l'espace de travail préféré Expensify Card au lieu de l'espace de travail préféré.",
             strictlyEnforceWorkspaceRules: 'Appliquer strictement les règles de l’espace de travail',
             strictlyEnforceWorkspaceRulesDescription:
                 'Toutes les règles de l’espace de travail doivent être respectées avant de soumettre un rapport. Aucune exception manuelle n’est autorisée.',
@@ -9285,9 +9291,6 @@ Voici un *reçu test* pour vous montrer comment ça fonctionne :`,
             restrictDefaultLoginSelection: 'Restreindre la sélection de connexion par défaut',
             restrictDefaultLoginSelectionDescription:
                 'Empêche les membres de modifier leur e-mail de connexion en dehors du domaine de leur entreprise afin d’éviter les restrictions de politique.',
-            expensifyCardPreferredWorkspace: 'Espace de travail préféré pour la Expensify Card',
-            expensifyCardPreferredWorkspaceDescription:
-                'Toutes les transactions Expensify Card seront créées dans l’espace de travail préféré pour la Expensify Card au lieu de l’espace de travail préféré. L’activation de cette fonctionnalité remplacera le paramètre d’espace de travail préféré uniquement pour les transactions Expensify Card.',
             expensifyCardPreferredWorkspaceDisabledMessage:
                 'Pour utiliser ce paramètre, l’espace de travail préféré doit être activé et la Expensify Card doit être configurée pour le domaine.',
             findGroup: 'Trouver un groupe',

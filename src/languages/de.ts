@@ -9242,7 +9242,13 @@ Hier ist ein *Testbeleg*, um dir zu zeigen, wie es funktioniert:`,
                 `Möchtest du ${newName} wirklich zur Standardgruppe machen? Neue Mitglieder werden zu dieser Gruppe anstelle der bisherigen Standardgruppe (${currentName}) eingeladen. `,
             makeDefault: 'Als Standard festlegen',
             neverMind: 'Vergiss es',
+            createGroupError: 'Diese Gruppe konnte nicht erstellt werden. Bitte versuche es erneut.',
             permissions: 'Gruppenberechtigungen',
+            createNewGroupButton: 'Neue Gruppe',
+            createGroupSubmitButton: 'Gruppe erstellen',
+            expensifyCardPreferredWorkspace: 'Expensify Card bevorzugter Arbeitsbereich',
+            expensifyCardPreferredWorkspaceDescription:
+                'Alle Expensify Card-Transaktionen werden im bevorzugten Expensify Card-Arbeitsbereich anstelle des bevorzugten Arbeitsbereichs erstellt. Durch Aktivieren dieser Funktion wird die Einstellung des bevorzugten Arbeitsbereichs nur für Expensify Card-Transaktionen überschrieben.',
             strictlyEnforceWorkspaceRules: 'Workspace-Regeln strikt durchsetzen',
             strictlyEnforceWorkspaceRulesDescription: 'Alle Workspace-Regeln müssen erfüllt sein, bevor ein Bericht eingereicht wird. Manuelle Ausnahmen sind nicht zulässig.',
             restrictExpenseWorkspaceCreation: 'Erstellen/Entfernen von Ausgaben-Workspaces einschränken',
@@ -9260,9 +9266,6 @@ Hier ist ein *Testbeleg*, um dir zu zeigen, wie es funktioniert:`,
             restrictDefaultLoginSelection: 'Standard-Login-Auswahl einschränken',
             restrictDefaultLoginSelectionDescription:
                 'Verhindert, dass Mitglieder ihre Login-E-Mail-Adresse außerhalb der Unternehmensdomäne ändern, um Richtlinienbeschränkungen zu umgehen.',
-            expensifyCardPreferredWorkspace: 'Bevorzugter Workspace für die Expensify Card',
-            expensifyCardPreferredWorkspaceDescription:
-                'Alle Expensify-Card-Transaktionen werden im bevorzugten Workspace für die Expensify Card statt im bevorzugten Workspace erstellt. Die Aktivierung dieser Funktion überschreibt die Einstellung des bevorzugten Workspace ausschließlich für Expensify-Card-Transaktionen.',
             expensifyCardPreferredWorkspaceDisabledMessage:
                 'Um diese Einstellung zu verwenden, muss der bevorzugte Workspace aktiviert und für die Domain die Expensify Card eingerichtet sein.',
             findGroup: 'Gruppe suchen',
