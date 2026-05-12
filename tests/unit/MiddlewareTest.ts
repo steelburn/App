@@ -8,6 +8,7 @@ import handleUnusedOptimisticID from '@src/libs/Middleware/HandleUnusedOptimisti
 import * as MainQueue from '@src/libs/Network/MainQueue';
 import * as NetworkStore from '@src/libs/Network/NetworkStore';
 import * as SequentialQueue from '@src/libs/Network/SequentialQueue';
+import * as PersistedRequests from '@src/libs/actions/PersistedRequests';
 import * as Request from '@src/libs/Request';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type {Report as OnyxReport, PersonalDetailsList} from '@src/types/onyx';
@@ -21,18 +22,21 @@ Onyx.init({
     keys: ONYXKEYS,
 });
 
-beforeAll(() => {
-    global.fetch = TestHelper.getGlobalFetchMock();
-});
-
 beforeEach(async () => {
     await Onyx.clear();
+    await waitForBatchedUpdates();
+    // Explicitly reset PersistedRequests module state (knownRequestIDs, ongoingRequest,
+    // pendingSaveOperations) which Onyx.clear() alone does not fully reset.
+    await PersistedRequests.clear();
     await waitForBatchedUpdates();
     SequentialQueue.resetQueue();
     MainQueue.clear();
     HttpUtils.cancelPendingRequests();
     NetworkStore.checkRequiredData();
     await waitForNetworkPromises();
+    // Reassign global.fetch to a fresh mock to clear any leftover mockImplementationOnce
+    // queue from the previous test. jest.clearAllMocks() only resets call counts, not the queue.
+    global.fetch = TestHelper.getGlobalFetchMock();
     jest.clearAllMocks();
     Request.clearMiddlewares();
 });
