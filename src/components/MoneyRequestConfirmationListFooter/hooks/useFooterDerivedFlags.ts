@@ -1,12 +1,12 @@
 import type {OnyxEntry} from 'react-native-onyx';
 import type {ValueOf} from 'type-fest';
+import shouldShowDistanceMap from '@components/MoneyRequestConfirmationListFooter/shouldShowDistanceMap';
 import usePolicyForMovingExpenses from '@hooks/usePolicyForMovingExpenses';
 import {hasEnabledTags} from '@libs/TagsOptionsListUtils';
-import {getCurrency, isFetchingWaypointsFromServer, isManagedCardTransaction, isScanRequest, shouldShowAttendees as shouldShowAttendeesTransactionUtils} from '@libs/TransactionUtils';
+import {getCurrency, isManagedCardTransaction, isScanRequest, shouldShowAttendees as shouldShowAttendeesTransactionUtils} from '@libs/TransactionUtils';
 import CONST from '@src/CONST';
 import type {IOUAction, IOUType} from '@src/CONST';
 import type * as OnyxTypes from '@src/types/onyx';
-import {isEmptyObject} from '@src/types/utils/EmptyObject';
 
 type UseFooterDerivedFlagsParams = {
     /** Action being performed (create / edit / submit / etc.) */
@@ -81,10 +81,7 @@ function useFooterDerivedFlags({
     const shouldShowTags = (isPolicyExpenseChat || isUnreported || isCreatingTrackExpense) && hasEnabledTags(policyTagLists);
     const shouldShowAttendees = shouldShowAttendeesTransactionUtils(iouType, policy);
 
-    const hasPendingWaypoints = transaction && isFetchingWaypointsFromServer(transaction);
-    const hasErrors = !isEmptyObject(transaction?.errors) || !isEmptyObject(transaction?.errorFields?.route) || !isEmptyObject(transaction?.errorFields?.waypoints);
-    const shouldShowMap =
-        isDistanceRequest && !isManualDistanceRequest && !isOdometerDistanceRequest && [hasErrors, hasPendingWaypoints, iouType !== CONST.IOU.TYPE.SPLIT, !isReadOnly].some(Boolean);
+    const shouldShowMap = shouldShowDistanceMap({transaction, isDistanceRequest, isManualDistanceRequest, isOdometerDistanceRequest, iouType, isReadOnly});
 
     // In Send Money and Split Bill with Scan flow, we don't allow the Merchant or Date to be edited.
     // For distance requests, don't show the merchant as there's already another "Distance" menu item.
@@ -110,8 +107,6 @@ function useFooterDerivedFlags({
         isCreatingTrackExpense,
         shouldShowTags,
         shouldShowAttendees,
-        hasPendingWaypoints,
-        hasErrors,
         shouldShowMap,
         shouldShowDate,
         canModifyTaxFields,

@@ -3,18 +3,18 @@ import type {OnyxEntry} from 'react-native-onyx';
 import ConfirmationReceiptThumbnail from '@components/MoneyRequestConfirmationListFooter/ConfirmationReceiptThumbnail';
 import useCompactReceiptDimensions from '@components/MoneyRequestConfirmationListFooter/hooks/useCompactReceiptDimensions';
 import useReceiptThumbnailSource from '@components/MoneyRequestConfirmationListFooter/hooks/useReceiptThumbnailSource';
+import shouldShowDistanceMap from '@components/MoneyRequestConfirmationListFooter/shouldShowDistanceMap';
 import ReceiptEmptyState from '@components/ReceiptEmptyState';
 import useIsInLandscapeMode from '@hooks/useIsInLandscapeMode';
 import useThemeStyles from '@hooks/useThemeStyles';
 import useWindowDimensions from '@hooks/useWindowDimensions';
 import {shouldShowReceiptEmptyState} from '@libs/IOUUtils';
 import Navigation from '@libs/Navigation/Navigation';
-import {isFetchingWaypointsFromServer, isScanRequest} from '@libs/TransactionUtils';
+import {isScanRequest} from '@libs/TransactionUtils';
 import CONST from '@src/CONST';
 import type {IOUAction, IOUType} from '@src/CONST';
 import ROUTES from '@src/ROUTES';
 import type * as OnyxTypes from '@src/types/onyx';
-import {isEmptyObject} from '@src/types/utils/EmptyObject';
 
 type ReceiptSectionProps = {
     transaction: OnyxEntry<OnyxTypes.Transaction>;
@@ -75,12 +75,8 @@ function ReceiptSection({
         horizontalMargin,
     });
 
-    // Mirror the shouldShowMap logic to determine whether the receipt area should render.
     // When a GPS distance map is visible, the receipt is hidden (unless manual/odometer).
-    const hasPendingWaypoints = transaction && isFetchingWaypointsFromServer(transaction);
-    const hasErrors = !isEmptyObject(transaction?.errors) || !isEmptyObject(transaction?.errorFields?.route) || !isEmptyObject(transaction?.errorFields?.waypoints);
-    const shouldShowMap =
-        isDistanceRequest && !isManualDistanceRequest && !isOdometerDistanceRequest && [hasErrors, hasPendingWaypoints, iouType !== CONST.IOU.TYPE.SPLIT, !isReadOnly].some(Boolean);
+    const shouldShowMap = shouldShowDistanceMap({transaction, isDistanceRequest, isManualDistanceRequest, isOdometerDistanceRequest, iouType, isReadOnly});
     const shouldShowReceiptArea = !shouldShowMap || isManualDistanceRequest || isOdometerDistanceRequest;
 
     if (!shouldShowReceiptArea) {
