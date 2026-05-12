@@ -56,14 +56,16 @@ function ReanimatedModal({
     ...props
 }: ReanimatedModalProps) {
     const [isContainerOpen, setIsContainerOpen] = useState(false);
-    const isTransitioning = isVisible !== isContainerOpen;
     const {windowWidth, windowHeight} = useWindowDimensions();
+    const styles = useThemeStyles();
 
     const backHandlerListener = useRef<NativeEventSubscription | null>(null);
     const handleRef = useRef<number | undefined>(undefined);
     const transitionHandleRef = useRef<TransitionHandle | null>(null);
 
-    const styles = useThemeStyles();
+    const isTransitioning = isVisible !== isContainerOpen;
+    const backdropStyle: ViewStyle = {width: windowWidth, height: windowHeight, backgroundColor: backdropColor};
+    const modalStyle = {zIndex: StyleSheet.flatten(style)?.zIndex};
 
     const onBackButtonPressHandler = () => {
         if (shouldIgnoreBackHandlerDuringTransition && isVisible !== isContainerOpen) {
@@ -81,6 +83,38 @@ function ReanimatedModal({
             return;
         }
         e.stopImmediatePropagation();
+    };
+
+    const onOpenCallBack = () => {
+        setIsContainerOpen(true);
+        if (handleRef.current) {
+            InteractionManager.clearInteractionHandle(handleRef.current);
+            handleRef.current = undefined;
+        }
+        if (transitionHandleRef.current) {
+            TransitionTracker.endTransition(transitionHandleRef.current);
+            transitionHandleRef.current = null;
+        }
+        onModalShow();
+    };
+
+    const onCloseCallBack = () => {
+        setIsContainerOpen(false);
+        if (handleRef.current) {
+            InteractionManager.clearInteractionHandle(handleRef.current);
+            handleRef.current = undefined;
+        }
+        if (transitionHandleRef.current) {
+            TransitionTracker.endTransition(transitionHandleRef.current);
+            transitionHandleRef.current = null;
+        }
+
+        // Because on Android, the Modal's onDismiss callback does not work reliably. There's a reported issue at:
+        // https://stackoverflow.com/questions/58937956/react-native-modal-ondismiss-not-invoked
+        // Therefore, we manually call onModalHide() here for Android.
+        if (getPlatform() === CONST.PLATFORM.ANDROID) {
+            onModalHide();
+        }
     };
 
     useEffect(() => {
@@ -129,42 +163,6 @@ function ReanimatedModal({
     useEffect(() => {
         fireTransitionCallbacks();
     }, [isVisible, isContainerOpen]);
-
-    const backdropStyle: ViewStyle = {width: windowWidth, height: windowHeight, backgroundColor: backdropColor};
-
-    const onOpenCallBack = () => {
-        setIsContainerOpen(true);
-        if (handleRef.current) {
-            InteractionManager.clearInteractionHandle(handleRef.current);
-            handleRef.current = undefined;
-        }
-        if (transitionHandleRef.current) {
-            TransitionTracker.endTransition(transitionHandleRef.current);
-            transitionHandleRef.current = null;
-        }
-        onModalShow();
-    };
-
-    const onCloseCallBack = () => {
-        setIsContainerOpen(false);
-        if (handleRef.current) {
-            InteractionManager.clearInteractionHandle(handleRef.current);
-            handleRef.current = undefined;
-        }
-        if (transitionHandleRef.current) {
-            TransitionTracker.endTransition(transitionHandleRef.current);
-            transitionHandleRef.current = null;
-        }
-
-        // Because on Android, the Modal's onDismiss callback does not work reliably. There's a reported issue at:
-        // https://stackoverflow.com/questions/58937956/react-native-modal-ondismiss-not-invoked
-        // Therefore, we manually call onModalHide() here for Android.
-        if (getPlatform() === CONST.PLATFORM.ANDROID) {
-            onModalHide();
-        }
-    };
-
-    const modalStyle = {zIndex: StyleSheet.flatten(style)?.zIndex};
 
     const containerView = (
         <Container
