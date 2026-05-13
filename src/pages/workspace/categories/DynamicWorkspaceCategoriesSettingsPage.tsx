@@ -27,13 +27,13 @@ import CONST from '@src/CONST';
 import {DYNAMIC_ROUTES} from '@src/ROUTES';
 import SCREENS from '@src/SCREENS';
 
-type WorkspaceCategoriesSettingsPageProps = WithPolicyConnectionsProps &
+type DynamicWorkspaceCategoriesSettingsPageProps = WithPolicyConnectionsProps &
     (
         | PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.WORKSPACE.DYNAMIC_CATEGORIES_SETTINGS>
         | PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.SETTINGS_CATEGORIES.DYNAMIC_SETTINGS_CATEGORIES_SETTINGS>
     );
 
-function WorkspaceCategoriesSettingsPage({policy, route}: WorkspaceCategoriesSettingsPageProps) {
+function DynamicWorkspaceCategoriesSettingsPage({policy, route}: DynamicWorkspaceCategoriesSettingsPageProps) {
     const {policyID} = route.params;
     const styles = useThemeStyles();
     const {translate} = useLocalize();
@@ -99,7 +99,7 @@ function WorkspaceCategoriesSettingsPage({policy, route}: WorkspaceCategoriesSet
             <ScreenWrapper
                 enableEdgeToEdgeBottomSafeAreaPadding
                 style={[styles.defaultModalContainer]}
-                testID="WorkspaceCategoriesSettingsPage"
+                testID="DynamicWorkspaceCategoriesSettingsPage"
             >
                 <HeaderWithBackButton
                     title={translate('common.settings')}
@@ -137,4 +137,4 @@ function WorkspaceCategoriesSettingsPage({policy, route}: WorkspaceCategoriesSet
     );
 }
 
-export default withPolicyConnections(WorkspaceCategoriesSettingsPage);
+export default withPolicyConnections(DynamicWorkspaceCategoriesSettingsPage);

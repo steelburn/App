@@ -20,11 +20,11 @@ import {DYNAMIC_ROUTES} from '@src/ROUTES';
 import SCREENS from '@src/SCREENS';
 import CategoryForm from './CategoryForm';
 
-type CreateCategoryPageProps =
+type DynamicCreateCategoryPageProps =
     | PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.WORKSPACE.DYNAMIC_CATEGORY_CREATE>
     | PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.SETTINGS_CATEGORIES.DYNAMIC_SETTINGS_CATEGORY_CREATE>;
 
-function CreateCategoryPage({route}: CreateCategoryPageProps) {
+function DynamicCreateCategoryPage({route}: DynamicCreateCategoryPageProps) {
     const [policyCategories] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${route.params.policyID}`);
     const [policyTags] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY_TAGS}${route.params.policyID}`);
     const styles = useThemeStyles();
@@ -98,7 +98,7 @@ function CreateCategoryPage({route}: CreateCategoryPageProps) {
             <ScreenWrapper
                 enableEdgeToEdgeBottomSafeAreaPadding
                 style={[styles.defaultModalContainer]}
-                testID="CreateCategoryPage"
+                testID="DynamicCreateCategoryPage"
                 shouldEnableMaxHeight
             >
                 <HeaderWithBackButton
@@ -114,4 +114,4 @@ function CreateCategoryPage({route}: CreateCategoryPageProps) {
     );
 }
 
-export default CreateCategoryPage;
+export default DynamicCreateCategoryPage;
