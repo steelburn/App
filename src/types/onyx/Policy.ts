@@ -1379,16 +1379,16 @@ type FinancialForceSyncedEntity = {
 /** Data synced from Certinia (parent sync service); arrays may be empty until sync completes */
 type FinancialForceConnectionData = {
     /** Salesforce Accounts used as Default Vendor options (FFA) */
-    vendors: Array<FinancialForceSyncedEntity>;
+    vendors: FinancialForceSyncedEntity[];
 
     /** Certinia companies (c2g__codaCompany__c); FFA validates presence when applicable */
-    companies: Array<FinancialForceSyncedEntity>;
+    companies: FinancialForceSyncedEntity[];
 
     /** PSA: projects synced for mapping (Release 2) */
-    projects?: Array<FinancialForceSyncedEntity>;
+    projects?: FinancialForceSyncedEntity[];
 
     /** PSA: assignments synced for mapping (Release 2) */
-    assignments?: Array<FinancialForceSyncedEntity>;
+    assignments?: FinancialForceSyncedEntity[];
 };
 
 /** Certinia credentials (Salesforce / Certinia org); fields populate as OAuth / sync complete */
@@ -1435,7 +1435,7 @@ type FinancialForceExportConfig = {
     /** FFA / PSA: non-reimbursable expenses destination */
     nonReimbursable?: FinancialForceExportDestination;
 
-    /** Payable invoice / expense report export status.*/
+    /** Payable invoice / expense report export status. */
     exportStatus?: ValueOf<typeof CONST.CERTINIA_EXPORT_STATUS>;
 
     /** Date basis for export */
@@ -1450,7 +1450,7 @@ type FinancialForceExportConfig = {
     /** PSA / SRP: company ID for export */
     companyID?: string;
 
-    /** PSA: report-level export status.*/
+    /** PSA: report-level export status. */
     reportExportStatus?: ValueOf<typeof CONST.CERTINIA_EXPORT_STATUS>;
 };
 
@@ -1475,6 +1475,7 @@ type FinancialForceAdvancedConfig = {
 /** Certinia (FinancialForce) connection config */
 type FinancialForceConnectionConfig = OnyxCommon.OnyxValueWithOfflineFeedback<
     {
+        /** Certinia credentials */
         credentials: FinancialForceCredentials;
 
         /** True when only PSA is enabled (no FFA) */
