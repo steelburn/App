@@ -81,7 +81,7 @@ describe('getFocusedLeafScreenName', () => {
         expect(getFocusedLeafScreenName(state)).toBe('Report');
     });
 
-    it('resolves the deep leaf for a cold-start /r/:reportID style PartialState', () => {
+    it('resolves the deep leaf on cold-start when the state is incomplete (no index at any level)', () => {
         const state: PartialState<NavigationState> = {
             routes: [
                 {
@@ -91,7 +91,7 @@ describe('getFocusedLeafScreenName', () => {
                             {
                                 name: 'ReportsSplitNavigator',
                                 state: {
-                                    routes: [{name: 'Report', params: {reportID: '12345'}}],
+                                    routes: [{name: 'Report'}],
                                 },
                             },
                         ],
