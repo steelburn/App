@@ -9260,7 +9260,7 @@ Hier ist ein *Testbeleg*, um dir zu zeigen, wie es funktioniert:`,
             permissions: 'Gruppenberechtigungen',
             createNewGroupButton: 'Neue Gruppe',
             createGroupSubmitButton: 'Gruppe erstellen',
-            expensifyCardPreferredWorkspace: 'Expensify Card bevorzugter Arbeitsbereich',
+            expensifyCardPreferredWorkspace: 'Bevorzugter Workspace für Expensify Card',
             expensifyCardPreferredWorkspaceDescription:
                 'Alle Expensify Card-Transaktionen werden im bevorzugten Expensify Card-Arbeitsbereich anstelle des bevorzugten Arbeitsbereichs erstellt. Durch Aktivieren dieser Funktion wird die Einstellung des bevorzugten Arbeitsbereichs nur für Expensify Card-Transaktionen überschrieben.',
             strictlyEnforceWorkspaceRules: 'Workspace-Regeln strikt durchsetzen',
@@ -9281,7 +9281,7 @@ Hier ist ein *Testbeleg*, um dir zu zeigen, wie es funktioniert:`,
             restrictDefaultLoginSelectionDescription:
                 'Verhindert, dass Mitglieder ihre Login-E-Mail-Adresse außerhalb der Unternehmensdomäne ändern, um Richtlinienbeschränkungen zu umgehen.',
             expensifyCardPreferredWorkspaceDisabledMessage:
-                'Um diese Einstellung zu verwenden, muss der bevorzugte Workspace aktiviert und für die Domain die Expensify Card eingerichtet sein.',
+                'Um diese Einstellung zu aktivieren, aktiviere zuerst einen bevorzugten Workspace und richte Expensify Cards in deiner Domain ein.',
             findGroup: 'Gruppe suchen',
         },
     },

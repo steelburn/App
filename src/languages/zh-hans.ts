@@ -8998,7 +8998,7 @@ ${reportName}
             noWorkspacesMessage: '此域上没有工作区。启用此限制需要一个工作区。',
             restrictDefaultLoginSelection: '限制默认登录选择',
             restrictDefaultLoginSelectionDescription: '防止成员将登录邮箱更改为公司域名以外的地址，以规避政策限制。',
-            expensifyCardPreferredWorkspaceDisabledMessage: '要使用此设置，必须启用首选工作区，并且域必须已设置 Expensify Card。',
+            expensifyCardPreferredWorkspaceDisabledMessage: '要启用此设置，请先启用一个首选工作区，并在您的域上完成 Expensify Cards 的设置。',
             findGroup: '查找群组',
         },
     },
