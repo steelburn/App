@@ -772,6 +772,7 @@ function WorkspaceCategoriesPage({route}: WorkspaceCategoriesPageProps) {
                         customListHeader={getCustomListHeader()}
                         customListHeaderContent={headerContent}
                         canSelectMultiple={canSelectMultiple}
+                        selectAllAccessibilityLabel={translate('accessibilityHints.selectAllCategories')}
                         shouldShowListEmptyContent={false}
                         onDismissError={dismissError}
                         showScrollIndicator={false}
