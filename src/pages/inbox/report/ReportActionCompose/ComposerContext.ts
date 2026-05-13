@@ -191,4 +191,4 @@ export {
     useComposerEditActions,
     useComposerMeta,
 };
-export type {SuggestionsRef, ComposerText, ComposerState, ComposerEditState, ComposerSendState, ComposerActions, ComposerEditActions, ComposerMeta};
+export type {SuggestionsRef, ComposerEditState, ComposerActions};
