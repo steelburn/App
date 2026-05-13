@@ -6431,6 +6431,14 @@ const translations = {
                         description: 'I’ll manually setup approval workflows in Expensify.',
                     },
                 },
+                syncResults: {
+                    title: 'Gusto sync results',
+                    successTitle: 'Successfully synced your Gusto connection!',
+                    added: 'Added to Expensify',
+                    removed: 'Removed from Expensify',
+                    skipped: 'Skipped',
+                    employeeCount: ({count}: {count: number}) => `${count} ${count === 1 ? 'employee' : 'employees'}`,
+                },
             },
         },
         export: {
