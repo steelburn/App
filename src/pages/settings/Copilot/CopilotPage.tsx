@@ -175,6 +175,12 @@ function CopilotPage() {
                 return;
             }
             const isReturningToOriginalUser = isActingAsDelegate && email === stashedSession?.email;
+            // Chained delegation isn't supported by the backend — if we're already acting as a delegate,
+            // the only legal switch is back to the original user. Anything else triggers the "Not so fast" modal.
+            if (isActingAsDelegate && !isReturningToOriginalUser) {
+                modalClose(() => showDelegateNoAccessModal());
+                return;
+            }
             const switchAction = isReturningToOriginalUser
                 ? () => disconnect({stashedCredentials, stashedSession})
                 : () => connect({email, delegatedAccess: account?.delegatedAccess, credentials, session, activePolicyID});
@@ -192,6 +198,7 @@ function CopilotPage() {
             isOffline,
             isTrackingGPS,
             session,
+            showDelegateNoAccessModal,
             showGpsInProgressModal,
             showOfflineModal,
             stashedCredentials,
