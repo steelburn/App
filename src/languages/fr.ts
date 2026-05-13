@@ -4572,6 +4572,7 @@ ${amount} pour ${merchant} - ${date}`,
             notConfigured: 'Non configuré',
             bankAccountDescription: 'Choisissez d’où envoyer les chèques.',
             creditCardAccount: 'Compte de carte de crédit',
+            travelInvoicingDescription: 'Les frais de voyage seront exportés comme des débits de carte de crédit vers le compte QuickBooks Online indiqué ci-dessous.',
             companyCardsLocationEnabledDescription:
                 'QuickBooks Online ne prend pas en charge les emplacements pour l’exportation des factures fournisseur. Comme vous avez activé les emplacements sur votre espace de travail, cette option d’exportation n’est pas disponible.',
             outOfPocketTaxEnabledDescription:
