@@ -3777,7 +3777,7 @@ const CONST = {
                 GUSTO: 'gusto',
             },
             SUPPORTED_ONLY_ON_OLDDOT: {
-                FINANCIALFORCE: 'financialForce',
+                FINANCIALFORCE: 'financialforce',
             },
             UNSUPPORTED_NAMES: {
                 GENERIC_INDIRECT_CONNECTION: 'generic_indirect_connection',
