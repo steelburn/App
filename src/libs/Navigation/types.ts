@@ -363,11 +363,11 @@ type SettingsNavigatorParamList = {
         // eslint-disable-next-line no-restricted-syntax -- `backTo` usages in this file are legacy. Do not add new `backTo` params to screens. See contributingGuides/NAVIGATION.md
         backTo?: Routes;
     };
-    [SCREENS.WORKSPACE.CATEGORY_DEFAULT_TAX_RATE]: {
+    [SCREENS.WORKSPACE.DYNAMIC_CATEGORY_DEFAULT_TAX_RATE]: {
         policyID: string;
         categoryName: string;
     };
-    [SCREENS.WORKSPACE.CATEGORY_FLAG_AMOUNTS_OVER]: {
+    [SCREENS.WORKSPACE.DYNAMIC_CATEGORY_FLAG_AMOUNTS_OVER]: {
         policyID: string;
         categoryName: string;
     };
@@ -375,19 +375,19 @@ type SettingsNavigatorParamList = {
         policyID: string;
         categoryName: string;
     };
-    [SCREENS.WORKSPACE.CATEGORY_DESCRIPTION_HINT]: {
+    [SCREENS.WORKSPACE.DYNAMIC_CATEGORY_DESCRIPTION_HINT]: {
         policyID: string;
         categoryName: string;
     };
-    [SCREENS.WORKSPACE.CATEGORY_APPROVER]: {
+    [SCREENS.WORKSPACE.DYNAMIC_CATEGORY_APPROVER]: {
         policyID: string;
         categoryName: string;
     };
-    [SCREENS.WORKSPACE.CATEGORY_REQUIRE_RECEIPTS_OVER]: {
+    [SCREENS.WORKSPACE.DYNAMIC_CATEGORY_REQUIRE_RECEIPTS_OVER]: {
         policyID: string;
         categoryName: string;
     };
-    [SCREENS.WORKSPACE.CATEGORY_REQUIRE_ITEMIZED_RECEIPTS_OVER]: {
+    [SCREENS.WORKSPACE.DYNAMIC_CATEGORY_REQUIRE_ITEMIZED_RECEIPTS_OVER]: {
         policyID: string;
         categoryName: string;
     };
@@ -401,7 +401,7 @@ type SettingsNavigatorParamList = {
         // eslint-disable-next-line no-restricted-syntax -- `backTo` usages in this file are legacy. Do not add new `backTo` params to screens. See contributingGuides/NAVIGATION.md
         backTo?: Routes;
     };
-    [SCREENS.WORKSPACE.CATEGORY_REQUIRED_FIELDS]: {
+    [SCREENS.WORKSPACE.DYNAMIC_CATEGORY_REQUIRED_FIELDS]: {
         policyID: string;
         categoryName: string;
     };

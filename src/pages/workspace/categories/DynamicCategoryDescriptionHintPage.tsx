@@ -26,13 +26,13 @@ import {DYNAMIC_ROUTES} from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
 import INPUT_IDS from '@src/types/form/WorkspaceCategoryDescriptionHintForm';
 
-type EditCategoryPageProps = PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.WORKSPACE.CATEGORY_DESCRIPTION_HINT>;
+type DynamicCategoryDescriptionHintPageProps = PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.WORKSPACE.DYNAMIC_CATEGORY_DESCRIPTION_HINT>;
 
-function CategoryDescriptionHintPage({
+function DynamicCategoryDescriptionHintPage({
     route: {
         params: {policyID, categoryName},
     },
-}: EditCategoryPageProps) {
+}: DynamicCategoryDescriptionHintPageProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const categorySettingsBackPath = useDynamicBackPath(DYNAMIC_ROUTES.WORKSPACE_CATEGORY_DESCRIPTION_HINT.path);
@@ -52,7 +52,7 @@ function CategoryDescriptionHintPage({
             <ScreenWrapper
                 enableEdgeToEdgeBottomSafeAreaPadding
                 style={[styles.defaultModalContainer]}
-                testID="CategoryDescriptionHintPage"
+                testID="DynamicCategoryDescriptionHintPage"
                 shouldEnableMaxHeight
             >
                 <HeaderWithBackButton
@@ -93,4 +93,4 @@ function CategoryDescriptionHintPage({
     );
 }
 
-export default CategoryDescriptionHintPage;
+export default DynamicCategoryDescriptionHintPage;

@@ -23,13 +23,13 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import {DYNAMIC_ROUTES} from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
 
-type CategoryRequiredFieldsPageProps = PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.WORKSPACE.CATEGORY_REQUIRED_FIELDS>;
+type DynamicCategoryRequiredFieldsPageProps = PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.WORKSPACE.DYNAMIC_CATEGORY_REQUIRED_FIELDS>;
 
-function CategoryRequiredFieldsPage({
+function DynamicCategoryRequiredFieldsPage({
     route: {
         params: {policyID, categoryName},
     },
-}: CategoryRequiredFieldsPageProps) {
+}: DynamicCategoryRequiredFieldsPageProps) {
     const styles = useThemeStyles();
     const categorySettingsBackPath = useDynamicBackPath(DYNAMIC_ROUTES.WORKSPACE_CATEGORY_REQUIRED_FIELDS.path);
     const {translate} = useLocalize();
@@ -49,7 +49,7 @@ function CategoryRequiredFieldsPage({
             <ScreenWrapper
                 enableEdgeToEdgeBottomSafeAreaPadding
                 style={[styles.defaultModalContainer]}
-                testID={CategoryRequiredFieldsPage.displayName}
+                testID={DynamicCategoryRequiredFieldsPage.displayName}
                 shouldEnableMaxHeight
             >
                 <HeaderWithBackButton
@@ -111,6 +111,6 @@ function CategoryRequiredFieldsPage({
     );
 }
 
-CategoryRequiredFieldsPage.displayName = 'CategoryRequiredFieldsPage';
+DynamicCategoryRequiredFieldsPage.displayName = 'DynamicCategoryRequiredFieldsPage';
 
-export default CategoryRequiredFieldsPage;
+export default DynamicCategoryRequiredFieldsPage;

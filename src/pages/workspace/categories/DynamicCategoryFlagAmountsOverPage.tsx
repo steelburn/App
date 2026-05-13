@@ -29,13 +29,13 @@ import {DYNAMIC_ROUTES} from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
 import INPUT_IDS from '@src/types/form/WorkspaceCategoryFlagAmountsOverForm';
 
-type EditCategoryPageProps = PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.WORKSPACE.CATEGORY_FLAG_AMOUNTS_OVER>;
+type DynamicCategoryFlagAmountsOverPageProps = PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.WORKSPACE.DYNAMIC_CATEGORY_FLAG_AMOUNTS_OVER>;
 
-function CategoryFlagAmountsOverPage({
+function DynamicCategoryFlagAmountsOverPage({
     route: {
         params: {policyID, categoryName},
     },
-}: EditCategoryPageProps) {
+}: DynamicCategoryFlagAmountsOverPageProps) {
     const policy = usePolicy(policyID);
     const categorySettingsBackPath = useDynamicBackPath(DYNAMIC_ROUTES.WORKSPACE_CATEGORY_FLAG_AMOUNTS_OVER.path);
     const styles = useThemeStyles();
@@ -70,7 +70,7 @@ function CategoryFlagAmountsOverPage({
             <ScreenWrapper
                 enableEdgeToEdgeBottomSafeAreaPadding
                 style={styles.defaultModalContainer}
-                testID="CategoryFlagAmountsOverPage"
+                testID="DynamicCategoryFlagAmountsOverPage"
                 shouldEnableMaxHeight
             >
                 <HeaderWithBackButton
@@ -117,4 +117,4 @@ function CategoryFlagAmountsOverPage({
     );
 }
 
-export default CategoryFlagAmountsOverPage;
+export default DynamicCategoryFlagAmountsOverPage;

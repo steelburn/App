@@ -19,13 +19,13 @@ import {DYNAMIC_ROUTES} from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
 import type {TaxRate} from '@src/types/onyx';
 
-type EditCategoryPageProps = PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.WORKSPACE.CATEGORY_DEFAULT_TAX_RATE>;
+type DynamicCategoryDefaultTaxRatePageProps = PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.WORKSPACE.DYNAMIC_CATEGORY_DEFAULT_TAX_RATE>;
 
-function CategoryDefaultTaxRatePage({
+function DynamicCategoryDefaultTaxRatePage({
     route: {
         params: {policyID, categoryName},
     },
-}: EditCategoryPageProps) {
+}: DynamicCategoryDefaultTaxRatePageProps) {
     const styles = useThemeStyles();
     const {translate, localeCompare} = useLocalize();
     const policy = usePolicy(policyID);
@@ -76,7 +76,7 @@ function CategoryDefaultTaxRatePage({
             <ScreenWrapper
                 enableEdgeToEdgeBottomSafeAreaPadding
                 style={[styles.defaultModalContainer]}
-                testID="CategoryDefaultTaxRatePage"
+                testID="DynamicCategoryDefaultTaxRatePage"
                 shouldEnableMaxHeight
             >
                 <HeaderWithBackButton
@@ -97,4 +97,4 @@ function CategoryDefaultTaxRatePage({
     );
 }
 
-export default CategoryDefaultTaxRatePage;
+export default DynamicCategoryDefaultTaxRatePage;

@@ -16,13 +16,13 @@ import CONST from '@src/CONST';
 import {DYNAMIC_ROUTES} from '@src/ROUTES';
 import type SCREENS from '@src/SCREENS';
 
-type EditCategoryPageProps = PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.WORKSPACE.CATEGORY_APPROVER>;
+type DynamicCategoryApproverPageProps = PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.WORKSPACE.DYNAMIC_CATEGORY_APPROVER>;
 
-function CategoryApproverPage({
+function DynamicCategoryApproverPage({
     route: {
         params: {policyID, categoryName},
     },
-}: EditCategoryPageProps) {
+}: DynamicCategoryApproverPageProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const policy = usePolicy(policyID);
@@ -39,7 +39,7 @@ function CategoryApproverPage({
             <ScreenWrapper
                 enableEdgeToEdgeBottomSafeAreaPadding
                 style={[styles.defaultModalContainer]}
-                testID="CategoryApproverPage"
+                testID="DynamicCategoryApproverPage"
                 shouldEnableMaxHeight
             >
                 <HeaderWithBackButton
@@ -59,4 +59,4 @@ function CategoryApproverPage({
     );
 }
 
-export default CategoryApproverPage;
+export default DynamicCategoryApproverPage;

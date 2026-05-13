@@ -101,7 +101,7 @@ const DYNAMIC_ROUTES = {
     },
     EXPENSE_LIMIT_TYPE_SELECTOR: {
         path: 'expense-limit-type',
-        entryScreens: [SCREENS.WORKSPACE.CATEGORY_FLAG_AMOUNTS_OVER],
+        entryScreens: [SCREENS.WORKSPACE.DYNAMIC_CATEGORY_FLAG_AMOUNTS_OVER],
     },
     REPORT_SETTINGS_NAME: {
         path: 'settings/name',
