@@ -7,19 +7,7 @@ import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {shouldUseBoldText} from '@libs/OptionsListUtils';
 import CONST from '@src/CONST';
-import Avatar from './OptionRow/Avatar';
-import DescriptiveText from './OptionRow/DescriptiveText';
-import DraftIndicator from './OptionRow/DraftIndicator';
-import ErrorBadge from './OptionRow/ErrorBadge';
-import InfoBadge from './OptionRow/InfoBadge';
-import OfflineWrapper from './OptionRow/OfflineWrapper';
-import OnboardingBadge from './OptionRow/OnboardingBadge';
-import PinIndicator from './OptionRow/PinIndicator';
-import Pressable from './OptionRow/Pressable';
-import ProductTrainingTooltip from './OptionRow/ProductTrainingTooltip';
-import Status from './OptionRow/Status';
-import Subtitle from './OptionRow/Subtitle';
-import Title from './OptionRow/Title';
+import OptionRow from './OptionRow';
 
 function OptionRowLHN({isOptionFocused = false, onSelectRow = () => {}, optionItem, viewMode = 'default', style, onLayout = () => {}, hasDraftComment, testID}: OptionRowLHNProps) {
     const theme = useTheme();
@@ -56,12 +44,12 @@ function OptionRowLHN({isOptionFocused = false, onSelectRow = () => {}, optionIt
     const displayNameStyle = [styles.optionDisplayName, styles.optionDisplayNameCompact, styles.pre, textUnreadStyle, styles.flexShrink0, style];
 
     return (
-        <OfflineWrapper
+        <OptionRow.OfflineWrapper
             pendingAction={optionItem.pendingAction}
             errors={optionItem.allReportErrors}
         >
-            <ProductTrainingTooltip optionItem={optionItem}>
-                <Pressable
+            <OptionRow.ProductTrainingTooltip optionItem={optionItem}>
+                <OptionRow.Pressable
                     optionItem={optionItem}
                     isOptionFocused={isOptionFocused}
                     onSelectRow={onSelectRow}
@@ -71,7 +59,7 @@ function OptionRowLHN({isOptionFocused = false, onSelectRow = () => {}, optionIt
                 >
                     <View style={sidebarInnerRowStyle}>
                         <View style={[styles.flexRow, styles.alignItemsCenter]}>
-                            <Avatar
+                            <OptionRow.Avatar
                                 optionItem={optionItem}
                                 isInFocusMode={isInFocusMode}
                                 subscriptAvatarBorderColor={hovered && !isOptionFocused ? hoveredBackgroundColor : subscriptAvatarBorderColor}
@@ -80,45 +68,45 @@ function OptionRowLHN({isOptionFocused = false, onSelectRow = () => {}, optionIt
                             />
                             <View style={contentContainerStyles}>
                                 <View style={[styles.flexRow, styles.alignItemsCenter, styles.mw100, styles.overflowHidden]}>
-                                    <Title
+                                    <OptionRow.Title
                                         optionItem={optionItem}
                                         displayNameStyle={displayNameStyle}
                                         testID={testID}
                                     />
-                                    <OnboardingBadge optionItem={optionItem} />
-                                    <Status optionItem={optionItem} />
+                                    <OptionRow.OnboardingBadge optionItem={optionItem} />
+                                    <OptionRow.Status optionItem={optionItem} />
                                 </View>
-                                <Subtitle
+                                <OptionRow.Subtitle
                                     optionItem={optionItem}
                                     viewMode={viewMode}
                                     isOptionFocused={isOptionFocused}
                                     style={style}
                                 />
                             </View>
-                            <DescriptiveText optionItem={optionItem} />
-                            <ErrorBadge
+                            <OptionRow.DescriptiveText optionItem={optionItem} />
+                            <OptionRow.ErrorBadge
                                 brickRoadIndicator={brickRoadIndicator}
                                 actionBadge={optionItem.actionBadge}
                             />
                         </View>
                     </View>
                     <View style={[styles.flexRow, styles.alignItemsCenter]}>
-                        <InfoBadge
+                        <OptionRow.InfoBadge
                             brickRoadIndicator={brickRoadIndicator}
                             actionBadge={optionItem.actionBadge}
                         />
-                        <DraftIndicator
+                        <OptionRow.DraftIndicator
                             hasDraftComment={hasDraftComment}
                             isAllowedToComment={optionItem.isAllowedToComment}
                         />
-                        <PinIndicator
+                        <OptionRow.PinIndicator
                             isPinned={optionItem.isPinned}
                             brickRoadIndicator={brickRoadIndicator}
                         />
                     </View>
-                </Pressable>
-            </ProductTrainingTooltip>
-        </OfflineWrapper>
+                </OptionRow.Pressable>
+            </OptionRow.ProductTrainingTooltip>
+        </OptionRow.OfflineWrapper>
     );
 }
 

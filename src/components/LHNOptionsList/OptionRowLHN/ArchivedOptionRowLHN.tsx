@@ -7,13 +7,7 @@ import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {shouldUseBoldText} from '@libs/OptionsListUtils';
 import CONST from '@src/CONST';
-import Avatar from './OptionRow/Avatar';
-import DescriptiveText from './OptionRow/DescriptiveText';
-import OfflineWrapper from './OptionRow/OfflineWrapper';
-import Pressable from './OptionRow/Pressable';
-import Status from './OptionRow/Status';
-import Subtitle from './OptionRow/Subtitle';
-import Title from './OptionRow/Title';
+import OptionRow from './OptionRow';
 
 /**
  * Sibling variant of `OptionRowLHN` used for archived reports. Strips the product training
@@ -54,11 +48,11 @@ function ArchivedOptionRowLHN({isOptionFocused = false, onSelectRow = () => {}, 
     const displayNameStyle = [styles.optionDisplayName, styles.optionDisplayNameCompact, styles.pre, textUnreadStyle, styles.flexShrink0, style];
 
     return (
-        <OfflineWrapper
+        <OptionRow.OfflineWrapper
             pendingAction={optionItem.pendingAction}
             errors={optionItem.allReportErrors}
         >
-            <Pressable
+            <OptionRow.Pressable
                 optionItem={optionItem}
                 isOptionFocused={isOptionFocused}
                 onSelectRow={onSelectRow}
@@ -68,7 +62,7 @@ function ArchivedOptionRowLHN({isOptionFocused = false, onSelectRow = () => {}, 
             >
                 <View style={sidebarInnerRowStyle}>
                     <View style={[styles.flexRow, styles.alignItemsCenter]}>
-                        <Avatar
+                        <OptionRow.Avatar
                             optionItem={optionItem}
                             isInFocusMode={isInFocusMode}
                             subscriptAvatarBorderColor={hovered && !isOptionFocused ? hoveredBackgroundColor : subscriptAvatarBorderColor}
@@ -77,25 +71,25 @@ function ArchivedOptionRowLHN({isOptionFocused = false, onSelectRow = () => {}, 
                         />
                         <View style={contentContainerStyles}>
                             <View style={[styles.flexRow, styles.alignItemsCenter, styles.mw100, styles.overflowHidden]}>
-                                <Title
+                                <OptionRow.Title
                                     optionItem={optionItem}
                                     displayNameStyle={displayNameStyle}
                                     testID={testID}
                                 />
-                                <Status optionItem={optionItem} />
+                                <OptionRow.Status optionItem={optionItem} />
                             </View>
-                            <Subtitle
+                            <OptionRow.Subtitle
                                 optionItem={optionItem}
                                 viewMode={viewMode}
                                 isOptionFocused={isOptionFocused}
                                 style={style}
                             />
                         </View>
-                        <DescriptiveText optionItem={optionItem} />
+                        <OptionRow.DescriptiveText optionItem={optionItem} />
                     </View>
                 </View>
-            </Pressable>
-        </OfflineWrapper>
+            </OptionRow.Pressable>
+        </OptionRow.OfflineWrapper>
     );
 }
 
