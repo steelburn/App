@@ -3933,12 +3933,10 @@ const ROUTES = {
     },
     POLICY_ACCOUNTING_CERTINIA_PREREQUISITES: {
         route: 'workspaces/:policyID/accounting/certinia/prerequisites/:isSandbox?/:subPage?',
-
-        // eslint-disable-next-line no-restricted-syntax -- Legacy route generation
-        getRoute: (policyID: string, isSandbox?: boolean, subPage?: string, backTo?: string) => {
+        getRoute: (policyID: string, isSandbox?: boolean, subPage?: string) => {
             const sandboxSegment = isSandbox === undefined ? '' : `/${isSandbox ? 'true' : 'false'}`;
             const subPageSegment = subPage ? `/${subPage}` : '';
-            return getUrlWithBackToParam(`workspaces/${policyID}/accounting/certinia/prerequisites${sandboxSegment}${subPageSegment}` as const, backTo);
+            return `workspaces/${policyID}/accounting/certinia/prerequisites${sandboxSegment}${subPageSegment}` as const;
         },
     },
     POLICY_ACCOUNTING_CERTINIA_EXISTING_CONNECTIONS: {

@@ -1367,19 +1367,28 @@ type FinancialForceParentTagMappingMode = ValueOf<typeof CONST.CERTINIA_PARENT_T
 /** Keys on {@link FinancialForceConnectionConfig} tracked for offline pending / error field state */
 type FinancialForceOfflineStateKeys = ValueOf<typeof CONST.CERTINIA_CONFIG>;
 
+/** Synced Certinia entity with display name and external ID */
+type FinancialForceSyncedEntity = {
+    /** Display name of the synced entity */
+    name: string;
+
+    /** External ID of the synced entity */
+    id: string;
+};
+
 /** Data synced from Certinia (parent sync service); arrays may be empty until sync completes */
 type FinancialForceConnectionData = {
     /** Salesforce Accounts used as Default Vendor options (FFA) */
-    vendors: Array<{name: string; id: string}>;
+    vendors: Array<FinancialForceSyncedEntity>;
 
     /** Certinia companies (c2g__codaCompany__c); FFA validates presence when applicable */
-    companies: Array<{name: string; id: string}>;
+    companies: Array<FinancialForceSyncedEntity>;
 
     /** PSA: projects synced for mapping (Release 2) */
-    projects?: Array<{name: string; id: string}>;
+    projects?: Array<FinancialForceSyncedEntity>;
 
     /** PSA: assignments synced for mapping (Release 2) */
-    assignments?: Array<{name: string; id: string}>;
+    assignments?: Array<FinancialForceSyncedEntity>;
 };
 
 /** Certinia credentials (Salesforce / Certinia org); fields populate as OAuth / sync complete */
@@ -1426,8 +1435,8 @@ type FinancialForceExportConfig = {
     /** FFA / PSA: non-reimbursable expenses destination */
     nonReimbursable?: FinancialForceExportDestination;
 
-    /** Payable invoice / expense report export status (FFA vs PSA enums differ by module) */
-    exportStatus?: ValueOf<typeof CONST.CERTINIA_EXPORT_STATUS> | string;
+    /** Payable invoice / expense report export status.*/
+    exportStatus?: ValueOf<typeof CONST.CERTINIA_EXPORT_STATUS>;
 
     /** Date basis for export */
     exportDate?: ValueOf<typeof CONST.CERTINIA_EXPORT_DATE>;
@@ -1441,8 +1450,8 @@ type FinancialForceExportConfig = {
     /** PSA / SRP: company ID for export */
     companyID?: string;
 
-    /** PSA: report-level export status */
-    reportExportStatus?: ValueOf<typeof CONST.CERTINIA_EXPORT_STATUS> | string;
+    /** PSA: report-level export status.*/
+    reportExportStatus?: ValueOf<typeof CONST.CERTINIA_EXPORT_STATUS>;
 };
 
 /** Certinia auto-sync */
@@ -1477,12 +1486,16 @@ type FinancialForceConnectionConfig = OnyxCommon.OnyxValueWithOfflineFeedback<
         /** Whether the connection has been fully set up */
         isConfigured?: boolean;
 
+        /** Certinia import / coding settings */
         coding: FinancialForceCodingConfig;
 
+        /** Certinia export settings */
         export: FinancialForceExportConfig;
 
+        /** Certinia auto-sync settings */
         autoSync: FinancialForceAutoSyncConfig;
 
+        /** Certinia advanced settings */
         advanced: FinancialForceAdvancedConfig;
 
         /** Collection of errors coming from the backend */
