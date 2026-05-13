@@ -1,4 +1,4 @@
-import {useRef} from 'react';
+import {useCallback, useRef} from 'react';
 
 /**
  * Returns a factory that, given an index, returns a referentially-stable
@@ -10,24 +10,27 @@ import {useRef} from 'react';
  * The cache grows monotonically with unique indices visited and is released
  * with the consuming component, so this is safe for list-bounded index spaces.
  *
- * Caller must pass a stable `handler` reference (e.g. a `useState` setter or
- * compiler-memoized function). If `handler` flips reference every render, the
- * factory itself does too — cached handlers still call through to the latest
- * `handler`, but consumers that put the factory in deps will lose stability.
+ * Caller must pass a stable `handler` reference (e.g. a `useState` setter or a
+ * `useCallback`-memoized function). If `handler` flips between renders, the
+ * factory does too — and any `useCallback`/`useMemo` that lists the factory
+ * in deps will be invalidated each render.
  */
 function useStableIndexedHandler<Args extends unknown[]>(handler: (index: number, ...args: Args) => void): (index: number) => (...args: Args) => void {
     const cacheRef = useRef<Map<number, (...args: Args) => void>>(new Map());
 
-    return (index: number) => {
-        const cache = cacheRef.current;
-        const cached = cache.get(index);
-        if (cached) {
-            return cached;
-        }
-        const bound = (...args: Args) => handler(index, ...args);
-        cache.set(index, bound);
-        return bound;
-    };
+    return useCallback(
+        (index: number) => {
+            const cache = cacheRef.current;
+            const cached = cache.get(index);
+            if (cached) {
+                return cached;
+            }
+            const bound = (...args: Args) => handler(index, ...args);
+            cache.set(index, bound);
+            return bound;
+        },
+        [handler],
+    );
 }
 
 export default useStableIndexedHandler;
