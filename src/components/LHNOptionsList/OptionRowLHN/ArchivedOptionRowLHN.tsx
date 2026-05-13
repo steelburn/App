@@ -67,4 +67,4 @@ function ArchivedOptionRowLHN({isOptionFocused = false, onSelectRow = () => {}, 
 
 ArchivedOptionRowLHN.displayName = 'ArchivedOptionRowLHN';
 
-export default React.memo(ArchivedOptionRowLHN);
+export default ArchivedOptionRowLHN;

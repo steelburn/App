@@ -85,4 +85,4 @@ function OptionRowLHN({isOptionFocused = false, onSelectRow = () => {}, optionIt
 
 OptionRowLHN.displayName = 'OptionRowLHN';
 
-export default React.memo(OptionRowLHN);
+export default OptionRowLHN;
