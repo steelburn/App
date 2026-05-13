@@ -28,6 +28,7 @@ export default function TableSkeleton({renderSkeletonItem, reasonAttributes, row
     const isSmallView = isMediumScreenWidth || shouldUseNarrowLayout;
 
     const tableSkeletonRowStyles = [
+        styles.flex1,
         styles.flexRow,
         styles.overflowHidden,
         styles.alignItemsCenter,
@@ -44,6 +45,7 @@ export default function TableSkeleton({renderSkeletonItem, reasonAttributes, row
         >
             <SkeletonViewContentLoader
                 height={32}
+                width="100%"
                 backgroundColor={theme.skeletonLHNIn}
                 foregroundColor={theme.skeletonLHNOut}
             >

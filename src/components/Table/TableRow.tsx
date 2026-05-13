@@ -113,9 +113,10 @@ export default function TableRow({
             >
                 {(state) =>
                     !!isLoading && LoadingComponent ? (
-                        <View style={[styles.flexRow, styles.alignItemsCenter]}>
+                        <View style={[styles.flexRow, styles.alignItemsCenter, styles.flex1]}>
                             <SkeletonViewContentLoader
                                 height={32}
+                                width="100%"
                                 backgroundColor={theme.skeletonLHNIn}
                                 foregroundColor={theme.skeletonLHNOut}
                             >
