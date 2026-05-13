@@ -13,9 +13,16 @@ import CONST from '@src/CONST';
 type OptionMode = ValueOf<typeof CONST.OPTION_MODE>;
 
 type SubtitleProps = {
+    /** Option data for the row. Source of `alternateText` and emoji rendering hints. */
     optionItem: OptionData;
+
+    /** Display density mode. Compact rows hide the subtitle entirely. */
     viewMode: OptionMode;
+
+    /** Whether the row is the currently focused/active option. Drives the active text style. */
     isOptionFocused: boolean;
+
+    /** Optional text style override forwarded from the parent. */
     style?: StyleProp<TextStyle>;
 };
 

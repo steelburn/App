@@ -10,9 +10,16 @@ import type {OptionData} from '@libs/ReportUtils';
 import CONST from '@src/CONST';
 
 type UseOptionRowChromeParams = {
+    /** Option data for the row. Source of `optionItem` flags that drive the bold/unread text style. */
     optionItem: OptionData;
+
+    /** Whether the row is the currently focused/active option. Drives the focused colour path. */
     isOptionFocused: boolean;
+
+    /** Display density mode. `COMPACT` switches to the compact layout styles. */
     viewMode: NonNullable<OptionRowLHNProps['viewMode']>;
+
+    /** Optional outer text style override forwarded by the variant to the display name. */
     style: OptionRowLHNProps['style'];
 };
 

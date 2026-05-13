@@ -7,8 +7,13 @@ import {isGroupChat, isSystemChat} from '@libs/ReportUtils';
 import CONST from '@src/CONST';
 
 type TitleProps = {
+    /** Option data for the row. Source of `text`, `displayNamesWithTooltips`, chat-type flags, and parse-mode hints. */
     optionItem: OptionData;
+
+    /** Composed text style for the display name (focus, unread, bold variants pre-applied by the parent). */
     displayNameStyle: StyleProp<TextStyle>;
+
+    /** Numeric testID for the title node (mirrors `reportID`). */
     testID: number;
 };
 
