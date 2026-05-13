@@ -1,13 +1,9 @@
-import React, {useState} from 'react';
-import type {ViewStyle} from 'react-native';
-import {StyleSheet, View} from 'react-native';
+import React from 'react';
+import {View} from 'react-native';
 import type {OptionRowLHNProps} from '@components/LHNOptionsList/types';
-import useStyleUtils from '@hooks/useStyleUtils';
-import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
-import {shouldUseBoldText} from '@libs/OptionsListUtils';
-import CONST from '@src/CONST';
 import OptionRow from './OptionRow';
+import useOptionRowChrome from './useOptionRowChrome';
 
 /**
  * Sibling variant of `OptionRowLHN` used for archived reports. Strips the product training
@@ -15,37 +11,13 @@ import OptionRow from './OptionRow';
  * row (Draft/Pin) because none of them apply to a historical, write-locked row.
  */
 function ArchivedOptionRowLHN({isOptionFocused = false, onSelectRow = () => {}, optionItem, viewMode = 'default', style, onLayout = () => {}, testID}: OptionRowLHNProps) {
-    const theme = useTheme();
     const styles = useThemeStyles();
-    const StyleUtils = useStyleUtils();
-    const [hovered, setHovered] = useState(false);
-
-    const isInFocusMode = viewMode === CONST.OPTION_MODE.COMPACT;
-
-    const sidebarInnerRowStyle = StyleSheet.flatten<ViewStyle>(
-        isInFocusMode
-            ? [styles.chatLinkRowPressable, styles.flexGrow1, styles.optionItemAvatarNameWrapper, styles.optionRowCompact, styles.justifyContentCenter]
-            : [styles.chatLinkRowPressable, styles.flexGrow1, styles.optionItemAvatarNameWrapper, styles.optionRow, styles.justifyContentCenter],
-    );
-    const contentContainerStyles = isInFocusMode
-        ? [styles.flex1, styles.flexRow, styles.overflowHidden, StyleUtils.getCompactContentContainerStyles()]
-        : [styles.flex1];
-    const singleAvatarContainerStyle = [styles.actionAvatar, styles.mr3];
-
-    const hoveredBackgroundColor = !!styles.sidebarLinkHover && 'backgroundColor' in styles.sidebarLinkHover ? styles.sidebarLinkHover.backgroundColor : theme.sidebar;
-    const focusedBackgroundColor = styles.sidebarLinkActive.backgroundColor;
-    const subscriptAvatarBorderColor = isOptionFocused ? focusedBackgroundColor : theme.sidebar;
-
-    let secondaryAvatarBgColor = theme.sidebar;
-    if (isOptionFocused) {
-        secondaryAvatarBgColor = focusedBackgroundColor;
-    } else if (hovered) {
-        secondaryAvatarBgColor = hoveredBackgroundColor;
-    }
-
-    const textStyle = isOptionFocused ? styles.sidebarLinkActiveText : styles.sidebarLinkText;
-    const textUnreadStyle = shouldUseBoldText(optionItem) ? [textStyle, styles.sidebarLinkTextBold] : [textStyle];
-    const displayNameStyle = [styles.optionDisplayName, styles.optionDisplayNameCompact, styles.pre, textUnreadStyle, styles.flexShrink0, style];
+    const {setHovered, isInFocusMode, sidebarInnerRowStyle, contentContainerStyles, singleAvatarContainerStyle, avatarBackgroundColor, displayNameStyle} = useOptionRowChrome({
+        optionItem,
+        isOptionFocused,
+        viewMode,
+        style,
+    });
 
     return (
         <OptionRow.OfflineWrapper
@@ -65,8 +37,8 @@ function ArchivedOptionRowLHN({isOptionFocused = false, onSelectRow = () => {}, 
                         <OptionRow.Avatar
                             optionItem={optionItem}
                             isInFocusMode={isInFocusMode}
-                            subscriptAvatarBorderColor={hovered && !isOptionFocused ? hoveredBackgroundColor : subscriptAvatarBorderColor}
-                            secondaryAvatarBackgroundColor={secondaryAvatarBgColor}
+                            subscriptAvatarBorderColor={avatarBackgroundColor}
+                            secondaryAvatarBackgroundColor={avatarBackgroundColor}
                             singleAvatarContainerStyle={singleAvatarContainerStyle}
                         />
                         <View style={contentContainerStyles}>
