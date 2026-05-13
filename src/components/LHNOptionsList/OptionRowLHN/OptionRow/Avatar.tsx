@@ -1,9 +1,7 @@
 import React from 'react';
-import type {ColorValue} from 'react-native';
+import type {ColorValue, ViewStyle} from 'react-native';
 import LHNAvatar from '@components/LHNOptionsList/LHNAvatar';
 import {usePersonalDetails} from '@components/OnyxListItemProvider';
-import useTheme from '@hooks/useTheme';
-import useThemeStyles from '@hooks/useThemeStyles';
 import {shouldOptionShowTooltip} from '@libs/OptionsListUtils';
 import {getDelegateAccountIDFromReportAction} from '@libs/ReportActionsUtils';
 import type {OptionData} from '@libs/ReportUtils';
@@ -12,26 +10,13 @@ import CONST from '@src/CONST';
 type AvatarProps = {
     optionItem: OptionData;
     isInFocusMode: boolean;
-    hovered: boolean;
-    isOptionFocused: boolean;
+    subscriptAvatarBorderColor: ColorValue;
+    secondaryAvatarBackgroundColor: ColorValue;
+    singleAvatarContainerStyle: ViewStyle[];
 };
 
-function AvatarInner({optionItem, isInFocusMode, hovered, isOptionFocused}: AvatarProps) {
-    const theme = useTheme();
-    const styles = useThemeStyles();
+function AvatarInner({optionItem, isInFocusMode, subscriptAvatarBorderColor, secondaryAvatarBackgroundColor, singleAvatarContainerStyle}: AvatarProps) {
     const personalDetails = usePersonalDetails();
-
-    const hoveredBackgroundColor = !!styles.sidebarLinkHover && 'backgroundColor' in styles.sidebarLinkHover ? styles.sidebarLinkHover.backgroundColor : theme.sidebar;
-    const focusedBackgroundColor = styles.sidebarLinkActive.backgroundColor;
-
-    let backgroundColor: ColorValue = theme.sidebar;
-    if (isOptionFocused) {
-        backgroundColor = focusedBackgroundColor;
-    } else if (hovered) {
-        backgroundColor = hoveredBackgroundColor;
-    }
-
-    const singleAvatarContainerStyle = [styles.actionAvatar, styles.mr3];
 
     const delegateAccountID = getDelegateAccountIDFromReportAction(optionItem?.parentReportAction);
 
@@ -68,9 +53,9 @@ function AvatarInner({optionItem, isInFocusMode, hovered, isOptionFocused}: Avat
             icons={icons}
             shouldShowSubscript={!!optionItem.shouldShowSubscript}
             size={isInFocusMode ? CONST.AVATAR_SIZE.SMALL : CONST.AVATAR_SIZE.DEFAULT}
-            subscriptAvatarBorderColor={backgroundColor}
+            subscriptAvatarBorderColor={subscriptAvatarBorderColor}
             useMidSubscriptSize={isInFocusMode}
-            secondaryAvatarBackgroundColor={backgroundColor}
+            secondaryAvatarBackgroundColor={secondaryAvatarBackgroundColor}
             singleAvatarContainerStyle={singleAvatarContainerStyle}
             shouldShowTooltip={shouldOptionShowTooltip(optionItem)}
             delegateAccountID={skipDelegate ? undefined : delegateAccountID}
@@ -81,7 +66,7 @@ function AvatarInner({optionItem, isInFocusMode, hovered, isOptionFocused}: Avat
 
 AvatarInner.displayName = 'OptionRow.AvatarInner';
 
-function Avatar({optionItem, isInFocusMode, hovered, isOptionFocused}: AvatarProps) {
+function Avatar({optionItem, isInFocusMode, subscriptAvatarBorderColor, secondaryAvatarBackgroundColor, singleAvatarContainerStyle}: AvatarProps) {
     // Bail out before subscribing to personal details when the row has no avatar to render.
     if (!optionItem.icons?.length || !optionItem.icons.at(0)) {
         return null;
@@ -90,8 +75,9 @@ function Avatar({optionItem, isInFocusMode, hovered, isOptionFocused}: AvatarPro
         <AvatarInner
             optionItem={optionItem}
             isInFocusMode={isInFocusMode}
-            hovered={hovered}
-            isOptionFocused={isOptionFocused}
+            subscriptAvatarBorderColor={subscriptAvatarBorderColor}
+            secondaryAvatarBackgroundColor={secondaryAvatarBackgroundColor}
+            singleAvatarContainerStyle={singleAvatarContainerStyle}
         />
     );
 }
