@@ -23,7 +23,7 @@ function useTransactionsAndViolationsForReport(reportID?: string) {
         filteredViolations[transactionViolationKey] = getTransactionViolations(transaction, violations, currentUserDetails.email ?? '', currentUserDetails.accountID, report, policy) ?? [];
     }
 
-    return {transactions, violations: filteredViolations, isLoaded: allReportsTransactionsAndViolations !== undefined};
+    return {transactions, violations: filteredViolations};
 }
 
 export default useTransactionsAndViolationsForReport;
