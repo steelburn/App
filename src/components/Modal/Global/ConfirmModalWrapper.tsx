@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffectEvent, useState} from 'react';
 import type {ConfirmModalProps} from '@components/ConfirmModal';
 import ConfirmModal from '@components/ConfirmModal';
 import useActiveElementRole from '@hooks/useActiveElementRole';
@@ -29,13 +29,13 @@ function ConfirmModalWrapper({closeModal, onModalHide, ...props}: ConfirmModalWr
         setIsVisible(false);
     };
 
-    const handleModalHide = () => {
+    const handleModalHide = useEffectEvent(() => {
         if (isVisible) {
             return;
         }
         closeModal({action: closeAction});
         onModalHide?.();
-    };
+    });
 
     const shortcutConfig = {
         isActive: activeElementRole !== CONST.ROLE.BUTTON,
