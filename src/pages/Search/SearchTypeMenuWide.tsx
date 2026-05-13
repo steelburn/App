@@ -63,23 +63,18 @@ function Section({section, hash, activeItemIndex, sectionStartIndex, reportCount
     ]);
 
     const [isExpanded, setIsExpanded] = useState(true);
-    const isExpandedRef = useRef(isExpanded);
 
-    const onCollapsedCallback = useEffectEvent(onCollapsed);
+    const onUnmount = useEffectEvent(() => {
+        if (isExpanded) {
+            return;
+        }
+        // When the section is removed/unmounted while collapsed,
+        // notify the parent that the section is no longer collapsed.
+        onCollapsed(false);
+    });
 
     useEffect(() => {
-        isExpandedRef.current = isExpanded;
-    }, [isExpanded]);
-
-    // When the section is removed/unmounted while collapsed,
-    // notify the parent that the section is no longer collapsed.
-    useEffect(() => {
-        return () => {
-            if (isExpandedRef.current) {
-                return;
-            }
-            onCollapsedCallback(false);
-        };
+        return () => onUnmount();
     }, []);
 
     return (
