@@ -1,17 +1,13 @@
-import React, {createContext, useContext, useMemo, useState} from 'react';
+import React, {createContext, useContext, useState} from 'react';
 import type {Dispatch, SetStateAction} from 'react';
-import type {OnyxCollection} from 'react-native-onyx';
 import type {ValueOf} from 'type-fest';
 import type {TextSelection} from '@components/Composer/types';
-import useAncestors from '@hooks/useAncestors';
-import useOnyx from '@hooks/useOnyx';
 import useTransactionThreadReportID from '@hooks/useTransactionThreadReportID';
-import {getOriginalReportID, shouldExcludeAncestorReportAction} from '@libs/ReportUtils';
 import CONST from '@src/CONST';
-import ONYXKEYS from '@src/ONYXKEYS';
 import type * as OnyxTypes from '@src/types/onyx';
+import useActiveDraftReportAction from './useActiveDraftReportAction';
 
-function NOOP() {
+function noop() {
     return null;
 }
 
@@ -57,10 +53,10 @@ const ReportActionEditMessageContext = createContext<ReportActionEditMessageCont
 });
 
 const ReportActionEditMessageActionsContext = createContext<ReportActionEditMessageContextActions>({
-    setEditingMessage: NOOP,
-    setCurrentEditMessageSelection: NOOP,
-    submitEdit: NOOP,
-    stopEditing: NOOP,
+    setEditingMessage: noop,
+    setCurrentEditMessageSelection: noop,
+    submitEdit: noop,
+    stopEditing: noop,
 });
 
 type ReportActionEditMessageContextProviderProps = {
@@ -78,178 +74,47 @@ type ReportActionEditMessageContextProviderProps = {
 };
 
 function ReportActionEditMessageContextProvider({reportID, effectiveTransactionThreadReportID, children}: ReportActionEditMessageContextProviderProps) {
-    const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportID}`);
-    const ancestors = useAncestors(report, shouldExcludeAncestorReportAction);
-
-    // In one-transaction reports, edits can persist on exactly one linked transaction-thread report.
-    // We only subscribe to that thread when `effectiveTransactionThreadReportID` is usable (not fake, not same as visible report).
-    // This is not automatically memoized by React Compiler, therefore we need to use useMemo to avoid infinite re-renders.
-    const transactionThreadReportID = useMemo((): string | undefined => {
-        if (!effectiveTransactionThreadReportID || effectiveTransactionThreadReportID === CONST.FAKE_REPORT_ID || effectiveTransactionThreadReportID === reportID) {
-            return undefined;
-        }
-        return effectiveTransactionThreadReportID;
-    }, [effectiveTransactionThreadReportID, reportID]);
-
-    const reportActionsSelector = (allReportActions: OnyxCollection<OnyxTypes.ReportActions>) => {
-        if (!allReportActions) {
-            return {};
-        }
-        const result: OnyxCollection<OnyxTypes.ReportActions> = {};
-
-        if (reportID) {
-            const visibleReportActionsKey = `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${reportID}`;
-            result[visibleReportActionsKey] = allReportActions[visibleReportActionsKey];
-        }
-
-        if (transactionThreadReportID) {
-            const transactionThreadActionsKey = `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${transactionThreadReportID}`;
-            result[transactionThreadActionsKey] = allReportActions[transactionThreadActionsKey];
-        }
-        for (const ancestor of ancestors) {
-            const ancestorReportActionsKey = `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${ancestor.report.reportID}`;
-            result[ancestorReportActionsKey] = allReportActions[ancestorReportActionsKey];
-        }
-
-        return result;
-    };
-
-    const [reportActions] = useOnyx(ONYXKEYS.COLLECTION.REPORT_ACTIONS, {selector: reportActionsSelector}, [reportActionsSelector]);
-
-    const reportActionsDraftsSelector = (allDrafts: OnyxCollection<OnyxTypes.ReportActionsDrafts>) => {
-        if (!allDrafts) {
-            return {};
-        }
-        const result: OnyxCollection<OnyxTypes.ReportActionsDrafts> = {};
-        if (reportID) {
-            const currentDraftKey = `${ONYXKEYS.COLLECTION.REPORT_ACTIONS_DRAFTS}${reportID}`;
-            result[currentDraftKey] = allDrafts[currentDraftKey];
-        }
-        if (transactionThreadReportID) {
-            const transactionThreadDraftKey = `${ONYXKEYS.COLLECTION.REPORT_ACTIONS_DRAFTS}${transactionThreadReportID}`;
-            result[transactionThreadDraftKey] = allDrafts[transactionThreadDraftKey];
-        }
-        for (const ancestor of ancestors) {
-            const reportActionsForAncestor = reportActions?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${ancestor.report.reportID}`];
-            const originalReportID = getOriginalReportID(ancestor.report.reportID, ancestor.reportAction, reportActionsForAncestor);
-            if (!originalReportID) {
-                continue;
-            }
-            const draftKey = `${ONYXKEYS.COLLECTION.REPORT_ACTIONS_DRAFTS}${originalReportID}`;
-            result[draftKey] = allDrafts[draftKey];
-        }
-        return result;
-    };
-
-    const [reportActionsDrafts] = useOnyx(ONYXKEYS.COLLECTION.REPORT_ACTIONS_DRAFTS, {selector: reportActionsDraftsSelector}, [reportActionsDraftsSelector]);
+    const activeDraftEditResolution = useActiveDraftReportAction({effectiveTransactionThreadReportID, reportID});
 
     const [editingState, setEditingState] = useState<ReportActionEditMessageState>(CONST.REPORT_ACTION_EDIT_MESSAGE_STATE.OFF);
     const [prevEditingReportActionID, setPrevEditingReportActionID] = useState<string | null>(null);
     const [editingMessage, setEditingMessage] = useState<string | null>(null);
     const [currentEditMessageSelection, setCurrentEditMessageSelectionState] = useState<TextSelection | null>(null);
 
-    const reportDrafts = reportActionsDrafts?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS_DRAFTS}${reportID}`];
-    const reportDraftEntry = Object.entries(reportDrafts ?? {}).find(([, draft]) => draft?.message !== undefined);
-    let transactionThreadReportWithDraft: {
-        reportID: string;
-        reportActionID: string;
-        reportAction: OnyxTypes.ReportAction;
-        draft: OnyxTypes.ReportActionsDraft;
-    } | null = null;
-
-    if (transactionThreadReportID != null) {
-        const draftsForTransactionThreadReport = reportActionsDrafts?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS_DRAFTS}${transactionThreadReportID}`];
-        const draftEntry = Object.entries(draftsForTransactionThreadReport ?? {}).find(([, draft]) => draft?.message !== undefined);
-
-        const [draftReportActionID, draftPayload] = draftEntry ?? [undefined, undefined];
-        if (draftReportActionID != null && draftPayload?.message !== undefined) {
-            const transactionThreadActions = reportActions?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${transactionThreadReportID}`];
-            const matchedReportAction = transactionThreadActions?.[draftReportActionID];
-            if (matchedReportAction != null) {
-                transactionThreadReportWithDraft = {
-                    reportID: transactionThreadReportID,
-                    reportActionID: draftReportActionID,
-                    reportAction: matchedReportAction,
-                    draft: draftPayload,
-                };
-            }
-        }
-    }
-
     let editingReportID: string | null = null;
     let editingReportActionID: string | null = null;
     let editingReportAction: OnyxTypes.ReportAction | null = null;
 
-    const ancestorWithDraft = [...ancestors]
-        .slice()
-        .reverse()
-        .find(({report: ancestorReport, reportAction}) => {
-            const reportActionsForAncestor = reportActions?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${ancestorReport.reportID}`];
-            const origID = getOriginalReportID(ancestorReport.reportID, reportAction, reportActionsForAncestor);
-            if (!origID) {
-                return false;
-            }
-            const ancestorDrafts = reportActionsDrafts?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS_DRAFTS}${origID}`];
-            const ancestorDraft = ancestorDrafts?.[reportAction.reportActionID];
-
-            return ancestorDraft?.message !== undefined;
-        });
-
-    const updateMessage = (nextMessage: string | null) => {
-        if (nextMessage == null) {
+    const syncComposerDraftFromPersistedOnyxDraft = (activePersistedDraftReportActionID: string, persistedDraftMessagePreview: string | null) => {
+        if (persistedDraftMessagePreview == null) {
             return;
         }
 
-        const didReportActionChange = prevEditingReportActionID !== editingReportActionID;
-        if (didReportActionChange) {
-            setEditingMessage(nextMessage);
-            setPrevEditingReportActionID(editingReportActionID);
-            const defaultSelection: TextSelection = {start: nextMessage.length, end: nextMessage.length};
-            setCurrentEditMessageSelectionState(defaultSelection);
+        const didFocusShiftToDistinctReportAction = prevEditingReportActionID !== activePersistedDraftReportActionID;
+        if (!didFocusShiftToDistinctReportAction) {
+            return;
         }
+
+        setEditingMessage(persistedDraftMessagePreview);
+        setPrevEditingReportActionID(activePersistedDraftReportActionID);
+        const defaultSelection: TextSelection = {
+            start: persistedDraftMessagePreview.length,
+            end: persistedDraftMessagePreview.length,
+        };
+        setCurrentEditMessageSelectionState(defaultSelection);
     };
 
-    if (ancestorWithDraft) {
-        const {report: ancestorReport, reportAction: ancestorReportAction} = ancestorWithDraft;
-        const reportActionsForAncestor = reportActions?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${ancestorReport.reportID}`];
-        const ancestorOrigReportID = getOriginalReportID(ancestorReport.reportID, ancestorReportAction, reportActionsForAncestor);
-        const ancestorDrafts = ancestorOrigReportID ? reportActionsDrafts?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS_DRAFTS}${ancestorOrigReportID}`] : undefined;
-        const ancestorReportActionDraft = ancestorDrafts?.[ancestorReportAction.reportActionID];
-
-        editingReportID = ancestorReport.reportID;
-        editingReportActionID = ancestorReportAction.reportActionID;
-        editingReportAction = ancestorReportAction;
+    // Bridge resolved Onyx drafts into composing state (`useActiveDraftReportAction` encapsulates ancestry / visible / transaction-thread precedence).
+    if (activeDraftEditResolution !== null) {
+        editingReportID = activeDraftEditResolution.editingReportID;
+        editingReportActionID = activeDraftEditResolution.editingReportActionID;
+        editingReportAction = activeDraftEditResolution.editingReportAction;
 
         if (editingState === CONST.REPORT_ACTION_EDIT_MESSAGE_STATE.OFF) {
             setEditingState(CONST.REPORT_ACTION_EDIT_MESSAGE_STATE.EDITING);
         }
 
-        const nextMessage = ancestorReportActionDraft?.message ?? null;
-        updateMessage(nextMessage);
-    } else if (reportDraftEntry) {
-        const [reportActionIDOfDraft, reportActionDraft] = reportDraftEntry;
-
-        editingReportID = reportID ?? null;
-        editingReportActionID = reportActionIDOfDraft;
-        editingReportAction = reportActions?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${reportID}`]?.[reportActionIDOfDraft] ?? null;
-
-        if (editingState === CONST.REPORT_ACTION_EDIT_MESSAGE_STATE.OFF) {
-            setEditingState(CONST.REPORT_ACTION_EDIT_MESSAGE_STATE.EDITING);
-        }
-
-        const nextMessage = reportActionDraft?.message ?? null;
-        updateMessage(nextMessage);
-    } else if (transactionThreadReportWithDraft) {
-        editingReportID = transactionThreadReportWithDraft.reportID;
-        editingReportActionID = transactionThreadReportWithDraft.reportActionID;
-        editingReportAction = transactionThreadReportWithDraft.reportAction;
-
-        if (editingState === CONST.REPORT_ACTION_EDIT_MESSAGE_STATE.OFF) {
-            setEditingState(CONST.REPORT_ACTION_EDIT_MESSAGE_STATE.EDITING);
-        }
-
-        const nextMessage = transactionThreadReportWithDraft.draft?.message ?? null;
-        updateMessage(nextMessage);
+        syncComposerDraftFromPersistedOnyxDraft(activeDraftEditResolution.editingReportActionID, activeDraftEditResolution.draftMessage);
     }
 
     const submitEdit = () => {
