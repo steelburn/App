@@ -3773,7 +3773,7 @@ const CONST = {
                 XERO: 'xero',
                 NETSUITE: 'netsuite',
                 SAGE_INTACCT: 'intacct',
-                CERTINIA: 'financialForce',
+                CERTINIA: 'financialforce',
                 GUSTO: 'gusto',
             },
             SUPPORTED_ONLY_ON_OLDDOT: {
@@ -3797,7 +3797,7 @@ const CONST = {
                 quickbooksDesktop: 'QuickBooks Desktop',
                 xero: 'Xero',
                 intacct: 'Sage Intacct',
-                financialForce: 'Certinia',
+                financialforce: 'Certinia',
                 gusto: 'Gusto',
                 billCom: 'Bill.com',
                 zenefits: 'Zenefits',
