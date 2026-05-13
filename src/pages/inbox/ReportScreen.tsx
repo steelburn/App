@@ -47,7 +47,11 @@ import WideRHPReceiptPanel from './WideRHPReceiptPanel';
 type ReportScreenProps = ReportScreenNavigationProps;
 
 type ReportScreenEditMessageProviderProps = {
+    /** The report ID */
     reportID: string | undefined;
+    /** The effective transaction thread report ID */
+    effectiveTransactionThreadReportID?: string;
+    /** The children */
     children: React.ReactNode;
 };
 
