@@ -1,3 +1,4 @@
+// These rules are disabled because `require()` is used for jest mocking compatibility with react-test-renderer
 /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-var-requires */
 import React, {act} from 'react';
 import Onyx from 'react-native-onyx';
