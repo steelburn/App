@@ -60,32 +60,26 @@ function BaseSearchList({
         captureOnInputs: false,
     });
 
-    const handleFocusByIndex = useCallback(
-        (index: number, event: NativeSyntheticEvent<ExtendedTargetedEvent>) => {
-            // Prevent unexpected scrolling on mobile Chrome after the context menu closes by ignoring programmatic focus not triggered by direct user interaction.
-            if (isMobileChrome() && event.nativeEvent) {
-                if (!event.nativeEvent.sourceCapabilities) {
-                    return;
-                }
-                // Ignore the focus if it's caused by a touch event on mobile chrome.
-                // For example, a long press will trigger a focus event on mobile chrome
-                if (event.nativeEvent.sourceCapabilities.firesTouchEvents) {
-                    return;
-                }
+    const handleFocusByIndex = (index: number, event: NativeSyntheticEvent<ExtendedTargetedEvent>) => {
+        // Prevent unexpected scrolling on mobile Chrome after the context menu closes by ignoring programmatic focus not triggered by direct user interaction.
+        if (isMobileChrome() && event.nativeEvent) {
+            if (!event.nativeEvent.sourceCapabilities) {
+                return;
             }
-            setFocusedIndex(index);
-        },
-        [setFocusedIndex],
-    );
+            // Ignore the focus if it's caused by a touch event on mobile chrome.
+            // For example, a long press will trigger a focus event on mobile chrome
+            if (event.nativeEvent.sourceCapabilities.firesTouchEvents) {
+                return;
+            }
+        }
+        setFocusedIndex(index);
+    };
     const getOnFocus = useStableIndexedHandler(handleFocusByIndex);
 
-    const renderItemWithKeyboardFocus = useCallback(
-        ({item, index}: {item: SearchListItem; index: number}) => {
-            const isItemFocused = focusedIndex === index;
-            return renderItem(item, index, isItemFocused, getOnFocus(index));
-        },
-        [focusedIndex, renderItem, getOnFocus],
-    );
+    const renderItemWithKeyboardFocus = ({item, index}: {item: SearchListItem; index: number}) => {
+        const isItemFocused = focusedIndex === index;
+        return renderItem(item, index, isItemFocused, getOnFocus(index));
+    };
 
     const selectFocusedOption = useCallback(() => {
         const focusedItem = data.at(focusedIndex);
