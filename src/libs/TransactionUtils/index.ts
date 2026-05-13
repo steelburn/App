@@ -10,7 +10,7 @@ import type {LocaleContextProps} from '@components/LocaleContextProvider';
 import type {Coordinate} from '@components/MapView/MapViewTypes';
 import utils from '@components/MapView/utils';
 import type {UnreportedExpenseListItemType} from '@components/Search/SearchList/ListItem/types';
-import type {TransactionWithOptionalSearchFields} from '@components/TransactionItemRow';
+import type {TransactionWithOptionalSearchFields} from '@components/TransactionItemRow/types';
 import type {MergeDuplicatesParams} from '@libs/API/parameters';
 import {convertAttendeesToArray, normalizeAttendees} from '@libs/AttendeeUtils';
 import {getCategoryDefaultTaxRate, isCategoryMissing} from '@libs/CategoryUtils';
