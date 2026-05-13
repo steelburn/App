@@ -458,7 +458,6 @@ function SearchList({
                         ownerBillingGracePeriodEnd={ownerBillingGracePeriodEnd}
                         personalDetails={personalDetails}
                         userBillingFundID={userBillingFundID}
-                        isOffline={isOffline}
                         violations={violations}
                         nonPersonalAndWorkspaceCards={nonPersonalAndWorkspaceCards}
                         onFocus={onFocus}
@@ -490,7 +489,6 @@ function SearchList({
             policies,
             personalDetails,
             userBillingFundID,
-            isOffline,
             violations,
             lastPaymentMethod,
             personalPolicyID,
