@@ -254,7 +254,7 @@ function RoomMembersPage({report, policy}: RoomMembersPageProps) {
             return;
         }
         setSearchValue(userSearchPhrase ?? '');
-    }, [isFocusedScreen, shouldShowTextInput, userSearchPhrase]);
+    }, [isFocusedScreen, setSearchValue, shouldShowTextInput, userSearchPhrase]);
 
     useEffect(() => {
         updateUserSearchPhrase(searchValue);
@@ -421,7 +421,7 @@ function RoomMembersPage({report, policy}: RoomMembersPageProps) {
             onChangeText: setSearchValue,
             headerMessage: searchValue.trim() && !data.length ? `${translate('roomMembersPage.memberNotFound')} ${translate('roomMembersPage.useInviteButton')}` : '',
         }),
-        [data.length, searchValue, translate],
+        [data.length, searchValue, setSearchValue, translate],
     );
 
     let subtitleKey: '' | TranslationPaths | undefined;
