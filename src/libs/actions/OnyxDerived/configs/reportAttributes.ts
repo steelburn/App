@@ -302,6 +302,7 @@ export default createOnyxDerivedValueConfig({
                 const willShowGreenSubmit = requiresAttention && actionGreenBadge === CONST.REPORT.ACTION_BADGE.SUBMIT;
 
                 // if report has errors or violations, show red dot
+                // Also skip setting ERROR when we'll show the green Submit badge — let the user submit without fix.
                 if (reasonAndReportAction && !willShowGreenSubmit) {
                     needsParentChatErrorPropagation = true;
 
@@ -309,7 +310,6 @@ export default createOnyxDerivedValueConfig({
                     // see it on the parent workspace chat. The parent still gets ERROR/FIX through the
                     // propagation loop below, so the actionable indicator surfaces on the workspace chat row
                     // (which is where C+ wants it). Skips when the chat parent isn't accessible to the user.
-                    // Also skip setting ERROR when we'll show the green Submit badge — let the user submit without fix.
                     const chatPolicy = chatReport?.policyID ? policies?.[`${ONYXKEYS.COLLECTION.POLICY}${chatReport.policyID}`] : undefined;
                     const isChildOfAccessiblePolicyExpenseChat = !!chatReport && isPolicyExpenseChat(chatReport) && (!!chatReport.isOwnPolicyExpenseChat || isPolicyAdmin(chatPolicy));
                     if (!isChildOfAccessiblePolicyExpenseChat) {
