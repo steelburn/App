@@ -331,11 +331,11 @@ const DYNAMIC_ROUTES = {
         entryScreens: [SCREENS.SETTINGS_CATEGORIES.SETTINGS_CATEGORY_SETTINGS],
     },
     SETTINGS_CATEGORIES_SETTINGS: {
-        path: 'settings',
+        path: 'manage-settings',
         entryScreens: [SCREENS.SETTINGS_CATEGORIES.SETTINGS_CATEGORIES_ROOT],
     },
     SETTINGS_CATEGORY_CREATE: {
-        path: 'new',
+        path: 'category-create',
         entryScreens: [SCREENS.SETTINGS_CATEGORIES.SETTINGS_CATEGORIES_ROOT],
     },
     NOTIFICATION_PREFERENCES: {
