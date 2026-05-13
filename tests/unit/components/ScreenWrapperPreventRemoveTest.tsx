@@ -1,5 +1,6 @@
-// These rules are disabled because `require()` is used for jest mocking compatibility with react-test-renderer
-/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-var-requires */
+// These rules are disabled because `require()` is used inside jest.mock factories for module resolution,
+// and react-test-renderer is needed because @testing-library/react-native fails to render ScreenWrapper with these mocks.
+/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-deprecated */
 import React, {act} from 'react';
 import Onyx from 'react-native-onyx';
 import type ReactTestRendererType from 'react-test-renderer';
@@ -7,6 +8,7 @@ import ScreenWrapper from '@components/ScreenWrapper';
 import ONYXKEYS from '@src/ONYXKEYS';
 import waitForBatchedUpdates from '../../utils/waitForBatchedUpdates';
 
+// eslint-disable-next-line
 const ReactTestRenderer: typeof ReactTestRendererType = require('react-test-renderer');
 
 Onyx.init({keys: ONYXKEYS});
@@ -119,18 +121,13 @@ function getUsePreventRemove() {
 
 function lastPreventRemoveCondition(): boolean {
     const mock = getUsePreventRemove();
-    const calls = mock.mock.calls;
-    return calls[calls.length - 1][0] as boolean;
+    return mock.mock.calls.at(-1)?.[0] as boolean;
 }
 
 async function renderScreenWrapper(): Promise<ReactTestRendererType.ReactTestRenderer> {
     let renderer!: ReactTestRendererType.ReactTestRenderer;
     await act(async () => {
-        renderer = ReactTestRenderer.create(
-            <ScreenWrapper testID="test-screen">
-                <></>
-            </ScreenWrapper>,
-        );
+        renderer = ReactTestRenderer.create(<ScreenWrapper testID="test-screen">{null}</ScreenWrapper>);
         await waitForBatchedUpdates();
     });
     return renderer;
@@ -141,7 +138,7 @@ describe('ScreenWrapper – usePreventRemove condition', () => {
 
     afterEach(async () => {
         if (renderer) {
-            await act(() => renderer!.unmount());
+            act(() => renderer?.unmount());
             renderer = undefined;
         }
         await act(async () => {

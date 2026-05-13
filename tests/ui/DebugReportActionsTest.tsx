@@ -23,6 +23,8 @@ jest.mock('@react-navigation/native', () => {
 
 jest.mock('@src/libs/Navigation/Navigation', () => ({
     navigate: jest.fn(),
+    getActiveRouteWithoutParams: jest.fn(() => ''),
+    isNavigationReady: jest.fn(() => Promise.resolve()),
 }));
 
 describe('DebugReportActions', () => {
