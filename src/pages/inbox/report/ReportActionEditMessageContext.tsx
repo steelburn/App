@@ -1,4 +1,4 @@
-import React, {createContext, useContext, useMemo, useState} from 'react';
+import React, {createContext, useCallback, useContext, useMemo, useState} from 'react';
 import type {Dispatch, SetStateAction} from 'react';
 import type {OnyxCollection} from 'react-native-onyx';
 import type {ValueOf} from 'type-fest';
@@ -92,63 +92,75 @@ function ReportActionEditMessageContextProvider({reportID, effectiveTransactionT
         return shouldIncludeTransactionThreadReport ? [effectiveTransactionThreadReportID] : [];
     }, [effectiveTransactionThreadReportID, reportID]);
 
-    // One slice of COLLECTION.REPORT_ACTIONS: thread report(s) we may edit from this view + every ancestor's report (for getOriginalReportID).
-    const reportActionsSelector = (allReportActions: OnyxCollection<OnyxTypes.ReportActions>) => {
-        if (!allReportActions) {
-            return {};
-        }
-        const result: OnyxCollection<OnyxTypes.ReportActions> = {};
-        for (const additionalReportID of additionalReportIDs) {
-            const key = `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${additionalReportID}`;
-            result[key] = allReportActions[key];
-        }
-        for (const ancestor of ancestors) {
-            const key = `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${ancestor.report.reportID}`;
-            result[key] = allReportActions[key];
-        }
-        return result;
-    };
+    const reportActionsSelector = useCallback(
+        (allReportActions: OnyxCollection<OnyxTypes.ReportActions>) => {
+            if (!allReportActions) {
+                return {};
+            }
+            const result: OnyxCollection<OnyxTypes.ReportActions> = {};
+
+            // Visible-report actions — required when the draft sits on this report (`reportDraftEntry` resolves `reportActionID` → need the row).
+            if (reportID) {
+                const visibleReportActionsKey = `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${reportID}`;
+                result[visibleReportActionsKey] = allReportActions[visibleReportActionsKey];
+            }
+
+            for (const additionalReportID of additionalReportIDs) {
+                const additionalReportActionsKey = `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${additionalReportID}`;
+                result[additionalReportActionsKey] = allReportActions[additionalReportActionsKey];
+            }
+            for (const ancestor of ancestors) {
+                const ancestorReportActionsKey = `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${ancestor.report.reportID}`;
+                result[ancestorReportActionsKey] = allReportActions[ancestorReportActionsKey];
+            }
+
+            return result;
+        },
+        [additionalReportIDs, ancestors, reportID],
+    );
 
     const [reportActions] = useOnyx(ONYXKEYS.COLLECTION.REPORT_ACTIONS, {selector: reportActionsSelector}, [reportActionsSelector]);
 
-    // In-progress edit text still lives only under COLLECTION.REPORT_ACTIONS_DRAFTS (not on ReportAction rows); that subscription cannot be folded into REPORT_ACTIONS without an Onyx/data-model change.
-    const scopedReportActionDraftsSelector = (allDrafts: OnyxCollection<OnyxTypes.ReportActionsDrafts>) => {
-        if (!allDrafts) {
-            return {};
-        }
-        const result: OnyxCollection<OnyxTypes.ReportActionsDrafts> = {};
-        if (reportID) {
-            const currentDraftKey = `${ONYXKEYS.COLLECTION.REPORT_ACTIONS_DRAFTS}${reportID}`;
-            result[currentDraftKey] = allDrafts[currentDraftKey];
-        }
-        for (const additionalReportID of additionalReportIDs) {
-            const additionalDraftKey = `${ONYXKEYS.COLLECTION.REPORT_ACTIONS_DRAFTS}${additionalReportID}`;
-            result[additionalDraftKey] = allDrafts[additionalDraftKey];
-        }
-        for (const ancestor of ancestors) {
-            const reportActionsForAncestor = reportActions?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${ancestor.report.reportID}`];
-            const originalReportID = getOriginalReportID(ancestor.report.reportID, ancestor.reportAction, reportActionsForAncestor);
-            if (!originalReportID) {
-                continue;
+    const reportActionsDraftsSelector = useCallback(
+        (allDrafts: OnyxCollection<OnyxTypes.ReportActionsDrafts>) => {
+            if (!allDrafts) {
+                return {};
             }
-            const draftKey = `${ONYXKEYS.COLLECTION.REPORT_ACTIONS_DRAFTS}${originalReportID}`;
-            result[draftKey] = allDrafts[draftKey];
-        }
-        return result;
-    };
+            const result: OnyxCollection<OnyxTypes.ReportActionsDrafts> = {};
+            if (reportID) {
+                const currentDraftKey = `${ONYXKEYS.COLLECTION.REPORT_ACTIONS_DRAFTS}${reportID}`;
+                result[currentDraftKey] = allDrafts[currentDraftKey];
+            }
+            for (const additionalReportID of additionalReportIDs) {
+                const additionalDraftKey = `${ONYXKEYS.COLLECTION.REPORT_ACTIONS_DRAFTS}${additionalReportID}`;
+                result[additionalDraftKey] = allDrafts[additionalDraftKey];
+            }
+            for (const ancestor of ancestors) {
+                const reportActionsForAncestor = reportActions?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${ancestor.report.reportID}`];
+                const originalReportID = getOriginalReportID(ancestor.report.reportID, ancestor.reportAction, reportActionsForAncestor);
+                if (!originalReportID) {
+                    continue;
+                }
+                const draftKey = `${ONYXKEYS.COLLECTION.REPORT_ACTIONS_DRAFTS}${originalReportID}`;
+                result[draftKey] = allDrafts[draftKey];
+            }
+            return result;
+        },
+        [additionalReportIDs, ancestors, reportActions, reportID],
+    );
 
-    const [reportActionDrafts] = useOnyx(ONYXKEYS.COLLECTION.REPORT_ACTIONS_DRAFTS, {selector: scopedReportActionDraftsSelector}, [scopedReportActionDraftsSelector]);
+    const [reportActionsDrafts] = useOnyx(ONYXKEYS.COLLECTION.REPORT_ACTIONS_DRAFTS, {selector: reportActionsDraftsSelector}, [reportActionsDraftsSelector]);
 
     const [editingState, setEditingState] = useState<ReportActionEditMessageState>(CONST.REPORT_ACTION_EDIT_MESSAGE_STATE.OFF);
     const [prevEditingReportActionID, setPrevEditingReportActionID] = useState<string | null>(null);
     const [editingMessage, setEditingMessage] = useState<string | null>(null);
     const [currentEditMessageSelection, setCurrentEditMessageSelectionState] = useState<TextSelection | null>(null);
 
-    const reportDrafts = reportActionDrafts?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS_DRAFTS}${reportID}`];
+    const reportDrafts = reportActionsDrafts?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS_DRAFTS}${reportID}`];
     const reportDraftEntry = Object.entries(reportDrafts ?? {}).find(([, draft]) => draft?.message !== undefined);
     const additionalReportWithDraft = additionalReportIDs
         .map((additionalReportID) => {
-            const additionalDrafts = reportActionDrafts?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS_DRAFTS}${additionalReportID}`];
+            const additionalDrafts = reportActionsDrafts?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS_DRAFTS}${additionalReportID}`];
             const additionalDraftEntry = Object.entries(additionalDrafts ?? {}).find(([, draft]) => draft?.message !== undefined);
             if (!additionalDraftEntry) {
                 return null;
@@ -183,7 +195,7 @@ function ReportActionEditMessageContextProvider({reportID, effectiveTransactionT
             if (!origID) {
                 return false;
             }
-            const ancestorDrafts = reportActionDrafts?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS_DRAFTS}${origID}`];
+            const ancestorDrafts = reportActionsDrafts?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS_DRAFTS}${origID}`];
             const ancestorDraft = ancestorDrafts?.[reportAction.reportActionID];
 
             return ancestorDraft?.message !== undefined;
@@ -207,7 +219,7 @@ function ReportActionEditMessageContextProvider({reportID, effectiveTransactionT
         const {report: ancestorReport, reportAction: ancestorReportAction} = ancestorWithDraft;
         const reportActionsForAncestor = reportActions?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${ancestorReport.reportID}`];
         const ancestorOrigReportID = getOriginalReportID(ancestorReport.reportID, ancestorReportAction, reportActionsForAncestor);
-        const ancestorDrafts = ancestorOrigReportID ? reportActionDrafts?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS_DRAFTS}${ancestorOrigReportID}`] : undefined;
+        const ancestorDrafts = ancestorOrigReportID ? reportActionsDrafts?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS_DRAFTS}${ancestorOrigReportID}`] : undefined;
         const ancestorReportActionDraft = ancestorDrafts?.[ancestorReportAction.reportActionID];
 
         editingReportID = ancestorReport.reportID;
