@@ -108,18 +108,18 @@ function checkIfShouldUseNewPartnerName(partnerUserID?: string): boolean {
     return false;
 }
 
+const AGENT_EMAIL_REGEX = /^agent_\d+@expensify\.ai$/;
+
 function isAgentEmail(email?: string): boolean {
     if (!email) {
         return false;
     }
-
-    const AGENT_EMAIL_REGEX = /^agent_\d+@expensify\.ai$/;
     return AGENT_EMAIL_REGEX.test(email);
 }
 
 function useIsAgentAccount(): boolean {
-    const [session] = useOnyx(ONYXKEYS.SESSION);
-    return isAgentEmail(session?.email);
+    const [sessionEmail] = useOnyx(ONYXKEYS.SESSION, {selector: (session) => session?.email});
+    return isAgentEmail(sessionEmail);
 }
 
 export {isLoggingInAsNewUser, didUserLogInDuringSession, resetDidUserLogInDuringSession, checkIfShouldUseNewPartnerName, isLoggingInAsDelegate, isAgentEmail, useIsAgentAccount};
