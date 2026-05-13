@@ -130,7 +130,6 @@ function ReanimatedModal({
 
             // eslint-disable-next-line react-hooks/set-state-in-effect
             setIsVisibleState(true);
-            // eslint-disable-next-line react-hooks/set-state-in-effect
             setIsTransitioning(true);
         } else if (!isVisible && isContainerOpen && !isTransitioning) {
             handleRef.current = InteractionManager.createInteractionHandle();
@@ -138,9 +137,7 @@ function ReanimatedModal({
             onModalWillHide();
 
             blurActiveElement();
-            // eslint-disable-next-line react-hooks/set-state-in-effect
             setIsVisibleState(false);
-            // eslint-disable-next-line react-hooks/set-state-in-effect
             setIsTransitioning(true);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
