@@ -145,7 +145,7 @@ describe('ReportActionEditMessageContextProvider', () => {
         resetProviderTestState();
     });
 
-    describe('additional report IDs (transaction thread)', () => {
+    describe('transaction thread report', () => {
         it('surfaces an edit on the effective transaction thread when it differs from the visible report', () => {
             const threadReportAction = createReportActionWithId(THREAD_ACTION_ID);
 
