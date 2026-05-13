@@ -19,7 +19,7 @@ function useStableArrayReference<T>(value: T[]): T[] {
     if (!isEqual) {
         setStable(value);
     }
-    
+
     return isEqual ? stable : value;
 }
 
