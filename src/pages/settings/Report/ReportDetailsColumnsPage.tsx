@@ -80,6 +80,7 @@ function ReportDetailsColumnsPage() {
             shouldShowBillableColumn: isBillableEnabledOnPolicy(policy),
             shouldShowReimbursableColumn: hasNonReimbursableTransactions(reportTransactions),
             reportCurrency: report?.currency,
+            policy,
         });
 
         // Filter to only columns available in the custom columns list (drops RECEIPT/TYPE/COMMENTS etc.)

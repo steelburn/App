@@ -41,6 +41,7 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type * as OnyxTypes from '@src/types/onyx';
 import type {CustomCardFeedData} from '@src/types/onyx/CardFeeds';
+import type Policy from '@src/types/onyx/Policy';
 import type {Connections} from '@src/types/onyx/Policy';
 import type {SearchDataTypes} from '@src/types/onyx/SearchResults';
 import getOnyxValue from '../../utils/getOnyxValue';
@@ -8263,6 +8264,88 @@ describe('SearchUIUtils', () => {
 
             expect(columns).toContain(CONST.SEARCH.TABLE_COLUMNS.TAX_RATE);
             expect(columns).toContain(CONST.SEARCH.TABLE_COLUMNS.TAX_AMOUNT);
+        });
+
+        test('Should show TAX columns when user selected them and the workspace has taxes enabled, even for transactions with null tax fields', () => {
+            // Repro for the issue raised on GH #82252: expenses created before taxes were
+            // enabled have null taxCode/taxAmount/taxValue and never get backfilled, so the
+            // per-transaction check alone would hide the columns even though the user has
+            // both selected the columns and enabled taxes on the workspace.
+            const baseTransaction = searchResults.data[`transactions_${transactionID}`];
+            const legacyTransaction = {
+                ...baseTransaction,
+                transactionID: 'legacy',
+                merchant: 'Legacy Expense',
+                taxCode: undefined,
+                taxAmount: undefined,
+            };
+            const taxEnabledPolicy = {...policy, tax: {trackingEnabled: true}} as unknown as Policy;
+
+            const visibleColumns = [CONST.SEARCH.TABLE_COLUMNS.DATE, CONST.SEARCH.TABLE_COLUMNS.TAX_RATE, CONST.SEARCH.TABLE_COLUMNS.TAX_AMOUNT, CONST.SEARCH.TABLE_COLUMNS.TOTAL_AMOUNT];
+            const columns = SearchUIUtils.getColumnsToShow({
+                currentAccountID: submitterAccountID,
+                data: [legacyTransaction],
+                visibleColumns,
+                isExpenseReportView: true,
+                policy: taxEnabledPolicy,
+            });
+
+            expect(columns).toContain(CONST.SEARCH.TABLE_COLUMNS.TAX_RATE);
+            expect(columns).toContain(CONST.SEARCH.TABLE_COLUMNS.TAX_AMOUNT);
+        });
+
+        test('Should NOT inject TAX columns when the workspace has taxes enabled but the user did not select them', () => {
+            // Guard: enabling taxes on the workspace must not force the columns into the
+            // result if the user deselected them in the column selector. The customResult
+            // path filters to the user's selection, so unselected columns stay hidden even
+            // when columns[TAX_RATE]/[TAX_AMOUNT] get flipped on internally.
+            const baseTransaction = searchResults.data[`transactions_${transactionID}`];
+            const legacyTransaction = {
+                ...baseTransaction,
+                transactionID: 'legacy',
+                merchant: 'Legacy Expense',
+                taxCode: undefined,
+                taxAmount: undefined,
+            };
+            const taxEnabledPolicy = {...policy, tax: {trackingEnabled: true}} as unknown as Policy;
+
+            const visibleColumns = [CONST.SEARCH.TABLE_COLUMNS.DATE, CONST.SEARCH.TABLE_COLUMNS.MERCHANT, CONST.SEARCH.TABLE_COLUMNS.TOTAL_AMOUNT];
+            const columns = SearchUIUtils.getColumnsToShow({
+                currentAccountID: submitterAccountID,
+                data: [legacyTransaction],
+                visibleColumns,
+                isExpenseReportView: true,
+                policy: taxEnabledPolicy,
+            });
+
+            expect(columns).not.toContain(CONST.SEARCH.TABLE_COLUMNS.TAX_RATE);
+            expect(columns).not.toContain(CONST.SEARCH.TABLE_COLUMNS.TAX_AMOUNT);
+        });
+
+        test('Should hide TAX columns when the workspace does not have taxes enabled and transactions have no tax data', () => {
+            // Regression guard: without a tax-enabled policy and without per-transaction tax
+            // data, the columns must stay hidden even if the user selected them.
+            const baseTransaction = searchResults.data[`transactions_${transactionID}`];
+            const legacyTransaction = {
+                ...baseTransaction,
+                transactionID: 'legacy',
+                merchant: 'Legacy Expense',
+                taxCode: undefined,
+                taxAmount: undefined,
+            };
+            const taxDisabledPolicy = {...policy, tax: {trackingEnabled: false}} as unknown as Policy;
+
+            const visibleColumns = [CONST.SEARCH.TABLE_COLUMNS.DATE, CONST.SEARCH.TABLE_COLUMNS.TAX_RATE, CONST.SEARCH.TABLE_COLUMNS.TAX_AMOUNT, CONST.SEARCH.TABLE_COLUMNS.TOTAL_AMOUNT];
+            const columns = SearchUIUtils.getColumnsToShow({
+                currentAccountID: submitterAccountID,
+                data: [legacyTransaction],
+                visibleColumns,
+                isExpenseReportView: true,
+                policy: taxDisabledPolicy,
+            });
+
+            expect(columns).not.toContain(CONST.SEARCH.TABLE_COLUMNS.TAX_RATE);
+            expect(columns).not.toContain(CONST.SEARCH.TABLE_COLUMNS.TAX_AMOUNT);
         });
 
         test('Should hide empty AMOUNT column in expense report view when no conversion', () => {
