@@ -20,7 +20,8 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import type {ReportActions as ReportActionsType} from '@src/types/onyx';
 import type {VisibleReportActionsDerivedValue} from '@src/types/onyx/DerivedValues';
 import type {Icon} from '@src/types/onyx/OnyxCommon';
-import OptionRowLHN from './OptionRowLHNCore';
+import ArchivedOptionRowLHN from './ArchivedOptionRowLHN';
+import OptionRowLHN from './OptionRowLHN';
 
 /*
  * This component gets the data from onyx for the actual
@@ -190,8 +191,10 @@ function OptionRowLHNData({
         return isReportFocused ? null : <View style={placeholderRowStyle} />;
     }
 
+    const Row = isReportArchived ? ArchivedOptionRowLHN : OptionRowLHN;
+
     return (
-        <OptionRowLHN
+        <Row
             // eslint-disable-next-line react/jsx-props-no-spreading
             {...propsToForward}
             viewMode={viewMode}
