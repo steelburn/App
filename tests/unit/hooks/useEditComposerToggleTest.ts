@@ -220,7 +220,7 @@ describe('useEditComposerToggle', () => {
         expect(onValueChange).not.toHaveBeenCalled();
     });
 
-    it('on narrow, when edit ends, restores prior draft and selection; blurs if composer was not focused before', () => {
+    it('on narrow, when edit ends, restores prior draft and selection', () => {
         const onValueChange = jest.fn();
         const onSelectionChange = jest.fn();
         const composerRef = makeComposerRef();
@@ -254,7 +254,7 @@ describe('useEditComposerToggle', () => {
 
         expect(onValueChange).toHaveBeenCalledWith('restored');
         expect(onSelectionChange).toHaveBeenCalledWith(priorSelection);
-        expect(composerRef.current?.blur).toHaveBeenCalled();
+        expect(composerRef.current?.blur).not.toHaveBeenCalled();
     });
 
     it('resets the manual composer height after a submitted narrow composer edit ends', () => {
