@@ -41,7 +41,6 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
 import type * as OnyxTypes from '@src/types/onyx';
 import type {CustomCardFeedData} from '@src/types/onyx/CardFeeds';
-import type Policy from '@src/types/onyx/Policy';
 import type {Connections} from '@src/types/onyx/Policy';
 import type {SearchDataTypes} from '@src/types/onyx/SearchResults';
 import getOnyxValue from '../../utils/getOnyxValue';
@@ -8279,15 +8278,13 @@ describe('SearchUIUtils', () => {
                 taxCode: undefined,
                 taxAmount: undefined,
             };
-            const taxEnabledPolicy = {...policy, tax: {trackingEnabled: true}} as unknown as Policy;
-
             const visibleColumns = [CONST.SEARCH.TABLE_COLUMNS.DATE, CONST.SEARCH.TABLE_COLUMNS.TAX_RATE, CONST.SEARCH.TABLE_COLUMNS.TAX_AMOUNT, CONST.SEARCH.TABLE_COLUMNS.TOTAL_AMOUNT];
             const columns = SearchUIUtils.getColumnsToShow({
                 currentAccountID: submitterAccountID,
                 data: [legacyTransaction],
                 visibleColumns,
                 isExpenseReportView: true,
-                policy: taxEnabledPolicy,
+                isPolicyTaxEnabled: true,
             });
 
             expect(columns).toContain(CONST.SEARCH.TABLE_COLUMNS.TAX_RATE);
@@ -8307,15 +8304,13 @@ describe('SearchUIUtils', () => {
                 taxCode: undefined,
                 taxAmount: undefined,
             };
-            const taxEnabledPolicy = {...policy, tax: {trackingEnabled: true}} as unknown as Policy;
-
             const visibleColumns = [CONST.SEARCH.TABLE_COLUMNS.DATE, CONST.SEARCH.TABLE_COLUMNS.MERCHANT, CONST.SEARCH.TABLE_COLUMNS.TOTAL_AMOUNT];
             const columns = SearchUIUtils.getColumnsToShow({
                 currentAccountID: submitterAccountID,
                 data: [legacyTransaction],
                 visibleColumns,
                 isExpenseReportView: true,
-                policy: taxEnabledPolicy,
+                isPolicyTaxEnabled: true,
             });
 
             expect(columns).not.toContain(CONST.SEARCH.TABLE_COLUMNS.TAX_RATE);
@@ -8333,15 +8328,13 @@ describe('SearchUIUtils', () => {
                 taxCode: undefined,
                 taxAmount: undefined,
             };
-            const taxDisabledPolicy = {...policy, tax: {trackingEnabled: false}} as unknown as Policy;
-
             const visibleColumns = [CONST.SEARCH.TABLE_COLUMNS.DATE, CONST.SEARCH.TABLE_COLUMNS.TAX_RATE, CONST.SEARCH.TABLE_COLUMNS.TAX_AMOUNT, CONST.SEARCH.TABLE_COLUMNS.TOTAL_AMOUNT];
             const columns = SearchUIUtils.getColumnsToShow({
                 currentAccountID: submitterAccountID,
                 data: [legacyTransaction],
                 visibleColumns,
                 isExpenseReportView: true,
-                policy: taxDisabledPolicy,
+                isPolicyTaxEnabled: false,
             });
 
             expect(columns).not.toContain(CONST.SEARCH.TABLE_COLUMNS.TAX_RATE);

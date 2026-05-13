@@ -118,7 +118,6 @@ import {
     isPolicyAdmin,
     isPolicyApprover,
     isPolicyPayer,
-    isPolicyTaxEnabled,
 } from './PolicyUtils';
 import {
     getIOUActionForReportID,
@@ -5132,7 +5131,7 @@ function getColumnsToShow({
     shouldShowCommentsColumn = false,
     reportCurrency,
     shouldUseStrictDefaultExpenseColumns = false,
-    policy,
+    isPolicyTaxEnabled = false,
 }: {
     currentAccountID: number | undefined;
     data: OnyxTypes.SearchResults['data'] | OnyxTypes.Transaction[];
@@ -5146,7 +5145,7 @@ function getColumnsToShow({
     shouldShowCommentsColumn?: boolean;
     reportCurrency?: string;
     shouldUseStrictDefaultExpenseColumns?: boolean;
-    policy?: OnyxTypes.Policy;
+    isPolicyTaxEnabled?: boolean;
 }): SearchColumnType[] {
     if (type === CONST.SEARCH.DATA_TYPES.EXPENSE_REPORT) {
         const defaultReportColumns: SearchColumnType[] = [
@@ -5393,7 +5392,7 @@ function getColumnsToShow({
             // When the user explicitly selected the tax columns (customResult) and the workspace
             // has taxes enabled, keep them regardless of per-transaction values — older expenses
             // created before taxes were turned on still have null taxCode/taxAmount/taxValue.
-            const hasTaxInfo = (!!customResult && isPolicyTaxEnabled(policy)) || !!transaction.taxCode || !!transaction.taxAmount || !!transaction.taxValue;
+            const hasTaxInfo = (!!customResult && isPolicyTaxEnabled) || !!transaction.taxCode || !!transaction.taxAmount || !!transaction.taxValue;
             if (hasTaxInfo) {
                 columns[CONST.SEARCH.TABLE_COLUMNS.TAX_RATE] = true;
                 columns[CONST.SEARCH.TABLE_COLUMNS.TAX_AMOUNT] = true;
