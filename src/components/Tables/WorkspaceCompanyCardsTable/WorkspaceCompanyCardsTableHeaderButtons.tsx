@@ -71,6 +71,7 @@ function WorkspaceCompanyCardsTableHeaderButtons({policyID, feedName, isLoading,
     const hasFeedErrors = feedErrors?.hasFeedErrors;
     const isFeedConnectionBroken = feedErrors?.isFeedConnectionBroken;
     const hasOtherFeedWithRBR = Object.keys(companyFeeds ?? {}).some((feed) => feed !== feedName && shouldShowRbrForFeedNameWithDomainID[feed]);
+    const shouldShowFeedSelectorRBR = hasOtherFeedWithRBR || !!feedErrors?.hasWorkspaceErrors;
 
     const openBankConnection = () => {
         if (!feedName) {
@@ -144,7 +145,7 @@ function WorkspaceCompanyCardsTableHeaderButtons({policyID, feedName, isLoading,
                         CardFeedIcon={CardFeedIcon}
                         feedName={formattedFeedName}
                         supportingText={supportingText}
-                        shouldShowRBR={hasOtherFeedWithRBR}
+                        shouldShowRBR={shouldShowFeedSelectorRBR}
                     />
                 )}
 
