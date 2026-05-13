@@ -1,4 +1,4 @@
-import React, {createContext, useContext, useState} from 'react';
+import React, {createContext, useContext, useMemo, useState} from 'react';
 import type {Dispatch, SetStateAction} from 'react';
 import type {OnyxCollection} from 'react-native-onyx';
 import type {ValueOf} from 'type-fest';
@@ -87,9 +87,12 @@ function ReportActionEditMessageContextProvider({reportID, effectiveTransactionT
     // Edit drafts are stored against that owner report ID, so the edit state has to watch it too.
     // Sent-money reports do not surface transaction-thread actions in this view; use the effective ID so we
     // never pull drafts from a thread that is not editable here.
-    const shouldIncludeTransactionThreadReport =
-        !!effectiveTransactionThreadReportID && effectiveTransactionThreadReportID !== CONST.FAKE_REPORT_ID && effectiveTransactionThreadReportID !== reportID;
-    const additionalReportIDs = shouldIncludeTransactionThreadReport ? [effectiveTransactionThreadReportID] : [];
+    // This is not automatically memoized by React Compiler, therefore we need to use useMemo to avoid infinite re-renders.
+    const additionalReportIDs = useMemo(() => {
+        const shouldIncludeTransactionThreadReport =
+            !!effectiveTransactionThreadReportID && effectiveTransactionThreadReportID !== CONST.FAKE_REPORT_ID && effectiveTransactionThreadReportID !== reportID;
+        return shouldIncludeTransactionThreadReport ? [effectiveTransactionThreadReportID] : [];
+    }, [effectiveTransactionThreadReportID, reportID]);
 
     const additionalReportActionsSelector = (allReportActions: OnyxCollection<OnyxTypes.ReportActions>) => {
         if (!allReportActions) {
