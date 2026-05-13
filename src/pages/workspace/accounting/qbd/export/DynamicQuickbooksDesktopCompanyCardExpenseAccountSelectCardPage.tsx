@@ -64,7 +64,7 @@ function DynamicQuickbooksDesktopCompanyCardExpenseAccountSelectCardPage({policy
     );
 
     const goBack = useCallback(() => {
-        Navigation.goBack(backPath);
+        Navigation.goBack(backPath, {compareParams: false});
     }, [backPath]);
 
     const selectExportCompanyCard = useCallback(
