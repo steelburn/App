@@ -1,4 +1,4 @@
-import React, {createContext, useCallback, useContext, useMemo, useState} from 'react';
+import React, {createContext, useContext, useMemo, useState} from 'react';
 import type {Dispatch, SetStateAction} from 'react';
 import type {OnyxCollection} from 'react-native-onyx';
 import type {ValueOf} from 'type-fest';
@@ -81,73 +81,65 @@ function ReportActionEditMessageContextProvider({reportID, effectiveTransactionT
     const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${reportID}`);
     const ancestors = useAncestors(report, shouldExcludeAncestorReportAction);
 
-    // In one-transaction reports, the visible action can belong to the transaction thread report.
-    // Edit drafts are stored against that owner report ID, so the edit state has to watch it too.
-    // Sent-money reports do not surface transaction-thread actions in this view; use the effective ID so we
-    // never pull drafts from a thread that is not editable here.
+    // In one-transaction reports, edits can persist on exactly one linked transaction-thread report.
+    // We only subscribe to that thread when `effectiveTransactionThreadReportID` is usable (not fake, not same as visible report).
     // This is not automatically memoized by React Compiler, therefore we need to use useMemo to avoid infinite re-renders.
-    const additionalReportIDs = useMemo(() => {
-        const shouldIncludeTransactionThreadReport =
-            !!effectiveTransactionThreadReportID && effectiveTransactionThreadReportID !== CONST.FAKE_REPORT_ID && effectiveTransactionThreadReportID !== reportID;
-        return shouldIncludeTransactionThreadReport ? [effectiveTransactionThreadReportID] : [];
+    const transactionThreadReportID = useMemo((): string | undefined => {
+        if (!effectiveTransactionThreadReportID || effectiveTransactionThreadReportID === CONST.FAKE_REPORT_ID || effectiveTransactionThreadReportID === reportID) {
+            return undefined;
+        }
+        return effectiveTransactionThreadReportID;
     }, [effectiveTransactionThreadReportID, reportID]);
 
-    const reportActionsSelector = useCallback(
-        (allReportActions: OnyxCollection<OnyxTypes.ReportActions>) => {
-            if (!allReportActions) {
-                return {};
-            }
-            const result: OnyxCollection<OnyxTypes.ReportActions> = {};
+    const reportActionsSelector = (allReportActions: OnyxCollection<OnyxTypes.ReportActions>) => {
+        if (!allReportActions) {
+            return {};
+        }
+        const result: OnyxCollection<OnyxTypes.ReportActions> = {};
 
-            // Visible-report actions — required when the draft sits on this report (`reportDraftEntry` resolves `reportActionID` → need the row).
-            if (reportID) {
-                const visibleReportActionsKey = `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${reportID}`;
-                result[visibleReportActionsKey] = allReportActions[visibleReportActionsKey];
-            }
+        if (reportID) {
+            const visibleReportActionsKey = `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${reportID}`;
+            result[visibleReportActionsKey] = allReportActions[visibleReportActionsKey];
+        }
 
-            for (const additionalReportID of additionalReportIDs) {
-                const additionalReportActionsKey = `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${additionalReportID}`;
-                result[additionalReportActionsKey] = allReportActions[additionalReportActionsKey];
-            }
-            for (const ancestor of ancestors) {
-                const ancestorReportActionsKey = `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${ancestor.report.reportID}`;
-                result[ancestorReportActionsKey] = allReportActions[ancestorReportActionsKey];
-            }
+        if (transactionThreadReportID) {
+            const transactionThreadActionsKey = `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${transactionThreadReportID}`;
+            result[transactionThreadActionsKey] = allReportActions[transactionThreadActionsKey];
+        }
+        for (const ancestor of ancestors) {
+            const ancestorReportActionsKey = `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${ancestor.report.reportID}`;
+            result[ancestorReportActionsKey] = allReportActions[ancestorReportActionsKey];
+        }
 
-            return result;
-        },
-        [additionalReportIDs, ancestors, reportID],
-    );
+        return result;
+    };
 
     const [reportActions] = useOnyx(ONYXKEYS.COLLECTION.REPORT_ACTIONS, {selector: reportActionsSelector}, [reportActionsSelector]);
 
-    const reportActionsDraftsSelector = useCallback(
-        (allDrafts: OnyxCollection<OnyxTypes.ReportActionsDrafts>) => {
-            if (!allDrafts) {
-                return {};
+    const reportActionsDraftsSelector = (allDrafts: OnyxCollection<OnyxTypes.ReportActionsDrafts>) => {
+        if (!allDrafts) {
+            return {};
+        }
+        const result: OnyxCollection<OnyxTypes.ReportActionsDrafts> = {};
+        if (reportID) {
+            const currentDraftKey = `${ONYXKEYS.COLLECTION.REPORT_ACTIONS_DRAFTS}${reportID}`;
+            result[currentDraftKey] = allDrafts[currentDraftKey];
+        }
+        if (transactionThreadReportID) {
+            const transactionThreadDraftKey = `${ONYXKEYS.COLLECTION.REPORT_ACTIONS_DRAFTS}${transactionThreadReportID}`;
+            result[transactionThreadDraftKey] = allDrafts[transactionThreadDraftKey];
+        }
+        for (const ancestor of ancestors) {
+            const reportActionsForAncestor = reportActions?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${ancestor.report.reportID}`];
+            const originalReportID = getOriginalReportID(ancestor.report.reportID, ancestor.reportAction, reportActionsForAncestor);
+            if (!originalReportID) {
+                continue;
             }
-            const result: OnyxCollection<OnyxTypes.ReportActionsDrafts> = {};
-            if (reportID) {
-                const currentDraftKey = `${ONYXKEYS.COLLECTION.REPORT_ACTIONS_DRAFTS}${reportID}`;
-                result[currentDraftKey] = allDrafts[currentDraftKey];
-            }
-            for (const additionalReportID of additionalReportIDs) {
-                const additionalDraftKey = `${ONYXKEYS.COLLECTION.REPORT_ACTIONS_DRAFTS}${additionalReportID}`;
-                result[additionalDraftKey] = allDrafts[additionalDraftKey];
-            }
-            for (const ancestor of ancestors) {
-                const reportActionsForAncestor = reportActions?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${ancestor.report.reportID}`];
-                const originalReportID = getOriginalReportID(ancestor.report.reportID, ancestor.reportAction, reportActionsForAncestor);
-                if (!originalReportID) {
-                    continue;
-                }
-                const draftKey = `${ONYXKEYS.COLLECTION.REPORT_ACTIONS_DRAFTS}${originalReportID}`;
-                result[draftKey] = allDrafts[draftKey];
-            }
-            return result;
-        },
-        [additionalReportIDs, ancestors, reportActions, reportID],
-    );
+            const draftKey = `${ONYXKEYS.COLLECTION.REPORT_ACTIONS_DRAFTS}${originalReportID}`;
+            result[draftKey] = allDrafts[draftKey];
+        }
+        return result;
+    };
 
     const [reportActionsDrafts] = useOnyx(ONYXKEYS.COLLECTION.REPORT_ACTIONS_DRAFTS, {selector: reportActionsDraftsSelector}, [reportActionsDraftsSelector]);
 
@@ -158,29 +150,31 @@ function ReportActionEditMessageContextProvider({reportID, effectiveTransactionT
 
     const reportDrafts = reportActionsDrafts?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS_DRAFTS}${reportID}`];
     const reportDraftEntry = Object.entries(reportDrafts ?? {}).find(([, draft]) => draft?.message !== undefined);
-    const additionalReportWithDraft = additionalReportIDs
-        .map((additionalReportID) => {
-            const additionalDrafts = reportActionsDrafts?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS_DRAFTS}${additionalReportID}`];
-            const additionalDraftEntry = Object.entries(additionalDrafts ?? {}).find(([, draft]) => draft?.message !== undefined);
-            if (!additionalDraftEntry) {
-                return null;
-            }
+    let transactionThreadReportWithDraft: {
+        reportID: string;
+        reportActionID: string;
+        reportAction: OnyxTypes.ReportAction;
+        draft: OnyxTypes.ReportActionsDraft;
+    } | null = null;
 
-            const [reportActionIDOfDraft, reportActionDraft] = additionalDraftEntry;
-            const reportActionsForAdditionalReport = reportActions?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${additionalReportID}`];
-            const reportAction = reportActionsForAdditionalReport?.[reportActionIDOfDraft];
-            if (!reportAction) {
-                return null;
-            }
+    if (transactionThreadReportID != null) {
+        const draftsForTransactionThreadReport = reportActionsDrafts?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS_DRAFTS}${transactionThreadReportID}`];
+        const draftEntry = Object.entries(draftsForTransactionThreadReport ?? {}).find(([, draft]) => draft?.message !== undefined);
 
-            return {
-                reportID: additionalReportID,
-                reportActionID: reportActionIDOfDraft,
-                reportAction,
-                draft: reportActionDraft,
-            };
-        })
-        .find((additionalDraft): additionalDraft is NonNullable<typeof additionalDraft> => additionalDraft !== null);
+        const [draftReportActionID, draftPayload] = draftEntry ?? [undefined, undefined];
+        if (draftReportActionID != null && draftPayload?.message !== undefined) {
+            const transactionThreadActions = reportActions?.[`${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${transactionThreadReportID}`];
+            const matchedReportAction = transactionThreadActions?.[draftReportActionID];
+            if (matchedReportAction != null) {
+                transactionThreadReportWithDraft = {
+                    reportID: transactionThreadReportID,
+                    reportActionID: draftReportActionID,
+                    reportAction: matchedReportAction,
+                    draft: draftPayload,
+                };
+            }
+        }
+    }
 
     let editingReportID: string | null = null;
     let editingReportActionID: string | null = null;
@@ -245,16 +239,16 @@ function ReportActionEditMessageContextProvider({reportID, effectiveTransactionT
 
         const nextMessage = reportActionDraft?.message ?? null;
         updateMessage(nextMessage);
-    } else if (additionalReportWithDraft) {
-        editingReportID = additionalReportWithDraft.reportID;
-        editingReportActionID = additionalReportWithDraft.reportActionID;
-        editingReportAction = additionalReportWithDraft.reportAction;
+    } else if (transactionThreadReportWithDraft) {
+        editingReportID = transactionThreadReportWithDraft.reportID;
+        editingReportActionID = transactionThreadReportWithDraft.reportActionID;
+        editingReportAction = transactionThreadReportWithDraft.reportAction;
 
         if (editingState === CONST.REPORT_ACTION_EDIT_MESSAGE_STATE.OFF) {
             setEditingState(CONST.REPORT_ACTION_EDIT_MESSAGE_STATE.EDITING);
         }
 
-        const nextMessage = additionalReportWithDraft.draft?.message ?? null;
+        const nextMessage = transactionThreadReportWithDraft.draft?.message ?? null;
         updateMessage(nextMessage);
     }
 
