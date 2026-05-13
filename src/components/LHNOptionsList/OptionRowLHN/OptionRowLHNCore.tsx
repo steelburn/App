@@ -8,7 +8,6 @@ import getContextMenuAccessibilityProps from '@components/utils/getContextMenuAc
 import useEnvironment from '@hooks/useEnvironment';
 import useLocalize from '@hooks/useLocalize';
 import useStyleUtils from '@hooks/useStyleUtils';
-import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {shouldUseBoldText} from '@libs/OptionsListUtils';
 import CONST from '@src/CONST';
@@ -27,7 +26,6 @@ import OptionRowTooltipLayer from './OptionRowTooltipLayer';
 
 function OptionRowLHN({isOptionFocused = false, onSelectRow = () => {}, optionItem, viewMode = 'default', style, onLayout = () => {}, hasDraftComment, testID}: OptionRowLHNProps) {
     const {isProduction} = useEnvironment();
-    const theme = useTheme();
     const styles = useThemeStyles();
     const popoverAnchor = useRef<View>(null);
     const StyleUtils = useStyleUtils();
@@ -42,8 +40,6 @@ function OptionRowLHN({isOptionFocused = false, onSelectRow = () => {}, optionIt
             : [styles.chatLinkRowPressable, styles.flexGrow1, styles.optionItemAvatarNameWrapper, styles.optionRow, styles.justifyContentCenter],
     );
 
-    const singleAvatarContainerStyle = [styles.actionAvatar, styles.mr3];
-
     const brickRoadIndicator = optionItem.brickRoadIndicator;
     const actionBadgeText = !isProduction && optionItem.actionBadge ? translate(`common.actionBadge.${optionItem.actionBadge}`) : '';
     let accessibilityLabelForBadge = '';
@@ -57,10 +53,6 @@ function OptionRowLHN({isOptionFocused = false, onSelectRow = () => {}, optionIt
     const displayNameStyle = [styles.optionDisplayName, styles.optionDisplayNameCompact, styles.pre, textUnreadStyle, styles.flexShrink0, style];
 
     const contentContainerStyles = isInFocusMode ? [styles.flex1, styles.flexRow, styles.overflowHidden, StyleUtils.getCompactContentContainerStyles()] : [styles.flex1];
-    const hoveredBackgroundColor = !!styles.sidebarLinkHover && 'backgroundColor' in styles.sidebarLinkHover ? styles.sidebarLinkHover.backgroundColor : theme.sidebar;
-    const focusedBackgroundColor = styles.sidebarLinkActive.backgroundColor;
-
-    const subscriptAvatarBorderColor = isOptionFocused ? focusedBackgroundColor : theme.sidebar;
 
     const accessibilityLabel = [
         `${translate('accessibilityHints.navigatesToChat')} ${optionItem.text}`,
@@ -90,65 +82,56 @@ function OptionRowLHN({isOptionFocused = false, onSelectRow = () => {}, optionIt
             // reportID may be a number contrary to the type definition
             testID={typeof optionItem.reportID === 'number' ? String(optionItem.reportID) : optionItem.reportID}
         >
-            {(hovered) => {
-                let secondaryAvatarBgColor = theme.sidebar;
-                if (isOptionFocused) {
-                    secondaryAvatarBgColor = focusedBackgroundColor;
-                } else if (hovered) {
-                    secondaryAvatarBgColor = hoveredBackgroundColor;
-                }
-                return (
-                    <>
-                        <View style={sidebarInnerRowStyle}>
-                            <View style={[styles.flexRow, styles.alignItemsCenter]}>
-                                <Avatar
-                                    optionItem={optionItem}
-                                    isInFocusMode={isInFocusMode}
-                                    subscriptAvatarBorderColor={hovered && !isOptionFocused ? hoveredBackgroundColor : subscriptAvatarBorderColor}
-                                    secondaryAvatarBackgroundColor={secondaryAvatarBgColor}
-                                    singleAvatarContainerStyle={singleAvatarContainerStyle}
-                                />
-                                <View style={contentContainerStyles}>
-                                    <View style={[styles.flexRow, styles.alignItemsCenter, styles.mw100, styles.overflowHidden]}>
-                                        <Title
-                                            optionItem={optionItem}
-                                            displayNameStyle={displayNameStyle}
-                                            testID={testID}
-                                        />
-                                        <OnboardingBadge optionItem={optionItem} />
-                                        <Status optionItem={optionItem} />
-                                    </View>
-                                    <Subtitle
+            {(hovered) => (
+                <>
+                    <View style={sidebarInnerRowStyle}>
+                        <View style={[styles.flexRow, styles.alignItemsCenter]}>
+                            <Avatar
+                                optionItem={optionItem}
+                                isInFocusMode={isInFocusMode}
+                                hovered={hovered}
+                                isOptionFocused={isOptionFocused}
+                            />
+                            <View style={contentContainerStyles}>
+                                <View style={[styles.flexRow, styles.alignItemsCenter, styles.mw100, styles.overflowHidden]}>
+                                    <Title
                                         optionItem={optionItem}
-                                        viewMode={viewMode}
-                                        isOptionFocused={isOptionFocused}
-                                        style={style}
+                                        displayNameStyle={displayNameStyle}
+                                        testID={testID}
                                     />
+                                    <OnboardingBadge optionItem={optionItem} />
+                                    <Status optionItem={optionItem} />
                                 </View>
-                                <DescriptiveText optionItem={optionItem} />
-                                <ErrorBadge
-                                    brickRoadIndicator={brickRoadIndicator}
-                                    actionBadge={optionItem.actionBadge}
+                                <Subtitle
+                                    optionItem={optionItem}
+                                    viewMode={viewMode}
+                                    isOptionFocused={isOptionFocused}
+                                    style={style}
                                 />
                             </View>
-                        </View>
-                        <View style={[styles.flexRow, styles.alignItemsCenter]}>
-                            <InfoBadge
+                            <DescriptiveText optionItem={optionItem} />
+                            <ErrorBadge
                                 brickRoadIndicator={brickRoadIndicator}
                                 actionBadge={optionItem.actionBadge}
                             />
-                            <DraftIndicator
-                                hasDraftComment={hasDraftComment}
-                                isAllowedToComment={optionItem.isAllowedToComment}
-                            />
-                            <PinIndicator
-                                isPinned={optionItem.isPinned}
-                                brickRoadIndicator={brickRoadIndicator}
-                            />
                         </View>
-                    </>
-                );
-            }}
+                    </View>
+                    <View style={[styles.flexRow, styles.alignItemsCenter]}>
+                        <InfoBadge
+                            brickRoadIndicator={brickRoadIndicator}
+                            actionBadge={optionItem.actionBadge}
+                        />
+                        <DraftIndicator
+                            hasDraftComment={hasDraftComment}
+                            isAllowedToComment={optionItem.isAllowedToComment}
+                        />
+                        <PinIndicator
+                            isPinned={optionItem.isPinned}
+                            brickRoadIndicator={brickRoadIndicator}
+                        />
+                    </View>
+                </>
+            )}
         </OptionRowPressable>
     );
 
