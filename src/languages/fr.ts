@@ -4765,6 +4765,7 @@ ${amount} pour ${merchant} - ${date}`,
                     [CONST.SAGE_INTACCT_NON_REIMBURSABLE_EXPENSE_TYPE.VENDOR_BILL]: 'Factures fournisseurs',
                 },
             },
+            travelInvoicingDescription: 'Les frais de voyage seront exportés comme des débits de carte de crédit vers le compte Sage Intacct indiqué ci-dessous.',
             creditCardAccount: 'Compte de carte de crédit',
             defaultVendor: 'Fournisseur par défaut',
             defaultVendorDescription: (isReimbursable: boolean) =>
@@ -4811,8 +4812,8 @@ ${amount} pour ${merchant} - ${date}`,
             journalPostingPreference: {
                 label: 'Préférence de comptabilisation des écritures de journal',
                 values: {
-                    [CONST.NETSUITE_JOURNAL_POSTING_PREFERENCE.JOURNALS_POSTING_INDIVIDUAL_LINE]: 'Saisie unique et détaillée pour chaque note de frais',
-                    [CONST.NETSUITE_JOURNAL_POSTING_PREFERENCE.JOURNALS_POSTING_TOTAL_LINE]: 'Une seule entrée pour chaque dépense',
+                    [CONST.NETSUITE_JOURNAL_POSTING_PREFERENCE.JOURNALS_POSTING_INDIVIDUAL_LINE]: 'Saisie unique pour chaque dépense',
+                    [CONST.NETSUITE_JOURNAL_POSTING_PREFERENCE.JOURNALS_POSTING_TOTAL_LINE]: 'Entrée unique et détaillée pour chaque rapport',
                 },
             },
             invoiceItem: {
@@ -5324,6 +5325,7 @@ _Pour des instructions plus détaillées, [visitez notre site d’aide](${CONST.
                     requiredColumns: (missingColumns: string) => `Veuillez attribuer une colonne à chacun des attributs : ${missingColumns}.`,
                     duplicateColumns: (duplicateColumn: string) => `Oups ! Vous avez associé un seul champ (« ${duplicateColumn} ») à plusieurs colonnes. Veuillez vérifier et réessayer.`,
                 },
+                fileImportDescription: 'Une option manuelle si votre banque ne peut pas envoyer de flux.',
             },
             statementCloseDate: {
                 [CONST.COMPANY_CARDS.STATEMENT_CLOSE_DATE.LAST_DAY_OF_MONTH]: 'Dernier jour du mois',
@@ -7755,6 +7757,7 @@ Ajoutez davantage de règles de dépenses pour protéger la trésorerie de l’e
         deleteSavedSearchConfirm: 'Voulez-vous vraiment supprimer cette recherche ?',
         searchName: 'Rechercher un nom',
         savedSearchesMenuItemTitle: 'Enregistré',
+        urlCopied: 'URL copiée',
         groupedExpenses: 'dépenses groupées',
         bulkActions: {
             editMultiple: 'Modifier plusieurs',
@@ -8163,6 +8166,14 @@ Ajoutez davantage de règles de dépenses pour protéger la trésorerie de l’e
         selectAllFeatures: 'Sélectionner toutes les fonctionnalités',
         selectAllTransactions: 'Sélectionner toutes les transactions',
         selectAllItems: 'Sélectionner tous les éléments',
+        selectAllCategories: 'Sélectionner toutes les catégories',
+        selectAllDistanceRates: 'Sélectionner tous les taux de distance',
+        selectAllTags: 'Sélectionner toutes les étiquettes',
+        selectAllTaxes: 'Sélectionner toutes les taxes',
+        selectAllPerDiemRates: 'Sélectionner tous les taux de per diem',
+        selectAllMembers: 'Sélectionner tous les membres',
+        selectAllValues: 'Sélectionner toutes les valeurs',
+        selectAllRules: 'Sélectionner toutes les règles',
     },
     parentReportAction: {
         deletedReport: 'Note de frais supprimée',
@@ -8259,6 +8270,7 @@ Ajoutez davantage de règles de dépenses pour protéger la trésorerie de l’e
         companyCard: 'Carte d’entreprise',
         expensifyCard: 'Carte Expensify',
         centralInvoicing: 'Facturation centralisée',
+        travelCard: 'Carte de voyage',
     },
     distance: {
         addStop: 'Ajouter un arrêt',
