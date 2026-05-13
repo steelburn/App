@@ -100,9 +100,6 @@ function TravelCVVPage() {
     }, [isLoadingAccount, isLoadingLockAccountDetails, cvv, isSignedInAsDelegate, isOffline, isAccountLocked, isVerifyAccountInStack]);
 
     const handleRevealDetailsPress = () => {
-        if (isSignedInAsDelegate) {
-            return;
-        }
         if (isAccountLocked) {
             showLockedAccountModal();
             return;
