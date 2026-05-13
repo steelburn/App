@@ -106,6 +106,7 @@ function ReanimatedModal({
     useEffect(
         () => () => {
             if (handleRef.current) {
+                // eslint-disable-next-line @typescript-eslint/no-deprecated
                 InteractionManager.clearInteractionHandle(handleRef.current);
             }
             if (transitionHandleRef.current) {
@@ -122,11 +123,14 @@ function ReanimatedModal({
 
     useEffect(() => {
         if (isVisible && !isContainerOpen && !isTransitioning) {
+            // eslint-disable-next-line @typescript-eslint/no-deprecated
             handleRef.current = InteractionManager.createInteractionHandle();
             transitionHandleRef.current = TransitionTracker.startTransition();
             onModalWillShow();
 
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setIsVisibleState(true);
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setIsTransitioning(true);
         } else if (!isVisible && isContainerOpen && !isTransitioning) {
             handleRef.current = InteractionManager.createInteractionHandle();
@@ -134,7 +138,9 @@ function ReanimatedModal({
             onModalWillHide();
 
             blurActiveElement();
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setIsVisibleState(false);
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setIsTransitioning(true);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -148,6 +154,7 @@ function ReanimatedModal({
         setIsTransitioning(false);
         setIsContainerOpen(true);
         if (handleRef.current) {
+            // eslint-disable-next-line @typescript-eslint/no-deprecated
             InteractionManager.clearInteractionHandle(handleRef.current);
         }
         if (transitionHandleRef.current) {
