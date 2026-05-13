@@ -79,6 +79,7 @@ import type {OutstandingReportsByPolicyIDDerivedValue, Report, SaveSearch, Trans
 import type {PaymentMethodType} from '@src/types/onyx/OriginalMessage';
 import type SearchResults from '@src/types/onyx/SearchResults';
 import {isEmptyObject} from '@src/types/utils/EmptyObject';
+import getEmptyArray from '@src/types/utils/getEmptyArray';
 import SearchChartView from './SearchChartView';
 import SearchChartWrapper from './SearchChartWrapper';
 import {useSearchActionsContext, useSearchStateContext} from './SearchContext';
@@ -118,8 +119,6 @@ const OPTIMISTIC_TRACKING_TIMEOUT_MS = 10_000;
 const OPTIMISTIC_ROLLBACK_GRACE_MS = OPTIMISTIC_TRACKING_TIMEOUT_MS * 0.3;
 
 const hashToString = (queryHash?: number) => (queryHash || queryHash === 0 ? String(queryHash) : undefined);
-
-const EMPTY_COLUMNS: SearchColumnType[] = [];
 
 function mapTransactionItemToSelectedEntry(
     item: TransactionListItemType,
@@ -1272,7 +1271,7 @@ function Search({
 
     const computedColumns = useMemo(() => {
         if (!searchResults?.data) {
-            return EMPTY_COLUMNS;
+            return getEmptyArray<SearchColumnType>();
         }
         return getColumnsToShow({currentAccountID: accountID, data: searchResults?.data, visibleColumns, type: searchDataType, groupBy: validGroupBy, shouldUseStrictDefaultExpenseColumns});
     }, [accountID, searchResults?.data, searchDataType, visibleColumns, validGroupBy, shouldUseStrictDefaultExpenseColumns]);
@@ -1288,7 +1287,7 @@ function Search({
     }));
 
     const previousColumns = usePrevious(currentColumns);
-    const [columnsToShow, setColumnsToShow] = useState<SearchColumnType[]>(EMPTY_COLUMNS);
+    const [columnsToShow, setColumnsToShow] = useState<SearchColumnType[]>(getEmptyArray);
 
     // If columns have changed, trigger an animation before settings columnsToShow to prevent
     // new columns appearing before the fade out animation happens
