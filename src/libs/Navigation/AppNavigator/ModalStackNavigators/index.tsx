@@ -808,19 +808,6 @@ const SettingsModalStackNavigator = createModalStackNavigator<SettingsNavigatorP
         require<ReactComponentModule>('../../../../pages/workspace/accounting/intacct/advanced/DynamicSageIntacctAccountingMethodPage').default,
     [SCREENS.WORKSPACE.ACCOUNTING.SAGE_INTACCT_PAYMENT_ACCOUNT]: () =>
         require<ReactComponentModule>('../../../../pages/workspace/accounting/intacct/advanced/SageIntacctPaymentAccountPage').default,
-    [SCREENS.WORKSPACE.ACCOUNTING.CERTINIA_PREREQUISITES]: () => require<ReactComponentModule>('../../../../pages/workspace/accounting/certinia/CertiniaPrerequisitesPage').default,
-    [SCREENS.WORKSPACE.ACCOUNTING.CERTINIA_EXISTING_CONNECTIONS]: () =>
-        require<ReactComponentModule>('../../../../pages/workspace/accounting/certinia/CertiniaExistingConnectionsPage').default,
-    [SCREENS.WORKSPACE.ACCOUNTING.CERTINIA_IMPORT]: () => require<ReactComponentModule>('../../../../pages/workspace/accounting/certinia/import/CertiniaImportPage').default,
-    [SCREENS.WORKSPACE.ACCOUNTING.CERTINIA_DIMENSION_MAPPING]: () =>
-        require<ReactComponentModule>('../../../../pages/workspace/accounting/certinia/import/CertiniaDimensionMappingPage').default,
-    [SCREENS.WORKSPACE.ACCOUNTING.CERTINIA_EXPORT]: () => require<ReactComponentModule>('../../../../pages/workspace/accounting/certinia/export/CertiniaExportPage').default,
-    [SCREENS.WORKSPACE.ACCOUNTING.CERTINIA_PREFERRED_EXPORTER]: () =>
-        require<ReactComponentModule>('../../../../pages/workspace/accounting/certinia/export/CertiniaPreferredExporterPage').default,
-    [SCREENS.WORKSPACE.ACCOUNTING.CERTINIA_EXPORT_STATUS]: () => require<ReactComponentModule>('../../../../pages/workspace/accounting/certinia/export/CertiniaExportStatusPage').default,
-    [SCREENS.WORKSPACE.ACCOUNTING.CERTINIA_EXPORT_DATE]: () => require<ReactComponentModule>('../../../../pages/workspace/accounting/certinia/export/CertiniaExportDatePage').default,
-    [SCREENS.WORKSPACE.ACCOUNTING.CERTINIA_DEFAULT_VENDOR]: () => require<ReactComponentModule>('../../../../pages/workspace/accounting/certinia/export/CertiniaDefaultVendorPage').default,
-    [SCREENS.WORKSPACE.ACCOUNTING.CERTINIA_ADVANCED]: () => require<ReactComponentModule>('../../../../pages/workspace/accounting/certinia/advanced/CertiniaAdvancedPage').default,
     [SCREENS.WORKSPACE.ACCOUNTING.CARD_RECONCILIATION]: () => require<ReactComponentModule>('../../../../pages/workspace/accounting/reconciliation/CardReconciliationPage').default,
     [SCREENS.WORKSPACE.ACCOUNTING.CARD_RECONCILIATION_QUICKBOOKS_DESKTOP_AUTO_SYNC]: () =>
         require<ReactComponentModule>('../../../../pages/workspace/accounting/reconciliation/CardReconciliationQuickbooksDesktopAutoSyncPage').default,
