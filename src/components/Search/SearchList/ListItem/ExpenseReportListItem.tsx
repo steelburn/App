@@ -13,6 +13,7 @@ import type {ListItem} from '@components/SelectionList/types';
 import Text from '@components/Text';
 import useAnimatedHighlightStyle from '@hooks/useAnimatedHighlightStyle';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
+import useHoldMenuModal from '@hooks/useHoldMenuModal';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
@@ -24,8 +25,8 @@ import {handleActionButtonPress} from '@libs/actions/Search';
 import {syncMissingAttendeesViolation} from '@libs/AttendeeUtils';
 import getNonEmptyStringOnyxID from '@libs/getNonEmptyStringOnyxID';
 import {isAttendeeTrackingEnabled} from '@libs/PolicyUtils';
-import {isInvoiceReport, isOpenExpenseReport, isProcessingReport, isReportPendingDelete} from '@libs/ReportUtils';
-import {isViolationDismissed, shouldShowViolation} from '@libs/TransactionUtils';
+import {getNonHeldAndFullAmount, isInvoiceReport, isOpenExpenseReport, isProcessingReport, isReportPendingDelete} from '@libs/ReportUtils';
+import {isOnHold, isViolationDismissed, shouldShowViolation} from '@libs/TransactionUtils';
 import variables from '@styles/variables';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -49,7 +50,6 @@ function ExpenseReportListItem<TItem extends ListItem>({
     onFocus,
     onLongPressRow,
     shouldSyncFocus,
-    onHoldMenuOpen,
     onSelectionButtonPress,
     lastPaymentMethod,
     personalPolicyID,
@@ -136,6 +136,7 @@ function ExpenseReportListItem<TItem extends ListItem>({
     const {isDelegateAccessRestricted} = useDelegateNoAccessState();
     const {showDelegateNoAccessModal} = useDelegateNoAccessActions();
     const [amountOwed] = useOnyx(ONYXKEYS.NVP_PRIVATE_AMOUNT_OWED);
+    const {showHoldMenu} = useHoldMenuModal();
 
     const handleOnButtonPress = useCallback(() => {
         handleActionButtonPress({
@@ -151,7 +152,21 @@ function ExpenseReportListItem<TItem extends ListItem>({
             isDelegateAccessRestricted,
             onDelegateAccessRestricted: showDelegateNoAccessModal,
             personalPolicyID,
-            onHoldMenuOpen,
+            onHoldMenuOpen: (holdItem, requestType, paymentType) => {
+                const moneyRequestReport = parentReport ?? snapshotReport;
+                const {nonHeldAmount, fullAmount, hasValidNonHeldAmount} = getNonHeldAndFullAmount(moneyRequestReport, holdItem.allActions?.includes(CONST.SEARCH.ACTION_TYPES.PAY) ?? false);
+                const hasNonHeldExpenses = holdItem.transactions.some((t) => !isOnHold(t));
+                showHoldMenu({
+                    reportID: holdItem.reportID,
+                    chatReportID: holdItem.parentReportID,
+                    requestType,
+                    paymentType,
+                    nonHeldAmount: hasNonHeldExpenses && hasValidNonHeldAmount ? nonHeldAmount : undefined,
+                    fullAmount,
+                    hasNonHeldExpenses,
+                    transactionCount: holdItem.transactionCount ?? 0,
+                });
+            },
             ownerBillingGracePeriodEnd,
             amountOwed,
         });
@@ -162,13 +177,14 @@ function ExpenseReportListItem<TItem extends ListItem>({
         snapshotReport,
         snapshotPolicy,
         parentPolicy,
+        parentReport,
         lastPaymentMethod,
         userBillingGracePeriodEnds,
         personalPolicyID,
         currentSearchKey,
         isDelegateAccessRestricted,
         showDelegateNoAccessModal,
-        onHoldMenuOpen,
+        showHoldMenu,
         ownerBillingGracePeriodEnd,
         amountOwed,
     ]);
