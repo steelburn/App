@@ -298,21 +298,21 @@ export default createOnyxDerivedValueConfig({
                 );
 
                 // When the report is ready to submit, always show the green Submit badge
-                // regardless of violations — the user should submit first, then fix.
+                // regardless of violations — the user can submit without fix.
                 const willShowGreenSubmit = requiresAttention && actionGreenBadge === CONST.REPORT.ACTION_BADGE.SUBMIT;
 
                 // if report has errors or violations, show red dot
-                if (reasonAndReportAction) {
+                if (reasonAndReportAction && !willShowGreenSubmit) {
                     needsParentChatErrorPropagation = true;
 
                     // RBR/Fix mirrors GBR's access rule: only show on the child when the user can't already
                     // see it on the parent workspace chat. The parent still gets ERROR/FIX through the
                     // propagation loop below, so the actionable indicator surfaces on the workspace chat row
                     // (which is where C+ wants it). Skips when the chat parent isn't accessible to the user.
-                    // Also skip setting ERROR when we'll show the green Submit badge — let the user submit first.
+                    // Also skip setting ERROR when we'll show the green Submit badge — let the user submit without fix.
                     const chatPolicy = chatReport?.policyID ? policies?.[`${ONYXKEYS.COLLECTION.POLICY}${chatReport.policyID}`] : undefined;
                     const isChildOfAccessiblePolicyExpenseChat = !!chatReport && isPolicyExpenseChat(chatReport) && (!!chatReport.isOwnPolicyExpenseChat || isPolicyAdmin(chatPolicy));
-                    if (!isChildOfAccessiblePolicyExpenseChat && !willShowGreenSubmit) {
+                    if (!isChildOfAccessiblePolicyExpenseChat) {
                         brickRoadStatus = CONST.BRICK_ROAD_INDICATOR_STATUS.ERROR;
                         actionBadge = CONST.REPORT.ACTION_BADGE.FIX;
                         actionTargetReportActionID = reasonAndReportAction.reportAction?.reportActionID;
