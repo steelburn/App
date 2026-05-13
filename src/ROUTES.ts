@@ -3932,11 +3932,14 @@ const ROUTES = {
         },
     },
     POLICY_ACCOUNTING_CERTINIA_PREREQUISITES: {
-        route: 'workspaces/:policyID/accounting/certinia/prerequisites/:isSandbox/:subPage?',
+        route: 'workspaces/:policyID/accounting/certinia/prerequisites/:isSandbox?/:subPage?',
 
         // eslint-disable-next-line no-restricted-syntax -- Legacy route generation
-        getRoute: (policyID: string, isSandbox?: boolean, subPage?: string, backTo?: string) =>
-            getUrlWithBackToParam(`workspaces/${policyID}/accounting/certinia/prerequisites/${isSandbox === true ? 'true' : 'false'}${subPage ? `/${subPage}` : ''}` as const, backTo),
+        getRoute: (policyID: string, isSandbox?: boolean, subPage?: string, backTo?: string) => {
+            const sandboxSegment = isSandbox === undefined ? '' : `/${isSandbox ? 'true' : 'false'}`;
+            const subPageSegment = subPage ? `/${subPage}` : '';
+            return getUrlWithBackToParam(`workspaces/${policyID}/accounting/certinia/prerequisites${sandboxSegment}${subPageSegment}` as const, backTo);
+        },
     },
     POLICY_ACCOUNTING_CERTINIA_EXISTING_CONNECTIONS: {
         route: 'workspaces/:policyID/accounting/certinia/existing-connections',

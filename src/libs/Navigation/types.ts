@@ -1146,7 +1146,7 @@ type SettingsNavigatorParamList = {
     };
     [SCREENS.WORKSPACE.ACCOUNTING.CERTINIA_PREREQUISITES]: {
         policyID: string;
-        isSandbox: string;
+        isSandbox?: string;
         subPage?: string;
     };
     [SCREENS.WORKSPACE.ACCOUNTING.CERTINIA_EXISTING_CONNECTIONS]: {
