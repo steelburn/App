@@ -14,10 +14,10 @@ type AvatarProps = {
     /** Whether the row is in compact mode. Switches the avatar size between `SMALL` and `DEFAULT`. */
     isInFocusMode: boolean;
 
-    /** Border colour for the subscript icon. Matches the row background so the subscript blends in. */
+    /** Border color for the subscript icon. Matches the row background so the subscript blends in. */
     subscriptAvatarBorderColor: ColorValue;
 
-    /** Background colour for the secondary avatar in a multi-avatar group. Matches the row background. */
+    /** Background color for the secondary avatar in a multi-avatar group. Matches the row background. */
     secondaryAvatarBackgroundColor: ColorValue;
 
     /** Layout style applied when the row renders a single avatar (no group). */

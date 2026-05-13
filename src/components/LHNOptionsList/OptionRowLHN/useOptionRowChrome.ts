@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import type {ColorValue, StyleProp, TextStyle, ViewStyle} from 'react-native';
+import type {ColorValue, ViewStyle} from 'react-native';
 import {StyleSheet} from 'react-native';
 import type {OptionRowLHNProps} from '@components/LHNOptionsList/types';
 import useStyleUtils from '@hooks/useStyleUtils';
@@ -13,7 +13,7 @@ type UseOptionRowChromeParams = {
     /** Option data for the row. Source of `optionItem` flags that drive the bold/unread text style. */
     optionItem: OptionData;
 
-    /** Whether the row is the currently focused/active option. Drives the focused colour path. */
+    /** Whether the row is the currently focused/active option. Drives the focused color path. */
     isOptionFocused: boolean;
 
     /** Display density mode. `COMPACT` switches to the compact layout styles. */
@@ -26,12 +26,12 @@ type UseOptionRowChromeParams = {
 /**
  * Shared row-level state and style derivations for `OptionRowLHN` and `ArchivedOptionRowLHN`.
  *
- * Both variants need the same hover state, layout styles, avatar background colour, and
- * display-name style. Centralising avoids drift between the two and keeps each variant a
+ * Both variants need the same hover state, layout styles, avatar background color, and
+ * display-name style. Centralizing avoids drift between the two and keeps each variant a
  * thin wiring file.
  *
  * `avatarBackgroundColor` is a single value: the parent previously passed two separate
- * colour props to `LHNAvatar` (`subscriptAvatarBorderColor`, `secondaryAvatarBackgroundColor`)
+ * color props to `LHNAvatar` (`subscriptAvatarBorderColor`, `secondaryAvatarBackgroundColor`)
  * whose values collapsed to the same result in every state. The hook returns one value and
  * variant call sites pass it to both props.
  */
@@ -48,10 +48,8 @@ function useOptionRowChrome({optionItem, isOptionFocused, viewMode, style}: UseO
             ? [styles.chatLinkRowPressable, styles.flexGrow1, styles.optionItemAvatarNameWrapper, styles.optionRowCompact, styles.justifyContentCenter]
             : [styles.chatLinkRowPressable, styles.flexGrow1, styles.optionItemAvatarNameWrapper, styles.optionRow, styles.justifyContentCenter],
     );
-    const contentContainerStyles: ViewStyle[] = isInFocusMode
-        ? [styles.flex1, styles.flexRow, styles.overflowHidden, StyleUtils.getCompactContentContainerStyles()]
-        : [styles.flex1];
-    const singleAvatarContainerStyle: ViewStyle[] = [styles.actionAvatar, styles.mr3];
+    const contentContainerStyles = isInFocusMode ? [styles.flex1, styles.flexRow, styles.overflowHidden, StyleUtils.getCompactContentContainerStyles()] : [styles.flex1];
+    const singleAvatarContainerStyle = [styles.actionAvatar, styles.mr3];
 
     const hoveredBackgroundColor = !!styles.sidebarLinkHover && 'backgroundColor' in styles.sidebarLinkHover ? styles.sidebarLinkHover.backgroundColor : theme.sidebar;
     const focusedBackgroundColor = styles.sidebarLinkActive.backgroundColor;
@@ -64,8 +62,8 @@ function useOptionRowChrome({optionItem, isOptionFocused, viewMode, style}: UseO
     }
 
     const textStyle = isOptionFocused ? styles.sidebarLinkActiveText : styles.sidebarLinkText;
-    const textUnreadStyle: StyleProp<TextStyle>[] = shouldUseBoldText(optionItem) ? [textStyle, styles.sidebarLinkTextBold] : [textStyle];
-    const displayNameStyle: StyleProp<TextStyle>[] = [styles.optionDisplayName, styles.optionDisplayNameCompact, styles.pre, textUnreadStyle, styles.flexShrink0, style];
+    const textUnreadStyle = shouldUseBoldText(optionItem) ? [textStyle, styles.sidebarLinkTextBold] : [textStyle];
+    const displayNameStyle = [styles.optionDisplayName, styles.optionDisplayNameCompact, styles.pre, textUnreadStyle, styles.flexShrink0, style];
 
     return {
         hovered,
