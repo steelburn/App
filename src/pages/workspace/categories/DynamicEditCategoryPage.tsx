@@ -17,11 +17,11 @@ import {DYNAMIC_ROUTES} from '@src/ROUTES';
 import SCREENS from '@src/SCREENS';
 import CategoryForm from './CategoryForm';
 
-type EditCategoryPageProps =
+type DynamicEditCategoryPageProps =
     | PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.WORKSPACE.DYNAMIC_CATEGORY_EDIT>
     | PlatformStackScreenProps<SettingsNavigatorParamList, typeof SCREENS.SETTINGS_CATEGORIES.DYNAMIC_SETTINGS_CATEGORY_EDIT>;
 
-function EditCategoryPage({route}: EditCategoryPageProps) {
+function DynamicEditCategoryPage({route}: DynamicEditCategoryPageProps) {
     const {policyID, categoryName: currentCategoryName} = route.params;
     const policyData = usePolicyData(policyID);
     const {categories: policyCategories} = policyData;
@@ -76,7 +76,7 @@ function EditCategoryPage({route}: EditCategoryPageProps) {
             <ScreenWrapper
                 enableEdgeToEdgeBottomSafeAreaPadding
                 style={[styles.defaultModalContainer]}
-                testID="EditCategoryPage"
+                testID="DynamicEditCategoryPage"
                 shouldEnableMaxHeight
             >
                 <HeaderWithBackButton
@@ -94,4 +94,4 @@ function EditCategoryPage({route}: EditCategoryPageProps) {
     );
 }
 
-export default EditCategoryPage;
+export default DynamicEditCategoryPage;
