@@ -328,9 +328,7 @@ function ComposerWithSuggestions({
         focusComposerWithDelay(composerRef.current, delay)(shouldDelay, forcedSelectionRange, forceKeyboardIfAlreadyFocused).catch(() => {});
     }, []);
 
-    const handleEditFocus = useCallback(() => {
-        focus(true, undefined, true);
-    }, [focus]);
+    const handleEditFocus = useCallback(() => focus(true, undefined, true), [focus]);
 
     const handleEditValueChange = useCallback(
         (nextValue: string) => {
