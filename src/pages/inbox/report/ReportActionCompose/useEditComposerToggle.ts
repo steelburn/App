@@ -90,6 +90,9 @@ function useEditComposerToggle({selection, value, composerRef, onFocus, onValueC
                 }
             }
 
+            // When editing ends, focus the main composer again.
+            onFocus?.();
+
             wasEditingRef.current = false;
             wasEditingInComposerRef.current = shouldUseNarrowLayout;
             previousDraftSelectionRef.current = null;
@@ -142,6 +145,7 @@ function useEditComposerToggle({selection, value, composerRef, onFocus, onValueC
         editingReportActionID,
         editingState,
         isEditingInComposer,
+        onFocus,
         selection,
         setDidResetComposerHeightWhileEditing,
         shouldUseNarrowLayout,
