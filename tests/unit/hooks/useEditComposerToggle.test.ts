@@ -188,7 +188,7 @@ describe('useEditComposerToggle', () => {
             editingReportActionID: '100',
             currentEditMessageSelection: {start: 1, end: 2},
         });
-        rerender({selection: priorSelection, draft: 'keep my draft'});
+        rerender({selection: priorSelection, value: 'keep my draft'});
 
         const expectedEnd = 'edited body'.length;
         expect(onValueChange).toHaveBeenCalledWith('edited body');
