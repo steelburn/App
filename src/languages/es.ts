@@ -6936,6 +6936,7 @@ ${amount} para ${merchant} - ${date}`,
         restrictedDescription: 'Sólo las personas en tu espacio de trabajo pueden encontrar esta sala',
         privateDescription: 'Sólo las personas que están invitadas a esta sala pueden encontrarla',
         publicDescription: 'Cualquier persona puede unirse a esta sala',
+        // eslint-disable-next-line @typescript-eslint/naming-convention
         public_announceDescription: 'Cualquier persona puede unirse a esta sala',
         createRoom: 'Crea una sala de chat',
         roomAlreadyExistsError: 'Ya existe una sala con este nombre',
@@ -6955,6 +6956,7 @@ ${amount} para ${merchant} - ${date}`,
             restricted: 'Espacio de trabajo',
             private: 'Privada',
             public: 'Público',
+            // eslint-disable-next-line @typescript-eslint/naming-convention
             public_announce: 'Anuncio Público',
         },
     },
@@ -7269,6 +7271,7 @@ ${amount} para ${merchant} - ${date}`,
         updatedDefaultTitle: (newDefaultTitle, oldDefaultTitle) => `cambió la fórmula personalizada del nombre del informe a "${newDefaultTitle}" (previamente "${oldDefaultTitle}")`,
         updatedOwnership: (oldOwnerEmail, oldOwnerName, policyName) => `asumió la propiedad del espacio de trabajo ${policyName} de ${oldOwnerName} (${oldOwnerEmail})`,
         updatedAutoHarvesting: (enabled) => `${enabled ? 'habilitó' : 'deshabilitó'} el envío programado`,
+        // eslint-disable-next-line @typescript-eslint/max-params
         updatedIndividualBudgetNotification: (
             budgetAmount,
             budgetFrequency,
