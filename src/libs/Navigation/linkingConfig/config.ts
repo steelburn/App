@@ -1236,6 +1236,9 @@ const config: LinkingOptions<RootNavigatorParamList>['config'] = {
                         [SCREENS.WORKSPACE.HR_GUSTO_FINAL_APPROVER]: {
                             path: ROUTES.WORKSPACE_HR_GUSTO_FINAL_APPROVER.route,
                         },
+                        [SCREENS.WORKSPACE.HR_ZENEFITS_APPROVAL_MODE]: {
+                            path: ROUTES.WORKSPACE_HR_ZENEFITS_APPROVAL_MODE.route,
+                        },
                         [SCREENS.WORKSPACE.RULES_CUSTOM]: {
                             path: ROUTES.RULES_CUSTOM.route,
                         },
