@@ -16,12 +16,7 @@ import createRandomPolicy from '../utils/collections/policies';
 import waitForBatchedUpdatesWithAct from '../utils/waitForBatchedUpdatesWithAct';
 
 jest.mock('@components/ConfirmedRoute.tsx');
-jest.mock('@libs/Navigation/Navigation', () => ({
-    getActiveRouteWithoutParams: jest.fn(() => ''),
-    isNavigationReady: jest.fn(() => Promise.resolve()),
-    navigate: jest.fn(),
-    getActiveRoute: jest.fn(() => ''),
-}));
+jest.mock('@libs/Navigation/Navigation');
 jest.mock('@components/AvatarWithDisplayName.tsx');
 
 // Mock search context with all required SearchContextStateValue and SearchContextActionsValue fields

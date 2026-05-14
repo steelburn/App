@@ -10,12 +10,7 @@ import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 
 jest.mock('@components/ConfirmedRoute.tsx');
-jest.mock('@libs/Navigation/Navigation', () => ({
-    getActiveRouteWithoutParams: jest.fn(() => ''),
-    isNavigationReady: jest.fn(() => Promise.resolve()),
-    navigate: jest.fn(),
-    getActiveRoute: jest.fn(() => ''),
-}));
+jest.mock('@libs/Navigation/Navigation');
 
 const defaultDateValues: SearchDateValues = {
     [CONST.SEARCH.DATE_MODIFIERS.ON]: '2025-01-15',
