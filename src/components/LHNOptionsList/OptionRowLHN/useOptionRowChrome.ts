@@ -16,14 +16,14 @@ type UseOptionRowChromeParams = {
 };
 
 /**
- * Shared row-level state and layout-skeleton styles for `OptionRowLHN` and `ArchivedOptionRowLHN`.
+ * Row-level state and layout-skeleton styles for `OptionRowLHN`.
  *
- * Owns the cross-variant pieces that cannot be pushed into leaves: the hover `useState`,
- * the wrapper `<View>` styles (`sidebarInnerRowStyle`, `contentContainerStyles`) that wrap
- * multiple leaves, and the single `avatarBackgroundColor` derived from hover and focus state.
+ * Owns the pieces that cannot be pushed into leaves: the hover `useState`, the wrapper
+ * `<View>` styles (`sidebarInnerRowStyle`, `contentContainerStyles`) that wrap multiple
+ * leaves, and the single `avatarBackgroundColor` derived from hover and focus state.
  *
- * Per-leaf derivations (`isInFocusMode`, `singleAvatarContainerStyle`, `displayNameStyle`) live
- * inside their consuming leaf component (`Avatar`, `Title`) and are not returned here.
+ * Per-leaf derivations (`isInFocusMode`, `singleAvatarContainerStyle`, `displayNameStyle`)
+ * live inside their consuming leaf component (`Avatar`, `Title`) and are not returned here.
  */
 function useOptionRowChrome({isOptionFocused, viewMode}: UseOptionRowChromeParams) {
     const theme = useTheme();
