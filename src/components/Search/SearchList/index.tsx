@@ -35,7 +35,7 @@ import variables from '@styles/variables';
 import type {TransactionPreviewData} from '@userActions/Search';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
-import type {CardList, Policy, Transaction, TransactionViolations} from '@src/types/onyx';
+import type {CardList, Policy, Transaction} from '@src/types/onyx';
 import BaseSearchList from './BaseSearchList';
 import type ChatListItem from './ListItem/ChatListItem';
 import type ExpenseReportListItem from './ListItem/ExpenseReportListItem';
@@ -116,9 +116,6 @@ type SearchListProps = Pick<FlashListProps<SearchListItem>, 'onScroll' | 'conten
     isMobileSelectionModeEnabled: boolean;
 
     newTransactions?: Transaction[];
-
-    /** Violations indexed by transaction ID */
-    violations?: Record<string, TransactionViolations | undefined> | undefined;
 
     /** Selected transactions for determining isSelected state */
     selectedTransactions: SelectedTransactions;
@@ -213,7 +210,6 @@ function SearchList({
     shouldAnimate,
     isMobileSelectionModeEnabled,
     newTransactions = [],
-    violations,
     nonPersonalAndWorkspaceCards,
     selectedTransactions,
     hasLoadedAllTransactions,
@@ -450,7 +446,6 @@ function SearchList({
                         personalDetails={personalDetails}
                         userBillingFundID={userBillingFundID}
                         isOffline={isOffline}
-                        violations={violations}
                         nonPersonalAndWorkspaceCards={nonPersonalAndWorkspaceCards}
                         onFocus={onFocus}
                         newTransactionID={newTransactionID}
@@ -479,7 +474,6 @@ function SearchList({
             personalDetails,
             userBillingFundID,
             isOffline,
-            violations,
             lastPaymentMethod,
             personalPolicyID,
             userBillingGracePeriodEnds,
