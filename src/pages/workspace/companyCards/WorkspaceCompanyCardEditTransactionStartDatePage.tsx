@@ -47,7 +47,12 @@ function WorkspaceCompanyCardEditTransactionStartDatePage({route}: WorkspaceComp
     const card = allBankCards?.[cardID];
     const currentStartDate = card?.scrapeMinDate;
 
-    const [dateOptionSelected, setDateOptionSelected] = useState<DateOption>(CONST.COMPANY_CARD.TRANSACTION_START_DATE_OPTIONS.CUSTOM);
+    // Derive the saved option from the card's current scrapeMinDate:
+    // empty/null means "From the beginning", any date means "Custom".
+    const savedDateOption = currentStartDate ? CONST.COMPANY_CARD.TRANSACTION_START_DATE_OPTIONS.CUSTOM : CONST.COMPANY_CARD.TRANSACTION_START_DATE_OPTIONS.FROM_BEGINNING;
+
+    const [localDateOption, setLocalDateOption] = useState<DateOption | undefined>(undefined);
+    const dateOptionSelected = localDateOption ?? savedDateOption;
 
     const [startDate, setStartDate] = useState(() => {
         if (currentStartDate) {
@@ -60,7 +65,7 @@ function WorkspaceCompanyCardEditTransactionStartDatePage({route}: WorkspaceComp
 
     const handleSelectDateOption = (dateOption: DateOption) => {
         setErrorText('');
-        setDateOptionSelected(dateOption);
+        setLocalDateOption(dateOption);
         if (dateOption === CONST.COMPANY_CARD.TRANSACTION_START_DATE_OPTIONS.FROM_BEGINNING) {
             return;
         }
