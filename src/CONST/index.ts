@@ -888,6 +888,7 @@ const CONST = {
         PAY_INVOICE_VIA_EXPENSIFY: 'payInvoiceViaExpensify',
         SUGGESTED_FOLLOWUPS: 'suggestedFollowups',
         GUSTO: 'gustoNewDot',
+        ZENEFITS: 'zenefitsNewDot',
         BULK_EDIT: 'bulkEdit',
         NEW_MANUAL_EXPENSE_FLOW: 'newManualExpenseFlow',
         SUBMIT_2026: 'submit2026',
@@ -2786,6 +2787,14 @@ const CONST = {
         },
     },
 
+    ZENEFITS: {
+        APPROVAL_MODE: {
+            BASIC: 'basic',
+            MANAGER: 'manager',
+            CUSTOM: 'custom',
+        },
+    },
+
     QUICKBOOKS_REIMBURSABLE_ACCOUNT_TYPE: {
         VENDOR_BILL: 'bill',
         CHECK: 'check',
@@ -3721,6 +3730,7 @@ const CONST = {
                 SAGE_INTACCT: 'intacct',
                 CERTINIA: 'certinia',
                 GUSTO: 'gusto',
+                ZENEFITS: 'zenefits',
             },
             SUPPORTED_ONLY_ON_OLDDOT: {
                 FINANCIALFORCE: 'financialForce',
@@ -3736,6 +3746,7 @@ const CONST = {
                 QBD: 'quickbooks-desktop',
                 CERTINIA: 'certinia',
                 GUSTO: 'gusto',
+                ZENEFITS: 'zenefits',
             },
             NAME_USER_FRIENDLY: {
                 netsuite: 'NetSuite',
@@ -3747,7 +3758,7 @@ const CONST = {
                 certinia: 'Certinia',
                 gusto: 'Gusto',
                 billCom: 'Bill.com',
-                zenefits: 'Zenefits',
+                zenefits: 'TriNet',
                 sap: 'SAP',
                 oracle: 'Oracle',
                 microsoftDynamics: 'Microsoft Dynamics',
@@ -3757,7 +3768,7 @@ const CONST = {
                 return [this.NAME.QBO, this.NAME.QBD, this.NAME.XERO, this.NAME.NETSUITE, this.NAME.SAGE_INTACCT, this.NAME.CERTINIA] as const;
             },
             get HR_CONNECTION_NAMES() {
-                return [this.NAME.GUSTO] as const;
+                return [this.NAME.GUSTO, this.NAME.ZENEFITS] as const;
             },
             get EXPORTED_TO_INTEGRATION_DISPLAY_NAMES(): string[] {
                 return this.ACCOUNTING_CONNECTION_NAMES.map((name) => this.NAME_USER_FRIENDLY[name as keyof typeof this.NAME_USER_FRIENDLY]);
@@ -3841,6 +3852,9 @@ const CONST = {
                 GUSTO_SYNC_TITLE: 'gustoSyncTitle',
                 GUSTO_SYNC_LOAD_DATA: 'gustoSyncLoadData',
                 GUSTO_SYNC_PROVISIONING: 'gustoSyncProvisioning',
+                ZENEFITS_SYNC_TITLE: 'zenefitsSyncTitle',
+                ZENEFITS_SYNC_LOAD_DATA: 'zenefitsSyncLoadData',
+                ZENEFITS_SYNC_PROVISIONING: 'zenefitsSyncProvisioning',
             },
             SYNC_STAGE_TIMEOUT_MINUTES: 20,
         },
