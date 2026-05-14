@@ -47,9 +47,8 @@ type TableBodyProps = ViewProps & {
 function TableBody<T>({contentContainerStyle, ...props}: TableBodyProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
-    const {processedData: filteredAndSortedData, activeFilters, activeSearchString, listProps, hasActiveFilters, hasSearchString, isEmptyResult} = useTableContext<T>();
+    const {processedData: filteredAndSortedData, activeSearchString, listProps, hasActiveFilters, hasSearchString, isEmptyResult} = useTableContext<T>();
     const {ListEmptyComponent, contentContainerStyle: listContentContainerStyle, ...restListProps} = listProps ?? {};
-    const listKey = JSON.stringify(activeFilters);
 
     // Determine the message based on what caused the empty result
     const getEmptyMessage = () => {
@@ -84,7 +83,7 @@ function TableBody<T>({contentContainerStyle, ...props}: TableBodyProps) {
             {...props}
         >
             <FlashList<T>
-                key={listKey}
+                key={`${hasActiveFilters}`}
                 data={filteredAndSortedData}
                 ListEmptyComponent={isEmptyResult ? EmptyResultComponent : ListEmptyComponent}
                 contentContainerStyle={[filteredAndSortedData.length === 0 && styles.flex1, listContentContainerStyle, contentContainerStyle]}
