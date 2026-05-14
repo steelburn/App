@@ -1,4 +1,3 @@
-import {useCallback} from 'react';
 import type {OnyxEntry} from 'react-native-onyx';
 import {getAllNonDeletedTransactions} from '@libs/MoneyRequestReportUtils';
 import {getOneTransactionThreadReportID, getSortedReportActionsForDisplay} from '@libs/ReportActionsUtils';
@@ -49,17 +48,12 @@ function useTransactionThread({reportID, report, allReportActions, isOffline}: U
     const isReportArchived = useReportIsArchived(reportID);
     const canPerformWriteAction = canUserPerformWriteAction(report, isReportArchived);
 
-    const getTransactionThreadReportActions = useCallback(
-        (reportActions: OnyxEntry<ReportActions>): ReportAction[] => selectTransactionThreadReportActions(!!canPerformWriteAction, transactionThreadReportID, reportActions),
-        [canPerformWriteAction, transactionThreadReportID],
-    );
-
     const [transactionThreadReportActions] = useOnyx(
         `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${transactionThreadReportID}`,
         {
-            selector: getTransactionThreadReportActions,
+            selector: (reportActions) => selectTransactionThreadReportActions(!!canPerformWriteAction, transactionThreadReportID, reportActions),
         },
-        [getTransactionThreadReportActions],
+        [canPerformWriteAction, transactionThreadReportID],
     );
 
     const [transactionThreadReport] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${transactionThreadReportID}`);
