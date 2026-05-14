@@ -47,9 +47,12 @@ jest.mock('@components/Search/DeferredSearchAutocompleteList', () => {
 });
 
 jest.mock('@src/libs/Navigation/Navigation', () => ({
-    ...require('@testUtils/createNavigationMock').default,
+    dismissModalWithReport: jest.fn(),
+    getActiveRouteWithoutParams: jest.fn(() => ''),
     getTopmostReportId: jest.fn(),
+    isNavigationReady: jest.fn(() => Promise.resolve()),
     isDisplayedInModal: jest.fn(() => false),
+    navigate: jest.fn(),
 }));
 
 jest.mock('@src/hooks/useRootNavigationState', () => ({

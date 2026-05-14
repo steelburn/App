@@ -56,9 +56,10 @@ jest.mock('@hooks/useScreenWrapperTransitionStatus', () => ({
 jest.mock('@libs/Navigation/Navigation', () => ({
     __esModule: true,
     default: {
-        ...require('@testUtils/createNavigationMock').default,
         navigate: jest.fn(),
         getActiveRoute: jest.fn(() => ''),
+        getActiveRouteWithoutParams: jest.fn(() => ''),
+        isNavigationReady: jest.fn(() => Promise.resolve()),
         isTopmostRouteModalScreen: jest.fn(() => false),
     },
 }));

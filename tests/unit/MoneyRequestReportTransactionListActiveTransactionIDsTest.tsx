@@ -13,7 +13,8 @@ jest.mock('@libs/actions/TransactionThreadNavigation', () => ({
 
 // Mock the navigation module
 jest.mock('@libs/Navigation/Navigation', () => ({
-    ...require('@testUtils/createNavigationMock').default,
+    getActiveRouteWithoutParams: jest.fn(() => ''),
+    isNavigationReady: jest.fn(() => Promise.resolve()),
     navigationRef: {
         getRootState: jest.fn(),
     },

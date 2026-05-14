@@ -16,7 +16,7 @@ Onyx.init({keys: ONYXKEYS});
 let mockResolveNavigationReady: () => void;
 
 jest.mock('@libs/Navigation/Navigation', () => ({
-    ...require('@testUtils/createNavigationMock').default,
+    getActiveRouteWithoutParams: jest.fn(() => ''),
     isNavigationReady: jest.fn(
         () =>
             new Promise<void>((resolve) => {

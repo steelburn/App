@@ -8,7 +8,8 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import waitForBatchedUpdatesWithAct from '../utils/waitForBatchedUpdatesWithAct';
 
 jest.mock('@libs/Navigation/Navigation', () => ({
-    ...require('@testUtils/createNavigationMock').default,
+    getActiveRouteWithoutParams: jest.fn(() => ''),
+    isNavigationReady: jest.fn(() => Promise.resolve()),
     navigate: jest.fn(),
 }));
 

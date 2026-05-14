@@ -18,7 +18,8 @@ jest.mock('@libs/SidebarUtils', () => ({
     updateReportsToDisplayInLHN: jest.fn(),
 }));
 jest.mock('@libs/Navigation/Navigation', () => ({
-    ...require('@testUtils/createNavigationMock').default,
+    getActiveRouteWithoutParams: jest.fn(() => ''),
+    isNavigationReady: jest.fn(() => Promise.resolve()),
     getTopmostReportId: jest.fn(),
 }));
 jest.mock('@libs/ReportUtils', () => ({

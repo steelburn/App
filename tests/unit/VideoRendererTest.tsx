@@ -8,7 +8,8 @@ import Navigation from '@libs/Navigation/Navigation';
 import CONST from '@src/CONST';
 
 jest.mock('@libs/Navigation/Navigation', () => ({
-    ...require('@testUtils/createNavigationMock').default,
+    getActiveRouteWithoutParams: jest.fn(() => ''),
+    isNavigationReady: jest.fn(() => Promise.resolve()),
     navigate: jest.fn(),
 }));
 

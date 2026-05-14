@@ -21,10 +21,11 @@ jest.mock('@userActions/Report', () => ({
 
 const mockNavigate = jest.fn();
 jest.mock('@libs/Navigation/Navigation', () => ({
-    ...require('@testUtils/createNavigationMock').default,
     navigate: (...args: unknown[]): void => {
         mockNavigate(...args);
     },
+    getActiveRouteWithoutParams: jest.fn(() => ''),
+    isNavigationReady: jest.fn(() => Promise.resolve()),
     isTopmostRouteModalScreen: () => false,
 }));
 

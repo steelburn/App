@@ -15,6 +15,12 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import waitForBatchedUpdatesWithAct from '../utils/waitForBatchedUpdatesWithAct';
 
 jest.mock('@components/ConfirmedRoute.tsx');
+jest.mock('@libs/Navigation/Navigation', () => ({
+    getActiveRouteWithoutParams: jest.fn(() => ''),
+    isNavigationReady: jest.fn(() => Promise.resolve()),
+    navigate: jest.fn(),
+    getActiveRoute: jest.fn(() => ''),
+}));
 
 // Mock useResponsiveLayout to control screen size in tests
 jest.mock('@hooks/useResponsiveLayout', () => jest.fn());

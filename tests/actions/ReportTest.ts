@@ -116,12 +116,13 @@ jest.mock('@libs/Sound', () => ({
 jest.mock('@hooks/useCardFeedsForDisplay', () => jest.fn(() => ({defaultCardFeed: null, cardFeedsByPolicy: {}})));
 
 jest.mock('@libs/Navigation/Navigation', () => ({
-    ...require('@testUtils/createNavigationMock').default,
     navigate: jest.fn(),
     getActiveRoute: jest.fn().mockReturnValue(''),
+    getActiveRouteWithoutParams: jest.fn(() => ''),
     dismissModalWithReport: jest.fn(),
     dismissModal: jest.fn(),
     dismissToSuperWideRHP: jest.fn(),
+    isNavigationReady: jest.fn(() => Promise.resolve()),
     isActiveRoute: jest.fn(() => false),
     getTopmostReportId: jest.fn(() => undefined),
     getTopmostSuperWideRHPReportID: jest.fn(() => undefined),

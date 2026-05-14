@@ -130,11 +130,17 @@ jest.mock('@libs/Navigation/Navigation', () => {
         getState: jest.fn(() => ({})),
     };
     return {
-        ...require('@testUtils/createNavigationMock').default,
+        navigate: jest.fn(),
+        goBack: jest.fn(),
         closeRHPFlow: jest.fn(),
+        dismissModalWithReport: jest.fn(),
         navigationRef: mockRef,
+        setNavigationActionToMicrotaskQueue: jest.fn((callback: () => void) => callback()),
         getReportRouteByID: jest.fn(() => undefined),
         removeScreenByKey: jest.fn(),
+        getActiveRouteWithoutParams: jest.fn(() => ''),
+        isNavigationReady: jest.fn(() => Promise.resolve()),
+        getActiveRoute: jest.fn(() => ''),
     };
 });
 

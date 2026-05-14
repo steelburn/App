@@ -10,7 +10,8 @@ import SCREENS from '../../src/SCREENS';
 jest.mock('@libs/Navigation/Navigation', () => ({
     __esModule: true,
     default: {
-        ...require('@testUtils/createNavigationMock').default,
+        getActiveRouteWithoutParams: jest.fn(() => ''),
+        isNavigationReady: jest.fn(() => Promise.resolve()),
         getTopmostReportId: jest.fn(),
         getTopmostSuperWideRHPReportID: jest.fn(),
         dismissModal: jest.fn(),

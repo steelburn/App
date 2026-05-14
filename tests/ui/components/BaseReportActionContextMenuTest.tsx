@@ -125,10 +125,11 @@ const mockGetActiveRoute = jest.fn(() => '');
 const mockGetCurrentRoute = jest.fn(() => undefined as {name: string; params: Record<string, unknown>} | undefined);
 
 jest.mock('@libs/Navigation/Navigation', () => ({
-    ...require('@testUtils/createNavigationMock').default,
     navigate: (...args: unknown[]) => mockNavigate(...args) as void,
     setParams: (...args: unknown[]) => mockSetParams(...args) as void,
     getActiveRoute: () => mockGetActiveRoute(),
+    getActiveRouteWithoutParams: jest.fn(() => ''),
+    isNavigationReady: jest.fn(() => Promise.resolve()),
     navigationRef: {
         isReady: () => mockIsReady(),
         getCurrentRoute: () => mockGetCurrentRoute(),

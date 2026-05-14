@@ -34,11 +34,12 @@ jest.mock('@userActions/Subscription', () => ({
 
 jest.mock('@libs/Navigation/Navigation', () => {
     return {
-        ...require('@testUtils/createNavigationMock').default,
         goBack: jest.fn(),
         getTopmostReportId: jest.fn(() => undefined),
         dismissModal: jest.fn(),
         getActiveRoute: jest.fn(() => ''),
+        getActiveRouteWithoutParams: jest.fn(() => ''),
+        isNavigationReady: jest.fn(() => Promise.resolve()),
         useIsFocused: () => true,
         useNavigation: () => ({
             navigate: jest.fn(),

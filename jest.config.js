@@ -40,6 +40,5 @@ module.exports = {
         '\\.(lottie)$': '<rootDir>/__mocks__/fileMock.ts',
         '^group-ib-fp$': '<rootDir>/__mocks__/group-ib-fp.ts',
         '^parse-imports-exports$': '<rootDir>/node_modules/parse-imports-exports/index.cjs',
-        '^@testUtils/(.*)$': '<rootDir>/tests/utils/$1',
     },
 };

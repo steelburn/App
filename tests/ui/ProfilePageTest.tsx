@@ -23,10 +23,11 @@ import waitForBatchedUpdates from '../utils/waitForBatchedUpdates';
 import waitForBatchedUpdatesWithAct from '../utils/waitForBatchedUpdatesWithAct';
 
 jest.mock('@libs/Navigation/Navigation', () => ({
-    ...require('@testUtils/createNavigationMock').default,
     navigate: jest.fn(),
     goBack: jest.fn(),
     getActiveRoute: jest.fn(() => ''),
+    getActiveRouteWithoutParams: jest.fn(() => ''),
+    isNavigationReady: jest.fn(() => Promise.resolve()),
 }));
 
 jest.mock('@react-navigation/native', () => {

@@ -40,9 +40,10 @@ jest.mock('@libs/PusherConnectionManager', () => ({
 jest.mock('@libs/Navigation/Navigation', () => ({
     __esModule: true,
     default: {
-        ...require('@testUtils/createNavigationMock').default,
         isActiveRoute: jest.fn(() => false),
         navigate: jest.fn(),
+        getActiveRouteWithoutParams: jest.fn(() => ''),
+        isNavigationReady: jest.fn(() => Promise.resolve()),
         setNavigationActionToMicrotaskQueue: jest.fn(() => Promise.resolve()),
     },
 }));

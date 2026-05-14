@@ -16,7 +16,6 @@ import createRandomPolicy from '../utils/collections/policies';
 import waitForBatchedUpdatesWithAct from '../utils/waitForBatchedUpdatesWithAct';
 
 jest.mock('@libs/Navigation/Navigation', () => ({
-    ...require('@testUtils/createNavigationMock').default,
     navigate: jest.fn(),
     getActiveRoute: jest.fn(() => 'activeRoute'),
 }));
@@ -54,7 +53,10 @@ jest.mock('@libs/Navigation/Navigation', () => {
         getState: jest.fn(() => ({})),
     };
     return {
-        ...require('@testUtils/createNavigationMock').default,
+        navigate: jest.fn(),
+        getActiveRouteWithoutParams: jest.fn(() => ''),
+        isNavigationReady: jest.fn(() => Promise.resolve()),
+        goBack: jest.fn(),
         navigationRef: mockRef,
     };
 });
