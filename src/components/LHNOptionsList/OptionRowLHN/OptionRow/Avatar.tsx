@@ -18,14 +18,11 @@ type AvatarProps = {
     /** Display density mode. `COMPACT` switches the avatar size to `SMALL`. */
     viewMode: OptionMode;
 
-    /** Border color for the subscript icon. Matches the row background so the subscript blends in. */
-    subscriptAvatarBorderColor: ColorValue;
-
-    /** Background color for the secondary avatar in a multi-avatar group. Matches the row background. */
-    secondaryAvatarBackgroundColor: ColorValue;
+    /** Background color used for both the subscript icon border and the secondary avatar background. Matches the row background so the chrome blends in. */
+    avatarBackgroundColor: ColorValue;
 };
 
-function AvatarInner({optionItem, viewMode, subscriptAvatarBorderColor, secondaryAvatarBackgroundColor}: AvatarProps) {
+function AvatarInner({optionItem, viewMode, avatarBackgroundColor}: AvatarProps) {
     const styles = useThemeStyles();
     const personalDetails = usePersonalDetails();
 
@@ -67,9 +64,9 @@ function AvatarInner({optionItem, viewMode, subscriptAvatarBorderColor, secondar
             icons={icons}
             shouldShowSubscript={!!optionItem.shouldShowSubscript}
             size={isInFocusMode ? CONST.AVATAR_SIZE.SMALL : CONST.AVATAR_SIZE.DEFAULT}
-            subscriptAvatarBorderColor={subscriptAvatarBorderColor}
+            subscriptAvatarBorderColor={avatarBackgroundColor}
             useMidSubscriptSize={isInFocusMode}
-            secondaryAvatarBackgroundColor={secondaryAvatarBackgroundColor}
+            secondaryAvatarBackgroundColor={avatarBackgroundColor}
             singleAvatarContainerStyle={singleAvatarContainerStyle}
             shouldShowTooltip={shouldOptionShowTooltip(optionItem)}
             delegateAccountID={skipDelegate ? undefined : delegateAccountID}
@@ -80,7 +77,7 @@ function AvatarInner({optionItem, viewMode, subscriptAvatarBorderColor, secondar
 
 AvatarInner.displayName = 'OptionRow.AvatarInner';
 
-function Avatar({optionItem, viewMode, subscriptAvatarBorderColor, secondaryAvatarBackgroundColor}: AvatarProps) {
+function Avatar({optionItem, viewMode, avatarBackgroundColor}: AvatarProps) {
     // Bail out before subscribing to personal details when the row has no avatar to render.
     if (!optionItem.icons?.length || !optionItem.icons.at(0)) {
         return null;
@@ -89,8 +86,7 @@ function Avatar({optionItem, viewMode, subscriptAvatarBorderColor, secondaryAvat
         <AvatarInner
             optionItem={optionItem}
             viewMode={viewMode}
-            subscriptAvatarBorderColor={subscriptAvatarBorderColor}
-            secondaryAvatarBackgroundColor={secondaryAvatarBackgroundColor}
+            avatarBackgroundColor={avatarBackgroundColor}
         />
     );
 }

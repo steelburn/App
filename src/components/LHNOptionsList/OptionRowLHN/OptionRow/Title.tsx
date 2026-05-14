@@ -1,5 +1,4 @@
 import React from 'react';
-import type {StyleProp, TextStyle} from 'react-native';
 import DisplayNames from '@components/DisplayNames';
 import useLocalize from '@hooks/useLocalize';
 import useThemeStyles from '@hooks/useThemeStyles';
@@ -15,20 +14,17 @@ type TitleProps = {
     /** Whether the row is the currently focused/active option. Drives the active text style. */
     isOptionFocused: boolean;
 
-    /** Optional outer text style override forwarded by the variant. */
-    style?: StyleProp<TextStyle>;
-
     /** Numeric testID for the title node (mirrors `reportID`). */
     testID: number;
 };
 
-function Title({optionItem, isOptionFocused, style, testID}: TitleProps) {
+function Title({optionItem, isOptionFocused, testID}: TitleProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
 
     const textStyle = isOptionFocused ? styles.sidebarLinkActiveText : styles.sidebarLinkText;
     const textUnreadStyle = shouldUseBoldText(optionItem) ? [textStyle, styles.sidebarLinkTextBold] : [textStyle];
-    const displayNameStyle = [styles.optionDisplayName, styles.optionDisplayNameCompact, styles.pre, textUnreadStyle, styles.flexShrink0, style];
+    const displayNameStyle = [styles.optionDisplayName, styles.optionDisplayNameCompact, styles.pre, textUnreadStyle, styles.flexShrink0];
 
     const shouldParseFullTitle = optionItem?.parentReportAction?.actionName !== CONST.REPORT.ACTIONS.TYPE.ADD_COMMENT && !isGroupChat(optionItem);
     const shouldUseFullTitle =

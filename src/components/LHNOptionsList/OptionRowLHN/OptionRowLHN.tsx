@@ -5,7 +5,7 @@ import useThemeStyles from '@hooks/useThemeStyles';
 import OptionRow from './OptionRow';
 import useOptionRowChrome from './useOptionRowChrome';
 
-function OptionRowLHN({isOptionFocused = false, onSelectRow = () => {}, optionItem, viewMode = 'default', style, onLayout = () => {}, hasDraftComment, testID}: OptionRowLHNProps) {
+function OptionRowLHN({isOptionFocused = false, onSelectRow = () => {}, optionItem, viewMode = 'default', onLayout = () => {}, hasDraftComment, testID}: OptionRowLHNProps) {
     const styles = useThemeStyles();
     const {setHovered, sidebarInnerRowStyle, contentContainerStyles, avatarBackgroundColor} = useOptionRowChrome({
         isOptionFocused,
@@ -33,15 +33,13 @@ function OptionRowLHN({isOptionFocused = false, onSelectRow = () => {}, optionIt
                             <OptionRow.Avatar
                                 optionItem={optionItem}
                                 viewMode={viewMode}
-                                subscriptAvatarBorderColor={avatarBackgroundColor}
-                                secondaryAvatarBackgroundColor={avatarBackgroundColor}
+                                avatarBackgroundColor={avatarBackgroundColor}
                             />
                             <View style={contentContainerStyles}>
                                 <View style={[styles.flexRow, styles.alignItemsCenter, styles.mw100, styles.overflowHidden]}>
                                     <OptionRow.Title
                                         optionItem={optionItem}
                                         isOptionFocused={isOptionFocused}
-                                        style={style}
                                         testID={testID}
                                     />
                                     <OptionRow.OnboardingBadge optionItem={optionItem} />
@@ -51,7 +49,6 @@ function OptionRowLHN({isOptionFocused = false, onSelectRow = () => {}, optionIt
                                     optionItem={optionItem}
                                     viewMode={viewMode}
                                     isOptionFocused={isOptionFocused}
-                                    style={style}
                                 />
                             </View>
                             <OptionRow.DescriptiveText optionItem={optionItem} />

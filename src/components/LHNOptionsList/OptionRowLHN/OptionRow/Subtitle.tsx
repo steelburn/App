@@ -1,5 +1,4 @@
 import React from 'react';
-import type {StyleProp, TextStyle} from 'react-native';
 import type {ValueOf} from 'type-fest';
 import Text from '@components/Text';
 import useLocalize from '@hooks/useLocalize';
@@ -21,12 +20,9 @@ type SubtitleProps = {
 
     /** Whether the row is the currently focused/active option. Drives the active text style. */
     isOptionFocused: boolean;
-
-    /** Optional text style override forwarded from the parent. */
-    style?: StyleProp<TextStyle>;
 };
 
-function Subtitle({optionItem, viewMode, isOptionFocused, style}: SubtitleProps) {
+function Subtitle({optionItem, viewMode, isOptionFocused}: SubtitleProps) {
     const {translate} = useLocalize();
     const styles = useThemeStyles();
 
@@ -38,8 +34,8 @@ function Subtitle({optionItem, viewMode, isOptionFocused, style}: SubtitleProps)
     const isInFocusMode = viewMode === CONST.OPTION_MODE.COMPACT;
     const textStyle = isOptionFocused ? styles.sidebarLinkActiveText : styles.sidebarLinkText;
     const alternateTextStyle = isInFocusMode
-        ? [textStyle, styles.textLabelSupporting, styles.optionAlternateTextCompact, styles.ml2, style]
-        : [textStyle, styles.optionAlternateText, styles.textLabelSupporting, style];
+        ? [textStyle, styles.textLabelSupporting, styles.optionAlternateTextCompact, styles.ml2]
+        : [textStyle, styles.optionAlternateText, styles.textLabelSupporting];
     const alternateTextFSClass = FS.getChatFSClass(optionItem);
 
     const containsCustomEmojiWithText = containsCustomEmojiUtils(alternateText) && !containsOnlyCustomEmoji(alternateText);
