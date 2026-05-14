@@ -8,9 +8,8 @@ import {
     setMoneyRequestMerchant,
     setMoneyRequestReimbursable,
     setMoneyRequestTag,
-    setMoneyRequestTaxAmount,
-    setMoneyRequestTaxRate,
 } from '@libs/actions/IOU';
+import {setMoneyRequestTaxAmount, setMoneyRequestTaxRate} from '@libs/actions/IOU/MoneyRequest';
 import ONYXKEYS from '@src/ONYXKEYS';
 import createRandomTransaction from '../../utils/collections/transaction';
 import getOnyxValue from '../../utils/getOnyxValue';
