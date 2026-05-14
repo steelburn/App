@@ -7,11 +7,9 @@ import useOptionRowChrome from './useOptionRowChrome';
 
 function OptionRowLHN({isOptionFocused = false, onSelectRow = () => {}, optionItem, viewMode = 'default', style, onLayout = () => {}, hasDraftComment, testID}: OptionRowLHNProps) {
     const styles = useThemeStyles();
-    const {setHovered, isInFocusMode, sidebarInnerRowStyle, contentContainerStyles, singleAvatarContainerStyle, avatarBackgroundColor, displayNameStyle} = useOptionRowChrome({
-        optionItem,
+    const {setHovered, sidebarInnerRowStyle, contentContainerStyles, avatarBackgroundColor} = useOptionRowChrome({
         isOptionFocused,
         viewMode,
-        style,
     });
 
     const brickRoadIndicator = optionItem.brickRoadIndicator;
@@ -34,16 +32,16 @@ function OptionRowLHN({isOptionFocused = false, onSelectRow = () => {}, optionIt
                         <View style={[styles.flexRow, styles.alignItemsCenter]}>
                             <OptionRow.Avatar
                                 optionItem={optionItem}
-                                isInFocusMode={isInFocusMode}
+                                viewMode={viewMode}
                                 subscriptAvatarBorderColor={avatarBackgroundColor}
                                 secondaryAvatarBackgroundColor={avatarBackgroundColor}
-                                singleAvatarContainerStyle={singleAvatarContainerStyle}
                             />
                             <View style={contentContainerStyles}>
                                 <View style={[styles.flexRow, styles.alignItemsCenter, styles.mw100, styles.overflowHidden]}>
                                     <OptionRow.Title
                                         optionItem={optionItem}
-                                        displayNameStyle={displayNameStyle}
+                                        isOptionFocused={isOptionFocused}
+                                        style={style}
                                         testID={testID}
                                     />
                                     <OptionRow.OnboardingBadge optionItem={optionItem} />
