@@ -175,7 +175,6 @@ function TransactionListItem<TItem extends ListItem>({
     if (!isLargeScreenWidth) {
         return (
             <TransactionListItemNarrow
-                // eslint-disable-next-line react/jsx-props-no-spreading
                 {...sharedProps}
                 isLastItem={isLastItem}
                 isFirstItem={isFirstItem}
@@ -185,7 +184,6 @@ function TransactionListItem<TItem extends ListItem>({
 
     return (
         <TransactionListItemWide
-            // eslint-disable-next-line react/jsx-props-no-spreading
             {...sharedProps}
             isLastItem={isLastItem}
         />
