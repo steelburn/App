@@ -399,7 +399,7 @@ function IOURequestStepAmount({
 
         // Edits to the amount from the splits page should reset the split shares.
         if (transaction?.splitShares) {
-            resetSplitShares(transaction, newAmount, selectedCurrency);
+            resetSplitShares(transaction, newAmount, selectedCurrency, !isEditing);
         }
 
         if (!isEditing) {
