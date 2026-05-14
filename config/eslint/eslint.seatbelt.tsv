@@ -114,8 +114,8 @@
 "../../src/components/Modal/BaseModal.tsx"	"react-hooks/set-state-in-effect"	1
 "../../src/components/Modal/Global/ConfirmModalWrapper.tsx"	"@typescript-eslint/no-deprecated/ConfirmModal"	1
 "../../src/components/Modal/ReanimatedModal/Container/index.web.tsx"	"react-hooks/refs"	1
-"../../src/components/Modal/ReanimatedModal/index.tsx"	"@typescript-eslint/no-deprecated/InteractionManager.clearInteractionHandle"	3
-"../../src/components/Modal/ReanimatedModal/index.tsx"	"@typescript-eslint/no-deprecated/InteractionManager.createInteractionHandle"	2
+"../../src/components/Modal/ReanimatedModal/index.tsx"	"@typescript-eslint/no-deprecated/InteractionManager.clearInteractionHandle"	1
+"../../src/components/Modal/ReanimatedModal/index.tsx"	"@typescript-eslint/no-deprecated/InteractionManager.createInteractionHandle"	1
 "../../src/components/Modal/ReanimatedModal/index.tsx"	"no-restricted-imports"	2
 "../../src/components/MoneyReportHeaderActions/MoneyReportHeaderSecondaryActions.tsx"	"@typescript-eslint/no-deprecated/InteractionManager.runAfterInteractions"	1
 "../../src/components/MoneyReportHeaderModals.tsx"	"@typescript-eslint/no-deprecated/InteractionManager.runAfterInteractions"	1
@@ -217,7 +217,6 @@
 "../../src/hooks/useDragAndDrop/types.ts"	"@typescript-eslint/no-deprecated/React.MutableRefObject"	1
 "../../src/hooks/useExpenseActions.ts"	"@typescript-eslint/no-deprecated/InteractionManager.runAfterInteractions"	3
 "../../src/hooks/useFilesValidation.tsx"	"@typescript-eslint/no-deprecated/ConfirmModal"	1
-"../../src/hooks/useFilesValidation.tsx"	"@typescript-eslint/no-deprecated/InteractionManager.runAfterInteractions"	2
 "../../src/hooks/useInitial.ts"	"react-hooks/refs"	4
 "../../src/hooks/useIsBlockedToAddFeed.ts"	"react-hooks/set-state-in-effect"	1
 "../../src/hooks/useIsOwnWorkspaceChatRef.ts"	"react-hooks/refs"	2
@@ -481,9 +480,7 @@
 "../../src/pages/ReportDetailsPage.tsx"	"@typescript-eslint/no-deprecated/InteractionManager.runAfterInteractions"	1
 "../../src/pages/ReportDetailsPage.tsx"	"react-hooks/preserve-manual-memoization"	4
 "../../src/pages/ReportParticipantDetailsPage.tsx"	"@typescript-eslint/no-deprecated/ConfirmModal"	1
-"../../src/pages/ReportParticipantsPage.tsx"	"@typescript-eslint/no-deprecated/InteractionManager.runAfterInteractions"	1
 "../../src/pages/RoomMemberDetailsPage.tsx"	"@typescript-eslint/no-deprecated/ConfirmModal"	1
-"../../src/pages/RoomMembersPage.tsx"	"@typescript-eslint/no-deprecated/InteractionManager.runAfterInteractions"	1
 "../../src/pages/RoomMembersPage.tsx"	"react-hooks/preserve-manual-memoization"	1
 "../../src/pages/RoomMembersPage.tsx"	"react-hooks/set-state-in-effect"	1
 "../../src/pages/ScheduleCall/ScheduleCallPage.tsx"	"react-hooks/preserve-manual-memoization"	1
@@ -508,7 +505,6 @@
 "../../src/pages/inbox/report/ContextMenu/BaseReportActionContextMenu.tsx"	"react-hooks/refs"	1
 "../../src/pages/inbox/report/ContextMenu/ContextMenuActions.tsx"	"@typescript-eslint/no-deprecated/getReportNameDeprecated"	1
 "../../src/pages/inbox/report/ContextMenu/PopoverReportActionContextMenu.tsx"	"@typescript-eslint/no-deprecated/ConfirmModal"	1
-"../../src/pages/inbox/report/ContextMenu/PopoverReportActionContextMenu.tsx"	"@typescript-eslint/no-deprecated/InteractionManager.runAfterInteractions"	1
 "../../src/pages/inbox/report/ContextMenu/PopoverReportActionContextMenu.tsx"	"react-hooks/refs"	30
 "../../src/pages/inbox/report/ListBoundaryLoader.tsx"	"react-hooks/set-state-in-effect"	1
 "../../src/pages/inbox/report/PureReportActionItem.tsx"	"react-hooks/refs"	2
@@ -543,7 +539,6 @@
 "../../src/pages/iou/request/step/IOURequestStepAmount.tsx"	"react-hooks/set-state-in-effect"	1
 "../../src/pages/iou/request/step/IOURequestStepCategory.tsx"	"@typescript-eslint/no-deprecated/InteractionManager.runAfterInteractions"	1
 "../../src/pages/iou/request/step/IOURequestStepConfirmation.tsx"	"react-hooks/preserve-manual-memoization"	1
-"../../src/pages/iou/request/step/IOURequestStepDescription.tsx"	"@typescript-eslint/no-deprecated/InteractionManager.runAfterInteractions"	1
 "../../src/pages/iou/request/step/IOURequestStepDestination.tsx"	"@typescript-eslint/no-deprecated/InteractionManager.runAfterInteractions"	1
 "../../src/pages/iou/request/step/IOURequestStepDistance.tsx"	"react-hooks/set-state-in-effect"	1
 "../../src/pages/iou/request/step/IOURequestStepDistanceGPS/BackgroundLocationPermissionsFlow/index.android.tsx"	"@typescript-eslint/no-deprecated/ConfirmModal"	3
@@ -551,7 +546,6 @@
 "../../src/pages/iou/request/step/IOURequestStepDistanceGPS/GPSButtons/index.tsx"	"@typescript-eslint/no-deprecated/ConfirmModal"	3
 "../../src/pages/iou/request/step/IOURequestStepDistanceMap.tsx"	"react-hooks/set-state-in-effect"	1
 "../../src/pages/iou/request/step/IOURequestStepDistanceOdometer.tsx"	"@typescript-eslint/no-deprecated/InteractionManager.runAfterInteractions"	1
-"../../src/pages/iou/request/step/IOURequestStepMerchant.tsx"	"@typescript-eslint/no-deprecated/InteractionManager.runAfterInteractions"	1
 "../../src/pages/iou/request/step/IOURequestStepReport/hooks/useReportSelectionActions.ts"	"@typescript-eslint/no-deprecated/InteractionManager.runAfterInteractions"	2
 "../../src/pages/iou/request/step/IOURequestStepScan/ReceiptView/index.tsx"	"@typescript-eslint/no-deprecated/InteractionManager.runAfterInteractions"	1
 "../../src/pages/iou/request/step/IOURequestStepScan/ReceiptView/index.tsx"	"react-hooks/set-state-in-effect"	1
@@ -601,7 +595,6 @@
 "../../src/pages/tasks/NewTaskPage.tsx"	"@typescript-eslint/no-deprecated/InteractionManager.runAfterInteractions"	1
 "../../src/pages/tasks/TaskAssigneeSelectorModal.tsx"	"@typescript-eslint/no-deprecated/InteractionManager.runAfterInteractions"	2
 "../../src/pages/workspace/DynamicWorkspaceOverviewPlanTypePage.tsx"	"react-hooks/set-state-in-effect"	1
-"../../src/pages/workspace/WorkspaceMembersPage.tsx"	"@typescript-eslint/no-deprecated/InteractionManager.runAfterInteractions"	1
 "../../src/pages/workspace/WorkspaceMembersPage.tsx"	"react-hooks/exhaustive-deps"	1
 "../../src/pages/workspace/WorkspaceMembersPage.tsx"	"react-hooks/refs"	1
 "../../src/pages/workspace/WorkspaceNewRoomPage.tsx"	"@typescript-eslint/no-deprecated/InteractionManager.runAfterInteractions"	1
@@ -654,15 +647,12 @@
 "../../src/pages/workspace/accounting/xero/import/XeroCustomerConfigurationPage.tsx"	"no-restricted-syntax"	3
 "../../src/pages/workspace/accounting/xero/import/XeroCustomerConfigurationPage.tsx"	"rulesdir/no-default-id-values"	1
 "../../src/pages/workspace/categories/CategorySettingsPage.tsx"	"react-hooks/preserve-manual-memoization"	1
-"../../src/pages/workspace/categories/WorkspaceCategoriesPage.tsx"	"@typescript-eslint/no-deprecated/InteractionManager.runAfterInteractions"	1
 "../../src/pages/workspace/categories/WorkspaceCategoriesPage.tsx"	"react-hooks/set-state-in-effect"	2
 "../../src/pages/workspace/companyCards/BankConnection/index.tsx"	"react-hooks/set-state-in-effect"	1
-"../../src/pages/workspace/companyCards/WorkspaceCompanyCardsSettingsPage.tsx"	"@typescript-eslint/no-deprecated/InteractionManager.runAfterInteractions"	1
 "../../src/pages/workspace/companyCards/WorkspaceVerifyWorkAccountPage.tsx"	"react-hooks/set-state-in-effect"	1
 "../../src/pages/workspace/companyCards/addNew/AddNewCardPage.tsx"	"@typescript-eslint/no-deprecated/ConfirmModal"	1
 "../../src/pages/workspace/companyCards/addNew/PlaidConnectionStep.tsx"	"@typescript-eslint/no-deprecated/InteractionManager.runAfterInteractions"	1
 "../../src/pages/workspace/companyCards/assignCard/ConfirmationStep.tsx"	"@typescript-eslint/no-deprecated/InteractionManager.runAfterInteractions"	1
-"../../src/pages/workspace/distanceRates/PolicyDistanceRatesPage.tsx"	"@typescript-eslint/no-deprecated/InteractionManager.runAfterInteractions"	1
 "../../src/pages/workspace/distanceRates/PolicyDistanceRatesPage.tsx"	"react-hooks/preserve-manual-memoization"	2
 "../../src/pages/workspace/downgrade/WorkspaceDowngradePage.tsx"	"@typescript-eslint/no-deprecated/ConfirmModal"	1
 "../../src/pages/workspace/downgrade/WorkspaceDowngradePage.tsx"	"@typescript-eslint/no-deprecated/InteractionManager.runAfterInteractions"	2
@@ -671,8 +661,7 @@
 "../../src/pages/workspace/duplicate/WorkspaceDuplicateSelectFeaturesForm.tsx"	"react-hooks/set-state-in-effect"	1
 "../../src/pages/workspace/expensifyCard/WorkspaceEditCardLimitPage.tsx"	"@typescript-eslint/no-deprecated/ConfirmModal"	1
 "../../src/pages/workspace/expensifyCard/WorkspaceEditCardLimitTypePage.tsx"	"@typescript-eslint/no-deprecated/ConfirmModal"	1
-"../../src/pages/workspace/expensifyCard/WorkspaceExpensifyCardDetailsPage.tsx"	"@typescript-eslint/no-deprecated/ConfirmModal"	3
-"../../src/pages/workspace/expensifyCard/WorkspaceExpensifyCardDetailsPage.tsx"	"@typescript-eslint/no-deprecated/InteractionManager.runAfterInteractions"	1
+"../../src/pages/workspace/expensifyCard/WorkspaceExpensifyCardDetailsPage.tsx"	"@typescript-eslint/no-deprecated/ConfirmModal"	2
 "../../src/pages/workspace/hr/WorkspaceHRPage.tsx"	"@typescript-eslint/no-deprecated/ConfirmModal"	1
 "../../src/pages/workspace/hr/gusto/GustoApprovalModePage.tsx"	"@typescript-eslint/no-deprecated/ConfirmModal"	1
 "../../src/pages/workspace/members/ImportMembersPage.tsx"	"no-restricted-syntax"	1
@@ -684,20 +673,14 @@
 "../../src/pages/workspace/members/WorkspaceOwnerChangeErrorPage.tsx"	"react-hooks/refs"	2
 "../../src/pages/workspace/members/WorkspaceOwnerChangeSuccessPage.tsx"	"react-hooks/refs"	2
 "../../src/pages/workspace/members/WorkspaceOwnerPaymentCardForm.tsx"	"react-hooks/set-state-in-effect"	2
-"../../src/pages/workspace/perDiem/WorkspacePerDiemPage.tsx"	"@typescript-eslint/no-deprecated/InteractionManager.runAfterInteractions"	1
 "../../src/pages/workspace/perDiem/WorkspacePerDiemPage.tsx"	"react-hooks/set-state-in-effect"	1
 "../../src/pages/workspace/receiptPartners/WorkspaceReceiptPartnersPage.tsx"	"@typescript-eslint/no-deprecated/ConfirmModal"	1
-"../../src/pages/workspace/reports/ReportFieldsListValuesPage.tsx"	"@typescript-eslint/no-deprecated/InteractionManager.runAfterInteractions"	1
-"../../src/pages/workspace/tags/WorkspaceTagsPage.tsx"	"@typescript-eslint/no-deprecated/InteractionManager.runAfterInteractions"	1
 "../../src/pages/workspace/tags/WorkspaceTagsPage.tsx"	"react-hooks/set-state-in-effect"	1
-"../../src/pages/workspace/tags/WorkspaceViewTagsPage.tsx"	"@typescript-eslint/no-deprecated/InteractionManager.runAfterInteractions"	1
-"../../src/pages/workspace/taxes/WorkspaceTaxesPage.tsx"	"@typescript-eslint/no-deprecated/InteractionManager.runAfterInteractions"	1
 "../../src/pages/workspace/taxes/WorkspaceTaxesPage.tsx"	"react-hooks/set-state-in-effect"	1
 "../../src/pages/workspace/travel/WorkspaceTravelInvoicingSection.tsx"	"@typescript-eslint/no-deprecated/ConfirmModal"	3
 "../../src/pages/workspace/workflows/WorkspaceWorkflowsPage.tsx"	"@typescript-eslint/no-deprecated/InteractionManager.runAfterInteractions"	1
 "../../src/pages/workspace/workflows/WorkspaceWorkflowsPage.tsx"	"react-hooks/preserve-manual-memoization"	3
 "../../src/pages/workspace/workflows/WorkspaceWorkflowsPayerPage.tsx"	"@typescript-eslint/no-deprecated/ConfirmModal"	2
-"../../src/pages/workspace/workflows/approvals/WorkspaceWorkflowsApprovalsEditPage.tsx"	"@typescript-eslint/no-deprecated/InteractionManager.runAfterInteractions"	2
 "../../src/stories/ReportActionItemImages.stories.tsx"	"no-restricted-syntax"	1
 "../../src/stories/TextInput.stories.tsx"	"react-hooks/set-state-in-effect"	1
 "../../src/styles/utils/autoCompleteSuggestion/index.web.ts"	"no-restricted-syntax"	1
