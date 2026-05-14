@@ -302,7 +302,7 @@ describe('IOU setter functions', () => {
         });
 
         it('should do nothing when transaction is null', async () => {
-            setSplitShares(null, 10000, 'USD', [USER_ACCOUNT_ID, PARTICIPANT_ACCOUNT_ID]);
+            setSplitShares(undefined, 10000, 'USD', [USER_ACCOUNT_ID, PARTICIPANT_ACCOUNT_ID]);
             await waitForBatchedUpdates();
 
             const draft = await getOnyxValue(`${ONYXKEYS.COLLECTION.TRANSACTION_DRAFT}${TRANSACTION_ID}`);
