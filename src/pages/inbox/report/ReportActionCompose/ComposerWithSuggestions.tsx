@@ -63,7 +63,7 @@ import type {FileObject} from '@src/types/utils/Attachment';
 import type ChildrenProps from '@src/types/utils/ChildrenProps';
 // eslint-disable-next-line no-restricted-imports
 import findNodeHandle from '@src/utils/findNodeHandle';
-import {useComposerEditState, useComposerState} from './ComposerContext';
+import {useComposerActions, useComposerEditState, useComposerText} from './ComposerContext';
 import getCursorPosition from './getCursorPosition';
 import getScrollPosition from './getScrollPosition';
 import getUpdatedSyncSelection from './getUpdatedSyncSelection';
@@ -259,14 +259,16 @@ function ComposerWithSuggestions({
 
     const composerRef = useRef<ComposerRef | null>(null);
 
-    const {draftComment = ''} = useComposerState();
     const {editingState, editingReportActionID, editingReportAction, effectiveDraft, currentEditMessageSelection} = useComposerEditState();
     const {setEditingMessage, setCurrentEditMessageSelection} = useReportActionActiveEditActions();
 
     const isEditing = editingState !== CONST.REPORT_ACTION_EDIT_MESSAGE_STATE.OFF;
-    const [value, setValue] = useState(() => {
-        const initialValue = effectiveDraft ?? draftComment;
-
+    const value = useComposerText();
+    const {setText} = useComposerActions();
+    // Snapshot of provider text at mount — used for one-time selection cursor + emoji baseline + autofocus decision.
+    // Reading the live `value` for these would cause re-renders and effect re-fires on every keystroke.
+    const [initialText] = useState(() => {
+        const initialValue = effectiveDraft ?? value;
         if (initialValue) {
             emojisPresentBefore.current = extractEmojis(initialValue);
         }
@@ -298,15 +300,15 @@ function ComposerWithSuggestions({
         draftMessage: value,
         isEditing,
         editingReportAction,
-        updateDraftMessage: setValue,
+        updateDraftMessage: setText,
         isEditInProgressRef: isDraftSavePending,
     });
 
-    const [selection, setSelection] = useState<TextSelection>(() => currentEditMessageSelection ?? {start: value.length, end: value.length});
+    const [selection, setSelection] = useState<TextSelection>(() => currentEditMessageSelection ?? {start: initialText.length, end: initialText.length});
 
     const {accountID: currentUserAccountID} = useCurrentUserPersonalDetails();
 
-    const commentRef = useRef(value);
+    const commentRef = useRef(initialText);
 
     const {superWideRHPRouteKeys} = useWideRHPState();
     // When SearchReport is stacked above another RHP, delay autofocus until after the transition completes to avoid animation jank
@@ -330,16 +332,19 @@ function ComposerWithSuggestions({
         focus(true, undefined, true);
     }, [focus]);
 
-    const handleEditValueChange = useCallback((nextValue: string) => {
-        commentRef.current = nextValue;
-        emojisPresentBefore.current = extractEmojis(nextValue);
+    const handleEditValueChange = useCallback(
+        (nextValue: string) => {
+            commentRef.current = nextValue;
+            emojisPresentBefore.current = extractEmojis(nextValue);
 
-        setValue(nextValue);
-    }, []);
+            setText(nextValue);
+        },
+        [setText],
+    );
 
     useEditComposerToggle({
         selection,
-        draftComment,
+        value,
         composerRef,
         onFocus: handleEditFocus,
         onValueChange: handleEditValueChange,
@@ -350,16 +355,16 @@ function ComposerWithSuggestions({
     const [preferredSkinTone = CONST.EMOJI_DEFAULT_SKIN_TONE] = useOnyx(ONYXKEYS.PREFERRED_EMOJI_SKIN_TONE);
     const [editFocused] = useOnyx(ONYXKEYS.INPUT_FOCUSED);
 
-    const lastTextRef = useRef(value);
+    const lastTextRef = useRef(initialText);
     useEffect(() => {
         lastTextRef.current = value;
     }, [value]);
 
     const maxComposerLines = shouldUseNarrowLayout ? CONST.COMPOSER.MAX_LINES_SMALL_SCREEN : CONST.COMPOSER.MAX_LINES;
-    const shouldAutoFocus = (shouldFocusInputOnScreenFocus || !!draftComment) && areAllModalsHidden() && isFocused;
+    const shouldAutoFocus = (shouldFocusInputOnScreenFocus || !!value) && areAllModalsHidden() && isFocused;
     const delayedAutoFocusRouteKeyRef = useRef<string | null>(null);
 
-    const valueRef = useRef(value);
+    const valueRef = useRef(initialText);
     valueRef.current = value;
 
     const [composerHeightAfterClear, setComposerHeightAfterClear] = useState<number | null>(null);
@@ -505,7 +510,7 @@ function ComposerWithSuggestions({
 
             const textVSOffset = getTextVSCursorOffset(emojiConvertedText, cursorPosition);
 
-            setValue(newCommentConverted);
+            setText(newCommentConverted);
             if (commentValue !== newComment) {
                 const adjustedCursorPosition = cursorPosition !== undefined && cursorPosition !== null ? cursorPosition + textVSOffset : undefined;
                 const position = Math.max((selection.end ?? 0) + (newComment.length - commentRef.current.length), adjustedCursorPosition ?? 0);
@@ -547,22 +552,23 @@ function ComposerWithSuggestions({
             }
         },
         [
-            currentUserAccountID,
-            editingReportActionID,
-            editingState,
-            findNewlyAddedChars,
-            preferredLocale,
-            preferredSkinTone,
             raiseIsScrollLikelyLayoutTriggered,
-            reportID,
-            selection.end,
             selection.start,
-            setCurrentEditMessageSelection,
-            setEditingMessage,
+            selection.end,
+            findNewlyAddedChars,
+            preferredSkinTone,
+            preferredLocale,
+            setText,
+            editingState,
             shouldUseNarrowLayout,
             suggestionsRef,
+            setCurrentEditMessageSelection,
+            setEditingMessage,
+            reportID,
+            editingReportActionID,
             debouncedSaveReportActionDraft,
             debouncedSaveComment,
+            currentUserAccountID,
         ],
     );
 
