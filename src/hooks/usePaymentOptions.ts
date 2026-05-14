@@ -122,7 +122,7 @@ function usePaymentOptions({
         const paymentMethods = {
             [CONST.IOU.PAYMENT_TYPE.EXPENSIFY]: {
                 text: hasActivatedWallet || hasPersonalBankAccount ? translate('iou.settleWallet', '') : translate('iou.settlePersonal', ''),
-                icon: hasPersonalBankAccount ? icons.Wallet : icons.User,
+                icon: hasActivatedWallet || hasPersonalBankAccount ? icons.Wallet : icons.User,
                 value: CONST.IOU.PAYMENT_TYPE.EXPENSIFY,
             },
             [CONST.IOU.PAYMENT_TYPE.VBBA]: {
