@@ -11,6 +11,8 @@ const oldRoutes: Record<string, string> = {
     '/workspaces/*/overview/address': '/workspaces/$1/overview/workspace-address',
     '/workspaces/*/categories/settings': '/workspaces/$1/categories/categories-settings',
     '/workspaces/*/categories/new': '/workspaces/$1/categories/category-new',
+    '/settings/*/categories/settings': '/settings/$1/categories/manage-settings',
+    '/settings/*/categories/new': '/settings/$1/categories/category-create',
     '/workspaces/*/accounting/*/card-reconciliation/account': '/workspaces/$1/accounting/$2/card-reconciliation/account-reconciliation-settings',
     '/workspaces/*/connections/netsuite/export/invoice-item-preference/invoice-item/select': '/workspaces/$1/connections/netsuite/export/invoice-item-preference/select/invoice-item/select',
     '/workspaces/*/connections/xero/export/preferred-exporter/select': '/workspaces/$1/accounting/xero/export/xero-preferred-exporter/select',
