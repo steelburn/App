@@ -8644,9 +8644,24 @@ const CONST = {
 
     ANALYTICS: {
         EVENT: {
-            SIGN_UP: 'sign_up',
-            WORKSPACE_CREATED: 'workspace_created',
-            PAID_ADOPTION: 'paid_adoption',
+            SIGN_UP: {
+                NAME: 'sign_up',
+                META: 'SignUp',
+                REDDIT: 'SignUp',
+                LINKEDIN: 507587661,
+            },
+            WORKSPACE_CREATED: {
+                NAME: 'workspace_created',
+                META: 'WorkspaceCreated',
+                REDDIT: 'Lead',
+                LINKEDIN: 25474804,
+            },
+            PAID_ADOPTION: {
+                NAME: 'paid_adoption',
+                META: 'PaidAdoption',
+                REDDIT: 'Purchase',
+                LINKEDIN: 25474820,
+            },
         },
     },
 
