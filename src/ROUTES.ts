@@ -3871,11 +3871,12 @@ const ROUTES = {
         },
     },
     POLICY_ACCOUNTING_CERTINIA_PREREQUISITES: {
-        route: 'workspaces/:policyID/accounting/certinia/prerequisites/:isSandbox?/:subPage?',
-        getRoute: (policyID: string, isSandbox?: boolean, subPage?: string) => {
-            const sandboxSegment = isSandbox === undefined ? '' : `/${isSandbox ? 'true' : 'false'}`;
-            const subPageSegment = subPage ? `/${subPage}` : '';
-            return `workspaces/${policyID}/accounting/certinia/prerequisites${sandboxSegment}${subPageSegment}` as const;
+        route: 'workspaces/:policyID/accounting/certinia/prerequisites/:subPage?/:isSandbox?',
+        getRoute: (policyID: string, subPage?: string, isSandbox?: boolean) => {
+            if (!policyID) {
+                Log.warn('Invalid policyID is used to build the POLICY_ACCOUNTING_CERTINIA_PREREQUISITES route');
+            }
+            return `workspaces/${policyID}/accounting/certinia/prerequisites${subPage ? `/${subPage}` : ''}${isSandbox !== undefined ? `/${isSandbox ? 'true' : 'false'}` : ''}` as const;
         },
     },
     POLICY_ACCOUNTING_CERTINIA_EXISTING_CONNECTIONS: {
