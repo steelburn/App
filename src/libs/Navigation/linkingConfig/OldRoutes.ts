@@ -19,6 +19,7 @@ const oldRoutes: Record<string, string> = {
     '/workspaces/*/connections/quickbooks-online/advanced/autosync/accounting-method':
         '/workspaces/$1/accounting/quickbooks-online/advanced/quickbooks-online-autosync/quickbooks-online-accounting-method',
     '/workspaces/*/connections/quickbooks-online/advanced/autosync': '/workspaces/$1/accounting/quickbooks-online/advanced/quickbooks-online-autosync',
+    '/travel/upgrade': '/travel/travel-upgrade',
     '/workspaces/*/accounting/quickbooks-desktop/export/company-card-expense-account': '/workspaces/$1/accounting/quickbooks-desktop/export/qbd-company-card-expense-account',
     '/workspaces/*/accounting/quickbooks-desktop/export/company-card-expense-account-select': '/workspaces/$1/accounting/quickbooks-desktop/export/qbd-company-card-expense-account-select',
     '/workspaces/*/accounting/quickbooks-desktop/export/company-card-expense-account/account-select':
