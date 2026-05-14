@@ -452,7 +452,6 @@ function SearchList({
                         ownerBillingGracePeriodEnd={ownerBillingGracePeriodEnd}
                         personalDetails={personalDetails}
                         userBillingFundID={userBillingFundID}
-                        isOffline={isOffline}
                         nonPersonalAndWorkspaceCards={nonPersonalAndWorkspaceCards}
                         onFocus={onFocus}
                         newTransactionID={newTransactionID}
@@ -481,7 +480,6 @@ function SearchList({
             columns,
             personalDetails,
             userBillingFundID,
-            isOffline,
             lastPaymentMethod,
             personalPolicyID,
             onHoldMenuOpen,
