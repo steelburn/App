@@ -49,7 +49,7 @@ function prepareOnyxDataForFinancialForceCodingUpdate<K extends keyof FinancialF
                     [CONST.POLICY.CONNECTIONS.NAME.CERTINIA]: {
                         config: {
                             coding: {
-                                [settingName]: oldSettingValue,
+                                [settingName]: oldSettingValue ?? null,
                             },
                             pendingFields: {
                                 [settingName]: null,
