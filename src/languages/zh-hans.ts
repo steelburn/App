@@ -2405,6 +2405,7 @@ const translations: TranslationDeepObject<typeof en> = {
             revealDetails: '显示详细信息',
             revealCvv: '显示 CVV',
             copyCardNumber: '复制卡号',
+            copyCvv: '复制 CVV',
             updateAddress: '更新地址',
         },
         cardAddedToWallet: ({platform}: {platform: 'Google' | 'Apple'}) => `已添加到 ${platform} 钱包`,

@@ -2450,6 +2450,7 @@ const translations: TranslationDeepObject<typeof en> = {
             revealDetails: '詳細を表示',
             revealCvv: 'CVV を表示',
             copyCardNumber: 'カード番号をコピー',
+            copyCvv: 'CVV をコピー',
             updateAddress: '住所を更新',
         },
         cardAddedToWallet: ({platform}: {platform: 'Google' | 'Apple'}) => `${platform}ウォレットに追加しました`,
