@@ -24,13 +24,12 @@ const mockOpenCreateReportConfirmation = jest.fn();
 jest.mock('@hooks/useCreateEmptyReportConfirmation', () => jest.fn(() => ({openCreateReportConfirmation: mockOpenCreateReportConfirmation})));
 
 jest.mock('@libs/Navigation/Navigation', () => ({
+    ...require('@testUtils/createNavigationMock').default,
     navigate: jest.fn(),
     goBack: jest.fn(),
     dismissModal: jest.fn(),
     setNavigationActionToMicrotaskQueue: jest.fn((cb: () => void) => cb()),
     getActiveRoute: jest.fn(() => ''),
-    getActiveRouteWithoutParams: jest.fn(() => ''),
-    isNavigationReady: jest.fn(() => Promise.resolve()),
     isTopmostRouteModalScreen: jest.fn(() => false),
 }));
 

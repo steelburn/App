@@ -19,9 +19,8 @@ import {signInWithTestUser} from '../utils/TestHelper';
 import waitForBatchedUpdatesWithAct from '../utils/waitForBatchedUpdatesWithAct';
 
 jest.mock('@libs/Navigation/Navigation', () => ({
+    ...require('@testUtils/createNavigationMock').default,
     navigate: jest.fn(),
-    getActiveRouteWithoutParams: jest.fn(() => ''),
-    isNavigationReady: jest.fn(() => Promise.resolve()),
     goBack: jest.fn(),
     setNavigationActionToMicrotaskQueue: jest.fn((callback: () => void) => callback()),
 }));

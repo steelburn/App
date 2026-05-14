@@ -7,13 +7,6 @@ import TimeSensitiveSection from '@src/pages/home/TimeSensitiveSection';
 import useTimeSensitiveAddPaymentCard from '@src/pages/home/TimeSensitiveSection/hooks/useTimeSensitiveAddPaymentCard';
 import waitForBatchedUpdates from '../../../../utils/waitForBatchedUpdates';
 
-jest.mock('@libs/Navigation/Navigation', () => ({
-    getActiveRouteWithoutParams: jest.fn(() => ''),
-    isNavigationReady: jest.fn(() => Promise.resolve()),
-    navigate: jest.fn(),
-    getActiveRoute: jest.fn(() => ''),
-}));
-
 jest.mock('@hooks/useLocalize', () => jest.fn(() => ({translate: jest.fn((key: string) => key)})));
 
 jest.mock('@hooks/useLazyAsset', () => ({

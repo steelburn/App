@@ -39,11 +39,10 @@ jest.mock('@src/libs/API', () => ({
 }));
 
 jest.mock('@src/libs/Navigation/Navigation', () => ({
+    ...require('@testUtils/createNavigationMock').default,
     dismissModalWithReport: jest.fn(),
     getTopmostReportId: jest.fn(),
-    isNavigationReady: jest.fn(() => Promise.resolve()),
     isDisplayedInModal: jest.fn(() => false),
-    getActiveRouteWithoutParams: jest.fn(() => ''),
 }));
 
 jest.mock('@src/hooks/useRootNavigationState', () => ({

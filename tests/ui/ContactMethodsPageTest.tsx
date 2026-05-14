@@ -12,11 +12,10 @@ import waitForBatchedUpdates from '../utils/waitForBatchedUpdates';
 
 // Mock navigation used by the page
 jest.mock('@libs/Navigation/Navigation', () => ({
+    ...require('@testUtils/createNavigationMock').default,
     navigate: jest.fn(),
     goBack: jest.fn(),
     getActiveRoute: jest.fn(() => ''),
-    getActiveRouteWithoutParams: jest.fn(() => ''),
-    isNavigationReady: jest.fn(() => Promise.resolve()),
 }));
 
 // Mock RenderHTML component

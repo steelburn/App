@@ -37,8 +37,7 @@ jest.mock('@components/ConfirmModal', () => {
 });
 
 jest.mock('@libs/Navigation/Navigation', () => ({
-    getActiveRouteWithoutParams: jest.fn(() => ''),
-    isNavigationReady: jest.fn(() => Promise.resolve()),
+    ...require('@testUtils/createNavigationMock').default,
     navigate: jest.fn(),
 }));
 

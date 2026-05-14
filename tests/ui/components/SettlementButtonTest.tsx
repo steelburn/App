@@ -38,12 +38,7 @@ jest.mock('@libs/Navigation/Navigation', () => {
         getState: jest.fn(() => ({})),
     };
     return {
-        navigate: jest.fn(),
-        goBack: jest.fn(),
-        dismissModalWithReport: jest.fn(),
-        getActiveRoute: jest.fn(() => ''),
-        getActiveRouteWithoutParams: jest.fn(() => ''),
-        isNavigationReady: jest.fn(() => Promise.resolve()),
+        ...require('@testUtils/createNavigationMock').default,
         navigationRef: mockRef,
     };
 });

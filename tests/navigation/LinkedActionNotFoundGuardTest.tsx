@@ -18,8 +18,8 @@ const mockIsNavigationReady = jest.fn(() => Promise.resolve());
 jest.mock('@libs/Navigation/Navigation', () => ({
     __esModule: true,
     default: {
+        ...require('@testUtils/createNavigationMock').default,
         setParams: (...args: unknown[]) => mockSetParams(...args),
-        getActiveRouteWithoutParams: jest.fn(() => ''),
         isNavigationReady: () => mockIsNavigationReady(),
     },
 }));

@@ -6,8 +6,7 @@ import {translateLocal} from '../../utils/TestHelper';
 
 jest.mock('@src/hooks/useResponsiveLayout');
 jest.mock('@libs/Navigation/Navigation', () => ({
-    getActiveRouteWithoutParams: jest.fn(() => ''),
-    isNavigationReady: jest.fn(() => Promise.resolve()),
+    ...require('@testUtils/createNavigationMock').default,
     getActiveRoute: jest.fn(() => ''),
     navigate: jest.fn(),
 }));

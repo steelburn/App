@@ -17,9 +17,8 @@ const TEST_POLICY_ID = 'ABC123';
 const RECENT_TRIAL_START = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T').at(0) ?? '';
 
 jest.mock('@libs/Navigation/Navigation', () => ({
+    ...require('@testUtils/createNavigationMock').default,
     navigate: jest.fn(),
-    getActiveRouteWithoutParams: jest.fn(() => ''),
-    isNavigationReady: jest.fn(() => Promise.resolve()),
     setNavigationActionToMicrotaskQueue: jest.fn((callback: () => void) => callback()),
 }));
 

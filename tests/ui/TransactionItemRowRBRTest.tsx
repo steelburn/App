@@ -16,12 +16,6 @@ import {createRandomReport} from '../utils/collections/reports';
 import createRandomTransaction from '../utils/collections/transaction';
 import waitForBatchedUpdates from '../utils/waitForBatchedUpdates';
 
-jest.mock('@libs/Navigation/Navigation', () => ({
-    getActiveRouteWithoutParams: jest.fn(() => ''),
-    isNavigationReady: jest.fn(() => Promise.resolve()),
-    navigate: jest.fn(),
-    getActiveRoute: jest.fn(() => ''),
-}));
 jest.mock('@hooks/useAnimatedHighlightStyle');
 
 const MOCK_TRANSACTION_ID = '1';

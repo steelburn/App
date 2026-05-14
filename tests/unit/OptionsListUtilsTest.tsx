@@ -96,14 +96,8 @@ jest.mock('@rnmapbox/maps', () => {
 });
 
 jest.mock('@src/libs/Navigation/Navigation', () => ({
-    navigate: jest.fn(),
-    getActiveRouteWithoutParams: jest.fn(() => ''),
-    dismissModal: jest.fn(),
-    dismissModalWithReport: jest.fn(),
-    goBack: jest.fn(),
+    ...require('@testUtils/createNavigationMock').default,
     getTopmostReportId: jest.fn(() => undefined),
-    setNavigationActionToMicrotaskQueue: jest.fn(),
-    isNavigationReady: jest.fn(() => Promise.resolve()),
     getReportRHPActiveRoute: jest.fn(),
 }));
 

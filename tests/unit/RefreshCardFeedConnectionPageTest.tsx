@@ -58,9 +58,8 @@ jest.mock('@pages/ErrorPage/NotFoundPage', () => ({
 }));
 
 jest.mock('@libs/Navigation/Navigation', () => ({
+    ...require('@testUtils/createNavigationMock').default,
     closeRHPFlow: mockCloseRHPFlow,
-    getActiveRouteWithoutParams: jest.fn(() => ''),
-    isNavigationReady: jest.fn(() => Promise.resolve()),
     navigate: jest.fn(),
     goBack: jest.fn(),
     setNavigationActionToMicrotaskQueue: jest.fn(),

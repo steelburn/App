@@ -10,9 +10,8 @@ import type {TodosDerivedValue} from '@src/types/onyx';
 import waitForBatchedUpdatesWithAct from '../utils/waitForBatchedUpdatesWithAct';
 
 jest.mock('@libs/Navigation/Navigation', () => ({
+    ...require('@testUtils/createNavigationMock').default,
     navigate: jest.fn(),
-    getActiveRouteWithoutParams: jest.fn(() => ''),
-    isNavigationReady: jest.fn(() => Promise.resolve()),
 }));
 
 jest.mock('@hooks/useResponsiveLayout', () => jest.fn());

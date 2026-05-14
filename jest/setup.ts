@@ -375,3 +375,11 @@ jest.mock('@src/hooks/useDomainDocumentTitle', () => ({
     __esModule: true,
     default: jest.fn(),
 }));
+
+// Base Navigation mock used by ScreenWrapper and many components.
+// Test files with custom Navigation needs can spread the base and add overrides:
+//   jest.mock('@libs/Navigation/Navigation', () => ({
+//       ...require('@testUtils/createNavigationMock').default,
+//       customProp: jest.fn(),
+//   }));
+jest.mock('@libs/Navigation/Navigation', () => require('@testUtils/createNavigationMock').default);

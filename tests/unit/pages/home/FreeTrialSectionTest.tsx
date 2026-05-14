@@ -9,12 +9,6 @@ jest.mock('@pages/home/FreeTrialSection/useFreeTrial');
 jest.mock('@libs/DateUtils', () => ({
     formatCountdownTimer: jest.fn(() => '12:34:56'),
 }));
-jest.mock('@libs/Navigation/Navigation', () => ({
-    getActiveRouteWithoutParams: jest.fn(() => ''),
-    isNavigationReady: jest.fn(() => Promise.resolve()),
-    navigate: jest.fn(),
-    getActiveRoute: jest.fn(() => ''),
-}));
 jest.mock('@hooks/useResponsiveLayout', () => jest.fn(() => ({shouldUseNarrowLayout: false})));
 jest.mock('@hooks/useTheme', () => jest.fn(() => ({trialBannerBackgroundColor: '#ffffff', trialTimer: '#00ff00'})));
 jest.mock('@hooks/useThemeStyles', () =>

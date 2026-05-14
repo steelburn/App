@@ -11,14 +11,11 @@ import wrapOnyxWithWaitForBatchedUpdates from '../utils/wrapOnyxWithWaitForBatch
 
 jest.mock('@libs/Permissions');
 jest.mock('../../src/libs/Navigation/Navigation', () => ({
-    navigate: jest.fn(),
+    ...require('@testUtils/createNavigationMock').default,
     isActiveRoute: jest.fn(),
     getTopmostReportId: jest.fn(),
-    getActiveRoute: jest.fn(),
     getTopmostReportActionId: jest.fn(),
-    isNavigationReady: jest.fn(() => Promise.resolve()),
     isDisplayedInModal: jest.fn(() => false),
-    getActiveRouteWithoutParams: jest.fn(() => ''),
 }));
 jest.mock('../../src/libs/Navigation/navigationRef', () => ({
     getState: () => ({
