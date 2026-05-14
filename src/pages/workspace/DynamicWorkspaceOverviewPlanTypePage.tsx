@@ -1,10 +1,11 @@
 import {format} from 'date-fns';
 import React, {useEffect, useState} from 'react';
+import {View} from 'react-native';
 import type {ValueOf} from 'type-fest';
+import ActivityIndicator from '@components/ActivityIndicator';
 import Button from '@components/Button';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import Icon from '@components/Icon';
-import LoadingIndicator from '@components/LoadingIndicator';
 import ScreenWrapper from '@components/ScreenWrapper';
 import SelectionList from '@components/SelectionList';
 import SingleSelectListItem from '@components/SelectionList/ListItem/SingleSelectListItem';
@@ -129,7 +130,12 @@ function DynamicWorkspaceOverviewPlanTypePage({policy}: WithPolicyProps) {
             >
                 <HeaderWithBackButton title={translate('workspace.common.planType')} />
                 {policy?.isLoading ? (
-                    <LoadingIndicator />
+                    <View style={[styles.flex1, styles.fullScreenLoading]}>
+                        <ActivityIndicator
+                            size={CONST.ACTIVITY_INDICATOR_SIZE.LARGE}
+                            reasonAttributes={{context: 'WorkspaceOverviewPlanTypePage'}}
+                        />
+                    </View>
                 ) : (
                     <>
                         {isPlanTypeLocked ? (
