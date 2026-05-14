@@ -153,7 +153,7 @@ describe('useEditComposerToggle', () => {
         renderHook(() =>
             useEditComposerToggle({
                 selection: {start: 0, end: 0},
-                draftComment: 'draft',
+                value: 'draft in composer',
                 composerRef,
                 onValueChange,
             }),
@@ -170,16 +170,16 @@ describe('useEditComposerToggle', () => {
         const priorSelection: TextSelection = {start: 0, end: 0};
 
         const {rerender} = renderHook(
-            (props: {selection: TextSelection; draft: string}) =>
+            (props: {selection: TextSelection; value: string}) =>
                 useEditComposerToggle({
                     selection: props.selection,
-                    draftComment: props.draft,
+                    value: props.value,
                     composerRef,
                     onValueChange,
                     onSelectionChange,
                     onFocus,
                 }),
-            {initialProps: {selection: priorSelection, draft: 'keep my draft'}},
+            {initialProps: {selection: priorSelection, value: 'keep my draft'}},
         );
 
         composerEditStateRef.current = defaultComposerEditState({
@@ -205,7 +205,7 @@ describe('useEditComposerToggle', () => {
         const {rerender} = renderHook(() =>
             useEditComposerToggle({
                 selection: {start: 0, end: 0},
-                draftComment: 'draft in composer',
+                value: 'draft in composer',
                 composerRef,
                 onValueChange,
             }),
@@ -228,7 +228,7 @@ describe('useEditComposerToggle', () => {
 
         // Start with edit off so wasEditingRef is false; then turn editing on to capture previousDraftSelectionRef.
         const {rerender} = renderHook(
-            (props: {selection: TextSelection; draft: string; editing: boolean}) => {
+            (props: {selection: TextSelection; value: string; editing: boolean}) => {
                 composerEditStateRef.current = defaultComposerEditState(
                     props.editing
                         ? {editingState: CONST.REPORT_ACTION_EDIT_MESSAGE_STATE.EDITING, editingMessage: 'e', editingReportActionID: '1'}
@@ -236,21 +236,21 @@ describe('useEditComposerToggle', () => {
                 );
                 return useEditComposerToggle({
                     selection: props.selection,
-                    draftComment: props.draft,
+                    value: props.value,
                     composerRef,
                     onValueChange,
                     onSelectionChange,
                 });
             },
-            {initialProps: {selection: priorSelection, draft: 'restored', editing: false}},
+            {initialProps: {selection: priorSelection, value: 'restored', editing: false}},
         );
 
-        rerender({selection: priorSelection, draft: 'restored', editing: true});
+        rerender({selection: priorSelection, value: 'restored', editing: true});
 
         onValueChange.mockClear();
         onSelectionChange.mockClear();
 
-        rerender({selection: priorSelection, draft: 'restored', editing: false});
+        rerender({selection: priorSelection, value: 'restored', editing: false});
 
         expect(onValueChange).toHaveBeenCalledWith('restored');
         expect(onSelectionChange).toHaveBeenCalledWith(priorSelection);
@@ -273,7 +273,7 @@ describe('useEditComposerToggle', () => {
 
                 return useEditComposerToggle({
                     selection: {start: 0, end: 0},
-                    draftComment: '',
+                    value: '',
                     composerRef,
                 });
             },
@@ -307,7 +307,7 @@ describe('useEditComposerToggle', () => {
                 });
                 return useEditComposerToggle({
                     selection: {start: 0, end: 0},
-                    draftComment: 'x',
+                    value: 'x',
                     composerRef,
                     onValueChange,
                     onFocus,
@@ -340,7 +340,7 @@ describe('useEditComposerToggle', () => {
         const {rerender} = renderHook(() =>
             useEditComposerToggle({
                 selection: {start: 0, end: 0},
-                draftComment: 'composer draft',
+                value: 'composer draft',
                 composerRef,
                 onValueChange,
                 onFocus,
@@ -370,7 +370,7 @@ describe('useEditComposerToggle', () => {
                 mockUseResponsiveLayout.mockReturnValue(narrow ? narrowLayoutResult() : wideLayoutResult());
                 return useEditComposerToggle({
                     selection: {start: 0, end: 0},
-                    draftComment: 'plain draft for wide',
+                    value: 'plain draft for wide',
                     composerRef,
                     onValueChange,
                 });
@@ -399,7 +399,7 @@ describe('useEditComposerToggle', () => {
                 );
                 return useEditComposerToggle({
                     selection: {start: 0, end: 0},
-                    draftComment: 'd',
+                    value: 'd',
                     composerRef,
                     onValueChange,
                     onSelectionChange,
