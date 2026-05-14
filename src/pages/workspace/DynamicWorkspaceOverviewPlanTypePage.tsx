@@ -131,7 +131,10 @@ function DynamicWorkspaceOverviewPlanTypePage({policy}: WithPolicyProps) {
                 <HeaderWithBackButton title={translate('workspace.common.planType')} />
                 {policy?.isLoading ? (
                     <View style={[styles.flex1, styles.fullScreenLoading]}>
-                        <ActivityIndicator size={CONST.ACTIVITY_INDICATOR_SIZE.LARGE} />
+                        <ActivityIndicator
+                            size={CONST.ACTIVITY_INDICATOR_SIZE.LARGE}
+                            reasonAttributes={{context: 'WorkspaceOverviewPlanTypePage'}}
+                        />
                     </View>
                 ) : (
                     <>
