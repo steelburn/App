@@ -32,8 +32,10 @@ import {
     hasAccountingConnections,
     hasAccountingFeatureConnection,
     isControlPolicy,
+    isGustoConnected,
     isHRIntegrationConnected,
     isTimeTrackingEnabled,
+    isZenefitsConnected,
 } from '@libs/PolicyUtils';
 import AccessOrNotFoundWrapper from '@pages/workspace/AccessOrNotFoundWrapper';
 import type {WithPolicyAndFullscreenLoadingProps} from '@pages/workspace/withPolicyAndFullscreenLoading';
@@ -174,9 +176,15 @@ function WorkspaceMoreFeaturesPage({policy, route}: WorkspaceMoreFeaturesPagePro
         if (!isHRIntegrationConnected(policy)) {
             return;
         }
+        let integration = '';
+        if (isZenefitsConnected(policy)) {
+            integration = translate('workspace.hr.zenefits.title');
+        } else if (isGustoConnected(policy)) {
+            integration = translate('workspace.hr.gusto.title');
+        }
         await showConfirmModal({
             title: translate('workspace.distanceRates.oopsNotSoFast'),
-            prompt: translate('workspace.moreFeatures.hrWarningModal.disconnectText'),
+            prompt: translate('workspace.moreFeatures.hrWarningModal.disconnectText', {integration}),
             confirmText: translate('common.buttonConfirm'),
             shouldShowCancelButton: false,
         });

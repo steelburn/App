@@ -5770,7 +5770,7 @@ const translations = {
                 confirmText: 'Got it',
             },
             hrWarningModal: {
-                disconnectText: 'To disable HR, please disconnect your HR integration from this workspace first.',
+                disconnectText: ({integration}: {integration: string}) => `To disable HR, please disconnect ${integration} from this workspace first.`,
             },
             workflowWarningModal: {
                 featureEnabledTitle: 'Not so fast...',
