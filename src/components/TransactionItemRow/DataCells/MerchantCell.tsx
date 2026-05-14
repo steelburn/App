@@ -47,7 +47,7 @@ function MerchantOrDescriptionCell({merchantOrDescription, shouldShowTooltip, sh
     const handleChangeText = (value: string) => {
         // Sanitize line breaks on change for single line inputs.
         if (!isMultilineInput) {
-            setLocalValue(StringUtils.removeLineBreaks(value));
+            setLocalValue(StringUtils.lineBreaksToSpaces(value));
             return;
         }
         setLocalValue(value);
