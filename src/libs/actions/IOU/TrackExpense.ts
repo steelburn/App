@@ -1474,6 +1474,10 @@ function convertTrackedExpenseToRequest(convertTrackedExpenseParams: ConvertTrac
         });
     }
 
+    // Drop `waypoints` when the caller passes an explicit manual `distance` so BE doesn't recompute
+    // from the route and overwrite the override (#90561).
+    const hasExplicitDistanceOverride = typeof distance === 'number';
+
     if (workspaceParams) {
         const additionalFailureData = getConvertTrackedExpenseWorkspaceFailureData({
             iouReportID: iouParams.reportID,
@@ -1491,6 +1495,7 @@ function convertTrackedExpenseToRequest(convertTrackedExpenseParams: ConvertTrac
         // Removing the ghost IOU report on API failure which can cause unexpected errors.
         failureData?.push(...additionalFailureData);
 
+        const workspaceParamsForAPI = hasExplicitDistanceOverride ? {...workspaceParams, waypoints: undefined} : workspaceParams;
         const params = {
             amount,
             distance,
@@ -1507,7 +1512,7 @@ function convertTrackedExpenseToRequest(convertTrackedExpenseParams: ConvertTrac
             moneyRequestPreviewReportActionID: iouParams.reportActionID,
             modifiedExpenseReportActionID: convertTrackedExpenseInformation.modifiedExpenseReportActionID,
             reportPreviewReportActionID: chatParams.reportPreviewReportActionID,
-            ...workspaceParams,
+            ...workspaceParamsForAPI,
         };
 
         addTrackedExpenseToPolicy(params, {optimisticData, successData, failureData});
@@ -1536,7 +1541,7 @@ function convertTrackedExpenseToRequest(convertTrackedExpenseParams: ConvertTrac
         reportPreviewReportActionID: chatParams.reportPreviewReportActionID,
         isDistance,
         customUnitRateID,
-        waypoints,
+        waypoints: hasExplicitDistanceOverride ? undefined : waypoints,
     };
     API.write(WRITE_COMMANDS.CONVERT_TRACKED_EXPENSE_TO_REQUEST, parameters, {optimisticData, successData, failureData});
 }
