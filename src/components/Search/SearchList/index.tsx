@@ -228,7 +228,7 @@ function SearchList({
     const styles = useThemeStyles();
     const expensifyIcons = useMemoizedLazyExpensifyIcons(['CheckSquare']);
 
-    const {hash, groupBy, type} = queryJSON;
+    const {groupBy, type} = queryJSON;
     const flattenedItems = useMemo(() => {
         if (groupBy || type === CONST.SEARCH.DATA_TYPES.EXPENSE_REPORT) {
             if (!isTransactionGroupListItemArray(data)) {
@@ -297,8 +297,6 @@ function SearchList({
 
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [longPressedItem, setLongPressedItem] = useState<SearchListItem>();
-
-    const [policies] = useOnyx(ONYXKEYS.COLLECTION.POLICY);
 
     const hasItemsBeingRemoved = prevDataLength && prevDataLength > data.length;
 
@@ -442,9 +440,7 @@ function SearchList({
                         onSelectionButtonPress={onCheckboxPress}
                         canSelectMultiple={canSelectMultiple}
                         item={itemWithSelection}
-                        queryJSONHash={hash}
                         columns={columns}
-                        policies={policies}
                         policyForMovingExpenses={policyForMovingExpenses}
                         isDisabled={isDisabled}
                         groupBy={groupBy}
@@ -480,9 +476,7 @@ function SearchList({
             handleLongPressRow,
             onCheckboxPress,
             canSelectMultiple,
-            hash,
             columns,
-            policies,
             isOffline,
             violations,
             lastPaymentMethod,
