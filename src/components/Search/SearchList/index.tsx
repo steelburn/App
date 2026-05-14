@@ -34,7 +34,7 @@ import variables from '@styles/variables';
 import type {TransactionPreviewData} from '@userActions/Search';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
-import type {CardList, Policy, Transaction, TransactionViolations} from '@src/types/onyx';
+import type {CardList, Policy, Transaction} from '@src/types/onyx';
 import type {HoldMenuCallback} from '..';
 import BaseSearchList from './BaseSearchList';
 import type ChatListItem from './ListItem/ChatListItem';
@@ -116,9 +116,6 @@ type SearchListProps = Pick<FlashListProps<SearchListItem>, 'onScroll' | 'conten
     isMobileSelectionModeEnabled: boolean;
 
     newTransactions?: Transaction[];
-
-    /** Violations indexed by transaction ID */
-    violations?: Record<string, TransactionViolations | undefined> | undefined;
 
     /** Callback to fire when hold menu should be opened */
     onHoldMenuOpen?: HoldMenuCallback;
@@ -216,7 +213,6 @@ function SearchList({
     shouldAnimate,
     isMobileSelectionModeEnabled,
     newTransactions = [],
-    violations,
     onHoldMenuOpen,
     nonPersonalAndWorkspaceCards,
     selectedTransactions,
@@ -449,8 +445,6 @@ function SearchList({
                         personalPolicyID={personalPolicyID}
                         userBillingGracePeriodEnds={userBillingGracePeriodEnds}
                         ownerBillingGracePeriodEnd={ownerBillingGracePeriodEnd}
-                        isOffline={isOffline}
-                        violations={violations}
                         nonPersonalAndWorkspaceCards={nonPersonalAndWorkspaceCards}
                         onFocus={onFocus}
                         newTransactionID={newTransactionID}
@@ -477,8 +471,6 @@ function SearchList({
             onCheckboxPress,
             canSelectMultiple,
             columns,
-            isOffline,
-            violations,
             lastPaymentMethod,
             personalPolicyID,
             onHoldMenuOpen,
