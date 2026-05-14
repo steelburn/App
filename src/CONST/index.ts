@@ -9004,6 +9004,9 @@ const CONST = {
             SORTABLE_HEADER: 'Search-SortableHeader',
             UNREPORTED_EXPENSE_LIST_ITEM: 'UnreportedExpenseListItem',
         },
+        TABLE: {
+            EDITABLE_CELL: 'Table-EditableCell',
+        },
         REPORT: {
             FLOATING_MESSAGE_COUNTER: 'Report-FloatingMessageCounter',
             LIST_BOUNDARY_LOADER_RETRY: 'Report-ListBoundaryLoaderRetry',
