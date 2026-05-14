@@ -15,7 +15,7 @@ type SubtitleProps = {
     /** Option data for the row. Source of `alternateText` and emoji rendering hints. */
     optionItem: OptionData;
 
-    /** Display density mode. Compact rows hide the subtitle entirely. */
+    /** Display density mode. Compact rows render the subtitle with compact styles; the subtitle is hidden only when `optionItem.alternateText` is empty. */
     viewMode: OptionMode;
 
     /** Whether the row is the currently focused/active option. Drives the active text style. */

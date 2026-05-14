@@ -14,7 +14,7 @@ type TitleProps = {
     /** Whether the row is the currently focused/active option. Drives the active text style. */
     isOptionFocused: boolean;
 
-    /** Numeric testID for the title node (mirrors `reportID`). */
+    /** Numeric testID for the title node. This is the FlashList row index passed in from the renderItem callback, not the report ID. */
     testID: number;
 };
 

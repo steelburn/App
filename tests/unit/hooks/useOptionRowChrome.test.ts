@@ -42,24 +42,6 @@ jest.mock('@hooks/useStyleUtils', () => ({
 }));
 
 describe('useOptionRowChrome', () => {
-    describe('hover state', () => {
-        it('initialises hovered to false', () => {
-            const {result} = renderHook(() => useOptionRowChrome({isOptionFocused: false, viewMode: CONST.OPTION_MODE.DEFAULT}));
-
-            expect(result.current.hovered).toBe(false);
-        });
-
-        it('setHovered(true) toggles hovered to true', () => {
-            const {result} = renderHook(() => useOptionRowChrome({isOptionFocused: false, viewMode: CONST.OPTION_MODE.DEFAULT}));
-
-            act(() => {
-                result.current.setHovered(true);
-            });
-
-            expect(result.current.hovered).toBe(true);
-        });
-    });
-
     describe('avatarBackgroundColor precedence', () => {
         it('returns the default sidebar color when neither focused nor hovered', () => {
             const {result} = renderHook(() => useOptionRowChrome({isOptionFocused: false, viewMode: CONST.OPTION_MODE.DEFAULT}));

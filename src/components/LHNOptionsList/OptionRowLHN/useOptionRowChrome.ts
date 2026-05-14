@@ -51,7 +51,6 @@ function useOptionRowChrome({isOptionFocused, viewMode}: UseOptionRowChromeParam
     }
 
     return {
-        hovered,
         setHovered,
         sidebarInnerRowStyle,
         contentContainerStyles,

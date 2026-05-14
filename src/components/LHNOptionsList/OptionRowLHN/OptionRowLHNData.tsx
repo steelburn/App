@@ -25,8 +25,8 @@ import OptionRowLHN from './OptionRowLHN';
 /*
  * This component gets the data from onyx for the actual
  * OptionRowLHN component.
- * The OptionRowLHN component is memoized, so it will only
- * re-render if the data really changed.
+ * OptionRowLHN is auto-memoized by React Compiler, so it will
+ * only re-render when the inputs derived from this wrapper change.
  */
 function OptionRowLHNData({
     isOptionFocused = false,
