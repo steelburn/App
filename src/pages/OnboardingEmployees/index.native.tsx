@@ -6,7 +6,6 @@ function OnboardingEmployees(props: OnboardingEmployeesProps) {
     return (
         <BaseOnboardingEmployees
             shouldUseNativeStyles
-             
             {...props}
         />
     );

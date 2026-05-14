@@ -9,7 +9,6 @@ function ValidateCodeForm(props: ValidateCodeFormProps) {
         <GestureHandlerRootView>
             <BaseValidateCodeForm
                 autoComplete={CONST.AUTO_COMPLETE_VARIANTS.SMS_OTP}
-                 
                 {...props}
             />
         </GestureHandlerRootView>

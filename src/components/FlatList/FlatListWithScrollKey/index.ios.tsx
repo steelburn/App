@@ -54,7 +54,6 @@ function FlatListWithScrollKey<T>({ref, ...props}: FlatListWithScrollKeyProps<T>
             initialScrollKey={initialScrollKey}
             onLayout={onLayoutInner}
             onContentSizeChange={onContentSizeChangeInner}
-             
             {...rest}
         />
     );

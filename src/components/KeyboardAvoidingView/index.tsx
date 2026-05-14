@@ -13,7 +13,6 @@ function KeyboardAvoidingView({shouldOffsetBottomSafeAreaPadding = false, keyboa
 
     return (
         <BaseKeyboardAvoidingView
-             
             {...restProps}
             keyboardVerticalOffset={keyboardVerticalOffset}
         />

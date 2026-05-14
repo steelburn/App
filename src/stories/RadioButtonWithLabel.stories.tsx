@@ -16,7 +16,6 @@ const story: Meta<typeof RadioButtonWithLabel> = {
 };
 
 function Template(props: RadioButtonWithLabelProps) {
-     
     return <RadioButtonWithLabel {...props} />;
 }
 

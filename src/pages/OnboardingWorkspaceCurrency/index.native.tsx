@@ -6,7 +6,6 @@ function OnboardingWorkspaceCurrency({...rest}: OnboardingWorkspaceCurrencyProps
     return (
         <BaseOnboardingWorkspaceCurrency
             shouldUseNativeStyles
-             
             {...rest}
         />
     );

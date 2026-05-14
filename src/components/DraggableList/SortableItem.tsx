@@ -76,9 +76,7 @@ function SortableItem({id, children, disabled = false, isFocused = false}: Sorta
             // Use capture phase to intercept Enter before inner MenuItem handles it
             onKeyDownCapture={handleKeyDown}
             onClick={handleClick}
-             
             {...attributes}
-             
             {...(disabled ? {} : listeners)}
             role="button"
             tabIndex={0}

@@ -100,7 +100,6 @@ export default function (pageTitle: TranslationPaths) {
 
             return (
                 <WrappedComponent
-                     
                     {...(props as TProps)}
                     accountID={session?.accountID}
                 />

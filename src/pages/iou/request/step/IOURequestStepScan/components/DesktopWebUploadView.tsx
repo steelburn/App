@@ -86,7 +86,6 @@ function DesktopWebUploadView({PDFValidationComponent, shouldAcceptMultipleFiles
                                 />
                                 <View
                                     style={[styles.uploadFileViewTextContainer, styles.userSelectNone]}
-                                     
                                     {...panResponder.panHandlers}
                                 >
                                     <Text style={[styles.textFileUpload, styles.mb2]}>{translate(shouldAcceptMultipleFiles ? 'receipt.uploadMultiple' : 'receipt.upload')}</Text>

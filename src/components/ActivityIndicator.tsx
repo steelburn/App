@@ -40,7 +40,6 @@ function ActivityIndicator({timeout = CONST.TIMING.ACTIVITY_INDICATOR_TIMEOUT, e
     return (
         <RNActivityIndicator
             color={theme.spinner}
-             
             {...rest}
         />
     );

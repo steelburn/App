@@ -255,7 +255,6 @@ function MapViewImpl({
     return !isOffline && !!accessToken && !!initialViewState ? (
         <View
             style={style}
-             
             {...responder.panHandlers}
         >
             <Map

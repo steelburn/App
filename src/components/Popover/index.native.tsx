@@ -12,7 +12,6 @@ function Popover({animationIn, animationOut, popoverAnchorPosition, disableAnima
         <Modal
             type={fromSidebarMediumScreen ? CONST.MODAL.MODAL_TYPE.POPOVER : CONST.MODAL.MODAL_TYPE.BOTTOM_DOCKED}
             popoverAnchorPosition={fromSidebarMediumScreen ? anchorPosition : undefined}
-             
             {...propsWithoutAnimation}
             // Mobile will always has fullscreen menu
             fullscreen

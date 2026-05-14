@@ -8,7 +8,6 @@ function OnboardingEmployees(props: OnboardingEmployeesProps) {
         <OnboardingWrapper>
             <BaseOnboardingEmployees
                 shouldUseNativeStyles={false}
-                 
                 {...props}
             />
         </OnboardingWrapper>

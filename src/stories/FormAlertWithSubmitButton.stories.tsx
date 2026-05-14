@@ -16,7 +16,6 @@ const story: Meta<typeof FormAlertWithSubmitButton> = {
 };
 
 function Template(props: FormAlertWithSubmitButtonProps) {
-     
     return <FormAlertWithSubmitButton {...props} />;
 }
 

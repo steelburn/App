@@ -18,7 +18,6 @@ export default function withToggleVisibilityView<TProps>(WrappedComponent: Compo
                 collapsable={false}
             >
                 <WrappedComponent
-                     
                     {...(rest as TProps)}
                     isVisible={isVisible}
                 />

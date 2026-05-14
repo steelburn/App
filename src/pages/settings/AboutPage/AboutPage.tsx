@@ -180,7 +180,6 @@ function AboutPage() {
                         illustrationBackgroundColor={colors.yellow600}
                         titleStyles={styles.accountSettingsSectionTitle}
                         overlayContent={overlayContent}
-                         
                         {...aboutIllustration}
                     >
                         <View style={[styles.flex1, styles.mt5]}>

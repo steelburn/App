@@ -12,7 +12,6 @@ function SelectionList<TItem extends ListItem>({ref, ...props}: SelectionListPro
 
     return (
         <BaseSelectionList
-             
             {...props}
             ref={ref}
             // Ignore the focus if it's caused by a touch event on mobile chrome.

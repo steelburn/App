@@ -29,7 +29,7 @@ function PressableWithSecondaryInteraction({
         return (
             <Text
                 // ESLint is disabled here to propagate all the props, enhancing PressableWithSecondaryInteraction's versatility across different use cases.
-                 
+
                 {...(rest as TextProps)}
                 suppressHighlighting={suppressHighlighting}
                 onLongPress={onSecondaryInteraction ? executeSecondaryInteraction : undefined}
@@ -42,7 +42,7 @@ function PressableWithSecondaryInteraction({
     return (
         <PressableWithFeedback
             // ESLint is disabled here to propagate all the props, enhancing PressableWithSecondaryInteraction's versatility across different use cases.
-             
+
             {...rest}
             ref={ref}
             onLongPress={onSecondaryInteraction ? executeSecondaryInteraction : undefined}

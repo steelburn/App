@@ -28,7 +28,6 @@ function RoomNameInput({disabled = false, autoFocus = false, isFocused, value, o
 
     return (
         <TextInput
-             
             {...props}
             ref={ref}
             disabled={disabled}

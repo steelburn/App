@@ -13,7 +13,6 @@ describe('ToggleDistanceUnitButton', () => {
                 testID="pressable"
                 accessibilityLabel="fake-button"
                 accessibilityRole={CONST.ROLE.BUTTON}
-                 
                 {...props}
             >
                 <Text>Click me</Text>

@@ -8,7 +8,6 @@ function OnboardingInterestedFeatures(props: OnboardingInterestedFeaturesProps) 
         <OnboardingWrapper>
             <BaseOnboardingInterestedFeatures
                 shouldUseNativeStyles={false}
-                 
                 {...props}
             />
         </OnboardingWrapper>

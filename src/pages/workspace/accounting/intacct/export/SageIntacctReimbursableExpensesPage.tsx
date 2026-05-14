@@ -138,7 +138,6 @@ function SageIntacctReimbursableExpensesPage({policy}: WithPolicyConnectionsProp
                             return (
                                 <ToggleSettingOptionRow
                                     key={key}
-                                     
                                     {...rest}
                                     wrapperStyle={[styles.mv3, styles.ph5]}
                                 />

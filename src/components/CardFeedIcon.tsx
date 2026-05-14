@@ -24,7 +24,6 @@ function CardFeedIcon({iconProps, selectedFeed, isExpensifyCardFeed = false, use
     const isPlaidCardFeed = !!getPlaidInstitutionId(selectedFeed);
 
     if (isExpensifyCardFeed) {
-         
         return <ExpensifyCardFeedIcon {...iconProps} />;
     }
 
@@ -33,7 +32,6 @@ function CardFeedIcon({iconProps, selectedFeed, isExpensifyCardFeed = false, use
             <PlaidCardFeedIcon
                 plaidUrl={getPlaidInstitutionIconUrl(selectedFeed)}
                 useSkeletonLoader={useSkeletonLoader}
-                 
                 {...restIconProps}
             />
         );
@@ -46,7 +44,6 @@ function CardFeedIcon({iconProps, selectedFeed, isExpensifyCardFeed = false, use
     return (
         <Icon
             src={src ?? getCardFeedIcon(selectedFeed, illustrations, companyCardFeedIcons)}
-             
             {...restIconProps}
         />
     );
@@ -60,7 +57,6 @@ function ExpensifyCardFeedIcon(iconProps: Partial<IconProps>) {
     return (
         <Icon
             src={memoizedIllustrations.ExpensifyCardImage}
-             
             {...restIconProps}
         />
     );

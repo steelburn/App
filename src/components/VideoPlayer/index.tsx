@@ -10,7 +10,6 @@ function VideoPlayer(props: VideoPlayerProps) {
 
     return (
         <BaseVideoPlayer
-             
             {...props}
             reportID={reportID ?? fakeReportID}
         />

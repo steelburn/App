@@ -8,7 +8,6 @@ function ValidateCodeForm({ref, ...props}: ValidateCodeFormProps) {
         <BaseValidateCodeForm
             autoComplete={CONST.AUTO_COMPLETE_VARIANTS.ONE_TIME_CODE}
             ref={ref}
-             
             {...props}
         />
     );

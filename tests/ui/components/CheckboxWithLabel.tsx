@@ -12,7 +12,6 @@ describe('CheckboxWithLabel Component', () => {
             <CheckboxWithLabel
                 label={LABEL}
                 onInputChange={mockOnInputChange}
-                 
                 {...props}
             />,
         );

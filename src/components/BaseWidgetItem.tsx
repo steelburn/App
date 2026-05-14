@@ -72,7 +72,7 @@ function BaseWidgetItem({icon, iconBackgroundColor, title, subtitle, ctaText, on
                         small
                         style={styles.widgetItemButton}
                         // Prop spreading allows parent components to pass additional button styling props (e.g., danger: true, success: true)
-                         
+
                         {...buttonProps}
                     />
                 </View>

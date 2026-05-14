@@ -28,7 +28,6 @@ export default function withViewportOffsetTop<TProps extends ViewportOffsetTopPr
 
         return (
             <WrappedComponent
-                 
                 {...(props as TProps)}
                 viewportOffsetTop={viewportOffsetTop}
             />

@@ -43,7 +43,6 @@ function PreRenderer({TDefaultRenderer, onPressIn, onPressOut, onLongPress, ...d
     if (isChildOfTaskTitle) {
         return (
             <TDefaultRenderer
-                 
                 {...defaultRendererProps}
                 style={styles.taskTitleMenuItem}
             />
@@ -71,7 +70,7 @@ function PreRenderer({TDefaultRenderer, onPressIn, onPressOut, onLongPress, ...d
             >
                 <View>
                     <Text style={{fontSize}}>
-                        { }
+                        {}
                         <TDefaultRenderer {...defaultRendererProps} />
                     </Text>
                 </View>

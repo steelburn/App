@@ -8,7 +8,6 @@ function OnboardingWorkspaces({...rest}: OnboardingWorkspacesProps) {
         <OnboardingWrapper>
             <BaseOnboardingWorkspaces
                 shouldUseNativeStyles={false}
-                 
                 {...rest}
             />
         </OnboardingWrapper>

@@ -281,7 +281,6 @@ function ScreenWrapper({
                 includeSafeAreaPaddingBottom={includeSafeAreaPaddingBottom}
                 isFocused={isFocused}
                 shouldHideFromAccessibility={shouldHideFromAccessibility}
-                 
                 {...restContainerProps}
             >
                 {isDevelopment && <CustomDevMenu />}

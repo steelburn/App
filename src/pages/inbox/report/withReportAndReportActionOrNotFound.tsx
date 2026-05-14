@@ -95,7 +95,6 @@ export default function <TProps extends WithReportAndReportActionOrNotFoundProps
 
         return (
             <WrappedComponent
-                 
                 {...props}
                 report={report}
                 parentReport={parentReport}

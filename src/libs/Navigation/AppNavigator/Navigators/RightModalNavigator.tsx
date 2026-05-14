@@ -53,10 +53,7 @@ const getWideRHPWidth = (windowWidth: number) => variables.sideBarWidth + calcul
 function MissingPersonalDetailsWithPINContext(props: Record<string, unknown>) {
     return (
         <PINContextProvider>
-            <ModalStackNavigators.MissingPersonalDetailsModalStackNavigator
-                 
-                {...props}
-            />
+            <ModalStackNavigators.MissingPersonalDetailsModalStackNavigator {...props} />
         </PINContextProvider>
     );
 }

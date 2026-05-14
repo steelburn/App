@@ -7,7 +7,6 @@ import type {AnchorForCommentsOnlyProps} from './types';
 function AnchorForCommentsOnly(props: AnchorForCommentsOnlyProps) {
     return (
         <BaseAnchorForCommentsOnly
-             
             {...props}
             onPressIn={() => DeviceCapabilities.canUseTouchScreen() && ControlSelection.block()}
             onPressOut={() => ControlSelection.unblock()}

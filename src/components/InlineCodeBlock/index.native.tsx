@@ -23,10 +23,7 @@ function InlineCodeBlock<TComponent extends TTextOrTPhrasing>({TDefaultRenderer,
     const data = getCurrentData(defaultRendererProps);
 
     return (
-        <TDefaultRenderer
-             
-            {...defaultRendererProps}
-        >
+        <TDefaultRenderer {...defaultRendererProps}>
             <Text style={[boxModelStyle, textStyle]}>{data}</Text>
         </TDefaultRenderer>
     );

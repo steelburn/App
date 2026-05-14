@@ -251,7 +251,6 @@ function MVCPFlatList<T>({
     );
     return (
         <FlatList
-             
             {...restProps}
             maintainVisibleContentPosition={maintainVisibleContentPosition}
             horizontal={horizontal}

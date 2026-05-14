@@ -68,7 +68,6 @@ function BaseTextInputWithSymbol({
                 onKeyPress={onKeyPress}
                 style={[styles.pr1, style]}
                 rightHandSideComponent={rightHandSideComponent}
-                 
                 {...rest}
             />
             {!hideSymbol && symbolPosition === CONST.TEXT_INPUT_SYMBOL_POSITION.SUFFIX && (

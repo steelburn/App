@@ -6,7 +6,6 @@ function OnboardingInterestedFeatures(props: OnboardingInterestedFeaturesProps) 
     return (
         <BaseOnboardingInterestedFeatures
             shouldUseNativeStyles
-             
             {...props}
         />
     );

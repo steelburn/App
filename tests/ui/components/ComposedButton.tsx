@@ -45,7 +45,6 @@ describe('ButtonComposed — Button', () => {
         render(
             <Button
                 accessibilityLabel={LABEL}
-                 
                 {...props}
             >
                 {children}

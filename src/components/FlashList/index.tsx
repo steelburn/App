@@ -15,7 +15,6 @@ function FlashList<T>({onScroll: onScrollProp, inverted, ...restProps}: FlashLis
 
     return (
         <ShopifyFlashList<T>
-             
             {...restProps}
             inverted={inverted}
             onScroll={handleScroll}

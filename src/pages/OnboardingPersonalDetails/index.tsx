@@ -8,7 +8,6 @@ function OnboardingPersonalDetails({...rest}: OnboardingPersonalDetailsProps) {
         <OnboardingWrapper>
             <BaseOnboardingPersonalDetails
                 shouldUseNativeStyles={false}
-                 
                 {...rest}
             />
         </OnboardingWrapper>

@@ -43,7 +43,6 @@ jest.mock('@components/withCurrentUserPersonalDetails', () => {
         function WrappedComponent(props: Omit<TProps, keyof WithCurrentUserPersonalDetailsProps>) {
             return (
                 <Component
-                     
                     {...(props as TProps)}
                     currentUserPersonalDetails={{
                         accountID: 1,

@@ -8,7 +8,6 @@ function OnboardingAccounting(props: OnboardingAccountingProps) {
         <OnboardingWrapper>
             <BaseOnboardingAccounting
                 shouldUseNativeStyles={false}
-                 
                 {...props}
             />
         </OnboardingWrapper>

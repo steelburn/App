@@ -19,7 +19,6 @@ function OnboardingWorkspaceInvite(props: OnboardingWorkspaceInviteProps) {
     return (
         <BaseOnboardingWorkspaceInvite
             shouldUseNativeStyles
-             
             {...props}
         />
     );

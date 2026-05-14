@@ -109,7 +109,6 @@ function createPlatformStackNavigatorComponent<RouterOptions extends PlatformSta
             () => (
                 <NavigationContent>
                     <StackView
-                         
                         {...props}
                         direction="ltr"
                         state={mappedState}
@@ -118,16 +117,12 @@ function createPlatformStackNavigatorComponent<RouterOptions extends PlatformSta
                         describe={describe}
                     />
 
-                    {!!ExtraContent && (
-                         
-                        <ExtraContent {...customCodePropsWithCustomState} />
-                    )}
+                    {!!ExtraContent && <ExtraContent {...customCodePropsWithCustomState} />}
                 </NavigationContent>
             ),
             [NavigationContent, customCodePropsWithCustomState, describe, wrappedDescriptors, mappedState, navigation, props],
         );
 
-         
         return NavigationContentWrapper === undefined ? Content : <NavigationContentWrapper {...customCodePropsWithCustomState}>{Content}</NavigationContentWrapper>;
     }
     PlatformNavigator.displayName = displayName;

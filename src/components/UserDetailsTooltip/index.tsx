@@ -7,14 +7,7 @@ function UserDetailsTooltip({shouldRender = true, children, ...props}: UserDetai
         return children;
     }
 
-    return (
-        <BaseUserDetailsTooltip
-             
-            {...props}
-        >
-            {children}
-        </BaseUserDetailsTooltip>
-    );
+    return <BaseUserDetailsTooltip {...props}>{children}</BaseUserDetailsTooltip>;
 }
 
 export default UserDetailsTooltip;

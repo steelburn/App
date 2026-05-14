@@ -37,12 +37,7 @@ function createCancelConfirmModal(displayName: string, baseProps: BaseProps): (p
     function CancelConfirmModal(mutableProps: CancelConfirmModalProps) {
         const props = {...baseProps, ...mutableProps};
 
-        return (
-            <CancelConfirmModalBase
-                 
-                {...props}
-            />
-        );
+        return <CancelConfirmModalBase {...props} />;
     }
 
     CancelConfirmModal.displayName = displayName;

@@ -37,7 +37,6 @@ function DeferredAutocompleteList(props: SearchAutocompleteListProps) {
         );
     }
 
-     
     return <SearchAutocompleteList {...props} />;
 }
 

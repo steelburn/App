@@ -35,7 +35,7 @@ function DecisionModalWrapper({closeModal, onModalHide, ...props}: DecisionModal
     return (
         <DecisionModal
             // Spreading is needed to forward all modal configuration props from the wrapper to the underlying DecisionModal.
-             
+
             {...props}
             isVisible={isVisible}
             isSmallScreenWidth={isSmallScreenWidth}

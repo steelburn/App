@@ -133,7 +133,7 @@ const renderMoneyRequestConfirmationListFooter = (transaction: Transaction) => {
     return render(
         <ComposeProviders components={[OnyxListItemProvider, LocaleContextProvider]}>
             <ScreenWrapper testID="MoneyRequestConfirmationListFooter">
-                { }
+                {}
                 <MoneyRequestConfirmationListFooter {...defaultProps} />
             </ScreenWrapper>
         </ComposeProviders>,

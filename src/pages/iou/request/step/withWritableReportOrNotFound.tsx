@@ -104,7 +104,6 @@ export default function <TProps extends WithWritableReportOrNotFoundProps<MoneyR
 
         return (
             <WrappedComponent
-                 
                 {...(props as TProps)}
                 report={report}
                 reportDraft={reportDraft}

@@ -23,7 +23,6 @@ jest.mock('@shopify/flash-list', () => {
         FlashList: ({data, ...props}: React.ComponentProps<typeof RN.FlatList>) => (
             <RN.FlatList
                 data={data}
-                 
                 {...props}
                 initialNumToRender={data?.length}
             />
@@ -48,7 +47,6 @@ jest.mock('@components/withKeyboardState', () => <TProps extends KeyboardStateCo
     function WrappedComponent(props: Omit<TProps, keyof KeyboardStateContextValue>) {
         return (
             <Component
-                 
                 {...(props as TProps)}
                 isKeyboardShown={false}
             />

@@ -101,7 +101,6 @@ const VideoView = forwardRef((props: VideoViewProps, ref: ForwardedRef<View>) =>
     <View
         ref={ref}
         accessibilityLabel="MockVideoView"
-         
         {...props}
     />
 ));

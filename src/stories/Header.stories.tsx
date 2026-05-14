@@ -16,7 +16,6 @@ const story: Meta<typeof Header> = {
 };
 
 function Template(props: HeaderProps) {
-     
     return <Header {...props} />;
 }
 

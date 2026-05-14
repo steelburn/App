@@ -8,7 +8,6 @@ function OnboardingWorkEmail(props: OnboardingWorkEmailProps) {
         <OnboardingWrapper>
             <BaseOnboardingWorkEmail
                 shouldUseNativeStyles={false}
-                 
                 {...props}
             />
         </OnboardingWrapper>

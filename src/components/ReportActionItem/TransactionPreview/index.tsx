@@ -119,7 +119,6 @@ function TransactionPreview(props: TransactionPreviewProps) {
                 sentryLabel={CONST.SENTRY_LABEL.TRANSACTION_PREVIEW.CARD}
             >
                 <TransactionPreviewContent
-                     
                     {...props}
                     action={iouAction}
                     isBillSplit={isBillSplit && !transaction?.comment?.originalTransactionID}
@@ -144,7 +143,6 @@ function TransactionPreview(props: TransactionPreviewProps) {
 
     return (
         <TransactionPreviewContent
-             
             {...props}
             action={iouAction}
             isBillSplit={isBillSplit}

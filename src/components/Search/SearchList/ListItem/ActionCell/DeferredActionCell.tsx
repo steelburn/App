@@ -32,7 +32,7 @@ function DeferredActionCell(actionCellProps: ActionCellProps) {
     }
 
     // Deferred wrapper intentionally forwards all props to the underlying component
-     
+
     return <ActionCell {...actionCellProps} />;
 }
 

@@ -14,7 +14,6 @@ function AnchorForCommentsOnly({onPress, href = '', ...props}: AnchorForComments
 
     return (
         <BaseAnchorForCommentsOnly
-             
             {...props}
             href={href}
             onPress={onLinkPress}

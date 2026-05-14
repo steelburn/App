@@ -140,7 +140,6 @@ function Template(props: MoneyRequestReportPreviewContentProps, {parameters}: {p
             <ThemeStylesProvider>
                 <View style={{maxWidth: '100%'}}>
                     <MoneyRequestReportPreviewContent
-                         
                         {...props}
                         reportPreviewStyles={reportPreviewStyle}
                         containerStyles={[reportPreviewStyle.componentStyle, props.containerStyles]}

@@ -48,7 +48,6 @@ function Container({
     return (
         <View
             style={style}
-             
             {...props}
         >
             <GestureHandler

@@ -25,7 +25,7 @@ jest.mock('@libs/Navigation/Navigation', () => ({
 
 jest.mock('@components/ImageSVG', () => {
     const {View} = require<typeof ReactNative>('react-native');
-     
+
     return (props: ViewProps) => <View {...props} />;
 });
 

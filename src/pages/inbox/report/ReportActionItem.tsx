@@ -58,7 +58,6 @@ function ReportActionItem({
 
     return (
         <PureReportActionItem
-             
             {...props}
             action={action}
             report={report}

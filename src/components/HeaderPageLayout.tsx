@@ -89,7 +89,6 @@ function HeaderPageLayout({
             {({safeAreaPaddingBottomStyle}) => (
                 <>
                     <HeaderWithBackButton
-                         
                         {...rest}
                         titleColor={titleColor}
                         iconFill={iconFill}

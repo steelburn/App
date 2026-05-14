@@ -23,7 +23,6 @@ function withSafeAreaInsets(WrappedComponent: React.ComponentType<WithSafeAreaIn
     function WithSafeAreaInsets(props: WithSafeAreaInsetsProps & {ref: React.ForwardedRef<unknown>}) {
         return (
             <WrappedComponent
-                 
                 {...props}
                 ref={props.ref}
                 insets={insets}
@@ -34,7 +33,6 @@ function withSafeAreaInsets(WrappedComponent: React.ComponentType<WithSafeAreaIn
     function WithSafeAreaInsetsWithRef(props: WithSafeAreaInsetsProps & {ref: ForwardedRef<unknown>}) {
         return (
             <WithSafeAreaInsets
-                 
                 {...props}
                 ref={props.ref}
             />

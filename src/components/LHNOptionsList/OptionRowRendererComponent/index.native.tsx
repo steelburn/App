@@ -15,7 +15,6 @@ type OptionRowRendererComponentProps = {
 function OptionRowRendererComponent({...props}: OptionRowRendererComponentProps) {
     return (
         <View
-             
             {...props}
             style={[props.style, {zIndex: -props.index}]}
         />

@@ -9,7 +9,6 @@ function TextInputWithSymbol({onSelectionChange = () => {}, ref, ...props}: Text
 
     return (
         <BaseTextInputWithSymbol
-             
             {...props}
             ref={ref}
             onSelectionChange={(event: TextInputSelectionChangeEvent) => {

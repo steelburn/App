@@ -63,7 +63,6 @@ describe('TimePicker Component', () => {
             <NavigationContainer>
                 <TimePicker
                     onSubmit={() => {}}
-                     
                     {...props}
                 />
             </NavigationContainer>,

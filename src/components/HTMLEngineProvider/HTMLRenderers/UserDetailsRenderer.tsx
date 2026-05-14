@@ -26,7 +26,6 @@ function UserDetailsRenderer({tnode, ...defaultRendererProps}: UserDetailsRender
         <UserDetailsTooltip accountID={accountID}>
             {isOptimistic ? (
                 <Text
-                     
                     {...defaultRendererProps}
                     style={[styles.textStrong]}
                 >
@@ -34,7 +33,6 @@ function UserDetailsRenderer({tnode, ...defaultRendererProps}: UserDetailsRender
                 </Text>
             ) : (
                 <Text
-                     
                     {...defaultRendererProps}
                     style={[styles.textStrong]}
                     onPress={() => Navigation.navigate(ROUTES.PROFILE.getRoute(accountID, Navigation.getActiveRoute()))}

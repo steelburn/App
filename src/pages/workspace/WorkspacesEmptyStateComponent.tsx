@@ -16,7 +16,6 @@ function WorkspacesEmptyStateComponent() {
 
     return (
         <GenericEmptyStateComponent
-             
             {...illustration}
             title={translate('workspace.emptyWorkspace.title')}
             subtitle={translate('workspace.emptyWorkspace.subtitle')}

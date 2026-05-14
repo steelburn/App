@@ -1,4 +1,3 @@
- 
 import {Str} from 'expensify-common';
 import React from 'react';
 import type {ViewStyle} from 'react-native';

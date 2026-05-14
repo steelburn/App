@@ -106,7 +106,6 @@ function ModalProvider({children}: {children: React.ReactNode}) {
             {children}
             {!!ModalComponent && (
                 <ModalComponent
-                     
                     {...modalToRender.props}
                     key={modalToRender.id}
                     closeModal={closeModal}

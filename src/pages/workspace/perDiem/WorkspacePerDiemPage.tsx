@@ -507,7 +507,6 @@ function WorkspacePerDiemPage({route}: WorkspacePerDiemPageProps) {
                 {!hasVisibleSubRates && !isLoading && (
                     <ScrollView contentContainerStyle={[styles.flexGrow1, styles.flexShrink0]}>
                         <GenericEmptyStateComponent
-                             
                             {...genericIllustration}
                             title={translate('workspace.perDiem.emptyList.title')}
                             subtitle={translate('workspace.perDiem.emptyList.subtitle')}

@@ -23,7 +23,6 @@ function SkeletonRect({borderRadius, height, ...rest}: SkeletonRectProps) {
     const radius = borderRadius ?? getDefaultRadius(height);
     return (
         <Rect
-             
             {...rest}
             height={height}
             rx={radius}

@@ -28,7 +28,6 @@ function HighlightableMenuItem({wrapperStyle, highlighted, ...restOfProps}: Prop
 
     return (
         <MenuItem
-             
             {...restOfProps}
             outerWrapperStyle={animatedHighlightStyle}
             wrapperStyle={wrapperStyle}

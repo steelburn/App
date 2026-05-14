@@ -8,7 +8,6 @@ function OnboardingPrivateDomain(props: OnboardingPrivateDomainProps) {
         <OnboardingWrapper>
             <BaseOnboardingPrivateDomain
                 shouldUseNativeStyles={false}
-                 
                 {...props}
             />
         </OnboardingWrapper>

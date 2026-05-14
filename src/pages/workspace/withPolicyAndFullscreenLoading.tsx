@@ -47,7 +47,6 @@ export default function withPolicyAndFullscreenLoading<TProps extends WithPolicy
 
         return (
             <WrappedComponent
-                 
                 {...(rest as TProps)}
                 isLoadingReportData={isLoadingReportData}
                 personalDetails={personalDetails}

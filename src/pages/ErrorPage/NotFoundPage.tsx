@@ -48,7 +48,6 @@ function NotFoundPage({onBackButtonPress = () => Navigation.goBack(), isReportRe
                     }
                     onBackButtonPress();
                 }}
-                 
                 {...fullPageNotFoundViewProps}
                 onLinkPress={isOnGenericErrorScreen ? () => Navigation.goBack(ROUTES.HOME) : fullPageNotFoundViewProps.onLinkPress}
             />

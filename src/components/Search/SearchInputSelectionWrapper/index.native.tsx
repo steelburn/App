@@ -30,7 +30,6 @@ function SearchInputSelectionWrapper({ref, skipSkeleton, ...props}: SearchAutoco
     return (
         <SearchAutocompleteInput
             ref={ref}
-             
             {...props}
             selection={undefined}
         />

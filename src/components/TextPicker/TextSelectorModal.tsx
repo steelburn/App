@@ -178,7 +178,6 @@ function TextSelectorModal({
                         InputComponent={TextInput}
                         value={currentValue}
                         onValueChange={(changedValue) => setValue(SafeString(changedValue))}
-                         
                         {...rest}
                         inputID={rest.inputID}
                         autoGrowHeight={autoGrowHeight}

@@ -11,7 +11,6 @@ function ButtonDisabledWhenOffline({disabledWhenOffline = true, ...props}: Butto
     const {isOffline} = useNetwork();
     return (
         <Button
-             
             {...props}
             isDisabled={disabledWhenOffline && isOffline}
         />

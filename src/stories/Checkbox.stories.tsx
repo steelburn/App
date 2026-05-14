@@ -16,7 +16,6 @@ const story: Meta<typeof Checkbox> = {
 };
 
 function Template(props: CheckboxProps) {
-     
     return <Checkbox {...props} />;
 }
 

@@ -62,9 +62,7 @@ const renderReportActionItemMessageEdit = (props?: Partial<ReportActionItemMessa
     return render(
         <ComposeProviders components={[OnyxListItemProvider, LocaleContextProvider]}>
             <ReportActionItemMessageEdit
-                 
                 {...defaultProps}
-                 
                 {...props}
             />
         </ComposeProviders>,

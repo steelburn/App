@@ -19,7 +19,6 @@ function PlaidLink({onExit = () => {}, ...restProps}: PlaidLinkProps) {
                     onExit();
                 });
             }}
-             
             {...restProps}
         />
     );

@@ -32,7 +32,6 @@ function QRShareWithDownload({ref, ...props}: QRShareWithDownloadProps) {
     return (
         <QRShare
             ref={qrShareRef}
-             
             {...props}
             logo={isOffline ? undefined : props.logo}
         />

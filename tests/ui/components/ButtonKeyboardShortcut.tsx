@@ -39,7 +39,6 @@ const renderShortcut = (props: Partial<ButtonKeyboardShortcutProps> = {}) =>
             <ButtonKeyboardShortcut
                 pressOnEnter
                 isPressOnEnterActive
-                 
                 {...props}
             />
         </NavigationContainer>,

@@ -6,7 +6,6 @@ function FormElement({ref, ...props}: FormElementProps) {
     return (
         <View
             ref={ref}
-             
             {...props}
         />
     );

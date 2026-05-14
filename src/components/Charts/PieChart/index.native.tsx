@@ -3,7 +3,6 @@ import type {PieChartProps} from './PieChartContent';
 import PieChartContent from './PieChartContent';
 
 function PieChart(props: PieChartProps) {
-     
     return <PieChartContent {...props} />;
 }
 

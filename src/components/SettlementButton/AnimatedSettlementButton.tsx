@@ -123,7 +123,6 @@ function AnimatedSettlementButton({
             )}
             {!isAnimationRunning && (
                 <SettlementButton
-                     
                     {...settlementButtonProps}
                     wrapperStyle={wrapperStyle}
                     isDisabled={isAnimationRunning || isDisabled}

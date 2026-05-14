@@ -298,7 +298,6 @@ function WorkspaceReceiptPartnersPage({route}: WorkspaceReceiptPartnersPageProps
                                             errorTextStyle={styles.mt3}
                                             brickRoadIndicator={menuItem.brickRoadIndicator}
                                             key={menuItem.title}
-                                             
                                             {...menuItem}
                                         />
                                     </OfflineWithFeedback>

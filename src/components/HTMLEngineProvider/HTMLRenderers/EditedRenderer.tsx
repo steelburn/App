@@ -15,7 +15,6 @@ function EditedRenderer({tnode, TDefaultRenderer, style, ...defaultRendererProps
         <Text fontSize={variables.fontSizeSmall}>
             <Text fontSize={variables.fontSizeSmall}> </Text>
             <Text
-                 
                 {...defaultRendererProps}
                 fontSize={variables.fontSizeSmall}
                 color={theme.textSupporting}

@@ -16,7 +16,6 @@ const story: Meta<typeof HeaderWithBackButton> = {
 };
 
 function Template(props: HeaderWithBackButtonProps) {
-     
     return <HeaderWithBackButton {...props} />;
 }
 

@@ -101,7 +101,6 @@ function MentionUserRenderer({style, tnode, TDefaultRenderer, currentUserPersona
                 }}
             >
                 <Text
-                     
                     {...defaultRendererProps}
                     style={[
                         styles.link,

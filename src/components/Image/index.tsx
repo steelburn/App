@@ -160,7 +160,6 @@ function Image({
 
     return (
         <BaseImage
-             
             {...forwardedProps}
             onLoad={handleLoad}
             style={[style, aspectRatioStyle, shouldOpacityBeZero && {opacity: 0}]}

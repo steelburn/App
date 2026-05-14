@@ -23,7 +23,6 @@ function PressableWithoutFocus({children, onPress, onLongPress, ...rest}: Pressa
             onPress={pressAndBlur}
             onLongPress={onLongPress}
             ref={ref}
-             
             {...rest}
         >
             {children}

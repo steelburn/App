@@ -98,7 +98,6 @@ function CurrencySelectionList({
 
     return (
         <SelectionListWithSections
-             
             {...restProps}
             sections={sections}
             ListItem={SingleSelectListItem}

@@ -6,7 +6,6 @@ function OnboardingWorkspaces({...rest}: OnboardingWorkspacesProps) {
     return (
         <BaseOnboardingWorkspaces
             shouldUseNativeStyles
-             
             {...rest}
         />
     );

@@ -164,13 +164,11 @@ function Suggestions({
         <View testID="suggestions">
             <SuggestionEmoji
                 ref={suggestionEmojiRef}
-                 
                 {...baseProps}
                 resetKeyboardInput={resetKeyboardInput}
             />
             <SuggestionMention
                 ref={suggestionMentionRef}
-                 
                 {...baseProps}
             />
         </View>

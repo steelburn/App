@@ -10,7 +10,6 @@ type CellRendererComponentProps = ViewProps & {
 function CellRendererComponent(props: CellRendererComponentProps) {
     return (
         <View
-             
             {...props}
             style={[
                 props.style,

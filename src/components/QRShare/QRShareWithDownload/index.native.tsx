@@ -25,7 +25,6 @@ function QRShareWithDownload({ref, ...props}: QRShareWithDownloadProps) {
     return (
         <ViewShot ref={qrCodeScreenshotRef}>
             <QRShare
-                 
                 {...props}
                 logo={isOffline ? undefined : props.logo}
             />

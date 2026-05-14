@@ -16,7 +16,6 @@ const story = {
 };
 
 function Template(props: BannerProps) {
-     
     return <Banner {...props} />;
 }
 

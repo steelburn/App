@@ -133,7 +133,6 @@ function Composer({
             textAlignVertical="center"
             style={[composerStyle, maxHeightStyle]}
             markdownStyle={markdownStyle}
-             
             {...props}
             autoFocus={isInLandscapeMode ? false : props.autoFocus}
             readOnly={isDisabled}

@@ -9,7 +9,6 @@ function FlatListWithScrollKey<T>({ref, ...props}: FlatListWithScrollKeyProps<T>
     return (
         <BaseFlatListWithScrollKey
             ref={ref}
-             
             {...props}
         />
     );

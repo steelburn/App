@@ -79,7 +79,6 @@ function TableBody<T>({contentContainerStyle, ...props}: TableBodyProps) {
     return (
         <View
             style={styles.flex1}
-             
             {...props}
         >
             <FlashList<T>
@@ -87,7 +86,6 @@ function TableBody<T>({contentContainerStyle, ...props}: TableBodyProps) {
                 ListEmptyComponent={isEmptyResult ? EmptyResultComponent : ListEmptyComponent}
                 contentContainerStyle={[filteredAndSortedData.length === 0 && styles.flex1, listContentContainerStyle, contentContainerStyle]}
                 keyboardShouldPersistTaps="handled"
-                 
                 {...restListProps}
             />
         </View>

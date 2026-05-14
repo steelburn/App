@@ -18,7 +18,6 @@ function SingleSelectWithAvatarListItem<TItem extends ListItem>({item, wrapperSt
     if (!icon) {
         return (
             <SingleSelectListItem
-                 
                 {...props}
                 item={item}
                 wrapperStyle={wrapperStyle}
@@ -42,7 +41,6 @@ function SingleSelectWithAvatarListItem<TItem extends ListItem>({item, wrapperSt
 
     return (
         <SingleSelectListItem
-             
             {...props}
             item={{...item, leftElement: avatarElement}}
             wrapperStyle={[styles.optionRow, styles.pv0, styles.pv3, styles.w100, wrapperStyle]}

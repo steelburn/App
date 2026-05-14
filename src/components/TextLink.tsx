@@ -72,7 +72,6 @@ function TextLink({href, onPress, children, style, onMouseDown = (event) => even
             ref={ref}
             suppressHighlighting
             accessible
-             
             {...rest}
         >
             {children}

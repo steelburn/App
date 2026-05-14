@@ -7,7 +7,6 @@ function NativeGenericPressable({ref, ...props}: PressableProps) {
         <GenericPressable
             focusable
             accessible
-             
             {...props}
             ref={ref}
             accessibilityHint={props.accessibilityHint ?? props.accessibilityLabel}

@@ -17,7 +17,6 @@ function FocusTrapContainerElement({onContainerElementChanged, ref, ...props}: F
                 }
                 onContainerElementChanged?.(node as unknown as HTMLElement | null);
             }}
-             
             {...props}
         />
     );

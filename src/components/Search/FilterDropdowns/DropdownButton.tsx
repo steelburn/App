@@ -172,7 +172,6 @@ function DropdownButton({
                         onPress={calculatePopoverPositionAndToggleOverlay}
                         sentryLabel={sentryLabel}
                         shouldRemoveRightBorderRadius={shouldShowCloseButton}
-                         
                         {...(medium ? {medium: true} : {small: true})}
                     >
                         <CaretWrapper

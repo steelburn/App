@@ -55,7 +55,6 @@ function MentionReportRenderer({style, tnode, TDefaultRenderer, ...defaultRender
 
     return (
         <Text
-             
             {...defaultRendererProps}
             style={
                 isGroupPolicyReport && (!exactlyMatch || navigationRoute)

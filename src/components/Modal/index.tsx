@@ -105,7 +105,6 @@ function Modal({fullscreen = true, onModalHide = () => {}, type, onModalShow = (
 
     return (
         <BaseModal
-             
             {...rest}
             onModalHide={hideModal}
             onModalShow={showModal}

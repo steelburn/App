@@ -16,7 +16,6 @@ const story: Meta<typeof InlineSystemMessage> = {
 };
 
 function Template(props: InlineSystemMessageProps) {
-     
     return <InlineSystemMessage {...props} />;
 }
 

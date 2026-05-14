@@ -182,7 +182,6 @@ function AutoCompleteSuggestions<TSuggestion>({measureParentContainerAndReportCu
 
     return (
         <AutoCompleteSuggestionsPortal
-             
             {...props}
             left={containerState.left}
             width={containerState.width}

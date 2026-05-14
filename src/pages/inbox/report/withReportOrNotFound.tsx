@@ -128,7 +128,6 @@ export default function (shouldRequireReportID = true): <TProps extends WithRepo
 
             return (
                 <WrappedComponent
-                     
                     {...props}
                     report={report}
                     betas={betas}

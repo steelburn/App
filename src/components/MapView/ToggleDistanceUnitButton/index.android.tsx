@@ -43,7 +43,6 @@ function ToggleDistanceUnitButton({onPress, children, ...rest}: PressableProps) 
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
-             
             {...rest}
         >
             {children}

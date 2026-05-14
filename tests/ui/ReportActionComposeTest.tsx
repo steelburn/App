@@ -60,9 +60,7 @@ const renderReportActionCompose = (props?: Partial<ReportActionComposeProps>) =>
     return render(
         <ComposeProviders components={[OnyxListItemProvider, LocaleContextProvider]}>
             <ReportActionCompose
-                 
                 {...defaultProps}
-                 
                 {...props}
             />
         </ComposeProviders>,

@@ -52,7 +52,6 @@ function InvertedFlashList<T>({
 
     return (
         <FlashList<T>
-             
             {...restProps}
             inverted
             onStartReached={onStartReached}

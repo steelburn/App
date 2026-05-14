@@ -192,7 +192,6 @@ function OptionRowLHNData({
 
     return (
         <OptionRowLHN
-             
             {...propsToForward}
             viewMode={viewMode}
             isOptionFocused={isReportFocused}

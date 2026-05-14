@@ -103,7 +103,6 @@ function BasePicker<TPickerValue>({
             <Icon
                 fill={theme.icon}
                 src={icons.DownArrow}
-                 
                 {...(size === 'small' ? {width: styles.pickerSmall().icon.width, height: styles.pickerSmall().icon.height} : {})}
             />
         );

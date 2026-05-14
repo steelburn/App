@@ -205,7 +205,6 @@ function PopoverWithMeasuredContentBase({
             hideModalContentWhileAnimating={hideModalContentWhileAnimating}
             modalId={modalId}
             shouldEnableNewFocusManagement={shouldEnableNewFocusManagement}
-             
             {...props}
             anchorPosition={shiftedAnchorPosition}
         >

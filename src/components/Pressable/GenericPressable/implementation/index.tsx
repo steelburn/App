@@ -27,7 +27,6 @@ function WebGenericPressable({focusable = true, ref, sentryLabel, ...props}: Pre
 
     return (
         <GenericPressable
-             
             {...props}
             ref={mergeRefs(internalRef, ref)}
             // change native accessibility props to web accessibility props

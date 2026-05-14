@@ -15,7 +15,6 @@ function MiniReportActionContextMenu({displayAsGroup = false, ...rest}: MiniRepo
         >
             <BaseReportActionContextMenu
                 isMini
-                 
                 {...rest}
             />
         </View>

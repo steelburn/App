@@ -16,7 +16,6 @@ const story = {
 type StoryType = typeof Template & {args?: Partial<BreadcrumbsProps>};
 
 function Template(args: BreadcrumbsProps) {
-     
     return <Breadcrumbs {...args} />;
 }
 

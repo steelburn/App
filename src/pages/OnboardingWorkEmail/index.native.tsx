@@ -23,7 +23,6 @@ function OnboardingWorkEmail(props: OnboardingWorkEmailProps) {
     return (
         <BaseOnboardingWorkEmail
             shouldUseNativeStyles
-             
             {...props}
         />
     );

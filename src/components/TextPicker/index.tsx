@@ -82,7 +82,6 @@ function TextPicker({
                 required={required}
                 customValidate={customValidate}
                 shouldUseStrictHtmlTagValidation={shouldUseStrictHtmlTagValidation}
-                 
                 {...rest}
             />
         </View>

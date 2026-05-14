@@ -54,7 +54,6 @@ function MapView({ref, ...props}: MapViewProps) {
                 {!isOffline ? (
                     <MapViewImpl
                         ref={ref}
-                         
                         {...props}
                     />
                 ) : (

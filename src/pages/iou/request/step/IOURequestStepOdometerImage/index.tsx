@@ -347,7 +347,6 @@ function IOURequestStepOdometerImage({
             />
             <View
                 style={[styles.uploadFileViewTextContainer, styles.userSelectNone]}
-                 
                 {...panResponder.panHandlers}
             >
                 <Text style={[styles.textFileUpload, styles.mb2]}>{title}</Text>

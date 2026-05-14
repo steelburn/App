@@ -3,7 +3,6 @@ import type {BarChartProps} from './BarChartContent';
 import BarChartContent from './BarChartContent';
 
 function BarChart(props: BarChartProps) {
-     
     return <BarChartContent {...props} />;
 }
 

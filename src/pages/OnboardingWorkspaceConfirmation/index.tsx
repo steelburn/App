@@ -8,7 +8,6 @@ function OnboardingWorkspaceConfirmation({...rest}: OnboardingWorkspaceConfirmat
         <OnboardingWrapper>
             <BaseOnboardingWorkspaceConfirmation
                 shouldUseNativeStyles={false}
-                 
                 {...rest}
             />
         </OnboardingWrapper>

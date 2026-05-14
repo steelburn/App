@@ -47,7 +47,6 @@ function ConfirmModalWrapper({closeModal, onModalHide, ...props}: ConfirmModalWr
 
     return (
         <ConfirmModal
-             
             {...props}
             isVisible={isVisible}
             onConfirm={handleConfirm}

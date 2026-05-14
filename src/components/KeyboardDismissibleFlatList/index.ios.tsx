@@ -41,7 +41,6 @@ function KeyboardDismissibleFlatList<T>({onScroll: onScrollProp, ref, ...restPro
 
     return (
         <AnimatedFlatListWithCellRenderer
-             
             {...restProps}
             ref={ref}
             onScroll={onScroll}

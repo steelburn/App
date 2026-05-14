@@ -359,7 +359,6 @@ function Composer({
             value={value}
             defaultValue={defaultValue}
             autoFocus={autoFocus}
-             
             {...props}
             onSelectionChange={addCursorPositionToSelectionChange}
             onContentSizeChange={(e) => {

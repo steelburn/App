@@ -17,7 +17,6 @@ function Picker<TPickerValue>({ref, ...props}: BasePickerProps<TPickerValue>) {
 
     return (
         <BasePicker<TPickerValue>
-             
             {...props}
             // Forward the ref to Picker, as we implement imperative methods there
             ref={ref}

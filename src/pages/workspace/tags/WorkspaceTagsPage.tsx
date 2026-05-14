@@ -931,7 +931,6 @@ function WorkspaceTagsPage({route}: WorkspaceTagsPageProps) {
                     {!hasVisibleTags && !isLoading && (
                         <ScrollView contentContainerStyle={[styles.flexGrow1, styles.flexShrink0]}>
                             <GenericEmptyStateComponent
-                                 
                                 {...genericIllustration}
                                 title={translate('workspace.tags.emptyTags.title')}
                                 subtitleText={subtitleText}

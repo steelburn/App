@@ -41,7 +41,6 @@ jest.mock('@components/withCurrentUserPersonalDetails', () => {
 
             return (
                 <Component
-                     
                     {...(props as TProps)}
                     currentUserPersonalDetails={LHNTestUtils.fakePersonalDetails[currentUserAccountID]}
                 />

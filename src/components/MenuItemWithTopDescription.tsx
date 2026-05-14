@@ -19,7 +19,6 @@ function MenuItemWithTopDescription({highlighted, outerWrapperStyle, ref, ...pro
 
     return (
         <MenuItem
-             
             {...props}
             ref={ref}
             shouldShowBasicTitle

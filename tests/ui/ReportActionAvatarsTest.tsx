@@ -276,7 +276,7 @@ const onyxState = {
 function renderAvatar(props: Parameters<typeof ReportActionAvatars>[0]) {
     return render(
         <OnyxListItemProvider>
-            { }
+            {}
             <ReportActionAvatars {...props} />
         </OnyxListItemProvider>,
     );

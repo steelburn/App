@@ -5,7 +5,6 @@ import type LoginFormProps from './types';
 function LoginForm({ref, ...props}: LoginFormProps) {
     return (
         <BaseLoginForm
-             
             {...props}
             ref={ref}
         />

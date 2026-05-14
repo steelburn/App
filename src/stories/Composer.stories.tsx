@@ -45,7 +45,6 @@ function Default(props: ComposerProps) {
         <View>
             <View style={[defaultStyles.border, defaultStyles.p4]}>
                 <ComposerWithNavigation
-                     
                     {...props}
                     multiline
                     value={comment}

@@ -60,7 +60,6 @@ function DomainNotFoundPageWrapper({domainAccountID, shouldBeBlocked, fullPageNo
                 onBackButtonPress={() => {
                     Navigation.goBack(ROUTES.WORKSPACES_LIST.route);
                 }}
-                 
                 {...fullPageNotFoundViewProps}
                 shouldShowBackButton
             />

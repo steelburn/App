@@ -341,7 +341,6 @@ function BaseTextInput({
         <>
             <View
                 style={[containerStyles]}
-                 
                 {...(shouldInterceptSwipe && SwipeInterceptPanResponder.panHandlers)}
             >
                 <PressableWithoutFeedback

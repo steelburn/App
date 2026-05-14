@@ -9,14 +9,7 @@ function EducationalTooltip({children, ...props}: TooltipExtendedProps) {
         return children;
     }
 
-    return (
-        <BaseEducationalTooltip
-             
-            {...props}
-        >
-            {children}
-        </BaseEducationalTooltip>
-    );
+    return <BaseEducationalTooltip {...props}>{children}</BaseEducationalTooltip>;
 }
 
 export default EducationalTooltip;

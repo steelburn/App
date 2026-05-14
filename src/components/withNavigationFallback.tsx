@@ -28,16 +28,10 @@ export default function <TProps extends Record<string, unknown>>(WrappedComponen
         );
 
         return context ? (
-            <WrappedComponent
-                 
-                {...props}
-            />
+            <WrappedComponent {...props} />
         ) : (
             <NavigationContext.Provider value={navigationContextValue as unknown as NavigationProp<ParamListBase>}>
-                <WrappedComponent
-                     
-                    {...props}
-                />
+                <WrappedComponent {...props} />
             </NavigationContext.Provider>
         );
     }

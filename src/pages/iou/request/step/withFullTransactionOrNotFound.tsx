@@ -99,7 +99,6 @@ export default function <TProps extends WithFullTransactionOrNotFoundProps<Money
         }
         return (
             <WrappedComponent
-                 
                 {...(props as TProps)}
                 transaction={shouldUseTransactionDraft(userAction, userType) ? transactionDraftData : transaction}
                 isLoadingTransaction={isLoadingTransaction}

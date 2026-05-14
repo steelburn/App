@@ -86,7 +86,6 @@ function TableFilterButtons({contentContainerStyle, ...props}: TableFilterButton
     }
 
     return (
-         
         <View {...props}>
             <FlatList
                 horizontal
@@ -139,7 +138,6 @@ function CellRendererComponent({children, style, ...props}: {children: ReactNode
     const shouldShowResponsiveLayout = shouldUseNarrowLayout || isMediumScreenWidth;
     return (
         <View
-             
             {...props}
             style={[style, shouldShowResponsiveLayout && styles.flex1]}
         >

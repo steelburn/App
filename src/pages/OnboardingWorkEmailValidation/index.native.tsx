@@ -6,7 +6,6 @@ function OnboardingWorkEmailValidation(props: OnboardingWorkEmailValidationProps
     return (
         <BaseOnboardingWorkEmailValidation
             shouldUseNativeStyles
-             
             {...props}
         />
     );

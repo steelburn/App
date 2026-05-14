@@ -34,7 +34,6 @@ function Template(props: PopoverMenuProps) {
             />
             <SafeAreaProvider>
                 <PopoverMenu
-                     
                     {...props}
                     isVisible={isVisible}
                     onClose={toggleVisibility}

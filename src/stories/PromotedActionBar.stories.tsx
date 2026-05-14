@@ -21,10 +21,7 @@ type StoryType = typeof Template & {args?: Partial<PromotedActionsBarPropsWithTe
 function Template(args: PromotedActionsBarProps) {
     return (
         <View style={{maxWidth: variables.sideBarWidth}}>
-            <PromotedActionsBar
-                 
-                {...args}
-            />
+            <PromotedActionsBar {...args} />
         </View>
     );
 }

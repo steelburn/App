@@ -7,7 +7,6 @@ function AnchorForAttachmentsOnly(props: AnchorForAttachmentsOnlyProps) {
     const styles = useThemeStyles();
     return (
         <BaseAnchorForAttachmentsOnly
-             
             {...props}
             style={styles.mw100}
         />

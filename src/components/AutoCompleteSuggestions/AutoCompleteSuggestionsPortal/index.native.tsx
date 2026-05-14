@@ -30,7 +30,6 @@ function AutoCompleteSuggestionsPortal<TSuggestion>({
                 {}
                 <BaseAutoCompleteSuggestions<TSuggestion>
                     width={width}
-                     
                     {...props}
                 />
             </View>

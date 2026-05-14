@@ -6,7 +6,6 @@ function OnboardingPrivateDomain(props: OnboardingPrivateDomainProps) {
     return (
         <BaseOnboardingPrivateDomain
             shouldUseNativeStyles
-             
             {...props}
         />
     );

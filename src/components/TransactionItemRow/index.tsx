@@ -144,7 +144,6 @@ function TransactionItemRow({
 
         return (
             <TransactionItemRowNarrow
-                 
                 {...narrowForwardedProps}
                 bgActiveStyles={bgActiveStyles}
                 merchant={merchant}
@@ -207,7 +206,6 @@ function TransactionItemRow({
 
     return (
         <TransactionItemRowWide
-             
             {...wideForwardedProps}
             bgActiveStyles={bgActiveStyles}
             merchant={merchant}

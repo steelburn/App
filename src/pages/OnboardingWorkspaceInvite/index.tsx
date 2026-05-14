@@ -8,7 +8,6 @@ function OnboardingWorkspaceInvite({...rest}: OnboardingWorkspaceInviteProps) {
         <OnboardingWrapper>
             <BaseOnboardingWorkspaceInvite
                 shouldUseNativeStyles={false}
-                 
                 {...rest}
             />
         </OnboardingWrapper>

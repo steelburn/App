@@ -154,7 +154,6 @@ function BaseEducationalTooltip({children, shouldRender = false, shouldHideOnNav
             shouldForceAnimate
             shouldRender={shouldRender}
             isEducationTooltip
-             
             {...props}
         >
             {(genericTooltipState) => {

@@ -116,7 +116,6 @@ function Lottie({source, webStyle, shouldLoadAfterInteractions, ...props}: Props
 
     return (
         <LottieView
-             
             {...props}
             source={animationFile}
             key={`${hasNavigatedAway}`}

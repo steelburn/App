@@ -64,7 +64,6 @@ function MoneyReportHeaderKYCDropdown({
 
     return (
         <KYCWall
-             
             {...props}
             onSuccessfulKYC={onSuccessfulKYC}
             enablePaymentsRoute={ROUTES.ENABLE_PAYMENTS}

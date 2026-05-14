@@ -12,7 +12,6 @@ function FocusableMenuItem(props: MenuItemProps) {
 
     return (
         <MenuItem
-             
             {...props}
             ref={ref}
         />

@@ -175,7 +175,6 @@ function TransactionListItem<TItem extends ListItem>({
     if (!isLargeScreenWidth) {
         return (
             <TransactionListItemNarrow
-                 
                 {...sharedProps}
                 isLastItem={isLastItem}
                 isFirstItem={isFirstItem}
@@ -185,7 +184,6 @@ function TransactionListItem<TItem extends ListItem>({
 
     return (
         <TransactionListItemWide
-             
             {...sharedProps}
             isLastItem={isLastItem}
         />

@@ -54,7 +54,6 @@ function withPolicyConnections<TProps extends WithPolicyConnectionsProps>(Wrappe
 
         return (
             <WrappedComponent
-                 
                 {...props}
                 isConnectionDataFetchNeeded={isConnectionDataFetchNeeded}
             />

@@ -11,7 +11,6 @@ const openAppSettings = () => {
 function LocationErrorMessage(props: LocationErrorMessageProps) {
     return (
         <BaseLocationErrorMessage
-             
             {...props}
             onAllowLocationLinkPress={openAppSettings}
         />

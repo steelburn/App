@@ -20,7 +20,7 @@ function DeferredChatBubbleCell(props: DeferredChatBubbleCellProps) {
     }
 
     // Deferred wrapper intentionally forwards all props to the underlying component
-     
+
     return <ChatBubbleCell {...props} />;
 }
 

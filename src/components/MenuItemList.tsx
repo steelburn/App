@@ -104,7 +104,6 @@ function MenuItemList({menuItems = [], shouldUseSingleExecution = false, wrapper
                     icon={icon}
                     iconWidth={iconWidth}
                     iconHeight={iconHeight}
-                     
                     {...menuItemProps}
                     disabled={!!menuItemProps.disabled || isExecuting}
                     onPress={shouldUseSingleExecution ? singleExecution(menuItemProps.onPress) : menuItemProps.onPress}

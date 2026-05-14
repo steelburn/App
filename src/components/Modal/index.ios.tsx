@@ -11,7 +11,6 @@ function Modal({children, ...rest}: BaseModalProps) {
 
     return (
         <BaseModal
-             
             {...rest}
             animationInTiming={animationInTiming}
             animationOutTiming={animationOutTiming}

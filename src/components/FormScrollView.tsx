@@ -21,7 +21,6 @@ function FormScrollView({children, ref, ...rest}: FormScrollViewProps) {
             ref={ref}
             contentContainerStyle={styles.flexGrow1}
             keyboardShouldPersistTaps="handled"
-             
             {...rest}
         >
             {children}

@@ -6,7 +6,6 @@ function OnboardingWorkspaceConfirmation({...rest}: OnboardingWorkspaceConfirmat
     return (
         <BaseOnboardingWorkspaceConfirmation
             shouldUseNativeStyles
-             
             {...rest}
         />
     );

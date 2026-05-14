@@ -13,7 +13,6 @@ describe('Button Component', () => {
         render(
             <Button
                 text={buttonText}
-                 
                 {...props}
             />,
         );

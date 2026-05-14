@@ -23,7 +23,7 @@ const story: Meta<typeof NumberWithSymbolForm> = {
 function Template(props: NumberWithSymbolFormProps) {
     return (
         <ScrollView contentContainerStyle={defaultStyles.flexGrow1}>
-            { }
+            {}
             <NumberWithSymbolFormWithNavigation {...props} />
         </ScrollView>
     );

@@ -292,7 +292,6 @@ function NetSuiteAdvancedPage({policy}: WithPolicyConnectionsProps) {
                             return (
                                 <ToggleSettingOptionRow
                                     key={rest.title}
-                                     
                                     {...rest}
                                     wrapperStyle={[styles.mv3, styles.ph5]}
                                 />

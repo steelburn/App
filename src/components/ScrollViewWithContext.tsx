@@ -51,7 +51,6 @@ function ScrollViewWithContext({onScroll, scrollEventThrottle, children, ref, ..
 
     return (
         <ScrollView
-             
             {...restProps}
             ref={scrollViewRef}
             onScroll={setContextScrollPosition}

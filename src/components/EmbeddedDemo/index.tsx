@@ -10,7 +10,6 @@ function EmbeddedDemo({url, iframeTitle, iframeProps}: EmbeddedDemoProps) {
             title={iframeTitle}
             src={url}
             style={styles.embeddedDemoIframe}
-             
             {...iframeProps}
         />
     );

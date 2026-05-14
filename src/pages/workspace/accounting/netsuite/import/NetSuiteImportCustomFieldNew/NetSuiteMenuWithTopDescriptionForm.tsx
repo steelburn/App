@@ -13,7 +13,6 @@ type NetSuiteMenuWithTopDescriptionFormProps = MenuItemProps & {
 function NetSuiteMenuWithTopDescriptionForm({value, valueRenderer, ...props}: NetSuiteMenuWithTopDescriptionFormProps) {
     return (
         <MenuItemWithTopDescription
-             
             {...props}
             title={valueRenderer ? valueRenderer(value) : value}
         />

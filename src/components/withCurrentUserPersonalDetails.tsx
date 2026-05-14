@@ -15,7 +15,6 @@ export default function <TProps extends WithCurrentUserPersonalDetailsProps>(Wra
         const currentUserPersonalDetails = useCurrentUserPersonalDetails();
         return (
             <WrappedComponent
-                 
                 {...(props as TProps)}
                 currentUserPersonalDetails={currentUserPersonalDetails}
             />

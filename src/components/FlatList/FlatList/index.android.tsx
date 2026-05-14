@@ -48,7 +48,6 @@ function CustomFlatList<T>({ref, enableAnimatedKeyboardDismissal = false, onMome
     if (enableAnimatedKeyboardDismissal) {
         return (
             <KeyboardDismissibleFlatList
-                 
                 {...props}
                 ref={ref}
                 onScroll={handleScroll}
@@ -60,7 +59,6 @@ function CustomFlatList<T>({ref, enableAnimatedKeyboardDismissal = false, onMome
 
     return (
         <FlatList<T>
-             
             {...props}
             ref={ref}
             onScroll={handleScroll}

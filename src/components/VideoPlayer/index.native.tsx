@@ -11,7 +11,6 @@ function VideoPlayer({videoControlsStyle, shouldUseControlsBottomMargin = true, 
 
     return (
         <BaseVideoPlayer
-             
             {...props}
             isVideoHovered
             shouldUseSharedVideoElement={false}

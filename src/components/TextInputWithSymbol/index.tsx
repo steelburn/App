@@ -6,7 +6,6 @@ import type {TextInputWithSymbolProps} from './types';
 function TextInputWithSymbol({onSelectionChange = () => {}, ref, ...props}: TextInputWithSymbolProps) {
     return (
         <BaseTextInputWithSymbol
-             
             {...props}
             ref={ref}
             onSelectionChange={(event: TextInputSelectionChangeEvent) => {

@@ -16,7 +16,6 @@ function TwoFactorAuthPage(props: TwoFactorAuthPageProps) {
         return <EnabledPage />;
     }
 
-     
     return <CopyCodesPage {...props} />;
 }
 

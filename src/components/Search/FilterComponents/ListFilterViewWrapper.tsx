@@ -48,7 +48,6 @@ function ListFilterWrapper({children, ...props}: ListFilterWrapperProps) {
         return children;
     }
 
-     
     return <ListFilterView {...props}>{children}</ListFilterView>;
 }
 

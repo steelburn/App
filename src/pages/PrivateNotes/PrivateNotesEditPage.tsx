@@ -201,7 +201,6 @@ function PrivateNotesEditPage({report, ...rest}: PrivateNotesEditPageProps) {
         <PrivateNotesEditPageInternal
             report={report}
             privateNoteDraft={privateNoteDraft ?? ''}
-             
             {...rest}
         />
     );

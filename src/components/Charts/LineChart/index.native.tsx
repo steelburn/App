@@ -3,7 +3,6 @@ import type {LineChartProps} from './LineChartContent';
 import LineChartContent from './LineChartContent';
 
 function LineChart(props: LineChartProps) {
-     
     return <LineChartContent {...props} />;
 }
 

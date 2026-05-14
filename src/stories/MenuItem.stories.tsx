@@ -21,7 +21,6 @@ const story: Meta<typeof MenuItem> = {
 };
 
 function Template(props: MenuItemProps) {
-     
     return <MenuItem {...props} />;
 }
 

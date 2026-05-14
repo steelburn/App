@@ -24,7 +24,6 @@ function Template(props: ReportActionItemImagesProps) {
         >
             {({hovered}) => (
                 <ReportActionItemImages
-                     
                     {...props}
                     isHovered={hovered}
                 />

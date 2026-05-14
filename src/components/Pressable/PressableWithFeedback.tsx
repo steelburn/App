@@ -73,7 +73,6 @@ function PressableWithFeedback({
         >
             <GenericPressable
                 ref={ref}
-                 
                 {...rest}
                 disabled={rest.disabled}
                 onHoverIn={(event) => {

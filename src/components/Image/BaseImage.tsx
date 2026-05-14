@@ -50,7 +50,6 @@ function BaseImage({onLoad, onLoadStart, source, style, ...props}: BaseImageProp
             source={resolvedSource}
             recyclingKey={getImageRecyclingKey(source)}
             style={style as ExpoImageProps['style']}
-             
             {...props}
         />
     );

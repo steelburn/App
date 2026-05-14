@@ -51,7 +51,6 @@ function BaseFlatListWithScrollKey<T>({ref, ...props}: BaseFlatListWithScrollKey
     return (
         <FlatList
             ref={listRef}
-             
             {...restProps}
             data={displayedData}
             maintainVisibleContentPosition={maintainVisibleContentPosition}

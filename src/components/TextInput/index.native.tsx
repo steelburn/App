@@ -32,7 +32,6 @@ function TextInput({ref, navigation, ...props}: BaseTextInputProps) {
 
     return (
         <BaseTextInput
-             
             {...props}
             // Setting autoCompleteType to new-password throws an error on Android/iOS, so fall back to password in that case
 

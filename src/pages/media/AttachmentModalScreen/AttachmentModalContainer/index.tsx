@@ -55,7 +55,6 @@ function AttachmentModalContainer<Screen extends AttachmentModalScreenType>({
             >
                 <AttachmentStateContextProvider>
                     <AttachmentModalBaseContent
-                         
                         {...contentProps}
                         shouldDisplayHelpButton={false}
                         onClose={closeModal}

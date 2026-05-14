@@ -20,7 +20,6 @@ function Hoverable({isDisabled, ref, ...props}: HoverableProps) {
 
     return (
         <ActiveHoverable
-             
             {...props}
             ref={ref}
         />

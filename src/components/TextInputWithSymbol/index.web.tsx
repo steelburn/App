@@ -8,7 +8,6 @@ function TextInputWithSymbol({onSelectionChange = () => {}, ref, ...props}: Text
 
     return (
         <BaseTextInputWithSymbol
-             
             {...props}
             ref={(element) => {
                 textInputRef.current = element as HTMLFormElement;

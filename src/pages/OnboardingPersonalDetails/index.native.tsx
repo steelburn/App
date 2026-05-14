@@ -27,7 +27,6 @@ function OnboardingPersonalDetails({...rest}: OnboardingPersonalDetailsProps) {
     return (
         <BaseOnboardingPersonalDetails
             shouldUseNativeStyles
-             
             {...rest}
         />
     );

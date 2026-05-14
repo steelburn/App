@@ -101,7 +101,6 @@ function BaseAnchorForCommentsOnly({
                     suppressHighlighting
                     // Add testID so it gets selected as an anchor tag by SelectionScraper
                     testID="a"
-                     
                     {...rest}
                 >
                     {children}

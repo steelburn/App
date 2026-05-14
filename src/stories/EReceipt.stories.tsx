@@ -170,7 +170,6 @@ const story: Meta<typeof EReceipt> = {
 };
 
 function Template(props: EReceiptProps) {
-     
     return <EReceipt {...props} />;
 }
 

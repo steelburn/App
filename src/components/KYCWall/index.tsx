@@ -5,7 +5,6 @@ import type {KYCWallProps} from './types';
 function KYCWall({ref, ...props}: KYCWallProps) {
     return (
         <BaseKYCWall
-             
             {...props}
             shouldListenForResize
             ref={ref}

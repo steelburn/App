@@ -52,7 +52,6 @@ describe('AvatarSelector', () => {
             <ComposeProviders components={[OnyxListItemProvider, LocaleContextProvider]}>
                 <AvatarSelector
                     onSelect={onSelectMock}
-                     
                     {...props}
                 />
             </ComposeProviders>,

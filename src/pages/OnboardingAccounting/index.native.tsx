@@ -6,7 +6,6 @@ function OnboardingAccounting(props: OnboardingAccountingProps) {
     return (
         <BaseOnboardingAccounting
             shouldUseNativeStyles
-             
             {...props}
         />
     );

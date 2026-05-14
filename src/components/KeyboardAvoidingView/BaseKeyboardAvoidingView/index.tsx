@@ -51,7 +51,6 @@ function BaseKeyboardAvoidingView(props: KeyboardAvoidingViewProps) {
 
     return (
         <Animated.View
-             
             {...rest}
             style={[style, isMobileSafariIos26 && animatedStyle]}
         />

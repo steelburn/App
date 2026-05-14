@@ -5,12 +5,7 @@ import type TextInputLabelProps from '@components/TextInput/TextInputLabel/types
 
 describe('TextInputLabel', () => {
     const renderLabel = (props: TextInputLabelProps) => {
-        return render(
-            <TextInputLabel
-                 
-                {...props}
-            />,
-        );
+        return render(<TextInputLabel {...props} />);
     };
 
     const labelTranslateY = useSharedValue(0);

@@ -9,7 +9,6 @@ function QuickEmojiReactions({closeContextMenu, ...rest}: QuickEmojiReactionsPro
 
     return (
         <BaseQuickEmojiReactions
-             
             {...rest}
             onPressOpenPicker={onPressOpenPicker}
         />

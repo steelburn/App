@@ -25,7 +25,6 @@ function PopoverAnchorTooltip({shouldRender = true, children, ...props}: Tooltip
 
     return (
         <BaseTooltip
-             
             {...props}
             ref={tooltipRef}
         >

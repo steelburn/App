@@ -17,7 +17,6 @@ const story: Meta<typeof TextInput> = {
 };
 
 function Template(props: BaseTextInputProps) {
-     
     return <TextInput {...props} />;
 }
 
@@ -85,7 +84,6 @@ function HintAndErrorInput(props: BaseTextInputProps) {
     const [error, setError] = useState('');
     return (
         <TextInput
-             
             {...props}
             onChangeText={(value) => {
                 if (value?.toLowerCase() === 'oops!') {
@@ -114,7 +112,6 @@ function AutoGrowSupportInput(props: BaseTextInputProps) {
 
     return (
         <TextInput
-             
             {...props}
             onChangeText={setValue}
             value={value}

@@ -18,7 +18,6 @@ function ActionSheetAwareScrollView({style, children, ref, ...restProps}: Action
 
     return (
         <Reanimated.ScrollView
-             
             {...restProps}
             ref={onRef}
             style={[style, animatedStyle]}
@@ -34,7 +33,6 @@ function ActionSheetAwareScrollView({style, children, ref, ...restProps}: Action
  * @returns - ActionSheetAwareScrollView
  */
 const renderScrollComponent: RenderActionSheetAwareScrollViewComponent = (props) => {
-     
     return <ActionSheetAwareScrollView {...props} />;
 };
 

@@ -7,14 +7,7 @@ function Tooltip({shouldRender = true, children, ...props}: TooltipExtendedProps
         return children;
     }
 
-    return (
-        <BaseTooltip
-             
-            {...props}
-        >
-            {children}
-        </BaseTooltip>
-    );
+    return <BaseTooltip {...props}>{children}</BaseTooltip>;
 }
 
 export default Tooltip;

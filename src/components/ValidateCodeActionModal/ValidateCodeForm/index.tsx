@@ -7,7 +7,6 @@ function ValidateCodeForm(props: ValidateCodeFormProps) {
     return (
         <BaseValidateCodeForm
             autoComplete={CONST.AUTO_COMPLETE_VARIANTS.ONE_TIME_CODE}
-             
             {...props}
         />
     );

@@ -22,7 +22,6 @@ function SwipeableView({children, onSwipeDown}: SwipeableViewProps) {
         }),
     ).current;
 
-     
     return <View {...panResponder.panHandlers}>{children}</View>;
 }
 

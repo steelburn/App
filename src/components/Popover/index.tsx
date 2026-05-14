@@ -78,7 +78,6 @@ function Popover(props: PopoverProps) {
     if (!fullscreen && !shouldUseNarrowLayout) {
         return createPortal(
             <Modal
-                 
                 {...props}
                 onClose={onCloseWithPopoverContext}
                 type={CONST.MODAL.MODAL_TYPE.POPOVER}
@@ -96,7 +95,6 @@ function Popover(props: PopoverProps) {
     if (withoutOverlay && !shouldUseNarrowLayout) {
         return createPortal(
             <PopoverWithoutOverlay
-                 
                 {...props}
                 withoutOverlayRef={withoutOverlayRef}
                 animationIn={animationIn}
@@ -108,7 +106,6 @@ function Popover(props: PopoverProps) {
 
     return (
         <Modal
-             
             {...props}
             onClose={onCloseWithPopoverContext}
             shouldHandleNavigationBack={props.shouldHandleNavigationBack}

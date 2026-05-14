@@ -28,7 +28,6 @@ function SelectableListItem<TItem extends ListItem>({
 
     return (
         <BaseListItem
-             
             {...baseProps}
             item={item}
             isFocused={isFocused}

@@ -60,10 +60,7 @@ const renderWorkspacePageWithSections = (props = {}) => {
 
     return render(
         <ComposeProviders components={[OnyxListItemProvider, LocaleContextProvider]}>
-            <WorkspacePageWithSections
-                 
-                {...defaultProps}
-            >
+            <WorkspacePageWithSections {...defaultProps}>
                 <View />
             </WorkspacePageWithSections>
         </ComposeProviders>,

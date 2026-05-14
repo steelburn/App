@@ -62,7 +62,6 @@ function AttachmentViewPdf(props: AttachmentViewPdfProps) {
     const Content = useMemo(
         () => (
             <BaseAttachmentViewPdf
-                 
                 {...props}
                 onScaleChanged={(newScale) => {
                     // The react-native-pdf's onScaleChanged event will sometimes give us scale values of e.g. 0.99... instead of 1,

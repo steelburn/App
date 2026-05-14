@@ -70,7 +70,6 @@ function LHNEmptyState() {
 
     return (
         <BlockingView
-             
             {...(emptyLHNIllustration as BlockingViewProps)}
             title={translate('common.emptyLHN.title')}
             CustomSubtitle={subtitle}

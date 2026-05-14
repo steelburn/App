@@ -7,7 +7,6 @@ import type AnchorForAttachmentsOnlyProps from './types';
 function AnchorForAttachmentsOnly(props: AnchorForAttachmentsOnlyProps) {
     return (
         <BaseAnchorForAttachmentsOnly
-             
             {...props}
             onPressIn={() => DeviceCapabilities.canUseTouchScreen() && ControlSelection.block()}
             onPressOut={() => ControlSelection.unblock()}

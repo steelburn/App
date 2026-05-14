@@ -14,11 +14,9 @@ function ReportDescriptionPage(props: ReportDescriptionPageProps) {
     const isTask = ReportUtils.isTaskReport(props.report);
 
     if (isTask) {
-         
         return <TaskDescriptionPage {...props} />;
     }
 
-     
     return <RoomDescriptionPage {...props} />;
 }
 

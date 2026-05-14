@@ -97,23 +97,18 @@ function createPlatformStackNavigatorComponent<RouterOptions extends PlatformSta
             () => (
                 <NavigationContent>
                     <NativeStackView
-                         
                         {...props}
                         state={state}
                         descriptors={wrappedDescriptors}
                         navigation={navigation}
                         describe={describe}
                     />
-                    {!!ExtraContent && (
-                         
-                        <ExtraContent {...customCodePropsWithCustomState} />
-                    )}
+                    {!!ExtraContent && <ExtraContent {...customCodePropsWithCustomState} />}
                 </NavigationContent>
             ),
             [NavigationContent, customCodePropsWithCustomState, describe, wrappedDescriptors, navigation, props, state],
         );
 
-         
         return NavigationContentWrapper === undefined ? Content : <NavigationContentWrapper {...customCodePropsWithCustomState}>{Content}</NavigationContentWrapper>;
     }
     PlatformNavigator.displayName = displayName;

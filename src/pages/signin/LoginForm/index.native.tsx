@@ -29,7 +29,6 @@ function LoginForm({scrollPageToTop, ref, ...rest}: LoginFormProps) {
 
     return (
         <BaseLoginForm
-             
             {...rest}
             scrollPageToTop={scrollPageToTop}
             ref={loginFormRef}

@@ -9,7 +9,6 @@ function OnboardingPurpose({...rest}: OnboardingPurposeProps) {
             <BaseOnboardingPurpose
                 shouldUseNativeStyles={false}
                 shouldEnableMaxHeight={false}
-                 
                 {...rest}
             />
         </OnboardingWrapper>

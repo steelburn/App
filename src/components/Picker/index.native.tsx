@@ -5,7 +5,6 @@ import type {BasePickerProps} from './types';
 function Picker<TPickerValue>({ref, ...props}: BasePickerProps<TPickerValue>) {
     return (
         <BasePicker<TPickerValue>
-             
             {...props}
             key={props.inputID}
             ref={ref}

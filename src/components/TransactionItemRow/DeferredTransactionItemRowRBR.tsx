@@ -12,7 +12,7 @@ function DeferredTransactionItemRowRBR(props: DeferredTransactionItemRowRBRProps
     }
 
     // Deferred wrapper intentionally forwards all props to the underlying component
-     
+
     return <TransactionItemRowRBR {...props} />;
 }
 

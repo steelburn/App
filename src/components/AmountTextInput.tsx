@@ -108,7 +108,6 @@ function AmountTextInput({
             shouldApplyPaddingToContainer={shouldApplyPaddingToContainer}
             rightHandSideComponent={rightHandSideComponent}
             navigation={navigation}
-             
             {...rest}
         />
     );

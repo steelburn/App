@@ -63,7 +63,6 @@ function CustomFlatList<T>({
     if (enableAnimatedKeyboardDismissal) {
         return (
             <KeyboardDismissibleFlatList
-                 
                 {...restProps}
                 ref={listRef}
                 maintainVisibleContentPosition={maintainVisibleContentPosition}
@@ -78,7 +77,6 @@ function CustomFlatList<T>({
 
     return (
         <FlatList<T>
-             
             {...restProps}
             ref={listRef}
             maintainVisibleContentPosition={maintainVisibleContentPosition}

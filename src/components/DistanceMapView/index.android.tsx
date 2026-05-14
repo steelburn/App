@@ -23,7 +23,6 @@ function DistanceMapView({overlayStyle, requireRouteToDisplayMap, ...rest}: Dist
     return (
         <>
             <MapView
-                 
                 {...rest}
                 onMapReady={() => {
                     if (isMapReady) {

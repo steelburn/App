@@ -32,7 +32,6 @@ function AutoCompleteSuggestionsPortal<TSuggestion>({
     const componentToRender = (
         <BaseAutoCompleteSuggestions<TSuggestion>
             width={width}
-             
             {...props}
         />
     );

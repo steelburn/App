@@ -65,7 +65,6 @@ function AmountSelectorModal({value, description = '', onValueSelected, isVisibl
                 >
                     <View style={styles.flex1}>
                         <NumberWithSymbolForm
-                             
                             {...rest}
                             value={currentValue}
                             onInputChange={setValue}

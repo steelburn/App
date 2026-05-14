@@ -74,7 +74,6 @@ function Template(props: FormProviderProps & FormProviderOnyxProps) {
     }
 
     return (
-         
         <FormProvider {...props}>
             <View>
                 <InputWrapper
@@ -187,7 +186,6 @@ function WithNativeEventHandler(props: FormProviderProps & FormProviderOnyxProps
     }
 
     return (
-         
         <FormProvider {...props}>
             <InputWrapper
                 InputComponent={TextInput}

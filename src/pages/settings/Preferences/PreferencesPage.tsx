@@ -75,7 +75,6 @@ function PreferencesPage() {
                         isCentralPane
                         illustrationContainerStyle={styles.cardSectionIllustrationContainer}
                         illustrationBackgroundColor={colors.blue500}
-                         
                         {...preferencesIllustration}
                     >
                         <View style={[styles.flex1, styles.mt5]}>

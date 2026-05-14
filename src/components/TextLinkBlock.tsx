@@ -56,7 +56,6 @@ function TextLinkBlock({text, style, prefixIcon, ...rest}: TextLinkBlockProps) {
                     {!!prefixIcon && index === 0 && <Text> </Text>}
                     <TextLink
                         style={style}
-                         
                         {...rest}
                     >
                         {word}

@@ -3,7 +3,6 @@ import {KeyboardAvoidingView as KeyboardAvoidingViewComponent} from 'react-nativ
 import type {KeyboardAvoidingViewProps} from 'react-native-keyboard-controller';
 
 function BaseKeyboardAvoidingView(props: KeyboardAvoidingViewProps) {
-     
     return <KeyboardAvoidingViewComponent {...props} />;
 }
 

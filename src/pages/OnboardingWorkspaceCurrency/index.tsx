@@ -8,7 +8,6 @@ function OnboardingWorkspaceCurrency({...rest}: OnboardingWorkspaceCurrencyProps
         <OnboardingWrapper>
             <BaseOnboardingWorkspaceCurrency
                 shouldUseNativeStyles={false}
-                 
                 {...rest}
             />
         </OnboardingWrapper>

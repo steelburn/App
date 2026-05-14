@@ -103,7 +103,6 @@ export default function <TProps extends WithPolicyProps>(WrappedComponent: Compo
 
         return (
             <WrappedComponent
-                 
                 {...(props as TProps)}
                 policy={policy}
                 policyDraft={policyDraft}

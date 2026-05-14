@@ -206,7 +206,6 @@ function ReceiptImage({
                 <EReceiptThumbnail
                     transactionID={transactionID}
                     iconSize={iconSize}
-                     
                     {...props}
                 />
             </View>

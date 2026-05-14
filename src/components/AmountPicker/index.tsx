@@ -41,7 +41,6 @@ function AmountPicker({value, description, title, errorText = '', onInputChange,
                 errorText={errorText}
             />
             <AmountSelectorModal
-                 
                 {...rest}
                 value={value}
                 isVisible={isPickerVisible}

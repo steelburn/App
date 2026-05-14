@@ -154,7 +154,6 @@ function OnyxTabNavigator<TTabName extends string = SelectedTabRequest>({
                     shouldShowProductTrainingTooltip={shouldShowProductTrainingTooltip}
                     renderProductTrainingTooltip={renderProductTrainingTooltip}
                     equalWidth={equalWidth}
-                     
                     {...props}
                 />
             );
@@ -174,7 +173,6 @@ function OnyxTabNavigator<TTabName extends string = SelectedTabRequest>({
     return (
         <TabFocusTrapContext.Provider value={setTabFocusTrapContainerElement}>
             <TopTab.Navigator
-                 
                 {...rest}
                 id={id}
                 initialRouteName={validInitialTab}

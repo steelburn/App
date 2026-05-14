@@ -93,7 +93,6 @@ function TextInput({ref, ...props}: BaseTextInputProps) {
 
     return (
         <BaseTextInput
-             
             {...props}
             ref={(element) => {
                 textInputRef.current = element as HTMLFormElement;

@@ -245,7 +245,6 @@ function ReanimatedModal({
                     }
                 }}
                 style={modalStyle}
-                 
                 {...props}
             >
                 {isBackdropMounted && hasBackdrop && backdropView}
