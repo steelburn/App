@@ -1150,4 +1150,4 @@ export {
     updateLastLocationPermissionPrompt,
     setMultipleMoneyRequestParticipantsFromReport,
 };
-export type {MoneyRequestStepScanParticipantsFlowParams, MoneyRequestStepDistanceNavigationParams};
+export type {MoneyRequestStepScanParticipantsFlowParams};
