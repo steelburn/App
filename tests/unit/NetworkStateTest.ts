@@ -106,15 +106,15 @@ describe('NetworkState', () => {
         test('multiple listeners all get called', () => {
             const listener1 = jest.fn();
             const listener2 = jest.fn();
-            const unsub1 = subscribe(listener1);
-            const unsub2 = subscribe(listener2);
+            const unsubscribe1 = subscribe(listener1);
+            const unsubscribe2 = subscribe(listener2);
 
             setHasRadio(false);
             expect(listener1).toHaveBeenCalledTimes(1);
             expect(listener2).toHaveBeenCalledTimes(1);
 
-            unsub1();
-            unsub2();
+            unsubscribe1();
+            unsubscribe2();
         });
 
         test('unsubscribe removes the listener', () => {
