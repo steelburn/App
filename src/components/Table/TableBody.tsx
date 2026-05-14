@@ -83,7 +83,6 @@ function TableBody<T>({contentContainerStyle, ...props}: TableBodyProps) {
             {...props}
         >
             <FlashList<T>
-                key={`${hasActiveFilters}`}
                 data={filteredAndSortedData}
                 ListEmptyComponent={isEmptyResult ? EmptyResultComponent : ListEmptyComponent}
                 contentContainerStyle={[filteredAndSortedData.length === 0 && styles.flex1, listContentContainerStyle, contentContainerStyle]}
