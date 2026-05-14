@@ -277,6 +277,7 @@
 "../../src/libs/Navigation/AppNavigator/Navigators/TestToolsModalNavigator.tsx"	"no-restricted-syntax"	1
 "../../src/libs/Navigation/Navigation.ts"	"no-restricted-imports"	1
 "../../src/libs/Navigation/PlatformStackNavigation/ScreenLayout.tsx"	"no-restricted-imports"	2
+"../../src/libs/Navigation/helpers/createNormalizedConfigs.ts"	"@typescript-eslint/no-deprecated/escape"	1
 "../../src/libs/Navigation/helpers/dismissModalAndOpenReportInInboxTab.ts"	"@typescript-eslint/no-deprecated/InteractionManager.runAfterInteractions"	1
 "../../src/libs/Navigation/navigateAfterInteraction/index.ios.ts"	"@typescript-eslint/no-deprecated/InteractionManager.runAfterInteractions"	1
 "../../src/libs/Network/enhanceParameters.ts"	"no-restricted-syntax"	1
