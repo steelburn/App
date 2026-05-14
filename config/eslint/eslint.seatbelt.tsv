@@ -752,6 +752,7 @@
 "../../src/types/onyx/WalletTransfer.ts"	"no-restricted-syntax"	1
 "../../src/utils/keyboard/index.android.ts"	"no-restricted-imports"	1
 "../../src/utils/keyboard/index.ts"	"no-restricted-imports"	1
+"../../src/utils/keyboard/index.web.ts"	"no-restricted-imports"	1
 "../../src/utils/keyboard/index.website.ts"	"no-restricted-imports"	1
 "../../tests/actions/ReportTest.ts"	"@typescript-eslint/no-deprecated/buildNextStepNew"	1
 "../../tests/perf-test/ReportUtils.perf-test.ts"	"@typescript-eslint/no-deprecated/getReportName"	1
