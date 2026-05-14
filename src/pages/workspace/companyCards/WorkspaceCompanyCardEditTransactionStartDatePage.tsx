@@ -46,9 +46,6 @@ function WorkspaceCompanyCardEditTransactionStartDatePage({route}: WorkspaceComp
     const [allBankCards] = useCardsList(feedName);
     const card = allBankCards?.[cardID];
     const currentStartDate = card?.scrapeMinDate;
-
-    // Derive the saved option from the card's current scrapeMinDate:
-    // empty/null means "From the beginning", any date means "Custom".
     const savedDateOption = currentStartDate ? CONST.COMPANY_CARD.TRANSACTION_START_DATE_OPTIONS.CUSTOM : CONST.COMPANY_CARD.TRANSACTION_START_DATE_OPTIONS.FROM_BEGINNING;
 
     const [localDateOption, setLocalDateOption] = useState<DateOption | undefined>(undefined);
