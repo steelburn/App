@@ -21,6 +21,7 @@ import Section from '@components/Section';
 import Text from '@components/Text';
 import ThreeDotsMenu from '@components/ThreeDotsMenu';
 import useCardFeeds from '@hooks/useCardFeeds';
+import useConfirmModal from '@hooks/useConfirmModal';
 import {useCurrencyListActions} from '@hooks/useCurrencyList';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useDefaultFundID from '@hooks/useDefaultFundID';
@@ -30,7 +31,6 @@ import useNetwork from '@hooks/useNetwork';
 import useOnyx from '@hooks/useOnyx';
 import useOutstandingBalanceGuard from '@hooks/useOutstandingBalanceGuard';
 import usePayAndDowngrade from '@hooks/usePayAndDowngrade';
-import usePermissions from '@hooks/usePermissions';
 import usePrevious from '@hooks/usePrevious';
 import usePrivateSubscription from '@hooks/usePrivateSubscription';
 import useResponsiveLayout from '@hooks/useResponsiveLayout';
@@ -62,6 +62,7 @@ import Navigation from '@libs/Navigation/Navigation';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
 import type {WorkspaceSplitNavigatorParamList} from '@libs/Navigation/types';
 import {
+    canEditWorkspaceSettings,
     getConnectionExporters,
     getRulesDocumentSourceURL,
     getUserFriendlyWorkspaceType,
@@ -127,7 +128,7 @@ function WorkspaceOverviewPage({policyDraft, policy: policyProp, route}: Workspa
     const isBankAccountVerified = !!settings?.paymentBankAccountID;
     const shouldBlockCurrencyChange = useShouldBlockCurrencyChange(policyID);
 
-    const isPolicyAdmin = isPolicyAdminPolicyUtils(policy);
+    const isPolicyAdmin = canEditWorkspaceSettings(policy);
     const outputCurrency = policy?.outputCurrency ?? '';
     const currencySymbol = getCurrencySymbol(outputCurrency) ?? '';
     const formattedCurrency = !isEmptyObject(policy) ? `${outputCurrency} - ${currencySymbol}` : '';
@@ -195,18 +196,16 @@ function WorkspaceOverviewPage({policyDraft, policy: policyProp, route}: Workspa
     const policyName = policy?.name ?? '';
     const policyDescription = policy?.description ?? translate('workspace.common.defaultDescription');
     const policyCurrency = policy?.outputCurrency ?? '';
-    const readOnly = !isPolicyAdminPolicyUtils(policy);
+    const readOnly = !canEditWorkspaceSettings(policy);
     const currencyReadOnly = readOnly || isBankAccountVerified;
     const isOwner = isPolicyOwner(policy, currentUserPersonalDetails.accountID);
     const shouldShowAddress = !readOnly || !!formattedAddress;
     const {isAccountLocked} = useLockedAccountState();
     const {showLockedAccountModal} = useLockedAccountActions();
     const [lastPaymentMethod] = useOnyx(ONYXKEYS.NVP_LAST_PAYMENT_METHOD);
-    const {isBetaEnabled} = usePermissions();
     const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false);
     const [pendingRulesDocumentFile, setPendingRulesDocumentFile] = useState<FileObject | undefined>();
-    const [isProtectedRulesDocumentVisible, setIsProtectedRulesDocumentVisible] = useState(false);
-    const [isCorruptedRulesDocumentVisible, setIsCorruptedRulesDocumentVisible] = useState(false);
+    const {showConfirmModal} = useConfirmModal();
     const [session] = useOnyx(ONYXKEYS.SESSION);
 
     const rulesDocumentSourceURL = useMemo(
@@ -255,7 +254,7 @@ function WorkspaceOverviewPage({policyDraft, policy: policyProp, route}: Workspa
         ],
         [translate, expensifyIcons, handleRulesDocumentPicked, policyID, rulesDocumentURL],
     );
-    const shouldShowExpensePolicySection = isBetaEnabled(CONST.BETAS.CUSTOM_RULES) && (isPolicyAdmin || hasRulesDocument || hasCustomRulesText);
+    const shouldShowExpensePolicySection = isPolicyAdmin || hasRulesDocument || hasCustomRulesText;
     const shouldShowRulesDocumentSubSection = isPolicyAdmin || hasRulesDocument;
 
     const personalDetails = usePersonalDetails();
@@ -649,32 +648,24 @@ function WorkspaceOverviewPage({policyDraft, policy: policyProp, route}: Workspa
                     }}
                     onPassword={() => {
                         setPendingRulesDocumentFile(undefined);
-                        setIsProtectedRulesDocumentVisible(true);
+                        showConfirmModal({
+                            title: translate('attachmentPicker.attachmentError'),
+                            prompt: translate('attachmentPicker.protectedPDFNotSupported'),
+                            confirmText: translate('common.close'),
+                            shouldShowCancelButton: false,
+                        });
                     }}
                     onLoadError={() => {
                         setPendingRulesDocumentFile(undefined);
-                        setIsCorruptedRulesDocumentVisible(true);
+                        showConfirmModal({
+                            title: translate('attachmentPicker.attachmentError'),
+                            prompt: translate('attachmentPicker.errorWhileSelectingCorruptedAttachment'),
+                            confirmText: translate('common.close'),
+                            shouldShowCancelButton: false,
+                        });
                     }}
                 />
             )}
-            <ConfirmModal
-                title={translate('attachmentPicker.attachmentError')}
-                isVisible={isProtectedRulesDocumentVisible}
-                onConfirm={() => setIsProtectedRulesDocumentVisible(false)}
-                onCancel={() => setIsProtectedRulesDocumentVisible(false)}
-                prompt={translate('attachmentPicker.protectedPDFNotSupported')}
-                confirmText={translate('common.close')}
-                shouldShowCancelButton={false}
-            />
-            <ConfirmModal
-                title={translate('attachmentPicker.attachmentError')}
-                isVisible={isCorruptedRulesDocumentVisible}
-                onConfirm={() => setIsCorruptedRulesDocumentVisible(false)}
-                onCancel={() => setIsCorruptedRulesDocumentVisible(false)}
-                prompt={translate('attachmentPicker.errorWhileSelectingCorruptedAttachment')}
-                confirmText={translate('common.close')}
-                shouldShowCancelButton={false}
-            />
         </>
     );
     return (
