@@ -117,7 +117,7 @@ function ReanimatedModal({
             setIsVisibleState(false);
             setIsContainerOpen(false);
         },
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+
         [],
     );
 
@@ -128,10 +128,10 @@ function ReanimatedModal({
             transitionHandleRef.current = TransitionTracker.startTransition();
             onModalWillShow();
 
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setIsVisibleState(true);
             setIsTransitioning(true);
         } else if (!isVisible && isContainerOpen && !isTransitioning) {
-            // eslint-disable-next-line @typescript-eslint/no-deprecated
             handleRef.current = InteractionManager.createInteractionHandle();
             transitionHandleRef.current = TransitionTracker.startTransition();
             onModalWillHide();
@@ -165,7 +165,6 @@ function ReanimatedModal({
         setIsTransitioning(false);
         setIsContainerOpen(false);
         if (handleRef.current) {
-            // eslint-disable-next-line @typescript-eslint/no-deprecated
             InteractionManager.clearInteractionHandle(handleRef.current);
         }
         if (transitionHandleRef.current) {
@@ -235,7 +234,6 @@ function ReanimatedModal({
             <Modal
                 transparent
                 animationType="none"
-                // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
                 visible={modalVisibility}
                 onRequestClose={onBackButtonPressHandler}
                 statusBarTranslucent={statusBarTranslucent}
@@ -247,7 +245,6 @@ function ReanimatedModal({
                     }
                 }}
                 style={modalStyle}
-                // eslint-disable-next-line react/jsx-props-no-spreading
                 {...props}
             >
                 {isBackdropMounted && hasBackdrop && backdropView}
