@@ -72,6 +72,7 @@ function ExpenseReportListItem<TItem extends ListItem>({
     // Fetch live policy categories from Onyx to sync violations at render time
     const [parentPolicy] = originalUseOnyx(`${ONYXKEYS.COLLECTION.POLICY}${getNonEmptyStringOnyxID(reportItem.policyID)}`);
     const [parentReport] = originalUseOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(reportItem.reportID)}`);
+    const [parentChatReport] = originalUseOnyx(`${ONYXKEYS.COLLECTION.REPORT}${getNonEmptyStringOnyxID(reportItem.parentReportID)}`);
     const [policyCategories] = originalUseOnyx(`${ONYXKEYS.COLLECTION.POLICY_CATEGORIES}${getNonEmptyStringOnyxID(reportItem.policyID)}`);
 
     const searchData = currentSearchResults?.data;
@@ -79,6 +80,10 @@ function ExpenseReportListItem<TItem extends ListItem>({
     const snapshotReport = useMemo(() => {
         return (searchData?.[`${ONYXKEYS.COLLECTION.REPORT}${reportItem.reportID}`] ?? {}) as Report;
     }, [searchData, reportItem.reportID]);
+
+    const snapshotChatReport = useMemo(() => {
+        return searchData?.[`${ONYXKEYS.COLLECTION.REPORT}${reportItem.parentReportID}`];
+    }, [searchData, reportItem.parentReportID]);
 
     const snapshotPolicy = useMemo(() => {
         return (searchData?.[`${ONYXKEYS.COLLECTION.POLICY}${reportItem.policyID}`] ?? {}) as Policy;
@@ -153,12 +158,17 @@ function ExpenseReportListItem<TItem extends ListItem>({
             onDelegateAccessRestricted: showDelegateNoAccessModal,
             personalPolicyID,
             onHoldMenuOpen: (holdItem, requestType, paymentType) => {
+                // Search rows render from a snapshot; the report may not exist in the main
+                // collection yet. Fall back to the snapshot so the modal can submit.
                 const moneyRequestReport = parentReport ?? snapshotReport;
+                const chatReport = parentChatReport ?? snapshotChatReport;
                 const {nonHeldAmount, fullAmount, hasValidNonHeldAmount} = getNonHeldAndFullAmount(moneyRequestReport, holdItem.allActions?.includes(CONST.SEARCH.ACTION_TYPES.PAY) ?? false);
                 const hasNonHeldExpenses = holdItem.transactions.some((t) => !isOnHold(t));
                 showHoldMenu({
                     reportID: holdItem.reportID,
                     chatReportID: holdItem.parentReportID,
+                    moneyRequestReport,
+                    chatReport,
                     requestType,
                     paymentType,
                     nonHeldAmount: hasNonHeldExpenses && hasValidNonHeldAmount ? nonHeldAmount : undefined,
@@ -175,9 +185,11 @@ function ExpenseReportListItem<TItem extends ListItem>({
         reportItem,
         onSelectRow,
         snapshotReport,
+        snapshotChatReport,
         snapshotPolicy,
         parentPolicy,
         parentReport,
+        parentChatReport,
         lastPaymentMethod,
         userBillingGracePeriodEnds,
         personalPolicyID,
