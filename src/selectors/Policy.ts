@@ -187,8 +187,6 @@ function getReusablePoliciesConnectedTo(policies: OnyxCollection<Policy>, connec
 const reusablePoliciesConnectedToSelector = (policies: OnyxCollection<Policy>, connectionName: ReusablePolicyConnectionName, currentPolicyID?: string) =>
     getReusablePoliciesConnectedTo(policies, connectionName, currentPolicyID);
 
-const hasPoliciesConnectedToCertiniaSelector = (policies: OnyxCollection<Policy>) => !!adminPoliciesConnectedToCertiniaSelector(policies).length;
-
 const hasPoliciesConnectedToQBDSelector = (policies: OnyxCollection<Policy>) => !!adminPoliciesConnectedToQBDSelector(policies).length;
 
 const hasReusablePoliciesConnectedToSelector = (policies: OnyxCollection<Policy>, connectionName: ReusablePolicyConnectionName, currentPolicyID?: string) =>
@@ -258,7 +256,6 @@ export {
     adminPoliciesConnectedToNetSuiteSelector,
     adminPoliciesConnectedToQBDSelector,
     reusablePoliciesConnectedToSelector,
-    hasPoliciesConnectedToCertiniaSelector,
     hasPoliciesConnectedToQBDSelector,
     hasReusablePoliciesConnectedToSelector,
     lastWorkspaceNumberSelector,
