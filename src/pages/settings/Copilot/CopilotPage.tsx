@@ -488,10 +488,7 @@ function CopilotPage() {
                             <PopoverMenu
                                 isVisible={shouldShowDelegatePopoverMenu}
                                 anchorRef={delegateButtonRef as RefObject<View | null>}
-                                anchorPosition={{
-                                    horizontal: anchorPosition.horizontal,
-                                    vertical: anchorPosition.vertical,
-                                }}
+                                anchorPosition={anchorPosition}
                                 anchorAlignment={{
                                     horizontal: CONST.MODAL.ANCHOR_ORIGIN_HORIZONTAL.RIGHT,
                                     vertical: CONST.MODAL.ANCHOR_ORIGIN_VERTICAL.TOP,
