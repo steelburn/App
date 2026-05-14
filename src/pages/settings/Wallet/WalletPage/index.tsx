@@ -3,7 +3,7 @@ import debounce from 'lodash/debounce';
 import isEmpty from 'lodash/isEmpty';
 import type {ForwardedRef, RefObject} from 'react';
 import React, {useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react';
-import {StyleSheet, View} from 'react-native';
+import {View} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';
 import ActivityIndicator from '@components/ActivityIndicator';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
@@ -669,7 +669,7 @@ function WalletPage() {
                 shouldShowOfflineIndicatorInWideScreen
             >
                 {headerWithBackButton}
-                <View style={[styles.flex1, StyleSheet.absoluteFill, styles.fullScreenLoading]}>
+                <View style={[styles.flex1, styles.fullScreenLoading]}>
                     <ActivityIndicator
                         size={CONST.ACTIVITY_INDICATOR_SIZE.LARGE}
                         reasonAttributes={reasonAttributes}
