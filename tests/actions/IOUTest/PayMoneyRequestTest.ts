@@ -1566,6 +1566,82 @@ describe('actions/IOU/PayMoneyRequest', () => {
                 },
             });
         });
+
+        it('optimistic nextStep shows waiting to pay when approvals are disabled (OPTIONAL approval mode)', async () => {
+            const adminEmail = 'admin@expensifail.com';
+            const adminAccountID = 10;
+            const employeeEmail = 'employee@expensifail.com';
+            const employeeAccountID = 11;
+
+            await Onyx.set(ONYXKEYS.SESSION, {email: adminEmail, accountID: adminAccountID});
+            await Onyx.set(ONYXKEYS.PERSONAL_DETAILS_LIST, {
+                [adminAccountID]: {
+                    accountID: adminAccountID,
+                    login: adminEmail,
+                    displayName: 'Admin User',
+                },
+                [employeeAccountID]: {
+                    accountID: employeeAccountID,
+                    login: employeeEmail,
+                    displayName: 'Employee User',
+                },
+            });
+
+            const policy = {
+                id: 'cancelOptionalPolicy',
+                name: 'Test Policy',
+                role: CONST.POLICY.ROLE.ADMIN,
+                owner: adminEmail,
+                ownerAccountID: adminAccountID,
+                outputCurrency: CONST.CURRENCY.USD,
+                isPolicyExpenseChatEnabled: true,
+                type: CONST.POLICY.TYPE.CORPORATE,
+                approvalMode: CONST.POLICY.APPROVAL_MODE.OPTIONAL,
+                reimbursementChoice: CONST.POLICY.REIMBURSEMENT_CHOICES.REIMBURSEMENT_YES,
+            };
+
+            const expenseReport = {
+                reportID: 'cancelOptionalExpense',
+                type: CONST.REPORT.TYPE.EXPENSE,
+                ownerAccountID: employeeAccountID,
+                managerID: adminAccountID,
+                policyID: policy.id,
+                stateNum: CONST.REPORT.STATE_NUM.APPROVED,
+                statusNum: CONST.REPORT.STATUS_NUM.REIMBURSED,
+                total: -1000,
+                nonReimbursableTotal: 0,
+                currency: 'USD',
+                parentReportID: 'cancelOptionalChat',
+                chatReportID: 'cancelOptionalChat',
+            };
+
+            const chatReport = {
+                reportID: 'cancelOptionalChat',
+                isOwnPolicyExpenseChat: true,
+                ownerAccountID: employeeAccountID,
+                iouReportID: expenseReport.reportID,
+                policyID: policy.id,
+                type: CONST.REPORT.TYPE.CHAT,
+                chatType: CONST.REPORT.CHAT_TYPE.POLICY_EXPENSE_CHAT,
+            };
+
+            await Onyx.set(`${ONYXKEYS.COLLECTION.POLICY}${policy.id}`, policy);
+            await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT}${expenseReport.reportID}`, expenseReport);
+            await Onyx.set(`${ONYXKEYS.COLLECTION.REPORT}${chatReport.reportID}`, chatReport);
+
+            mockFetch?.pause?.();
+
+            cancelPayment(expenseReport, chatReport, policy, true, adminAccountID, adminEmail, false);
+            await waitForBatchedUpdates();
+
+            // Verify the report's statusNum stays CLOSED (not changed to SUBMITTED)
+            const updatedReport = await getOnyxValue(`${ONYXKEYS.COLLECTION.REPORT}${expenseReport.reportID}`);
+            expect(updatedReport?.statusNum).toBe(CONST.REPORT.STATUS_NUM.CLOSED);
+            expect(updatedReport?.stateNum).toBe(CONST.REPORT.STATE_NUM.APPROVED);
+
+            // Verify the nextStep shows "waiting to pay" instead of "no further action"
+            expect(updatedReport?.nextStep?.messageKey).toBe(CONST.NEXT_STEP.MESSAGE_KEY.WAITING_TO_PAY);
+        });
     });
 
     describe('payMoneyRequest', () => {
