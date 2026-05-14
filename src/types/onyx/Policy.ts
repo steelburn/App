@@ -1086,6 +1086,9 @@ type NetSuiteConnectionConfig = OnyxCommon.OnyxValueWithOfflineFeedback<
         /** The payable account to use for Expensify Travel expenses when exporting to NetSuite */
         travelInvoicingPayableAccountID?: string;
 
+        /** Whether Travel Invoicing JEs post as individual entries per expense or a single grouped entry */
+        travelInvoicingJournalPostingPreference?: NetSuiteJournalPostingPreferences;
+
         /** The provincial tax account for tax line items in NetSuite (only for Canadian Subsidiaries) */
         provincialTaxPostingAccount?: string;
 
@@ -1295,6 +1298,9 @@ type SageIntacctExportConfig = {
 
     /** Accounting method for Sage Intacct */
     accountingMethod: ValueOf<typeof COMMON_CONST.INTEGRATIONS.ACCOUNTING_METHOD>;
+
+    /** The payable account to use for Expensify Travel expenses when exporting to Sage Intacct */
+    travelInvoicingPayableAccountID?: string;
 };
 
 /**
@@ -2205,7 +2211,6 @@ export type {
     Connections,
     SageIntacctOfflineStateKeys,
     ConnectionName,
-    ReceiptPartners,
     UberReceiptPartner,
     AllConnectionName,
     Tenant,
@@ -2223,9 +2228,6 @@ export type {
     NetSuiteCustomSegment,
     NetSuiteCustomFieldMapping,
     NetSuiteAccount,
-    NetSuiteVendor,
-    InvoiceItem,
-    NetSuiteTaxAccount,
     NetSuiteCustomFormID,
     SageIntacctMappingValue,
     SageIntacctMappingType,
