@@ -177,6 +177,9 @@ const SCREENS = {
         AGENTS: {
             ROOT: 'Settings_Agents',
             ADD: 'Settings_Agents_Add',
+            EDIT: 'Settings_Agents_Edit',
+            EDIT_NAME: 'Settings_Agents_Edit_Name',
+            EDIT_PROMPT: 'Settings_Agents_Edit_Prompt',
         },
 
         RULES: {

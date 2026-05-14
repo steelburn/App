@@ -2742,6 +2742,9 @@ ${amount} für ${merchant} – ${date}`,
         emptyAgents: {title: 'Keine Agenten erstellt', subtitle: 'Hör auf, Dinge manuell zu erledigen. Weise stattdessen eine:n Agent:in an und spare dir eine Menge Zeit.'},
         error: {
             genericAdd: 'Beim Hinzufügen dieses Agenten ist ein Problem aufgetreten',
+            genericUpdate: 'Beim Aktualisieren dieses Agents ist ein Problem aufgetreten',
+            updateName: 'Beim Aktualisieren des Namens dieses Agents ist ein Problem aufgetreten',
+            updatePrompt: 'Beim Aktualisieren der Anweisungen dieses Agenten ist ein Problem aufgetreten',
         },
     },
     addAgentPage: {
@@ -2754,6 +2757,16 @@ ${amount} für ${merchant} – ${date}`,
         defaultPrompt:
             'Lehne Ausgaben ab, die für Glücksspiele, Kinobesuche oder andere offensichtlich nicht geschäftliche Zwecke sind.\n\nErinnere den:die Nutzer:in daran, immer ein Belegfoto beizufügen, auf dem das Trinkgeld klar erkennbar ist.\n\nGenehmige den Bericht, wenn er früheren Berichten derselben Person sehr ähnlich ist.\n\nLehne Berichte mit mehr als 500 $ an Reisekosten ab.',
     },
+    editAgentPage: {
+        title: 'Agent bearbeiten',
+        agentName: 'Agentenname',
+        instructions: 'Eigene Anweisungen schreiben',
+        deleteAgent: 'Agent löschen',
+        deleteAgentTitle: 'Agent löschen?',
+        deleteAgentMessage: 'Sind Sie sicher, dass Sie diese Ansprechperson löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.',
+    },
+    editAgentNamePage: {title: 'Agentenname'},
+    editAgentPromptPage: {title: 'Eigene Anweisungen schreiben', error: {emptyPrompt: 'Bitte gib Anweisungen für deine Agentin/deinen Agenten ein.'}},
     expenseRulesPage: {
         title: 'Ausgabenregeln',
         findRule: 'Regel finden',
