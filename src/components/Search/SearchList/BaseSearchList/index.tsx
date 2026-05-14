@@ -8,6 +8,7 @@ import type {ExtendedTargetedEvent} from '@components/SelectionList/ListItem/typ
 import {useEditingCellState} from '@components/Table/EditableCell';
 import useArrowKeyFocusManager from '@hooks/useArrowKeyFocusManager';
 import useKeyboardShortcut from '@hooks/useKeyboardShortcut';
+import useStableIndexedHandler from '@hooks/useStableIndexedHandler';
 import {isMobileChrome} from '@libs/Browser';
 import {addKeyDownPressListener, removeKeyDownPressListener} from '@libs/KeyboardShortcut/KeyDownPressListener';
 import CONST from '@src/CONST';
@@ -33,7 +34,7 @@ function BaseSearchList({
     flattenedItemsLength,
     newTransactions,
     selectedTransactions,
-    policyForMovingExpenses,
+    isAttendeesEnabledForMovingPolicy,
     nonPersonalAndWorkspaceCards,
 }: BaseSearchListProps) {
     const hasKeyBeenPressed = useRef(false);
@@ -61,28 +62,26 @@ function BaseSearchList({
         captureOnInputs: false,
     });
 
-    const renderItemWithKeyboardFocus = useCallback(
-        ({item, index}: {item: SearchListItem; index: number}) => {
-            const isItemFocused = focusedIndex === index;
+    const handleFocusByIndex = (index: number, event: NativeSyntheticEvent<ExtendedTargetedEvent>) => {
+        // Prevent unexpected scrolling on mobile Chrome after the context menu closes by ignoring programmatic focus not triggered by direct user interaction.
+        if (isMobileChrome() && event.nativeEvent) {
+            if (!event.nativeEvent.sourceCapabilities) {
+                return;
+            }
+            // Ignore the focus if it's caused by a touch event on mobile chrome.
+            // For example, a long press will trigger a focus event on mobile chrome
+            if (event.nativeEvent.sourceCapabilities.firesTouchEvents) {
+                return;
+            }
+        }
+        setFocusedIndex(index);
+    };
+    const getOnFocus = useStableIndexedHandler(handleFocusByIndex);
 
-            const onFocus = (event: NativeSyntheticEvent<ExtendedTargetedEvent>) => {
-                // Prevent unexpected scrolling on mobile Chrome after the context menu closes by ignoring programmatic focus not triggered by direct user interaction.
-                if (isMobileChrome() && event.nativeEvent) {
-                    if (!event.nativeEvent.sourceCapabilities) {
-                        return;
-                    }
-                    // Ignore the focus if it's caused by a touch event on mobile chrome.
-                    // For example, a long press will trigger a focus event on mobile chrome
-                    if (event.nativeEvent.sourceCapabilities.firesTouchEvents) {
-                        return;
-                    }
-                }
-                setFocusedIndex(index);
-            };
-            return renderItem(item, index, isItemFocused, onFocus);
-        },
-        [focusedIndex, renderItem, setFocusedIndex],
-    );
+    const renderItemWithKeyboardFocus = ({item, index}: {item: SearchListItem; index: number}) => {
+        const isItemFocused = focusedIndex === index;
+        return renderItem(item, index, isItemFocused, getOnFocus(index));
+    };
 
     const selectFocusedOption = useCallback(
         (event?: GestureResponderEvent | KeyboardEvent) => {
@@ -126,8 +125,8 @@ function BaseSearchList({
     }, [setHasKeyBeenPressed]);
 
     const extraData = useMemo(
-        () => [focusedIndex, columns, newTransactions, selectedTransactions, nonPersonalAndWorkspaceCards, policyForMovingExpenses],
-        [focusedIndex, columns, newTransactions, selectedTransactions, nonPersonalAndWorkspaceCards, policyForMovingExpenses],
+        () => [focusedIndex, columns, newTransactions, selectedTransactions, nonPersonalAndWorkspaceCards, isAttendeesEnabledForMovingPolicy],
+        [focusedIndex, columns, newTransactions, selectedTransactions, nonPersonalAndWorkspaceCards, isAttendeesEnabledForMovingPolicy],
     );
 
     return (

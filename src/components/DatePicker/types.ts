@@ -43,16 +43,6 @@ type DatePickerBaseProps = ForwardedFSClassProps & {
     shouldEnableMonthYearBackdropInNarrowPane?: boolean;
 };
 
-type DatePickerModalProps = DatePickerBaseProps & {
-    isVisible: boolean;
-    onClose: () => void;
-    anchorPosition: {
-        horizontal: number;
-        vertical: number;
-    };
-    onSelected?: (value: string) => void;
-};
-
 type DateInputWithPickerProps = DatePickerBaseProps &
     BaseTextInputProps & {
         /**
@@ -117,4 +107,4 @@ type DatePickerProps = {
     shouldEnableMonthYearBackdropInNarrowPane?: boolean;
 } & Omit<BaseTextInputProps & PopoverWithMeasuredContentProps, 'anchorRef' | 'children'>;
 
-export type {DatePickerBaseProps, DatePickerModalProps, DateInputWithPickerProps, DatePickerProps};
+export type {DateInputWithPickerProps, DatePickerProps};
