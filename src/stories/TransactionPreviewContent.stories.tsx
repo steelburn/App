@@ -131,7 +131,6 @@ function Template(props: TransactionPreviewContentProps) {
         <ThemeProvider theme={CONST.THEME.LIGHT}>
             <ThemeStylesProvider>
                 <View style={{flexDirection: 'row'}}>
-                    {}
                     <TransactionPreviewContent {...props} />
                 </View>
             </ThemeStylesProvider>

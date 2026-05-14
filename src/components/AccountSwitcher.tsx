@@ -223,7 +223,6 @@ function AccountSwitcher({isScreenFocused}: AccountSwitcherProps) {
 
     return (
         <>
-            {}
             <TooltipToRender {...tooltipProps}>
                 <PressableWithFeedback
                     accessible

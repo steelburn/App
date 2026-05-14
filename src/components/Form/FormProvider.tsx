@@ -522,7 +522,6 @@ function FormProvider({
 
     return (
         <FormContext.Provider value={value}>
-            {}
             <FormWrapper
                 {...rest}
                 formID={formID}

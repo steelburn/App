@@ -153,7 +153,6 @@ function ThreeDotsMenu({
     return (
         <>
             <View>
-                {}
                 <TooltipToRender {...tooltipProps}>
                     <PressableWithoutFeedback
                         onPress={onThreeDotsPress}

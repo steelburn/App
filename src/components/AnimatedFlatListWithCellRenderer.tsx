@@ -25,7 +25,6 @@ const createCellRendererComponent = <Item,>(CellRendererComponentProp?: CellRend
                 onLayout={props.onLayout}
                 style={CellRendererComponentProp ? undefined : props.style}
             >
-                {}
                 {CellRendererComponentProp ? <CellRendererComponentProp {...props}>{props.children}</CellRendererComponentProp> : props.children}
             </Animated.View>
         );

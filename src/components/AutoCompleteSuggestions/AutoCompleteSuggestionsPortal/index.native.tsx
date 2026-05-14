@@ -27,7 +27,6 @@ function AutoCompleteSuggestionsPortal<TSuggestion>({
         <Portal hostName="suggestions">
             <TransparentOverlay onPress={resetSuggestions} />
             <View style={styles}>
-                {}
                 <BaseAutoCompleteSuggestions<TSuggestion>
                     width={width}
                     {...props}

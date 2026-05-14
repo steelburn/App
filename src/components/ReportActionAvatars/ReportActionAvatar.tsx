@@ -95,7 +95,6 @@ function ProfileAvatar(props: Parameters<typeof Avatar>[0] & {useProfileNavigati
             accessibilityRole={CONST.ROLE.BUTTON}
             sentryLabel={CONST.SENTRY_LABEL.REPORT.REPORT_ACTION_AVATAR}
         >
-            {}
             <Avatar {...{...props, useProfileNavigationWrapper: undefined}} />
         </PressableWithoutFocus>
     );

@@ -70,7 +70,6 @@ function PreRenderer({TDefaultRenderer, onPressIn, onPressOut, onLongPress, ...d
             >
                 <View>
                     <Text style={{fontSize}}>
-                        {}
                         <TDefaultRenderer {...defaultRendererProps} />
                     </Text>
                 </View>
