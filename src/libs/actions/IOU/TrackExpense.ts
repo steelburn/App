@@ -14,6 +14,7 @@ import type {
 import {WRITE_COMMANDS} from '@libs/API/types';
 import DateUtils from '@libs/DateUtils';
 import {deferOrExecuteWrite} from '@libs/deferredLayoutWrite';
+import DistanceRequestUtils from '@libs/DistanceRequestUtils';
 import {getMicroSecondOnyxErrorWithTranslationKey} from '@libs/ErrorUtils';
 import GoogleTagManager from '@libs/GoogleTagManager';
 import {isMovingTransactionFromTrackExpense as isMovingTransactionFromTrackExpenseIOUUtils} from '@libs/IOUUtils';
@@ -1474,9 +1475,21 @@ function convertTrackedExpenseToRequest(convertTrackedExpenseParams: ConvertTrac
         });
     }
 
-    // Drop `waypoints` when the caller passes an explicit manual `distance` so BE doesn't recompute
-    // from the route and overwrite the override (#90561).
-    const hasExplicitDistanceOverride = typeof distance === 'number';
+    // Drop `waypoints` only when the caller passes a manual `distance` that diverges from the route's
+    // computed distance, so BE doesn't recompute and overwrite the override (#90561). GPS-tracked
+    // expenses also carry a numeric `distance`, but its value matches the route — they must keep
+    // waypoints so BE can regenerate the map receipt.
+    const sourceTransaction = getAllTransactions()?.[`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`];
+    const sourceQuantity = sourceTransaction?.comment?.customUnit?.quantity;
+    const sourceDistanceUnit = sourceTransaction?.comment?.customUnit?.distanceUnit;
+    const sourceRouteDistanceMeters = sourceTransaction?.routes?.route0?.distance;
+    const quantityInMeters = typeof sourceQuantity === 'number' && sourceDistanceUnit ? DistanceRequestUtils.convertToDistanceInMeters(sourceQuantity, sourceDistanceUnit) : undefined;
+    const hasManualDistanceOverride =
+        typeof distance === 'number' &&
+        typeof quantityInMeters === 'number' &&
+        typeof sourceRouteDistanceMeters === 'number' &&
+        sourceRouteDistanceMeters > 0 &&
+        Math.abs(quantityInMeters - sourceRouteDistanceMeters) > 1;
 
     if (workspaceParams) {
         const additionalFailureData = getConvertTrackedExpenseWorkspaceFailureData({
@@ -1495,7 +1508,7 @@ function convertTrackedExpenseToRequest(convertTrackedExpenseParams: ConvertTrac
         // Removing the ghost IOU report on API failure which can cause unexpected errors.
         failureData?.push(...additionalFailureData);
 
-        const workspaceParamsForAPI = hasExplicitDistanceOverride ? {...workspaceParams, waypoints: undefined} : workspaceParams;
+        const workspaceParamsForAPI = hasManualDistanceOverride ? {...workspaceParams, waypoints: undefined} : workspaceParams;
         const params = {
             amount,
             distance,
@@ -1541,7 +1554,7 @@ function convertTrackedExpenseToRequest(convertTrackedExpenseParams: ConvertTrac
         reportPreviewReportActionID: chatParams.reportPreviewReportActionID,
         isDistance,
         customUnitRateID,
-        waypoints: hasExplicitDistanceOverride ? undefined : waypoints,
+        waypoints: hasManualDistanceOverride ? undefined : waypoints,
     };
     API.write(WRITE_COMMANDS.CONVERT_TRACKED_EXPENSE_TO_REQUEST, parameters, {optimisticData, successData, failureData});
 }
