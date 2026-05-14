@@ -244,6 +244,15 @@ type SettingsNavigatorParamList = {
     [SCREENS.SETTINGS.BANK_ACCOUNT_PURPOSE]: undefined;
     [SCREENS.SETTINGS.ADD_BANK_ACCOUNT_SELECT_COUNTRY_VERIFY_ACCOUNT]: undefined;
     [SCREENS.SETTINGS.AGENTS.ADD]: undefined;
+    [SCREENS.SETTINGS.AGENTS.EDIT]: {
+        accountID: number;
+    };
+    [SCREENS.SETTINGS.AGENTS.EDIT_NAME]: {
+        accountID: number;
+    };
+    [SCREENS.SETTINGS.AGENTS.EDIT_PROMPT]: {
+        accountID: number;
+    };
     [SCREENS.SETTINGS.RULES.ADD]: undefined;
     [SCREENS.SETTINGS.RULES.ADD_MERCHANT]: undefined;
     [SCREENS.SETTINGS.RULES.ADD_RENAME_MERCHANT]: undefined;
