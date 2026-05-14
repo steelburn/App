@@ -17,24 +17,61 @@ import ROUTES from '@src/ROUTES';
 import type * as OnyxTypes from '@src/types/onyx';
 
 type ReceiptSectionProps = {
+    /** Active transaction (drives receipt source resolution + scan-mode compact dimensions) */
     transaction: OnyxEntry<OnyxTypes.Transaction>;
+
+    /** ID of the active transaction */
     transactionID: string | undefined;
+
+    /** ID of the report the transaction belongs to */
     reportID: string;
+
+    /** Action being performed (drives the receipt-scan navigation target) */
     action: IOUAction;
+
+    /** Type of IOU being confirmed */
     iouType: Exclude<IOUType, typeof CONST.IOU.TYPE.REQUEST | typeof CONST.IOU.TYPE.SEND>;
+
+    /** Active policy (used to decide whether the receipt empty state should render) */
     policy: OnyxEntry<OnyxTypes.Policy>;
+
+    /** Whether the active transaction is a per-diem request */
     isPerDiemRequest: boolean;
+
+    /** Whether the active transaction is a distance request (suppresses receipt area unless manual/odometer) */
     isDistanceRequest: boolean;
+
+    /** Whether the active transaction is a manual distance request */
     isManualDistanceRequest: boolean;
+
+    /** Whether the active transaction is an odometer-driven distance request */
     isOdometerDistanceRequest: boolean;
+
+    /** Whether the surface is read-only */
     isReadOnly: boolean;
+
+    /** Whether the receipt can be replaced */
     isReceiptEditable: boolean;
+
+    /** Whether the receipt should be displayed */
     shouldDisplayReceipt: boolean;
+
+    /** Whether the receipt is currently being stitched */
     isLoadingReceipt: boolean;
+
+    /** Path of the receipt asset (URL or local) */
     receiptPath: string | number;
+
+    /** Filename of the receipt asset */
     receiptFilename: string;
+
+    /** Whether optional fields are expanded (drives compact-mode dimensions) */
     showMoreFields: boolean;
+
+    /** Callback when the receipt PDF fails to load */
     onPDFLoadError?: () => void;
+
+    /** Callback when the receipt PDF requires a password */
     onPDFPassword?: () => void;
 };
 
