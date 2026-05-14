@@ -11352,7 +11352,7 @@ function createDraftTransactionAndNavigateToParticipantSelector({
         comment,
         merchant,
         modifiedMerchant: '',
-        isMerchantSet: isMerchantValid ? true : false,
+        isMerchantSet: isMerchantValid,
         modifiedAttendees: undefined,
         mccGroup,
         participants: [],
