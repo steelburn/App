@@ -7,8 +7,9 @@ import useOptionRowChrome from './useOptionRowChrome';
 
 /**
  * Sibling variant of `OptionRowLHN` used for archived reports. Strips the product training
- * tooltip layer, all brick-road badges (Error/Info/Onboarding), and the trailing indicator
- * row (Draft/Pin) because none of them apply to a historical, write-locked row.
+ * tooltip layer, all brick-road badges (Error/Info/Onboarding), and the draft indicator
+ * (write-locked rows cannot have an actionable draft). The pin indicator is kept because
+ * pinned archived chats stay in the pinned section of the LHN and must show the pin icon.
  */
 function ArchivedOptionRowLHN({isOptionFocused = false, onSelectRow = () => {}, optionItem, viewMode = 'default', style, onLayout = () => {}, testID}: OptionRowLHNProps) {
     const styles = useThemeStyles();
@@ -57,6 +58,12 @@ function ArchivedOptionRowLHN({isOptionFocused = false, onSelectRow = () => {}, 
                         </View>
                         <OptionRow.DescriptiveText optionItem={optionItem} />
                     </View>
+                </View>
+                <View style={[styles.flexRow, styles.alignItemsCenter]}>
+                    <OptionRow.PinIndicator
+                        isPinned={optionItem.isPinned}
+                        brickRoadIndicator={optionItem.brickRoadIndicator}
+                    />
                 </View>
             </OptionRow.Pressable>
         </OptionRow.OfflineWrapper>
