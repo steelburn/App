@@ -1,6 +1,6 @@
 import {act, renderHook} from '@testing-library/react-native';
 import type {OnyxEntry} from 'react-native-onyx';
-import useCreateReportAction from '@hooks/useCreateReportAction';
+import useCreateReport from '@hooks/useCreateReport';
 import useOnyx from '@hooks/useOnyx';
 import Navigation from '@libs/Navigation/Navigation';
 import CONST from '@src/CONST';
@@ -86,7 +86,7 @@ function setupUseOnyx(overrides: Record<string, unknown> = {}) {
 
 // ── Tests ──────────────────────────────────────────────────────────────────────
 
-describe('useCreateReportAction', () => {
+describe('useCreateReport', () => {
     beforeEach(() => {
         jest.clearAllMocks();
         reportIDCounter.value = 100;
@@ -100,14 +100,14 @@ describe('useCreateReportAction', () => {
             const onCreateReport = jest.fn();
 
             const {result} = renderHook(() =>
-                useCreateReportAction({
+                useCreateReport({
                     onCreateReport,
                     groupPoliciesWithChatEnabled: [],
                 }),
             );
 
             act(() => {
-                result.current.createReportAction();
+                result.current.createReport();
             });
 
             expect(Navigation.navigate).toHaveBeenCalledTimes(1);
@@ -125,14 +125,14 @@ describe('useCreateReportAction', () => {
             const policies = [undefined] as Array<OnyxEntry<Policy>>;
 
             const {result} = renderHook(() =>
-                useCreateReportAction({
+                useCreateReport({
                     onCreateReport,
                     groupPoliciesWithChatEnabled: policies,
                 }),
             );
 
             act(() => {
-                result.current.createReportAction();
+                result.current.createReport();
             });
 
             expect(Navigation.navigate).toHaveBeenCalledWith(ROUTES.NEW_REPORT_WORKSPACE_SELECTION.getRoute());
@@ -151,14 +151,14 @@ describe('useCreateReportAction', () => {
             const policies = [makePaidPolicy('p1'), makePaidPolicy('p2')];
 
             const {result} = renderHook(() =>
-                useCreateReportAction({
+                useCreateReport({
                     onCreateReport,
                     groupPoliciesWithChatEnabled: policies,
                 }),
             );
 
             act(() => {
-                result.current.createReportAction();
+                result.current.createReport();
             });
 
             expect(Navigation.navigate).toHaveBeenCalledWith(ROUTES.NEW_REPORT_WORKSPACE_SELECTION.getRoute());
@@ -178,14 +178,14 @@ describe('useCreateReportAction', () => {
             const policies = [makePaidPolicy('p1'), makePaidPolicy('p2')];
 
             const {result} = renderHook(() =>
-                useCreateReportAction({
+                useCreateReport({
                     onCreateReport,
                     groupPoliciesWithChatEnabled: policies,
                 }),
             );
 
             act(() => {
-                result.current.createReportAction();
+                result.current.createReport();
             });
 
             expect(Navigation.navigate).toHaveBeenCalledWith(ROUTES.NEW_REPORT_WORKSPACE_SELECTION.getRoute());
@@ -202,14 +202,14 @@ describe('useCreateReportAction', () => {
             const policies = [makePaidPolicy('p1'), makePaidPolicy('p2'), makePaidPolicy('p3')];
 
             const {result} = renderHook(() =>
-                useCreateReportAction({
+                useCreateReport({
                     onCreateReport,
                     groupPoliciesWithChatEnabled: policies,
                 }),
             );
 
             act(() => {
-                result.current.createReportAction();
+                result.current.createReport();
             });
 
             expect(Navigation.navigate).not.toHaveBeenCalledWith(ROUTES.NEW_REPORT_WORKSPACE_SELECTION.getRoute());
@@ -230,14 +230,14 @@ describe('useCreateReportAction', () => {
             const policies = [makePaidPolicy('p1')];
 
             const {result} = renderHook(() =>
-                useCreateReportAction({
+                useCreateReport({
                     onCreateReport,
                     groupPoliciesWithChatEnabled: policies,
                 }),
             );
 
             act(() => {
-                result.current.createReportAction();
+                result.current.createReport();
             });
 
             expect(Navigation.navigate).not.toHaveBeenCalledWith(ROUTES.NEW_REPORT_WORKSPACE_SELECTION.getRoute());
@@ -251,14 +251,14 @@ describe('useCreateReportAction', () => {
             const policies = [makePaidPolicy()];
 
             const {result} = renderHook(() =>
-                useCreateReportAction({
+                useCreateReport({
                     onCreateReport,
                     groupPoliciesWithChatEnabled: policies,
                 }),
             );
 
             act(() => {
-                result.current.createReportAction();
+                result.current.createReport();
             });
 
             expect(onCreateReport).toHaveBeenCalledWith(false);
@@ -271,14 +271,14 @@ describe('useCreateReportAction', () => {
             const policies = [makePaidPolicy()];
 
             const {result} = renderHook(() =>
-                useCreateReportAction({
+                useCreateReport({
                     onCreateReport,
                     groupPoliciesWithChatEnabled: policies,
                 }),
             );
 
             act(() => {
-                result.current.createReportAction();
+                result.current.createReport();
             });
 
             expect(mockOpenCreateReportConfirmation).toHaveBeenCalledTimes(1);
@@ -293,14 +293,14 @@ describe('useCreateReportAction', () => {
             const policies = [makePaidPolicy()];
 
             const {result} = renderHook(() =>
-                useCreateReportAction({
+                useCreateReport({
                     onCreateReport,
                     groupPoliciesWithChatEnabled: policies,
                 }),
             );
 
             act(() => {
-                result.current.createReportAction();
+                result.current.createReport();
             });
 
             expect(Navigation.navigate).toHaveBeenCalledWith(ROUTES.RESTRICTED_ACTION.getRoute(POLICY_ID));
@@ -313,14 +313,14 @@ describe('useCreateReportAction', () => {
             const onCreateReport = jest.fn();
 
             const {result} = renderHook(() =>
-                useCreateReportAction({
+                useCreateReport({
                     onCreateReport,
                     groupPoliciesWithChatEnabled: [],
                 }),
             );
 
             act(() => {
-                result.current.createReportAction();
+                result.current.createReport();
             });
 
             const navigateArg = jest.mocked(Navigation.navigate).mock.calls.at(0)?.at(0) as string;
@@ -334,14 +334,14 @@ describe('useCreateReportAction', () => {
             const policies = [makePaidPolicy()];
 
             const {result} = renderHook(() =>
-                useCreateReportAction({
+                useCreateReport({
                     onCreateReport,
                     groupPoliciesWithChatEnabled: policies,
                 }),
             );
 
             act(() => {
-                result.current.createReportAction();
+                result.current.createReport();
             });
 
             // Should call onCreateReport directly, not navigate to upgrade
@@ -366,14 +366,14 @@ describe('useCreateReportAction', () => {
             const policies = [makePaidPolicy()];
 
             const {result} = renderHook(() =>
-                useCreateReportAction({
+                useCreateReport({
                     onCreateReport,
                     groupPoliciesWithChatEnabled: policies,
                 }),
             );
 
             act(() => {
-                result.current.createReportAction();
+                result.current.createReport();
             });
 
             expect(onCreateReport).toHaveBeenCalledWith(false);
@@ -382,17 +382,17 @@ describe('useCreateReportAction', () => {
     });
 
     describe('returns', () => {
-        it('returns createReportAction function and isVisible flag', () => {
+        it('returns createReport function and isVisible flag', () => {
             const onCreateReport = jest.fn();
 
             const {result} = renderHook(() =>
-                useCreateReportAction({
+                useCreateReport({
                     onCreateReport,
                     groupPoliciesWithChatEnabled: [],
                 }),
             );
 
-            expect(typeof result.current.createReportAction).toBe('function');
+            expect(typeof result.current.createReport).toBe('function');
             expect(typeof result.current.isVisible).toBe('boolean');
         });
 
@@ -400,7 +400,7 @@ describe('useCreateReportAction', () => {
             const onCreateReport = jest.fn();
 
             const {result} = renderHook(() =>
-                useCreateReportAction({
+                useCreateReport({
                     onCreateReport,
                     groupPoliciesWithChatEnabled: [makePaidPolicy()],
                 }),
@@ -421,7 +421,7 @@ describe('useCreateReportAction', () => {
             const onCreateReport = jest.fn();
 
             const {result} = renderHook(() =>
-                useCreateReportAction({
+                useCreateReport({
                     onCreateReport,
                     groupPoliciesWithChatEnabled: [],
                 }),
@@ -442,14 +442,14 @@ describe('useCreateReportAction', () => {
             const onCreateReport = jest.fn();
 
             const {result} = renderHook(() =>
-                useCreateReportAction({
+                useCreateReport({
                     onCreateReport,
                     groupPoliciesWithChatEnabled: [],
                 }),
             );
 
             act(() => {
-                result.current.createReportAction();
+                result.current.createReport();
             });
 
             expect(Navigation.navigate).not.toHaveBeenCalled();

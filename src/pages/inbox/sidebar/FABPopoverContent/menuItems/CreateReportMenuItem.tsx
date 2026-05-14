@@ -1,6 +1,6 @@
 import React from 'react';
 import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
-import useCreateReportAction from '@hooks/useCreateReportAction';
+import useCreateReport from '@hooks/useCreateReport';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
@@ -94,7 +94,7 @@ function CreateReportMenuItem() {
         });
     };
 
-    const {createReportAction, isVisible} = useCreateReportAction({
+    const {createReport, isVisible} = useCreateReport({
         onCreateReport: handleCreateWorkspaceReport,
         groupPoliciesWithChatEnabled,
         shouldHandleNavigationBack: false,
@@ -107,7 +107,7 @@ function CreateReportMenuItem() {
             pressableTestID={CONST.SENTRY_LABEL.FAB_MENU.CREATE_REPORT}
             icon={icons.Document}
             title={translate('report.newReport.createReport')}
-            onPress={createReportAction}
+            onPress={createReport}
             shouldCallAfterModalHide={shouldUseNarrowLayout}
         />
     );

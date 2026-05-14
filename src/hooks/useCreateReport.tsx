@@ -14,7 +14,7 @@ import useCreateEmptyReportConfirmation from './useCreateEmptyReportConfirmation
 import useHasEmptyReportsForPolicy from './useHasEmptyReportsForPolicy';
 import useOnyx from './useOnyx';
 
-type UseCreateReportActionParams = {
+type UseCreateReportParams = {
     /** Callback that creates the report and navigates after creation */
     onCreateReport: (shouldDismissEmptyReportsConfirmation?: boolean) => void;
     /** Group paid policies with expense chat enabled */
@@ -23,9 +23,9 @@ type UseCreateReportActionParams = {
     shouldHandleNavigationBack?: boolean;
 };
 
-type UseCreateReportActionResult = {
-    /** The action to trigger when the user clicks "Create report" */
-    createReportAction: () => void;
+type UseCreateReportResult = {
+    /** The callback to trigger when the user clicks "Create report" */
+    createReport: () => void;
     /** Whether the menu item/button should be visible */
     isVisible: boolean;
 };
@@ -36,14 +36,14 @@ type UseCreateReportActionResult = {
  *
  * Decision flow:
  * 1. Navigate to upgrade path if user has no valid group policies at all
- * 2. Navigate to workspace selector if default is personal AND there are 2+ non-personal workspaces, or if the chosen default is billing-restricted and alternatives exist
+ * 2. Navigate to workspace selector if default is personal AND there are at least 2 non-personal workspaces, or if the chosen default is billing-restricted and alternatives exist
  * 3. Show empty report confirmation or create directly if workspace is valid
  * 4. Navigate to restricted action if billing restricts the workspace
  */
-export default function useCreateReportAction({onCreateReport, groupPoliciesWithChatEnabled, shouldHandleNavigationBack = true}: UseCreateReportActionParams): UseCreateReportActionResult {
+export default function useCreateReport({onCreateReport, groupPoliciesWithChatEnabled, shouldHandleNavigationBack = true}: UseCreateReportParams): UseCreateReportResult {
     const [activePolicyID] = useOnyx(ONYXKEYS.NVP_ACTIVE_POLICY_ID);
     const [activePolicy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${activePolicyID}`);
-    const [, policiesMeta] = useOnyx(ONYXKEYS.COLLECTION.POLICY);
+    const [, policiesLoadStatus] = useOnyx(ONYXKEYS.COLLECTION.POLICY);
     const [ownerBillingGracePeriodEnd] = useOnyx(ONYXKEYS.NVP_PRIVATE_OWNER_BILLING_GRACE_PERIOD_END);
     const [userBillingGracePeriodEnds] = useOnyx(ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_USER_BILLING_GRACE_PERIOD_END);
     const [amountOwed] = useOnyx(ONYXKEYS.NVP_PRIVATE_AMOUNT_OWED);
@@ -53,7 +53,7 @@ export default function useCreateReportAction({onCreateReport, groupPoliciesWith
     // Gate visibility and routing on policy hydration. Without this, during Onyx cold-start
     // groupPoliciesWithChatEnabled.length === 0 would be true even for users who actually have
     // workspaces, sending them to MONEY_REQUEST_UPGRADE as if they had none.
-    const arePoliciesLoaded = !isLoadingOnyxValue(policiesMeta);
+    const arePoliciesLoaded = !isLoadingOnyxValue(policiesLoadStatus);
     const isVisible = arePoliciesLoaded;
     const shouldNavigateToUpgradePath = groupPoliciesWithChatEnabled.length === 0;
 
@@ -70,7 +70,7 @@ export default function useCreateReportAction({onCreateReport, groupPoliciesWith
         shouldHandleNavigationBack,
     });
 
-    const createReportAction = useCallback(() => {
+    const createReport = useCallback(() => {
         interceptAnonymousUser(() => {
             if (!arePoliciesLoaded) {
                 return;
@@ -94,10 +94,10 @@ export default function useCreateReportAction({onCreateReport, groupPoliciesWith
 
             const workspaceIDForReportCreation = defaultChatEnabledPolicyID;
 
-            // Per spec: show the workspace selector only when the default (active) workspace is personal
-            // AND the user has 2+ non-personal workspaces to choose between. We also fall back to the
-            // selector if the chosen default is billing-restricted and alternatives exist, so the user
-            // isn't dead-ended on the restricted-action page.
+            // Show the workspace selector only when the default workspace is personal and there are
+            // at least 2 non-personal workspaces to choose between. Also fall back to the selector if
+            // the default is billing-restricted and alternatives exist, so the user isn't dead-ended
+            // on the restricted-action page.
             const isDefaultPersonal = !activePolicy || activePolicy.type === CONST.POLICY.TYPE.PERSONAL || !isPaidGroupPolicy(activePolicy);
             const hasMultipleNonPersonalWorkspaces = groupPoliciesWithChatEnabled.length > 1;
             const isDefaultBillingRestricted =
@@ -136,5 +136,5 @@ export default function useCreateReportAction({onCreateReport, groupPoliciesWith
         onCreateReport,
     ]);
 
-    return {createReportAction, isVisible};
+    return {createReport, isVisible};
 }

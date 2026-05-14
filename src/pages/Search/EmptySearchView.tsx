@@ -13,7 +13,7 @@ import {SearchScopeProvider} from '@components/Search/SearchScopeProvider';
 import type {SearchQueryJSON} from '@components/Search/types';
 import Text from '@components/Text';
 import TextLink from '@components/TextLink';
-import useCreateReportAction from '@hooks/useCreateReportAction';
+import useCreateReport from '@hooks/useCreateReport';
 import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails';
 import useIsInLandscapeMode from '@hooks/useIsInLandscapeMode';
 import {useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
@@ -178,7 +178,7 @@ function EmptySearchViewContent({
         });
     };
 
-    const {createReportAction, isVisible: isCreateReportVisible} = useCreateReportAction({
+    const {createReport, isVisible: isCreateReportVisible} = useCreateReport({
         onCreateReport: handleCreateWorkspaceReport,
         groupPoliciesWithChatEnabled,
     });
@@ -282,7 +282,7 @@ function EmptySearchViewContent({
                                 ? [
                                       {
                                           buttonText: translate('quickAction.createReport'),
-                                          buttonAction: createReportAction,
+                                          buttonAction: createReport,
                                           success: true,
                                       },
                                   ]
