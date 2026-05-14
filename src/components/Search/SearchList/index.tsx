@@ -9,7 +9,6 @@ import Animated, {Easing, FadeOutUp, LinearTransition} from 'react-native-reanim
 import Checkbox from '@components/Checkbox';
 import MenuItem from '@components/MenuItem';
 import Modal from '@components/Modal';
-import {usePersonalDetails} from '@components/OnyxListItemProvider';
 import {PressableWithFeedback} from '@components/Pressable';
 import {ScrollOffsetContext} from '@components/ScrollOffsetContextProvider';
 import ScrollView from '@components/ScrollView';
@@ -293,9 +292,7 @@ function SearchList({
     const [longPressedItem, setLongPressedItem] = useState<SearchListItem>();
 
     const hasItemsBeingRemoved = prevDataLength && prevDataLength > data.length;
-    const personalDetails = usePersonalDetails();
 
-    const [userBillingFundID] = useOnyx(ONYXKEYS.NVP_BILLING_FUND_ID);
     const [lastPaymentMethod] = useOnyx(ONYXKEYS.NVP_LAST_PAYMENT_METHOD);
     const [personalPolicyID] = useOnyx(ONYXKEYS.PERSONAL_POLICY_ID);
     const [userBillingGracePeriodEnds] = useOnyx(ONYXKEYS.COLLECTION.SHARED_NVP_PRIVATE_USER_BILLING_GRACE_PERIOD_END);
@@ -445,8 +442,6 @@ function SearchList({
                         personalPolicyID={personalPolicyID}
                         userBillingGracePeriodEnds={userBillingGracePeriodEnds}
                         ownerBillingGracePeriodEnd={ownerBillingGracePeriodEnd}
-                        personalDetails={personalDetails}
-                        userBillingFundID={userBillingFundID}
                         nonPersonalAndWorkspaceCards={nonPersonalAndWorkspaceCards}
                         onFocus={onFocus}
                         newTransactionID={newTransactionID}
@@ -472,8 +467,6 @@ function SearchList({
             onCheckboxPress,
             canSelectMultiple,
             columns,
-            personalDetails,
-            userBillingFundID,
             lastPaymentMethod,
             personalPolicyID,
             userBillingGracePeriodEnds,
