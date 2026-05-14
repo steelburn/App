@@ -235,16 +235,16 @@ function getIouParamsForTransaction({
     }
 
     if (!resolvedTransactionThreadReport && resolvedParentReportAction && transaction) {
-        resolvedTransactionThreadReport = createTransactionThreadReport(
+        resolvedTransactionThreadReport = createTransactionThreadReport({
             introSelected,
-            currentUserEmail,
+            currentUserLogin: currentUserEmail,
             currentUserAccountID,
-            allBetas,
-            resolvedParentReport,
-            resolvedParentReportAction,
+            betas: allBetas,
+            iouReport: resolvedParentReport,
+            iouReportAction: resolvedParentReportAction,
             transaction,
-            transactionViolations,
-        );
+            transactionViolations: transactionViolations ?? undefined,
+        });
     }
 
     return {
