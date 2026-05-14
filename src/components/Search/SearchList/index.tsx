@@ -35,7 +35,7 @@ import variables from '@styles/variables';
 import type {TransactionPreviewData} from '@userActions/Search';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
-import type {CardList, Policy, Transaction} from '@src/types/onyx';
+import type {CardList, Transaction} from '@src/types/onyx';
 import type {HoldMenuCallback} from '..';
 import BaseSearchList from './BaseSearchList';
 import type ChatListItem from './ListItem/ChatListItem';
@@ -130,7 +130,9 @@ type SearchListProps = Pick<FlashListProps<SearchListItem>, 'onScroll' | 'conten
     /** Whether all transactions have been loaded from snapshots in group-by views */
     hasLoadedAllTransactions?: boolean;
 
-    policyForMovingExpenses?: Policy;
+    /** Precomputed boolean: shouldShowAttendees applied to the user's policy-for-moving-expenses.
+     * Drilled instead of the policy object to avoid ref churn on unrelated policy updates. */
+    isAttendeesEnabledForMovingPolicy?: boolean;
 
     /** Whether the action column should use its wider variant (e.g. when there is at least one deleted transaction) */
     isActionColumnWide?: boolean;
@@ -218,7 +220,7 @@ function SearchList({
     nonPersonalAndWorkspaceCards,
     selectedTransactions,
     hasLoadedAllTransactions,
-    policyForMovingExpenses,
+    isAttendeesEnabledForMovingPolicy,
     isActionColumnWide,
     ref,
 }: SearchListProps) {
@@ -440,7 +442,7 @@ function SearchList({
                         canSelectMultiple={canSelectMultiple}
                         item={itemWithSelection}
                         columns={columns}
-                        policyForMovingExpenses={policyForMovingExpenses}
+                        isAttendeesEnabledForMovingPolicy={isAttendeesEnabledForMovingPolicy}
                         isDisabled={isDisabled}
                         groupBy={groupBy}
                         searchType={type}
@@ -488,7 +490,7 @@ function SearchList({
             nonPersonalAndWorkspaceCards,
             selectedTransactions,
             ListFooterComponent,
-            policyForMovingExpenses,
+            isAttendeesEnabledForMovingPolicy,
             handleUndelete,
             firstVisibleIndex,
             lastVisibleIndex,
@@ -558,7 +560,7 @@ function SearchList({
                 contentContainerStyle={contentContainerStyle}
                 newTransactions={newTransactions}
                 selectedTransactions={selectedTransactions}
-                policyForMovingExpenses={policyForMovingExpenses}
+                isAttendeesEnabledForMovingPolicy={isAttendeesEnabledForMovingPolicy}
                 nonPersonalAndWorkspaceCards={nonPersonalAndWorkspaceCards}
             />
             <Modal
