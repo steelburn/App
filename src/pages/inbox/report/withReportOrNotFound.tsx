@@ -1,12 +1,10 @@
 import {useIsFocused} from '@react-navigation/native';
 import type {ComponentType} from 'react';
 import React, {useEffect} from 'react';
-import {StyleSheet, View} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';
-import ActivityIndicator from '@components/ActivityIndicator';
+import FullscreenLoadingIndicator from '@components/FullscreenLoadingIndicator';
 import useOnyx from '@hooks/useOnyx';
 import useReportIsArchived from '@hooks/useReportIsArchived';
-import useThemeStyles from '@hooks/useThemeStyles';
 import {openReport} from '@libs/actions/Report';
 import getComponentDisplayName from '@libs/getComponentDisplayName';
 import type {PlatformStackScreenProps} from '@libs/Navigation/PlatformStackNavigation/types';
@@ -23,7 +21,6 @@ import type {
     RoomMembersNavigatorParamList,
 } from '@navigation/types';
 import NotFoundPage from '@pages/ErrorPage/NotFoundPage';
-import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import type SCREENS from '@src/SCREENS';
 import type * as OnyxTypes from '@src/types/onyx';
@@ -74,7 +71,6 @@ type WithReportOrNotFoundProps = WithReportOrNotFoundOnyxProps & {
 export default function (shouldRequireReportID = true): <TProps extends WithReportOrNotFoundProps>(WrappedComponent: ComponentType<TProps>) => ComponentType<TProps> {
     return function <TProps extends WithReportOrNotFoundProps>(WrappedComponent: ComponentType<TProps>) {
         function WithReportOrNotFound(props: TProps) {
-            const styles = useThemeStyles();
             const [betas] = useOnyx(ONYXKEYS.BETAS);
             const [report] = useOnyx(`${ONYXKEYS.COLLECTION.REPORT}${props.route.params.reportID}`);
             const [policy] = useOnyx(`${ONYXKEYS.COLLECTION.POLICY}${report?.policyID}`);
@@ -119,12 +115,10 @@ export default function (shouldRequireReportID = true): <TProps extends WithRepo
                         shouldFetchReport,
                     };
                     return (
-                        <View style={[StyleSheet.absoluteFill, styles.fullScreenLoading, styles.w100]}>
-                            <ActivityIndicator
-                                size={CONST.ACTIVITY_INDICATOR_SIZE.LARGE}
-                                reasonAttributes={reasonAttributes}
-                            />
-                        </View>
+                        <FullscreenLoadingIndicator
+                            shouldUseGoBackButton
+                            reasonAttributes={reasonAttributes}
+                        />
                     );
                 }
 
