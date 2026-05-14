@@ -495,12 +495,16 @@ function cancelPayment(
     const approvalMode = policy?.approvalMode ?? CONST.POLICY.APPROVAL_MODE.BASIC;
 
     const stateNum: ValueOf<typeof CONST.REPORT.STATE_NUM> = CONST.REPORT.STATE_NUM.APPROVED;
-    const statusNum: ValueOf<typeof CONST.REPORT.STATUS_NUM> = approvalMode === CONST.POLICY.APPROVAL_MODE.OPTIONAL ? CONST.REPORT.STATUS_NUM.SUBMITTED : CONST.REPORT.STATUS_NUM.APPROVED;
+    const statusNum: ValueOf<typeof CONST.REPORT.STATUS_NUM> = approvalMode === CONST.POLICY.APPROVAL_MODE.OPTIONAL ? CONST.REPORT.STATUS_NUM.CLOSED : CONST.REPORT.STATUS_NUM.APPROVED;
+
+    // For OPTIONAL approval mode, the report status is CLOSED but the next step should show "waiting to pay"
+    // so we use SUBMITTED as the predictedNextStatus which routes through the correct next step path.
+    const predictedNextStatus = approvalMode === CONST.POLICY.APPROVAL_MODE.OPTIONAL ? CONST.REPORT.STATUS_NUM.SUBMITTED : statusNum;
 
     // buildOptimisticNextStep is used in parallel
     const optimisticNextStepDeprecated = buildNextStepNew({
         report: expenseReport,
-        predictedNextStatus: statusNum,
+        predictedNextStatus,
         policy,
         currentUserAccountIDParam,
         currentUserEmailParam,
@@ -509,7 +513,7 @@ function cancelPayment(
     });
     const optimisticNextStep = buildOptimisticNextStep({
         report: expenseReport,
-        predictedNextStatus: statusNum,
+        predictedNextStatus,
         policy,
         currentUserAccountIDParam,
         currentUserEmailParam,
