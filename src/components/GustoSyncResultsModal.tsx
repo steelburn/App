@@ -14,17 +14,13 @@ import {useMemoizedLazyExpensifyIcons, useMemoizedLazyIllustrations} from '@hook
 import useLocalize from '@hooks/useLocalize';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
-import type {GustoSyncResult, GustoSyncResultUser} from '@libs/API/GustoSyncResult';
+import type {GustoSyncResult} from '@libs/API/GustoSyncResult';
 import CONST from '@src/CONST';
 
 type GustoSyncResultsModalProps = ModalProps & {
     /** Sync result returned by the completed Gusto sync job */
     result: GustoSyncResult;
 };
-
-function getResultCount(users?: GustoSyncResultUser[]) {
-    return users?.length ?? 0;
-}
 
 function GustoSyncResultsModal({result, closeModal}: GustoSyncResultsModalProps) {
     const {translate} = useLocalize();
@@ -34,9 +30,9 @@ function GustoSyncResultsModal({result, closeModal}: GustoSyncResultsModalProps)
     const illustrations = useMemoizedLazyIllustrations(['NewUser']);
     const [isSkippedSectionExpanded, setIsSkippedSectionExpanded] = useState(false);
 
-    const addedCount = getResultCount(result.added);
-    const removedCount = getResultCount(result.removed);
-    const skippedCount = getResultCount(result.skipped);
+    const addedCount = result.addedEmployeesCount ?? 0;
+    const removedCount = result.removedEmployeesCount ?? 0;
+    const skippedCount = result.skippedEmployees?.length ?? 0;
     const closeResultsModal = () => closeModal();
 
     const renderResultSummary = (label: string, count: number) => (
@@ -99,13 +95,13 @@ function GustoSyncResultsModal({result, closeModal}: GustoSyncResultsModalProps)
                         />
                     </PressableWithoutFeedback>
                     {isSkippedSectionExpanded &&
-                        result.skipped?.map((user) => (
+                        result.skippedEmployees?.map((employee) => (
                             <View
-                                key={user.email}
+                                key={employee.id}
                                 style={[styles.mt4]}
                             >
-                                <Text style={[styles.textNormalThemeText, styles.textStrong]}>{user.displayName ?? user.email}</Text>
-                                <Text style={[styles.textSupporting]}>{user.reason}</Text>
+                                <Text style={[styles.textNormalThemeText, styles.textStrong]}>{employee.name}</Text>
+                                <Text style={[styles.textSupporting]}>{employee.reason}</Text>
                             </View>
                         ))}
                 </ScrollView>
