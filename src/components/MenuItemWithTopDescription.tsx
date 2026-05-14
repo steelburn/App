@@ -16,6 +16,7 @@ function MenuItemWithTopDescription({highlighted, outerWrapperStyle, ref, ...pro
         highlightColor: theme.messageHighlightBG,
         itemEnterDelay: 0,
     });
+
     return (
         <MenuItem
             // eslint-disable-next-line react/jsx-props-no-spreading
