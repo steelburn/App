@@ -3,6 +3,7 @@ import Onyx from 'react-native-onyx';
 import CONFIG from '@src/CONFIG';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
+import {getCommandURL} from './ApiUtils';
 import {onSustainedFailureChange, reset as resetFailureCounters} from './FailureTracker';
 import Log from './Log';
 
@@ -289,7 +290,7 @@ function configureAndSubscribe() {
 
     if (!CONFIG.IS_USING_LOCAL_WEB) {
         NetInfo.configure({
-            reachabilityUrl: `${CONFIG.EXPENSIFY.DEFAULT_API_ROOT}api/Ping?accountID=${accountID ?? 'unknown'}`,
+            reachabilityUrl: `${getCommandURL({command: 'Ping'})}accountID=${accountID ?? 'unknown'}`,
             reachabilityMethod: 'GET',
             reachabilityTest: (response) => {
                 if (!response.ok) {
@@ -360,6 +361,16 @@ Onyx.connectWithoutView({
             return;
         }
         accountID = newAccountID;
+        configureAndSubscribe();
+    },
+});
+
+// Re-target the reachability ping when the staging-server toggle changes. The initial callback
+// also fires once ApiUtils settles its async getEnvironment() chain, which transparently fixes the
+// boot race where the first configureAndSubscribe() ran before ENV_NAME was resolved.
+Onyx.connectWithoutView({
+    key: ONYXKEYS.SHOULD_USE_STAGING_SERVER,
+    callback: () => {
         configureAndSubscribe();
     },
 });
