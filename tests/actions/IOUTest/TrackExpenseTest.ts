@@ -2,7 +2,14 @@
 import {format} from 'date-fns';
 import Onyx from 'react-native-onyx';
 import type {OnyxCollection, OnyxEntry} from 'react-native-onyx';
-import {convertBulkTrackedExpensesToIOU, deleteTrackExpense, getDeleteTrackExpenseInformation, getTrackExpenseInformation, trackExpense} from '@libs/actions/IOU/TrackExpense';
+import {
+    convertBulkTrackedExpensesToIOU,
+    deleteTrackExpense,
+    getDeleteTrackExpenseInformation,
+    getTrackExpenseInformation,
+    hasManualDistanceOverride,
+    trackExpense,
+} from '@libs/actions/IOU/TrackExpense';
 import initOnyxDerivedValues from '@libs/actions/OnyxDerived';
 import {addComment, openReport} from '@libs/actions/Report';
 import {subscribeToUserEvents} from '@libs/actions/User';
@@ -2429,6 +2436,89 @@ describe('actions/IOU/TrackExpense', () => {
                     betas: [CONST.BETAS.ALL],
                 });
             }).not.toThrow();
+        });
+    });
+
+    describe('hasManualDistanceOverride', () => {
+        const KM_5_IN_METERS = 5000;
+        const ROUTE_GEOMETRY_STUB = {type: 'LineString' as const, coordinates: [] as Array<[number, number]>};
+        const buildRoute = (distance: number | null) => ({route0: {distance, geometry: ROUTE_GEOMETRY_STUB}});
+
+        function buildDistanceTransaction(overrides: Partial<Transaction> = {}): Transaction {
+            return {
+                transactionID: 'distance_txn',
+                amount: 1000,
+                currency: CONST.CURRENCY.USD,
+                merchant: 'Test',
+                created: DateUtils.getDBTime(),
+                reportID: 'r1',
+                comment: {
+                    type: CONST.TRANSACTION.TYPE.CUSTOM_UNIT,
+                    customUnit: {
+                        name: CONST.CUSTOM_UNITS.NAME_DISTANCE,
+                        quantity: 5,
+                        distanceUnit: CONST.CUSTOM_UNITS.DISTANCE_UNIT_KILOMETERS,
+                    },
+                },
+                routes: buildRoute(KM_5_IN_METERS),
+                ...overrides,
+            } as Transaction;
+        }
+
+        it('returns false when distance is not a number', () => {
+            expect(hasManualDistanceOverride(buildDistanceTransaction(), undefined)).toBe(false);
+        });
+
+        it('returns false when quantity matches the route distance (GPS-tracked expense)', () => {
+            // 5 km == 5000 m → no override.
+            expect(hasManualDistanceOverride(buildDistanceTransaction(), 5)).toBe(false);
+        });
+
+        it('returns true when quantity diverges from the route distance by more than 1m (manual override on map)', () => {
+            // 5 km == 5000 m, but route is 10000 m → override.
+            const transaction = buildDistanceTransaction({routes: buildRoute(10000)});
+            expect(hasManualDistanceOverride(transaction, 5)).toBe(true);
+        });
+
+        it('tolerates float-precision drift within 1m', () => {
+            // 5 km converted hits 5000 m; route at 5000.5 m → within tolerance.
+            const transaction = buildDistanceTransaction({routes: buildRoute(5000.5)});
+            expect(hasManualDistanceOverride(transaction, 5)).toBe(false);
+        });
+
+        it('returns false when transaction has no route distance (pure manual expense)', () => {
+            const transaction = buildDistanceTransaction({routes: buildRoute(0)});
+            expect(hasManualDistanceOverride(transaction, 5)).toBe(false);
+        });
+
+        it('returns false when transaction has no customUnit.quantity', () => {
+            const transaction = buildDistanceTransaction({
+                comment: {
+                    type: CONST.TRANSACTION.TYPE.CUSTOM_UNIT,
+                    customUnit: {
+                        name: CONST.CUSTOM_UNITS.NAME_DISTANCE,
+                        distanceUnit: CONST.CUSTOM_UNITS.DISTANCE_UNIT_KILOMETERS,
+                    },
+                },
+            });
+            expect(hasManualDistanceOverride(transaction, 5)).toBe(false);
+        });
+
+        it('returns false when transaction has no distanceUnit', () => {
+            const transaction = buildDistanceTransaction({
+                comment: {
+                    type: CONST.TRANSACTION.TYPE.CUSTOM_UNIT,
+                    customUnit: {
+                        name: CONST.CUSTOM_UNITS.NAME_DISTANCE,
+                        quantity: 5,
+                    },
+                },
+            });
+            expect(hasManualDistanceOverride(transaction, 5)).toBe(false);
+        });
+
+        it('returns false when transaction is undefined', () => {
+            expect(hasManualDistanceOverride(undefined, 5)).toBe(false);
         });
     });
 });
