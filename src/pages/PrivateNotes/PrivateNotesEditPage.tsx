@@ -201,7 +201,7 @@ function PrivateNotesEditPage({report, ...rest}: PrivateNotesEditPageProps) {
         <PrivateNotesEditPageInternal
             report={report}
             privateNoteDraft={privateNoteDraft ?? ''}
-            // eslint-disable-next-line react/jsx-props-no-spreading
+             
             {...rest}
         />
     );

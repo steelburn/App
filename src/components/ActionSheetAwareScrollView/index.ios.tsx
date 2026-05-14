@@ -18,7 +18,7 @@ function ActionSheetAwareScrollView({style, children, ref, ...restProps}: Action
 
     return (
         <Reanimated.ScrollView
-            // eslint-disable-next-line react/jsx-props-no-spreading
+             
             {...restProps}
             ref={onRef}
             style={[style, animatedStyle]}
@@ -34,7 +34,7 @@ function ActionSheetAwareScrollView({style, children, ref, ...restProps}: Action
  * @returns - ActionSheetAwareScrollView
  */
 const renderScrollComponent: RenderActionSheetAwareScrollViewComponent = (props) => {
-    // eslint-disable-next-line react/jsx-props-no-spreading
+     
     return <ActionSheetAwareScrollView {...props} />;
 };
 

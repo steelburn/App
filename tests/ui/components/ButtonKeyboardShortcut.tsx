@@ -39,7 +39,7 @@ const renderShortcut = (props: Partial<ButtonKeyboardShortcutProps> = {}) =>
             <ButtonKeyboardShortcut
                 pressOnEnter
                 isPressOnEnterActive
-                // eslint-disable-next-line react/jsx-props-no-spreading
+                 
                 {...props}
             />
         </NavigationContainer>,

@@ -43,7 +43,7 @@ function PreRenderer({TDefaultRenderer, onPressIn, onPressOut, onLongPress, ...d
     if (isChildOfTaskTitle) {
         return (
             <TDefaultRenderer
-                // eslint-disable-next-line react/jsx-props-no-spreading
+                 
                 {...defaultRendererProps}
                 style={styles.taskTitleMenuItem}
             />
@@ -71,7 +71,7 @@ function PreRenderer({TDefaultRenderer, onPressIn, onPressOut, onLongPress, ...d
             >
                 <View>
                     <Text style={{fontSize}}>
-                        {/* eslint-disable-next-line react/jsx-props-no-spreading */}
+                        { }
                         <TDefaultRenderer {...defaultRendererProps} />
                     </Text>
                 </View>

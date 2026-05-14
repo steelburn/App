@@ -15,7 +15,7 @@ function EditedRenderer({tnode, TDefaultRenderer, style, ...defaultRendererProps
         <Text fontSize={variables.fontSizeSmall}>
             <Text fontSize={variables.fontSizeSmall}> </Text>
             <Text
-                // eslint-disable-next-line react/jsx-props-no-spreading
+                 
                 {...defaultRendererProps}
                 fontSize={variables.fontSizeSmall}
                 color={theme.textSupporting}

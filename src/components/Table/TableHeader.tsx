@@ -81,7 +81,7 @@ function TableHeader<T, ColumnKey extends string = string>({style, shouldHideHea
                 !shouldUseNarrowTableLayout && {gridTemplateColumns: `repeat(${columns.length}, 1fr)`},
                 style,
             ]}
-            // eslint-disable-next-line react/jsx-props-no-spreading
+             
             {...props}
         >
             {shouldUseNarrowTableLayout && (

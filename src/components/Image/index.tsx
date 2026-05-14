@@ -160,7 +160,7 @@ function Image({
 
     return (
         <BaseImage
-            // eslint-disable-next-line react/jsx-props-no-spreading
+             
             {...forwardedProps}
             onLoad={handleLoad}
             style={[style, aspectRatioStyle, shouldOpacityBeZero && {opacity: 0}]}

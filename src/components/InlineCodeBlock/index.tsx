@@ -63,7 +63,7 @@ function InlineCodeBlock<TComponent extends TTextOrTPhrasing>({TDefaultRenderer,
 
     return (
         <TDefaultRenderer
-            // eslint-disable-next-line react/jsx-props-no-spreading
+             
             {...defaultRendererProps}
         >
             <Text style={[boxModelStyle, textStyles]}>{elements}</Text>

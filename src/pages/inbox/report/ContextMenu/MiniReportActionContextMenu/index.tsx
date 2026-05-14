@@ -15,7 +15,7 @@ function MiniReportActionContextMenu({displayAsGroup = false, ...rest}: MiniRepo
         >
             <BaseReportActionContextMenu
                 isMini
-                // eslint-disable-next-line react/jsx-props-no-spreading
+                 
                 {...rest}
             />
         </View>

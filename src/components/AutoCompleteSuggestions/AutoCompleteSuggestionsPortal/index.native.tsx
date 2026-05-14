@@ -30,7 +30,7 @@ function AutoCompleteSuggestionsPortal<TSuggestion>({
                 {}
                 <BaseAutoCompleteSuggestions<TSuggestion>
                     width={width}
-                    // eslint-disable-next-line react/jsx-props-no-spreading
+                     
                     {...props}
                 />
             </View>

@@ -21,7 +21,7 @@ const story: Meta<typeof CheckboxWithLabel> = {
 };
 
 function Template(props: CheckboxWithLabelProps) {
-    // eslint-disable-next-line react/jsx-props-no-spreading
+     
     return <CheckboxWithLabel {...props} />;
 }
 

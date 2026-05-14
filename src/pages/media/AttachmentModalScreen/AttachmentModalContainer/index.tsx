@@ -55,7 +55,7 @@ function AttachmentModalContainer<Screen extends AttachmentModalScreenType>({
             >
                 <AttachmentStateContextProvider>
                     <AttachmentModalBaseContent
-                        // eslint-disable-next-line react/jsx-props-no-spreading
+                         
                         {...contentProps}
                         shouldDisplayHelpButton={false}
                         onClose={closeModal}

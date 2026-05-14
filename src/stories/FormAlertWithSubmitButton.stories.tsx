@@ -16,7 +16,7 @@ const story: Meta<typeof FormAlertWithSubmitButton> = {
 };
 
 function Template(props: FormAlertWithSubmitButtonProps) {
-    // eslint-disable-next-line react/jsx-props-no-spreading
+     
     return <FormAlertWithSubmitButton {...props} />;
 }
 

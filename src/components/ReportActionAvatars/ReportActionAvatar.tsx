@@ -72,7 +72,7 @@ function ProfileAvatar(props: Parameters<typeof Avatar>[0] & {useProfileNavigati
 
     if (!useProfileNavigationWrapper) {
         return (
-            /* eslint-disable-next-line react/jsx-props-no-spreading */
+             
             <Avatar {...{...props, useProfileNavigationWrapper: undefined}} />
         );
     }
@@ -98,7 +98,7 @@ function ProfileAvatar(props: Parameters<typeof Avatar>[0] & {useProfileNavigati
             accessibilityRole={CONST.ROLE.BUTTON}
             sentryLabel={CONST.SENTRY_LABEL.REPORT.REPORT_ACTION_AVATAR}
         >
-            {/* eslint-disable-next-line react/jsx-props-no-spreading */}
+            { }
             <Avatar {...{...props, useProfileNavigationWrapper: undefined}} />
         </PressableWithoutFocus>
     );

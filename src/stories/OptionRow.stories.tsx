@@ -4,7 +4,7 @@ import OnyxListItemProvider from '@components/OnyxListItemProvider';
 import OptionRow from '@components/OptionRow';
 import type {OptionRowProps} from '@components/OptionRow';
 
-/* eslint-disable react/jsx-props-no-spreading */
+ 
 
 /**
  * We use the Component Story Format for writing stories. Follow the docs here:

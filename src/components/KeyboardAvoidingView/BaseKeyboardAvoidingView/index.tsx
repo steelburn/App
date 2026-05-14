@@ -51,7 +51,7 @@ function BaseKeyboardAvoidingView(props: KeyboardAvoidingViewProps) {
 
     return (
         <Animated.View
-            // eslint-disable-next-line react/jsx-props-no-spreading
+             
             {...rest}
             style={[style, isMobileSafariIos26 && animatedStyle]}
         />

@@ -11,7 +11,7 @@ function ButtonDisabledWhenOffline({disabledWhenOffline = true, ...props}: Butto
     const {isOffline} = useNetwork();
     return (
         <Button
-            // eslint-disable-next-line react/jsx-props-no-spreading
+             
             {...props}
             isDisabled={disabledWhenOffline && isOffline}
         />

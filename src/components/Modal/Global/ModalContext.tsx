@@ -106,7 +106,7 @@ function ModalProvider({children}: {children: React.ReactNode}) {
             {children}
             {!!ModalComponent && (
                 <ModalComponent
-                    // eslint-disable-next-line react/jsx-props-no-spreading
+                     
                     {...modalToRender.props}
                     key={modalToRender.id}
                     closeModal={closeModal}

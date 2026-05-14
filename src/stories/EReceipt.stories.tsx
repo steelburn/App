@@ -170,7 +170,7 @@ const story: Meta<typeof EReceipt> = {
 };
 
 function Template(props: EReceiptProps) {
-    // eslint-disable-next-line react/jsx-props-no-spreading
+     
     return <EReceipt {...props} />;
 }
 

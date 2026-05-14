@@ -9,7 +9,7 @@ function UserDetailsTooltip({shouldRender = true, children, ...props}: UserDetai
 
     return (
         <BaseUserDetailsTooltip
-            // eslint-disable-next-line react/jsx-props-no-spreading
+             
             {...props}
         >
             {children}

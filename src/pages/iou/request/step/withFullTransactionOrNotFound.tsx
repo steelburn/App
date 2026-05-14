@@ -99,7 +99,7 @@ export default function <TProps extends WithFullTransactionOrNotFoundProps<Money
         }
         return (
             <WrappedComponent
-                // eslint-disable-next-line react/jsx-props-no-spreading
+                 
                 {...(props as TProps)}
                 transaction={shouldUseTransactionDraft(userAction, userType) ? transactionDraftData : transaction}
                 isLoadingTransaction={isLoadingTransaction}

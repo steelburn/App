@@ -10,7 +10,7 @@ type CellRendererComponentProps = ViewProps & {
 function CellRendererComponent(props: CellRendererComponentProps) {
     return (
         <View
-            // eslint-disable-next-line react/jsx-props-no-spreading
+             
             {...props}
             style={[
                 props.style,

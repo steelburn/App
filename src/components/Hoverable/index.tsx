@@ -20,7 +20,7 @@ function Hoverable({isDisabled, ref, ...props}: HoverableProps) {
 
     return (
         <ActiveHoverable
-            // eslint-disable-next-line react/jsx-props-no-spreading
+             
             {...props}
             ref={ref}
         />

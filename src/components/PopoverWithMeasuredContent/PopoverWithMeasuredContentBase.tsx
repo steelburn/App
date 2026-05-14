@@ -205,7 +205,7 @@ function PopoverWithMeasuredContentBase({
             hideModalContentWhileAnimating={hideModalContentWhileAnimating}
             modalId={modalId}
             shouldEnableNewFocusManagement={shouldEnableNewFocusManagement}
-            // eslint-disable-next-line react/jsx-props-no-spreading
+             
             {...props}
             anchorPosition={shiftedAnchorPosition}
         >

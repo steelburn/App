@@ -298,7 +298,7 @@ function WorkspaceReceiptPartnersPage({route}: WorkspaceReceiptPartnersPageProps
                                             errorTextStyle={styles.mt3}
                                             brickRoadIndicator={menuItem.brickRoadIndicator}
                                             key={menuItem.title}
-                                            // eslint-disable-next-line react/jsx-props-no-spreading
+                                             
                                             {...menuItem}
                                         />
                                     </OfflineWithFeedback>

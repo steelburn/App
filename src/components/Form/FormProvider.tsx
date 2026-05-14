@@ -522,7 +522,7 @@ function FormProvider({
 
     return (
         <FormContext.Provider value={value}>
-            {/* eslint-disable react/jsx-props-no-spreading */}
+            { }
             <FormWrapper
                 {...rest}
                 formID={formID}

@@ -10,7 +10,7 @@ function VideoPlayer(props: VideoPlayerProps) {
 
     return (
         <BaseVideoPlayer
-            // eslint-disable-next-line react/jsx-props-no-spreading
+             
             {...props}
             reportID={reportID ?? fakeReportID}
         />

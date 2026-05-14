@@ -17,7 +17,7 @@ const story: Meta<typeof TextInput> = {
 };
 
 function Template(props: BaseTextInputProps) {
-    // eslint-disable-next-line react/jsx-props-no-spreading
+     
     return <TextInput {...props} />;
 }
 
@@ -85,7 +85,7 @@ function HintAndErrorInput(props: BaseTextInputProps) {
     const [error, setError] = useState('');
     return (
         <TextInput
-            // eslint-disable-next-line react/jsx-props-no-spreading
+             
             {...props}
             onChangeText={(value) => {
                 if (value?.toLowerCase() === 'oops!') {
@@ -114,7 +114,7 @@ function AutoGrowSupportInput(props: BaseTextInputProps) {
 
     return (
         <TextInput
-            // eslint-disable-next-line react/jsx-props-no-spreading
+             
             {...props}
             onChangeText={setValue}
             value={value}

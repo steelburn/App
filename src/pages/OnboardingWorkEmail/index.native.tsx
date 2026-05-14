@@ -23,7 +23,7 @@ function OnboardingWorkEmail(props: OnboardingWorkEmailProps) {
     return (
         <BaseOnboardingWorkEmail
             shouldUseNativeStyles
-            // eslint-disable-next-line react/jsx-props-no-spreading
+             
             {...props}
         />
     );

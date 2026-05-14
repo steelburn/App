@@ -3,7 +3,7 @@ import type {LineChartProps} from './LineChartContent';
 import LineChartContent from './LineChartContent';
 
 function LineChart(props: LineChartProps) {
-    // eslint-disable-next-line react/jsx-props-no-spreading
+     
     return <LineChartContent {...props} />;
 }
 

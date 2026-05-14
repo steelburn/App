@@ -74,7 +74,7 @@ function Template(props: FormProviderProps & FormProviderOnyxProps) {
     }
 
     return (
-        // eslint-disable-next-line react/jsx-props-no-spreading
+         
         <FormProvider {...props}>
             <View>
                 <InputWrapper
@@ -187,7 +187,7 @@ function WithNativeEventHandler(props: FormProviderProps & FormProviderOnyxProps
     }
 
     return (
-        // eslint-disable-next-line react/jsx-props-no-spreading
+         
         <FormProvider {...props}>
             <InputWrapper
                 InputComponent={TextInput}

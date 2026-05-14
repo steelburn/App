@@ -178,7 +178,7 @@ function TextSelectorModal({
                         InputComponent={TextInput}
                         value={currentValue}
                         onValueChange={(changedValue) => setValue(SafeString(changedValue))}
-                        // eslint-disable-next-line react/jsx-props-no-spreading
+                         
                         {...rest}
                         inputID={rest.inputID}
                         autoGrowHeight={autoGrowHeight}

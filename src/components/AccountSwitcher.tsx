@@ -223,7 +223,7 @@ function AccountSwitcher({isScreenFocused}: AccountSwitcherProps) {
 
     return (
         <>
-            {/* eslint-disable-next-line react/jsx-props-no-spreading */}
+            { }
             <TooltipToRender {...tooltipProps}>
                 <PressableWithFeedback
                     accessible

@@ -43,7 +43,7 @@ function ToggleDistanceUnitButton({onPress, children, ...rest}: PressableProps) 
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
-            // eslint-disable-next-line react/jsx-props-no-spreading
+             
             {...rest}
         >
             {children}

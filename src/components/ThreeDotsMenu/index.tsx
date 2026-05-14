@@ -153,7 +153,7 @@ function ThreeDotsMenu({
     return (
         <>
             <View>
-                {/* eslint-disable-next-line react/jsx-props-no-spreading */}
+                { }
                 <TooltipToRender {...tooltipProps}>
                     <PressableWithoutFeedback
                         onPress={onThreeDotsPress}

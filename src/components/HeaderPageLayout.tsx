@@ -89,7 +89,7 @@ function HeaderPageLayout({
             {({safeAreaPaddingBottomStyle}) => (
                 <>
                     <HeaderWithBackButton
-                        // eslint-disable-next-line react/jsx-props-no-spreading
+                         
                         {...rest}
                         titleColor={titleColor}
                         iconFill={iconFill}

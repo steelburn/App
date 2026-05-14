@@ -245,7 +245,7 @@ function ReanimatedModal({
                     }
                 }}
                 style={modalStyle}
-                // eslint-disable-next-line react/jsx-props-no-spreading
+                 
                 {...props}
             >
                 {isBackdropMounted && hasBackdrop && backdropView}

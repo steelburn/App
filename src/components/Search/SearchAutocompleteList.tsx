@@ -110,7 +110,7 @@ function SearchRouterItem(props: UserListItemProps<AutocompleteListItem> | Searc
     if (isSearchQueryListItem(props)) {
         return (
             <SearchQueryListItem
-                // eslint-disable-next-line react/jsx-props-no-spreading
+                 
                 {...props}
             />
         );

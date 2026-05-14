@@ -28,7 +28,7 @@ function RoomNameInput({disabled = false, autoFocus = false, isFocused, value, o
 
     return (
         <TextInput
-            // eslint-disable-next-line react/jsx-props-no-spreading
+             
             {...props}
             ref={ref}
             disabled={disabled}

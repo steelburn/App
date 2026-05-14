@@ -28,7 +28,7 @@ export default function withViewportOffsetTop<TProps extends ViewportOffsetTopPr
 
         return (
             <WrappedComponent
-                // eslint-disable-next-line react/jsx-props-no-spreading
+                 
                 {...(props as TProps)}
                 viewportOffsetTop={viewportOffsetTop}
             />

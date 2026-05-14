@@ -314,7 +314,7 @@ describe('TransactionGroupListItem', () => {
     const renderTransactionGroupListItem = () => {
         return render(
             <TransactionGroupListItem
-                // eslint-disable-next-line react/jsx-props-no-spreading
+                 
                 {...defaultProps}
             />,
             {wrapper: TestWrapper},
@@ -444,7 +444,7 @@ describe('Empty Report Selection', () => {
     const renderTransactionGroupListItem = () => {
         return render(
             <TransactionGroupListItem
-                // eslint-disable-next-line react/jsx-props-no-spreading
+                 
                 {...defaultProps}
             />,
             {wrapper: TestWrapper},
@@ -535,7 +535,7 @@ describe('Empty Report Selection', () => {
 
         const {unmount: unmountNonEmpty} = render(
             <TransactionGroupListItem
-                // eslint-disable-next-line react/jsx-props-no-spreading
+                 
                 {...nonEmptyProps}
             />,
             {wrapper: TestWrapper},
@@ -579,7 +579,7 @@ describe('Empty Report Selection', () => {
 
         render(
             <TransactionGroupListItem
-                // eslint-disable-next-line react/jsx-props-no-spreading
+                 
                 {...nonEmptyProps}
             />,
             {wrapper: TestWrapper},

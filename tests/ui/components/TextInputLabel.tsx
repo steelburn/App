@@ -7,7 +7,7 @@ describe('TextInputLabel', () => {
     const renderLabel = (props: TextInputLabelProps) => {
         return render(
             <TextInputLabel
-                // eslint-disable-next-line react/jsx-props-no-spreading
+                 
                 {...props}
             />,
         );

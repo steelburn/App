@@ -144,7 +144,7 @@ function TransactionItemRow({
 
         return (
             <TransactionItemRowNarrow
-                // eslint-disable-next-line react/jsx-props-no-spreading
+                 
                 {...narrowForwardedProps}
                 bgActiveStyles={bgActiveStyles}
                 merchant={merchant}
@@ -207,7 +207,7 @@ function TransactionItemRow({
 
     return (
         <TransactionItemRowWide
-            // eslint-disable-next-line react/jsx-props-no-spreading
+             
             {...wideForwardedProps}
             bgActiveStyles={bgActiveStyles}
             merchant={merchant}

@@ -11,7 +11,7 @@ function EducationalTooltip({children, ...props}: TooltipExtendedProps) {
 
     return (
         <BaseEducationalTooltip
-            // eslint-disable-next-line react/jsx-props-no-spreading
+             
             {...props}
         >
             {children}

@@ -9,7 +9,7 @@ function Tooltip({shouldRender = true, children, ...props}: TooltipExtendedProps
 
     return (
         <BaseTooltip
-            // eslint-disable-next-line react/jsx-props-no-spreading
+             
             {...props}
         >
             {children}

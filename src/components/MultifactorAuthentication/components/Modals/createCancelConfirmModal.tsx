@@ -39,7 +39,7 @@ function createCancelConfirmModal(displayName: string, baseProps: BaseProps): (p
 
         return (
             <CancelConfirmModalBase
-                // eslint-disable-next-line react/jsx-props-no-spreading
+                 
                 {...props}
             />
         );

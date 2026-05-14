@@ -6,7 +6,7 @@ function OnboardingWorkspaceCurrency({...rest}: OnboardingWorkspaceCurrencyProps
     return (
         <BaseOnboardingWorkspaceCurrency
             shouldUseNativeStyles
-            // eslint-disable-next-line react/jsx-props-no-spreading
+             
             {...rest}
         />
     );

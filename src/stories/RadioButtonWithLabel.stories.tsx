@@ -16,7 +16,7 @@ const story: Meta<typeof RadioButtonWithLabel> = {
 };
 
 function Template(props: RadioButtonWithLabelProps) {
-    // eslint-disable-next-line react/jsx-props-no-spreading
+     
     return <RadioButtonWithLabel {...props} />;
 }
 

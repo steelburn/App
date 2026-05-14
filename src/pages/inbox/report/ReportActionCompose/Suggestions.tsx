@@ -164,13 +164,13 @@ function Suggestions({
         <View testID="suggestions">
             <SuggestionEmoji
                 ref={suggestionEmojiRef}
-                // eslint-disable-next-line react/jsx-props-no-spreading
+                 
                 {...baseProps}
                 resetKeyboardInput={resetKeyboardInput}
             />
             <SuggestionMention
                 ref={suggestionMentionRef}
-                // eslint-disable-next-line react/jsx-props-no-spreading
+                 
                 {...baseProps}
             />
         </View>

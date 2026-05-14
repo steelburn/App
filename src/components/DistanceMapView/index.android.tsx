@@ -23,7 +23,7 @@ function DistanceMapView({overlayStyle, requireRouteToDisplayMap, ...rest}: Dist
     return (
         <>
             <MapView
-                // eslint-disable-next-line react/jsx-props-no-spreading
+                 
                 {...rest}
                 onMapReady={() => {
                     if (isMapReady) {

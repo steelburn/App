@@ -47,7 +47,7 @@ const renderTransactionItemRow = (transactionItem: TransactionWithOptionalSearch
                 report={transactionItem.report}
                 policy={transactionItem.policy}
                 reportActions={reportActions}
-                // eslint-disable-next-line react/jsx-props-no-spreading
+                 
                 {...defaultProps}
             />
         </ComposeProviders>,
@@ -135,7 +135,7 @@ describe('TransactionItemRowRBR', () => {
                 <TransactionItemRow
                     transactionItem={mockTransaction}
                     violations={undefined}
-                    // eslint-disable-next-line react/jsx-props-no-spreading
+                     
                     {...defaultProps}
                     columns={[CONST.SEARCH.TABLE_COLUMNS.REIMBURSABLE]}
                 />
@@ -298,7 +298,7 @@ describe('TransactionItemRowRBR', () => {
                 <TransactionItemRow
                     transactionItem={mockTimeTransaction}
                     violations={undefined}
-                    // eslint-disable-next-line react/jsx-props-no-spreading
+                     
                     {...defaultProps}
                     columns={[CONST.SEARCH.TABLE_COLUMNS.TAX_RATE, CONST.SEARCH.TABLE_COLUMNS.TAX_AMOUNT]}
                 />

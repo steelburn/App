@@ -28,7 +28,7 @@ function HighlightableMenuItem({wrapperStyle, highlighted, ...restOfProps}: Prop
 
     return (
         <MenuItem
-            // eslint-disable-next-line react/jsx-props-no-spreading
+             
             {...restOfProps}
             outerWrapperStyle={animatedHighlightStyle}
             wrapperStyle={wrapperStyle}

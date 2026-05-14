@@ -39,7 +39,7 @@ function DebugJSON({data}: DebugJSONProps) {
                 icon={icons.Copy}
             />
             <View
-                // eslint-disable-next-line react/jsx-props-no-spreading
+                 
                 {...SwipeInterceptPanResponder.panHandlers}
             >
                 <Text style={[styles.textLabel, styles.mb5, styles.border, styles.p2]}>{json}</Text>
