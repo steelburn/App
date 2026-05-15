@@ -2478,30 +2478,27 @@ describe('actions/IOU/TrackExpense', () => {
             } as Partial<Transaction>;
         }
 
-        it('returns false when distance is not a number', () => {
-            expect(hasManualDistanceOverride(buildDistanceTransaction(), undefined)).toBe(false);
-        });
-
         it('returns false when quantity matches the route distance (GPS-tracked expense)', () => {
-            // 5 km == 5000 m → no override.
-            expect(hasManualDistanceOverride(buildDistanceTransaction(), 5)).toBe(false);
+            // 5 km display vs 5000 m route → 0 diff in display units.
+            expect(hasManualDistanceOverride(buildDistanceTransaction())).toBe(false);
         });
 
-        it('returns true when quantity diverges from the route distance by more than 1m (manual override on map)', () => {
-            // 5 km == 5000 m, but route is 10000 m → override.
+        it('returns false when quantity is at the 2dp rounding boundary (unedited GPS expense)', () => {
+            // `customUnit.quantity` is stored at 2dp via `roundToTwoDecimalPlaces`. A 5005 m route
+            // is 5.005 km in display units, well within the 0.01 km tolerance.
+            const transaction = buildDistanceTransaction(withCustomUnit({routeDistanceMeters: 5005}));
+            expect(hasManualDistanceOverride(transaction)).toBe(false);
+        });
+
+        it('returns true when quantity diverges from the route distance (manual override on map)', () => {
+            // 5 km display vs 10000 m (10 km) route → diff of 5 km, well above tolerance.
             const transaction = buildDistanceTransaction(withCustomUnit({routeDistanceMeters: 10000}));
-            expect(hasManualDistanceOverride(transaction, 5)).toBe(true);
-        });
-
-        it('tolerates float-precision drift within 1m', () => {
-            // 5 km converted hits 5000 m; route at 5000.5 m → within tolerance.
-            const transaction = buildDistanceTransaction(withCustomUnit({routeDistanceMeters: 5000.5}));
-            expect(hasManualDistanceOverride(transaction, 5)).toBe(false);
+            expect(hasManualDistanceOverride(transaction)).toBe(true);
         });
 
         it('returns false when transaction has no route distance (pure manual expense)', () => {
             const transaction = buildDistanceTransaction(withCustomUnit({routeDistanceMeters: 0}));
-            expect(hasManualDistanceOverride(transaction, 5)).toBe(false);
+            expect(hasManualDistanceOverride(transaction)).toBe(false);
         });
 
         it('returns false when transaction has no customUnit.quantity', () => {
@@ -2515,7 +2512,7 @@ describe('actions/IOU/TrackExpense', () => {
                     },
                 },
             });
-            expect(hasManualDistanceOverride(transaction, 5)).toBe(false);
+            expect(hasManualDistanceOverride(transaction)).toBe(false);
         });
 
         it('returns false when transaction has no distanceUnit', () => {
@@ -2529,11 +2526,11 @@ describe('actions/IOU/TrackExpense', () => {
                     },
                 },
             });
-            expect(hasManualDistanceOverride(transaction, 5)).toBe(false);
+            expect(hasManualDistanceOverride(transaction)).toBe(false);
         });
 
         it('returns false when transaction is undefined', () => {
-            expect(hasManualDistanceOverride(undefined, 5)).toBe(false);
+            expect(hasManualDistanceOverride(undefined)).toBe(false);
         });
     });
 });

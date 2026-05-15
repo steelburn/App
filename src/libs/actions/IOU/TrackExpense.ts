@@ -1410,30 +1410,25 @@ function addTrackedExpenseToPolicy(parameters: AddTrackedExpenseToPolicyParam, o
 }
 
 /**
- * Detects whether `distance` is a user-set manual override of the transaction's route-computed
- * distance — i.e. `customUnit.quantity` (converted to meters) diverges from
- * `customUnit.routeDistanceMeters`.
+ * Returns `true` when `customUnit.quantity` (in `distanceUnit`) diverges from
+ * `customUnit.routeDistanceMeters` — i.e. the user typed a manual value on the "Manual" tab
+ * after a map route had already populated the distance.
  *
- * Used in `convertTrackedExpenseToRequest` to decide whether to strip `waypoints` from the outbound
- * params, so BE doesn't recompute the distance from the route and discard the override (#90561).
- *
- * Returns `false` for GPS-tracked expenses (quantity matches the route), pure-manual expenses (no
- * route), and any case missing the data needed to make a confident comparison — those flows must
- * keep `waypoints` so BE can preserve / regenerate the map receipt.
+ * Returns `false` for map-routed / GPS-tracked expenses (quantity matches the route) and any
+ * case missing the data needed for a confident compare — those flows must keep `waypoints` so
+ * BE can preserve / regenerate the map receipt.
  */
-function hasManualDistanceOverride(transaction: OnyxEntry<OnyxTypes.Transaction>, distance: number | undefined): boolean {
-    if (typeof distance !== 'number') {
-        return false;
-    }
+function hasManualDistanceOverride(transaction: OnyxEntry<OnyxTypes.Transaction>): boolean {
     const quantity = transaction?.comment?.customUnit?.quantity;
     const distanceUnit = transaction?.comment?.customUnit?.distanceUnit;
     const routeDistanceMeters = transaction?.comment?.customUnit?.routeDistanceMeters;
     if (typeof quantity !== 'number' || !distanceUnit || typeof routeDistanceMeters !== 'number' || routeDistanceMeters <= 0) {
         return false;
     }
-    const quantityInMeters = DistanceRequestUtils.convertToDistanceInMeters(quantity, distanceUnit);
-    // 1m tolerance swallows float-precision noise between the two representations.
-    return Math.abs(quantityInMeters - routeDistanceMeters) > 1;
+    // Compare in display units — `quantity` is stored at 2dp, so a meters round-trip would
+    // exceed any sub-meter tolerance from rounding alone (~5m km / ~8m mi).
+    const routeQuantity = DistanceRequestUtils.convertDistanceUnit(routeDistanceMeters, distanceUnit);
+    return Math.abs(quantity - routeQuantity) > 0.01;
 }
 
 function convertTrackedExpenseToRequest(convertTrackedExpenseParams: ConvertTrackedExpenseToRequestParams) {
@@ -1502,12 +1497,12 @@ function convertTrackedExpenseToRequest(convertTrackedExpenseParams: ConvertTrac
         });
     }
 
-    // Drop `waypoints` only when the caller passes a manual `distance` that diverges from the route's
-    // computed distance, so BE doesn't recompute and overwrite the override (#90561). GPS-tracked
-    // expenses also carry a numeric `distance`, but its value matches the route — they must keep
-    // waypoints so BE can regenerate the map receipt.
+    // Drop `waypoints` only when the transaction's stored distance diverges from the route's
+    // computed distance, so BE doesn't recompute and overwrite the manual override. GPS-tracked
+    // / map-routed expenses match the route — they must keep waypoints so BE can regenerate the
+    // map receipt.
     const sourceTransaction = getAllTransactions()?.[`${ONYXKEYS.COLLECTION.TRANSACTION}${transactionID}`];
-    const hasManualDistanceOverrideForRequest = hasManualDistanceOverride(sourceTransaction, distance);
+    const hasManualDistanceOverrideForRequest = hasManualDistanceOverride(sourceTransaction);
 
     if (workspaceParams) {
         const additionalFailureData = getConvertTrackedExpenseWorkspaceFailureData({
