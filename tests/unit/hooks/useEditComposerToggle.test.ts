@@ -226,11 +226,11 @@ describe('useEditComposerToggle', () => {
 
         // Start with edit off so wasEditingRef is false; then turn editing on to capture previousDraftSelectionRef.
         const {rerender} = renderHook(
-            (props: {selection: TextSelection; value: string; editing: boolean}) => {
+            (props: {selection: TextSelection; draftComment: string; editing: boolean}) => {
                 composerEditStateRef.current = defaultComposerEditState(
                     props.editing
-                        ? {editingState: CONST.REPORT_ACTION_EDIT_MESSAGE_STATE.EDITING, editingMessage: 'e', editingReportActionID: '1'}
-                        : {editingState: CONST.REPORT_ACTION_EDIT_MESSAGE_STATE.OFF},
+                        ? {editingState: CONST.REPORT_ACTION_EDIT_MESSAGE_STATE.EDITING, editingMessage: 'e', editingReportActionID: '1', draftComment: props.draftComment}
+                        : {editingState: CONST.REPORT_ACTION_EDIT_MESSAGE_STATE.OFF, draftComment: props.draftComment},
                 );
                 return useEditComposerToggle({
                     selection: props.selection,
@@ -239,15 +239,15 @@ describe('useEditComposerToggle', () => {
                     onSelectionChange,
                 });
             },
-            {initialProps: {selection: priorSelection, value: 'restored', editing: false}},
+            {initialProps: {selection: priorSelection, draftComment: 'restored', editing: false}},
         );
 
-        rerender({selection: priorSelection, value: 'restored', editing: true});
+        rerender({selection: priorSelection, draftComment: 'restored', editing: true});
 
         onValueChange.mockClear();
         onSelectionChange.mockClear();
 
-        rerender({selection: priorSelection, value: 'restored', editing: false});
+        rerender({selection: priorSelection, draftComment: 'restored', editing: false});
 
         expect(onValueChange).toHaveBeenCalledWith('restored');
         expect(onSelectionChange).toHaveBeenCalledWith(priorSelection);
@@ -357,6 +357,7 @@ describe('useEditComposerToggle', () => {
         composerEditStateRef.current = defaultComposerEditState({
             editingState: CONST.REPORT_ACTION_EDIT_MESSAGE_STATE.EDITING,
             editingMessage: 'editing in narrow',
+            draftComment: 'plain draft for wide',
         });
 
         const {rerender} = renderHook(
