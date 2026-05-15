@@ -113,9 +113,9 @@ function PersonalCardDetailsPage({route}: PersonalCardDetailsPageProps) {
             if (result.action !== ModalActions.CONFIRM) {
                 return;
             }
+            Navigation.goBack();
             const savedColumnLayout = savedColumnLayouts?.[card.cardID];
             deletePersonalCard({cardID: card.cardID, card, allTransactions, allReports, savedColumnLayout});
-            Navigation.goBack();
         });
     };
 
