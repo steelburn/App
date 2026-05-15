@@ -6868,6 +6868,17 @@ ${reportName}
                 syncError: '无法连接到 Gusto',
                 disconnectTitle: '断开 Gusto',
                 disconnectPrompt: '确定要断开与 Gusto 的连接吗？',
+                syncResults: {
+                    title: 'Gusto 同步结果',
+                    successTitle: '已成功同步你的 Gusto 连接！',
+                    added: '已添加',
+                    removed: '已移除',
+                    skipped: '已跳过',
+                    employeeCount: () => ({
+                        one: '1 员工',
+                        other: (count: number) => `${count} 员工`,
+                    }),
+                },
             },
         },
     },

@@ -6437,7 +6437,10 @@ const translations = {
                     added: 'Added',
                     removed: 'Removed',
                     skipped: 'Skipped',
-                    employeeCount: ({count}: {count: number}) => `${count} ${count === 1 ? 'employee' : 'employees'}`,
+                    employeeCount: () => ({
+                        one: '1 employee',
+                        other: (count: number) => `${count} employees`,
+                    }),
                 },
             },
         },

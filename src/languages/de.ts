@@ -7079,6 +7079,17 @@ Fügen Sie weitere Ausgabelimits hinzu, um den Cashflow Ihres Unternehmens zu sc
                 syncError: 'Verbindung zu Gusto nicht möglich',
                 disconnectTitle: 'Gusto trennen',
                 disconnectPrompt: 'Bist du sicher, dass du Gusto trennen möchtest?',
+                syncResults: {
+                    title: 'Gusto-Synchronisierungsergebnisse',
+                    successTitle: 'Ihre Gusto-Verbindung wurde erfolgreich synchronisiert!',
+                    added: 'Hinzugefügt',
+                    removed: 'Entfernt',
+                    skipped: 'Übersprungen',
+                    employeeCount: () => ({
+                        one: '1 Mitarbeiter',
+                        other: (count: number) => `${count} Mitarbeitende`,
+                    }),
+                },
             },
         },
     },

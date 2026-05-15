@@ -7101,6 +7101,17 @@ Ajoutez davantage de règles de dépenses pour protéger la trésorerie de l’e
                 syncError: 'Impossible de se connecter à Gusto',
                 disconnectTitle: 'Déconnecter Gusto',
                 disconnectPrompt: 'Voulez-vous vraiment déconnecter Gusto ?',
+                syncResults: {
+                    title: 'Résultats de la synchronisation Gusto',
+                    successTitle: 'Connexion Gusto synchronisée avec succès !',
+                    added: 'Ajouté',
+                    removed: 'Supprimé',
+                    skipped: 'Ignoré',
+                    employeeCount: () => ({
+                        one: '1 employé',
+                        other: (count: number) => `${count} employés`,
+                    }),
+                },
             },
         },
     },
@@ -9306,7 +9317,6 @@ Voici un *reçu test* pour vous montrer comment ça fonctionne :`,
             restrictDefaultLoginSelection: 'Restreindre la sélection de connexion par défaut',
             restrictDefaultLoginSelectionDescription:
                 'Empêche les membres de modifier leur e-mail de connexion en dehors du domaine de leur entreprise afin d’éviter les restrictions de politique.',
-
             expensifyCardPreferredWorkspaceDisabledMessage:
                 'Pour activer ce paramètre, veuillez d’abord activer un espace de travail préféré et configurer les cartes Expensify sur votre domaine.',
             findGroup: 'Trouver un groupe',
