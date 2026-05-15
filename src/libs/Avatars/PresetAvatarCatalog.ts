@@ -240,6 +240,10 @@ function isPresetAvatarID(value: unknown): value is PresetAvatarID {
     return typeof value === 'string' && value in PRESET_AVATAR_CATALOG;
 }
 
+function resolveAvatarURI(id: string): string {
+    return isPresetAvatarID(id) ? (getAvatarURL(id) ?? id) : id;
+}
+
 export {
     PRESET_AVATAR_CATALOG,
     PRESET_AVATAR_CATALOG_ORDERED,
@@ -250,4 +254,5 @@ export {
     getAvatarURL,
     getLetterAvatar,
     isPresetAvatarID,
+    resolveAvatarURI,
 };

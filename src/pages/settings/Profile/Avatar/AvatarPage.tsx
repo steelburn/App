@@ -13,7 +13,7 @@ import useDiscardChangesConfirmation from '@hooks/useDiscardChangesConfirmation'
 import useIsInLandscapeMode from '@hooks/useIsInLandscapeMode';
 import useLocalize from '@hooks/useLocalize';
 import useThemeStyles from '@hooks/useThemeStyles';
-import {getAvatarURL, isPresetAvatarID} from '@libs/Avatars/PresetAvatarCatalog';
+import {getAvatarURL, isPresetAvatarID, resolveAvatarURI} from '@libs/Avatars/PresetAvatarCatalog';
 import type {CustomRNImageManipulatorResult} from '@libs/cropOrRotateImage/types';
 import Navigation from '@libs/Navigation/Navigation';
 import {useIsAgentAccount} from '@libs/SessionUtils';
@@ -130,7 +130,7 @@ function ProfileAvatar() {
                 });
             } else {
                 const {customExpensifyAvatarID} = params;
-                const uri = isPresetAvatarID(customExpensifyAvatarID) ? (getAvatarURL(customExpensifyAvatarID) ?? customExpensifyAvatarID) : customExpensifyAvatarID;
+                const uri = resolveAvatarURI(customExpensifyAvatarID);
                 updateAvatar(
                     {
                         uri,
