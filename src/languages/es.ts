@@ -1690,10 +1690,8 @@ const translations: TranslationDeepObject<typeof en> = {
         backdropLabel: 'Fondo del Modal',
     },
     nextStep: {
-        /* eslint-disable @typescript-eslint/no-unused-vars */
         message: {
             [CONST.NEXT_STEP.MESSAGE_KEY.WAITING_TO_ADD_TRANSACTIONS]: (actor, actorType, _eta, _etaType) => {
-                // eslint-disable-next-line default-case
                 switch (actorType) {
                     case CONST.NEXT_STEP.ACTOR_TYPE.CURRENT_USER:
                         return `Esperando a que <strong>tú</strong> añadas gastos.`;
@@ -1704,7 +1702,6 @@ const translations: TranslationDeepObject<typeof en> = {
                 }
             },
             [CONST.NEXT_STEP.MESSAGE_KEY.WAITING_TO_SUBMIT]: (actor, actorType, _eta, _etaType) => {
-                // eslint-disable-next-line default-case
                 switch (actorType) {
                     case CONST.NEXT_STEP.ACTOR_TYPE.CURRENT_USER:
                         return `Esperando a que <strong>tú</strong> envíes los gastos.`;
@@ -1716,7 +1713,6 @@ const translations: TranslationDeepObject<typeof en> = {
             },
             [CONST.NEXT_STEP.MESSAGE_KEY.NO_FURTHER_ACTION]: (_actor, _actorType, _eta, _etaType) => `¡No se requiere ninguna acción adicional!`,
             [CONST.NEXT_STEP.MESSAGE_KEY.WAITING_FOR_SUBMITTER_ACCOUNT]: (actor, actorType, _eta, _etaType) => {
-                // eslint-disable-next-line default-case
                 switch (actorType) {
                     case CONST.NEXT_STEP.ACTOR_TYPE.CURRENT_USER:
                         return `Esperando a que <strong>tú</strong> añadas una cuenta bancaria.`;
@@ -1731,7 +1727,6 @@ const translations: TranslationDeepObject<typeof en> = {
                 if (eta) {
                     formattedETA = etaType === CONST.NEXT_STEP.ETA_TYPE.DATE_TIME ? ` el ${eta} de cada mes` : ` ${eta}`;
                 }
-                // eslint-disable-next-line default-case
                 switch (actorType) {
                     case CONST.NEXT_STEP.ACTOR_TYPE.CURRENT_USER:
                         return `Esperando a que tus gastos se envíen automáticamente${formattedETA}.`;
@@ -1742,7 +1737,6 @@ const translations: TranslationDeepObject<typeof en> = {
                 }
             },
             [CONST.NEXT_STEP.MESSAGE_KEY.WAITING_TO_FIX_ISSUES]: (actor, actorType, _eta, _etaType) => {
-                // eslint-disable-next-line default-case
                 switch (actorType) {
                     case CONST.NEXT_STEP.ACTOR_TYPE.CURRENT_USER:
                         return `Esperando a que <strong>tú</strong> soluciones ellos problemas.`;
@@ -1753,7 +1747,6 @@ const translations: TranslationDeepObject<typeof en> = {
                 }
             },
             [CONST.NEXT_STEP.MESSAGE_KEY.WAITING_TO_APPROVE]: (actor, actorType, _eta, _etaType) => {
-                // eslint-disable-next-line default-case
                 switch (actorType) {
                     case CONST.NEXT_STEP.ACTOR_TYPE.CURRENT_USER:
                         return `Esperando a que <strong>tú</strong> apruebes los gastos.`;
@@ -1764,7 +1757,6 @@ const translations: TranslationDeepObject<typeof en> = {
                 }
             },
             [CONST.NEXT_STEP.MESSAGE_KEY.WAITING_TO_EXPORT]: (actor, actorType, _eta, _etaType) => {
-                // eslint-disable-next-line default-case
                 switch (actorType) {
                     case CONST.NEXT_STEP.ACTOR_TYPE.CURRENT_USER:
                         return `Esperando a que <strong>tú</strong> exportes este informe.`;
@@ -1775,7 +1767,6 @@ const translations: TranslationDeepObject<typeof en> = {
                 }
             },
             [CONST.NEXT_STEP.MESSAGE_KEY.WAITING_TO_PAY]: (actor, actorType, _eta, _etaType) => {
-                // eslint-disable-next-line default-case
                 switch (actorType) {
                     case CONST.NEXT_STEP.ACTOR_TYPE.CURRENT_USER:
                         return `Esperando a que <strong>tú</strong> pagues los gastos.`;
@@ -1786,7 +1777,6 @@ const translations: TranslationDeepObject<typeof en> = {
                 }
             },
             [CONST.NEXT_STEP.MESSAGE_KEY.WAITING_FOR_POLICY_BANK_ACCOUNT]: (actor, actorType, _eta, _etaType) => {
-                // eslint-disable-next-line default-case
                 switch (actorType) {
                     case CONST.NEXT_STEP.ACTOR_TYPE.CURRENT_USER:
                         return `Esperando a que <strong>tú</strong> termines de configurar una cuenta bancaria de empresa.`;
@@ -1806,7 +1796,6 @@ const translations: TranslationDeepObject<typeof en> = {
             [CONST.NEXT_STEP.MESSAGE_KEY.SUBMITTING_TO_SELF]: (_actor, _actorType, _eta, _etaType) =>
                 `¡Ups! Parece que estás enviando el informe a <strong>ti mismo</strong>. Aprobar tus propios informes está <strong>prohibido</strong> por tu espacio de trabajo. Por favor, envía este informe a otra persona o contacta a tu administrador para cambiar la persona a la que lo envías.`,
             [CONST.NEXT_STEP.MESSAGE_KEY.REJECTED_REPORT]: (actor, actorType) => {
-                // eslint-disable-next-line default-case
                 switch (actorType) {
                     case CONST.NEXT_STEP.ACTOR_TYPE.CURRENT_USER:
                         return `Este informe fue rechazado. Esperando a que <strong>tú</strong> corrijas los problemas y lo vuelvas a enviar manualmente.`;
@@ -2462,7 +2451,6 @@ ${amount} para ${merchant} - ${date}`,
                 two: 'º',
                 few: 'º',
                 other: 'º',
-                /* eslint-disable @typescript-eslint/naming-convention */
                 '1': 'Primero',
                 '2': 'Segundo',
                 '3': 'Tercero',
@@ -2473,7 +2461,6 @@ ${amount} para ${merchant} - ${date}`,
                 '8': 'Octavo',
                 '9': 'Noveno',
                 '10': 'Décimo',
-                /* eslint-enable @typescript-eslint/naming-convention */
             },
         },
         approverInMultipleWorkflows: 'Este miembro ya pertenece a otro flujo de aprobación. Cualquier actualización aquí se reflejará allí también.',
@@ -5610,9 +5597,7 @@ ${amount} para ${merchant} - ${date}`,
                 description: '¿Está seguro de que desea desconectar esta integración?',
                 confirmText: 'Entendido',
             },
-            hrWarningModal: {
-                disconnectText: 'Para desactivar HR, primero desconecta Gusto de este espacio de trabajo.',
-            },
+            hrWarningModal: {disconnectText: ({integration}: {integration: string}) => `Para deshabilitar RR. HH., primero desconecta ${integration} de este espacio de trabajo.`},
             workflowWarningModal: {
                 featureEnabledTitle: 'No tan rápido...',
                 featureEnabledText:
@@ -6245,18 +6230,24 @@ ${amount} para ${merchant} - ${date}`,
             title: 'HR',
             subtitle: 'Conecta herramientas de HR y mantén sincronizadas las aprobaciones de empleados.',
             settingsTitle: 'Configuración de Gusto',
-            syncStageName: ({stage}) => {
+            syncStageName: ({stage}: SyncStageNameConnectionsParams) => {
                 switch (stage) {
                     case 'gustoSyncTitle':
-                        return 'Synchronizing Gusto Employees';
+                        return 'Sincronizar empleados de Gusto';
                     case 'gustoSyncLoadData':
-                        return 'Loading data from Gusto';
+                        return 'Cargando datos desde Gusto';
                     case 'gustoSyncProvisioning':
-                        return 'Provisioning employees in policy';
+                        return 'Aprovisionar empleados en la política';
+                    case 'zenefitsSyncTitle':
+                        return 'Sincronización de empleados de TriNet';
+                    case 'zenefitsSyncLoadData':
+                        return 'Cargando datos desde TriNet';
+                    case 'zenefitsSyncProvisioning':
+                        return 'Aprovisionar empleados en la política';
                     case 'jobDone':
                         return 'Esperando a que se carguen los datos importados';
                     default: {
-                        return `Translation missing for stage: ${stage}`;
+                        return `Falta la traducción para la etapa: ${stage}`;
                     }
                 }
             },
@@ -6291,6 +6282,30 @@ ${amount} para ${merchant} - ${date}`,
                         label: 'Aprobación personalizada',
                         description: 'Configuraré manualmente los flujos de aprobación en Expensify.',
                     },
+                },
+            },
+            zenefits: {
+                title: 'TriNet',
+                connect: 'Conectar',
+                syncNow: 'Sincronizar ahora',
+                disconnect: 'Desconectar',
+                lastSync: (relativeDate: string) => `Última sincronización ${relativeDate}`,
+                syncError: 'No se puede conectar con TriNet',
+                disconnectTitle: 'Desconectar TriNet',
+                disconnectPrompt: '¿Seguro que quieres desconectar TriNet?',
+                connectionDescription: 'Conecta TriNet para mantener las aprobaciones de empleados sincronizadas con tu espacio de trabajo.',
+                approvalMode: 'Modo de aprobación',
+                finalApprover: 'Aprobador final',
+                notSet: 'No establecido',
+                approvalModeDescription: 'Los miembros y gestores están configurados para sincronizarse con TriNet.',
+                approvalModeWarningTitle: '¿Cambiar el modo de aprobación?',
+                approvalModeWarningPrompt: (helpSiteURL: string) =>
+                    `¿Seguro que quieres cambiar el modo de aprobación de este espacio de trabajo? Obtén más información sobre los distintos modos de flujo de trabajo habilitados por TriNet en nuestro <a href="${helpSiteURL}">sitio de ayuda</a>.`,
+                approvalModeWarningConfirm: 'Cambiar el modo de aprobación',
+                approvalModes: {
+                    basic: {label: 'Aprobación básica', description: 'Todos los usuarios envían a una sola persona para su procesamiento y aprobación.'},
+                    manager: {label: 'Aprobación del responsable', description: 'Los empleados envían informes a su responsable directo configurado en TriNet.'},
+                    custom: {label: 'Aprobación personalizada', description: 'Configuraré manualmente los flujos de aprobación en Expensify.'},
                 },
             },
         },
@@ -6957,7 +6972,6 @@ ${amount} para ${merchant} - ${date}`,
         restrictedDescription: 'Sólo las personas en tu espacio de trabajo pueden encontrar esta sala',
         privateDescription: 'Sólo las personas que están invitadas a esta sala pueden encontrarla',
         publicDescription: 'Cualquier persona puede unirse a esta sala',
-        // eslint-disable-next-line @typescript-eslint/naming-convention
         public_announceDescription: 'Cualquier persona puede unirse a esta sala',
         createRoom: 'Crea una sala de chat',
         roomAlreadyExistsError: 'Ya existe una sala con este nombre',
@@ -6977,7 +6991,6 @@ ${amount} para ${merchant} - ${date}`,
             restricted: 'Espacio de trabajo',
             private: 'Privada',
             public: 'Público',
-            // eslint-disable-next-line @typescript-eslint/naming-convention
             public_announce: 'Anuncio Público',
         },
     },
@@ -7292,7 +7305,6 @@ ${amount} para ${merchant} - ${date}`,
         updatedDefaultTitle: (newDefaultTitle, oldDefaultTitle) => `cambió la fórmula personalizada del nombre del informe a "${newDefaultTitle}" (previamente "${oldDefaultTitle}")`,
         updatedOwnership: (oldOwnerEmail, oldOwnerName, policyName) => `asumió la propiedad del espacio de trabajo ${policyName} de ${oldOwnerName} (${oldOwnerEmail})`,
         updatedAutoHarvesting: (enabled) => `${enabled ? 'habilitó' : 'deshabilitó'} el envío programado`,
-        // eslint-disable-next-line @typescript-eslint/max-params
         updatedIndividualBudgetNotification: (
             budgetAmount,
             budgetFrequency,
