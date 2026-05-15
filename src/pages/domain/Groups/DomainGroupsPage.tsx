@@ -16,6 +16,7 @@ import useDomainDocumentTitle from '@hooks/useDomainDocumentTitle';
 import {useMemoizedLazyExpensifyIcons, useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
+import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useSearchResults from '@hooks/useSearchResults';
 import useShouldDisplayButtonsInSeparateLine from '@hooks/useShouldDisplayButtonsInSeparateLine';
 import useThemeStyles from '@hooks/useThemeStyles';
@@ -49,6 +50,7 @@ function DomainGroupsPage({route}: DomainGroupsPageProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const illustrations = useMemoizedLazyIllustrations(['Members']);
+    const {shouldUseNarrowLayout} = useResponsiveLayout();
     const shouldDisplayButtonsInSeparateLine = useShouldDisplayButtonsInSeparateLine();
 
     const [groups = getEmptyArray<DomainSecurityGroupWithID>()] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {selector: groupsSelector});
@@ -150,7 +152,7 @@ function DomainGroupsPage({route}: DomainGroupsPageProps) {
                     title={translate('domain.groups.title')}
                     onBackButtonPress={Navigation.popToSidebar}
                     icon={illustrations.Members}
-                    shouldShowBackButton={shouldDisplayButtonsInSeparateLine}
+                    shouldShowBackButton={shouldUseNarrowLayout}
                     shouldUseHeadlineHeader
                 >
                     {!shouldDisplayButtonsInSeparateLine && <View style={[styles.flexRow, styles.gap2]}>{createGroupHeaderButton}</View>}
