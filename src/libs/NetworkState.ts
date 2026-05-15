@@ -4,6 +4,7 @@ import CONFIG from '@src/CONFIG';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import {getCommandURL} from './ApiUtils';
+import getEnvironment from './Environment/getEnvironment';
 import {onSustainedFailureChange, reset as resetFailureCounters} from './FailureTracker';
 import Log from './Log';
 
@@ -346,10 +347,14 @@ function configureAndSubscribe() {
     });
 }
 
-// Subscribe to NetInfo immediately so logged-out screens (login, offline indicator)
-// have network detection from the start. Reconfigure when accountID changes to
-// update the reachability URL.
-configureAndSubscribe();
+// Subscribe to NetInfo once getEnvironment() resolves so the first ping uses the correct root.
+// ApiUtils is imported above, so its getEnvironment().then() is registered first and runs before
+// this one — by the time we configure, ApiUtils' shouldUseStagingServer is already settled.
+// On web/dev/adhoc this resolves on the next microtask; on native staging/prod it may wait on the
+// betaChecker network call (Android) or a bridge call (iOS).
+getEnvironment().then(() => {
+    configureAndSubscribe();
+});
 
 // --- Onyx subscriptions (inputs for state computation) ---
 
@@ -365,9 +370,7 @@ Onyx.connectWithoutView({
     },
 });
 
-// Re-target the reachability ping when the staging-server toggle changes. The initial callback
-// also fires once ApiUtils settles its async getEnvironment() chain, which transparently fixes the
-// boot race where the first configureAndSubscribe() ran before ENV_NAME was resolved.
+// Re-target the reachability ping when the in-app staging-server toggle flips at runtime.
 Onyx.connectWithoutView({
     key: ONYXKEYS.SHOULD_USE_STAGING_SERVER,
     callback: () => {

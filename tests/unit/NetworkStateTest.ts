@@ -41,6 +41,13 @@ jest.mock('@libs/ApiUtils', () => ({
     isUsingStagingApi: jest.fn(() => false),
 }));
 
+// NetworkState awaits getEnvironment() so configureAndSubscribe runs after ApiUtils settles its
+// own env-aware Onyx subscription. Mock a resolved promise so the .then() callback fires deterministically.
+jest.mock('@src/libs/Environment/getEnvironment', () => ({
+    __esModule: true,
+    default: () => Promise.resolve('adhoc'),
+}));
+
 Onyx.init({keys: ONYXKEYS});
 
 describe('NetworkState', () => {
