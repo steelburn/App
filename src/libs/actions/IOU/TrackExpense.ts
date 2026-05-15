@@ -1411,7 +1411,8 @@ function addTrackedExpenseToPolicy(parameters: AddTrackedExpenseToPolicyParam, o
 
 /**
  * Detects whether `distance` is a user-set manual override of the transaction's route-computed
- * distance — i.e. `customUnit.quantity` (converted to meters) diverges from `routes.route0.distance`.
+ * distance — i.e. `customUnit.quantity` (converted to meters) diverges from
+ * `customUnit.routeDistanceMeters`.
  *
  * Used in `convertTrackedExpenseToRequest` to decide whether to strip `waypoints` from the outbound
  * params, so BE doesn't recompute the distance from the route and discard the override (#90561).
@@ -1426,7 +1427,7 @@ function hasManualDistanceOverride(transaction: OnyxEntry<OnyxTypes.Transaction>
     }
     const quantity = transaction?.comment?.customUnit?.quantity;
     const distanceUnit = transaction?.comment?.customUnit?.distanceUnit;
-    const routeDistanceMeters = transaction?.routes?.route0?.distance;
+    const routeDistanceMeters = transaction?.comment?.customUnit?.routeDistanceMeters;
     if (typeof quantity !== 'number' || !distanceUnit || typeof routeDistanceMeters !== 'number' || routeDistanceMeters <= 0) {
         return false;
     }

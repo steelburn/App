@@ -2441,8 +2441,6 @@ describe('actions/IOU/TrackExpense', () => {
 
     describe('hasManualDistanceOverride', () => {
         const KM_5_IN_METERS = 5000;
-        const ROUTE_GEOMETRY_STUB = {type: 'LineString' as const, coordinates: [] as Array<[number, number]>};
-        const buildRoute = (distance: number | null) => ({route0: {distance, geometry: ROUTE_GEOMETRY_STUB}});
 
         function buildDistanceTransaction(overrides: Partial<Transaction> = {}): Transaction {
             return {
@@ -2458,11 +2456,26 @@ describe('actions/IOU/TrackExpense', () => {
                         name: CONST.CUSTOM_UNITS.NAME_DISTANCE,
                         quantity: 5,
                         distanceUnit: CONST.CUSTOM_UNITS.DISTANCE_UNIT_KILOMETERS,
+                        routeDistanceMeters: KM_5_IN_METERS,
                     },
                 },
-                routes: buildRoute(KM_5_IN_METERS),
                 ...overrides,
             } as Transaction;
+        }
+
+        function withCustomUnit(overrides: Record<string, unknown>): Partial<Transaction> {
+            return {
+                comment: {
+                    type: CONST.TRANSACTION.TYPE.CUSTOM_UNIT,
+                    customUnit: {
+                        name: CONST.CUSTOM_UNITS.NAME_DISTANCE,
+                        quantity: 5,
+                        distanceUnit: CONST.CUSTOM_UNITS.DISTANCE_UNIT_KILOMETERS,
+                        routeDistanceMeters: KM_5_IN_METERS,
+                        ...overrides,
+                    },
+                },
+            } as Partial<Transaction>;
         }
 
         it('returns false when distance is not a number', () => {
@@ -2476,18 +2489,18 @@ describe('actions/IOU/TrackExpense', () => {
 
         it('returns true when quantity diverges from the route distance by more than 1m (manual override on map)', () => {
             // 5 km == 5000 m, but route is 10000 m → override.
-            const transaction = buildDistanceTransaction({routes: buildRoute(10000)});
+            const transaction = buildDistanceTransaction(withCustomUnit({routeDistanceMeters: 10000}));
             expect(hasManualDistanceOverride(transaction, 5)).toBe(true);
         });
 
         it('tolerates float-precision drift within 1m', () => {
             // 5 km converted hits 5000 m; route at 5000.5 m → within tolerance.
-            const transaction = buildDistanceTransaction({routes: buildRoute(5000.5)});
+            const transaction = buildDistanceTransaction(withCustomUnit({routeDistanceMeters: 5000.5}));
             expect(hasManualDistanceOverride(transaction, 5)).toBe(false);
         });
 
         it('returns false when transaction has no route distance (pure manual expense)', () => {
-            const transaction = buildDistanceTransaction({routes: buildRoute(0)});
+            const transaction = buildDistanceTransaction(withCustomUnit({routeDistanceMeters: 0}));
             expect(hasManualDistanceOverride(transaction, 5)).toBe(false);
         });
 
@@ -2498,6 +2511,7 @@ describe('actions/IOU/TrackExpense', () => {
                     customUnit: {
                         name: CONST.CUSTOM_UNITS.NAME_DISTANCE,
                         distanceUnit: CONST.CUSTOM_UNITS.DISTANCE_UNIT_KILOMETERS,
+                        routeDistanceMeters: KM_5_IN_METERS,
                     },
                 },
             });
@@ -2511,6 +2525,7 @@ describe('actions/IOU/TrackExpense', () => {
                     customUnit: {
                         name: CONST.CUSTOM_UNITS.NAME_DISTANCE,
                         quantity: 5,
+                        routeDistanceMeters: KM_5_IN_METERS,
                     },
                 },
             });
