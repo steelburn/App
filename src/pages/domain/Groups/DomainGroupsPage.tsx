@@ -76,7 +76,7 @@ function DomainGroupsPage({route}: DomainGroupsPageProps) {
                     {isDefault && <Badge text={translate('common.default')} />}
                 </View>
             ),
-            pendingAction: Object.values(groupPendingActions ?? {}).find(Boolean),
+            pendingAction: groupPendingActions?.deleteGroup ?? groupPendingActions?.createGroup ?? Object.values(groupPendingActions ?? {}).find(Boolean),
             isDisabled: isSecurityGroupPendingDeleteSelector(group.id)(pendingActions) || isFailedCreate,
         };
     });
