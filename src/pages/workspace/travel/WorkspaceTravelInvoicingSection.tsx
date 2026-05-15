@@ -276,14 +276,14 @@ function WorkspaceTravelInvoicingSection({policyID}: WorkspaceTravelInvoicingSec
         // eslint-disable-next-line react-hooks/exhaustive-deps -- we only want to trigger this effect when privatePersonalDetails changes
     }, [privatePersonalDetails]);
 
-    const getCentralInvoicingSubtitle = () => {
+    const getTravelInvoicingSubtitle = () => {
         if (!isTravelInvoicingEnabled) {
             return <TravelInvoicingSubtitleWrapper htmlComponent={<TravelInvoicingLearnHow />} />;
         }
         return <TravelInvoicingSubtitleWrapper />;
     };
 
-    const centralInvoicingSubMenuItems = (
+    const travelInvoicingSubMenuItems = (
         <>
             {hasTravelProvisioningErrors && (
                 <View style={styles.mt4}>
@@ -392,7 +392,7 @@ function WorkspaceTravelInvoicingSection({policyID}: WorkspaceTravelInvoicingSec
                 <ToggleSettingOptionRow
                     title={translate('workspace.moreFeatures.travel.travelInvoicing.travelInvoicingSection.title')}
                     titleStyle={[styles.textHeadline, styles.cardSectionTitle, styles.accountSettingsSectionTitle]}
-                    subtitle={getCentralInvoicingSubtitle()}
+                    subtitle={getTravelInvoicingSubtitle()}
                     switchAccessibilityLabel={translate('workspace.moreFeatures.travel.travelInvoicing.travelInvoicingSection.subtitle')}
                     onToggle={handleToggle}
                     isActive={isTravelInvoicingEnabled}
@@ -401,7 +401,7 @@ function WorkspaceTravelInvoicingSection({policyID}: WorkspaceTravelInvoicingSec
                     pendingAction={togglePendingAction}
                     errors={toggleErrors}
                     onCloseError={() => clearTravelInvoicingErrors(workspaceAccountID)}
-                    subMenuItems={centralInvoicingSubMenuItems}
+                    subMenuItems={travelInvoicingSubMenuItems}
                 />
             </Section>
 
