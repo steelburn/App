@@ -7,7 +7,6 @@ import Icon from '@components/Icon';
 import Modal from '@components/Modal';
 import type {ModalProps} from '@components/Modal/Global/ModalContext';
 import PressableWithoutFeedback from '@components/Pressable/PressableWithoutFeedback';
-import ScreenWrapper from '@components/ScreenWrapper';
 import ScrollView from '@components/ScrollView';
 import Text from '@components/Text';
 import {useMemoizedLazyExpensifyIcons, useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
@@ -24,10 +23,10 @@ type GustoSyncResultsModalProps = ModalProps & {
 
 function GustoSyncResultsModal({result, closeModal}: GustoSyncResultsModalProps) {
     const {translate} = useLocalize();
-    const styles = useThemeStyles();
     const theme = useTheme();
-    const icons = useMemoizedLazyExpensifyIcons(['DownArrow', 'Sync']);
-    const illustrations = useMemoizedLazyIllustrations(['NewUser']);
+    const styles = useThemeStyles();
+    const icons = useMemoizedLazyExpensifyIcons(['DownArrow']);
+    const illustrations = useMemoizedLazyIllustrations(['SyncUsers']);
     const [isSkippedSectionExpanded, setIsSkippedSectionExpanded] = useState(false);
 
     const addedCount = result.addedEmployeesCount ?? 0;
@@ -50,10 +49,9 @@ function GustoSyncResultsModal({result, closeModal}: GustoSyncResultsModalProps)
             shouldHandleNavigationBack
             enableEdgeToEdgeBottomSafeAreaPadding
         >
-            <ScreenWrapper
-                includePaddingTop={false}
-                enableEdgeToEdgeBottomSafeAreaPadding
+            <View
                 testID="GustoSyncResultsModal"
+                style={[styles.flex1, styles.appBG]}
             >
                 <HeaderWithBackButton
                     title={translate('workspace.hr.gusto.syncResults.title')}
@@ -62,18 +60,10 @@ function GustoSyncResultsModal({result, closeModal}: GustoSyncResultsModalProps)
                 <ScrollView contentContainerStyle={[styles.flexGrow1, styles.ph5]}>
                     <View style={[styles.alignItemsCenter, styles.mt8, styles.mb8, styles.pRelative]}>
                         <Icon
-                            src={illustrations.NewUser}
+                            src={illustrations.SyncUsers}
                             width={88}
                             height={88}
                         />
-                        <View style={[styles.pAbsolute, styles.rn3, styles.b0]}>
-                            <Icon
-                                src={icons.Sync}
-                                fill={theme.success}
-                                width={36}
-                                height={36}
-                            />
-                        </View>
                     </View>
                     <Text style={[styles.textHeadlineH1, styles.mb8]}>{translate('workspace.hr.gusto.syncResults.successTitle')}</Text>
                     {renderResultSummary(translate('workspace.hr.gusto.syncResults.added'), addedCount)}
@@ -105,7 +95,7 @@ function GustoSyncResultsModal({result, closeModal}: GustoSyncResultsModalProps)
                             </View>
                         ))}
                 </ScrollView>
-                <FixedFooter>
+                <FixedFooter addBottomSafeAreaPadding>
                     <Button
                         large
                         success
@@ -113,7 +103,7 @@ function GustoSyncResultsModal({result, closeModal}: GustoSyncResultsModalProps)
                         onPress={closeResultsModal}
                     />
                 </FixedFooter>
-            </ScreenWrapper>
+            </View>
         </Modal>
     );
 }
