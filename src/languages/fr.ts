@@ -5221,6 +5221,7 @@ _Pour des instructions plus détaillées, [visitez notre site d’aide](${CONST.
             free: 'Gratuit',
             control: 'Contrôle',
             collect: 'Encaisser',
+            submit: 'Soumettre',
         },
         companyCards: {
             addCards: 'Ajouter des cartes',
