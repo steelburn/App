@@ -342,7 +342,6 @@ function ComposerWithSuggestions({
 
     useEditComposerToggle({
         selection,
-        value,
         composerRef,
         onFocus: handleEditFocus,
         onValueChange: handleEditValueChange,

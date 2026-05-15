@@ -64,6 +64,7 @@ function defaultComposerEditState(overrides?: Partial<ComposerEditState>): Compo
         editingReportAction: null,
         editingMessage: null,
         currentEditMessageSelection: null,
+        draftComment: undefined,
         effectiveDraft: undefined,
         didResetComposerHeightWhileEditing: false,
         ...overrides,
@@ -153,7 +154,6 @@ describe('useEditComposerToggle', () => {
         renderHook(() =>
             useEditComposerToggle({
                 selection: {start: 0, end: 0},
-                value: 'draft in composer',
                 composerRef,
                 onValueChange,
             }),
@@ -173,7 +173,6 @@ describe('useEditComposerToggle', () => {
             (props: {selection: TextSelection; value: string}) =>
                 useEditComposerToggle({
                     selection: props.selection,
-                    value: props.value,
                     composerRef,
                     onValueChange,
                     onSelectionChange,
@@ -205,7 +204,6 @@ describe('useEditComposerToggle', () => {
         const {rerender} = renderHook(() =>
             useEditComposerToggle({
                 selection: {start: 0, end: 0},
-                value: 'draft in composer',
                 composerRef,
                 onValueChange,
             }),
@@ -236,7 +234,6 @@ describe('useEditComposerToggle', () => {
                 );
                 return useEditComposerToggle({
                     selection: props.selection,
-                    value: props.value,
                     composerRef,
                     onValueChange,
                     onSelectionChange,
@@ -273,7 +270,6 @@ describe('useEditComposerToggle', () => {
 
                 return useEditComposerToggle({
                     selection: {start: 0, end: 0},
-                    value: '',
                     composerRef,
                 });
             },
@@ -307,7 +303,6 @@ describe('useEditComposerToggle', () => {
                 });
                 return useEditComposerToggle({
                     selection: {start: 0, end: 0},
-                    value: 'x',
                     composerRef,
                     onValueChange,
                     onFocus,
@@ -340,7 +335,6 @@ describe('useEditComposerToggle', () => {
         const {rerender} = renderHook(() =>
             useEditComposerToggle({
                 selection: {start: 0, end: 0},
-                value: 'composer draft',
                 composerRef,
                 onValueChange,
                 onFocus,
@@ -370,7 +364,6 @@ describe('useEditComposerToggle', () => {
                 mockUseResponsiveLayout.mockReturnValue(narrow ? narrowLayoutResult() : wideLayoutResult());
                 return useEditComposerToggle({
                     selection: {start: 0, end: 0},
-                    value: 'plain draft for wide',
                     composerRef,
                     onValueChange,
                 });
@@ -399,7 +392,6 @@ describe('useEditComposerToggle', () => {
                 );
                 return useEditComposerToggle({
                     selection: {start: 0, end: 0},
-                    value: 'd',
                     composerRef,
                     onValueChange,
                     onSelectionChange,
