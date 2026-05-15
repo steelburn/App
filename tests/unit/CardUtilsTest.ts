@@ -2983,7 +2983,7 @@ describe('CardUtils', () => {
 
     describe('getCompanyCardDescription', () => {
         const mockTranslate = ((key: string) => {
-            if (key === 'cardTransactions.centralInvoicing') {
+            if (key === 'cardTransactions.travelInvoicing') {
                 return 'Travel invoicing';
             }
             return key;

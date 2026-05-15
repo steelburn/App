@@ -7834,7 +7834,7 @@ const translations = {
             },
             card: {
                 expensify: 'Expensify',
-                centralInvoicing: 'Travel invoicing',
+                travelInvoicing: 'Travel invoicing',
                 individualCards: 'Individual cards',
                 closedCards: 'Closed cards',
                 cardFeeds: 'Card feeds',
@@ -8268,7 +8268,7 @@ const translations = {
         personalCard: 'Personal card',
         companyCard: 'Company card',
         expensifyCard: 'Expensify Card',
-        centralInvoicing: 'Travel invoicing',
+        travelInvoicing: 'Travel invoicing',
         travelCard: 'Travel Card',
     },
     distance: {
