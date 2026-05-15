@@ -8,7 +8,6 @@ import ROUTES from '@src/ROUTES';
 
 jest.mock('@userActions/Agent', () => ({
     createAgent: jest.fn(),
-    scheduleAgentAvatarUploadAfterCreation: jest.fn(),
 }));
 
 const mockTranslate = jest.fn().mockImplementation((key: string, param?: string) => (param !== undefined ? `${key}(${param})` : key));

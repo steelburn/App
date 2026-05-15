@@ -107,6 +107,14 @@ describe('createAgent', () => {
         expect(mockWrite).toHaveBeenCalledWith(WRITE_COMMANDS.CREATE_AGENT, {firstName: 'Bot', prompt: 'My prompt', file: mockFile}, expect.any(Object));
     });
 
+    it('uploads file in the CREATE_AGENT call itself — no separate UPDATE_AGENT_AVATAR write', () => {
+        const mockFile = {uri: 'file://photo.jpg', name: 'photo.jpg'} as unknown as File;
+        createAgent('Bot', 'My prompt', undefined, mockFile, 'file://photo.jpg');
+
+        expect(mockWrite).toHaveBeenCalledTimes(1);
+        expect(mockWrite).not.toHaveBeenCalledWith(WRITE_COMMANDS.UPDATE_AGENT_AVATAR, expect.anything(), expect.anything());
+    });
+
     it('includes resolved avatar URI in optimistic and failure personal detail data for a preset ID', () => {
         createAgent('Bot', 'My prompt', 'bot-avatar--blue');
 
