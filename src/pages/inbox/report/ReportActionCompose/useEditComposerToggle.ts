@@ -35,15 +35,16 @@ type UseEditComposerToggleProps = {
 function useEditComposerToggle({selection, composerRef, onFocus, onValueChange, onSelectionChange}: UseEditComposerToggleProps) {
     const {shouldUseNarrowLayout} = useResponsiveLayout();
 
-    const {isEditingInComposer, editingState, editingReportActionID, editingMessage, currentEditMessageSelection} = useComposerEditState();
-    const text = useComposerText();
+    const {isEditingInComposer, editingState, editingReportActionID, editingMessage, currentEditMessageSelection, draftComment} = useComposerEditState();
     const {setDidResetComposerHeightWhileEditing} = useComposerEditActions();
+    const text = useComposerText();
     const isEditing = editingState !== CONST.REPORT_ACTION_EDIT_MESSAGE_STATE.OFF;
 
     const wasEditingRef = useRef(isEditing);
     const wasEditingInComposerRef = useRef(shouldUseNarrowLayout);
     const previousDraftSelectionRef = useRef<TextSelection | null>(null);
     const previousEditingReportActionIDRef = useRef<string | null>(null);
+    const previousTextRef = useRef<string | null>(null);
 
     type ApplyComposerValueOptions = {
         isEditingInComposer?: boolean;
@@ -60,6 +61,7 @@ function useEditComposerToggle({selection, composerRef, onFocus, onValueChange, 
 
         const selectionToApply = explicitSelection ?? (shouldUseEditingSelection && !shouldForceSelectionToEnd ? (currentEditMessageSelection ?? defaultSelection) : defaultSelection);
 
+        previousTextRef.current = nextValue;
         onValueChange?.(nextValue);
         updateNativeTextInputValue({text: nextValue, shouldForceNativeValueUpdate: options?.shouldForceNativeValueUpdate ?? false, composerRef});
 
@@ -80,7 +82,7 @@ function useEditComposerToggle({selection, composerRef, onFocus, onValueChange, 
         if (editingState !== CONST.REPORT_ACTION_EDIT_MESSAGE_STATE.EDITING) {
             if (wasEditingRef.current && wasEditingInComposerRef.current) {
                 // Editing just ended in the composer – restore the draft comment and its previous selection.
-                applyComposerValue(text, {selection: previousDraftSelectionRef.current, shouldForceNativeValueUpdate: true});
+                applyComposerValue(draftComment ?? '', {selection: previousDraftSelectionRef.current, shouldForceNativeValueUpdate: true});
 
                 // Once the composer is no longer in edit mode, we can reset the manual composer height.
                 if (wasEditingInComposerRef.current) {
@@ -126,19 +128,19 @@ function useEditComposerToggle({selection, composerRef, onFocus, onValueChange, 
         // Editing is ongoing and layout toggled from narrow to wide.
         if (!shouldUseNarrowLayout && wasEditingInComposerRef.current) {
             wasEditingInComposerRef.current = false;
-            applyComposerValue(text);
+            applyComposerValue(draftComment ?? '');
             return;
         }
 
         // The editing report action and message changed
         if (shouldUseNarrowLayout && editingReportActionID !== previousEditingReportActionIDRef.current) {
             applyComposerValue(editingMessage ?? '', {isEditingInComposer: true, shouldForceNativeValueUpdate: true});
+            previousEditingReportActionIDRef.current = editingReportActionID;
         }
-
-        previousEditingReportActionIDRef.current = editingReportActionID;
     }, [
         applyComposerValue,
         composerRef,
+        text,
         editingMessage,
         editingReportActionID,
         editingState,
@@ -147,7 +149,8 @@ function useEditComposerToggle({selection, composerRef, onFocus, onValueChange, 
         selection,
         setDidResetComposerHeightWhileEditing,
         shouldUseNarrowLayout,
-        text,
+        draftComment,
+        onValueChange,
     ]);
 }
 

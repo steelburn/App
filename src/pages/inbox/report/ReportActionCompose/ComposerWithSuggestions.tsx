@@ -332,12 +332,13 @@ function ComposerWithSuggestions({
 
     const handleEditValueChange = useCallback(
         (nextValue: string) => {
+            onValueChange(nextValue);
             commentRef.current = nextValue;
             emojisPresentBefore.current = extractEmojis(nextValue);
 
             setText(nextValue);
         },
-        [setText],
+        [onValueChange, setText],
     );
 
     useEditComposerToggle({
@@ -508,6 +509,7 @@ function ComposerWithSuggestions({
             const textVSOffset = getTextVSCursorOffset(emojiConvertedText, cursorPosition);
 
             setText(newCommentConverted);
+            onValueChange(newCommentConverted);
             if (commentValue !== newComment) {
                 const adjustedCursorPosition = cursorPosition !== undefined && cursorPosition !== null ? cursorPosition + textVSOffset : undefined;
                 const position = Math.max((selection.end ?? 0) + (newComment.length - commentRef.current.length), adjustedCursorPosition ?? 0);
@@ -556,6 +558,7 @@ function ComposerWithSuggestions({
             preferredSkinTone,
             preferredLocale,
             setText,
+            onValueChange,
             editingState,
             shouldUseNarrowLayout,
             suggestionsRef,
@@ -930,10 +933,6 @@ function ComposerWithSuggestions({
                 },
             ) as ComposerWithSuggestionsRef,
     );
-
-    useEffect(() => {
-        onValueChange(text);
-    }, [onValueChange, text]);
 
     const onClear = useCallback(
         (textOnClear: string) => {
