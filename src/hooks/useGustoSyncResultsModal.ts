@@ -21,8 +21,7 @@ function useGustoSyncResultsModal(policyID: string, connectionSyncProgress: Onyx
             previousSyncProgress?.stageInProgress === CONST.POLICY.CONNECTIONS.SYNC_STAGE_NAME.JOB_DONE &&
             previousSyncProgress?.timestamp === connectionSyncProgress?.timestamp &&
             !!previousSyncProgress?.result;
-        const didGustoSyncComplete =
-            isFocused && isGustoSyncDoneWithResult && !wasSameGustoResultAlreadyHandled;
+        const didGustoSyncComplete = isFocused && isGustoSyncDoneWithResult && !wasSameGustoResultAlreadyHandled;
 
         if (!didGustoSyncComplete || !syncResult) {
             return;
