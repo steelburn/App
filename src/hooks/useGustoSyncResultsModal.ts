@@ -7,7 +7,7 @@ import type {PolicyConnectionSyncProgress} from '@src/types/onyx/Policy';
 import usePrevious from './usePrevious';
 
 function useGustoSyncResultsModal(policyID: string, connectionSyncProgress: OnyxEntry<PolicyConnectionSyncProgress>, isFocused: boolean) {
-    const {showModal} = useModal();
+    const modal = useModal();
     const previousSyncProgress = usePrevious(connectionSyncProgress);
 
     useEffect(() => {
@@ -17,15 +17,14 @@ function useGustoSyncResultsModal(policyID: string, connectionSyncProgress: Onyx
             connectionSyncProgress?.stageInProgress === CONST.POLICY.CONNECTIONS.SYNC_STAGE_NAME.JOB_DONE &&
             !!syncResult;
         const didTransitionToJobDone =
-            previousSyncProgress?.connectionName === CONST.POLICY.CONNECTIONS.NAME.GUSTO &&
-            previousSyncProgress?.stageInProgress !== CONST.POLICY.CONNECTIONS.SYNC_STAGE_NAME.JOB_DONE;
+            previousSyncProgress?.connectionName === CONST.POLICY.CONNECTIONS.NAME.GUSTO && previousSyncProgress?.stageInProgress !== CONST.POLICY.CONNECTIONS.SYNC_STAGE_NAME.JOB_DONE;
         const didGustoSyncComplete = isFocused && isGustoSyncDoneWithResult && didTransitionToJobDone;
 
         if (!didGustoSyncComplete || !syncResult) {
             return;
         }
 
-        showModal({
+        modal.showModal({
             component: GustoSyncResultsModal,
             props: {result: syncResult},
             id: `gusto-sync-results-${policyID}`,
@@ -39,7 +38,7 @@ function useGustoSyncResultsModal(policyID: string, connectionSyncProgress: Onyx
         policyID,
         previousSyncProgress?.connectionName,
         previousSyncProgress?.stageInProgress,
-        showModal,
+        modal,
     ]);
 }
 
