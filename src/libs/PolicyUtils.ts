@@ -2355,6 +2355,8 @@ export {
     getRulesDocumentSourceURL,
     getHRConnectionNames,
     isGustoConnected,
+    isSubmitPolicy,
+    isPolicyEditor,
 };
 
 export type {MemberEmailsToAccountIDs};
