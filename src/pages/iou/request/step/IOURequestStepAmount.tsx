@@ -413,11 +413,6 @@ function IOURequestStepAmount({
             return;
         }
 
-        // Edits to the amount from the splits page should reset the split shares (only when the amount actually changed).
-        if (transaction?.splitShares) {
-            resetSplitShares(transaction, newAmount, selectedCurrency, false);
-        }
-
         // If currency has changed, then we get the default tax rate based on currency, otherwise we use the current tax rate selected in transaction, if we have it.
         const transactionTaxCode = getTransactionDetails(currentTransaction)?.taxCode;
         const defaultTaxCode = getDefaultTaxCode(policy, currentTransaction, selectedCurrency) ?? '';
@@ -429,6 +424,11 @@ function IOURequestStepAmount({
             setDraftSplitTransaction(transactionID, splitDraftTransaction, {amount: newAmount, currency: selectedCurrency, taxCode, taxAmount});
             navigateBack();
             return;
+        }
+
+        // Reset split shares for non-split-bill edits (split-bill share recalculation is handled by the confirmation list).
+        if (transaction?.splitShares) {
+            resetSplitShares(transaction, newAmount, selectedCurrency, false);
         }
 
         updateMoneyRequestAmountAndCurrency({
