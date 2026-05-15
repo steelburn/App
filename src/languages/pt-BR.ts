@@ -7071,6 +7071,17 @@ Adicione mais regras de gasto para proteger o fluxo de caixa da empresa.`,
                 syncError: 'Não é possível conectar ao Gusto',
                 disconnectTitle: 'Desconectar Gusto',
                 disconnectPrompt: 'Tem certeza de que deseja desconectar o Gusto?',
+                syncResults: {
+                    title: 'Resultados da sincronização com Gusto',
+                    successTitle: 'Sua conexão com o Gusto foi sincronizada com sucesso!',
+                    added: 'Adicionado',
+                    removed: 'Removido',
+                    skipped: 'Ignorado',
+                    employeeCount: () => ({
+                        one: '1 funcionário',
+                        other: (count: number) => `${count} funcionários`,
+                    }),
+                },
             },
             zenefits: {
                 title: 'TriNet',

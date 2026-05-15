@@ -7130,6 +7130,17 @@ Ajoutez davantage de règles de dépenses pour protéger la trésorerie de l’e
                 syncError: 'Impossible de se connecter à Gusto',
                 disconnectTitle: 'Déconnecter Gusto',
                 disconnectPrompt: 'Voulez-vous vraiment déconnecter Gusto ?',
+                syncResults: {
+                    title: 'Résultats de la synchronisation Gusto',
+                    successTitle: 'Connexion Gusto synchronisée avec succès !',
+                    added: 'Ajouté',
+                    removed: 'Supprimé',
+                    skipped: 'Ignoré',
+                    employeeCount: () => ({
+                        one: '1 employé',
+                        other: (count: number) => `${count} employés`,
+                    }),
+                },
             },
             zenefits: {
                 title: 'TriNet',

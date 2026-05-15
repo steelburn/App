@@ -7015,6 +7015,17 @@ ${reportName}
                 syncError: 'Gusto に接続できません',
                 disconnectTitle: 'Gusto の接続を解除',
                 disconnectPrompt: 'Gusto との接続を本当に解除しますか？',
+                syncResults: {
+                    title: 'Gusto 同期結果',
+                    successTitle: 'Gusto との連携が正常に同期されました！',
+                    added: '追加済み',
+                    removed: '削除済み',
+                    skipped: 'スキップ済み',
+                    employeeCount: () => ({
+                        one: '1 従業員',
+                        other: (count: number) => `${count} 従業員`,
+                    }),
+                },
             },
             zenefits: {
                 title: 'TriNet',

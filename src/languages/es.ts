@@ -6282,6 +6282,17 @@ ${amount} para ${merchant} - ${date}`,
                         description: 'Configuraré manualmente los flujos de aprobación en Expensify.',
                     },
                 },
+                syncResults: {
+                    title: 'Resultados de la sincronización de Gusto',
+                    successTitle: '¡Se sincronizó correctamente tu conexión con Gusto!',
+                    added: 'Añadido',
+                    removed: 'Eliminado',
+                    skipped: 'Omitido',
+                    employeeCount: () => ({
+                        one: '1 empleado',
+                        other: (count: number) => `${count} empleados`,
+                    }),
+                },
             },
             zenefits: {
                 title: 'TriNet',

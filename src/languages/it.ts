@@ -7094,6 +7094,17 @@ Aggiungi altre regole di spesa per proteggere il flusso di cassa aziendale.`,
                 syncError: 'Impossibile connettersi a Gusto',
                 disconnectTitle: 'Disconnetti Gusto',
                 disconnectPrompt: 'Sei sicuro di voler disconnettere Gusto?',
+                syncResults: {
+                    title: 'Risultati sincronizzazione Gusto',
+                    successTitle: 'Connessione a Gusto sincronizzata con successo!',
+                    added: 'Aggiunto',
+                    removed: 'Rimosso',
+                    skipped: 'Saltato',
+                    employeeCount: () => ({
+                        one: '1 dipendente',
+                        other: (count: number) => `${count} dipendenti`,
+                    }),
+                },
             },
             zenefits: {
                 title: 'TriNet',
