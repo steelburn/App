@@ -16,8 +16,8 @@ import useDomainDocumentTitle from '@hooks/useDomainDocumentTitle';
 import {useMemoizedLazyExpensifyIcons, useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useOnyx from '@hooks/useOnyx';
-import useResponsiveLayout from '@hooks/useResponsiveLayout';
 import useSearchResults from '@hooks/useSearchResults';
+import useShouldDisplayButtonsInSeparateLine from '@hooks/useShouldDisplayButtonsInSeparateLine';
 import useThemeStyles from '@hooks/useThemeStyles';
 import {hasDomainGroupDetailsErrors} from '@libs/DomainUtils';
 import {getLatestError} from '@libs/ErrorUtils';
@@ -49,7 +49,7 @@ function DomainGroupsPage({route}: DomainGroupsPageProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
     const illustrations = useMemoizedLazyIllustrations(['Members']);
-    const {shouldUseNarrowLayout} = useResponsiveLayout();
+    const shouldDisplayButtonsInSeparateLine = useShouldDisplayButtonsInSeparateLine();
 
     const [groups = getEmptyArray<DomainSecurityGroupWithID>()] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {selector: groupsSelector});
     const [defaultGroupID] = useOnyx(`${ONYXKEYS.COLLECTION.DOMAIN}${domainAccountID}`, {selector: defaultSecurityGroupIDSelector});
@@ -90,8 +90,8 @@ function DomainGroupsPage({route}: DomainGroupsPageProps) {
 
     const listHeaderContent = shouldShowSearchBar ? (
         <View style={styles.flexColumn}>
-            <View style={[styles.mh5, styles.gap3, styles.mb5, shouldUseNarrowLayout ? styles.flexColumn : styles.flexRow]}>
-                <View style={[shouldUseNarrowLayout && styles.w100]}>
+            <View style={[styles.mh5, styles.gap3, styles.mb5, shouldDisplayButtonsInSeparateLine ? styles.flexColumn : styles.flexRow]}>
+                <View style={[shouldDisplayButtonsInSeparateLine ? styles.w100 : styles.flex1]}>
                     <SearchBar
                         inputValue={inputValue}
                         onChangeText={setInputValue}
@@ -132,8 +132,8 @@ function DomainGroupsPage({route}: DomainGroupsPageProps) {
             sentryLabel={CONST.SENTRY_LABEL.DOMAIN.GROUPS.CREATE_GROUP_BUTTON}
             onPress={() => Navigation.navigate(ROUTES.DOMAIN_GROUP_CREATE.getRoute(domainAccountID))}
             icon={icons.Plus}
-            innerStyles={[shouldUseNarrowLayout && styles.alignItemsCenter]}
-            style={shouldUseNarrowLayout ? [styles.flexGrow1, styles.mb3] : undefined}
+            innerStyles={[shouldDisplayButtonsInSeparateLine && styles.alignItemsCenter]}
+            style={shouldDisplayButtonsInSeparateLine ? [styles.flexGrow1, styles.mb3] : undefined}
             success
         />
     );
@@ -150,12 +150,12 @@ function DomainGroupsPage({route}: DomainGroupsPageProps) {
                     title={translate('domain.groups.title')}
                     onBackButtonPress={Navigation.popToSidebar}
                     icon={illustrations.Members}
-                    shouldShowBackButton={shouldUseNarrowLayout}
+                    shouldShowBackButton={shouldDisplayButtonsInSeparateLine}
                     shouldUseHeadlineHeader
                 >
-                    {!shouldUseNarrowLayout && <View style={[styles.flexRow, styles.gap2]}>{createGroupHeaderButton}</View>}
+                    {!shouldDisplayButtonsInSeparateLine && <View style={[styles.flexRow, styles.gap2]}>{createGroupHeaderButton}</View>}
                 </HeaderWithBackButton>
-                {shouldUseNarrowLayout && <View style={[styles.pl5, styles.pr5]}>{createGroupHeaderButton}</View>}
+                {shouldDisplayButtonsInSeparateLine && <View style={[styles.pl5, styles.pr5]}>{createGroupHeaderButton}</View>}
 
                 <SelectionList
                     data={filteredData}
