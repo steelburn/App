@@ -6434,8 +6434,8 @@ const translations = {
                 syncResults: {
                     title: 'Gusto sync results',
                     successTitle: 'Successfully synced your Gusto connection!',
-                    added: 'Added to Expensify',
-                    removed: 'Removed from Expensify',
+                    added: 'Added',
+                    removed: 'Removed',
                     skipped: 'Skipped',
                     employeeCount: ({count}: {count: number}) => `${count} ${count === 1 ? 'employee' : 'employees'}`,
                 },

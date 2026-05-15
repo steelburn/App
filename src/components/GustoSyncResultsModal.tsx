@@ -1,20 +1,20 @@
 import React, {useState} from 'react';
 import {View} from 'react-native';
-import Button from '@components/Button';
-import FixedFooter from '@components/FixedFooter';
-import HeaderWithBackButton from '@components/HeaderWithBackButton';
-import Icon from '@components/Icon';
-import Modal from '@components/Modal';
-import type {ModalProps} from '@components/Modal/Global/ModalContext';
-import PressableWithoutFeedback from '@components/Pressable/PressableWithoutFeedback';
-import ScrollView from '@components/ScrollView';
-import Text from '@components/Text';
 import {useMemoizedLazyExpensifyIcons, useMemoizedLazyIllustrations} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
 import useTheme from '@hooks/useTheme';
 import useThemeStyles from '@hooks/useThemeStyles';
 import type {GustoSyncResult} from '@libs/API/GustoSyncResult';
 import CONST from '@src/CONST';
+import Button from './Button';
+import FixedFooter from './FixedFooter';
+import HeaderWithBackButton from './HeaderWithBackButton';
+import Icon from './Icon';
+import Modal from './Modal';
+import type {ModalProps} from './Modal/Global/ModalContext';
+import PressableWithoutFeedback from './Pressable/PressableWithoutFeedback';
+import ScrollView from './ScrollView';
+import Text from './Text';
 
 type GustoSyncResultsModalProps = ModalProps & {
     /** Sync result returned by the completed Gusto sync job */
@@ -57,12 +57,12 @@ function GustoSyncResultsModal({result, closeModal}: GustoSyncResultsModalProps)
                     title={translate('workspace.hr.gusto.syncResults.title')}
                     onBackButtonPress={closeResultsModal}
                 />
-                <ScrollView contentContainerStyle={[styles.flexGrow1, styles.ph5]}>
-                    <View style={[styles.alignItemsCenter, styles.mt8, styles.mb8, styles.pRelative]}>
+                <ScrollView contentContainerStyle={[styles.flexGrow1, styles.ph5, styles.pb8]}>
+                    <View style={[styles.alignItemsCenter, styles.mt4, styles.mb4, styles.pRelative]}>
                         <Icon
                             src={illustrations.SyncUsers}
-                            width={88}
-                            height={88}
+                            width={68}
+                            height={68}
                         />
                     </View>
                     <Text style={[styles.textHeadlineH1, styles.mb8]}>{translate('workspace.hr.gusto.syncResults.successTitle')}</Text>
@@ -70,6 +70,7 @@ function GustoSyncResultsModal({result, closeModal}: GustoSyncResultsModalProps)
                     {renderResultSummary(translate('workspace.hr.gusto.syncResults.removed'), removedCount)}
                     <PressableWithoutFeedback
                         accessibilityLabel={translate('workspace.hr.gusto.syncResults.skipped')}
+                        sentryLabel="GustoSyncResultsModal-SkippedEmployees"
                         role={CONST.ROLE.BUTTON}
                         onPress={() => setIsSkippedSectionExpanded((isExpanded) => !isExpanded)}
                         style={[styles.flexRow, styles.justifyContentBetween, styles.alignItemsCenter]}

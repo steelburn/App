@@ -11,10 +11,11 @@ function useGustoSyncResultsModal(policyID: string, connectionSyncProgress: Onyx
     const previousSyncProgress = usePrevious(connectionSyncProgress);
 
     useEffect(() => {
+        const syncResult = connectionSyncProgress?.result;
         const isGustoSyncDoneWithResult =
             connectionSyncProgress?.connectionName === CONST.POLICY.CONNECTIONS.NAME.GUSTO &&
             connectionSyncProgress?.stageInProgress === CONST.POLICY.CONNECTIONS.SYNC_STAGE_NAME.JOB_DONE &&
-            !!connectionSyncProgress?.result;
+            !!syncResult;
         const wasSameGustoResultAlreadyHandled =
             previousSyncProgress?.connectionName === CONST.POLICY.CONNECTIONS.NAME.GUSTO &&
             previousSyncProgress?.stageInProgress === CONST.POLICY.CONNECTIONS.SYNC_STAGE_NAME.JOB_DONE &&
@@ -23,13 +24,13 @@ function useGustoSyncResultsModal(policyID: string, connectionSyncProgress: Onyx
         const didGustoSyncComplete =
             isFocused && isGustoSyncDoneWithResult && !wasSameGustoResultAlreadyHandled;
 
-        if (!didGustoSyncComplete) {
+        if (!didGustoSyncComplete || !syncResult) {
             return;
         }
 
         showModal({
             component: GustoSyncResultsModal,
-            props: {result: connectionSyncProgress.result},
+            props: {result: syncResult},
             id: `gusto-sync-results-${policyID}`,
         });
     }, [
