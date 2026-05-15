@@ -214,7 +214,7 @@ function WorkspaceTravelInvoicingSection({policyID}: WorkspaceTravelInvoicingSec
     };
 
     /**
-     * Handle toggle change for Central Invoicing.
+     * Handle toggle change for Travel Invoicing.
      * When turning ON:
      *   - If has settlement account: call configureTravelInvoicingForPolicy
      *   - If no settlement account: navigate to selection (enable happens after selection)
