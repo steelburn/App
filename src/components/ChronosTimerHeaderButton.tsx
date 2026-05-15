@@ -66,6 +66,7 @@ function ChronosTimerHeaderButton({report}: ChronosTimerHeaderButtonProps) {
     const delegateAccountID = useDelegateAccountID();
 
     function formatElapsedTime(startTime: string): string {
+        // eslint-disable-next-line react-hooks/purity
         const elapsedMs = Date.now() - new Date(`${startTime}Z`).getTime();
         const totalMinutes = Math.floor(elapsedMs / 60000);
         const hours = Math.floor(totalMinutes / 60);
