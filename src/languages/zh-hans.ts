@@ -7885,7 +7885,7 @@ ${reportName}
         oooEventSummaryFullDay: (summary: string, dayCount: number, date: string) => `${summary}，共计 ${dayCount} ${dayCount === 1 ? '天' : '天'}，截至 ${date}`,
         oooEventSummaryPartialDay: (summary: string, timePeriod: string, date: string) => `${summary}，时间范围：${timePeriod}，日期：${date}`,
         startTimer: '开始计时',
-        stopTimer: '停止计时器',
+        stopTimer: (duration: string) => `停止计时器 (${duration})`,
         scheduleOOO: '安排外出办公',
         scheduleOOOTitle: '安排外出办公',
         date: '日期',

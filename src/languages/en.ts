@@ -8142,7 +8142,7 @@ const translations = {
         oooEventSummaryFullDay: (summary: string, dayCount: number, date: string) => `${summary} for ${dayCount} ${dayCount === 1 ? 'day' : 'days'} until ${date}`,
         oooEventSummaryPartialDay: (summary: string, timePeriod: string, date: string) => `${summary} from ${timePeriod} on ${date}`,
         startTimer: 'Start Timer',
-        stopTimer: 'Stop Timer',
+        stopTimer: (duration: string) => `Stop Timer (${duration})`,
         scheduleOOO: 'Schedule OOO',
         scheduleOOOTitle: 'Schedule Out of Office',
         date: 'Date',

@@ -8152,7 +8152,7 @@ Ajoutez davantage de règles de dépenses pour protéger la trésorerie de l’e
         oooEventSummaryFullDay: (summary: string, dayCount: number, date: string) => `${summary} pour ${dayCount} ${dayCount === 1 ? 'jour' : 'jours'} jusqu’au ${date}`,
         oooEventSummaryPartialDay: (summary: string, timePeriod: string, date: string) => `${summary} du ${timePeriod} le ${date}`,
         startTimer: 'Démarrer le minuteur',
-        stopTimer: 'Arrêter le minuteur',
+        stopTimer: (duration: string) => `Arrêter le minuteur (${duration})`,
         scheduleOOO: 'Planifier une absence',
         scheduleOOOTitle: 'Planifier une absence du bureau',
         date: 'Date',

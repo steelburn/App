@@ -8020,7 +8020,7 @@ ${reportName}
         oooEventSummaryFullDay: (summary: string, dayCount: number, date: string) => `${summary}（${date} までの ${dayCount} ${dayCount === 1 ? '日' : '日数'} 分）`,
         oooEventSummaryPartialDay: (summary: string, timePeriod: string, date: string) => `${date}の${timePeriod}の${summary}`,
         startTimer: 'タイマー開始',
-        stopTimer: 'タイマーを停止',
+        stopTimer: (duration: string) => `タイマーを停止 (${duration})`,
         scheduleOOO: '不在予定を設定',
         scheduleOOOTitle: '不在予定を設定',
         date: '日付',
