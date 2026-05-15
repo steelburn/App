@@ -5589,7 +5589,7 @@ const translations = {
                         subtitle: "Congrats! You're all set to book and manage travel on this workspace.",
                         manageTravelLabel: 'Manage travel',
                     },
-                    centralInvoicingSection: {
+                    travelInvoicingSection: {
                         title: 'Travel invoicing',
                         subtitle: 'Centralize all travel spend in a monthly invoice instead of paying at time of purchase.',
                         learnHow: 'Learn how.',

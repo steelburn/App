@@ -6,7 +6,7 @@ import CONST from '@src/CONST';
 function CentralInvoicingLearnHow() {
     const {translate} = useLocalize();
 
-    return <TextLink href={CONST.FOOTER.TRAVEL_URL}>{translate('workspace.moreFeatures.travel.travelInvoicing.centralInvoicingSection.learnHow')}</TextLink>;
+    return <TextLink href={CONST.FOOTER.TRAVEL_URL}>{translate('workspace.moreFeatures.travel.travelInvoicing.travelInvoicingSection.learnHow')}</TextLink>;
 }
 
 export default CentralInvoicingLearnHow;

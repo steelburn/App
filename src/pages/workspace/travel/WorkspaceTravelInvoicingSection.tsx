@@ -199,7 +199,7 @@ function WorkspaceTravelInvoicingSection({policyID}: WorkspaceTravelInvoicingSec
     const promptCurrencyChangeAndStartFlow = async () => {
         isCurrencyModalOpen.current = true;
         const result = await showConfirmModal({
-            title: translate('workspace.moreFeatures.travel.travelInvoicing.centralInvoicingSection.title'),
+            title: translate('workspace.moreFeatures.travel.travelInvoicing.travelInvoicingSection.title'),
             prompt: translate('workspace.bankAccount.updateCurrencyPrompt'),
             confirmText: translate('workspace.bankAccount.updateToUSD'),
             cancelText: translate('common.cancel'),
@@ -288,7 +288,7 @@ function WorkspaceTravelInvoicingSection({policyID}: WorkspaceTravelInvoicingSec
             {hasTravelProvisioningErrors && (
                 <View style={styles.mt4}>
                     <FormHelpMessageRowWithRetryButton
-                        message={translate('workspace.moreFeatures.travel.travelInvoicing.centralInvoicingSection.subsections.provisioningError')}
+                        message={translate('workspace.moreFeatures.travel.travelInvoicing.travelInvoicingSection.subsections.provisioningError')}
                         isButtonSmall
                         onRetry={() => retryTravelCardsProvisioning(policyID, workspaceAccountID, domainMemberData?.settings?.travelInvoicing?.errors ?? [])}
                         danger
@@ -299,7 +299,7 @@ function WorkspaceTravelInvoicingSection({policyID}: WorkspaceTravelInvoicingSec
             <View style={[styles.dFlex, styles.flexRow, styles.mt6, styles.gap4, styles.alignItemsCenter]}>
                 <View style={styles.flex1}>
                     <MenuItemWithTopDescription
-                        description={translate('workspace.moreFeatures.travel.travelInvoicing.centralInvoicingSection.subsections.currentTravelSpendLabel')}
+                        description={translate('workspace.moreFeatures.travel.travelInvoicing.travelInvoicingSection.subsections.currentTravelSpendLabel')}
                         title={formattedSpend}
                         wrapperStyle={[styles.sectionMenuItemTopDescription, hasPendingSettlement && styles.pb1]}
                         titleStyle={[styles.textNormalThemeText, styles.headerAnonymousFooter]}
@@ -308,13 +308,13 @@ function WorkspaceTravelInvoicingSection({policyID}: WorkspaceTravelInvoicingSec
                     />
                     {hasPendingSettlement && (
                         <Text style={[styles.textLabelSupporting, styles.pb3]}>
-                            {translate('workspace.moreFeatures.travel.travelInvoicing.centralInvoicingSection.subsections.currentTravelSpendPaymentQueued', formattedQueuedAmount)}
+                            {translate('workspace.moreFeatures.travel.travelInvoicing.travelInvoicingSection.subsections.currentTravelSpendPaymentQueued', formattedQueuedAmount)}
                         </Text>
                     )}
                 </View>
                 {shouldShowPayButton && (
                     <Button
-                        text={translate('workspace.moreFeatures.travel.travelInvoicing.centralInvoicingSection.subsections.currentTravelSpendCta')}
+                        text={translate('workspace.moreFeatures.travel.travelInvoicing.travelInvoicingSection.subsections.currentTravelSpendCta')}
                         onPress={handlePayBalance}
                         isDisabled={isOffline}
                         success
@@ -322,7 +322,7 @@ function WorkspaceTravelInvoicingSection({policyID}: WorkspaceTravelInvoicingSec
                 )}
             </View>
             <MenuItemWithTopDescription
-                description={translate('workspace.moreFeatures.travel.travelInvoicing.centralInvoicingSection.subsections.currentTravelLimitLabel')}
+                description={translate('workspace.moreFeatures.travel.travelInvoicing.travelInvoicingSection.subsections.currentTravelLimitLabel')}
                 title={formattedLimit}
                 wrapperStyle={[styles.sectionMenuItemTopDescription]}
                 titleStyle={styles.textNormalThemeText}
@@ -337,7 +337,7 @@ function WorkspaceTravelInvoicingSection({policyID}: WorkspaceTravelInvoicingSec
                 errorRowTextStyles={styles.mr3}
             >
                 <MenuItemWithTopDescription
-                    description={translate('workspace.moreFeatures.travel.travelInvoicing.centralInvoicingSection.subsections.settlementAccountLabel')}
+                    description={translate('workspace.moreFeatures.travel.travelInvoicing.travelInvoicingSection.subsections.settlementAccountLabel')}
                     title={settlementAccountNumber}
                     onPress={() => Navigation.navigate(ROUTES.WORKSPACE_TRAVEL_SETTINGS_ACCOUNT.getRoute(policyID))}
                     wrapperStyle={[styles.sectionMenuItemTopDescription]}
@@ -355,7 +355,7 @@ function WorkspaceTravelInvoicingSection({policyID}: WorkspaceTravelInvoicingSec
                 errorRowTextStyles={styles.mr3}
             >
                 <MenuItemWithTopDescription
-                    description={translate('workspace.moreFeatures.travel.travelInvoicing.centralInvoicingSection.subsections.settlementFrequencyLabel')}
+                    description={translate('workspace.moreFeatures.travel.travelInvoicing.travelInvoicingSection.subsections.settlementFrequencyLabel')}
                     title={localizedFrequency}
                     onPress={() => Navigation.navigate(ROUTES.WORKSPACE_TRAVEL_SETTINGS_FREQUENCY.getRoute(policyID))}
                     wrapperStyle={[styles.sectionMenuItemTopDescription]}
@@ -373,7 +373,7 @@ function WorkspaceTravelInvoicingSection({policyID}: WorkspaceTravelInvoicingSec
                 errorRowTextStyles={styles.mr3}
             >
                 <MenuItemWithTopDescription
-                    description={translate('workspace.moreFeatures.travel.travelInvoicing.centralInvoicingSection.subsections.monthlySpendLimitLabel')}
+                    description={translate('workspace.moreFeatures.travel.travelInvoicing.travelInvoicingSection.subsections.monthlySpendLimitLabel')}
                     title={formattedMonthlyLimit}
                     onPress={() => Navigation.navigate(ROUTES.WORKSPACE_TRAVEL_SETTINGS_MONTHLY_LIMIT.getRoute(policyID))}
                     wrapperStyle={[styles.sectionMenuItemTopDescription]}
@@ -390,10 +390,10 @@ function WorkspaceTravelInvoicingSection({policyID}: WorkspaceTravelInvoicingSec
         <>
             <Section isCentralPane>
                 <ToggleSettingOptionRow
-                    title={translate('workspace.moreFeatures.travel.travelInvoicing.centralInvoicingSection.title')}
+                    title={translate('workspace.moreFeatures.travel.travelInvoicing.travelInvoicingSection.title')}
                     titleStyle={[styles.textHeadline, styles.cardSectionTitle, styles.accountSettingsSectionTitle]}
                     subtitle={getCentralInvoicingSubtitle()}
-                    switchAccessibilityLabel={translate('workspace.moreFeatures.travel.travelInvoicing.centralInvoicingSection.subtitle')}
+                    switchAccessibilityLabel={translate('workspace.moreFeatures.travel.travelInvoicing.travelInvoicingSection.subtitle')}
                     onToggle={handleToggle}
                     isActive={isTravelInvoicingEnabled}
                     disabled={isLoading || isOnWaitlist}
@@ -432,7 +432,7 @@ function WorkspaceTravelInvoicingSection({policyID}: WorkspaceTravelInvoicingSec
                 onConfirm={handleConfirmPayBalance}
                 onCancel={() => setIsPayBalanceModalVisible(false)}
                 prompt={translate('workspace.moreFeatures.travel.travelInvoicing.payBalanceModal.body')}
-                confirmText={translate('workspace.moreFeatures.travel.travelInvoicing.centralInvoicingSection.subsections.currentTravelSpendCta')}
+                confirmText={translate('workspace.moreFeatures.travel.travelInvoicing.travelInvoicingSection.subsections.currentTravelSpendCta')}
                 cancelText={translate('common.cancel')}
                 success
             />

@@ -5573,8 +5573,8 @@ _Für ausführlichere Anweisungen [besuchen Sie unsere Hilfeseite](${CONST.NETSU
                         subtitle: 'Glückwunsch! Du kannst jetzt in diesem Workspace Reisen buchen und verwalten.',
                         manageTravelLabel: 'Reisen verwalten',
                     },
-                    centralInvoicingSection: {
-                        title: 'Zentrale Rechnungsstellung',
+                    travelInvoicingSection: {
+                        title: 'Reiseabrechnung',
                         subtitle: 'Zentralisiere alle Reisekosten in einer monatlichen Rechnung, statt sie direkt beim Kauf zu bezahlen.',
                         learnHow: 'Mehr erfahren.',
                         subsections: {
@@ -5591,7 +5591,7 @@ _Für ausführlichere Anweisungen [besuchen Sie unsere Hilfeseite](${CONST.NETSU
                             reduceLimitWarning:
                                 'Wenn Sie das Limit reduzieren, können Mitglieder, die diesen Betrag bereits überschritten haben, bis zum nächsten Monat keine neuen Reisebuchungen vornehmen.',
                             provisioningError:
-                                'Wir konnten einige Mitglieder Ihres Arbeitsbereichs nicht für die zentrale Rechnungsstellung einrichten. Bitte versuchen Sie es später erneut oder wenden Sie sich für Unterstützung an Concierge.',
+                                'Wir konnten einige Mitglieder Ihres Workspace nicht für die Reiseabrechnung einrichten. Bitte versuchen Sie es später erneut oder wenden Sie sich für Unterstützung an Concierge.',
                         },
                     },
                     disableModal: {
@@ -5612,7 +5612,7 @@ _Für ausführlichere Anweisungen [besuchen Sie unsere Hilfeseite](${CONST.NETSU
                     exportToCSV: 'Als CSV exportieren',
                     selectDateRangeError: 'Bitte wählen Sie einen Datumsbereich für den Export aus',
                     invalidDateRangeError: 'Das Startdatum muss vor dem Enddatum liegen',
-                    enabled: 'Zentrale Rechnungsstellung aktiviert!',
+                    enabled: 'Rechnungsstellung für Reisen aktiviert!',
                     enabledDescription: 'Alle Reisekosten in diesem Workspace werden nun in einer monatlichen Rechnung zentralisiert.',
                 },
                 personalDetailsDescription: 'Um eine Reise zu buchen, gib bitte deinen amtlichen Namen genau so ein, wie er auf deinem amtlichen Ausweis steht.',
@@ -7810,7 +7810,7 @@ Fügen Sie weitere Ausgabelimits hinzu, um den Cashflow Ihres Unternehmens zu sc
                 cardFeedName: ({cardFeedBankName, cardFeedLabel}: {cardFeedBankName: string; cardFeedLabel?: string}) =>
                     `Alle ${cardFeedBankName}${cardFeedLabel ? ` - ${cardFeedLabel}` : ''}`,
                 cardFeedNameCSV: ({cardFeedLabel}: {cardFeedLabel?: string}) => `Alle importierten CSV-Karten${cardFeedLabel ? ` - ${cardFeedLabel}` : ''}`,
-                travelInvoicing: 'Zentrale Rechnungsstellung',
+                travelInvoicing: 'Reiseabrechnung',
             },
             reportField: (name: string, value: string) => `${name} ist ${value}`,
             current: 'Aktuell',
@@ -7842,9 +7842,9 @@ Fügen Sie weitere Ausgabelimits hinzu, um den Cashflow Ihres Unternehmens zu sc
             },
             feed: 'Feed',
             withdrawalType: {
-                [CONST.SEARCH.WITHDRAWAL_TYPE.EXPENSIFY_CARD]: 'Expensify Card',
+                [CONST.SEARCH.WITHDRAWAL_TYPE.EXPENSIFY_CARD]: 'Expensify Karte',
                 [CONST.SEARCH.WITHDRAWAL_TYPE.REIMBURSEMENT]: 'Erstattung',
-                [CONST.SEARCH.WITHDRAWAL_TYPE.CENTRAL_TRAVEL_INVOICING]: 'Zentrale Rechnungsstellung',
+                [CONST.SEARCH.WITHDRAWAL_TYPE.CENTRAL_TRAVEL_INVOICING]: 'Reiseabrechnung',
             },
             is: 'Ist',
             action: {
@@ -8267,7 +8267,7 @@ Fügen Sie weitere Ausgabelimits hinzu, um den Cashflow Ihres Unternehmens zu sc
         personalCard: 'Private Karte',
         companyCard: 'Firmenkarte',
         expensifyCard: 'Expensify Karte',
-        travelInvoicing: 'Zentrale Rechnungsstellung',
+        travelInvoicing: 'Reiseabrechnung',
         travelCard: 'Reisekarte',
     },
     distance: {
