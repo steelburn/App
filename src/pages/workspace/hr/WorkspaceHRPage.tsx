@@ -165,7 +165,7 @@ function WorkspaceHRPage({
             accessVariants={[CONST.POLICY.ACCESS_VARIANTS.ADMIN, CONST.POLICY.ACCESS_VARIANTS.CONTROL]}
             policyID={policyID}
             featureName={CONST.POLICY.MORE_FEATURES.IS_HR_ENABLED}
-            shouldBeBlocked={!isBetaEnabled(CONST.BETAS.GUSTO) && !isBetaEnabled(CONST.BETAS.ZENEFITS)}
+            shouldBeBlocked={!isBetaEnabled(CONST.BETAS.GUSTO)}
         >
             <ScreenWrapper
                 enableEdgeToEdgeBottomSafeAreaPadding
