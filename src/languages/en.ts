@@ -1279,9 +1279,12 @@ const translations = {
         deleteReceipt: 'Delete receipt',
         findExpense: 'Find expense',
         deletedTransaction: (amount: string, merchant: string) => `deleted an expense (${amount} for ${merchant})`,
-        movedFromReport: (reportName: string) => `moved an expense${reportName ? ` from ${reportName}` : ''}`,
-        movedTransactionTo: (reportUrl: string, reportName?: string) => `moved this expense${reportName ? ` to <a href="${reportUrl}">${reportName}</a>` : ''}`,
-        movedTransactionFrom: (reportUrl: string, reportName?: string) => `moved this expense${reportName ? ` from <a href="${reportUrl}">${reportName}</a>` : ''}`,
+        movedFromReport: (reportName: string) => `moved an expense from ${reportName}`,
+        movedFromReportNoName: 'moved an expense',
+        movedTransactionTo: (reportUrl: string, reportName: string) => `moved this expense to <a href="${reportUrl}">${reportName}</a>`,
+        movedTransactionToAnotherReport: 'moved this expense to another report',
+        movedTransactionFrom: (reportUrl: string, reportName: string) => `moved this expense from <a href="${reportUrl}">${reportName}</a>`,
+        movedTransactionFromAnotherReport: 'moved this expense from another report',
         unreportedTransaction: (reportUrl: string) => `moved this expense to your <a href="${reportUrl}">personal space</a>`,
         movedAction: (shouldHideMovedReportUrl: boolean, movedReportUrl: string, newParentReportUrl: string, toPolicyName: string) => {
             if (shouldHideMovedReportUrl) {
@@ -1497,6 +1500,8 @@ const translations = {
             receiptDeleteFailureError: 'Unexpected error deleting this receipt. Please try again later.',
             receiptFailureMessage: '<rbr>There was an error uploading your receipt. Please <a href="download">save the receipt</a> and <a href="retry">try again</a> later.</rbr>',
             receiptFailureMessageShort: 'There was an error uploading your receipt.',
+            receiptUploadFailedMessage: 'Receipt upload failed. Save the receipt, or delete the expense and lose it.',
+            saveReceipt: 'Save receipt',
             genericDeleteFailureMessage: 'Unexpected error deleting this expense. Please try again later.',
             genericEditFailureMessage: 'Unexpected error editing this expense. Please try again later.',
             genericSmartscanFailureMessage: 'Transaction is missing fields',
@@ -2543,6 +2548,7 @@ const translations = {
             revealDetails: 'Reveal details',
             revealCvv: 'Reveal CVV',
             copyCardNumber: 'Copy card number',
+            copyCvv: 'Copy CVV',
             updateAddress: 'Update address',
         },
         cardAddedToWallet: ({platform}: {platform: 'Google' | 'Apple'}) => `Added to ${platform} Wallet`,
@@ -2795,6 +2801,9 @@ const translations = {
         },
         error: {
             genericAdd: 'There was a problem adding this agent',
+            genericUpdate: 'There was a problem updating this agent',
+            updateName: "There was a problem updating this agent's name",
+            updatePrompt: "There was a problem updating this agent's instructions",
         },
     },
     addAgentPage: {
@@ -2806,6 +2815,23 @@ const translations = {
         defaultAgentName: (displayName: string) => `${displayName}'s Agent`,
         defaultPrompt:
             "Reject expenses that are for gambling, movies, or other obvious non-business reasons.\n\nRemind the user to always include a receipt image that makes the tip clear.\n\nApprove the report if it's very similar to previous reports from the same user.\n\nReject reports with more than $500 in travel expenses.",
+    },
+    editAgentPage: {
+        title: 'Edit agent',
+        agentName: 'Agent name',
+        instructions: 'Write custom instructions',
+        deleteAgent: 'Delete agent',
+        deleteAgentTitle: 'Delete agent?',
+        deleteAgentMessage: 'Are you sure you want to delete this agent? This action cannot be undone.',
+    },
+    editAgentNamePage: {
+        title: 'Agent name',
+    },
+    editAgentPromptPage: {
+        title: 'Write custom instructions',
+        error: {
+            emptyPrompt: 'Please enter instructions for your agent.',
+        },
     },
     expenseRulesPage: {
         title: 'Expense rules',
@@ -3351,6 +3377,7 @@ const translations = {
         enterPhoneNumber: "What's your phone number?",
         personalDetails: 'Personal details',
         privateDataMessage: 'These details are used for travel and payments. They are never shown on your public profile.',
+        basicDetails: 'Basic details',
         legalName: 'Legal name',
         legalFirstName: 'Legal first name',
         legalLastName: 'Legal last name',
@@ -5219,6 +5246,7 @@ const translations = {
             free: 'Free',
             control: 'Control',
             collect: 'Collect',
+            submit: 'Submit',
         },
         companyCards: {
             addCards: 'Add cards',
@@ -5746,7 +5774,7 @@ const translations = {
                 confirmText: 'Got it',
             },
             hrWarningModal: {
-                disconnectText: 'To disable HR, please disconnect Gusto from this workspace first.',
+                disconnectText: ({integration}: {integration: string}) => `To disable HR, please disconnect ${integration} from this workspace first.`,
             },
             workflowWarningModal: {
                 featureEnabledTitle: 'Not so fast...',
@@ -6392,6 +6420,12 @@ const translations = {
                         return 'Loading data from Gusto';
                     case 'gustoSyncProvisioning':
                         return 'Provisioning employees in policy';
+                    case 'zenefitsSyncTitle':
+                        return 'Synchronizing TriNet Employees';
+                    case 'zenefitsSyncLoadData':
+                        return 'Loading data from TriNet';
+                    case 'zenefitsSyncProvisioning':
+                        return 'Provisioning employees in policy';
                     case 'jobDone':
                         return 'Waiting for imported data to load';
                     default: {
@@ -6441,6 +6475,39 @@ const translations = {
                         one: '1 employee',
                         other: (count: number) => `${count} employees`,
                     }),
+                },
+            },
+            zenefits: {
+                title: 'TriNet',
+                connect: 'Connect',
+                syncNow: 'Sync now',
+                disconnect: 'Disconnect',
+                lastSync: (relativeDate: string) => `Last synced ${relativeDate}`,
+                syncError: "Can't connect to TriNet",
+                disconnectTitle: 'Disconnect TriNet',
+                disconnectPrompt: 'Are you sure you want to disconnect TriNet?',
+                connectionDescription: 'Connect TriNet to keep employee approvals in sync with your workspace.',
+                approvalMode: 'Approval mode',
+                finalApprover: 'Final approver',
+                notSet: 'Not set',
+                approvalModeDescription: 'Members and managers are set up to sync with TriNet.',
+                approvalModeWarningTitle: 'Change approval mode?',
+                approvalModeWarningPrompt: (helpSiteURL: string) =>
+                    `Are you sure you would like to change the approval mode for this workspace? Learn more about the different TriNet-enabled workflow modes in our <a href="${helpSiteURL}">help site</a>.`,
+                approvalModeWarningConfirm: 'Change approval mode',
+                approvalModes: {
+                    basic: {
+                        label: 'Basic approval',
+                        description: 'All users submit to a single person for processing and approval.',
+                    },
+                    manager: {
+                        label: 'Manager approval',
+                        description: 'Employees submit reports to their direct manager configured in TriNet.',
+                    },
+                    custom: {
+                        label: 'Custom approval',
+                        description: "I'll manually setup approval workflows in Expensify.",
+                    },
                 },
             },
         },
@@ -7773,7 +7840,7 @@ const translations = {
             editMultiple: 'Edit multiple',
             editMultipleTitle: 'Edit multiple expenses',
             // cspell:disable
-            editMultipleDescription: "Changes will be set for all selected expenses and will override any previously set values. Just sayin'.",
+            editMultipleDescription: 'Changes will be set for all selected expenses and will override any previously set values.',
             approve: 'Approve',
             pay: 'Pay',
             delete: 'Delete',
@@ -8884,12 +8951,14 @@ const translations = {
     },
     delegate: {
         switchAccount: 'Switch accounts:',
+        switch: 'Switch',
+        copilot: 'Copilot',
         copilotDelegatedAccess: 'Copilot: Delegated access',
         copilotDelegatedAccessDescription: 'Allow other members to access your account.',
         learnMoreAboutDelegatedAccess: 'Learn more about delegated access',
-        addCopilot: 'Add copilot',
+        addCopilot: 'Add a copilot to your account',
         membersCanAccessYourAccount: 'These members can access your account:',
-        youCanAccessTheseAccounts: 'You can access these accounts via the account switcher:',
+        youCanAccessTheseAccounts: 'You can access these accounts:',
         role: ({role}: OptionalParam<DelegateRoleParams> = {}) => {
             switch (role) {
                 case CONST.DELEGATE_ROLE.ALL:

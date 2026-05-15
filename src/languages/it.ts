@@ -1228,9 +1228,12 @@ const translations: TranslationDeepObject<typeof en> = {
         deleteReceipt: 'Elimina ricevuta',
         findExpense: 'Trova spesa',
         deletedTransaction: (amount: string, merchant: string) => `ha eliminato una spesa (${amount} per ${merchant})`,
-        movedFromReport: (reportName: string) => `ha spostato una spesa${reportName ? `da ${reportName}` : ''}`,
-        movedTransactionTo: (reportUrl: string, reportName?: string) => `ha spostato questa spesa${reportName ? `a <a href="${reportUrl}">${reportName}</a>` : ''}`,
-        movedTransactionFrom: (reportUrl: string, reportName?: string) => `ha spostato questa spesa${reportName ? `da <a href="${reportUrl}">${reportName}</a>` : ''}`,
+        movedFromReport: (reportName: string) => `ha spostato una spesa da ${reportName}`,
+        movedFromReportNoName: 'ha spostato una spesa',
+        movedTransactionTo: (reportUrl: string, reportName: string) => `ha spostato questa spesa su <a href="${reportUrl}">${reportName}</a>`,
+        movedTransactionToAnotherReport: 'ha spostato questa spesa in un altro report',
+        movedTransactionFrom: (reportUrl: string, reportName: string) => `ha spostato questa spesa da <a href="${reportUrl}">${reportName}</a>`,
+        movedTransactionFromAnotherReport: 'ha spostato questa nota spese da un altro report',
         unreportedTransaction: (reportUrl: string) => `ha spostato questa spesa nel tuo <a href="${reportUrl}">spazio personale</a>`,
         movedAction: (shouldHideMovedReportUrl: boolean, movedReportUrl: string, newParentReportUrl: string, toPolicyName: string) => {
             if (shouldHideMovedReportUrl) {
@@ -1441,6 +1444,8 @@ const translations: TranslationDeepObject<typeof en> = {
             receiptFailureMessage:
                 '<rbr>Si è verificato un errore durante il caricamento della ricevuta. <a href="download">Salva la ricevuta</a> e <a href="retry">riprova</a> più tardi.</rbr>',
             receiptFailureMessageShort: 'Si è verificato un errore durante il caricamento della ricevuta.',
+            receiptUploadFailedMessage: 'Caricamento della ricevuta non riuscito. Salva la ricevuta oppure elimina la spesa e perdila.',
+            saveReceipt: 'Salva ricevuta',
             genericDeleteFailureMessage: 'Errore imprevisto durante l’eliminazione di questa spesa. Riprova più tardi.',
             genericEditFailureMessage: 'Errore imprevisto durante la modifica di questa spesa. Riprova più tardi.',
             genericSmartscanFailureMessage: 'Alla transazione mancano dei campi',
@@ -2470,6 +2475,7 @@ const translations: TranslationDeepObject<typeof en> = {
             revealDetails: 'Mostra dettagli',
             revealCvv: 'Mostra CVV',
             copyCardNumber: 'Copia numero carta',
+            copyCvv: 'Copia CVV',
             updateAddress: 'Aggiorna indirizzo',
         },
         cardAddedToWallet: ({platform}: {platform: 'Google' | 'Apple'}) => `Aggiunto al portafoglio ${platform}`,
@@ -2735,6 +2741,9 @@ ${amount} per ${merchant} - ${date}`,
         emptyAgents: {title: 'Nessun agente creato', subtitle: 'Smetti di fare le cose manualmente. Dai istruzioni a un agente e risparmia un sacco di tempo.'},
         error: {
             genericAdd: "Si è verificato un problema durante l'aggiunta di questo agente",
+            genericUpdate: "Si è verificato un problema durante l'aggiornamento di questo agente",
+            updateName: "Si è verificato un problema durante l'aggiornamento del nome di questo agente",
+            updatePrompt: "Si è verificato un problema nell'aggiornare le istruzioni di questo agente",
         },
     },
     addAgentPage: {
@@ -2747,6 +2756,16 @@ ${amount} per ${merchant} - ${date}`,
         defaultPrompt:
             "Rifiuta le spese relative a gioco d'azzardo, cinema o altri motivi chiaramente non legati all'attività.\n\nRicorda all'utente di includere sempre un'immagine della ricevuta in cui la mancia sia ben visibile.\n\nApprova il report se è molto simile ai report precedenti dello stesso utente.\n\nRifiuta i report con più di 500 $ di spese di viaggio.",
     },
+    editAgentPage: {
+        title: 'Modifica agente',
+        agentName: 'Nome agente',
+        instructions: 'Scrivi istruzioni personalizzate',
+        deleteAgent: 'Elimina agente',
+        deleteAgentTitle: 'Eliminare agente?',
+        deleteAgentMessage: 'Sei sicuro di voler eliminare questo agente? Questa azione non può essere annullata.',
+    },
+    editAgentNamePage: {title: 'Nome agente'},
+    editAgentPromptPage: {title: 'Scrivi istruzioni personalizzate', error: {emptyPrompt: 'Inserisci le istruzioni per il tuo agente.'}},
     expenseRulesPage: {
         title: 'Regole spese',
         findRule: 'Trova regola',
@@ -3279,6 +3298,7 @@ ${amount} per ${merchant} - ${date}`,
         enterPhoneNumber: 'Qual è il tuo numero di telefono?',
         personalDetails: 'Dati personali',
         privateDataMessage: 'Questi dettagli vengono utilizzati per viaggi e pagamenti. Non vengono mai mostrati sul tuo profilo pubblico.',
+        basicDetails: 'Dettagli di base',
         legalName: 'Nome legale',
         legalFirstName: 'Nome legale di battesimo',
         legalLastName: 'Cognome legale',
@@ -5179,6 +5199,7 @@ _Per istruzioni più dettagliate, [visita il nostro sito di assistenza](${CONST.
             free: 'Gratis',
             control: 'Controllo',
             collect: 'Riscuoti',
+            submit: 'Invia',
         },
         companyCards: {
             addCards: 'Aggiungi carte',
@@ -5743,7 +5764,7 @@ _Per istruzioni più dettagliate, [visita il nostro sito di assistenza](${CONST.
                 subtitle: 'Imposta una tariffa oraria fatturabile per il rilevamento del tempo.',
                 defaultHourlyRate: 'Tariffa oraria predefinita',
             },
-            hrWarningModal: {disconnectText: 'Per disattivare le risorse umane, disconnetti prima Gusto da questo spazio di lavoro.'},
+            hrWarningModal: {disconnectText: ({integration}: {integration: string}) => `Per disattivare HR, scollega prima ${integration} da questo workspace.`},
         },
         reports: {
             reportsCustomTitleExamples: 'Esempi:',
@@ -7030,11 +7051,17 @@ Aggiungi altre regole di spesa per proteggere il flusso di cassa aziendale.`,
             syncStageName: ({stage}: SyncStageNameConnectionsParams) => {
                 switch (stage) {
                     case 'gustoSyncTitle':
-                        return 'Synchronizing Gusto Employees';
+                        return 'Sincronizzazione dei dipendenti Gusto';
                     case 'gustoSyncLoadData':
-                        return 'Loading data from Gusto';
+                        return 'Caricamento dei dati da Gusto';
                     case 'gustoSyncProvisioning':
-                        return 'Provisioning employees in policy';
+                        return 'Provisioning dei dipendenti nella policy';
+                    case 'zenefitsSyncTitle':
+                        return 'Sincronizzazione dipendenti TriNet';
+                    case 'zenefitsSyncLoadData':
+                        return 'Caricamento dei dati da TriNet';
+                    case 'zenefitsSyncProvisioning':
+                        return 'Provisioning dei dipendenti nella policy';
                     case 'jobDone':
                         return 'In attesa del caricamento dei dati importati';
                     default: {
@@ -7075,6 +7102,30 @@ Aggiungi altre regole di spesa per proteggere il flusso di cassa aziendale.`,
                         one: '1 dipendente',
                         other: (count: number) => `${count} dipendenti`,
                     }),
+                },
+            },
+            zenefits: {
+                title: 'TriNet',
+                connect: 'Connetti',
+                syncNow: 'Sincronizza ora',
+                disconnect: 'Disconnetti',
+                lastSync: (relativeDate: string) => `Ultima sincronizzazione ${relativeDate}`,
+                syncError: 'Impossibile connettersi a TriNet',
+                disconnectTitle: 'Disconnetti TriNet',
+                disconnectPrompt: 'Sei sicuro di voler disconnettere TriNet?',
+                connectionDescription: 'Collega TriNet per mantenere sincronizzate le approvazioni dei dipendenti con il tuo spazio di lavoro.',
+                approvalMode: 'Modalità approvazione',
+                finalApprover: 'Responsabile finale approvazione',
+                notSet: 'Non impostato',
+                approvalModeDescription: 'Membri e responsabili sono configurati per sincronizzarsi con TriNet.',
+                approvalModeWarningTitle: 'Cambiare modalità di approvazione?',
+                approvalModeWarningPrompt: (helpSiteURL: string) =>
+                    `Sei sicuro di voler cambiare la modalità di approvazione per questo workspace? Scopri di più sulle diverse modalità di workflow abilitate per TriNet nel nostro <a href="${helpSiteURL}">sito di assistenza</a>.`,
+                approvalModeWarningConfirm: 'Modifica modalità di approvazione',
+                approvalModes: {
+                    basic: {label: 'Approvazione di base', description: 'Tutti gli utenti inviano a una sola persona per l’elaborazione e l’approvazione.'},
+                    manager: {label: 'Approvazione del manager', description: 'I dipendenti inviano i report al loro responsabile diretto configurato in TriNet.'},
+                    custom: {label: 'Approvazione personalizzata', description: 'Imposterò manualmente i flussi di approvazione in Expensify.'},
                 },
             },
         },
@@ -7741,7 +7792,7 @@ Aggiungi altre regole di spesa per proteggere il flusso di cassa aziendale.`,
         bulkActions: {
             editMultiple: 'Modifica multipli',
             editMultipleTitle: 'Modifica più spese',
-            editMultipleDescription: 'Le modifiche verranno applicate a tutte le spese selezionate e sostituiranno i valori precedentemente impostati.',
+            editMultipleDescription: 'Le modifiche verranno applicate a tutte le spese selezionate e sovrascriveranno qualsiasi valore impostato in precedenza.',
             approve: 'Approva',
             pay: 'Paga',
             delete: 'Elimina',
@@ -8877,12 +8928,14 @@ Aggiungi altre regole di spesa per proteggere il flusso di cassa aziendale.`,
     },
     delegate: {
         switchAccount: 'Cambia account:',
+        switch: 'Cambia',
+        copilot: 'Copilot',
         copilotDelegatedAccess: 'Copilot: Accesso delegato',
         copilotDelegatedAccessDescription: 'Consenti agli altri membri di accedere al tuo account.',
         learnMoreAboutDelegatedAccess: "Scopri di più sull'accesso delegato",
         addCopilot: 'Aggiungi copilota',
         membersCanAccessYourAccount: 'Questi membri possono accedere al tuo account:',
-        youCanAccessTheseAccounts: 'Puoi accedere a questi account tramite il selettore di account:',
+        youCanAccessTheseAccounts: 'Puoi accedere a questi account:',
         role: ({role}: OptionalParam<DelegateRoleParams> = {}) => {
             switch (role) {
                 case CONST.DELEGATE_ROLE.ALL:

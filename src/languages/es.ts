@@ -1194,9 +1194,12 @@ const translations: TranslationDeepObject<typeof en> = {
         routePending: 'Ruta pendiente...',
         findExpense: 'Buscar gasto',
         deletedTransaction: (amount, merchant) => `eliminó un gasto (${amount} para ${merchant})`,
-        movedFromReport: (reportName) => `movió un gasto${reportName ? ` desde ${reportName}` : ''}`,
-        movedTransactionTo: (reportUrl, reportName) => `movió este gasto${reportName ? ` a <a href="${reportUrl}">${reportName}</a>` : ''}`,
-        movedTransactionFrom: (reportUrl, reportName) => `movió este gasto${reportName ? ` desde <a href="${reportUrl}">${reportName}</a>` : ''}`,
+        movedFromReport: (reportName) => `movió un gasto desde ${reportName}`,
+        movedFromReportNoName: 'movió un gasto',
+        movedTransactionTo: (reportUrl, reportName) => `movió este gasto a <a href="${reportUrl}">${reportName}</a>`,
+        movedTransactionToAnotherReport: 'movió este gasto a otro informe',
+        movedTransactionFrom: (reportUrl, reportName) => `movió este gasto desde <a href="${reportUrl}">${reportName}</a>`,
+        movedTransactionFromAnotherReport: 'movió este gasto desde otro informe',
         unreportedTransaction: (reportUrl) => `movió este gasto a tu <a href="${reportUrl}">espacio personal</a>`,
         movedAction: (shouldHideMovedReportUrl, movedReportUrl, newParentReportUrl, toPolicyName) => {
             if (shouldHideMovedReportUrl) {
@@ -1408,6 +1411,8 @@ const translations: TranslationDeepObject<typeof en> = {
             receiptDeleteFailureError: 'Error inesperado al borrar este recibo. Por favor, vuelve a intentarlo más tarde.',
             receiptFailureMessage: '<rbr>Hubo un error al cargar tu recibo. Por favor, <a href="download">guarda el recibo</a> e <a href="retry">inténtalo de nuevo</a> más tarde.</rbr>',
             receiptFailureMessageShort: 'Hubo un error al cargar tu recibo.',
+            receiptUploadFailedMessage: 'Error al subir el recibo. Guarda el recibo, o elimina el gasto y piérdelo.',
+            saveReceipt: 'Guardar recibo',
             genericDeleteFailureMessage: 'Error inesperado al eliminar este gasto. Por favor, inténtalo más tarde.',
             genericEditFailureMessage: 'Error inesperado al editar este gasto. Por favor, inténtalo más tarde.',
             genericSmartscanFailureMessage: 'La transacción tiene campos vacíos',
@@ -2358,6 +2363,7 @@ const translations: TranslationDeepObject<typeof en> = {
             revealDetails: 'Revelar detalles',
             revealCvv: 'Revelar CVV',
             copyCardNumber: 'Copiar número de la tarjeta',
+            copyCvv: 'Copiar CVV',
             updateAddress: 'Actualizar dirección',
         },
         cardAddedToWallet: ({platform}) => `Añadida a ${platform} Wallet`,
@@ -2611,6 +2617,9 @@ ${amount} para ${merchant} - ${date}`,
         },
         error: {
             genericAdd: 'Hubo un problema al agregar este agente',
+            genericUpdate: 'Hubo un problema al actualizar este agente',
+            updateName: 'Hubo un problema al actualizar el nombre de este agente',
+            updatePrompt: 'Hubo un problema al actualizar las instrucciones de este agente',
         },
     },
     addAgentPage: {
@@ -2622,6 +2631,23 @@ ${amount} para ${merchant} - ${date}`,
         defaultAgentName: (displayName: string) => `Agente de ${displayName}`,
         defaultPrompt:
             'Rechazar gastos por juegos de azar, películas u otras razones claramente no comerciales.\n\nRecordar al usuario que siempre incluya una imagen del recibo que muestre claramente la propina.\n\nAprobar el informe si es muy similar a informes anteriores del mismo usuario.\n\nRechazar informes con más de $500 en gastos de viaje.',
+    },
+    editAgentPage: {
+        title: 'Editar agente',
+        agentName: 'Nombre del agente',
+        instructions: 'Escribe instrucciones personalizadas',
+        deleteAgent: 'Eliminar agente',
+        deleteAgentTitle: '¿Eliminar agente?',
+        deleteAgentMessage: '¿Estás seguro de que quieres eliminar este agente? Esta acción no se puede deshacer.',
+    },
+    editAgentNamePage: {
+        title: 'Nombre del agente',
+    },
+    editAgentPromptPage: {
+        title: 'Escribe instrucciones personalizadas',
+        error: {
+            emptyPrompt: 'Por favor, introduce instrucciones para tu agente.',
+        },
     },
     expenseRulesPage: {
         title: 'Reglas de gastos',
@@ -3163,6 +3189,7 @@ ${amount} para ${merchant} - ${date}`,
         enterPhoneNumber: '¿Cuál es tu número de teléfono?',
         personalDetails: 'Datos personales',
         privateDataMessage: 'Estos detalles se utilizan para viajes y pagos. Nunca se mostrarán en tu perfil público.',
+        basicDetails: 'Datos básicos',
         legalName: 'Nombre completo',
         legalFirstName: 'Nombre legal',
         legalLastName: 'Apellidos legales',
@@ -5038,6 +5065,7 @@ ${amount} para ${merchant} - ${date}`,
             free: 'Gratis',
             control: 'Controlar',
             collect: 'Recopilar',
+            submit: 'Enviar',
         },
         companyCards: {
             addCards: 'Añadir tarjetas',
@@ -5573,9 +5601,7 @@ ${amount} para ${merchant} - ${date}`,
                 description: '¿Está seguro de que desea desconectar esta integración?',
                 confirmText: 'Entendido',
             },
-            hrWarningModal: {
-                disconnectText: 'Para desactivar HR, primero desconecta Gusto de este espacio de trabajo.',
-            },
+            hrWarningModal: {disconnectText: ({integration}: {integration: string}) => `Para deshabilitar RR. HH., primero desconecta ${integration} de este espacio de trabajo.`},
             workflowWarningModal: {
                 featureEnabledTitle: 'No tan rápido...',
                 featureEnabledText:
@@ -6211,15 +6237,21 @@ ${amount} para ${merchant} - ${date}`,
             syncStageName: ({stage}) => {
                 switch (stage) {
                     case 'gustoSyncTitle':
-                        return 'Synchronizing Gusto Employees';
+                        return 'Sincronizar empleados de Gusto';
                     case 'gustoSyncLoadData':
-                        return 'Loading data from Gusto';
+                        return 'Cargando datos desde Gusto';
                     case 'gustoSyncProvisioning':
-                        return 'Provisioning employees in policy';
+                        return 'Aprovisionar empleados en la política';
+                    case 'zenefitsSyncTitle':
+                        return 'Sincronización de empleados de TriNet';
+                    case 'zenefitsSyncLoadData':
+                        return 'Cargando datos desde TriNet';
+                    case 'zenefitsSyncProvisioning':
+                        return 'Aprovisionar empleados en la política';
                     case 'jobDone':
                         return 'Esperando a que se carguen los datos importados';
                     default: {
-                        return `Translation missing for stage: ${stage}`;
+                        return `Falta la traducción para la etapa: ${stage}`;
                     }
                 }
             },
@@ -6265,6 +6297,30 @@ ${amount} para ${merchant} - ${date}`,
                         one: '1 empleado',
                         other: (count: number) => `${count} empleados`,
                     }),
+                },
+            },
+            zenefits: {
+                title: 'TriNet',
+                connect: 'Conectar',
+                syncNow: 'Sincronizar ahora',
+                disconnect: 'Desconectar',
+                lastSync: (relativeDate: string) => `Última sincronización ${relativeDate}`,
+                syncError: 'No se puede conectar con TriNet',
+                disconnectTitle: 'Desconectar TriNet',
+                disconnectPrompt: '¿Seguro que quieres desconectar TriNet?',
+                connectionDescription: 'Conecta TriNet para mantener las aprobaciones de empleados sincronizadas con tu espacio de trabajo.',
+                approvalMode: 'Modo de aprobación',
+                finalApprover: 'Aprobador final',
+                notSet: 'No establecido',
+                approvalModeDescription: 'Los miembros y gestores están configurados para sincronizarse con TriNet.',
+                approvalModeWarningTitle: '¿Cambiar el modo de aprobación?',
+                approvalModeWarningPrompt: (helpSiteURL: string) =>
+                    `¿Seguro que quieres cambiar el modo de aprobación de este espacio de trabajo? Obtén más información sobre los distintos modos de flujo de trabajo habilitados por TriNet en nuestro <a href="${helpSiteURL}">sitio de ayuda</a>.`,
+                approvalModeWarningConfirm: 'Cambiar el modo de aprobación',
+                approvalModes: {
+                    basic: {label: 'Aprobación básica', description: 'Todos los usuarios envían a una sola persona para su procesamiento y aprobación.'},
+                    manager: {label: 'Aprobación del responsable', description: 'Los empleados envían informes a su responsable directo configurado en TriNet.'},
+                    custom: {label: 'Aprobación personalizada', description: 'Configuraré manualmente los flujos de aprobación en Expensify.'},
                 },
             },
         },
@@ -7580,7 +7636,7 @@ ${amount} para ${merchant} - ${date}`,
         bulkActions: {
             editMultiple: 'Editar múltiples',
             editMultipleTitle: 'Editar múltiples gastos',
-            editMultipleDescription: 'Los cambios se aplicarán a todos los gastos seleccionados y anularán cualquier valor previamente establecido.',
+            editMultipleDescription: 'Los cambios se aplicarán a todos los gastos seleccionados y sustituirán cualquier valor establecido previamente.',
             approve: 'Aprobar',
             pay: 'Pagar',
             delete: 'Eliminar',
@@ -9057,12 +9113,14 @@ ${amount} para ${merchant} - ${date}`,
     },
     delegate: {
         switchAccount: 'Cambiar de cuenta:',
+        switch: 'Cambiar',
+        copilot: 'Copiloto',
         copilotDelegatedAccess: 'Copilot: Acceso delegado',
         copilotDelegatedAccessDescription: 'Permitir que otros miembros accedan a tu cuenta.',
         learnMoreAboutDelegatedAccess: 'Más información sobre acceso delegado',
-        addCopilot: 'Agregar copiloto',
+        addCopilot: 'Añade un copiloto a tu cuenta',
         membersCanAccessYourAccount: 'Estos miembros pueden acceder a tu cuenta:',
-        youCanAccessTheseAccounts: 'Puedes acceder a estas cuentas a través del conmutador de cuentas:',
+        youCanAccessTheseAccounts: 'Puedes acceder a estas cuentas:',
         role: ({role} = {}) => {
             switch (role) {
                 case CONST.DELEGATE_ROLE.ALL:

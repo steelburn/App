@@ -1226,9 +1226,12 @@ const translations: TranslationDeepObject<typeof en> = {
         deleteReceipt: 'Usuń paragon',
         findExpense: 'Znajdź wydatek',
         deletedTransaction: (amount: string, merchant: string) => `usunął(-ę) wydatek (${amount} dla ${merchant})`,
-        movedFromReport: (reportName: string) => `przeniesiono wydatek${reportName ? `z ${reportName}` : ''}`,
-        movedTransactionTo: (reportUrl: string, reportName?: string) => `przeniósł ten wydatek${reportName ? `do <a href="${reportUrl}">${reportName}</a>` : ''}`,
-        movedTransactionFrom: (reportUrl: string, reportName?: string) => `przeniósł(-ę) ten wydatek${reportName ? `z <a href="${reportUrl}">${reportName}</a>` : ''}`,
+        movedFromReport: (reportName: string) => `przeniesiono wydatek z ${reportName}`,
+        movedFromReportNoName: 'przeniesiono wydatek',
+        movedTransactionTo: (reportUrl: string, reportName: string) => `przeniósł ten wydatek do <a href="${reportUrl}">${reportName}</a>`,
+        movedTransactionToAnotherReport: 'przeniesiono ten wydatek do innego raportu',
+        movedTransactionFrom: (reportUrl: string, reportName: string) => `przeniósł ten wydatek z <a href="${reportUrl}">${reportName}</a>`,
+        movedTransactionFromAnotherReport: 'przeniesiono ten wydatek z innego raportu',
         unreportedTransaction: (reportUrl: string) => `przeniósł ten wydatek do Twojej <a href="${reportUrl}">przestrzeni osobistej</a>`,
         movedAction: (shouldHideMovedReportUrl: boolean, movedReportUrl: string, newParentReportUrl: string, toPolicyName: string) => {
             if (shouldHideMovedReportUrl) {
@@ -1437,6 +1440,8 @@ const translations: TranslationDeepObject<typeof en> = {
             receiptDeleteFailureError: 'Nieoczekiwany błąd podczas usuwania tego paragonu. Spróbuj ponownie później.',
             receiptFailureMessage: '<rbr>Wystąpił błąd podczas przesyłania paragonu. Prosimy <a href="download">zapisać paragon</a> i <a href="retry">spróbować ponownie</a> później.</rbr>',
             receiptFailureMessageShort: 'Wystąpił błąd podczas przesyłania paragonu.',
+            receiptUploadFailedMessage: 'Nie udało się przesłać paragonu. Zapisz paragon lub usuń wydatek i utracisz go.',
+            saveReceipt: 'Zapisz paragon',
             genericDeleteFailureMessage: 'Nieoczekiwany błąd podczas usuwania tego wydatku. Spróbuj ponownie później.',
             genericEditFailureMessage: 'Nieoczekiwany błąd podczas edycji tego wydatku. Spróbuj ponownie później.',
             genericSmartscanFailureMessage: 'W transakcji brakuje pól',
@@ -2465,6 +2470,7 @@ const translations: TranslationDeepObject<typeof en> = {
             revealDetails: 'Pokaż szczegóły',
             revealCvv: 'Pokaż kod CVV',
             copyCardNumber: 'Skopiuj numer karty',
+            copyCvv: 'Skopiuj CVV',
             updateAddress: 'Zaktualizuj adres',
         },
         cardAddedToWallet: ({platform}: {platform: 'Google' | 'Apple'}) => `Dodano do portfela ${platform}`,
@@ -2726,18 +2732,31 @@ ${amount} dla ${merchant} - ${date}`,
         emptyAgents: {title: 'Nie utworzono agentów', subtitle: 'Przestań robić wszystko ręcznie. Zamiast tego wydaj polecenia agentowi i zaoszczędź mnóstwo czasu.'},
         error: {
             genericAdd: 'Wystąpił problem podczas dodawania tego agenta',
+            genericUpdate: 'Wystąpił problem z aktualizacją tego agenta',
+            updateName: 'Wystąpił problem z aktualizacją imienia i nazwiska tego agenta',
+            updatePrompt: 'Wystąpił problem z aktualizacją instrukcji tego agenta',
         },
     },
     addAgentPage: {
         title: 'Nowy agent',
         agentName: 'Nazwa agenta',
-        instructions: 'Napisz własne instrukcje',
+        instructions: 'Napisz niestandardowe instrukcje',
         createAgent: 'Utwórz agenta',
         switchAvatar: 'Zmień awatar',
         defaultAgentName: (displayName: string) => `Agent ${displayName}`,
         defaultPrompt:
             'Odrzucaj wydatki związane z hazardem, filmami lub innymi oczywistymi celami niezwiązanymi z działalnością biznesową.\n\nPrzypominaj użytkownikowi, aby zawsze dołączał zdjęcie paragonu, na którym wysokość napiwku jest wyraźnie widoczna.\n\nZatwierdź raport, jeśli jest bardzo podobny do wcześniejszych raportów tego samego użytkownika.\n\nOdrzucaj raporty zawierające więcej niż 500 USD wydatków na podróże.',
     },
+    editAgentPage: {
+        title: 'Edytuj agenta',
+        agentName: 'Nazwa agenta',
+        instructions: 'Napisz niestandardowe instrukcje',
+        deleteAgent: 'Usuń agenta',
+        deleteAgentTitle: 'Usunąć agenta?',
+        deleteAgentMessage: 'Czy na pewno chcesz usunąć tego agenta? Tej czynności nie można cofnąć.',
+    },
+    editAgentNamePage: {title: 'Nazwa agenta'},
+    editAgentPromptPage: {title: 'Napisz niestandardowe instrukcje', error: {emptyPrompt: 'Wprowadź instrukcje dla swojego agenta.'}},
     expenseRulesPage: {
         title: 'Reguły wydatków',
         findRule: 'Znajdź regułę',
@@ -3268,6 +3287,7 @@ ${amount} dla ${merchant} - ${date}`,
         enterPhoneNumber: 'Jaki jest Twój numer telefonu?',
         personalDetails: 'Dane osobiste',
         privateDataMessage: 'Te dane są używane do podróży i płatności. Nigdy nie są wyświetlane w Twoim publicznym profilu.',
+        basicDetails: 'Podstawowe dane',
         legalName: 'Imię i nazwisko (pełne)',
         legalFirstName: 'Imię (zgodnie z dokumentem tożsamości)',
         legalLastName: 'Nazwisko zgodne z dokumentami',
@@ -5162,6 +5182,7 @@ _Aby uzyskać bardziej szczegółowe instrukcje, [odwiedź naszą stronę pomocy
             free: 'Darmowy',
             control: 'Sterowanie',
             collect: 'Zbierz',
+            submit: 'Prześlij',
         },
         companyCards: {
             addCards: 'Dodaj karty',
@@ -5716,7 +5737,7 @@ _Aby uzyskać bardziej szczegółowe instrukcje, [odwiedź naszą stronę pomocy
                 subtitle: 'Ustaw godzinową stawkę rozliczeniową do śledzenia czasu.',
                 defaultHourlyRate: 'Domyślna stawka godzinowa',
             },
-            hrWarningModal: {disconnectText: 'Aby wyłączyć HR, najpierw odłącz Gusto od tego miejsca pracy.'},
+            hrWarningModal: {disconnectText: ({integration}: {integration: string}) => `Aby wyłączyć HR, najpierw odłącz ${integration} od tego workspace’a.`},
         },
         reports: {
             reportsCustomTitleExamples: 'Przykłady:',
@@ -7001,11 +7022,17 @@ Dodaj więcej zasad wydatków, żeby chronić płynność finansową firmy.`,
             syncStageName: ({stage}: SyncStageNameConnectionsParams) => {
                 switch (stage) {
                     case 'gustoSyncTitle':
-                        return 'Synchronizing Gusto Employees';
+                        return 'Synchronizowanie pracowników Gusto';
                     case 'gustoSyncLoadData':
-                        return 'Loading data from Gusto';
+                        return 'Wczytywanie danych z Gusto';
                     case 'gustoSyncProvisioning':
-                        return 'Provisioning employees in policy';
+                        return 'Przydzielanie pracowników w polisie';
+                    case 'zenefitsSyncTitle':
+                        return 'Synchronizowanie pracowników TriNet';
+                    case 'zenefitsSyncLoadData':
+                        return 'Wczytywanie danych z TriNet';
+                    case 'zenefitsSyncProvisioning':
+                        return 'Przydzielanie pracowników w polisie';
                     case 'jobDone':
                         return 'Oczekiwanie na załadowanie zaimportowanych danych';
                     default: {
@@ -7046,6 +7073,30 @@ Dodaj więcej zasad wydatków, żeby chronić płynność finansową firmy.`,
                         one: '1 pracownik',
                         other: (count: number) => `${count} pracownicy`,
                     }),
+                },
+            },
+            zenefits: {
+                title: 'TriNet',
+                connect: 'Połącz',
+                syncNow: 'Synchronizuj teraz',
+                disconnect: 'Odłącz',
+                lastSync: (relativeDate: string) => `Ostatnia synchronizacja: ${relativeDate}`,
+                syncError: 'Nie można połączyć się z TriNet',
+                disconnectTitle: 'Odłącz TriNet',
+                disconnectPrompt: 'Czy na pewno chcesz odłączyć TriNet?',
+                connectionDescription: 'Połącz TriNet, żeby utrzymywać zatwierdzenia pracowników w synchronizacji z twoim workspace’em.',
+                approvalMode: 'Tryb zatwierdzania',
+                finalApprover: 'Ostateczny zatwierdzający',
+                notSet: 'Nie ustawiono',
+                approvalModeDescription: 'Członkowie i menedżerowie są skonfigurowani do synchronizacji z TriNet.',
+                approvalModeWarningTitle: 'Zmienić tryb zatwierdzania?',
+                approvalModeWarningPrompt: (helpSiteURL: string) =>
+                    `Czy na pewno chcesz zmienić tryb zatwierdzania dla tego workspace? Dowiedz się więcej o różnych trybach workflow obsługiwanych przez TriNet na naszej <a href="${helpSiteURL}">stronie pomocy</a>.`,
+                approvalModeWarningConfirm: 'Zmień tryb akceptacji',
+                approvalModes: {
+                    basic: {label: 'Podstawowa akceptacja', description: 'Wszyscy użytkownicy przesyłają wydatki do jednej osoby w celu ich przetworzenia i zatwierdzenia.'},
+                    manager: {label: 'Akceptacja przez menedżera', description: 'Pracownicy składają raporty do swojego bezpośredniego przełożonego skonfigurowanego w TriNet.'},
+                    custom: {label: 'Niestandardowe zatwierdzanie', description: 'Ręcznie skonfiguruję przepływy akceptacji w Expensify.'},
                 },
             },
         },
@@ -7704,7 +7755,7 @@ Dodaj więcej zasad wydatków, żeby chronić płynność finansową firmy.`,
         bulkActions: {
             editMultiple: 'Edytuj wiele',
             editMultipleTitle: 'Edytuj wiele wydatków',
-            editMultipleDescription: 'Zmiany zostaną zastosowane do wszystkich wybranych wydatków i zastąpią wcześniej ustawione wartości.',
+            editMultipleDescription: 'Zmiany zostaną ustawione dla wszystkich wybranych wydatków i nadpiszą wszystkie wcześniej ustawione wartości.',
             approve: 'Zatwierdź',
             pay: 'Zapłać',
             delete: 'Usuń',
@@ -8833,12 +8884,14 @@ Dodaj więcej zasad wydatków, żeby chronić płynność finansową firmy.`,
     },
     delegate: {
         switchAccount: 'Przełącz konta:',
+        switch: 'Przełącz',
+        copilot: 'Copilot',
         copilotDelegatedAccess: 'Copilot: Dostęp delegowany',
         copilotDelegatedAccessDescription: 'Zezwól innym członkom na dostęp do Twojego konta.',
         learnMoreAboutDelegatedAccess: 'Dowiedz się więcej o dostępie delegowanym',
         addCopilot: 'Dodaj pilota',
         membersCanAccessYourAccount: 'Ci członkowie mają dostęp do Twojego konta:',
-        youCanAccessTheseAccounts: 'Masz dostęp do tych kont za pomocą przełącznika kont:',
+        youCanAccessTheseAccounts: 'Masz dostęp do tych kont:',
         role: ({role}: OptionalParam<DelegateRoleParams> = {}) => {
             switch (role) {
                 case CONST.DELEGATE_ROLE.ALL:
