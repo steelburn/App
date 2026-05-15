@@ -14,14 +14,13 @@ import useCurrentUserPersonalDetails from '@hooks/useCurrentUserPersonalDetails'
 import useIsInLandscapeMode from '@hooks/useIsInLandscapeMode';
 import {useMemoizedLazyExpensifyIcons} from '@hooks/useLazyAsset';
 import useLocalize from '@hooks/useLocalize';
-import useOnyx from '@hooks/useOnyx';
 import useThemeStyles from '@hooks/useThemeStyles';
 import useWindowDimensions from '@hooks/useWindowDimensions';
 import {isMobile} from '@libs/Browser';
 import type {CustomRNImageManipulatorResult} from '@libs/cropOrRotateImage/types';
 import Navigation from '@libs/Navigation/Navigation';
 import type {AvatarSource} from '@libs/UserAvatarUtils';
-import {createAgent, scheduleAgentAvatarUploadAfterCreation} from '@userActions/Agent';
+import {createAgent} from '@userActions/Agent';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES from '@src/ROUTES';
@@ -41,8 +40,6 @@ function AddAgentPage() {
     const avatarStyle = [styles.avatarXLarge, styles.alignSelfCenter];
     const [avatarSource, setAvatarSource] = useState<AvatarSource>(() => botAvatars[Math.floor(Math.random() * botAvatars.length)]);
     const pendingFileRef = useRef<{file: File | CustomRNImageManipulatorResult; uri: string} | null>(null);
-
-    const [agentPrompts] = useOnyx(ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT);
 
     useFocusEffect(
         useCallback(() => {
@@ -82,15 +79,13 @@ function AddAgentPage() {
 
     const handleSubmit = (values: FormOnyxValues<typeof ONYXKEYS.FORMS.ADD_AGENT_FORM>) => {
         const firstName = values[INPUT_IDS.FIRST_NAME].trim() || undefined;
+        const prompt = values[INPUT_IDS.PROMPT].trim();
         const pendingFile = pendingFileRef.current;
 
         if (pendingFile) {
-            const existingAgentIDs = Object.keys(agentPrompts ?? {}).map((key) => parseInt(key.slice(ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT.length), 10));
-            createAgent(firstName, values[INPUT_IDS.PROMPT].trim(), undefined, pendingFile.uri);
-            scheduleAgentAvatarUploadAfterCreation(pendingFile.file, pendingFile.uri, existingAgentIDs);
+            createAgent(firstName, prompt, undefined, pendingFile.file, pendingFile.uri);
         } else {
-            const customExpensifyAvatarID = botAvatarIDs.get(avatarSource as BotAvatar);
-            createAgent(firstName, values[INPUT_IDS.PROMPT].trim(), customExpensifyAvatarID);
+            createAgent(firstName, prompt, botAvatarIDs.get(avatarSource as BotAvatar));
         }
 
         Navigation.goBack();

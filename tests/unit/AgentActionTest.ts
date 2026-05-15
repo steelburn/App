@@ -100,6 +100,13 @@ describe('createAgent', () => {
         expect(mockWrite).toHaveBeenCalledWith(WRITE_COMMANDS.CREATE_AGENT, {firstName: 'Bot', prompt: 'My prompt', customExpensifyAvatarID: 'bot-avatar--blue'}, expect.any(Object));
     });
 
+    it('passes file to write params when provided', () => {
+        const mockFile = {uri: 'file://photo.jpg', name: 'photo.jpg'} as unknown as File;
+        createAgent('Bot', 'My prompt', undefined, mockFile, 'file://photo.jpg');
+
+        expect(mockWrite).toHaveBeenCalledWith(WRITE_COMMANDS.CREATE_AGENT, {firstName: 'Bot', prompt: 'My prompt', file: mockFile}, expect.any(Object));
+    });
+
     it('includes resolved avatar URI in optimistic and failure personal detail data for a preset ID', () => {
         createAgent('Bot', 'My prompt', 'bot-avatar--blue');
 
@@ -117,7 +124,7 @@ describe('createAgent', () => {
 
     it('includes optimisticAvatarURI in optimistic and failure personal detail data for a custom file URI', () => {
         const fileURI = 'file://local-photo.jpg';
-        createAgent('Bot', 'My prompt', undefined, fileURI);
+        createAgent('Bot', 'My prompt', undefined, undefined, fileURI);
 
         const {optimisticData, failureData} = getWriteOptions();
         const accountID = getOptimisticAccountID(optimisticData);

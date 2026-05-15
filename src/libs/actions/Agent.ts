@@ -15,7 +15,7 @@ function openAgentsPage() {
     read(READ_COMMANDS.OPEN_AGENTS_PAGE, null);
 }
 
-function createAgent(firstName: string | undefined, prompt: string, customExpensifyAvatarID?: string, optimisticAvatarURI?: string) {
+function createAgent(firstName: string | undefined, prompt: string, customExpensifyAvatarID?: string, file?: File | CustomRNImageManipulatorResult, optimisticAvatarURI?: string) {
     const optimisticAccountID = -Math.round(Math.random() * 1000000);
 
     let avatarURI: string | undefined;
@@ -84,7 +84,7 @@ function createAgent(firstName: string | undefined, prompt: string, customExpens
         },
     ];
 
-    write(WRITE_COMMANDS.CREATE_AGENT, {firstName, prompt, customExpensifyAvatarID}, {optimisticData, successData, failureData});
+    write(WRITE_COMMANDS.CREATE_AGENT, {firstName, prompt, customExpensifyAvatarID, file}, {optimisticData, successData, failureData});
 }
 
 function clearAgentError(optimisticAccountID: number) {
@@ -285,48 +285,9 @@ function deleteAgent(accountID: number) {
     Navigation.navigate(ROUTES.SETTINGS_AGENTS);
 }
 
-const AVATAR_UPLOAD_TIMEOUT_MS = 120_000;
-
-function scheduleAgentAvatarUploadAfterCreation(file: File | CustomRNImageManipulatorResult, uri: string, existingAgentIDs: number[]) {
-    const existingIDsSet = new Set(existingAgentIDs);
-    const keyPrefix = ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT;
-
-    let connectionID: ReturnType<typeof Onyx.connectWithoutView>;
-
-    const cleanup = () => {
-        Onyx.disconnect(connectionID);
-    };
-
-    const timeoutID = setTimeout(cleanup, AVATAR_UPLOAD_TIMEOUT_MS);
-
-    connectionID = Onyx.connectWithoutView({
-        key: ONYXKEYS.COLLECTION.SHARED_NVP_AGENT_PROMPT,
-        callback: (agentPrompt, key) => {
-            if (!agentPrompt || !key) {
-                return;
-            }
-
-            const accountID = parseInt(key.slice(keyPrefix.length), 10);
-
-            if (Number.isNaN(accountID) || accountID <= 0 || existingIDsSet.has(accountID)) {
-                return;
-            }
-
-            if (agentPrompt.pendingAction === CONST.RED_BRICK_ROAD_PENDING_ACTION.ADD) {
-                return;
-            }
-
-            clearTimeout(timeoutID);
-            cleanup();
-            updateAgentAvatar(accountID, {file, uri}, undefined);
-        },
-    });
-}
-
 export {
     openAgentsPage,
     createAgent,
-    scheduleAgentAvatarUploadAfterCreation,
     clearAgentError,
     clearAgentUpdateError,
     clearAgentNameUpdateError,
