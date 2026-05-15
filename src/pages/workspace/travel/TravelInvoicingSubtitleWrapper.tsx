@@ -4,11 +4,11 @@ import Text from '@components/Text';
 import useLocalize from '@hooks/useLocalize';
 import useThemeStyles from '@hooks/useThemeStyles';
 
-type CentralInvoicingSubtitleWrapperProps = {
+type TravelInvoicingSubtitleWrapperProps = {
     htmlComponent?: React.ReactNode;
 };
 
-function CentralInvoicingSubtitleWrapper({htmlComponent}: CentralInvoicingSubtitleWrapperProps) {
+function TravelInvoicingSubtitleWrapper({htmlComponent}: TravelInvoicingSubtitleWrapperProps) {
     const styles = useThemeStyles();
     const {translate} = useLocalize();
 
@@ -21,4 +21,4 @@ function CentralInvoicingSubtitleWrapper({htmlComponent}: CentralInvoicingSubtit
     );
 }
 
-export default CentralInvoicingSubtitleWrapper;
+export default TravelInvoicingSubtitleWrapper;

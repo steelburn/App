@@ -47,8 +47,8 @@ import {updateGeneralSettings as updatePolicyGeneralSettings} from '@userActions
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
 import ROUTES, {DYNAMIC_ROUTES} from '@src/ROUTES';
-import CentralInvoicingLearnHow from './CentralInvoicingLearnHow';
-import CentralInvoicingSubtitleWrapper from './CentralInvoicingSubtitleWrapper';
+import TravelInvoicingLearnHow from './TravelInvoicingLearnHow';
+import TravelInvoicingSubtitleWrapper from './TravelInvoicingSubtitleWrapper';
 
 type WorkspaceTravelInvoicingSectionProps = {
     /** The ID of the policy */
@@ -278,9 +278,9 @@ function WorkspaceTravelInvoicingSection({policyID}: WorkspaceTravelInvoicingSec
 
     const getCentralInvoicingSubtitle = () => {
         if (!isTravelInvoicingEnabled) {
-            return <CentralInvoicingSubtitleWrapper htmlComponent={<CentralInvoicingLearnHow />} />;
+            return <TravelInvoicingSubtitleWrapper htmlComponent={<TravelInvoicingLearnHow />} />;
         }
-        return <CentralInvoicingSubtitleWrapper />;
+        return <TravelInvoicingSubtitleWrapper />;
     };
 
     const centralInvoicingSubMenuItems = (
